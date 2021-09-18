@@ -1,0 +1,109 @@
+{
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "serving.knative.dev/creator": "docker-for-desktop",
+            "serving.knative.dev/lastModifier": "docker-for-desktop"
+        },
+        "creationTimestamp": "2020-04-23T21:14:01Z",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/component": "adapter",
+            "app.kubernetes.io/instance": "sample",
+            "app.kubernetes.io/managed-by": "foo-sources-controller",
+            "app.kubernetes.io/name": "foosource",
+            "app.kubernetes.io/part-of": "foo-sources"
+        },
+        "name": "foosource-sample",
+        "namespace": "dev",
+        "ownerReferences": [
+            {
+                "apiVersion": "sources.triggermesh.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "FooSource",
+                "name": "sample",
+                "uid": "429cbd19-06ef-4795-b78e-ffcbc30660a1"
+            }
+        ],
+        "resourceVersion": "572071",
+        "selfLink": "/apis/serving.knative.dev/v1/namespaces/dev/services/foosource-sample",
+        "uid": "5470339e-86a7-46fe-bb66-4c49c4a8f22e"
+    },
+    "spec": {
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app.kubernetes.io/component": "adapter",
+                    "app.kubernetes.io/instance": "sample",
+                    "app.kubernetes.io/managed-by": "foo-sources-controller",
+                    "app.kubernetes.io/name": "foosource",
+                    "app.kubernetes.io/part-of": "foo-sources"
+                }
+            },
+            "spec": {
+                "containerConcurrency": 0,
+                "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "K_LOGGING_CONFIG",
+                                "value": "{\"zap-logger-config\":\"{\\n  \\\"level\\\": \\\"info\\\",\\n  \\\"development\\\": false,\\n  \\\"outputPaths\\\": [\\\"stdout\\\"],\\n  \\\"errorOutputPaths\\\": [\\\"stderr\\\"],\\n  \\\"encoding\\\": \\\"json\\\",\\n  \\\"encoderConfig\\\": {\\n    \\\"timeKey\\\": \\\"ts\\\",\\n    \\\"levelKey\\\": \\\"level\\\",\\n    \\\"nameKey\\\": \\\"logger\\\",\\n    \\\"callerKey\\\": \\\"caller\\\",\\n    \\\"messageKey\\\": \\\"msg\\\",\\n    \\\"stacktraceKey\\\": \\\"stacktrace\\\",\\n    \\\"lineEnding\\\": \\\"\\\",\\n    \\\"levelEncoder\\\": \\\"\\\",\\n    \\\"timeEncoder\\\": \\\"iso8601\\\",\\n    \\\"durationEncoder\\\": \\\"\\\",\\n    \\\"callerEncoder\\\": \\\"\\\"\\n  }\\n}\"}"
+                            },
+                            {
+                                "name": "K_METRICS_CONFIG",
+                                "value": "{\"Domain\":\"triggermesh.io/sources\",\"Component\":\"foosource\",\"PrometheusPort\":0,\"ConfigMap\":{}}"
+                            }
+                        ],
+                        "image": "gcr.io/triggermesh/foosource",
+                        "name": "adapter",
+                        "readinessProbe": {
+                            "successThreshold": 1,
+                            "tcpSocket": {
+                                "port": 0
+                            }
+                        },
+                        "resources": {}
+                    }
+                ],
+                "timeoutSeconds": 300
+            }
+        },
+        "traffic": [
+            {
+                "latestRevision": true,
+                "percent": 100
+            }
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastTransitionTime": "2020-04-23T21:14:02Z",
+                "message": "Revision \"foosource-sample-6wfhj\" failed with message: Unable to fetch image \"gcr.io/triggermesh/foosource\": failed to resolve image to digest: failed to fetch image information: GET https://gcr.io/v2/triggermesh/foosource/manifests/latest: MANIFEST_UNKNOWN: Failed to fetch \"latest\" from request \"/v2/triggermesh/foosource/manifests/latest\"..",
+                "reason": "RevisionFailed",
+                "status": "False",
+                "type": "ConfigurationsReady"
+            },
+            {
+                "lastTransitionTime": "2020-04-23T21:14:02Z",
+                "message": "Configuration \"foosource-sample\" does not have any ready Revision.",
+                "reason": "RevisionMissing",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastTransitionTime": "2020-04-23T21:14:02Z",
+                "message": "Configuration \"foosource-sample\" does not have any ready Revision.",
+                "reason": "RevisionMissing",
+                "status": "False",
+                "type": "RoutesReady"
+            }
+        ],
+        "latestCreatedRevisionName": "foosource-sample-6wfhj",
+        "observedGeneration": 1,
+        "url": "http://foosource-sample.dev.example.com"
+    }
+}

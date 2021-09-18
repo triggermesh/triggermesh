@@ -1,0 +1,209 @@
+# Copyright 2020-2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: awscodecommitsources.sources.triggermesh.io
+  labels:
+    eventing.knative.dev/source: 'true'
+    duck.knative.dev/source: 'true'
+    knative.dev/crd-install: 'true'
+    triggermesh.io/crd-install: 'true'
+  annotations:
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "com.amazon.codecommit.push" },
+        { "type": "com.amazon.codecommit.pull_request" }
+      ]
+spec:
+  group: sources.triggermesh.io
+  scope: Namespaced
+  names:
+    kind: AWSCodeCommitSource
+    plural: awscodecommitsources
+    categories:
+    - all
+    - knative
+    - eventing
+    - sources
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        description: TriggerMesh event source for Amazon CodeCommit.
+        type: object
+        properties:
+          spec:
+            description: Desired state of the event source.
+            type: object
+            properties:
+              arn:
+                description: ARN of the CodeCommit repository to receive events from. The expected format is documented at
+                  https://docs.aws.amazon.com/IAM/latest/UserGuide/list_awscodecommit.html#awscodecommit-resources-for-iam-policies
+                type: string
+                pattern: ^arn:aws(-cn|-us-gov)?:codecommit:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
+              branch:
+                description: Name of the Git branch this source observes.
+                type: string
+              eventTypes:
+                description: List of event types that should be processed by the source.
+                type: array
+                items:
+                  type: string
+                  enum: [push, pull_request]
+              credentials:
+                description: Credentials to interact with the Amazon CodeCommit API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                type: object
+                properties:
+                  accessKeyID:
+                    description: Access key ID.
+                    type: object
+                    properties:
+                      value:
+                        description: Literal value of the access key ID.
+                        type: string
+                      valueFromSecret:
+                        description: A reference to a Kubernetes Secret object containing the access key ID.
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          key:
+                            type: string
+                        required:
+                        - name
+                        - key
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
+                  secretAccessKey:
+                    description: Secret access key.
+                    type: object
+                    properties:
+                      value:
+                        description: Literal value of the secret access key.
+                        type: string
+                        format: password
+                      valueFromSecret:
+                        description: A reference to a Kubernetes Secret object containing the secret access key.
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          key:
+                            type: string
+                        required:
+                        - name
+                        - key
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
+              sink:
+                description: The destination of events sourced from Amazon CodeCommit.
+                type: object
+                properties:
+                  ref:
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
+                    type: object
+                    properties:
+                      apiVersion:
+                        type: string
+                      kind:
+                        type: string
+                      namespace:
+                        type: string
+                      name:
+                        type: string
+                    required:
+                    - apiVersion
+                    - kind
+                    - name
+                  uri:
+                    description: URI to use as the destination of events.
+                    type: string
+                    format: uri
+                oneOf:
+                - required: [ref]
+                - required: [uri]
+            required:
+            - arn
+            - branch
+            - eventTypes
+            - sink
+          status:
+            description: Reported status of the event source.
+            type: object
+            properties:
+              sinkUri:
+                description: URI of the sink where events are currently sent to.
+                type: string
+                format: uri
+              ceAttributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    source:
+                      type: string
+                  required:
+                  - type
+                  - source
+              observedGeneration:
+                type: integer
+                format: int64
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ['True', 'False', Unknown]
+                    severity:
+                      type: string
+                      enum: [Error, Warning, Info]
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                  required:
+                  - type
+                  - status
+    additionalPrinterColumns:
+    - name: Ready
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].status
+    - name: Reason
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].reason
+    - name: Sink
+      type: string
+      jsonPath: .status.sinkUri
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

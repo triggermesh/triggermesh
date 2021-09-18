@@ -1,0 +1,87 @@
+# Copyright 2020 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Sample SinkBinding for the AWS SQS event source.
+
+apiVersion: sources.knative.dev/v1alpha2
+kind: SinkBinding
+metadata:
+  name: &srcname awssqs-source
+spec:
+  subject:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: *srcname
+
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: default
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: &srcname awssqs-source
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: *srcname
+
+  template:
+    metadata:
+      labels:
+        app: *srcname
+
+    spec:
+      containers:
+      - name: source
+        image: gcr.io/triggermesh/awssqssource:latest
+
+        env:
+
+        # SQS queue
+        - name: ARN
+          value: arn:aws:sqs:us-west-2:123456789012:triggermeshtest
+
+        # AWS credentials
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: awscreds
+              key: aws_access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: awscreds
+              key: aws_secret_access_key
+
+        # Knative system variables
+        - name: NAME
+          value: *srcname
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: K_LOGGING_CONFIG
+          value: ''
+        - name: K_METRICS_CONFIG
+          value: |
+            {
+              "domain": "triggermesh.io/sources",
+              "component": "awssqssource",
+              "configMap": {}
+            }

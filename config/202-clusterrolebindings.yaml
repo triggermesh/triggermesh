@@ -1,0 +1,194 @@
+# Copyright 2020-2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-controller
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: triggermesh-controller
+
+---
+
+# Permissions not required by controllers directly, but granted to
+# receive-adapters via RoleBindings.
+#
+# Without them, the following error is thrown:
+#   "attempting to grant RBAC permissions not currently held"
+#
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awscloudwatchlogssource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awscloudwatchlogssource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awscloudwatchsource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awscloudwatchsource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awscodecommitsource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awscodecommitsource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awscognitoidentitysource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awscognitoidentitysource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awscognitouserpoolsource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awscognitouserpoolsource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awsdynamodbsource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awsdynamodbsource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awskinesissource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awskinesissource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awsperformanceinsightssource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awsperformanceinsightssource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awss3source-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awss3source-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awssnssource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awssnssource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awssqssource-adapter
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awssqssource-adapter
+
+---
+
+# Resolve sink URIs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-controller-addressable-resolver
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: addressable-resolver

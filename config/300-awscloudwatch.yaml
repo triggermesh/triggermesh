@@ -1,0 +1,259 @@
+# Copyright 2020-2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: awscloudwatchsources.sources.triggermesh.io
+  labels:
+    eventing.knative.dev/source: 'true'
+    duck.knative.dev/source: 'true'
+    knative.dev/crd-install: 'true'
+    triggermesh.io/crd-install: 'true'
+  annotations:
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "com.amazon.cloudwatch.metrics.message" },
+        { "type": "com.amazon.cloudwatch.metrics.metric" }
+      ]
+spec:
+  group: sources.triggermesh.io
+  scope: Namespaced
+  names:
+    kind: AWSCloudWatchSource
+    plural: awscloudwatchsources
+    categories:
+    - all
+    - knative
+    - eventing
+    - sources
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        description: TriggerMesh event source for Amazon CloudWatch.
+        type: object
+        properties:
+          spec:
+            description: Desired state of the event source.
+            type: object
+            properties:
+              region:
+                description: Code of the AWS region to source metrics from. Available region codes are documented in the
+                  AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
+                type: string
+                pattern: ^[a-z]{2}(-gov)?-[a-z]+-\d$
+              pollingInterval:
+                description: Duration which defines how often metrics should be pulled from Amazon CloudWatch. Expressed
+                  as a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
+                  Defaults to 5m
+                type: string
+              metricQueries:
+                description: List of queries that determine what metrics will be sourced from Amazon CloudWatch.
+                  Each item represents an individual MetricDataQuery. For more information, please refer to the
+                  CloudWatch API reference at
+                  https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      description: Unique short name that identifies the query.
+                      type: string
+                      pattern: ^[a-z]\w{0,254}$
+                    expression:
+                      description: Math expression to be performed on the metric data. Mutually exclusive with 'metric'.
+                      type: string
+                    metric:
+                      description: Representation of a metric with statistics, period, and units, but no math
+                        expression. Mutually exclusive with 'expression'.
+                      type: object
+                      properties:
+                        period:
+                          description: The granularity, in seconds, of the returned data points.
+                          type: integer
+                        stat:
+                          description: The statistic to return.
+                          type: string
+                        unit:
+                          description: If specified, return only data with that unit.
+                          type: string
+                        metric:
+                          description: The metric to return.
+                          type: object
+                          properties:
+                            metricName:
+                              description: Name of the metric.
+                              type: string
+                            namespace:
+                              description: Namespace of the metric.
+                              type: string
+                            dimensions:
+                              description: Dimensions of the metric.
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    description: Name of the dimension.
+                                    type: string
+                                  value:
+                                    description: Value of the dimension.
+                                    type: string
+                  oneOf:
+                  - required: [expression]
+                  - required: [metric]
+              credentials:
+                description: Credentials to interact with the Amazon CloudWatch API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                type: object
+                properties:
+                  accessKeyID:
+                    description: Access key ID.
+                    type: object
+                    properties:
+                      value:
+                        description: Literal value of the access key ID.
+                        type: string
+                      valueFromSecret:
+                        description: A reference to a Kubernetes Secret object containing the access key ID.
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          key:
+                            type: string
+                        required:
+                        - name
+                        - key
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
+                  secretAccessKey:
+                    description: Secret access key.
+                    type: object
+                    properties:
+                      value:
+                        description: Literal value of the secret access key.
+                        type: string
+                        format: password
+                      valueFromSecret:
+                        description: A reference to a Kubernetes Secret object containing the secret access key.
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          key:
+                            type: string
+                        required:
+                        - name
+                        - key
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
+              sink:
+                description: The destination of events generated from Amazon CloudWatch metrics.
+                type: object
+                properties:
+                  ref:
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
+                    type: object
+                    properties:
+                      apiVersion:
+                        type: string
+                      kind:
+                        type: string
+                      namespace:
+                        type: string
+                      name:
+                        type: string
+                    required:
+                    - apiVersion
+                    - kind
+                    - name
+                  uri:
+                    description: URI to use as the destination of events.
+                    type: string
+                    format: uri
+                oneOf:
+                - required: [ref]
+                - required: [uri]
+            required:
+            - region
+            - metricQueries
+            - sink
+          status:
+            description: Reported status of the event source.
+            type: object
+            properties:
+              sinkUri:
+                description: URI of the sink where events are currently sent to.
+                type: string
+                format: uri
+              ceAttributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    source:
+                      type: string
+                  required:
+                  - type
+                  - source
+              observedGeneration:
+                type: integer
+                format: int64
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ['True', 'False', Unknown]
+                    severity:
+                      type: string
+                      enum: [Error, Warning, Info]
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                  required:
+                  - type
+                  - status
+    additionalPrinterColumns:
+    - name: Ready
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].status
+    - name: Reason
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].reason
+    - name: Sink
+      type: string
+      jsonPath: .status.sinkUri
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

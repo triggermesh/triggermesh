@@ -1,0 +1,379 @@
+# Copyright 2020-2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-controller
+rules:
+
+# Record Kubernetes events
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+
+# Manage receive-adapters
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+
+# Read Source resources and update their statuses
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources
+  - awscloudwatchsources
+  - awscodecommitsources
+  - awscognitoidentitysources
+  - awscognitouserpoolsources
+  - awsdynamodbsources
+  - awskinesissources
+  - awsperformanceinsightssources
+  - awss3sources
+  - awssnssources
+  - awssqssources
+  verbs:
+  - list
+  - watch
+  - get
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources/status
+  - awscloudwatchsources/status
+  - awscodecommitsources/status
+  - awscognitoidentitysources/status
+  - awscognitouserpoolsources/status
+  - awsdynamodbsources/status
+  - awskinesissources/status
+  - awsperformanceinsightssources/status
+  - awss3sources/status
+  - awssnssources/status
+  - awssqssources/status
+  verbs:
+  - update
+
+# Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
+# https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources/finalizers
+  - awscloudwatchsources/finalizers
+  - awscodecommitsources/finalizers
+  - awscognitoidentitysources/finalizers
+  - awscognitouserpoolsources/finalizers
+  - awsdynamodbsources/finalizers
+  - awskinesissources/finalizers
+  - awsperformanceinsightssources/finalizers
+  - awss3sources/finalizers
+  - awssnssources/finalizers
+  - awssqssources/finalizers
+  verbs:
+  - update
+
+# Set finalizers
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awss3sources
+  - awssnssources
+  verbs:
+  - patch
+
+# Manage resource-specific ServiceAccounts and RoleBindings
+- apiGroups:
+  - ''
+  resources:
+  - serviceaccounts
+  verbs:
+  - list
+  - watch
+  - create
+- apiGroups:
+  - ''
+  resources:
+  - serviceaccounts
+  resourceNames:
+  - awscloudwatchlogssource-adapter
+  - awscloudwatchsource-adapter
+  - awscodecommitsource-adapter
+  - awscognitoidentitysource-adapter
+  - awscognitouserpoolsource-adapter
+  - awsdynamodbsource-adapter
+  - awskinesissource-adapter
+  - awsperformanceinsightssource-adapter
+  - awss3source-adapter
+  - awssnssource-adapter
+  - awssqssource-adapter
+  verbs:
+  - update
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - list
+  - watch
+  - create
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  resourceNames:
+  - awscloudwatchlogssource-adapter
+  - awscloudwatchsource-adapter
+  - awscodecommitsource-adapter
+  - awscognitoidentitysource-adapter
+  - awscognitouserpoolsource-adapter
+  - awsdynamodbsource-adapter
+  - awskinesissource-adapter
+  - awsperformanceinsightssource-adapter
+  - awss3source-adapter
+  - awssnssource-adapter
+  - awssqssource-adapter
+  verbs:
+  - update
+
+# Read credentials
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - get
+
+# Read controller configurations
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  resourceNames:
+  - config-logging
+  - config-observability
+  - config-leader-election
+  verbs:
+  - get
+
+# Acquire leases for leader election
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+# Determine the exact reason why Deployments fail
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - list
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awscloudwatchlogssource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awscloudwatchsource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awscodecommitsource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awscognitoidentitysource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awscognitouserpoolsource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awsdynamodbsource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awskinesissource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awsperformanceinsightssource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awss3source-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awssnssource-adapter
+rules:
+
+# Record Kubernetes events
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+
+# Read Source resources and update their statuses
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awssnssources
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awssnssources/status
+  verbs:
+  - patch
+
+# Read credentials
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - get
+
+# Acquire leases for leader election
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awssqssource-adapter
+rules: []
+
+---
+
+# The role is needed for the aggregated role source-observer in knative-eventing to provide readonly access to "Sources".
+# see https://github.com/knative/eventing/blob/release-0.14/docs/spec/sources.md#source-rbac
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-source-observer
+  labels:
+    duck.knative.dev/source: 'true'
+rules:
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources
+  - awscloudwatchsources
+  - awscodecommitsources
+  - awscognitoidentitysources
+  - awscognitouserpoolsources
+  - awsdynamodbsources
+  - awskinesissources
+  - awsperformanceinsightssources
+  - awss3sources
+  - awssnssources
+  - awssqssources
+  verbs:
+  - get
+  - list
+  - watch
