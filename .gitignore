@@ -1,0 +1,22 @@
+# Local configurations and secrets
+/.env/
+/.local/
+
+# Editors and IDEs
+*.swo
+*.swp
+*~
+/*.sublime-project
+/*.sublime-workspace
+/.idea/
+/.vscode/
+
+# OS Artifacts
+.DS_Store
+
+# GNU patch
+*.orig
+*.rej
+
+# Build artifacts
+/_output/
