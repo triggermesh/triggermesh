@@ -72,6 +72,22 @@ func (c *FakeSourcesV1alpha1) AWSSQSSources(namespace string) v1alpha1.AWSSQSSou
 	return &FakeAWSSQSSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) HTTPPollerSources(namespace string) v1alpha1.HTTPPollerSourceInterface {
+	return &FakeHTTPPollerSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) SlackSources(namespace string) v1alpha1.SlackSourceInterface {
+	return &FakeSlackSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) WebhookSources(namespace string) v1alpha1.WebhookSourceInterface {
+	return &FakeWebhookSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) ZendeskSources(namespace string) v1alpha1.ZendeskSourceInterface {
+	return &FakeZendeskSources{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeSourcesV1alpha1) RESTClient() rest.Interface {

@@ -143,6 +143,26 @@ func (l *Listers) GetAWSSQSSourceLister() listersv1alpha1.AWSSQSSourceLister {
 	return listersv1alpha1.NewAWSSQSSourceLister(l.IndexerFor(&v1alpha1.AWSSQSSource{}))
 }
 
+// GetHTTPPollerSourceLister returns a Lister for HTTPPollerSource objects.
+func (l *Listers) GetHTTPPollerSourceLister() listersv1alpha1.HTTPPollerSourceLister {
+	return listersv1alpha1.NewHTTPPollerSourceLister(l.IndexerFor(&v1alpha1.HTTPPollerSource{}))
+}
+
+// GetSlackSourceLister returns a Lister for SlackSource objects.
+func (l *Listers) GetSlackSourceLister() listersv1alpha1.SlackSourceLister {
+	return listersv1alpha1.NewSlackSourceLister(l.IndexerFor(&v1alpha1.SlackSource{}))
+}
+
+// GetWebhookSourceLister returns a Lister for WebhookSource objects.
+func (l *Listers) GetWebhookSourceLister() listersv1alpha1.WebhookSourceLister {
+	return listersv1alpha1.NewWebhookSourceLister(l.IndexerFor(&v1alpha1.WebhookSource{}))
+}
+
+// GetZendeskSourceLister returns a Lister for ZendeskSource objects.
+func (l *Listers) GetZendeskSourceLister() listersv1alpha1.ZendeskSourceLister {
+	return listersv1alpha1.NewZendeskSourceLister(l.IndexerFor(&v1alpha1.ZendeskSource{}))
+}
+
 // GetDeploymentLister returns a lister for Deployment objects.
 func (l *Listers) GetDeploymentLister() appslistersv1.DeploymentLister {
 	return appslistersv1.NewDeploymentLister(l.IndexerFor(&appsv1.Deployment{}))

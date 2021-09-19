@@ -69,6 +69,10 @@ rules:
   - awss3sources
   - awssnssources
   - awssqssources
+  - httppollersources
+  - slacksources
+  - webhooksources
+  - zendesksources
   verbs:
   - list
   - watch
@@ -87,6 +91,10 @@ rules:
   - awss3sources/status
   - awssnssources/status
   - awssqssources/status
+  - httppollersources/status
+  - slacksources/status
+  - webhooksources/status
+  - zendesksources/status
   verbs:
   - update
 
@@ -106,6 +114,10 @@ rules:
   - awss3sources/finalizers
   - awssnssources/finalizers
   - awssqssources/finalizers
+  - httppollersources/finalizers
+  - slacksources/finalizers
+  - webhooksources/finalizers
+  - zendesksources/finalizers
   verbs:
   - update
 
@@ -115,6 +127,7 @@ rules:
   resources:
   - awss3sources
   - awssnssources
+  - zendesksources
   verbs:
   - patch
 
@@ -143,6 +156,10 @@ rules:
   - awss3source-adapter
   - awssnssource-adapter
   - awssqssource-adapter
+  - httppollersource-adapter
+  - slacksource-adapter
+  - webhooksource-adapter
+  - zendesksource-adapter
   verbs:
   - update
 - apiGroups:
@@ -169,6 +186,10 @@ rules:
   - awss3source-adapter
   - awssnssource-adapter
   - awssqssource-adapter
+  - httppollersource-adapter
+  - slacksource-adapter
+  - webhooksource-adapter
+  - zendesksource-adapter
   verbs:
   - update
 
@@ -350,6 +371,75 @@ rules: []
 
 ---
 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: httppollersource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: slacksource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: webhooksource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: zendesksource-adapter
+rules:
+
+# Record Kubernetes events
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+
+# Read Source resources
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - zendesksources
+  verbs:
+  - list
+  - watch
+
+# Read credentials
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - get
+
+# Acquire leases for leader election
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
 # The role is needed for the aggregated role source-observer in knative-eventing to provide readonly access to "Sources".
 # see https://github.com/knative/eventing/blob/release-0.14/docs/spec/sources.md#source-rbac
 apiVersion: rbac.authorization.k8s.io/v1
@@ -373,6 +463,10 @@ rules:
   - awss3sources
   - awssnssources
   - awssqssources
+  - httppollersources
+  - slacksources
+  - webhooksources
+  - zendesksources
   verbs:
   - get
   - list

@@ -7,7 +7,6 @@ go 1.15
 replace k8s.io/client-go => k8s.io/client-go v0.19.7
 
 require (
-	github.com/aws/aws-sdk-go v1.37.1
 	github.com/cloudevents/sdk-go/v2 v2.2.0
 	github.com/google/go-cmp v0.5.5
 	github.com/google/uuid v1.2.0
@@ -23,3 +22,7 @@ require (
 	knative.dev/pkg v0.0.0-20210331065221-952fdd90dbb0
 	knative.dev/serving v0.22.0
 )
+
+require github.com/aws/aws-sdk-go v1.37.1
+
+require github.com/nukosuke/go-zendesk v0.9.2

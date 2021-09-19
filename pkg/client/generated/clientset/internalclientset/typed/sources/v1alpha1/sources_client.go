@@ -37,6 +37,10 @@ type SourcesV1alpha1Interface interface {
 	AWSS3SourcesGetter
 	AWSSNSSourcesGetter
 	AWSSQSSourcesGetter
+	HTTPPollerSourcesGetter
+	SlackSourcesGetter
+	WebhookSourcesGetter
+	ZendeskSourcesGetter
 }
 
 // SourcesV1alpha1Client is used to interact with features provided by the sources.triggermesh.io group.
@@ -86,6 +90,22 @@ func (c *SourcesV1alpha1Client) AWSSNSSources(namespace string) AWSSNSSourceInte
 
 func (c *SourcesV1alpha1Client) AWSSQSSources(namespace string) AWSSQSSourceInterface {
 	return newAWSSQSSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) HTTPPollerSources(namespace string) HTTPPollerSourceInterface {
+	return newHTTPPollerSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) SlackSources(namespace string) SlackSourceInterface {
+	return newSlackSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) WebhookSources(namespace string) WebhookSourceInterface {
+	return newWebhookSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) ZendeskSources(namespace string) ZendeskSourceInterface {
+	return newZendeskSources(c, namespace)
 }
 
 // NewForConfig creates a new SourcesV1alpha1Client for the given config.

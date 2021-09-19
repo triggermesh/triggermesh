@@ -87,4 +87,28 @@ var (
 		Group:    GroupName,
 		Resource: "awssqssources",
 	}
+
+	// HTTPPollerSourceResource represents an event source for polling HTTP endpoints.
+	HTTPPollerSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "httppollersources",
+	}
+
+	// SlackSourceResource represents an event source for Slack.
+	SlackSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "slacksources",
+	}
+
+	// WebhookSourceResource represents an event source for HTTP webhooks.
+	WebhookSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "webhooksources",
+	}
+
+	// ZendeskSourceResource represents an event source for Zendesk.
+	ZendeskSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "zendesksources",
+	}
 )

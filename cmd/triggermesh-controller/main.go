@@ -30,6 +30,10 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awss3source"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssnssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssqssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/httppollersource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/slacksource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/webhooksource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
 )
 
 func main() {
@@ -45,5 +49,9 @@ func main() {
 		awss3source.NewController,
 		awssnssource.NewController,
 		awssqssource.NewController,
+		httppollersource.NewController,
+		slacksource.NewController,
+		webhooksource.NewController,
+		zendesksource.NewController,
 	)
 }

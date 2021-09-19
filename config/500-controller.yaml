@@ -75,6 +75,14 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awssnssource
         - name: AWSSQSSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssqssource
+        - name: HTTPPOLLERSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/httppollersource-adapter
+        - name: SLACKSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/slacksource-adapter
+        - name: WEBHOOKSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/webhooksource-adapter
+        - name: ZENDESKSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/zendesksource-adapter
 
         securityContext:
           allowPrivilegeEscalation: false

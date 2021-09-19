@@ -75,3 +75,8 @@ func (l *Listers) GetSourcesObjects() []runtime.Object {
 func (l *Listers) GetAWSSNSSourceLister() listersv1alpha1.AWSSNSSourceLister {
 	return listersv1alpha1.NewAWSSNSSourceLister(l.IndexerFor(&v1alpha1.AWSSNSSource{}))
 }
+
+// GetZendeskSourceLister returns a Lister for ZendeskSource objects.
+func (l *Listers) GetZendeskSourceLister() listersv1alpha1.ZendeskSourceLister {
+	return listersv1alpha1.NewZendeskSourceLister(l.IndexerFor(&v1alpha1.ZendeskSource{}))
+}

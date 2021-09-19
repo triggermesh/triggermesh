@@ -75,6 +75,14 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSSNSSources().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("awssqssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSSQSSources().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("httppollersources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().HTTPPollerSources().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("slacksources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().SlackSources().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("webhooksources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().WebhookSources().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("zendesksources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().ZendeskSources().Informer()}, nil
 
 	}
 

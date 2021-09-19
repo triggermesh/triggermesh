@@ -46,6 +46,14 @@ type Interface interface {
 	AWSSNSSources() AWSSNSSourceInformer
 	// AWSSQSSources returns a AWSSQSSourceInformer.
 	AWSSQSSources() AWSSQSSourceInformer
+	// HTTPPollerSources returns a HTTPPollerSourceInformer.
+	HTTPPollerSources() HTTPPollerSourceInformer
+	// SlackSources returns a SlackSourceInformer.
+	SlackSources() SlackSourceInformer
+	// WebhookSources returns a WebhookSourceInformer.
+	WebhookSources() WebhookSourceInformer
+	// ZendeskSources returns a ZendeskSourceInformer.
+	ZendeskSources() ZendeskSourceInformer
 }
 
 type version struct {
@@ -112,4 +120,24 @@ func (v *version) AWSSNSSources() AWSSNSSourceInformer {
 // AWSSQSSources returns a AWSSQSSourceInformer.
 func (v *version) AWSSQSSources() AWSSQSSourceInformer {
 	return &aWSSQSSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// HTTPPollerSources returns a HTTPPollerSourceInformer.
+func (v *version) HTTPPollerSources() HTTPPollerSourceInformer {
+	return &hTTPPollerSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// SlackSources returns a SlackSourceInformer.
+func (v *version) SlackSources() SlackSourceInformer {
+	return &slackSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// WebhookSources returns a WebhookSourceInformer.
+func (v *version) WebhookSources() WebhookSourceInformer {
+	return &webhookSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// ZendeskSources returns a ZendeskSourceInformer.
+func (v *version) ZendeskSources() ZendeskSourceInformer {
+	return &zendeskSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

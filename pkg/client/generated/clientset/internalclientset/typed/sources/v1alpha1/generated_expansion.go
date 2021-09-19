@@ -39,3 +39,11 @@ type AWSS3SourceExpansion interface{}
 type AWSSNSSourceExpansion interface{}
 
 type AWSSQSSourceExpansion interface{}
+
+type HTTPPollerSourceExpansion interface{}
+
+type SlackSourceExpansion interface{}
+
+type WebhookSourceExpansion interface{}
+
+type ZendeskSourceExpansion interface{}

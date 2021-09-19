@@ -47,6 +47,10 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&AWSSNSSource{}, &AWSSNSSourceList{},
 		&AWSSQSSource{}, &AWSSQSSourceList{},
 		&AWSPerformanceInsightsSource{}, &AWSPerformanceInsightsSourceList{},
+		&HTTPPollerSource{}, &HTTPPollerSourceList{},
+		&SlackSource{}, &SlackSourceList{},
+		&WebhookSource{}, &WebhookSourceList{},
+		&ZendeskSource{}, &ZendeskSourceList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

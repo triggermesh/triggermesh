@@ -244,6 +244,30 @@ func CommonObjectLabels(src kmeta.OwnerRefable) labels.Set {
 	}
 }
 
+// MaybeAppendValueFromEnvVar conditionally appends an EnvVar to env based on
+// the contents of valueFrom.
+// ValueFromSecret takes precedence over Value in case the API didn't reject
+// the object despite the CRD's schema validation
+func MaybeAppendValueFromEnvVar(envs []corev1.EnvVar, key string, valueFrom v1alpha1.ValueFromField) []corev1.EnvVar {
+	if vfs := valueFrom.ValueFromSecret; vfs != nil {
+		return append(envs, corev1.EnvVar{
+			Name: key,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: vfs,
+			},
+		})
+	}
+
+	if v := valueFrom.Value; v != "" {
+		return append(envs, corev1.EnvVar{
+			Name:  key,
+			Value: v,
+		})
+	}
+
+	return envs
+}
+
 // MakeSecurityCredentialsEnvVars returns environment variables for the given
 // AWS security credentials.
 func MakeSecurityCredentialsEnvVars(creds v1alpha1.AWSSecurityCredentials) []corev1.EnvVar {
