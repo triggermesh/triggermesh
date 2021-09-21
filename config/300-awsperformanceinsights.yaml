@@ -61,10 +61,10 @@ spec:
                 description: Duration which defines how often metrics should be pulled from Amazon Performance Insights.
                   Expressed as a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
                 type: string
-              metricQueries:
-                description: List of queries that determine what metrics will be sourced from Amazon Performance
-                  Insights. Each item represents the 'metric' attribute of a MetricQuery. For more information, please
-                  refer to the Performance Insights API reference at
+              metrics:
+                description: List of metrics to retrieve from Amazon Performance Insights. Each item represents the
+                  'metric' attribute of a MetricQuery. For more information, please refer to the Performance Insights API
+                  reference at
                   https://docs.aws.amazon.com/performance-insights/latest/APIReference/API_MetricQuery.html
                 type: array
                 items:
@@ -149,7 +149,7 @@ spec:
             required:
             - arn
             - pollingInterval
-            - metricQueries
+            - metrics
             - sink
           status:
             description: Reported status of the event source.

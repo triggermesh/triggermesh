@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
@@ -39,14 +40,22 @@ import (
 const (
 	tQueueArnResource = "MyQueue"
 	tQueueURL         = "https://sqs.us-fake-0.amazonaws.com/123456789012/MyQueue"
-	tMsgIDPrefix      = "00000000-0000-0000-0000-000000000" // + 3 digits appended for each msg
+
+	tMsgIDPrefix = "00000000-0000-0000-0000-000000000" // + 3 digits appended for each msg
+
+	tVisibilityTimeout = 120 // seconds
 )
 
 func TestAdapter(t *testing.T) {
-	// The test's data is pre-populated so the flow of messages is
-	// uninterrupted until every message has been retrieved. We can
-	// therefore affirm something went wrong if the receiveMsgPeriod timer
-	// happens during a test.
+	// When ReceiveMessage() returns at least one message, the next call to
+	// ReceiveMessage() is sent immediatly instead of waiting for
+	// 'receiveMsgPeriod' (burst mode).
+	// In these tests, data is pre-populated with 'numMsgs' messages to
+	// simulate a queue with a (potentially large) amount of unprocessed
+	// messages, which we expect to keep receivers in burst mode until all
+	// messages have been processed.
+	// For this reason, a test that would take more than 'receiveMsgPeriod'
+	// to complete would very likely indicate a flaw in the burst logic.
 	const testTimeout = receiveMsgPeriod
 
 	arn := makeARN(tQueueArnResource)
@@ -94,6 +103,8 @@ func TestAdapter(t *testing.T) {
 				arn: arn,
 
 				msgPrcsr: &defaultMessageProcessor{ceSource: arn.String()},
+
+				visibilityTimeoutSeconds: aws.Int64(tVisibilityTimeout),
 
 				processQueue: make(chan *sqs.Message, tc.queueBufSize),
 				deleteQueue:  make(chan *sqs.Message, tc.queueBufSize),
@@ -144,16 +155,29 @@ func TestAdapter(t *testing.T) {
 				assert.NoError(t, err)
 			}
 
-			// asserting a single event suffices since the entire data set is mocked
-			ev := ceCli.Sent()[0]
-			assert.Equal(t, ev.Type(), "com.amazon.sqs.message")
-			assert.Equal(t, "arn:aws:sqs:us-fake-0:123456789012:MyQueue", ev.Source())
-			assert.Contains(t, ev.ID(), tMsgIDPrefix)
+			assrt := assert.New(t)
+			reqr := require.New(t)
 
-			// final assertions
-			assert.Len(t, ceCli.Sent(), tc.numMsgs, "Received more events than expected")
-			assert.Equal(t, tc.numMsgs, sqsCli.totalDeleted, "Not all processed messages were deleted")
-			assert.Empty(t, sqsCli.inFlightMsgs, "Found unprocessed in-flight messages")
+			// assertions on sent events
+			// (asserting attributes of a single event suffices since the entire data set is mocked)
+			sentEvents := ceCli.Sent()
+			reqr.Greater(len(sentEvents), 0, "Expected at least one CloudEvent to be sent")
+			assrt.Equal(sentEvents[0].Type(), "com.amazon.sqs.message")
+			assrt.Equal("arn:aws:sqs:us-fake-0:123456789012:MyQueue", sentEvents[0].Source(), "CloudEvent source should match queue ARN")
+			assrt.Contains(sentEvents[0].ID(), tMsgIDPrefix, "CloudEvent id should match SQS message ID")
+			assrt.Contains(sentEvents[0].Extensions(), "sqsmsgcountryspaincapital", "String/Number attributes should be included as extensions")
+			assrt.Len(sentEvents[0].Extensions(), 1, "Binary message attributes shouldn't be included as extensions")
+
+			// assertions on post-test queue state
+			assrt.Len(ceCli.Sent(), tc.numMsgs, "Received more events than expected")
+			assrt.Equal(tc.numMsgs, sqsCli.totalDeleted, "Not all processed messages were deleted")
+			assrt.Empty(sqsCli.inFlightMsgs, "Found unprocessed in-flight messages")
+
+			// assertions on API requests and their parameters
+			rcvMsgRequests := sqsCli.rcvMsgRecorder.requests
+			reqr.Greater(len(rcvMsgRequests), 0, "Expected at least one ReceiveMessage request")
+			reqr.NotNil(rcvMsgRequests[0].VisibilityTimeout, "VisibilityTimeout should be set in ReceiveMessage requests")
+			assrt.EqualValues(tVisibilityTimeout, *rcvMsgRequests[0].VisibilityTimeout)
 		})
 	}
 }
@@ -175,10 +199,14 @@ type standardMockSQSClient struct {
 	sqsiface.SQSAPI
 
 	sync.Mutex
-	availMsgs    []*sqs.Message
-	inFlightMsgs []*sqs.Message
+	availMsgs []*sqs.Message
 
+	// messages which have been received but not yet deleted are kept in this queue
+	inFlightMsgs []*sqs.Message
+	// counter for the number messages explicitly deleted by message deleters
 	totalDeleted int
+
+	rcvMsgRecorder receiveMessageRequestRecorder
 }
 
 func (*standardMockSQSClient) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) { //nolint:golint,stylecheck
@@ -189,6 +217,8 @@ func (*standardMockSQSClient) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueU
 
 func (c *standardMockSQSClient) ReceiveMessageWithContext(_ context.Context,
 	in *sqs.ReceiveMessageInput, _ ...request.Option) (*sqs.ReceiveMessageOutput, error) {
+
+	c.rcvMsgRecorder.Record(in)
 
 	c.Lock()
 	defer c.Unlock()
@@ -249,6 +279,19 @@ func makeMockMessages(n int) []*sqs.Message {
 		msgs[i] = &sqs.Message{
 			MessageId:     aws.String(fmt.Sprintf(tMsgIDPrefix+"%03d", i+1)),
 			ReceiptHandle: aws.String(receiptHandle),
+			MessageAttributes: map[string]*sqs.MessageAttributeValue{
+				"Country.Spain.Capital": &sqs.MessageAttributeValue{
+					DataType:    aws.String("String.CityName"),
+					StringValue: aws.String("Madrid"),
+				},
+				"Blue_Pixel": &sqs.MessageAttributeValue{
+					DataType: aws.String("Binary.png"),
+					// base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgaPj/HwAEggJ/xY9R+AAAAABJRU5ErkJggg==
+					BinaryValue: []byte("\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00" +
+						"\x00\x00\x01\b\x06\x00\x00\x00\x1f\x15ĉ\x00\x00\x00\rIDAT\b\x99c`h\xf8" +
+						"\xff\x1f\x00\x04\x82\x02\u007fŏQ\xf8\x00\x00\x00\x00IEND\xaeB`\x82"),
+				},
+			},
 		}
 	}
 
@@ -310,4 +353,18 @@ func TestDeleteMessageBatchWithContext(t *testing.T) {
 
 	assert.EqualValues(t, expect, sqsClient.inFlightMsgs)
 	assert.Equal(t, len(in.Entries), sqsClient.totalDeleted)
+}
+
+// receiveMessageRequestRecorder records calls to ReceiveMessage.
+type receiveMessageRequestRecorder struct {
+	sync.Mutex
+	requests []*sqs.ReceiveMessageInput
+}
+
+// receiveMessageRequestRecorder records calls to ReceiveMessage.
+func (r *receiveMessageRequestRecorder) Record(req *sqs.ReceiveMessageInput) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.requests = append(r.requests, req)
 }

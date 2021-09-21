@@ -38,10 +38,6 @@ const (
 	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html#sqs-long-polling
 	maxLongPollingWaitTimeSeconds = 20
 
-	// Visibility timeout to set on all messages received by this event source.
-	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
-	visibilityTimeoutSeconds = 30
-
 	// Duration between calls to ReceiveMessage when the previous call didn't return any message.
 	receiveMsgPeriod = 3 * time.Second
 )
@@ -57,7 +53,7 @@ func (a *adapter) runMessagesReceiver(ctx context.Context, queueURL string) {
 			return
 
 		case <-t.C:
-			messages, err := receiveMessages(ctx, a.sqsClient, queueURL)
+			messages, err := receiveMessages(ctx, a.sqsClient, queueURL, a.visibilityTimeoutSeconds)
 			if err != nil {
 				a.logger.Errorw("Failed to get messages from the SQS queue", zap.Error(err))
 				t.Reset(1 * time.Second)
@@ -99,13 +95,18 @@ func (ml messageList) MarshalLogArray(arr zapcore.ArrayEncoder) error {
 
 // receiveMessages returns a batch of messages read from the SQS queue, if any
 // is available.
-func receiveMessages(ctx context.Context, cli sqsiface.SQSAPI, queueURL string) ([]*sqs.Message, error) {
+func receiveMessages(ctx context.Context, cli sqsiface.SQSAPI,
+	queueURL string, visibilityTimeoutSeconds *int64) ([]*sqs.Message, error) {
+
+	allAttributes := aws.StringSlice([]string{sqs.QueueAttributeNameAll})
+
 	resp, err := cli.ReceiveMessageWithContext(ctx, &sqs.ReceiveMessageInput{
-		AttributeNames:      aws.StringSlice([]string{sqs.QueueAttributeNameAll}),
-		QueueUrl:            &queueURL,
-		MaxNumberOfMessages: aws.Int64(maxReceiveMsgBatchSize),
-		WaitTimeSeconds:     aws.Int64(maxLongPollingWaitTimeSeconds),
-		VisibilityTimeout:   aws.Int64(visibilityTimeoutSeconds),
+		AttributeNames:        allAttributes,
+		MessageAttributeNames: allAttributes,
+		QueueUrl:              &queueURL,
+		MaxNumberOfMessages:   aws.Int64(maxReceiveMsgBatchSize),
+		WaitTimeSeconds:       aws.Int64(maxLongPollingWaitTimeSeconds),
+		VisibilityTimeout:     visibilityTimeoutSeconds,
 	})
 	if err != nil {
 		return nil, err

@@ -60,7 +60,7 @@ type AWSPerformanceInsightsSourceSpec struct {
 	//
 	// Each item represents the 'metric' attribute of a MetricQuery.
 	// https://docs.aws.amazon.com/performance-insights/latest/APIReference/API_MetricQuery.html
-	MetricQueries []string `json:"metricQueries"`
+	Metrics []string `json:"metrics"`
 
 	// Credentials to interact with the Amazon RDS and Performance Insights APIs.
 	Credentials AWSSecurityCredentials `json:"credentials"`

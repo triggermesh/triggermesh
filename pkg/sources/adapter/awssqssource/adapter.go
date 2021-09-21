@@ -59,6 +59,11 @@ type envConfig struct {
 	//
 	// Supported values: [ default s3 ]
 	MessageProcessor string `envconfig:"SQS_MESSAGE_PROCESSOR" default:"default"`
+
+	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
+	// Visibility timeout to set on all messages received by this event source.
+	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
+	VisibilityTimeout *time.Duration `envconfig:"SQS_VISIBILITY_TIMEOUT"`
 }
 
 // adapter implements the source's adapter.
@@ -74,6 +79,8 @@ type adapter struct {
 	arn arn.ARN
 
 	msgPrcsr MessageProcessor
+
+	visibilityTimeoutSeconds *int64
 
 	processQueue chan *sqs.Message
 	deleteQueue  chan *sqs.Message
@@ -112,6 +119,16 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		panic("unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
+	var visibilityTimeoutSeconds *int64
+	if vt := env.VisibilityTimeout; vt != nil {
+		if *vt < 0 || *vt > 12*time.Hour {
+			logger.Warn("Ignoring out of bounds visibility timeout (", *vt, ")")
+		} else {
+			vts := durationInSeconds(*vt)
+			visibilityTimeoutSeconds = &vts
+		}
+	}
+
 	cfg := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(arn.Region),
 	))
@@ -138,6 +155,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		arn: arn,
 
 		msgPrcsr: msgPrcsr,
+
+		visibilityTimeoutSeconds: visibilityTimeoutSeconds,
 
 		processQueue: make(chan *sqs.Message, queueBufferSizeProcess),
 		deleteQueue:  make(chan *sqs.Message, queueBufferSizeDelete),
@@ -233,4 +252,12 @@ func prettifyBatchResultErrors(errs []*sqs.BatchResultErrorEntry) string {
 	errStr.WriteByte(']')
 
 	return errStr.String()
+}
+
+// durationInSeconds returns a duration as a number of seconds truncated
+// towards zero.
+func durationInSeconds(d time.Duration) int64 {
+	// converting a floating-point number to an integer discards
+	// the fraction (truncation towards zero)
+	return int64(d.Seconds())
 }

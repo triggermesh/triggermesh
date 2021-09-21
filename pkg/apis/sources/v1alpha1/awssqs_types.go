@@ -52,8 +52,28 @@ type AWSSQSSourceSpec struct {
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies
 	ARN apis.ARN `json:"arn"`
 
+	// Options that control the behavior of message receivers.
+	// +optional
+	ReceiveOptions *AWSSQSSourceReceiveOptions `json:"receiveOptions,omitempty"`
+
 	// Credentials to interact with the Amazon SQS API.
 	Credentials AWSSecurityCredentials `json:"credentials"`
+}
+
+// AWSSQSSourceReceiveOptions defines options that control the behavior of
+// Amazon SQS message receivers.
+type AWSSQSSourceReceiveOptions struct {
+	// Period of time during which Amazon SQS prevents other consumers from
+	// receiving and processing a message that has been received via ReceiveMessage.
+	// Expressed as a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
+	//
+	// If not defined, the overall visibility timeout for the queue is used.
+	//
+	// For more details, please refer to the Amazon SQS Developer Guide at
+	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html.
+	//
+	// +optional
+	VisibilityTimeout *apis.Duration `json:"visibilityTimeout,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

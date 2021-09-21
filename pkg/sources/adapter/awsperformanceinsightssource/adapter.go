@@ -48,7 +48,7 @@ type envConfig struct {
 
 	PollingInterval string `envconfig:"POLLING_INTERVAL" required:"true"`
 
-	MetricQueries []string `envconfig:"METRIC_QUERIES" required:"true"`
+	Metrics []string `envconfig:"PI_METRICS" required:"true"`
 }
 
 // adapter implements the source's adapter.
@@ -95,9 +95,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	var mql []*pi.MetricQuery
 
-	for _, r := range env.MetricQueries {
-		m := &pi.MetricQuery{Metric: aws.String(r)}
-		mql = append(mql, m)
+	for _, m := range env.Metrics {
+		mq := &pi.MetricQuery{Metric: aws.String(m)}
+		mql = append(mql, mq)
 	}
 
 	r := rds.New(cfg)

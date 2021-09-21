@@ -104,6 +104,11 @@ func makeSQSEvent(msg *sqs.Message, srcAttr string) (*cloudevents.Event, error) 
 	event.SetType(v1alpha1.AWSEventType(sqs.ServiceName, v1alpha1.AWSSQSGenericEventType))
 	event.SetSource(srcAttr)
 	event.SetID(*msg.MessageId)
+
+	for name, val := range ceExtensionAttrsForMessage(msg) {
+		event.SetExtension(name, val)
+	}
+
 	if err := event.SetData(cloudevents.ApplicationJSON, msg); err != nil {
 		return nil, fmt.Errorf("setting CloudEvent data: %w", err)
 	}
