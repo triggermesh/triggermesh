@@ -1,7 +1,16 @@
 # TriggerMesh
 
 <!-- TODO: add repository description, docs, contribution guidelines, etc. -->
-\-
+
+The current codebase can be built using [ko][ko] as:
+```shell
+$ CGOENABLED=1 ko apply -f config/
+```
+
+To regenerate the client code run:
+```shell
+$ make
+```
 
 ## Contributions and Support
 
@@ -22,3 +31,5 @@ Although this project is not part of the [CNCF][cncf], we abide by its [code of 
 
 [cncf]: https://www.cncf.io/
 [cncf-conduct]: https://github.com/cncf/foundation/blob/master/code-of-conduct.md
+
+[ko]: https://github.com/google/ko

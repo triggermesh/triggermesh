@@ -17,6 +17,30 @@ limitations under the License.
 package main
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awscomprehendtarget"
+	awstarget2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler/awstarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/confluenttarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/datadogtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/elasticsearchtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudfirestoretarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudstoragetarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudworkflowstarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlesheettarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/hasuratarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/httptarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/infratarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/jiratarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/logztarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/oracletarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/salesforcetarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/sendgridtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/slacktarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/splunktarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/tektontarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/twiliotarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/uipathtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
 	"knative.dev/pkg/injection/sharedmain"
 
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchlogssource"
@@ -38,6 +62,7 @@ import (
 
 func main() {
 	sharedmain.Main("triggermesh-controller",
+		// sources
 		awscloudwatchlogssource.NewController,
 		awscloudwatchsource.NewController,
 		awscodecommitsource.NewController,
@@ -53,5 +78,35 @@ func main() {
 		slacksource.NewController,
 		webhooksource.NewController,
 		zendesksource.NewController,
+		//targets
+		alibabaosstarget.NewController,
+		awstarget2.NewDynamoDBController,
+		awstarget2.NewLambdaController,
+		awstarget2.NewS3Controller,
+		awstarget2.NewSNSController,
+		awstarget2.NewSQSController,
+		awstarget2.NewKinesisController,
+		awscomprehendtarget.NewController,
+		confluenttarget.NewController,
+		elasticsearchtarget.NewController,
+		googlecloudstoragetarget.NewController,
+		googlecloudfirestoretarget.NewController,
+		googlecloudworkflowstarget.NewController,
+		googlesheettarget.NewController,
+		hasuratarget.NewController,
+		httptarget.NewController,
+		datadogtarget.NewController,
+		infratarget.NewController,
+		jiratarget.NewController,
+		logztarget.NewController,
+		oracletarget.NewController,
+		salesforcetarget.NewController,
+		sendgridtarget.NewController,
+		slacktarget.NewController,
+		splunktarget.NewController,
+		tektontarget.NewController,
+		twiliotarget.NewController,
+		uipathtarget.NewController,
+		zendesktarget.NewController,
 	)
 }

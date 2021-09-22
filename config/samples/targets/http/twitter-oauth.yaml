@@ -1,0 +1,109 @@
+# Copyright (c) 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: twitter
+  namespace: mynamespace
+type: Opaque
+stringData:
+  clientsecret: _OAUTH_CLIENT_SECRET_
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Broker
+metadata:
+  name: twitter-requests
+  namespace: mynamespace
+
+---
+
+apiVersion: targets.triggermesh.io/v1alpha1
+kind: HTTPTarget
+metadata:
+  name: twitter
+  namespace: mynamespace
+spec:
+  response:
+    eventType: twitter.message
+  endpoint: 'https://api.twitter.com/'
+  method: 'GET'
+  oauthClientID: _OAUTH_CLIENT_ID_
+  oauthTokenURL: https://api.twitter.com/oauth2/token
+  oauthClientSecret:
+    secretKeyRef:
+      key: clientsecret
+      name: twitter
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: twitter-requests
+  namespace: mynamespace
+spec:
+  broker: twitter-requests
+  subscriber:
+    ref:
+      apiVersion: targets.triggermesh.io/v1alpha1
+      kind: HTTPTarget
+      name: twitter
+
+---
+
+apiVersion: sources.knative.dev/v1beta2
+kind: PingSource
+metadata:
+    name: minute-twitter-request
+    namespace: mynamespace
+spec:
+    data: '{"path_suffix":"2/tweets/20"}'
+    schedule: '*/1 * * * *'
+    sink:
+      ref:
+        apiVersion: eventing.knative.dev/v1
+        kind: Broker
+        name: twitter-requests
+
+---
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: event-display
+  namespace: mynamespace
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: twitter-eventdisplay
+  namespace: mynamespace
+spec:
+  broker: twitter-requests
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display

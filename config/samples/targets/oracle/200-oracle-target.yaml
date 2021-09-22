@@ -1,0 +1,36 @@
+# Copyright (c) 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: targets.triggermesh.io/v1alpha1
+kind: OracleTarget
+metadata:
+  name: triggermesh-oracle-function
+spec:
+  oracleApiPrivateKey:
+    secretKeyRef:
+      name: oraclecreds
+      key: apiKey
+  oracleApiPrivateKeyPassphrase:
+    secretKeyRef:
+      name: oraclecreds
+      key: apiPassphrase
+  oracleApiPrivateKeyFingerprint:
+    secretKeyRef:
+      name: oraclecreds
+      key: apiKeyFingerprint
+  oracleTenancy: ocid1.tenancy.oc1..aaaaaaaaav23f45mqyxmwu4x3s2uhuh4rb2bwdpgb5kbpjqvwiiqufhsq6za
+  oracleUser: ocid1.user.oc1..aaaaaaaacaxtveoy4zx7rsg7lanexmouxjxay6godthrfsocpl6ggrfpbiuq
+  oracleRegion: us-phoenix-1
+  function:
+    function: ocid1.fnfunc.oc1.phx.aaaaaaaaaajrgy4on66e6krko73h2im5qaiiagecg5hmbcqib2kpbzlcy3bq
