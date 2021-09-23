@@ -1,0 +1,119 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: github-push-transformation-trigger
+spec:
+  broker: transformation-demo
+  filter:
+    attributes:
+      type: dev.knative.source.github.push
+  subscriber:
+    ref:
+      apiVersion: flow.triggermesh.io/v1alpha1
+      kind: Transformation
+      name: github-push-transformation
+
+---
+
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: Transformation
+metadata:
+  name: github-push-transformation
+spec:
+  context:
+  - operation: store
+    paths:
+    - key: $ceType
+      value: type
+  
+  - operation: add
+    paths:
+    - key: type
+      value: io.triggermesh.transformation.github
+
+  data:
+  - operation: store
+    paths: 
+    - key: $repository
+      value: repository.name 
+    - key: $message
+      value: head_commit.message
+    - key: $author
+      value: head_commit.author.username
+  
+  - operation: delete
+    paths:
+    - key: 
+
+  - operation: add
+    paths:
+    - key: type
+      value: $ceType
+    - key: object
+      value: $author 
+    - key: subject
+      value: $repository
+    - key: verb
+      value: $message
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: github-issue-transformation-trigger
+spec:
+  broker: transformation-demo
+  filter:
+    attributes:
+      type: dev.knative.source.github.issues
+  subscriber:
+    ref:
+      apiVersion: flow.triggermesh.io/v1alpha1
+      kind: Transformation
+      name: github-issue-transformation
+
+---
+
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: Transformation
+metadata:
+  name: github-issue-transformation
+spec:
+  context:
+  - operation: store
+    paths:
+    - key: $ceType
+      value: type
+  
+  - operation: add
+    paths:
+    - key: type
+      value: io.triggermesh.transformation.github
+
+  data:
+  - operation: store
+    paths: 
+    - key: $action
+      value: action
+    - key: $repository
+      value: repository.name
+    - key: $title
+      value: issue.title
+    - key: $author
+      value: issue.user.login
+  
+  - operation: delete
+    paths:
+    - key: 
+
+  - operation: add
+    paths:
+    - key: type
+      value: $ceType
+    - key: object
+      value: $author 
+    - key: subject
+      value: $repository
+    - key: verb
+      value: $action issue "$title"

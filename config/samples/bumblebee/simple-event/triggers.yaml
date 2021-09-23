@@ -1,0 +1,31 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: pingsource-transformation-trigger
+spec:
+  broker: transformation-demo
+  filter:
+    attributes:
+      type: dev.knative.sources.ping
+  subscriber:
+    ref:
+      apiVersion: flow.triggermesh.io/v1alpha1
+      kind: Transformation
+      name: pingsource-transformation
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: eventdisplay-transformation-trigger
+spec:
+  broker: transformation-demo
+  filter: 
+    attributes:
+      type: io.triggermesh.transformation.pingsource
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display

@@ -23,6 +23,7 @@ import (
 
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
+	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/transformation/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -32,6 +33,7 @@ type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface
 	TargetsV1alpha1() targetsv1alpha1.TargetsV1alpha1Interface
+	FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -40,6 +42,7 @@ type Clientset struct {
 	*discovery.DiscoveryClient
 	sourcesV1alpha1 *sourcesv1alpha1.SourcesV1alpha1Client
 	targetsV1alpha1 *targetsv1alpha1.TargetsV1alpha1Client
+	flowV1alpha1    *flowv1alpha1.FlowV1alpha1Client
 }
 
 // SourcesV1alpha1 retrieves the SourcesV1alpha1Client
@@ -50,6 +53,11 @@ func (c *Clientset) SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface {
 // TargetsV1alpha1 retrieves the TargetsV1alpha1Client
 func (c *Clientset) TargetsV1alpha1() targetsv1alpha1.TargetsV1alpha1Interface {
 	return c.targetsV1alpha1
+}
+
+// FlowV1alpha1 retrieves the FlowV1alpha1Client
+func (c *Clientset) FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface {
+	return c.flowV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -81,6 +89,10 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	if err != nil {
 		return nil, err
 	}
+	cs.flowV1alpha1, err = flowv1alpha1.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
 
 	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
@@ -95,6 +107,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
 	cs.sourcesV1alpha1 = sourcesv1alpha1.NewForConfigOrDie(c)
 	cs.targetsV1alpha1 = targetsv1alpha1.NewForConfigOrDie(c)
+	cs.flowV1alpha1 = flowv1alpha1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -105,6 +118,7 @@ func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.sourcesV1alpha1 = sourcesv1alpha1.New(c)
 	cs.targetsV1alpha1 = targetsv1alpha1.New(c)
+	cs.flowV1alpha1 = flowv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

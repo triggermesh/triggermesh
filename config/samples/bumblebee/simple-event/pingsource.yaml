@@ -1,0 +1,28 @@
+apiVersion: sources.knative.dev/v1
+kind: PingSource
+metadata:
+  name: ping-source
+spec:
+  schedule: "*/1 * * * *"
+  contentType: "application/json"
+  data: '{
+    "First Name": "Barbara",
+    "Last Name": "Singh",
+    "Date of birth": {
+      "year": 1955, 
+      "month": 1,
+      "day" : 23
+    },
+    "Married": true,
+    "Children":
+    [
+        {"Name": "Martin", "Year of birth": 1980},
+        {"Name": "Margaret", "Year of birth": 1983}        
+    ],
+    "Mobile phone": null
+  }'
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: transformation-demo
