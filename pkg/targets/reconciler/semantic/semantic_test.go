@@ -31,9 +31,9 @@ import (
 )
 
 const (
-	fixtureDeploymentPath = "../../../test/fixtures/deployment.json"
-	fixtureServicePath    = "../../../test/fixtures/service.json"
-	fixtureKnServicePath  = "../../../test/fixtures/knService.json"
+	fixtureDeploymentPath = "../../../../test/fixtures/deployment.json"
+	fixtureServicePath    = "../../../../test/fixtures/service.json"
+	fixtureKnServicePath  = "../../../../test/fixtures/knService.json"
 )
 
 func TestDeploymentEqual(t *testing.T) {
