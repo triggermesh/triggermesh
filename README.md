@@ -4,7 +4,7 @@
 
 The current codebase can be built using [ko][ko] as:
 ```shell
-$ CGOENABLED=1 ko apply -f config/
+$ CGO_ENABLED=1 ko apply -f config/
 ```
 
 To regenerate the client code run:
