@@ -26,6 +26,7 @@ import (
 	internalclientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
 	internalinterfaces "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/internalinterfaces"
 	sources "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/sources"
+	targets "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/targets"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -173,8 +174,13 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Sources() sources.Interface
+	Targets() targets.Interface
 }
 
 func (f *sharedInformerFactory) Sources() sources.Interface {
 	return sources.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Targets() targets.Interface {
+	return targets.New(f, f.namespace, f.tweakListOptions)
 }

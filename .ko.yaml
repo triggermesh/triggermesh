@@ -1,0 +1,6 @@
+# The Confluent target adapter requires cgo (CGO_ENABLED=1) and compiles to a
+# dynamic binary with a dependency on glibc. Defining a baseImageOverride for
+# just that component wouldn't work because we can't enable cgo selectively
+# when executing `ko apply`. Therefore, we must use a default base image that
+# contains glibc, even though most components don't need it.
+defaultBaseImage: gcr.io/distroless/base:nonroot

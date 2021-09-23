@@ -1,0 +1,63 @@
+# Copyright (c) 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: eventing.knative.dev/v1
+kind: Broker
+metadata:
+  name: calendar-requests
+  namespace: mynamespace
+
+---
+
+apiVersion: targets.triggermesh.io/v1alpha1
+kind: HTTPTarget
+metadata:
+  name: calendarific
+  namespace: mynamespace
+spec:
+  response:
+    eventType: calendarific.holidays
+  endpoint: 'https://calendarific.com/api/v2/holidays?api_key=<YOUR-API-KEY>'
+  method: 'GET'
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: calendar-requests
+  namespace: mynamespace
+spec:
+  broker: calendar-requests
+  subscriber:
+    ref:
+      apiVersion: targets.triggermesh.io/v1alpha1
+      kind: HTTPTarget
+      name: calendarific
+
+---
+
+apiVersion: sources.knative.dev/v1beta2
+kind: PingSource
+metadata:
+    name: minute-calendar-request
+    namespace: mynamespace
+spec:
+    data: '{"query_string":"country=ES&year=2020"}'
+    schedule: '*/1 * * * *'
+    sink:
+      ref:
+        apiVersion: eventing.knative.dev/v1
+        kind: Broker
+        name: calendar-requests

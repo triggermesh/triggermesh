@@ -22,6 +22,8 @@ import (
 	clientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	fakesourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1/fake"
+	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
+	faketargetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -79,4 +81,9 @@ var _ clientset.Interface = &Clientset{}
 // SourcesV1alpha1 retrieves the SourcesV1alpha1Client
 func (c *Clientset) SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface {
 	return &fakesourcesv1alpha1.FakeSourcesV1alpha1{Fake: &c.Fake}
+}
+
+// TargetsV1alpha1 retrieves the TargetsV1alpha1Client
+func (c *Clientset) TargetsV1alpha1() targetsv1alpha1.TargetsV1alpha1Interface {
+	return &faketargetsv1alpha1.FakeTargetsV1alpha1{Fake: &c.Fake}
 }

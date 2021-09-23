@@ -39,7 +39,7 @@ spec:
 
         resources:
           requests:
-            cpu: 20m
+            cpu: 50m
             memory: 20Mi
 
         env:
@@ -83,6 +83,58 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/webhooksource-adapter
         - name: ZENDESKSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesksource-adapter
+        # Target adapters
+        - name: ALIBABAOSS_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/alibabaoss-target-adapter
+        - name: AWS_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-target-adapter
+        - name: AWS_COMPREHEND_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehend-target-adapter
+        - name: CONFLUENT_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/confluent-target-adapter
+        - name: DATADOGTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/datadog-target-adapter
+        - name: ELASTICSEARCH_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearch-target-adapter
+        - name: GOOGLESHEET_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlesheet-target-adapter
+        - name: GOOGLECLOUDFIRESTORE_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestore-target-adapter
+        - name: GOOGLECLOUDSTORAGE_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstorage-target-adapter
+        - name: GOOGLECLOUDWORKFLOWS_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflows-target-adapter
+        - name: HASURATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/hasura-target-adapter
+        - name: HTTPTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/http-target-adapter
+        - name: INFRATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/infra-target-adapter
+        - name: JIRATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/jira-target-adapter
+        - name: LOGZTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/logz-target-adapter
+        - name: ORACLE_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/oracle-target-adapter
+        - name: SALESFORCETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/salesforce-target-adapter
+        - name: SENDGRID_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/sendgrid-target-adapter
+        - name: SLACK_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/slack-target-adapter
+        - name: SPLUNKTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/splunk-target-adapter
+        - name: TEKTON_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/tekton-target-adapter
+        - name: TWILIO_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/twilio-target-adapter
+        - name: UIPATH_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/uipath-target-adapter
+        - name: ZENDESK_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/zendesk-target-adapter
+        # Type-specific options
+        - name: TEKTON_REAPING_INTERVAL
+          value: 2m
 
         securityContext:
           allowPrivilegeEscalation: false
