@@ -19,20 +19,20 @@ package elasticsearchtarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"go.uber.org/zap"
 
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	elasticsearchv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcileres "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/elasticsearchtarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // reconciler reconciles the target adapter object
 type reconciler struct {
 	logger *zap.SugaredLogger
-	ksvcr  reconciler2.KServiceReconciler
-	vg     reconciler2.ValueGetter
+	ksvcr  libreconciler.KServiceReconciler
+	vg     libreconciler.ValueGetter
 
 	adapterCfg *adapterConfig
 }

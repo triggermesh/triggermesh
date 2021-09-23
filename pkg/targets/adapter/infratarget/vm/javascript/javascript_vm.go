@@ -28,8 +28,9 @@ import (
 	"github.com/clbanning/mxj"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/robertkrimen/otto"
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm"
 	"go.uber.org/zap"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm"
 )
 
 type javascriptVM struct {

@@ -20,7 +20,6 @@ package hasuratarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"go.uber.org/zap"
 	corev1 "k8s.io/api/core/v1"
 
@@ -30,6 +29,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/hasuratarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
@@ -40,7 +40,7 @@ type Reconciler struct {
 	adapterCfg *adapterConfig
 
 	// Knative Service reconciler
-	ksvcr reconciler2.KServiceReconciler
+	ksvcr libreconciler.KServiceReconciler
 }
 
 // Check that our Reconciler implements Interface
@@ -51,7 +51,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.HasuraTarget
 	o.Status.InitializeConditions()
 	o.Status.ObservedGeneration = o.Generation
 	o.Status.AcceptedEventTypes = o.AcceptedEventTypes()
-	o.Status.ResponseAttributes = reconciler2.CeResponseAttributes(o)
+	o.Status.ResponseAttributes = libreconciler.CeResponseAttributes(o)
 
 	svc, err := makeAdapterKnService(o, r.adapterCfg)
 	if err != nil {

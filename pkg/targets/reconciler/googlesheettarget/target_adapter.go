@@ -17,7 +17,6 @@ limitations under the License.
 package googlesheettarget
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -26,6 +25,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const targetPrefix = "googlesheettarget"

@@ -23,7 +23,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	zendesktargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/zendesktarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/zendesktarget"
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 
 	"k8s.io/client-go/tools/cache"
 
@@ -53,8 +53,8 @@ func NewController(
 
 	r := &reconciler{
 		logger:     logging.FromContext(ctx),
-		ksvcr:      reconciler2.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:         reconciler2.NewValueGetter(kubeclient.Get(ctx)),
+		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
 	}
 

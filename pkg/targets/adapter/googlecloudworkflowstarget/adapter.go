@@ -22,7 +22,6 @@ import (
 
 	workflows "cloud.google.com/go/workflows/apiv1beta"
 	executions "cloud.google.com/go/workflows/executions/apiv1beta"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"google.golang.org/api/option"
 	executionspb "google.golang.org/genproto/googleapis/cloud/workflows/executions/v1beta"
 
@@ -31,6 +30,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -49,10 +49,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Failed to create client: %v", err)
 	}
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeGoogleCloudWorkflowsRunResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeGoogleCloudWorkflowsRunResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -73,7 +73,7 @@ type googlecloudworkflowsAdapter struct {
 	client  *workflows.Client
 	eClient *executions.Client
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -89,14 +89,14 @@ func (a *googlecloudworkflowsAdapter) dispatch(ctx context.Context, event cloude
 	case v1alpha1.EventTypeGoogleCloudWorkflowsRun:
 		return a.runWorkflow(ctx, event)
 	default:
-		return a.replier.Error(&event, cloudevents2.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
 	}
 }
 
 func (a *googlecloudworkflowsAdapter) runWorkflow(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	rjp := &RunJobEvent{}
 	if err := event.DataAs(rjp); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	req := &executionspb.CreateExecutionRequest{

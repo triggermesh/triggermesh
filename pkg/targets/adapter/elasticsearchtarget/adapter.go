@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
@@ -34,6 +33,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
@@ -41,10 +41,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeElasticsearchResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeElasticsearchResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -69,7 +69,7 @@ type esAdapter struct {
 
 	discardCEContext bool
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -108,7 +108,7 @@ func (a *esAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*clo
 	} else {
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
-			return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 		data = jsonEvent
 	}
@@ -120,18 +120,18 @@ func (a *esAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*clo
 
 	res, err := req.Do(ctx, a.client)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 
 	}
 	defer res.Body.Close()
 	if res.IsError() {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 
 	}
 
 	var resp map[string]interface{}
 	if err := json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 
 	}
 

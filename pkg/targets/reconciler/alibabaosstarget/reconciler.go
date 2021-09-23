@@ -19,11 +19,11 @@ package alibabaosstarget
 import (
 	"context"
 
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/alibabaosstarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
@@ -32,7 +32,7 @@ type Reconciler struct {
 	adapterCfg *adapterConfig
 
 	// Knative Service reconciler
-	ksvcr reconciler.KServiceReconciler
+	ksvcr libreconciler.KServiceReconciler
 }
 
 // Check that our Reconciler implements Interface
@@ -43,7 +43,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.AlibabaOSS
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	trg.Status.ResponseAttributes = reconciler.CeResponseAttributes(trg)
+	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
 

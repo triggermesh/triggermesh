@@ -3,17 +3,17 @@ package awstarget
 import (
 	"context"
 
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	awsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/awskinesistarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // kinesisReconciler reconciles the target adapter object
 type kinesisReconciler struct {
-	ksvcr reconciler.KServiceReconciler
-	vg    reconciler.ValueGetter
+	ksvcr libreconciler.KServiceReconciler
+	vg    libreconciler.ValueGetter
 
 	adapterCfg *adapterConfig
 }

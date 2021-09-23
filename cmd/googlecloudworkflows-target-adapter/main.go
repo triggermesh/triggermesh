@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	googlecloudworkflowstarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/googlecloudworkflowstarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/googlecloudworkflowstarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 func main() {
-	pkgadapter.Main("googlecloudworkflows-target-adapter", googlecloudworkflowstarget2.EnvAccessorCtor, googlecloudworkflowstarget2.NewTarget)
+	pkgadapter.Main("googlecloudworkflows-target-adapter", googlecloudworkflowstarget.EnvAccessorCtor, googlecloudworkflowstarget.NewTarget)
 }

@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	hasuratarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/hasuratarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/hasuratarget"
 )
 
 func main() {
-	pkgadapter.Main("hasura-target-adapter", hasuratarget2.EnvAccessorCtor, hasuratarget2.NewTarget)
+	pkgadapter.Main("hasura-target-adapter", hasuratarget.EnvAccessorCtor, hasuratarget.NewTarget)
 }

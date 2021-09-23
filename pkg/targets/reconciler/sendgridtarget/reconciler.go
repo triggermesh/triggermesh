@@ -19,7 +19,6 @@ package sendgridtarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"go.uber.org/zap"
 
 	"knative.dev/pkg/logging"
@@ -27,13 +26,14 @@ import (
 
 	sendgridv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilersendgrid "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/sendgridtarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // Reconciler reconciles the target adapter object
 type reconciler struct {
 	logger *zap.SugaredLogger
-	ksvcr  reconciler2.KServiceReconciler
-	vg     reconciler2.ValueGetter
+	ksvcr  libreconciler.KServiceReconciler
+	vg     libreconciler.ValueGetter
 
 	adapterCfg *adapterConfig
 }
@@ -48,7 +48,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, trg *sendgridv1alpha1.Se
 	// NOTE(antoineco): the adapter currently doesn't evaluate the attributes of incoming events.
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
 	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = reconciler2.CeResponseAttributes(trg)
+	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.APIKey.SecretKeyRef)
 	if err != nil {

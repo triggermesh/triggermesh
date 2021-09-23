@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"k8s.io/client-go/tools/cache"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -33,6 +32,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	confluenttargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/confluenttarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/confluenttarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code

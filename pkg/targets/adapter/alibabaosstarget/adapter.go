@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -30,6 +29,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
@@ -37,10 +37,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeAlibabaOSSGenericResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeAlibabaOSSGenericResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -66,7 +66,7 @@ type ossAdapter struct {
 	oClient *oss.Client
 	bucket  string
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -81,15 +81,15 @@ func (a *ossAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cl
 
 	bucket, err := a.oClient.Bucket(a.bucket)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	if bucket == nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, fmt.Errorf("no bucket returned"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, fmt.Errorf("no bucket returned"), nil)
 	}
 
 	if err = bucket.PutObject(event.ID(), bytes.NewReader(event.Data())); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	return a.replier.Ok(&event, "ok")

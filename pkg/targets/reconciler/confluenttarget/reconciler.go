@@ -19,12 +19,12 @@ package confluenttarget
 import (
 	"context"
 
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"go.uber.org/zap"
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	confluentv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerconfluent "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/confluenttarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // reconciler reconciles the target adapter object

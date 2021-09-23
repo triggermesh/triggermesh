@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 
 	"k8s.io/client-go/tools/cache"
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -32,6 +31,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	awss3targetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/awss3target"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/awss3target"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+
 	kserviceclient "knative.dev/serving/pkg/client/injection/client"
 	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 )
@@ -52,8 +53,8 @@ func NewS3Controller(
 	serviceInformer := kserviceinformer.Get(ctx)
 
 	impl := awss3target.NewImpl(ctx, &s3Reconciler{
-		ksvcr:      reconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:         reconciler.NewValueGetter(kubeclient.Get(ctx)),
+		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
 	})
 	logging.FromContext(ctx).Info("Setting up event handlers")

@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	jiratarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/jiratarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/jiratarget"
 )
 
 func main() {
-	pkgadapter.Main("jira-target-adapter", jiratarget2.EnvAccessorCtor, jiratarget2.NewTarget)
+	pkgadapter.Main("jira-target-adapter", jiratarget.EnvAccessorCtor, jiratarget.NewTarget)
 }

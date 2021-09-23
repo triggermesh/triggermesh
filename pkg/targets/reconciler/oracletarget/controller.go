@@ -19,7 +19,6 @@ package oracletarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"knative.dev/eventing/pkg/reconciler/source"
 
 	"github.com/kelseyhightower/envconfig"
@@ -27,6 +26,7 @@ import (
 	oracletargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/oracletarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/oracletarget"
 
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"k8s.io/client-go/tools/cache"
 	kubeclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/configmap"
@@ -54,8 +54,8 @@ func NewController(
 
 	r := &reconciler{
 		logger:     logging.FromContext(ctx),
-		ksvcr:      reconciler2.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:         reconciler2.NewValueGetter(kubeclient.Get(ctx)),
+		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
 	}
 

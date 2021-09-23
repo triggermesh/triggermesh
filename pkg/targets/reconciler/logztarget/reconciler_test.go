@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package infratarget
+package logztarget
 
 import (
 	"context"
-	"strconv"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -31,7 +30,6 @@ import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	network "knative.dev/networking/pkg"
 	"knative.dev/pkg/apis"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/logging"
@@ -42,7 +40,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/infratarget"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/logztarget"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
@@ -55,23 +53,28 @@ const (
 	tUID  = types.UID("00000000-0000-0000-0000-000000000000")
 
 	tImg = "registry/image:tag"
-
-	tCode = `console.log("hello test")`
 )
+
+var tGenName = kmeta.ChildName(adapterName+"-", tName)
+
+var tAdapterURL = apis.URL{
+	Scheme: "https",
+	Host:   tGenName + "." + tNs + ".svc.cluster.local",
+}
 
 var (
-	tGenName = kmeta.ChildName(adapterName+"-", tName)
-
-	tAdapterURL = apis.URL{
+	tLogsListenerURL = apis.URL{
 		Scheme: "https",
-		Host:   tGenName + "." + tNs + ".svc.cluster.local",
+		Host:   "example.com",
 	}
-
-	tTimeout            = 4000
-	tHeaderPolicy       = v1alpha1.HeaderPolicyEnsure
-	tBridge             = "bridge-triggermesh-sample"
-	tTypeLoopProtection = true
 )
+
+var tSecretSelector = &corev1.SecretKeySelector{
+	LocalObjectReference: corev1.LocalObjectReference{
+		Name: "test-secret",
+	},
+	Key: "secret",
+}
 
 // Test the Reconcile method of the controller.Reconciler implemented by our controller.
 //
@@ -88,6 +91,7 @@ func TestReconcile(t *testing.T) {
 			Name: "Target object creation",
 			Key:  tKey,
 			Objects: []runtime.Object{
+				newSecret(),
 				newEventTarget(),
 			},
 			WantCreates: []runtime.Object{
@@ -143,54 +147,6 @@ func TestReconcile(t *testing.T) {
 			},
 		},
 
-		// Errors
-
-		{
-			Name: "Fail to create adapter service",
-			Key:  tKey,
-			WithReactors: []clientgotesting.ReactionFunc{
-				rt.InduceFailure("create", "services"),
-			},
-			Objects: []runtime.Object{
-				newEventTarget(),
-			},
-			WantCreates: []runtime.Object{
-				newAdapterService(),
-			},
-			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
-				Object: newEventTargetUnknownDeployed(false),
-			}},
-			WantEvents: []string{
-				failCreateAdapterEvent(),
-			},
-			WantErr: true,
-		},
-
-		{
-			Name: "Fail to update adapter service",
-			Key:  tKey,
-			WithReactors: []clientgotesting.ReactionFunc{
-				rt.InduceFailure("update", "services"),
-			},
-			Objects: []runtime.Object{
-				newEventTargetDeployed(),
-				setAdapterImage(
-					newAdapterServiceReady(),
-					tImg+":old",
-				),
-			},
-			WantUpdates: []clientgotesting.UpdateActionImpl{{
-				Object: newAdapterServiceReady(),
-			}},
-			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
-				Object: newEventTargetUnknownDeployed(true),
-			}},
-			WantEvents: []string{
-				failUpdateAdapterEvent(),
-			},
-			WantErr: true,
-		},
-
 		// Edge cases
 
 		{
@@ -204,11 +160,11 @@ func TestReconcile(t *testing.T) {
 	testCases.Test(t, MakeFactory(reconcilerCtor))
 }
 
-// reconcilerCtor returns a Ctor for a InfraTarget Reconciler.
+// reconcilerCtor returns a Ctor for a LogzTarget Reconciler.
 var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) controller.Reconciler {
 	adapterCfg := &adapterConfig{
-		Image:   tImg,
-		configs: &source.EmptyVarsGenerator{},
+		Image:     tImg,
+		obsConfig: &source.EmptyVarsGenerator{},
 	}
 
 	r := &reconciler{
@@ -220,63 +176,57 @@ var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) c
 	}
 
 	return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
-		fakeinjectionclient.Get(ctx), ls.GetInfraTargetLister(),
+		fakeinjectionclient.Get(ctx), ls.GetLogzTargetLister(),
 		controller.GetEventRecorder(ctx), r)
 }
 
 /* Event targets */
 
-// newEventTarget returns a test InfraTarget object with pre-filled attributes.
-func newEventTarget() *v1alpha1.InfraTarget {
-	o := &v1alpha1.InfraTarget{
+// newEventTarget returns a test LogzTarget object with pre-filled attributes.
+func newEventTarget() *v1alpha1.LogzTarget {
+	o := &v1alpha1.LogzTarget{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
 			Name:      tName,
 			UID:       tUID,
 		},
-		Spec: v1alpha1.InfraTargetSpec{
-			Script: &v1alpha1.InfraTargetScript{
-				Code:    tCode,
-				Timeout: &tTimeout,
+		Spec: v1alpha1.LogzTargetSpec{
+			LogsListenerURL: tLogsListenerURL.String(),
+			ShippingToken: v1alpha1.SecretValueFromSource{
+				SecretKeyRef: tSecretSelector,
 			},
-			State: &v1alpha1.InfraTargetState{
-				HeadersPolicy: &tHeaderPolicy,
-				Bridge:        &tBridge,
-			},
-			TypeLoopProtection: &tTypeLoopProtection,
 		},
 	}
 
 	o.Status.InitializeConditions()
+	o.Status.AcceptedEventTypes = o.GetEventTypes()
+	o.Status.ResponseAttributes = libreconciler.CeResponseAttributes(o)
 
 	return o
 }
 
-// Deployed: Unknown
-func newEventTargetUnknownDeployed(adapterExists bool) *v1alpha1.InfraTarget {
-	o := newEventTarget()
-	o.Status.PropagateAvailability(nil)
-
-	// cover the case where the URL was already set because an adapter was successfully created at an earlier time,
-	// but the new adapter status can't be propagated, e.g. due to an update error
-	if adapterExists {
-		o.Status.Address = &duckv1.Addressable{
-			URL: &tAdapterURL,
-		}
+// newSecret returns a test Secret object with pre-filled data.
+func newSecret() *corev1.Secret {
+	return &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: tNs,
+			Name:      tSecretSelector.Name,
+		},
+		Data: map[string][]byte{
+			tSecretSelector.Key: nil,
+		},
 	}
-
-	return o
 }
 
 // Deployed: True
-func newEventTargetDeployed() *v1alpha1.InfraTarget {
+func newEventTargetDeployed() *v1alpha1.LogzTarget {
 	o := newEventTarget()
 	o.Status.PropagateAvailability(newAdapterServiceReady())
 	return o
 }
 
 // Deployed: False
-func newEventTargetNotDeployed() *v1alpha1.InfraTarget {
+func newEventTargetNotDeployed() *v1alpha1.LogzTarget {
 	o := newEventTarget()
 	o.Status.PropagateAvailability(newAdapterServiceNotReady())
 	return o
@@ -301,7 +251,7 @@ func newAdapterService() *servingv1.Service {
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(NewOwnerRefable(
 					tName,
-					(&v1alpha1.InfraTarget{}).GetGroupVersionKind(),
+					(&v1alpha1.LogzTarget{}).GetGroupVersionKind(),
 					tUID,
 				)),
 			},
@@ -329,22 +279,15 @@ func newAdapterService() *servingv1.Service {
 										Value: tNs,
 									}, {
 										Name:  resources.EnvName,
-										Value: tName,
+										Value: "logztarget-" + tName,
 									}, {
-										Name:  envInfraScriptCode,
-										Value: tCode,
+										Name: "LOGZ_SHIPPING_TOKEN",
+										ValueFrom: &corev1.EnvVarSource{
+											SecretKeyRef: tSecretSelector,
+										},
 									}, {
-										Name:  envInfraScriptTimeout,
-										Value: strconv.Itoa(tTimeout),
-									}, {
-										Name:  envInfraStateHeadersPolicy,
-										Value: string(tHeaderPolicy),
-									}, {
-										Name:  envInfraStateBridge,
-										Value: tBridge,
-									}, {
-										Name:  envInfraTypeLoopProtection,
-										Value: strconv.FormatBool(tTypeLoopProtection),
+										Name:  "LOGZ_LISTENER_URL",
+										Value: tLogsListenerURL.String(),
 									}, {
 										Name: source.EnvLoggingCfg,
 									}, {
@@ -390,7 +333,7 @@ func setAdapterImage(o *servingv1.Service, img string) *servingv1.Service {
 
 /* Events */
 
-// TODO(antoineco): make event generators public inside pkg/reconciler for
+// TODO(cab): make event generators public inside pkg/reconciler for
 // easy reuse in tests
 
 func createAdapterEvent() string {
@@ -401,11 +344,4 @@ func createAdapterEvent() string {
 func updateAdapterEvent() string {
 	return Eventf(corev1.EventTypeNormal, "KServiceUpdated", "updated kservice: \"%s/%s\"",
 		tNs, tGenName)
-}
-func failCreateAdapterEvent() string {
-	return Eventf(corev1.EventTypeWarning, "InternalError", "inducing failure for create services")
-}
-
-func failUpdateAdapterEvent() string {
-	return Eventf(corev1.EventTypeWarning, "InternalError", "inducing failure for update services")
 }

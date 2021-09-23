@@ -19,8 +19,6 @@ package awstarget
 import (
 	"strconv"
 
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -30,6 +28,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/arn"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const adapterName = "awstarget"

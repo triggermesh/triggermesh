@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	sendgridtarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/sendgridtarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/sendgridtarget"
 )
 
 func main() {
-	pkgadapter.Main("sendgrid-target-adapter", sendgridtarget2.EnvAccessorCtor, sendgridtarget2.NewTarget)
+	pkgadapter.Main("sendgrid-target-adapter", sendgridtarget.EnvAccessorCtor, sendgridtarget.NewTarget)
 }

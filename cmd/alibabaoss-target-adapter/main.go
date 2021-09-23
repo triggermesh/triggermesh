@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	alibabaosstarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/alibabaosstarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/alibabaosstarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 func main() {
-	pkgadapter.Main("alibabaoss-target-adapter", alibabaosstarget2.EnvAccessorCtor, alibabaosstarget2.NewTarget)
+	pkgadapter.Main("alibabaoss-target-adapter", alibabaosstarget.EnvAccessorCtor, alibabaosstarget.NewTarget)
 }

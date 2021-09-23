@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	googlecloudfirestoretarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/googlecloudfirestoretarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/googlecloudfirestoretarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 func main() {
-	pkgadapter.Main("googlecloudfirestore-target-adapter", googlecloudfirestoretarget2.EnvAccessorCtor, googlecloudfirestoretarget2.NewTarget)
+	pkgadapter.Main("googlecloudfirestore-target-adapter", googlecloudfirestoretarget.EnvAccessorCtor, googlecloudfirestoretarget.NewTarget)
 }

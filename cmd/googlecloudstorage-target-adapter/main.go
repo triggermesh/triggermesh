@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	googlecloudstoragetarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/googlecloudstoragetarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/googlecloudstoragetarget"
 )
 
 func main() {
-	pkgadapter.Main("googlecloudstorage-target-adapter", googlecloudstoragetarget2.EnvAccessorCtor, googlecloudstoragetarget2.NewTarget)
+	pkgadapter.Main("googlecloudstorage-target-adapter", googlecloudstoragetarget.EnvAccessorCtor, googlecloudstoragetarget.NewTarget)
 }

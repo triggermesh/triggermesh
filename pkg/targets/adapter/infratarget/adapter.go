@@ -24,12 +24,13 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/google/uuid"
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm"
-	jsvm "github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm/javascript"
 	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm"
+	jsvm "github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm/javascript"
 )
 
 // NewTarget adapter implementation

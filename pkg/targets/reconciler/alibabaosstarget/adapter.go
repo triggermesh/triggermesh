@@ -17,8 +17,6 @@ limitations under the License.
 package alibabaosstarget
 
 import (
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -27,6 +25,9 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	alibabaossv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const (
@@ -51,11 +52,11 @@ type adapterConfig struct {
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.AlibabaOSSTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	lbl := pkgreconciler.MakeAdapterLabels(adapterName, target.Name)
-	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, target.Name)
-	envSvc := pkgreconciler.MakeServiceEnv(name, target.Namespace)
+	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeAppEnv(target)
-	envObs := pkgreconciler.MakeObsEnv(cfg.obsConfig)
+	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
 

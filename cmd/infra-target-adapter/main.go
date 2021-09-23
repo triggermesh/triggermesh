@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	infratarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget"
 )
 
 func main() {
-	pkgadapter.Main("infra-target-adapter", infratarget2.EnvAccessorCtor, infratarget2.NewTarget)
+	pkgadapter.Main("infra-target-adapter", infratarget.EnvAccessorCtor, infratarget.NewTarget)
 }

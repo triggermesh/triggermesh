@@ -21,10 +21,11 @@ import (
 	"strings"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	"knative.dev/eventing/pkg/reconciler/source"
 
+	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
@@ -52,12 +53,12 @@ type TargetAdapterArgs struct {
 
 // MakeTargetAdapterKService generates the target adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.ElasticsearchTarget, cfg *adapterConfig) *servingv1.Service {
-	labels := pkgreconciler.MakeAdapterLabels(adapterName, target.Name)
+	labels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, target.Name)
-	envSvc := pkgreconciler.MakeServiceEnv(name, target.Namespace)
+	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeAppEnv(target)
-	envObs := pkgreconciler.MakeObsEnv(cfg.obsConfig)
+	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
 

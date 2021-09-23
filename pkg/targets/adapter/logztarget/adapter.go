@@ -21,13 +21,13 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/logzio/logzio-go"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
@@ -35,10 +35,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeLogzShipResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeLogzShipResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
@@ -66,7 +66,7 @@ var _ pkgadapter.Adapter = (*logzAdapter)(nil)
 type logzAdapter struct {
 	l *logzio.LogzioSender
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -80,7 +80,7 @@ func (a *logzAdapter) Start(ctx context.Context) error {
 func (a *logzAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	err := a.l.Send(event.Data())
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	return a.replier.Ok(&event, "ok")

@@ -20,9 +20,6 @@ import (
 	"context"
 	"testing"
 
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	resources2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
-	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -45,6 +42,9 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/splunktarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 )
 
 const (
@@ -296,12 +296,12 @@ func newAdapterService() *servingv1.Service {
 			Namespace: tNs,
 			Name:      tGenName,
 			Labels: labels.Set{
-				resources2.AppNameLabel:      adapterName,
-				resources2.AppInstanceLabel:  tName,
-				resources2.AppComponentLabel: resources2.AdapterComponent,
-				resources2.AppPartOfLabel:    partOf,
-				resources2.AppManagedByLabel: resources2.ManagedController,
-				network.VisibilityLabelKey:   serving.VisibilityClusterLocal,
+				resources.AppNameLabel:      adapterName,
+				resources.AppInstanceLabel:  tName,
+				resources.AppComponentLabel: resources.AdapterComponent,
+				resources.AppPartOfLabel:    partOf,
+				resources.AppManagedByLabel: resources.ManagedController,
+				network.VisibilityLabelKey:  serving.VisibilityClusterLocal,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(NewOwnerRefable(
@@ -316,11 +316,11 @@ func newAdapterService() *servingv1.Service {
 				Template: servingv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Labels: labels.Set{
-							resources2.AppNameLabel:      adapterName,
-							resources2.AppInstanceLabel:  tName,
-							resources2.AppComponentLabel: resources2.AdapterComponent,
-							resources2.AppPartOfLabel:    partOf,
-							resources2.AppManagedByLabel: resources2.ManagedController,
+							resources.AppNameLabel:      adapterName,
+							resources.AppInstanceLabel:  tName,
+							resources.AppComponentLabel: resources.AdapterComponent,
+							resources.AppPartOfLabel:    partOf,
+							resources.AppManagedByLabel: resources.ManagedController,
 						},
 					},
 					Spec: servingv1.RevisionSpec{
@@ -329,14 +329,14 @@ func newAdapterService() *servingv1.Service {
 								Image: tImg,
 								Env: []corev1.EnvVar{
 									{
-										Name:  resources2.EnvName,
+										Name:  resources.EnvName,
 										Value: tName,
 									}, {
-										Name:  resources2.EnvNamespace,
+										Name:  resources.EnvNamespace,
 										Value: tNs,
 									}, {
-										Name:  resources2.EnvMetricsDomain,
-										Value: resources2.DefaultMetricsDomain,
+										Name:  resources.EnvMetricsDomain,
+										Value: resources.DefaultMetricsDomain,
 									}, {
 										Name:  envHECEndpoint,
 										Value: tHECEndpointURL.String(),

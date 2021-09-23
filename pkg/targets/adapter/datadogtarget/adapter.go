@@ -24,13 +24,13 @@ import (
 	"net/http"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 const (
@@ -49,10 +49,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeDatadogResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeDatadogResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -72,7 +72,7 @@ var _ pkgadapter.Adapter = (*datadogAdapter)(nil)
 type datadogAdapter struct {
 	apiKey string
 
-	replier    *cloudevents2.Replier
+	replier    *targetce.Replier
 	httpClient *http.Client
 	ceClient   cloudevents.Client
 	logger     *zap.SugaredLogger
@@ -93,34 +93,34 @@ func (a *datadogAdapter) dispatch(ctx context.Context, event cloudevents.Event) 
 	case v1alpha1.EventTypeDatadogLog:
 		return a.postLog(event)
 	default:
-		return a.replier.Error(&event, cloudevents2.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
 	}
 }
 
 func (a *datadogAdapter) postLog(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if err := event.DataAs(&LogData{}); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	request, err := newLogsAPIRequest("/v1/input", a.apiKey, event.Data())
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 
 	}
 
 	res, err := a.httpClient.Do(request)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	defer res.Body.Close()
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess,
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess,
 			fmt.Errorf("received HTTP code %d", res.StatusCode),
 			map[string]string{"body": string(resBody)})
 	}
@@ -130,28 +130,28 @@ func (a *datadogAdapter) postLog(event cloudevents.Event) (*cloudevents.Event, c
 
 func (a *datadogAdapter) postEvent(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if err := event.DataAs(&EventData{}); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	request, err := newAPIRequest("/api/v1/events", a.apiKey, event.Data())
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 
 	}
 
 	res, err := a.httpClient.Do(request)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	defer res.Body.Close()
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}
 
 	if res.StatusCode != http.StatusAccepted {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess,
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess,
 			fmt.Errorf("received HTTP code %d", res.StatusCode),
 			map[string]string{"body": string(resBody)})
 	}
@@ -161,27 +161,27 @@ func (a *datadogAdapter) postEvent(event cloudevents.Event) (*cloudevents.Event,
 
 func (a *datadogAdapter) postMetric(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if err := event.DataAs(&MetricData{}); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	request, err := newAPIRequest("/api/v1/series", a.apiKey, event.Data())
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	res, err := a.httpClient.Do(request)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	defer res.Body.Close()
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}
 
 	if res.StatusCode != http.StatusAccepted {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess,
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess,
 			fmt.Errorf("received HTTP code %d", res.StatusCode),
 			map[string]string{"body": string(resBody)})
 	}

@@ -17,8 +17,6 @@ limitations under the License.
 package jiratarget
 
 import (
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -26,6 +24,8 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const (
@@ -49,11 +49,11 @@ type adapterConfig struct {
 func makeAdapterKnService(o *v1alpha1.JiraTarget, cfg *adapterConfig) *servingv1.Service {
 	envApp := makeCommonAppEnv(o)
 
-	ksvcLabels := reconciler2.MakeAdapterLabels(adapterName, o.Name)
-	podLabels := reconciler2.MakeAdapterLabels(adapterName, o.Name)
+	ksvcLabels := pkgreconciler.MakeAdapterLabels(adapterName, o.Name)
+	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, o.Name)
 	name := kmeta.ChildName(adapterName+"-", o.Name)
-	envSvc := reconciler2.MakeServiceEnv(o.Name, o.Namespace)
-	envObs := reconciler2.MakeObsEnv(cfg.configs)
+	envSvc := pkgreconciler.MakeServiceEnv(o.Name, o.Namespace)
+	envObs := pkgreconciler.MakeObsEnv(cfg.configs)
 	envs := append(envSvc, append(envApp, envObs...)...)
 
 	return resources.MakeKService(o.Namespace, name, cfg.Image,
@@ -81,8 +81,8 @@ func makeCommonAppEnv(o *v1alpha1.JiraTarget) []corev1.EnvVar {
 			Value: o.Spec.URL,
 		},
 		{
-			Name:  reconciler2.EnvBridgeID,
-			Value: reconciler2.GetStatefulBridgeID(o),
+			Name:  pkgreconciler.EnvBridgeID,
+			Value: pkgreconciler.GetStatefulBridgeID(o),
 		},
 	}
 }

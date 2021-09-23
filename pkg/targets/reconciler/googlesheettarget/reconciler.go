@@ -20,20 +20,20 @@ import (
 	"context"
 	"fmt"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"knative.dev/eventing/pkg/reconciler/source"
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	gsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilergsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlesheettarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // reconciler reconciles the target adapter object
 type reconciler struct {
 	TargetAdapterImage string `envconfig:"GOOGLESHEET_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlesheet-target-adapter"`
 
-	ksvcr reconciler2.KServiceReconciler
-	vg    reconciler2.ValueGetter
+	ksvcr libreconciler.KServiceReconciler
+	vg    libreconciler.ValueGetter
 
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
@@ -49,7 +49,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, trg *gsv1alpha1.GoogleSh
 	// NOTE(antoineco): the adapter currently doesn't evaluate the attributes of incoming events.
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
 	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = reconciler2.CeResponseAttributes(trg)
+	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.GoogleServiceAccount.SecretKeyRef)
 	if err != nil {

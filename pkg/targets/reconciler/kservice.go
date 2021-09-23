@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/semantic"
 	"go.uber.org/zap"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -34,6 +33,8 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 	servingclientset "knative.dev/serving/pkg/client/clientset/versioned"
 	servinglisters "knative.dev/serving/pkg/client/listers/serving/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/semantic"
 )
 
 // List of annotations set on Knative Serving objects by the Knative Serving

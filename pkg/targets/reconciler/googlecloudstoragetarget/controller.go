@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 
 	"k8s.io/client-go/tools/cache"
 
@@ -34,6 +33,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/googlecloudstoragetarget"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlecloudstoragetarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code

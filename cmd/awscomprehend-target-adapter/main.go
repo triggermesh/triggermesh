@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	awscomphrehendtarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/awscomphrehendtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/awscomphrehendtarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 func main() {
-	pkgadapter.Main("awscomphrehend-target-adapter", awscomphrehendtarget2.EnvAccessorCtor, awscomphrehendtarget2.NewTarget)
+	pkgadapter.Main("awscomphrehend-target-adapter", awscomphrehendtarget.EnvAccessorCtor, awscomphrehendtarget.NewTarget)
 }

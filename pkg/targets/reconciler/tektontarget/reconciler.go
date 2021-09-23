@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"go.uber.org/zap"
 
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -32,13 +31,14 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/tektontarget"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // reconciler reconciles the target adapter object
 type reconciler struct {
 	logger *zap.SugaredLogger
-	ksvcr  reconciler2.KServiceReconciler
-	vg     reconciler2.ValueGetter
+	ksvcr  libreconciler.KServiceReconciler
+	vg     libreconciler.ValueGetter
 
 	adapterCfg *adapterConfig
 
@@ -60,7 +60,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.TektonTarg
 	trg.Status.ObservedGeneration = trg.Generation
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
 	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = reconciler2.CeResponseAttributes(trg)
+	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	if err := r.reconcileServiceAccounts(ctx, trg.Namespace); err != nil {
 		return fmt.Errorf("reconciling adapter ServiceAccount: %w", err)

@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
@@ -34,6 +33,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	slacktargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/slacktarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/slacktarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code

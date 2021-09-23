@@ -19,20 +19,20 @@ package slacktarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/logging"
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	slack "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/slacktarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // reconciler reconciles the target adapter object
 type reconciler struct {
 	TargetAdapterImage string `envconfig:"SLACK_ADAPTER_IMAGE" default:"gcr.io/triggermesh/slack-target-adapter"`
 
-	ksvcr reconciler2.KServiceReconciler
+	ksvcr libreconciler.KServiceReconciler
 
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
@@ -47,7 +47,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, trg *slack.SlackTarget) 
 	trg.Status.ObservedGeneration = trg.Generation
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
 	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = reconciler2.CeResponseAttributes(trg)
+	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, MakeTargetAdapterKService(&TargetAdapterArgs{
 		Image:   r.TargetAdapterImage,

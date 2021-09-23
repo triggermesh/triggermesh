@@ -5,7 +5,7 @@ import (
 
 	zendeskv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerzendesk "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/zendesktarget"
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 
 	"go.uber.org/zap"
 
@@ -15,8 +15,8 @@ import (
 // reconciler reconciles the target adapter object
 type reconciler struct {
 	logger *zap.SugaredLogger
-	ksvcr  reconciler2.KServiceReconciler
-	vg     reconciler2.ValueGetter
+	ksvcr  libreconciler.KServiceReconciler
+	vg     libreconciler.ValueGetter
 
 	adapterCfg *adapterConfig
 }
@@ -31,7 +31,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, trg *zendeskv1alpha1.Zen
 	// NOTE(antoineco): the adapter currently doesn't evaluate the attributes of incoming events.
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
 	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = reconciler2.CeResponseAttributes(trg)
+	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	if trg.Spec.Token.SecretKeyRef != nil {
 		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.Token.SecretKeyRef)

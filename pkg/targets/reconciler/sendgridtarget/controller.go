@@ -19,7 +19,6 @@ package sendgridtarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"knative.dev/eventing/pkg/reconciler/source"
 
 	"github.com/kelseyhightower/envconfig"
@@ -32,6 +31,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	sendgridtargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/sendgridtarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/sendgridtarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+
 	kserviceclient "knative.dev/serving/pkg/client/injection/client"
 	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 )
@@ -53,8 +54,8 @@ func NewController(
 
 	r := &reconciler{
 		logger:     logging.FromContext(ctx),
-		ksvcr:      reconciler2.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:         reconciler2.NewValueGetter(kubeclient.Get(ctx)),
+		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
 	}
 

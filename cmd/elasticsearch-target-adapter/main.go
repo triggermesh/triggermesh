@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	elasticsearchtarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/elasticsearchtarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/elasticsearchtarget"
 )
 
 func main() {
-	pkgadapter.Main("elasticsearch", elasticsearchtarget2.EnvAccessorCtor, elasticsearchtarget2.NewTarget)
+	pkgadapter.Main("elasticsearch", elasticsearchtarget.EnvAccessorCtor, elasticsearchtarget.NewTarget)
 }

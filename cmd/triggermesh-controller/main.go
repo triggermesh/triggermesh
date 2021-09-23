@@ -17,9 +17,26 @@ limitations under the License.
 package main
 
 import (
+	"knative.dev/pkg/injection/sharedmain"
+
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchlogssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscodecommitsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscognitoidentitysource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscognitouserpoolsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awsdynamodbsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awskinesissource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awsperformanceinsightssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awss3source"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssnssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssqssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/httppollersource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/slacksource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/webhooksource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awscomprehendtarget"
-	awstarget2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler/awstarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/confluenttarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/datadogtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/elasticsearchtarget"
@@ -41,23 +58,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/twiliotarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/uipathtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
-	"knative.dev/pkg/injection/sharedmain"
-
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchlogssource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchsource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscodecommitsource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscognitoidentitysource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscognitouserpoolsource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awsdynamodbsource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awskinesissource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awsperformanceinsightssource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awss3source"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssnssource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssqssource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/httppollersource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/slacksource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/webhooksource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
 )
 
 func main() {
@@ -78,14 +78,14 @@ func main() {
 		slacksource.NewController,
 		webhooksource.NewController,
 		zendesksource.NewController,
-		//targets
+		// targets
 		alibabaosstarget.NewController,
-		awstarget2.NewDynamoDBController,
-		awstarget2.NewLambdaController,
-		awstarget2.NewS3Controller,
-		awstarget2.NewSNSController,
-		awstarget2.NewSQSController,
-		awstarget2.NewKinesisController,
+		awstarget.NewDynamoDBController,
+		awstarget.NewLambdaController,
+		awstarget.NewS3Controller,
+		awstarget.NewSNSController,
+		awstarget.NewSQSController,
+		awstarget.NewKinesisController,
 		awscomprehendtarget.NewController,
 		confluenttarget.NewController,
 		elasticsearchtarget.NewController,

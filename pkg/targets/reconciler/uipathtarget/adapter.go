@@ -17,8 +17,6 @@ limitations under the License.
 package uipathtarget
 
 import (
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
@@ -26,6 +24,8 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	uipathv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const adapterName = "uipathtarget"

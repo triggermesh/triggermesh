@@ -17,14 +17,15 @@ limitations under the License.
 package sendgridtarget
 
 import (
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const adapterName = "sendgrid"
@@ -47,12 +48,12 @@ type TargetAdapterArgs struct {
 
 // MakeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.SendGridTarget, cfg *adapterConfig) *servingv1.Service {
-	labels := pkgreconciler.MakeAdapterLabels(adapterName, target.Name)
+	labels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, target.Name)
-	envSvc := pkgreconciler.MakeServiceEnv(name, target.Namespace)
+	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeAppEnv(target)
-	envObs := pkgreconciler.MakeObsEnv(cfg.obsConfig)
+	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
 

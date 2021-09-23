@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	twiliotarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/twiliotarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/twiliotarget"
 )
 
 func main() {
-	pkgadapter.Main("twilio-target-adapter", twiliotarget2.EnvAccessorCtor, twiliotarget2.NewTarget)
+	pkgadapter.Main("twilio-target-adapter", twiliotarget.EnvAccessorCtor, twiliotarget.NewTarget)
 }

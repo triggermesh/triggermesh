@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"cloud.google.com/go/storage"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"google.golang.org/api/option"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -30,6 +29,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
@@ -43,10 +43,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Failed to create client: %v", err)
 	}
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeGoogleCloudStorageResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeGoogleCloudStorageResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -67,7 +67,7 @@ type googlecloudstorageAdapter struct {
 	client *storage.Client
 	bucket *storage.BucketHandle
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -93,10 +93,10 @@ func (a *googlecloudstorageAdapter) instertArbitraryObject(ctx context.Context, 
 	w := obj.NewWriter(ctx)
 
 	if _, err := w.Write(event.Data()); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 	if err := w.Close(); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	return a.replier.Ok(&event, "ok")
@@ -106,17 +106,17 @@ func (a *googlecloudstorageAdapter) instertArbitraryObject(ctx context.Context, 
 func (a *googlecloudstorageAdapter) insertObject(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	ep := &EventPayload{}
 	if err := event.DataAs(ep); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	obj := a.bucket.Object(ep.FileName)
 	w := obj.NewWriter(ctx)
 
 	if _, err := w.Write(ep.Data); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 	if err := w.Close(); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	return a.replier.Ok(&event, "ok")

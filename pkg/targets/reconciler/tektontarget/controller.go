@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"k8s.io/client-go/tools/cache"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -36,6 +35,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/tektontarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/tektontarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -56,8 +56,8 @@ func NewController(
 
 	r := &reconciler{
 		logger:       logging.FromContext(ctx),
-		ksvcr:        reconciler2.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:           reconciler2.NewValueGetter(k8sclient.Get(ctx)),
+		ksvcr:        libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:           libreconciler.NewValueGetter(k8sclient.Get(ctx)),
 		adapterCfg:   adapterCfg,
 		saClient:     k8sclient.Get(ctx).CoreV1().ServiceAccounts,
 		rbClient:     k8sclient.Get(ctx).RbacV1().RoleBindings,

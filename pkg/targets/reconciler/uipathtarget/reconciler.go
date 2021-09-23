@@ -19,12 +19,12 @@ package uipathtarget
 import (
 	"context"
 
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"go.uber.org/zap"
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	uipathv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcileruipath "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/uipathtarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // reconciler reconciles the target adapter object

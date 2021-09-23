@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	uipathtarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/uipathtarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/uipathtarget"
 )
 
 func main() {
-	pkgadapter.Main("uipath-target-adapter", uipathtarget2.EnvAccessorCtor, uipathtarget2.NewTarget)
+	pkgadapter.Main("uipath-target-adapter", uipathtarget.EnvAccessorCtor, uipathtarget.NewTarget)
 }

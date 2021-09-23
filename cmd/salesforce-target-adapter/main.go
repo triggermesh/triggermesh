@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	salesforcetarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/salesforcetarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/salesforcetarget"
 )
 
 func main() {
-	pkgadapter.Main("salesforce-target-adapter", salesforcetarget2.EnvAccessor, salesforcetarget2.NewTarget)
+	pkgadapter.Main("salesforce-target-adapter", salesforcetarget.EnvAccessor, salesforcetarget.NewTarget)
 }

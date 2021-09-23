@@ -58,6 +58,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		ctx, gsclient := faketargetsinjectionclient.With(ctx, ls.GetGoogleSheetTargetsObjects()...)
 		ctx, splunkclient := faketargetsinjectionclient.With(ctx, ls.GetSplunkTargetsObjects()...)
 		ctx, httpclient := faketargetsinjectionclient.With(ctx, ls.GetHTTPTargetsObjects()...)
+		ctx, logzclient := faketargetsinjectionclient.With(ctx, ls.GetLogzTargetObjects()...)
 
 		// all clients used inside reconciler implementations should be
 		// injected as well
@@ -83,6 +84,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 			gsclient.PrependReactor("*", "*", reactor)
 			splunkclient.PrependReactor("*", "*", reactor)
 			httpclient.PrependReactor("*", "*", reactor)
+			logzclient.PrependReactor("*", "*", reactor)
 			k8sClient.PrependReactor("*", "*", reactor)
 			servingClient.PrependReactor("*", "*", reactor)
 		}
@@ -94,6 +96,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 			gsclient,
 			splunkclient,
 			httpclient,
+			logzclient,
 
 			k8sClient,
 			servingClient,

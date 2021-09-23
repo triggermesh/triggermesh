@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	slacktarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/slacktarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/slacktarget"
 )
 
 func main() {
-	pkgadapter.Main("slack-target-adapter", slacktarget2.EnvAccessorCtor, slacktarget2.NewTarget)
+	pkgadapter.Main("slack-target-adapter", slacktarget.EnvAccessorCtor, slacktarget.NewTarget)
 }

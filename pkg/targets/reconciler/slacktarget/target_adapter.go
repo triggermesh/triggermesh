@@ -19,7 +19,6 @@ package slacktarget
 import (
 	"fmt"
 
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -27,6 +26,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const targetPrefix = "slacktarget"
@@ -71,7 +71,7 @@ func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 
 func makeLabels(name string) map[string]string {
 	return map[string]string{
-		"knative-eventing-target-controller": "triggermesh-controller",
+		"knative-eventing-target-controller": "knative-targets-controller",
 		"knative-eventing-target-name":       name,
 	}
 }

@@ -19,7 +19,6 @@ package splunktarget
 import (
 	"strconv"
 
-	resources2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -32,6 +31,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const adapterName = "splunktarget"
@@ -55,21 +55,21 @@ type adapterConfig struct {
 // makeAdapterKnService returns a Knative Service object for the target's adapter.
 func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *servingv1.Service {
 	svcLabels := labels.Set{
-		resources2.AppNameLabel:      adapterName,
-		resources2.AppInstanceLabel:  o.Name,
-		resources2.AppComponentLabel: resources2.AdapterComponent,
-		resources2.AppPartOfLabel:    partOf,
-		resources2.AppManagedByLabel: resources2.ManagedController,
+		resources.AppNameLabel:      adapterName,
+		resources.AppInstanceLabel:  o.Name,
+		resources.AppComponentLabel: resources.AdapterComponent,
+		resources.AppPartOfLabel:    partOf,
+		resources.AppManagedByLabel: resources.ManagedController,
 		// do not expose the service publicly
 		network.VisibilityLabelKey: serving.VisibilityClusterLocal,
 	}
 
 	podLabels := labels.Set{
-		resources2.AppNameLabel:      adapterName,
-		resources2.AppInstanceLabel:  o.Name,
-		resources2.AppComponentLabel: resources2.AdapterComponent,
-		resources2.AppPartOfLabel:    partOf,
-		resources2.AppManagedByLabel: resources2.ManagedController,
+		resources.AppNameLabel:      adapterName,
+		resources.AppInstanceLabel:  o.Name,
+		resources.AppComponentLabel: resources.AdapterComponent,
+		resources.AppPartOfLabel:    partOf,
+		resources.AppManagedByLabel: resources.ManagedController,
 	}
 
 	hecURL := apis.URL{
@@ -79,14 +79,14 @@ func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *serving
 
 	env := []corev1.EnvVar{
 		{
-			Name:  resources2.EnvName,
+			Name:  resources.EnvName,
 			Value: o.Name,
 		}, {
-			Name:  resources2.EnvNamespace,
+			Name:  resources.EnvNamespace,
 			Value: o.Namespace,
 		}, {
-			Name:  resources2.EnvMetricsDomain,
-			Value: resources2.DefaultMetricsDomain,
+			Name:  resources.EnvMetricsDomain,
+			Value: resources.DefaultMetricsDomain,
 		}, {
 			Name:  envHECEndpoint,
 			Value: hecURL.String(),

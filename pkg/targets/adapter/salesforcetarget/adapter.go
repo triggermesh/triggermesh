@@ -24,15 +24,15 @@ import (
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/salesforcetarget/auth"
-	client2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/salesforcetarget/client"
 	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/salesforcetarget/auth"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/salesforcetarget/client"
 )
 
 const (
@@ -49,13 +49,13 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error creating JWT authenticator: %v", err)
 	}
 
-	sfc := client2.New(jwtAuth, logger.Named("sfclient"),
-		client2.WithAPIVersion(env.Version),
-		client2.WithHTTPClient(&http.Client{Timeout: salesforceTimeout}))
+	sfc := client.New(jwtAuth, logger.Named("sfclient"),
+		client.WithAPIVersion(env.Version),
+		client.WithHTTPClient(&http.Client{Timeout: salesforceTimeout}))
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeSalesforceAPICallResponse))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeSalesforceAPICallResponse))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -71,9 +71,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*salesforceTarget)(nil)
 
 type salesforceTarget struct {
-	sfClient *client2.SalesforceClient
+	sfClient *client.SalesforceClient
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -93,31 +93,31 @@ func (a *salesforceTarget) Start(ctx context.Context) error {
 
 func (a *salesforceTarget) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if event.Type() != v1alpha1.EventTypeSalesforceAPICall {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", event.Type()), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", event.Type()), nil)
 	}
 
-	sfr := &client2.SalesforceAPIRequest{}
+	sfr := &client.SalesforceAPIRequest{}
 	if err := event.DataAs(sfr); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	if err := sfr.Validate(); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, err, nil)
 	}
 
 	res, err := a.sfClient.Do(ctx, *sfr)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	defer res.Body.Close()
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}
 
 	if res.StatusCode >= 400 {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess,
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess,
 			fmt.Errorf("received HTTP code %d", res.StatusCode),
 			map[string]string{"body": string(resBody)})
 	}

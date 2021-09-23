@@ -19,20 +19,20 @@ package oracletarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"go.uber.org/zap"
 
 	oraclev1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 
 	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/oracletarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	pkgreconciler "knative.dev/pkg/reconciler"
 )
 
 // Reconciler reconciles the target adapter object
 type reconciler struct {
 	logger *zap.SugaredLogger
-	ksvcr  reconciler2.KServiceReconciler
-	vg     reconciler2.ValueGetter
+	ksvcr  libreconciler.KServiceReconciler
+	vg     libreconciler.ValueGetter
 
 	adapterCfg *adapterConfig
 }

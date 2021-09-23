@@ -20,9 +20,6 @@ import (
 	"context"
 	"testing"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	resources2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
-	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -45,6 +42,9 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/jiratarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 )
 
 const (
@@ -214,7 +214,7 @@ var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) c
 
 	r := &reconciler{
 		adapterCfg: adapterCfg,
-		ksvcr: reconciler2.NewKServiceReconciler(
+		ksvcr: libreconciler.NewKServiceReconciler(
 			fakeservinginjectionclient.Get(ctx),
 			ls.GetServiceLister(),
 		),
@@ -235,7 +235,7 @@ func newEventTarget() *v1alpha1.JiraTarget {
 			Name:      tName,
 			UID:       tUID,
 			Labels: labels.Set{
-				reconciler2.LabelBridgeUsedByPrefix + tBridge: reconciler2.LabelValueBridgeDominant,
+				libreconciler.LabelBridgeUsedByPrefix + tBridge: libreconciler.LabelValueBridgeDominant,
 			},
 		},
 		Spec: v1alpha1.JiraTargetSpec{
@@ -291,12 +291,12 @@ func newAdapterService() *servingv1.Service {
 			Namespace: tNs,
 			Name:      tGenName,
 			Labels: labels.Set{
-				resources2.AppNameLabel:      adapterName,
-				resources2.AppInstanceLabel:  tName,
-				resources2.AppComponentLabel: resources2.AdapterComponent,
-				resources2.AppPartOfLabel:    resources2.PartOf,
-				resources2.AppManagedByLabel: resources2.ManagedController,
-				network.VisibilityLabelKey:   serving.VisibilityClusterLocal,
+				resources.AppNameLabel:      adapterName,
+				resources.AppInstanceLabel:  tName,
+				resources.AppComponentLabel: resources.AdapterComponent,
+				resources.AppPartOfLabel:    resources.PartOf,
+				resources.AppManagedByLabel: resources.ManagedController,
+				network.VisibilityLabelKey:  serving.VisibilityClusterLocal,
 			},
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(NewOwnerRefable(
@@ -311,24 +311,24 @@ func newAdapterService() *servingv1.Service {
 				Template: servingv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
 						Labels: labels.Set{
-							resources2.AppNameLabel:      adapterName,
-							resources2.AppInstanceLabel:  tName,
-							resources2.AppComponentLabel: resources2.AdapterComponent,
-							resources2.AppPartOfLabel:    resources2.PartOf,
-							resources2.AppManagedByLabel: resources2.ManagedController,
+							resources.AppNameLabel:      adapterName,
+							resources.AppInstanceLabel:  tName,
+							resources.AppComponentLabel: resources.AdapterComponent,
+							resources.AppPartOfLabel:    resources.PartOf,
+							resources.AppManagedByLabel: resources.ManagedController,
 						},
 					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec: corev1.PodSpec{
 							Containers: []corev1.Container{{
-								Name:  resources2.AdapterComponent,
+								Name:  resources.AdapterComponent,
 								Image: tImg,
 								Env: []corev1.EnvVar{
 									{
-										Name:  resources2.EnvNamespace,
+										Name:  resources.EnvNamespace,
 										Value: tNs,
 									}, {
-										Name:  resources2.EnvName,
+										Name:  resources.EnvName,
 										Value: tName,
 									}, {
 										Name:  envJiraAuthUser,
@@ -340,7 +340,7 @@ func newAdapterService() *servingv1.Service {
 										Name:  envJiraURL,
 										Value: tURL,
 									}, {
-										Name:  reconciler2.EnvBridgeID,
+										Name:  libreconciler.EnvBridgeID,
 										Value: tBridge,
 									}, {
 										Name: source.EnvLoggingCfg,

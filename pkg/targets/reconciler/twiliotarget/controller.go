@@ -19,7 +19,6 @@ package twiliotarget
 import (
 	"context"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"knative.dev/eventing/pkg/reconciler/source"
 
 	"github.com/kelseyhightower/envconfig"
@@ -35,6 +34,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	twiliotargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/twiliotarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/twiliotarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -54,8 +54,8 @@ func NewController(
 
 	r := &reconciler{
 		logger:     logging.FromContext(ctx),
-		ksvcr:      reconciler2.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:         reconciler2.NewValueGetter(kubeclient.Get(ctx)),
+		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
 	}
 

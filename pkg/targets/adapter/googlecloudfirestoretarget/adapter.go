@@ -23,7 +23,6 @@ import (
 
 	"cloud.google.com/go/firestore"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"go.uber.org/zap"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -34,6 +33,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
@@ -47,10 +47,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Failed to create client: %v", err)
 	}
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeGoogleCloudFirestoreWriteResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeGoogleCloudFirestoreWriteResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -74,7 +74,7 @@ type googlecloudFirestoreAdapter struct {
 	defaultCollection string
 	discardCEContext  bool
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -102,30 +102,30 @@ func (a *googlecloudFirestoreAdapter) dispatch(ctx context.Context, event cloude
 func (a *googlecloudFirestoreAdapter) insertObject(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	ep := &EventPayload{}
 	if err := event.DataAs(ep); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 	if ep.Collection == "" {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("must include a 'collection' attribute in the payload"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("must include a 'collection' attribute in the payload"), nil)
 	}
 
 	if ep.Document == "" {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("must include a 'document' attribute in the payload"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("must include a 'document' attribute in the payload"), nil)
 	}
 
 	if ep.Data == nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("must include a 'data' attribute in the payload"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("must include a 'data' attribute in the payload"), nil)
 	}
 
 	col := a.client.Collection(ep.Collection)
 	if col == nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("collection '%s' not found", ep.Collection), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("collection '%s' not found", ep.Collection), nil)
 	}
 
 	doc := col.Doc(ep.Document)
 
 	wr, err := doc.Create(ctx, ep.Data)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	return a.replier.Ok(&event, wr)
@@ -136,27 +136,27 @@ func (a *googlecloudFirestoreAdapter) instertArbitraryObject(ctx context.Context
 
 	if a.discardCEContext {
 		if err := event.DataAs(&eventJSONMap); err != nil {
-			return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+			return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 		}
 	} else {
 		b, err := json.Marshal(event)
 		if err != nil {
-			return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+			return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 		}
 		if err := json.Unmarshal(b, &eventJSONMap); err != nil {
-			return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+			return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 		}
 	}
 
 	col := a.client.Collection(a.defaultCollection)
 	if col == nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, fmt.Errorf("a default collection was not set in the spec"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, fmt.Errorf("a default collection was not set in the spec"), nil)
 	}
 	doc := col.Doc(event.ID())
 
 	wr, err := doc.Create(ctx, eventJSONMap)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	return a.replier.Ok(&event, wr)
@@ -167,17 +167,17 @@ func (a *googlecloudFirestoreAdapter) queryTables(ctx context.Context, event clo
 	var d []interface{}
 
 	if err := event.DataAs(ep); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	if ep.Collection == "" {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("element 'collection' is mandatory in the payload"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("element 'collection' is mandatory in the payload"), nil)
 	}
 
 	iter := a.client.Collection(ep.Collection).Documents(ctx)
 	defer iter.Stop()
 	if iter == nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("no objects found"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("no objects found"), nil)
 	}
 
 	for {
@@ -187,7 +187,7 @@ func (a *googlecloudFirestoreAdapter) queryTables(ctx context.Context, event clo
 		}
 
 		if err != nil {
-			return a.replier.Error(&event, cloudevents2.ErrorCodeParseResponse, err, nil)
+			return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 		}
 
 		data := doc.Data()
@@ -200,24 +200,24 @@ func (a *googlecloudFirestoreAdapter) queryTables(ctx context.Context, event clo
 func (a *googlecloudFirestoreAdapter) queryTable(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	ep := &EventPayload{}
 	if err := event.DataAs(ep); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	if ep.Collection == "" {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("must include a 'collection' attribute in the payload"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("must include a 'collection' attribute in the payload"), nil)
 	}
 
 	if ep.Document == "" {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("must include a 'document' attribute in the payload"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("must include a 'document' attribute in the payload"), nil)
 	}
 
 	dsnap, err := a.client.Collection(ep.Collection).Doc(ep.Document).Get(ctx)
 	if err != nil && status.Code(err) != codes.NotFound {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	if dsnap.Data() == nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestValidation, fmt.Errorf("no data found"), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation, fmt.Errorf("no data found"), nil)
 	}
 
 	d := dsnap.Data()

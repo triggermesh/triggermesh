@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	httptarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/httptarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/httptarget"
 )
 
 func main() {
-	pkgadapter.Main("http-target-adapter", httptarget2.EnvAccessorCtor, httptarget2.NewTarget)
+	pkgadapter.Main("http-target-adapter", httptarget.EnvAccessorCtor, httptarget.NewTarget)
 }

@@ -24,10 +24,11 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
-	adaptertest "github.com/triggermesh/triggermesh/pkg/targets/adapter/test"
 	zapt "go.uber.org/zap/zaptest"
 
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+
+	adaptertest "github.com/triggermesh/triggermesh/pkg/targets/adapter/test"
 )
 
 const (

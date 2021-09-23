@@ -22,11 +22,12 @@ import (
 	"strings"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	slack2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/slacktarget/slack"
 	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/slacktarget/slack"
 )
 
 const (
@@ -46,10 +47,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	// adapter. At this moment we use the full available cataglo and
 	// let users filter by configuring the bot at slack with the
 	// set of OAuth scopes that fit the users needs.
-	catalog := slack2.GetFullCatalog(true)
+	catalog := slack.GetFullCatalog(true)
 
 	return &slackAdapter{
-		slackClient: slack2.NewWebAPIClient(env.Token, apiURL, &http.Client{}, catalog),
+		slackClient: slack.NewWebAPIClient(env.Token, apiURL, &http.Client{}, catalog),
 		ceClient:    ceClient,
 		logger:      logger,
 	}
@@ -58,7 +59,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*slackAdapter)(nil)
 
 type slackAdapter struct {
-	slackClient slack2.WebAPIClient
+	slackClient slack.WebAPIClient
 
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
@@ -100,7 +101,7 @@ func (t *slackAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 	}
 
 	// TODO return event containing response structure
-	// See: https://github.com/triggermesh/triggermesh/issues/165
+	// See: https://github.com/triggermesh/knative-targets/issues/165
 
 	return cloudevents.ResultACK
 }

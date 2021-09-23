@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	googlesheettarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/googlesheettarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/googlesheettarget"
 )
 
 func main() {
-	pkgadapter.Main("googlesheet-target-adapter", googlesheettarget2.EnvAccessorCtor, googlesheettarget2.NewTarget)
+	pkgadapter.Main("googlesheet-target-adapter", googlesheettarget.EnvAccessorCtor, googlesheettarget.NewTarget)
 }

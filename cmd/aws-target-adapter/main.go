@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	awstarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/awstarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/awstarget"
 )
 
 func main() {
-	pkgadapter.Main("aws-target-adapter", awstarget2.EnvAccessorCtor, awstarget2.NewTarget)
+	pkgadapter.Main("aws-target-adapter", awstarget.EnvAccessorCtor, awstarget.NewTarget)
 }

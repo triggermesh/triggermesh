@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"reflect"
 
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -32,6 +31,7 @@ import (
 	"knative.dev/pkg/ptr"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const tektontargetServiceAccountName = "tektontarget-adapter"

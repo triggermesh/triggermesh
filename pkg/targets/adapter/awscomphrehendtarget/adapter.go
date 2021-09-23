@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"go.uber.org/zap"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -32,6 +31,7 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -40,10 +40,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	config := env.GetAwsConfig(env.Region)
 	logger := logging.FromContext(ctx)
 
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeAWSComprehendResult),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeAWSComprehendResult),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -64,7 +64,7 @@ type comprehendAdapter struct {
 	comprehend comprehendiface.ComprehendAPI
 	language   string
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	config   *aws.Config
 	session  *session.Session
 	ceClient cloudevents.Client
@@ -90,7 +90,7 @@ func (a *comprehendAdapter) dispatch(event cloudevents.Event) (*cloudevents.Even
 	var dSI comprehend.DetectSentimentInput
 	dSI.SetLanguageCode(a.language)
 	if err := event.DataAs(&eventJSONMap); err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	for _, v := range eventJSONMap {
@@ -99,7 +99,7 @@ func (a *comprehendAdapter) dispatch(event cloudevents.Event) (*cloudevents.Even
 		req, resp := a.comprehend.DetectSentimentRequest(&dSI)
 		err := req.Send()
 		if err != nil {
-			return a.replier.Error(&event, cloudevents2.ErrorCodeRequestParsing, err, nil)
+			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 
 		mixed = mixed + float64(*resp.SentimentScore.Mixed)
@@ -125,7 +125,7 @@ func (a *comprehendAdapter) dispatch(event cloudevents.Event) (*cloudevents.Even
 	responseEvent := cloudevents.NewEvent(cloudevents.VersionV1)
 	err := responseEvent.SetData(cloudevents.ApplicationJSON, r)
 	if err != nil {
-		return a.replier.Error(&event, cloudevents2.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	responseEvent.SetType(v1alpha1.EventTypeAWSComprehendResult)

@@ -19,11 +19,11 @@ package salesforcetarget
 import (
 	"context"
 
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/salesforcetarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.

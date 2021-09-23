@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	confluenttarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/confluenttarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/confluenttarget"
 )
 
 func main() {
-	pkgadapter.Main("confluent-target-adapter", confluenttarget2.EnvAccessorCtor, confluenttarget2.NewTarget)
+	pkgadapter.Main("confluent-target-adapter", confluenttarget.EnvAccessorCtor, confluenttarget.NewTarget)
 }

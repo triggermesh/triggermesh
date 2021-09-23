@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 
 	"k8s.io/client-go/tools/cache"
 
@@ -35,6 +34,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	googlesheetstargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/googlesheettarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlesheettarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -47,8 +47,8 @@ func NewController(
 	serviceInformer := kserviceinformer.Get(ctx)
 
 	r := &reconciler{
-		ksvcr:   reconciler2.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:      reconciler2.NewValueGetter(kubeclient.Get(ctx)),
+		ksvcr:   libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:      libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		configs: source.WatchConfigurations(ctx, targetPrefix, cmw, source.WithLogging, source.WithMetrics),
 	}
 

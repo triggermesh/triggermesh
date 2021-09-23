@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	logztarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/logztarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/logztarget"
 )
 
 func main() {
-	pkgadapter.Main("logz-target-adapter", logztarget2.EnvAccessorCtor, logztarget2.NewTarget)
+	pkgadapter.Main("logz-target-adapter", logztarget.EnvAccessorCtor, logztarget.NewTarget)
 }

@@ -22,7 +22,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	tektontarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/tektontarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/tektontarget"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 
@@ -45,7 +45,7 @@ func main() {
 
 	ctx, _ = injection.Default.SetupInformers(ctx, config)
 
-	pkgadapter.MainWithContext(ctx, "tekton-target-adapter", tektontarget2.EnvAccessorCtor, tektontarget2.NewTarget)
+	pkgadapter.MainWithContext(ctx, "tekton-target-adapter", tektontarget.EnvAccessorCtor, tektontarget.NewTarget)
 }
 
 // Locate the cluster configuration for the adapter to properly instantiate the Tekton injector

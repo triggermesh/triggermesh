@@ -20,8 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/event"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/semantic"
 	"go.uber.org/zap"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -34,6 +32,9 @@ import (
 
 	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/logging"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/semantic"
 )
 
 // DeploymentReconciler performs reconciliation for Deployments

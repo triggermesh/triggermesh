@@ -21,9 +21,6 @@ import (
 	"fmt"
 	"testing"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
-	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,6 +40,9 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlesheettarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 )
 
 const (
@@ -220,11 +220,11 @@ func TestReconcile(t *testing.T) {
 var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) controller.Reconciler {
 	r := &reconciler{
 		TargetAdapterImage: tImg,
-		ksvcr: reconciler2.NewKServiceReconciler(
+		ksvcr: libreconciler.NewKServiceReconciler(
 			fakeservinginjectionclient.Get(ctx),
 			ls.GetServiceLister(),
 		),
-		vg:      reconciler2.NewValueGetter(fakek8sinjectionclient.Get(ctx)),
+		vg:      libreconciler.NewValueGetter(fakek8sinjectionclient.Get(ctx)),
 		configs: &source.EmptyVarsGenerator{},
 	}
 
@@ -254,7 +254,7 @@ func newEventTarget() *v1alpha1.GoogleSheetTarget {
 
 	o.Status.InitializeConditions()
 	o.Status.AcceptedEventTypes = o.AcceptedEventTypes()
-	o.Status.ResponseAttributes = reconciler2.CeResponseAttributes(o)
+	o.Status.ResponseAttributes = libreconciler.CeResponseAttributes(o)
 
 	return o
 }

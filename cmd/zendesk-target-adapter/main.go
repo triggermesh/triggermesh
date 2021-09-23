@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	zendesktarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/zendesktarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/zendesktarget"
 )
 
 func main() {
-	pkgadapter.Main("zendesk-target-adapter", zendesktarget2.EnvAccessorCtor, zendesktarget2.NewTarget)
+	pkgadapter.Main("zendesk-target-adapter", zendesktarget.EnvAccessorCtor, zendesktarget.NewTarget)
 }

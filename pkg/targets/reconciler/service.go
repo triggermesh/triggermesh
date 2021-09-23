@@ -20,8 +20,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/event"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/semantic"
 	"go.uber.org/zap"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -33,6 +31,9 @@ import (
 	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/logging"
 	pkgreconciler "knative.dev/pkg/reconciler"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/semantic"
 )
 
 // ServiceReconciler performs reconciliation for Services

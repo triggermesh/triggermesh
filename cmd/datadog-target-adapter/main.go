@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	datadogtarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/datadogtarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/datadogtarget"
 )
 
 func main() {
-	pkgadapter.Main("datadog-target-adapter", datadogtarget2.EnvAccessorCtor, datadogtarget2.NewTarget)
+	pkgadapter.Main("datadog-target-adapter", datadogtarget.EnvAccessorCtor, datadogtarget.NewTarget)
 }

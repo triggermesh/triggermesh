@@ -20,7 +20,6 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"k8s.io/client-go/tools/cache"
 	"knative.dev/eventing/pkg/reconciler/source"
 	kubeclient "knative.dev/pkg/client/injection/kube/client"
@@ -31,6 +30,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	awslambdatargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/awslambdatarget"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/awslambdatarget"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+
 	kserviceclient "knative.dev/serving/pkg/client/injection/client"
 	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 )
@@ -51,8 +52,8 @@ func NewLambdaController(
 	serviceInformer := kserviceinformer.Get(ctx)
 
 	impl := awslambdatarget.NewImpl(ctx, &lambdaReconciler{
-		ksvcr:      reconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:         reconciler.NewValueGetter(kubeclient.Get(ctx)),
+		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
+		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
 	})
 	logging.FromContext(ctx).Info("Setting up event handlers")

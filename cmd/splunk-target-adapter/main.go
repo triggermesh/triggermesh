@@ -17,8 +17,9 @@ limitations under the License.
 package main
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/splunktarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/splunktarget"
 )
 
 func main() {

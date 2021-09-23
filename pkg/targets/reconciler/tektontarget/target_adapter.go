@@ -17,11 +17,12 @@ limitations under the License.
 package tektontarget
 
 import (
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"

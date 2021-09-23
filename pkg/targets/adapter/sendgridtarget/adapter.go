@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cloudevents2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"go.uber.org/zap"
 
 	"github.com/sendgrid/sendgrid-go"
@@ -31,16 +30,17 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
-	replier, err := cloudevents2.New(env.Component, logger.Named("replier"),
-		cloudevents2.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		cloudevents2.ReplierWithStaticResponseType(v1alpha1.EventTypeSendGridEmailSendResponse),
-		cloudevents2.ReplierWithPayloadPolicy(cloudevents2.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeSendGridEmailSendResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -71,7 +71,7 @@ type sendGridAdapter struct {
 	defaultMessage   string
 	defaultSubject   string
 
-	replier  *cloudevents2.Replier
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -87,12 +87,12 @@ func (a *sendGridAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event,
 	case v1alpha1.EventTypeSendGridEmailSend:
 		resp, err := a.sendEmail(event)
 		if err != nil {
-			return a.replier.Error(&event, cloudevents2.ErrorCodeEventContext, err, nil)
+			return a.replier.Error(&event, targetce.ErrorCodeEventContext, err, nil)
 		}
 
 		return a.replier.Ok(&event, resp)
 	default:
-		return a.replier.Error(&event, cloudevents2.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", event.Type()), nil)
+		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", event.Type()), nil)
 
 	}
 }

@@ -17,10 +17,11 @@ limitations under the License.
 package main
 
 import (
-	oracletarget2 "github.com/triggermesh/triggermesh/pkg/targets/adapter/oracletarget"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/oracletarget"
 )
 
 func main() {
-	pkgadapter.Main("oracle-target-adapter", oracletarget2.EnvAccessorCtor, oracletarget2.NewTarget)
+	pkgadapter.Main("oracle-target-adapter", oracletarget.EnvAccessorCtor, oracletarget.NewTarget)
 }

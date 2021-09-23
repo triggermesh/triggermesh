@@ -19,8 +19,6 @@ package googlecloudfirestoretarget
 import (
 	"strconv"
 
-	reconciler2 "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -28,6 +26,8 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	googlecloudfirestorev1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const (
@@ -51,11 +51,11 @@ type adapterConfig struct {
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *googlecloudfirestorev1alpha1.GoogleCloudFirestoreTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	lbl := reconciler2.MakeAdapterLabels(adapterName, target.Name)
-	podLabels := reconciler2.MakeAdapterLabels(adapterName, target.Name)
-	envSvc := reconciler2.MakeServiceEnv(name, target.Namespace)
+	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeAppEnv(target)
-	envObs := reconciler2.MakeObsEnv(cfg.obsConfig)
+	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
 
@@ -75,8 +75,8 @@ func makeAppEnv(o *googlecloudfirestorev1alpha1.GoogleCloudFirestoreTarget) []co
 			Name:  evnDefaultCollection,
 			Value: o.Spec.DefaultCollection,
 		}, {
-			Name:  reconciler2.EnvBridgeID,
-			Value: reconciler2.GetStatefulBridgeID(o),
+			Name:  libreconciler.EnvBridgeID,
+			Value: libreconciler.GetStatefulBridgeID(o),
 		}, {
 			Name:  envProjectID,
 			Value: o.Spec.ProjectID,
