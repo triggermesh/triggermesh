@@ -43,7 +43,7 @@ LABEL description "This is the Triggermesh Knative Event Target Adapter for Data
 
 ENV KO_DATA_PATH /kodata
 
-COPY licenses/ /licenses/
+COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
 COPY --from=builder /bin/datadog-target-adapter /datadog-target-adapter
 
