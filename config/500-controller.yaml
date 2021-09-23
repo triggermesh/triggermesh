@@ -56,25 +56,25 @@ spec:
           value: triggermesh.io
         # Source adapters
         - name: AWSCLOUDWATCHSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awscloudwatchsource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-cloudwatch-source-adapter
         - name: AWSCLOUDWATCHLOGSSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awscloudwatchlogssource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-cloudwatchlogs-source-adapter
         - name: AWSCODECOMMITSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awscodecommitsource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-codecommit-source-adapter
         - name: AWSCOGNITOIDENTITYSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awscognitoidentitysource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-cognito-identity-source-adapter
         - name: AWSCOGNITOUSERPOOLSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awscognitouserpoolsource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-cognito-userpool-source-adapter
         - name: AWSDYNAMODBSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbsource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-dynamodb-source-adapter
         - name: AWSKINESISSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awskinesissource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-kinesis-source-adapter
         - name: AWSPERFORMANCEINSIGHTSSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awsperformanceinsightssource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-performance-insights-source-adapter
         - name: AWSSNSSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awssnssource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-sns-source-adapter
         - name: AWSSQSSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awssqssource
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-sqs-source-adapter
         - name: HTTPPOLLERSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/httppollersource-adapter
         - name: SLACKSOURCE_IMAGE
