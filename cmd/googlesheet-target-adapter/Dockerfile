@@ -1,4 +1,4 @@
-# Copyright (c) 2021 TriggerMesh Inc.
+# Copyright 2021 TriggerMesh Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ LABEL description "This is the Triggermesh Knative Event Target Adapter for Goog
 
 ENV KO_DATA_PATH /kodata
 
-COPY licenses/ /licenses/
+COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
 COPY --from=builder /bin/googlesheet-target-adapter /googlesheet-target-adapter
 
