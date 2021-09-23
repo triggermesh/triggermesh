@@ -98,6 +98,78 @@ rules:
   verbs:
   - update
 
+# Read Target resources and update their statuses
+- apiGroups:
+  - targets.triggermesh.io
+  resources:
+  - alibabaosstargets
+  - awscomprehendtargets
+  - awsdynamodbtargets
+  - awskinesistargets
+  - awslambdatargets
+  - awss3targets
+  - awssnstargets
+  - awssqstargets
+  - confluenttargets
+  - datadogtargets
+  - elasticsearchtargets
+  - googlecloudworkflowstargets
+  - googlesheettargets
+  - googlecloudfirestoretargets
+  - googlecloudstoragetargets
+  - hasuratargets
+  - httptargets
+  - infratargets
+  - jiratargets
+  - logztargets
+  - oracletargets
+  - salesforcetargets
+  - sendgridtargets
+  - slacktargets
+  - splunktargets
+  - tektontargets
+  - twiliotargets
+  - uipathtargets
+  - zendesktargets
+  verbs:
+  - list
+  - watch
+  - get
+- apiGroups:
+  - targets.triggermesh.io
+  resources:
+  - alibabaosstargets/status
+  - awscomprehendtargets/status
+  - awsdynamodbtargets/status
+  - awskinesistargets/status
+  - awslambdatargets/status
+  - awss3targets/status
+  - awssnstargets/status
+  - awssqstargets/status
+  - confluenttargets/status
+  - datadogtargets/status
+  - elasticsearchtargets/status
+  - googlesheettargets/status
+  - googlecloudfirestoretargets/status
+  - googlecloudstoragetargets/status
+  - googlecloudworkflowstargets/status
+  - hasuratargets/status
+  - httptargets/status
+  - infratargets/status
+  - jiratargets/status
+  - logztargets/status
+  - oracletargets/status
+  - salesforcetargets/status
+  - sendgridtargets/status
+  - slacktargets/status
+  - splunktargets/status
+  - tektontargets/status
+  - twiliotargets/status
+  - uipathtargets/status
+  - zendesktargets/status
+  verbs:
+  - update
+
 # Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
 # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
 - apiGroups:
@@ -160,17 +232,9 @@ rules:
   - slacksource-adapter
   - webhooksource-adapter
   - zendesksource-adapter
+  - tektontarget-adapter
   verbs:
   - update
-- apiGroups:
-    - ''
-  resources:
-    - serviceaccounts
-  resourceNames:
-    - tektontarget-adapter
-  verbs:
-    - update
-    - delete
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:
@@ -199,33 +263,18 @@ rules:
   - slacksource-adapter
   - webhooksource-adapter
   - zendesksource-adapter
-  verbs:
-  - update
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - rolebindings
-  verbs:
-  - list
-  - watch
-  - create
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - rolebindings
-  resourceNames:
   - tektontarget-adapter
   verbs:
   - update
-  - delete
 
 # List namespaces
+# Required by the TektonTarget reaper.
 - apiGroups:
-    - ''
+  - ''
   resources:
-    - namespaces
+  - namespaces
   verbs:
-    - list
+  - list
 
 # Read credentials
 - apiGroups:
@@ -271,79 +320,6 @@ rules:
   - pods
   verbs:
   - list
-
-# Read and manage status for targets
-- apiGroups:
-    - targets.triggermesh.io
-  resources:
-    - alibabaosstargets
-    - awscomprehendtargets
-    - awsdynamodbtargets
-    - awskinesistargets
-    - awslambdatargets
-    - awss3targets
-    - awssnstargets
-    - awssqstargets
-    - confluenttargets
-    - datadogtargets
-    - elasticsearchtargets
-    - googlecloudworkflowstargets
-    - googlesheettargets
-    - googlecloudfirestoretargets
-    - googlecloudstoragetargets
-    - hasuratargets
-    - httptargets
-    - infratargets
-    - jiratargets
-    - logztargets
-    - oracletargets
-    - salesforcetargets
-    - sendgridtargets
-    - slacktargets
-    - splunktargets
-    - tektontargets
-    - twiliotargets
-    - uipathtargets
-    - zendesktargets
-  verbs:
-    - list
-    - watch
-    - get
-
-- apiGroups:
-    - targets.triggermesh.io
-  resources:
-    - alibabaosstargets/status
-    - awscomprehendtargets/status
-    - awsdynamodbtargets/status
-    - awskinesistargets/status
-    - awslambdatargets/status
-    - awss3targets/status
-    - awssnstargets/status
-    - awssqstargets/status
-    - confluenttargets/status
-    - datadogtargets/status
-    - elasticsearchtargets/status
-    - googlesheettargets/status
-    - googlecloudfirestoretargets/status
-    - googlecloudstoragetargets/status
-    - googlecloudworkflowstargets/status
-    - hasuratargets/status
-    - httptargets/status
-    - infratargets/status
-    - jiratargets/status
-    - logztargets/status
-    - oracletargets/status
-    - salesforcetargets/status
-    - sendgridtargets/status
-    - slacktargets/status
-    - splunktargets/status
-    - tektontargets/status
-    - twiliotargets/status
-    - uipathtargets/status
-    - zendesktargets/status
-  verbs:
-    - update
 
 ---
 
@@ -550,206 +526,6 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: alibabaosstarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awscomprehendtarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awsdynamodbtarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awskinesistarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awslambdatarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awss3target-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awssnstarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awssqstarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: confluenttarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: datadogtarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: elasticsearchtarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudworkflowstarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlesheetstarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudfirestoragetarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudstoragetarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: hasuratarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: httptarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: infratarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: jiratarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: logztarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: oracletarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: salesforcetarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: sendgridtarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: slacktarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: splunktarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
   name: tektontarget-adapter
 rules:
 - apiGroups:
@@ -764,31 +540,9 @@ rules:
 
 ---
 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: twiliotarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: uipathtarget-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: zendesktarget-adapter
-rules: []
----
-
-# The role is needed for the aggregated role source-observer in knative-eventing to provide readonly access to "Sources".
-# see https://github.com/knative/eventing/blob/release-0.14/docs/spec/sources.md#source-rbac
+# This role provides readonly access to "Source" duck types.
+# All the rules it contains get aggregated into the "source-observer" ClusterRole provided by Knative Eventing.
+# see https://github.com/knative/eventing/blob/release-0.26/docs/spec/sources.md#source-rbac
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -821,12 +575,15 @@ rules:
 
 ---
 
+# This role provides readonly access to "Addressable" duck types.
+# All the rules it contains get aggregated into the "addressable-resolver" ClusterRole provided by Knative Eventing.
+# https://github.com/knative/eventing/blob/release-0.26/config/core/roles/addressable-resolvers-clusterrole.yaml#L15-L28
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  name: triggermesh-addressable-resolver
   labels:
     duck.knative.dev/addressable: 'true'
-  name: knative-targets-addressable-resolver
 rules:
 - apiGroups:
   - targets.triggermesh.io
