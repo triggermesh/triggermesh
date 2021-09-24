@@ -86,10 +86,34 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSSNSSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awssqssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSSQSSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("azureactivitylogssources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureActivityLogsSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("azureblobstoragesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureBlobStorageSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("azureeventgridsources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureEventGridSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("azureeventhubsources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureEventHubSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("azurequeuestoragesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureQueueStorageSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudauditlogssources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudAuditLogsSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudbillingsources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudBillingSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudpubsubsources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudPubSubSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudstoragesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudStorageSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("httppollersources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().HTTPPollerSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("ocimetricssources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().OCIMetricsSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("salesforcesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().SalesforceSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("slacksources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().SlackSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("twiliosources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().TwilioSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("webhooksources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().WebhookSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("zendesksources"):

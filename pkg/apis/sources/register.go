@@ -88,16 +88,95 @@ var (
 		Resource: "awssqssources",
 	}
 
+	// AzureActivityLogsSourceResource respresents an event source for Azure
+	// activity logs (part of Azure Monitor).
+	// https://docs.microsoft.com/en-us/azure/azure-monitor/platform/activity-log
+	AzureActivityLogsSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azureactivitylogssources",
+	}
+
+	// AzureBlobStorageSourceResource respresents an event source for Azure Blob
+	// Storage containers.
+	AzureBlobStorageSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azureblobstoragesources",
+	}
+
+	// AzureEventGridSourceResource respresents an event source for Azure Event Grid.
+	AzureEventGridSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azureeventgridsources",
+	}
+
+	// AzureEventHubSourceResource respresents an event source for Azure Event Hub.
+	AzureEventHubSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azureeventhubsources",
+	}
+
+	// AzureQueueStorageSourceResource respresents an event source for Azure Queue Storage.
+	AzureQueueStorageSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azurequeuestoragesources",
+	}
+
+	// GoogleCloudAuditLogsSourceResource respresents an event source for Google
+	// Cloud Audit Logs.
+	GoogleCloudAuditLogsSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "googlecloudauditlogssources",
+	}
+
+	// GoogleCloudBillingSourceResource respresents an event source for Google
+	// Cloud Billing.
+	GoogleCloudBillingSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "googlecloudbillingsources",
+	}
+
+	// GoogleCloudPubSubSourceResource respresents an event source for Google Cloud
+	// Pub/Sub.
+	GoogleCloudPubSubSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "googlecloudpubsubsources",
+	}
+
+	// GoogleCloudStorageSourceResource respresents an event source for Google
+	// Cloud Storage.
+	GoogleCloudStorageSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "googlecloudstoragesources",
+	}
+
 	// HTTPPollerSourceResource represents an event source for polling HTTP endpoints.
 	HTTPPollerSourceResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "httppollersources",
 	}
 
+	// OCIMetricsSourceResource represents an event source for OCI Metrics.
+	OCIMetricsSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "ocimetricssources",
+	}
+
+	// SalesforceSourceResource represents an event source for Salesforce.
+	SalesforceSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "salesforcesources",
+	}
+
 	// SlackSourceResource represents an event source for Slack.
 	SlackSourceResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "slacksources",
+	}
+
+	// TwilioSourceResource represents an event source for Twilio.
+	TwilioSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "twiliosources",
 	}
 
 	// WebhookSourceResource represents an event source for HTTP webhooks.

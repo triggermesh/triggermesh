@@ -75,10 +75,22 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awssnssource
         - name: AWSSQSSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssqssource
+        - name: AZUREEVENTHUBSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubsource-adapter
+        - name: AZUREQUEUESTORAGESOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azurequeuestoragesource-adapter
+        - name: GOOGLECLOUDPUBSUBSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudpubsubsource-adapter
         - name: HTTPPOLLERSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/httppollersource-adapter
+        - name: OCIMETRICSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/ocimetricssource-adapter
+        - name: SALESFORCESOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/salesforcesource-adapter
         - name: SLACKSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/slacksource-adapter
+        - name: TWILIOSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/twiliosource-adapter
         - name: WEBHOOKSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/webhooksource-adapter
         - name: ZENDESKSOURCE_IMAGE

@@ -42,4 +42,7 @@ const (
 	ReasonRBACNotBound = "RBACNotBound"
 	// ReasonUnavailable is set on a Deployed condition when an adapter in unavailable.
 	ReasonUnavailable = "AdapterUnavailable"
+
+	// ReasonFailedSync is set on a status condition when some external resource can not be reconciled.
+	ReasonFailedSync = "FailedSync"
 )

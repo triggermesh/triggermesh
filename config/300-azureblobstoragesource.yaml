@@ -1,0 +1,288 @@
+# Copyright 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: azureblobstoragesources.sources.triggermesh.io
+  labels:
+    eventing.knative.dev/source: 'true'
+    duck.knative.dev/source: 'true'
+    knative.dev/crd-install: 'true'
+    triggermesh.io/crd-install: 'true'
+  annotations:
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "Microsoft.Storage.BlobCreated" },
+        { "type": "Microsoft.Storage.BlobDeleted" },
+        { "type": "Microsoft.Storage.BlobRenamed" },
+        { "type": "Microsoft.Storage.DirectoryCreated" },
+        { "type": "Microsoft.Storage.DirectoryDeleted" },
+        { "type": "Microsoft.Storage.DirectoryRenamed" },
+        { "type": "Microsoft.Storage.BlobTierChanged" },
+        { "type": "Microsoft.Storage.AsyncOperationInitiated" },
+        { "type": "Microsoft.Storage.BlobInventoryPolicyCompleted" }
+      ]
+spec:
+  group: sources.triggermesh.io
+  scope: Namespaced
+  names:
+    kind: AzureBlobStorageSource
+    plural: azureblobstoragesources
+    categories:
+    - all
+    - knative
+    - eventing
+    - sources
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        description: TriggerMesh event source for Azure Blob Storage.
+        type: object
+        properties:
+          spec:
+            description: Desired state of the event source.
+            type: object
+            properties:
+              storageAccountID:
+                description: |-
+                  Resource ID of the Storage Account to receive events for.
+
+                  The accepted format is
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}
+
+                  Besides the Storage Account name itself, the resource ID contains the subscription ID and resource group name which all together uniquely identify the Storage Account within Azure.
+                type: string
+                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.Storage\/storageAccounts\/[a-z0-9]{3,24}$
+              eventHubID:
+                description: |-
+                  Resource ID of either the Event Hubs instance or Event Hubs namespace to send events to.
+
+                  Accepted formats are
+                    - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
+                    - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
+
+                  If the resource ID represents an Event Hubs namespace, an Event Hubs instance is created on behalf of the user inside that namespace. Otherwise, the user-provided Event Hub is used.
+                type: string
+                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}(?:\/eventHubs\/[a-zA-Z0-9][\w.-]{0,49})?$
+              eventTypes:
+                description: |-
+                  Types of events to subscribe to.
+
+                  The list of available event types can be found at https://docs.microsoft.com/en-us/azure/event-grid/event-schema-blob-storage.
+
+                  When this attribute is not set, the source automatically subscribes to the following event types
+                  - Microsoft.Storage.BlobCreated
+                  - Microsoft.Storage.BlobDeleted
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - Microsoft.Storage.BlobCreated
+                  - Microsoft.Storage.BlobDeleted
+                  - Microsoft.Storage.BlobRenamed
+                  - Microsoft.Storage.DirectoryCreated
+                  - Microsoft.Storage.DirectoryDeleted
+                  - Microsoft.Storage.DirectoryRenamed
+                  - Microsoft.Storage.BlobTierChanged
+                  - Microsoft.Storage.AsyncOperationInitiated
+                    # A special type of event documented at https://docs.microsoft.com/en-us/azure/storage/blobs/blob-inventory.
+                    # Allowed for completeness, but users should be aware that those events use a different schema from
+                    # the other Storage event types.
+                  - Microsoft.Storage.BlobInventoryPolicyCompleted
+              auth:
+                description: Authentication method to interact with the Azure Storage and Azure Event Hubs REST APIs.
+                  This event source only supports the Service Principal authentication.
+                type: object
+                properties:
+                  servicePrincipal:
+                    description: Credentials of an Azure Service Principal. For more information about service
+                      principals, please refer to the Azure Active Directory documentation at
+                      https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals.
+                    type: object
+                    properties:
+                      tenantID:
+                        description: ID of the Azure Active Directory tenant.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the tenant ID.
+                            type: string
+                            format: guid
+                            pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the tenant ID.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientID:
+                        description: ID of the registered client/application.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the client ID.
+                            type: string
+                            format: guid
+                            pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the client ID.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientSecret:
+                        description: Secret associated with the registered client/application.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the client secret.
+                            type: string
+                            format: password
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the client secret.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                    required:
+                    - tenantID
+                    - clientID
+                    - clientSecret
+                required:
+                - servicePrincipal
+              sink:
+                description: The destination of events sourced from Azure Storage.
+                type: object
+                properties:
+                  ref:
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
+                    type: object
+                    properties:
+                      apiVersion:
+                        type: string
+                      kind:
+                        type: string
+                      namespace:
+                        type: string
+                      name:
+                        type: string
+                    required:
+                    - apiVersion
+                    - kind
+                    - name
+                  uri:
+                    description: URI to use as the destination of events.
+                    type: string
+                    format: uri
+                oneOf:
+                - required: [ref]
+                - required: [uri]
+            required:
+            - storageAccountID
+            - eventHubID
+            - auth
+            - sink
+          status:
+            description: Reported status of the event source.
+            type: object
+            properties:
+              eventHubID:
+                description: Resource ID of the Event Hubs instance that is currently receiving events from the Azure
+                  Storage Account.
+                type: string
+              sinkUri:
+                description: URI of the sink where events are currently sent to.
+                type: string
+                format: uri
+              ceAttributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    source:
+                      type: string
+                  required:
+                  - type
+                  - source
+              observedGeneration:
+                type: integer
+                format: int64
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ['True', 'False', Unknown]
+                    severity:
+                      type: string
+                      enum: [Error, Warning, Info]
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                  required:
+                  - type
+                  - status
+    additionalPrinterColumns:
+    - name: Ready
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].status
+    - name: Reason
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].reason
+    - name: Sink
+      type: string
+      jsonPath: .status.sinkUri
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

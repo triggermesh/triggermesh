@@ -25,7 +25,24 @@ const (
 	envComponent             = "K_COMPONENT"
 	envMetricsPrometheusPort = "METRICS_PROMETHEUS_PORT"
 
+	// Common AWS attributes
 	EnvARN             = "ARN"
 	EnvAccessKeyID     = "AWS_ACCESS_KEY_ID"
 	EnvSecretAccessKey = "AWS_SECRET_ACCESS_KEY" //nolint:gosec
+
+	// Common Azure attributes
+	EnvTenantID     = "AZURE_TENANT_ID"
+	EnvClientID     = "AZURE_CLIENT_ID"
+	EnvClientSecret = "AZURE_CLIENT_SECRET"
+	EnvConnStr      = "AZURE_CONN_STR"
+
+	// Azure EventHub auth attributes
+	EnvHubName      = "AZURE_HUB_NAME"
+	EnvHubNamespace = "AZURE_HUB_NAMESPACE"
+	EnvHubKeyName   = "EVENTHUB_KEY_NAME"
+	EnvHubKeyValue  = "EVENTHUB_KEY_VALUE"
+
+	// Google Cloud
+	EnvGCloudProject = "GCLOUD_PROJECT"
+	EnvGCloudSAKey   = "GCLOUD_SERVICEACCOUNT_KEY"
 )

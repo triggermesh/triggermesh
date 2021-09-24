@@ -280,11 +280,11 @@ func makeMockMessages(n int) []*sqs.Message {
 			MessageId:     aws.String(fmt.Sprintf(tMsgIDPrefix+"%03d", i+1)),
 			ReceiptHandle: aws.String(receiptHandle),
 			MessageAttributes: map[string]*sqs.MessageAttributeValue{
-				"Country.Spain.Capital": &sqs.MessageAttributeValue{
+				"Country.Spain.Capital": {
 					DataType:    aws.String("String.CityName"),
 					StringValue: aws.String("Madrid"),
 				},
-				"Blue_Pixel": &sqs.MessageAttributeValue{
+				"Blue_Pixel": {
 					DataType: aws.String("Binary.png"),
 					// base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgaPj/HwAEggJ/xY9R+AAAAABJRU5ErkJggg==
 					BinaryValue: []byte("\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00" +

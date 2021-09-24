@@ -143,14 +143,69 @@ func (l *Listers) GetAWSSQSSourceLister() listersv1alpha1.AWSSQSSourceLister {
 	return listersv1alpha1.NewAWSSQSSourceLister(l.IndexerFor(&v1alpha1.AWSSQSSource{}))
 }
 
+// GetAzureActivityLogsSourceLister returns a Lister for AzureActivityLogsSource objects.
+func (l *Listers) GetAzureActivityLogsSourceLister() listersv1alpha1.AzureActivityLogsSourceLister {
+	return listersv1alpha1.NewAzureActivityLogsSourceLister(l.IndexerFor(&v1alpha1.AzureActivityLogsSource{}))
+}
+
+// GetAzureBlobStorageSourceLister returns a Lister for AzureBlobStorageSource objects.
+func (l *Listers) GetAzureBlobStorageSourceLister() listersv1alpha1.AzureBlobStorageSourceLister {
+	return listersv1alpha1.NewAzureBlobStorageSourceLister(l.IndexerFor(&v1alpha1.AzureBlobStorageSource{}))
+}
+
+// GetAzureEventGridSourceLister returns a Lister for AzureEventGridSource objects.
+func (l *Listers) GetAzureEventGridSourceLister() listersv1alpha1.AzureEventGridSourceLister {
+	return listersv1alpha1.NewAzureEventGridSourceLister(l.IndexerFor(&v1alpha1.AzureEventGridSource{}))
+}
+
+// GetAzureEventHubSourceLister returns a Lister for AzureEventHubSource objects.
+func (l *Listers) GetAzureEventHubSourceLister() listersv1alpha1.AzureEventHubSourceLister {
+	return listersv1alpha1.NewAzureEventHubSourceLister(l.IndexerFor(&v1alpha1.AzureEventHubSource{}))
+}
+
+// GetGoogleCloudAuditLogsSourceLister returns a Lister for GoogleCloudAuditLogsSource objects.
+func (l *Listers) GetGoogleCloudAuditLogsSourceLister() listersv1alpha1.GoogleCloudAuditLogsSourceLister {
+	return listersv1alpha1.NewGoogleCloudAuditLogsSourceLister(l.IndexerFor(&v1alpha1.GoogleCloudAuditLogsSource{}))
+}
+
+// GetGoogleCloudBillingSourceLister returns a Lister for GoogleCloudBillingSource objects.
+func (l *Listers) GetGoogleCloudBillingSourceLister() listersv1alpha1.GoogleCloudBillingSourceLister {
+	return listersv1alpha1.NewGoogleCloudBillingSourceLister(l.IndexerFor(&v1alpha1.GoogleCloudBillingSource{}))
+}
+
+// GetGoogleCloudPubSubSourceLister returns a Lister for GoogleCloudPubSubSource objects.
+func (l *Listers) GetGoogleCloudPubSubSourceLister() listersv1alpha1.GoogleCloudPubSubSourceLister {
+	return listersv1alpha1.NewGoogleCloudPubSubSourceLister(l.IndexerFor(&v1alpha1.GoogleCloudPubSubSource{}))
+}
+
+// GetGoogleCloudStorageSourceLister returns a Lister for GoogleCloudStorageSource objects.
+func (l *Listers) GetGoogleCloudStorageSourceLister() listersv1alpha1.GoogleCloudStorageSourceLister {
+	return listersv1alpha1.NewGoogleCloudStorageSourceLister(l.IndexerFor(&v1alpha1.GoogleCloudStorageSource{}))
+}
+
 // GetHTTPPollerSourceLister returns a Lister for HTTPPollerSource objects.
 func (l *Listers) GetHTTPPollerSourceLister() listersv1alpha1.HTTPPollerSourceLister {
 	return listersv1alpha1.NewHTTPPollerSourceLister(l.IndexerFor(&v1alpha1.HTTPPollerSource{}))
 }
 
+// GetOCIMetricsSourceLister returns a Lister for OCIMetricsSource objects.
+func (l *Listers) GetOCIMetricsSourceLister() listersv1alpha1.OCIMetricsSourceLister {
+	return listersv1alpha1.NewOCIMetricsSourceLister(l.IndexerFor(&v1alpha1.OCIMetricsSource{}))
+}
+
+// GetSalesforceSourceLister returns a Lister for SalesforceSource objects.
+func (l *Listers) GetSalesforceSourceLister() listersv1alpha1.SalesforceSourceLister {
+	return listersv1alpha1.NewSalesforceSourceLister(l.IndexerFor(&v1alpha1.SalesforceSource{}))
+}
+
 // GetSlackSourceLister returns a Lister for SlackSource objects.
 func (l *Listers) GetSlackSourceLister() listersv1alpha1.SlackSourceLister {
 	return listersv1alpha1.NewSlackSourceLister(l.IndexerFor(&v1alpha1.SlackSource{}))
+}
+
+// GetTwilioSourceLister returns a Lister for TwilioSource objects.
+func (l *Listers) GetTwilioSourceLister() listersv1alpha1.TwilioSourceLister {
+	return listersv1alpha1.NewTwilioSourceLister(l.IndexerFor(&v1alpha1.TwilioSource{}))
 }
 
 // GetWebhookSourceLister returns a Lister for WebhookSource objects.
