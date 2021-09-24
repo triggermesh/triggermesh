@@ -170,6 +170,22 @@ rules:
   verbs:
   - update
 
+# Read Transformation resources and update their statuses
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - transformations
+  verbs:
+  - list
+  - watch
+  - get
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - transformations/status
+  verbs:
+  - update
+
 # Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
 # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
 - apiGroups:
@@ -190,6 +206,12 @@ rules:
   - slacksources/finalizers
   - webhooksources/finalizers
   - zendesksources/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - transformations/finalizers
   verbs:
   - update
 
@@ -513,6 +535,14 @@ rules:
   - twiliotargets
   - uipathtargets
   - zendesktargets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - transformations
   verbs:
   - get
   - list

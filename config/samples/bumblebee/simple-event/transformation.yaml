@@ -1,0 +1,49 @@
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: Transformation
+metadata:
+  name: pingsource-transformation
+spec:
+  # sink:
+  #   ref:
+  #     apiVersion: serving.knative.dev/v1
+  #     kind: Service
+  #     name: event-display
+  context:
+  - operation: store
+    paths:
+    - key: $time
+      value: time
+    - key: $id
+      value: id
+
+  - operation: add
+    paths:
+    - key: id
+      value: $person-$id
+    - key: type
+      value: io.triggermesh.transformation.pingsource
+
+  data:
+  - operation: store
+    paths:
+    - key: $person
+      value: First Name
+
+  - operation: add
+    paths:
+    - key: event.ID
+      value: $id
+    - key: event.time
+      value: $time
+
+  - operation: shift
+    paths:
+    - key: Date of birth:birthday
+    - key: First Name:firstname
+    - key: Last Name:lastname
+
+  - operation: delete
+    paths:
+    - key: Mobile phone
+    - key: Children[1].Year of birth
+    - value: Martin

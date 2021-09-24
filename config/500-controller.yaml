@@ -132,6 +132,9 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/uipath-target-adapter
         - name: ZENDESK_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesk-target-adapter
+        # Transformation adapter
+        - name: TRANSFORMER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         # Type-specific options
         - name: TEKTON_REAPING_INTERVAL
           value: 2m

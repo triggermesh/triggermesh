@@ -58,6 +58,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/twiliotarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/uipathtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
+	transformation "github.com/triggermesh/triggermesh/pkg/transformation/reconciler/controller"
 )
 
 func main() {
@@ -108,5 +109,7 @@ func main() {
 		twiliotarget.NewController,
 		uipathtarget.NewController,
 		zendesktarget.NewController,
+		// transformation
+		transformation.NewController,
 	)
 }

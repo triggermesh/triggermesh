@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: githubsecret
+data:
+  accessToken: <access token>
+  secretToken: <secret token>
+
+---
+
+apiVersion: sources.knative.dev/v1alpha1
+kind: GitHubSource
+metadata:
+  name: githubsource-transformation-demo
+spec:
+  accessToken:
+    secretKeyRef:
+      key: accessToken
+      name: githubsecret
+  secretToken:
+    secretKeyRef:
+      key: secretToken
+      name: githubsecret
+  eventTypes:
+  - push
+  - issues
+  ownerAndRepository: tzununbekov/foo
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: transformation-demo

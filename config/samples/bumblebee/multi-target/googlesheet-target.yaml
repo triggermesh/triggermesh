@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: googlesheet
+data:
+  credentials: <SA JSON key>
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: googlesheet-transformation-trigger
+spec:
+  broker: transformation-demo
+  filter:
+    attributes:
+      type: io.triggermesh.transformation.github
+  subscriber:
+    ref:
+      apiVersion: flow.triggermesh.io/v1alpha1
+      kind: Transformation
+      name: googlesheet-transformation
+
+---
+
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: Transformation
+metadata:
+  name: googlesheet-transformation
+spec:
+  context:
+  - operation: add
+    paths:
+    - key: type
+      value: io.triggermesh.transformation.googlesheet
+
+  data:
+  - operation: store
+    paths:
+    - key: $type
+      value: type
+    - key: $object
+      value: object 
+    - key: $subject
+      value: subject
+    - key: $verb
+      value: verb
+
+  - operation: delete
+    paths:
+    - key:
+
+  - operation: add
+    paths:
+    - key: message
+      value: 'type: $type, user: $object, repository: $subject, action: $verb'
+
+---
+
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: googlesheet-target-trigger
+spec:
+  broker: transformation-demo
+  filter: 
+    attributes:
+      type: io.triggermesh.transformation.googlesheet
+  subscriber:
+    ref:
+      apiVersion: targets.triggermesh.io/v1alpha1
+      kind: GoogleSheetTarget
+      name: transformation-googlesheet-demo
+
+---
+
+apiVersion: targets.triggermesh.io/v1alpha1
+kind: GoogleSheetTarget
+metadata:
+  name: transformation-googlesheet-demo
+spec:
+  id: 1nmznXLnrziNbAnKTayH4y-uxOsTC3gxUNqRgIfXP_X4
+  defaultPrefix: transformation-demo
+  googleServiceAccount:
+    secretKeyRef:
+      name: googlesheet
+      key: credentials

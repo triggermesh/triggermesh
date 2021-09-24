@@ -21,8 +21,9 @@ package externalversions
 import (
 	"fmt"
 
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/transformation/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -53,36 +54,40 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=sources.triggermesh.io, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("awscloudwatchlogssources"):
+	// Group=flow.triggermesh.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("transformations"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().Transformations().Informer()}, nil
+
+		// Group=sources.triggermesh.io, Version=v1alpha1
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awscloudwatchlogssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSCloudWatchLogsSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awscloudwatchsources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awscloudwatchsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSCloudWatchSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awscodecommitsources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awscodecommitsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSCodeCommitSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awscognitoidentitysources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awscognitoidentitysources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSCognitoIdentitySources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awscognitouserpoolsources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awscognitouserpoolsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSCognitoUserPoolSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awsdynamodbsources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awsdynamodbsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSDynamoDBSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awskinesissources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awskinesissources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSKinesisSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awsperformanceinsightssources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awsperformanceinsightssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSPerformanceInsightsSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awss3sources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awss3sources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSS3Sources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awssnssources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awssnssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSSNSSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("awssqssources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awssqssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSSQSSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("httppollersources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("httppollersources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().HTTPPollerSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("slacksources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("slacksources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().SlackSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("webhooksources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("webhooksources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().WebhookSources().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("zendesksources"):
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("zendesksources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().ZendeskSources().Informer()}, nil
 
 		// Group=targets.triggermesh.io, Version=v1alpha1
