@@ -581,7 +581,6 @@ rules:
   - extensions.triggermesh.io
   resources:
   - functions
-  - functions/status
   verbs:
   - get
   - list

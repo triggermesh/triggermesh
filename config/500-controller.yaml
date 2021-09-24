@@ -90,8 +90,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/aws-target-adapter
         - name: AWS_COMPREHEND_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehend-target-adapter
-        # - name: CONFLUENT_ADAPTER_IMAGE
-          # value: ko://github.com/triggermesh/triggermesh/cmd/confluent-target-adapter
+        - name: CONFLUENT_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/confluent-target-adapter
         - name: DATADOGTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/datadog-target-adapter
         - name: ELASTICSEARCH_ADAPTER_IMAGE
