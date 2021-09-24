@@ -4,7 +4,7 @@ go 1.15
 
 // Top-level module control over the exact version used for important direct dependencies.
 // https://github.com/golang/go/wiki/Modules#when-should-i-use-the-replace-directive
-replace k8s.io/client-go => k8s.io/client-go v0.19.7
+replace k8s.io/client-go => k8s.io/client-go v0.20.7
 
 require (
 	github.com/cloudevents/sdk-go/v2 v2.4.1
@@ -14,13 +14,13 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.23.0
 	go.uber.org/zap v1.17.0
-	k8s.io/api v0.19.7
-	k8s.io/apimachinery v0.19.7
+	k8s.io/api v0.20.7
+	k8s.io/apimachinery v0.20.7
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
-	k8s.io/code-generator v0.19.7
-	knative.dev/eventing v0.23.5
-	knative.dev/pkg v0.0.0-20210902175106-8d4b5e065ebb
-	knative.dev/serving v0.23.2
+	k8s.io/code-generator v0.20.7
+	knative.dev/eventing v0.24.3
+	knative.dev/pkg v0.0.0-20210902173607-953af0138c75
+	knative.dev/serving v0.24.1
 )
 
 require (
@@ -79,5 +79,5 @@ require (
 	google.golang.org/grpc v1.40.0
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.4.2
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
-	knative.dev/networking v0.0.0-20210608114541-4b1712c029b7
+	knative.dev/networking v0.0.0-20210622182128-53f45d6d2cfa
 )
