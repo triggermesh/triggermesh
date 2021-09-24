@@ -40,9 +40,33 @@ type AWSSNSSourceExpansion interface{}
 
 type AWSSQSSourceExpansion interface{}
 
+type AzureActivityLogsSourceExpansion interface{}
+
+type AzureBlobStorageSourceExpansion interface{}
+
+type AzureEventGridSourceExpansion interface{}
+
+type AzureEventHubSourceExpansion interface{}
+
+type AzureQueueStorageSourceExpansion interface{}
+
+type GoogleCloudAuditLogsSourceExpansion interface{}
+
+type GoogleCloudBillingSourceExpansion interface{}
+
+type GoogleCloudPubSubSourceExpansion interface{}
+
+type GoogleCloudStorageSourceExpansion interface{}
+
 type HTTPPollerSourceExpansion interface{}
 
+type OCIMetricsSourceExpansion interface{}
+
+type SalesforceSourceExpansion interface{}
+
 type SlackSourceExpansion interface{}
+
+type TwilioSourceExpansion interface{}
 
 type WebhookSourceExpansion interface{}
 

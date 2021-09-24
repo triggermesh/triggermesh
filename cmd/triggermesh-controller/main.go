@@ -31,8 +31,20 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awss3source"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssnssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awssqssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureactivitylogssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureblobstoragesource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureeventgridsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureeventhubsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azurequeuestoragesource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudauditlogssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudbillingsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudpubsubsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudstoragesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/httppollersource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ocimetricssource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/salesforcesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/slacksource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/twiliosource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/webhooksource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
@@ -76,8 +88,20 @@ func main() {
 		awss3source.NewController,
 		awssnssource.NewController,
 		awssqssource.NewController,
+		azureactivitylogssource.NewController,
+		azureblobstoragesource.NewController,
+		azureeventgridsource.NewController,
+		azureeventhubsource.NewController,
+		azurequeuestoragesource.NewController,
+		googlecloudauditlogssource.NewController,
+		googlecloudbillingsource.NewController,
+		googlecloudpubsubsource.NewController,
+		googlecloudstoragesource.NewController,
 		httppollersource.NewController,
+		ocimetricssource.NewController,
+		salesforcesource.NewController,
 		slacksource.NewController,
+		twiliosource.NewController,
 		webhooksource.NewController,
 		zendesksource.NewController,
 		// targets

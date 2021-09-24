@@ -37,8 +37,20 @@ type SourcesV1alpha1Interface interface {
 	AWSS3SourcesGetter
 	AWSSNSSourcesGetter
 	AWSSQSSourcesGetter
+	AzureActivityLogsSourcesGetter
+	AzureBlobStorageSourcesGetter
+	AzureEventGridSourcesGetter
+	AzureEventHubSourcesGetter
+	AzureQueueStorageSourcesGetter
+	GoogleCloudAuditLogsSourcesGetter
+	GoogleCloudBillingSourcesGetter
+	GoogleCloudPubSubSourcesGetter
+	GoogleCloudStorageSourcesGetter
 	HTTPPollerSourcesGetter
+	OCIMetricsSourcesGetter
+	SalesforceSourcesGetter
 	SlackSourcesGetter
+	TwilioSourcesGetter
 	WebhookSourcesGetter
 	ZendeskSourcesGetter
 }
@@ -92,12 +104,60 @@ func (c *SourcesV1alpha1Client) AWSSQSSources(namespace string) AWSSQSSourceInte
 	return newAWSSQSSources(c, namespace)
 }
 
+func (c *SourcesV1alpha1Client) AzureActivityLogsSources(namespace string) AzureActivityLogsSourceInterface {
+	return newAzureActivityLogsSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) AzureBlobStorageSources(namespace string) AzureBlobStorageSourceInterface {
+	return newAzureBlobStorageSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) AzureEventGridSources(namespace string) AzureEventGridSourceInterface {
+	return newAzureEventGridSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) AzureEventHubSources(namespace string) AzureEventHubSourceInterface {
+	return newAzureEventHubSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) AzureQueueStorageSources(namespace string) AzureQueueStorageSourceInterface {
+	return newAzureQueueStorageSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) GoogleCloudAuditLogsSources(namespace string) GoogleCloudAuditLogsSourceInterface {
+	return newGoogleCloudAuditLogsSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) GoogleCloudBillingSources(namespace string) GoogleCloudBillingSourceInterface {
+	return newGoogleCloudBillingSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) GoogleCloudPubSubSources(namespace string) GoogleCloudPubSubSourceInterface {
+	return newGoogleCloudPubSubSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) GoogleCloudStorageSources(namespace string) GoogleCloudStorageSourceInterface {
+	return newGoogleCloudStorageSources(c, namespace)
+}
+
 func (c *SourcesV1alpha1Client) HTTPPollerSources(namespace string) HTTPPollerSourceInterface {
 	return newHTTPPollerSources(c, namespace)
 }
 
+func (c *SourcesV1alpha1Client) OCIMetricsSources(namespace string) OCIMetricsSourceInterface {
+	return newOCIMetricsSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) SalesforceSources(namespace string) SalesforceSourceInterface {
+	return newSalesforceSources(c, namespace)
+}
+
 func (c *SourcesV1alpha1Client) SlackSources(namespace string) SlackSourceInterface {
 	return newSlackSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) TwilioSources(namespace string) TwilioSourceInterface {
+	return newTwilioSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) WebhookSources(namespace string) WebhookSourceInterface {

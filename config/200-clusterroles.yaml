@@ -69,8 +69,20 @@ rules:
   - awss3sources
   - awssnssources
   - awssqssources
+  - azureactivitylogssources
+  - azureblobstoragesources
+  - azureeventgridsources
+  - azureeventhubsources
+  - azurequeuestoragesources
+  - googlecloudauditlogssources
+  - googlecloudbillingsources
+  - googlecloudpubsubsources
+  - googlecloudstoragesources
   - httppollersources
+  - ocimetricssources
+  - salesforcesources
   - slacksources
+  - twiliosources
   - webhooksources
   - zendesksources
   verbs:
@@ -91,8 +103,20 @@ rules:
   - awss3sources/status
   - awssnssources/status
   - awssqssources/status
+  - azureactivitylogssources/status
+  - azureblobstoragesources/status
+  - azureeventgridsources/status
+  - azureeventhubsources/status
+  - azurequeuestoragesources/status
+  - googlecloudauditlogssources/status
+  - googlecloudbillingsources/status
+  - googlecloudpubsubsources/status
+  - googlecloudstoragesources/status
   - httppollersources/status
+  - ocimetricssources/status
+  - salesforcesources/status
   - slacksources/status
+  - twiliosources/status
   - webhooksources/status
   - zendesksources/status
   verbs:
@@ -237,6 +261,13 @@ rules:
   resources:
   - awss3sources
   - awssnssources
+  - azureactivitylogssources
+  - azureblobstoragesources
+  - azureeventgridsources
+  - googlecloudauditlogssources
+  - googlecloudbillingsources
+  - googlecloudpubsubsources
+  - googlecloudstoragesources
   - zendesksources
   verbs:
   - patch
@@ -266,8 +297,20 @@ rules:
   - awss3source-adapter
   - awssnssource-adapter
   - awssqssource-adapter
+  - azureactivitylogssource-adapter
+  - azureblobstoragesource-adapter
+  - azureeventgridsource-adapter
+  - azureeventhubsource-adapter
+  - azurequeuestoragesource-adapter
+  - googlecloudauditlogssource-adapter
+  - googlecloudbillingsource-adapter
+  - googlecloudpubsubsource-adapter
+  - googlecloudstoragesource-adapter
   - httppollersource-adapter
+  - ocimetricssource-adapter
+  - salesforcesource-adapter
   - slacksource-adapter
+  - twiliosource-adapter
   - webhooksource-adapter
   - zendesksource-adapter
   - tektontarget-adapter
@@ -297,8 +340,20 @@ rules:
   - awss3source-adapter
   - awssnssource-adapter
   - awssqssource-adapter
+  - azureactivitylogssource-adapter
+  - azureblobstoragesource-adapter
+  - azureeventgridsource-adapter
+  - azureeventhubsource-adapter
+  - azurequeuestoragesource-adapter
+  - googlecloudauditlogssource-adapter
+  - googlecloudbillingsource-adapter
+  - googlecloudpubsubsource-adapter
+  - googlecloudstoragesource-adapter
   - httppollersource-adapter
+  - ocimetricssource-adapter
+  - salesforcesource-adapter
   - slacksource-adapter
+  - twiliosource-adapter
   - webhooksource-adapter
   - zendesksource-adapter
   - tektontarget-adapter
@@ -324,7 +379,7 @@ rules:
 
 # Required by Function controller to store, and mount user's code
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -512,8 +567,20 @@ rules:
   - awss3sources
   - awssnssources
   - awssqssources
+  - azureactivitylogssources
+  - azureblobstoragesources
+  - azureeventgridsources
+  - azureeventhubsources
+  - azurequeuestoragesources
+  - googlecloudauditlogssources
+  - googlecloudbillingsources
+  - googlecloudpubsubsources
+  - googlecloudstoragesources
   - httppollersources
+  - ocimetricssources
+  - salesforcesources
   - slacksources
+  - twiliosources
   - webhooksources
   - zendesksources
   verbs:

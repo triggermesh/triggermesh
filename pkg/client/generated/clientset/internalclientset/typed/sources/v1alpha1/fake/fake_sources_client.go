@@ -72,12 +72,60 @@ func (c *FakeSourcesV1alpha1) AWSSQSSources(namespace string) v1alpha1.AWSSQSSou
 	return &FakeAWSSQSSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) AzureActivityLogsSources(namespace string) v1alpha1.AzureActivityLogsSourceInterface {
+	return &FakeAzureActivityLogsSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) AzureBlobStorageSources(namespace string) v1alpha1.AzureBlobStorageSourceInterface {
+	return &FakeAzureBlobStorageSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) AzureEventGridSources(namespace string) v1alpha1.AzureEventGridSourceInterface {
+	return &FakeAzureEventGridSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) AzureEventHubSources(namespace string) v1alpha1.AzureEventHubSourceInterface {
+	return &FakeAzureEventHubSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) AzureQueueStorageSources(namespace string) v1alpha1.AzureQueueStorageSourceInterface {
+	return &FakeAzureQueueStorageSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) GoogleCloudAuditLogsSources(namespace string) v1alpha1.GoogleCloudAuditLogsSourceInterface {
+	return &FakeGoogleCloudAuditLogsSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) GoogleCloudBillingSources(namespace string) v1alpha1.GoogleCloudBillingSourceInterface {
+	return &FakeGoogleCloudBillingSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) GoogleCloudPubSubSources(namespace string) v1alpha1.GoogleCloudPubSubSourceInterface {
+	return &FakeGoogleCloudPubSubSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) GoogleCloudStorageSources(namespace string) v1alpha1.GoogleCloudStorageSourceInterface {
+	return &FakeGoogleCloudStorageSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) HTTPPollerSources(namespace string) v1alpha1.HTTPPollerSourceInterface {
 	return &FakeHTTPPollerSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) OCIMetricsSources(namespace string) v1alpha1.OCIMetricsSourceInterface {
+	return &FakeOCIMetricsSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) SalesforceSources(namespace string) v1alpha1.SalesforceSourceInterface {
+	return &FakeSalesforceSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) SlackSources(namespace string) v1alpha1.SlackSourceInterface {
 	return &FakeSlackSources{c, namespace}
+}
+
+func (c *FakeSourcesV1alpha1) TwilioSources(namespace string) v1alpha1.TwilioSourceInterface {
+	return &FakeTwilioSources{c, namespace}
 }
 
 func (c *FakeSourcesV1alpha1) WebhookSources(namespace string) v1alpha1.WebhookSourceInterface {

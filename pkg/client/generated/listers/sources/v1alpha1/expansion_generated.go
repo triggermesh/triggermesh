@@ -106,6 +106,78 @@ type AWSSQSSourceListerExpansion interface{}
 // AWSSQSSourceNamespaceLister.
 type AWSSQSSourceNamespaceListerExpansion interface{}
 
+// AzureActivityLogsSourceListerExpansion allows custom methods to be added to
+// AzureActivityLogsSourceLister.
+type AzureActivityLogsSourceListerExpansion interface{}
+
+// AzureActivityLogsSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureActivityLogsSourceNamespaceLister.
+type AzureActivityLogsSourceNamespaceListerExpansion interface{}
+
+// AzureBlobStorageSourceListerExpansion allows custom methods to be added to
+// AzureBlobStorageSourceLister.
+type AzureBlobStorageSourceListerExpansion interface{}
+
+// AzureBlobStorageSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureBlobStorageSourceNamespaceLister.
+type AzureBlobStorageSourceNamespaceListerExpansion interface{}
+
+// AzureEventGridSourceListerExpansion allows custom methods to be added to
+// AzureEventGridSourceLister.
+type AzureEventGridSourceListerExpansion interface{}
+
+// AzureEventGridSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureEventGridSourceNamespaceLister.
+type AzureEventGridSourceNamespaceListerExpansion interface{}
+
+// AzureEventHubSourceListerExpansion allows custom methods to be added to
+// AzureEventHubSourceLister.
+type AzureEventHubSourceListerExpansion interface{}
+
+// AzureEventHubSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureEventHubSourceNamespaceLister.
+type AzureEventHubSourceNamespaceListerExpansion interface{}
+
+// AzureQueueStorageSourceListerExpansion allows custom methods to be added to
+// AzureQueueStorageSourceLister.
+type AzureQueueStorageSourceListerExpansion interface{}
+
+// AzureQueueStorageSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureQueueStorageSourceNamespaceLister.
+type AzureQueueStorageSourceNamespaceListerExpansion interface{}
+
+// GoogleCloudAuditLogsSourceListerExpansion allows custom methods to be added to
+// GoogleCloudAuditLogsSourceLister.
+type GoogleCloudAuditLogsSourceListerExpansion interface{}
+
+// GoogleCloudAuditLogsSourceNamespaceListerExpansion allows custom methods to be added to
+// GoogleCloudAuditLogsSourceNamespaceLister.
+type GoogleCloudAuditLogsSourceNamespaceListerExpansion interface{}
+
+// GoogleCloudBillingSourceListerExpansion allows custom methods to be added to
+// GoogleCloudBillingSourceLister.
+type GoogleCloudBillingSourceListerExpansion interface{}
+
+// GoogleCloudBillingSourceNamespaceListerExpansion allows custom methods to be added to
+// GoogleCloudBillingSourceNamespaceLister.
+type GoogleCloudBillingSourceNamespaceListerExpansion interface{}
+
+// GoogleCloudPubSubSourceListerExpansion allows custom methods to be added to
+// GoogleCloudPubSubSourceLister.
+type GoogleCloudPubSubSourceListerExpansion interface{}
+
+// GoogleCloudPubSubSourceNamespaceListerExpansion allows custom methods to be added to
+// GoogleCloudPubSubSourceNamespaceLister.
+type GoogleCloudPubSubSourceNamespaceListerExpansion interface{}
+
+// GoogleCloudStorageSourceListerExpansion allows custom methods to be added to
+// GoogleCloudStorageSourceLister.
+type GoogleCloudStorageSourceListerExpansion interface{}
+
+// GoogleCloudStorageSourceNamespaceListerExpansion allows custom methods to be added to
+// GoogleCloudStorageSourceNamespaceLister.
+type GoogleCloudStorageSourceNamespaceListerExpansion interface{}
+
 // HTTPPollerSourceListerExpansion allows custom methods to be added to
 // HTTPPollerSourceLister.
 type HTTPPollerSourceListerExpansion interface{}
@@ -114,6 +186,22 @@ type HTTPPollerSourceListerExpansion interface{}
 // HTTPPollerSourceNamespaceLister.
 type HTTPPollerSourceNamespaceListerExpansion interface{}
 
+// OCIMetricsSourceListerExpansion allows custom methods to be added to
+// OCIMetricsSourceLister.
+type OCIMetricsSourceListerExpansion interface{}
+
+// OCIMetricsSourceNamespaceListerExpansion allows custom methods to be added to
+// OCIMetricsSourceNamespaceLister.
+type OCIMetricsSourceNamespaceListerExpansion interface{}
+
+// SalesforceSourceListerExpansion allows custom methods to be added to
+// SalesforceSourceLister.
+type SalesforceSourceListerExpansion interface{}
+
+// SalesforceSourceNamespaceListerExpansion allows custom methods to be added to
+// SalesforceSourceNamespaceLister.
+type SalesforceSourceNamespaceListerExpansion interface{}
+
 // SlackSourceListerExpansion allows custom methods to be added to
 // SlackSourceLister.
 type SlackSourceListerExpansion interface{}
@@ -121,6 +209,14 @@ type SlackSourceListerExpansion interface{}
 // SlackSourceNamespaceListerExpansion allows custom methods to be added to
 // SlackSourceNamespaceLister.
 type SlackSourceNamespaceListerExpansion interface{}
+
+// TwilioSourceListerExpansion allows custom methods to be added to
+// TwilioSourceLister.
+type TwilioSourceListerExpansion interface{}
+
+// TwilioSourceNamespaceListerExpansion allows custom methods to be added to
+// TwilioSourceNamespaceLister.
+type TwilioSourceNamespaceListerExpansion interface{}
 
 // WebhookSourceListerExpansion allows custom methods to be added to
 // WebhookSourceLister.

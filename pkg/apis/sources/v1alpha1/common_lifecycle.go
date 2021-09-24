@@ -34,6 +34,12 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/status"
 )
 
+// EventType returns an event type in a format suitable for usage as a
+// CloudEvent type attribute.
+func EventType(service, eventType string) string {
+	return "io.triggermesh." + service + "." + eventType
+}
+
 // AWSEventType returns an event type in a format suitable for usage as a
 // CloudEvent type attribute.
 func AWSEventType(awsService, eventType string) string {

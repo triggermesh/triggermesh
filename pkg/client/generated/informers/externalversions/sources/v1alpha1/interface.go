@@ -46,10 +46,34 @@ type Interface interface {
 	AWSSNSSources() AWSSNSSourceInformer
 	// AWSSQSSources returns a AWSSQSSourceInformer.
 	AWSSQSSources() AWSSQSSourceInformer
+	// AzureActivityLogsSources returns a AzureActivityLogsSourceInformer.
+	AzureActivityLogsSources() AzureActivityLogsSourceInformer
+	// AzureBlobStorageSources returns a AzureBlobStorageSourceInformer.
+	AzureBlobStorageSources() AzureBlobStorageSourceInformer
+	// AzureEventGridSources returns a AzureEventGridSourceInformer.
+	AzureEventGridSources() AzureEventGridSourceInformer
+	// AzureEventHubSources returns a AzureEventHubSourceInformer.
+	AzureEventHubSources() AzureEventHubSourceInformer
+	// AzureQueueStorageSources returns a AzureQueueStorageSourceInformer.
+	AzureQueueStorageSources() AzureQueueStorageSourceInformer
+	// GoogleCloudAuditLogsSources returns a GoogleCloudAuditLogsSourceInformer.
+	GoogleCloudAuditLogsSources() GoogleCloudAuditLogsSourceInformer
+	// GoogleCloudBillingSources returns a GoogleCloudBillingSourceInformer.
+	GoogleCloudBillingSources() GoogleCloudBillingSourceInformer
+	// GoogleCloudPubSubSources returns a GoogleCloudPubSubSourceInformer.
+	GoogleCloudPubSubSources() GoogleCloudPubSubSourceInformer
+	// GoogleCloudStorageSources returns a GoogleCloudStorageSourceInformer.
+	GoogleCloudStorageSources() GoogleCloudStorageSourceInformer
 	// HTTPPollerSources returns a HTTPPollerSourceInformer.
 	HTTPPollerSources() HTTPPollerSourceInformer
+	// OCIMetricsSources returns a OCIMetricsSourceInformer.
+	OCIMetricsSources() OCIMetricsSourceInformer
+	// SalesforceSources returns a SalesforceSourceInformer.
+	SalesforceSources() SalesforceSourceInformer
 	// SlackSources returns a SlackSourceInformer.
 	SlackSources() SlackSourceInformer
+	// TwilioSources returns a TwilioSourceInformer.
+	TwilioSources() TwilioSourceInformer
 	// WebhookSources returns a WebhookSourceInformer.
 	WebhookSources() WebhookSourceInformer
 	// ZendeskSources returns a ZendeskSourceInformer.
@@ -122,14 +146,74 @@ func (v *version) AWSSQSSources() AWSSQSSourceInformer {
 	return &aWSSQSSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
+// AzureActivityLogsSources returns a AzureActivityLogsSourceInformer.
+func (v *version) AzureActivityLogsSources() AzureActivityLogsSourceInformer {
+	return &azureActivityLogsSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureBlobStorageSources returns a AzureBlobStorageSourceInformer.
+func (v *version) AzureBlobStorageSources() AzureBlobStorageSourceInformer {
+	return &azureBlobStorageSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureEventGridSources returns a AzureEventGridSourceInformer.
+func (v *version) AzureEventGridSources() AzureEventGridSourceInformer {
+	return &azureEventGridSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureEventHubSources returns a AzureEventHubSourceInformer.
+func (v *version) AzureEventHubSources() AzureEventHubSourceInformer {
+	return &azureEventHubSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureQueueStorageSources returns a AzureQueueStorageSourceInformer.
+func (v *version) AzureQueueStorageSources() AzureQueueStorageSourceInformer {
+	return &azureQueueStorageSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GoogleCloudAuditLogsSources returns a GoogleCloudAuditLogsSourceInformer.
+func (v *version) GoogleCloudAuditLogsSources() GoogleCloudAuditLogsSourceInformer {
+	return &googleCloudAuditLogsSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GoogleCloudBillingSources returns a GoogleCloudBillingSourceInformer.
+func (v *version) GoogleCloudBillingSources() GoogleCloudBillingSourceInformer {
+	return &googleCloudBillingSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GoogleCloudPubSubSources returns a GoogleCloudPubSubSourceInformer.
+func (v *version) GoogleCloudPubSubSources() GoogleCloudPubSubSourceInformer {
+	return &googleCloudPubSubSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GoogleCloudStorageSources returns a GoogleCloudStorageSourceInformer.
+func (v *version) GoogleCloudStorageSources() GoogleCloudStorageSourceInformer {
+	return &googleCloudStorageSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
 // HTTPPollerSources returns a HTTPPollerSourceInformer.
 func (v *version) HTTPPollerSources() HTTPPollerSourceInformer {
 	return &hTTPPollerSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
+// OCIMetricsSources returns a OCIMetricsSourceInformer.
+func (v *version) OCIMetricsSources() OCIMetricsSourceInformer {
+	return &oCIMetricsSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// SalesforceSources returns a SalesforceSourceInformer.
+func (v *version) SalesforceSources() SalesforceSourceInformer {
+	return &salesforceSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
 // SlackSources returns a SlackSourceInformer.
 func (v *version) SlackSources() SlackSourceInformer {
 	return &slackSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// TwilioSources returns a TwilioSourceInformer.
+func (v *version) TwilioSources() TwilioSourceInformer {
+	return &twilioSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // WebhookSources returns a WebhookSourceInformer.
