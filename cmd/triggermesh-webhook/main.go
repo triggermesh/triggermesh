@@ -30,11 +30,13 @@ import (
 	"knative.dev/pkg/webhook/resourcesemantics/defaulting"
 	"knative.dev/pkg/webhook/resourcesemantics/validation"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
+	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
-	v1alpha1.SchemeGroupVersion.WithKind("AzureEventHubSource"): &v1alpha1.AzureEventHubSource{},
+	sourcesv1alpha1.SchemeGroupVersion.WithKind("AzureEventHubSource"): &sourcesv1alpha1.AzureEventHubSource{},
+	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):              &routingv1alpha1.Filter{},
 }
 
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}

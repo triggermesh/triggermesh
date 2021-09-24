@@ -23,6 +23,7 @@ import (
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -62,6 +63,12 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		// Group=flow.triggermesh.io, Version=v1alpha1
 	case flowv1alpha1.SchemeGroupVersion.WithResource("transformations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().Transformations().Informer()}, nil
+
+		// Group=routing.triggermesh.io, Version=v1alpha1
+	case routingv1alpha1.SchemeGroupVersion.WithResource("filters"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Routing().V1alpha1().Filters().Informer()}, nil
+	case routingv1alpha1.SchemeGroupVersion.WithResource("splitters"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Routing().V1alpha1().Splitters().Informer()}, nil
 
 		// Group=sources.triggermesh.io, Version=v1alpha1
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awscloudwatchlogssources"):

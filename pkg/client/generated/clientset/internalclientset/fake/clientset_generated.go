@@ -24,6 +24,8 @@ import (
 	fakeextensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/extensions/v1alpha1/fake"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/flow/v1alpha1"
 	fakeflowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/flow/v1alpha1/fake"
+	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/routing/v1alpha1"
+	fakeroutingv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/routing/v1alpha1/fake"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	fakesourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1/fake"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
@@ -90,6 +92,11 @@ func (c *Clientset) ExtensionsV1alpha1() extensionsv1alpha1.ExtensionsV1alpha1In
 // FlowV1alpha1 retrieves the FlowV1alpha1Client
 func (c *Clientset) FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface {
 	return &fakeflowv1alpha1.FakeFlowV1alpha1{Fake: &c.Fake}
+}
+
+// RoutingV1alpha1 retrieves the RoutingV1alpha1Client
+func (c *Clientset) RoutingV1alpha1() routingv1alpha1.RoutingV1alpha1Interface {
+	return &fakeroutingv1alpha1.FakeRoutingV1alpha1{Fake: &c.Fake}
 }
 
 // SourcesV1alpha1 retrieves the SourcesV1alpha1Client

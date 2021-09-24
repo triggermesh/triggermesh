@@ -47,6 +47,30 @@ rules:
   verbs:
   - update
 
+# Routing admin
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters
+  - splitters
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+
+# Routing statuses update
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - splitters/status
+  - filters/status
+  verbs:
+  - update
+
 # Events admin
 - apiGroups:
   - ''
@@ -73,6 +97,14 @@ rules:
   - update
   - list
   - watch
+
+# Validation webhook gets system namespace to use it as an owner.
+- apiGroups:
+  - ''
+  resources:
+  - namespaces
+  verbs:
+  - get
 
 # For actually registering our webhook.
 - apiGroups:

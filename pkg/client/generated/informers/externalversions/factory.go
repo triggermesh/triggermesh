@@ -27,6 +27,7 @@ import (
 	extensions "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/extensions"
 	flow "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/flow"
 	internalinterfaces "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/internalinterfaces"
+	routing "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/routing"
 	sources "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/sources"
 	targets "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/targets"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -177,6 +178,7 @@ type SharedInformerFactory interface {
 
 	Extensions() extensions.Interface
 	Flow() flow.Interface
+	Routing() routing.Interface
 	Sources() sources.Interface
 	Targets() targets.Interface
 }
@@ -187,6 +189,10 @@ func (f *sharedInformerFactory) Extensions() extensions.Interface {
 
 func (f *sharedInformerFactory) Flow() flow.Interface {
 	return flow.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Routing() routing.Interface {
+	return routing.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Sources() sources.Interface {

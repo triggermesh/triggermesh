@@ -20,6 +20,8 @@ import (
 	"knative.dev/pkg/injection/sharedmain"
 
 	"github.com/triggermesh/triggermesh/pkg/function"
+	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/filter"
+	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/splitter"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchlogssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscodecommitsource"
@@ -138,5 +140,8 @@ func main() {
 		transformation.NewController,
 		// functions
 		function.NewController,
+		// routing
+		filter.NewController,
+		splitter.NewController,
 	)
 }

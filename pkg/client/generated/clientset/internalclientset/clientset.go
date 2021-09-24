@@ -23,6 +23,7 @@ import (
 
 	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/extensions/v1alpha1"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/flow/v1alpha1"
+	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/routing/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
 	discovery "k8s.io/client-go/discovery"
@@ -34,6 +35,7 @@ type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	ExtensionsV1alpha1() extensionsv1alpha1.ExtensionsV1alpha1Interface
 	FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface
+	RoutingV1alpha1() routingv1alpha1.RoutingV1alpha1Interface
 	SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface
 	TargetsV1alpha1() targetsv1alpha1.TargetsV1alpha1Interface
 }
@@ -44,6 +46,7 @@ type Clientset struct {
 	*discovery.DiscoveryClient
 	extensionsV1alpha1 *extensionsv1alpha1.ExtensionsV1alpha1Client
 	flowV1alpha1       *flowv1alpha1.FlowV1alpha1Client
+	routingV1alpha1    *routingv1alpha1.RoutingV1alpha1Client
 	sourcesV1alpha1    *sourcesv1alpha1.SourcesV1alpha1Client
 	targetsV1alpha1    *targetsv1alpha1.TargetsV1alpha1Client
 }
@@ -56,6 +59,11 @@ func (c *Clientset) ExtensionsV1alpha1() extensionsv1alpha1.ExtensionsV1alpha1In
 // FlowV1alpha1 retrieves the FlowV1alpha1Client
 func (c *Clientset) FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface {
 	return c.flowV1alpha1
+}
+
+// RoutingV1alpha1 retrieves the RoutingV1alpha1Client
+func (c *Clientset) RoutingV1alpha1() routingv1alpha1.RoutingV1alpha1Interface {
+	return c.routingV1alpha1
 }
 
 // SourcesV1alpha1 retrieves the SourcesV1alpha1Client
@@ -97,6 +105,10 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	if err != nil {
 		return nil, err
 	}
+	cs.routingV1alpha1, err = routingv1alpha1.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
 	cs.sourcesV1alpha1, err = sourcesv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
@@ -119,6 +131,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
 	cs.extensionsV1alpha1 = extensionsv1alpha1.NewForConfigOrDie(c)
 	cs.flowV1alpha1 = flowv1alpha1.NewForConfigOrDie(c)
+	cs.routingV1alpha1 = routingv1alpha1.NewForConfigOrDie(c)
 	cs.sourcesV1alpha1 = sourcesv1alpha1.NewForConfigOrDie(c)
 	cs.targetsV1alpha1 = targetsv1alpha1.NewForConfigOrDie(c)
 
@@ -131,6 +144,7 @@ func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.extensionsV1alpha1 = extensionsv1alpha1.New(c)
 	cs.flowV1alpha1 = flowv1alpha1.New(c)
+	cs.routingV1alpha1 = routingv1alpha1.New(c)
 	cs.sourcesV1alpha1 = sourcesv1alpha1.New(c)
 	cs.targetsV1alpha1 = targetsv1alpha1.New(c)
 

@@ -1,4 +1,4 @@
-# Copyright 2020 TriggerMesh Inc.
+# Copyright 2021 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ ENV CGO_ENABLED 0
 ENV GOOS linux
 ENV GOARCH amd64
 
-WORKDIR /go/src/triggermesh-webhook
+WORKDIR /go/src/project
 
 COPY go.mod go.sum ./
 RUN go mod download
@@ -31,7 +31,16 @@ RUN BIN_OUTPUT_DIR=/bin make triggermesh-webhook && \
     rm -rf ${GOPATH} && \
     rm -rf ${HOME}/.cache
 
-FROM scratch
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.2
+
+ARG VERSION
+
+LABEL name "TriggerMesh webhook"
+LABEL vendor "TriggerMesh Inc."
+LABEL version "$VERSION"
+LABEL release "1"
+LABEL summary "Kubernetes webhook for the TriggerMesh platform"
+LABEL description "Event-driven integration platform powered by Kubernetes and Knative."
 
 # Emulate ko builds
 # https://github.com/google/ko/blob/v0.5.0/README.md#including-static-assets

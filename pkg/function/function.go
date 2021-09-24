@@ -48,7 +48,7 @@ import (
 
 const (
 	klrEntrypoint       = "/opt/aws-custom-runtime"
-	labelKey            = "flow.trigermesh.io/function"
+	labelKey            = "extensions.triggermesh.io/function"
 	ceDefaultTypePrefix = "io.triggermesh.function."
 )
 
