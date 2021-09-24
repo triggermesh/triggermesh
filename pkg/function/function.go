@@ -85,7 +85,7 @@ func newReconciledNormal(namespace, name string) reconciler.Event {
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *functionv1alpha1.Function) reconciler.Event {
 	logger := logging.FromContext(ctx)
 
-	// Reconcile Transformation Adapter
+	// Reconcile configmap
 	cm, err := r.reconcileConfigmap(ctx, o)
 	if err != nil {
 		logger.Error("Error reconciling Configmap", zap.Error(err))
@@ -111,7 +111,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *functionv1alpha1.Func
 	o.Status.SinkURI = sink
 	o.Status.MarkSinkAvailable()
 
-	// Reconcile Transformation Adapter
+	// Reconcile adapter service
 	ksvc, err := r.reconcileKnService(ctx, o, cm, sink)
 	if err != nil {
 		logger.Error("Error reconciling Kn Service", zap.Error(err))
@@ -148,7 +148,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *functionv1alpha1.Func
 		o.Status.CloudEventAttributes = r.statusAttributes(o.Spec.CloudEventOverrides.Extensions)
 	}
 
-	logger.Debug("Transformation reconciled")
+	logger.Debug("Function reconciled")
 	return newReconciledNormal(o.Namespace, o.Name)
 }
 
