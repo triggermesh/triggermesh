@@ -90,8 +90,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/aws-target-adapter
         - name: AWS_COMPREHEND_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehend-target-adapter
-        - name: CONFLUENT_ADAPTER_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/confluent-target-adapter
+        # - name: CONFLUENT_ADAPTER_IMAGE
+          # value: ko://github.com/triggermesh/triggermesh/cmd/confluent-target-adapter
         - name: DATADOGTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/datadog-target-adapter
         - name: ELASTICSEARCH_ADAPTER_IMAGE
@@ -135,6 +135,13 @@ spec:
         # Transformation adapter
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
+        # Function Runtimes
+        - name: RUNTIME_KLR_PYTHON
+          value: gcr.io/triggermesh/knative-lambda-python37:v1.9.1
+        - name: RUNTIME_KLR_NODE
+          value: gcr.io/triggermesh/knative-lambda-node10:v1.8.1
+        - name: RUNTIME_KLR_RUBY
+          value: gcr.io/triggermesh/knative-lambda-ruby25:v1.8.1
         # Type-specific options
         - name: TEKTON_REAPING_INTERVAL
           value: 2m

@@ -20,6 +20,8 @@ package fake
 
 import (
 	clientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/function/v1alpha1"
+	fakeextensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/function/v1alpha1/fake"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	fakesourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1/fake"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
@@ -79,6 +81,11 @@ func (c *Clientset) Tracker() testing.ObjectTracker {
 }
 
 var _ clientset.Interface = &Clientset{}
+
+// ExtensionsV1alpha1 retrieves the ExtensionsV1alpha1Client
+func (c *Clientset) ExtensionsV1alpha1() extensionsv1alpha1.ExtensionsV1alpha1Interface {
+	return &fakeextensionsv1alpha1.FakeExtensionsV1alpha1{Fake: &c.Fake}
+}
 
 // SourcesV1alpha1 retrieves the SourcesV1alpha1Client
 func (c *Clientset) SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface {

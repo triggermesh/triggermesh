@@ -186,6 +186,22 @@ rules:
   verbs:
   - update
 
+# Read Function resources and update their statuses
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions
+  verbs:
+  - list
+  - watch
+  - get
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions/status
+  verbs:
+  - update
+
 # Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
 # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
 - apiGroups:
@@ -305,6 +321,20 @@ rules:
   - secrets
   verbs:
   - get
+
+# Required by Function controller to store, and mount user's code
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+  - patch
+  - watch
 
 # Read controller configurations
 - apiGroups:
@@ -543,6 +573,15 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions
+  - functions/status
   verbs:
   - get
   - list

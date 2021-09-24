@@ -7,7 +7,7 @@ PKG := github.com/triggermesh/triggermesh
 
 # List of API groups to generate code for
 # e.g. "sources/v1alpha1 sources/v1alpha2"
-API_GROUPS := sources/v1alpha1 targets/v1alpha1 transformation/v1alpha1
+API_GROUPS := sources/v1alpha1 targets/v1alpha1 transformation/v1alpha1 function/v1alpha1
 # generates e.g. "PKG/pkg/apis/sources/v1alpha1 PKG/pkg/apis/sources/v1alpha2"
 api-import-paths := $(foreach group,$(API_GROUPS),$(PKG)/pkg/apis/$(group))
 
@@ -19,8 +19,7 @@ codegen: $(generators)
 
 # http://blog.jgc.org/2007/06/escaping-comma-and-space-in-gnu-make.html
 comma := ,
-space :=
-space +=
+space := $(null) $(null)
 
 deepcopy:
 	@echo "+ Generating deepcopy funcs for $(API_GROUPS)"
