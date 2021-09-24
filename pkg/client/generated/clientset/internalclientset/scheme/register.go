@@ -19,6 +19,7 @@ limitations under the License.
 package scheme
 
 import (
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/function/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/transformation/v1alpha1"
@@ -33,6 +34,7 @@ var Scheme = runtime.NewScheme()
 var Codecs = serializer.NewCodecFactory(Scheme)
 var ParameterCodec = runtime.NewParameterCodec(Scheme)
 var localSchemeBuilder = runtime.SchemeBuilder{
+	extensionsv1alpha1.AddToScheme,
 	sourcesv1alpha1.AddToScheme,
 	targetsv1alpha1.AddToScheme,
 	flowv1alpha1.AddToScheme,

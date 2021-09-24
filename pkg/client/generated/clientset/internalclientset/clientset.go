@@ -21,6 +21,7 @@ package internalclientset
 import (
 	"fmt"
 
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/function/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/transformation/v1alpha1"
@@ -31,6 +32,7 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
+	ExtensionsV1alpha1() extensionsv1alpha1.ExtensionsV1alpha1Interface
 	SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface
 	TargetsV1alpha1() targetsv1alpha1.TargetsV1alpha1Interface
 	FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface
@@ -40,9 +42,15 @@ type Interface interface {
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	sourcesV1alpha1 *sourcesv1alpha1.SourcesV1alpha1Client
-	targetsV1alpha1 *targetsv1alpha1.TargetsV1alpha1Client
-	flowV1alpha1    *flowv1alpha1.FlowV1alpha1Client
+	extensionsV1alpha1 *extensionsv1alpha1.ExtensionsV1alpha1Client
+	sourcesV1alpha1    *sourcesv1alpha1.SourcesV1alpha1Client
+	targetsV1alpha1    *targetsv1alpha1.TargetsV1alpha1Client
+	flowV1alpha1       *flowv1alpha1.FlowV1alpha1Client
+}
+
+// ExtensionsV1alpha1 retrieves the ExtensionsV1alpha1Client
+func (c *Clientset) ExtensionsV1alpha1() extensionsv1alpha1.ExtensionsV1alpha1Interface {
+	return c.extensionsV1alpha1
 }
 
 // SourcesV1alpha1 retrieves the SourcesV1alpha1Client
@@ -81,6 +89,10 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
+	cs.extensionsV1alpha1, err = extensionsv1alpha1.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
 	cs.sourcesV1alpha1, err = sourcesv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
@@ -105,6 +117,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
+	cs.extensionsV1alpha1 = extensionsv1alpha1.NewForConfigOrDie(c)
 	cs.sourcesV1alpha1 = sourcesv1alpha1.NewForConfigOrDie(c)
 	cs.targetsV1alpha1 = targetsv1alpha1.NewForConfigOrDie(c)
 	cs.flowV1alpha1 = flowv1alpha1.NewForConfigOrDie(c)
@@ -116,6 +129,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
+	cs.extensionsV1alpha1 = extensionsv1alpha1.New(c)
 	cs.sourcesV1alpha1 = sourcesv1alpha1.New(c)
 	cs.targetsV1alpha1 = targetsv1alpha1.New(c)
 	cs.flowV1alpha1 = flowv1alpha1.New(c)
