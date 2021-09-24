@@ -202,6 +202,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 		{
 			Name: "Sink goes missing",
 			Key:  tKey,
+			Ctx:  skipCtx,
 			Objects: []runtime.Object{
 				/* sink omitted */
 				newEventSource(withSink, deployed(a)),
@@ -220,6 +221,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 		{
 			Name: "Fail to create adapter",
 			Key:  tKey,
+			Ctx:  skipCtx,
 			WithReactors: []clientgotesting.ReactionFunc{
 				rt.InduceFailure("create", r),
 			},
@@ -243,6 +245,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 		{
 			Name: "Fail to update adapter",
 			Key:  tKey,
+			Ctx:  skipCtx,
 			WithReactors: []clientgotesting.ReactionFunc{
 				rt.InduceFailure("update", r),
 			},
