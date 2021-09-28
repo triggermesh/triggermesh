@@ -22,7 +22,7 @@ To create the user API token at Jira:
 
 - Open the Account settings > Security > [Create and manage API Tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
 - Press `Create API token` and fill the token name.
-- Copy the API token and create a secret for the Jira token at Triggermesh.
+- Copy the API token and create a secret for the Jira token at TriggerMesh.
 ## Deploying from Code
 
 The parent config directory can be used to deploy the controller and all adapters. Please consult the [development guide](../DEVELOPMENT.md) for information about how to deploy to a cluster.
@@ -104,7 +104,7 @@ curl -v -X POST http://jiratarget-tmjira.default.svc.cluster.local \
        },
        "labels": ["alpha","beta"],
        "summary": "Day 30.",
-       "description": "Issue created using Triggermesh Jira Target",
+       "description": "Issue created using TriggerMesh Jira Target",
        "issuetype": {
           "name": "Task"
        },

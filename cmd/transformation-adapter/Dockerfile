@@ -32,12 +32,12 @@ RUN BIN_OUTPUT_DIR=/bin make transformation-adapter && \
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-LABEL name "Triggermesh Event Transformation adapter"
-LABEL vendor "Triggermesh"
+LABEL name "TriggerMesh Event Transformation adapter"
+LABEL vendor "TriggerMesh"
 LABEL version "v0.1.0"
 LABEL release "1"
-LABEL summary "Triggermesh Event Transformation Adapter"
-LABEL description "This is Bumblebee - Triggermesh Event Transformation engine"
+LABEL summary "TriggerMesh Event Transformation Adapter"
+LABEL description "This is Bumblebee - TriggerMesh Event Transformation engine"
 
 COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/

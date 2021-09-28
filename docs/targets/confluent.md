@@ -139,5 +139,5 @@ curl -v http://confluenttarget-int1-8dc3abc7d44bdd0130bd0a311bea272f.knative-sam
  -H "Ce-Type: some.message.type" \
  -H "Ce-Source: some.origin/intance" \
  -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
- -d '{"message":"Hello from Triggermesh using Confluent!"}'
+ -d '{"message":"Hello from TriggerMesh using Confluent!"}'
 ```

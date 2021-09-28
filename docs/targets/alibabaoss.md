@@ -7,7 +7,7 @@ curl -v localhost:8080\
  -H "Ce-Type: any.event.type" \
  -H "Ce-Source: some.origin/intance" \
  -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
- -d '{"message":"Hello from Triggermesh!"}'
+ -d '{"message":"Hello from TriggerMesh!"}'
 ```
 
 

@@ -129,7 +129,7 @@ curl -v localhost:8080 \
  -H "Ce-Type: some.message.type" \
  -H "Ce-Source: some.origin/intance" \
  -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
- -d '{"mgs":"Hello from Triggermesh using GoogleSheet!"}'
+ -d '{"mgs":"Hello from TriggerMesh using GoogleSheet!"}'
 ```
 
 ### Sending Events of Type `io.triggermesh.googlesheet.append`
@@ -149,6 +149,6 @@ curl -v localhost:8080 \
  -H "Ce-Type: io.triggermesh.googlesheet.append" \
  -H "Ce-Source: some.origin/intance" \
  -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
- -d '{"rows":["Hello from Triggermesh using GoogleSheet!", "test","sheet1"],"sheet_name":"Sheet1"}'
+ -d '{"rows":["Hello from TriggerMesh using GoogleSheet!", "test","sheet1"],"sheet_name":"Sheet1"}'
 ```
 

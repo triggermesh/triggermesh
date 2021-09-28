@@ -118,7 +118,7 @@ curl -v http://localhost:8080 \
  -H "Ce-Type: com.slack.webapi.chat.postMessage" \
  -H "Ce-Source: awesome/instance" \
  -H "Ce-Id: aabbccdd11223344" \
- -d '{"channel":"C01112A09FT", "text": "Hello from Triggermesh!"}'
+ -d '{"channel":"C01112A09FT", "text": "Hello from TriggerMesh!"}'
 ```
 
 ### Send Scheduled Message
@@ -135,7 +135,7 @@ curl -v http://localhost:8080 \
  -H "Ce-Type: com.slack.webapi.chat.scheduleMessage" \
  -H "Ce-Source: awesome/instance" \
  -H "Ce-Id: aabbccdd11223344" \
- -d '{"channel":"C01112A09FT", "text": "Hello from scheduled Triggermesh!", "post_at": 1593430770}'
+ -d '{"channel":"C01112A09FT", "text": "Hello from scheduled TriggerMesh!", "post_at": 1593430770}'
 ```
 
 ### Update Message
@@ -152,5 +152,5 @@ curl -v http://localhost:8080 \
  -H "Ce-Type: com.slack.webapi.chat.update" \
  -H "Ce-Source: awesome/instance" \
  -H "Ce-Id: aabbccdd11223344" \
- -d '{"channel":"C01112A09FT", "text": "Hello from updated2 Triggermesh!", "ts":"1593430770.001300"}'
+ -d '{"channel":"C01112A09FT", "text": "Hello from updated2 TriggerMesh!", "ts":"1593430770.001300"}'
 ```

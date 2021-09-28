@@ -43,7 +43,7 @@ func TestWebAPI(t *testing.T) {
 	}{
 		"post message invalid response": {
 			methodURL: "chat.postMessage",
-			data:      `{"channel":"C01112A09FT", "text": "Hello from Triggermesh!"}`,
+			data:      `{"channel":"C01112A09FT", "text": "Hello from TriggerMesh!"}`,
 
 			mockStatus:   200,
 			mockResponse: "This is not JSON",
@@ -55,7 +55,7 @@ func TestWebAPI(t *testing.T) {
 
 		"post message failed": {
 			methodURL: "chat.postMessage",
-			data:      `{"channel":"C01112A09FT", "text": "Hello from Triggermesh!"}`,
+			data:      `{"channel":"C01112A09FT", "text": "Hello from TriggerMesh!"}`,
 
 			mockStatus:   200,
 			mockResponse: `{"ok":false,"error":"could not send message"}`,
@@ -67,7 +67,7 @@ func TestWebAPI(t *testing.T) {
 
 		"post message failed with no ok message": {
 			methodURL: "chat.postMessage",
-			data:      `{"channel":"C01112A09FT", "text": "Hello from Triggermesh!"}`,
+			data:      `{"channel":"C01112A09FT", "text": "Hello from TriggerMesh!"}`,
 
 			mockStatus:   200,
 			mockResponse: `{"error":"could not send message"}`,
@@ -79,10 +79,10 @@ func TestWebAPI(t *testing.T) {
 
 		"post message": {
 			methodURL: "chat.postMessage",
-			data:      `{"channel":"C01112A09FT", "text": "Hello from Triggermesh!"}`,
+			data:      `{"channel":"C01112A09FT", "text": "Hello from TriggerMesh!"}`,
 
 			mockStatus:   200,
-			mockResponse: `{"ok":true,"channel":"C01112A09FT","ts":"1593446134.003900","message":{"bot_id":"B01628BCTMZ","type":"message","text":"Hello from Triggermesh!","user":"U016RST62SU","ts":"1593446134.003900","team":"TA1J7JEBS"}}`,
+			mockResponse: `{"ok":true,"channel":"C01112A09FT","ts":"1593446134.003900","message":{"bot_id":"B01628BCTMZ","type":"message","text":"Hello from TriggerMesh!","user":"U016RST62SU","ts":"1593446134.003900","team":"TA1J7JEBS"}}`,
 
 			expectOK:     true,
 			expectStatus: 200,
@@ -90,10 +90,10 @@ func TestWebAPI(t *testing.T) {
 
 		"post message with warning": {
 			methodURL: "chat.postMessage",
-			data:      `{"channel":"C01112A09FT", "text": "Hello from Triggermesh!"}`,
+			data:      `{"channel":"C01112A09FT", "text": "Hello from TriggerMesh!"}`,
 
 			mockStatus:   200,
-			mockResponse: `{"ok":true, "warning": "channel being deleted", "channel":"C01112A09FT","ts":"1593446134.003900","message":{"bot_id":"B01628BCTMZ","type":"message","text":"Hello from Triggermesh!","user":"U016RST62SU","ts":"1593446134.003900","team":"TA1J7JEBS"}}`,
+			mockResponse: `{"ok":true, "warning": "channel being deleted", "channel":"C01112A09FT","ts":"1593446134.003900","message":{"bot_id":"B01628BCTMZ","type":"message","text":"Hello from TriggerMesh!","user":"U016RST62SU","ts":"1593446134.003900","team":"TA1J7JEBS"}}`,
 
 			expectOK:      true,
 			expectStatus:  200,

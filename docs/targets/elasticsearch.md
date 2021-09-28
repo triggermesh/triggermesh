@@ -136,5 +136,5 @@ curl -v http://elasticsearchtarget-es-indexinge5d0adf0209a48c23fa958aa1b8ecf0b.d
  -H "Ce-Type: something.to.index.type" \
  -H "Ce-Source: some.origin/intance" \
  -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
- -d '{"message":"thanks for indexing this message","from": "Triggermesh targets", "some_number": 12}'
+ -d '{"message":"thanks for indexing this message","from": "TriggerMesh targets", "some_number": 12}'
 ```

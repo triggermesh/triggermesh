@@ -34,12 +34,12 @@ RUN BIN_OUTPUT_DIR=/bin make tekton-target-adapter && \
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-LABEL name "Triggermesh Event Target Adapter for Tekton"
-LABEL vendor "Triggermesh"
+LABEL name "TriggerMesh Event Target Adapter for Tekton"
+LABEL vendor "TriggerMesh"
 LABEL version "v0.1.0"
 LABEL release "1"
-LABEL summary "The Triggermesh Event Target Adapter for Tekton"
-LABEL description "This is the Triggermesh Knative Event Target Adapter for Tekton"
+LABEL summary "The TriggerMesh Event Target Adapter for Tekton"
+LABEL description "This is the TriggerMesh Knative Event Target Adapter for Tekton"
 
 ENV KO_DATA_PATH /kodata
 

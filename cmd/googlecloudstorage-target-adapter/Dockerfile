@@ -34,12 +34,12 @@ RUN BIN_OUTPUT_DIR=/bin make googlecloudstorage-target-adapter && \
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-LABEL name "Triggermesh Event Target Adapter for Google Storage"
-LABEL vendor "Triggermesh"
+LABEL name "TriggerMesh Event Target Adapter for Google Storage"
+LABEL vendor "TriggerMesh"
 LABEL version "v1.0.0"
 LABEL release "1"
-LABEL summary "The Triggermesh Event Target Adapter for Google Cloud Storage"
-LABEL description "This is the Triggermesh Knative Event Target Adapter for Google Cloud Storage"
+LABEL summary "The TriggerMesh Event Target Adapter for Google Cloud Storage"
+LABEL description "This is the TriggerMesh Knative Event Target Adapter for Google Cloud Storage"
 
 ENV KO_DATA_PATH /kodata
 

@@ -89,7 +89,7 @@ spec:
       name: myservice
       key: password
   headers:
-    User-Agent: Triggermesh-HTTP
+    User-Agent: TriggerMesh-HTTP
     Some-header: some-value
 ```
 

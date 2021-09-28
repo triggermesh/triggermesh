@@ -32,7 +32,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
-const defaultTicketSubject = "Triggermesh New Ticket Event"
+const defaultTicketSubject = "TriggerMesh New Ticket Event"
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {

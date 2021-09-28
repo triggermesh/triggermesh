@@ -130,5 +130,5 @@ curl -v http://twiliotarget-int1-8dc3abc7d44bdd0130bd0a311bea272f.knative-sample
  -H "Ce-Type: io.triggermesh.twilio.sms.send" \
  -H "Ce-Source: some.origin/intance" \
  -H "Ce-Id: 536808d3-88be-4077-9d7a-a3f162705f79" \
- -d '{"message":"Hello from Triggermesh using Twilio!","to": "+1111111111"}'
+ -d '{"message":"Hello from TriggerMesh using Twilio!","to": "+1111111111"}'
 ```
