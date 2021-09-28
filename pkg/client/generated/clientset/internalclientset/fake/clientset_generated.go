@@ -20,8 +20,8 @@ package fake
 
 import (
 	clientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
-	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/function/v1alpha1"
-	fakeextensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/function/v1alpha1/fake"
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/extensions/v1alpha1"
+	fakeextensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/extensions/v1alpha1/fake"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	fakesourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1/fake"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"

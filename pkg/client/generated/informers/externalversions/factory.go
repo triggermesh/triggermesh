@@ -24,7 +24,7 @@ import (
 	time "time"
 
 	internalclientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
-	function "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/function"
+	extensions "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/extensions"
 	internalinterfaces "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/internalinterfaces"
 	sources "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/sources"
 	targets "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/targets"
@@ -175,14 +175,14 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Extensions() function.Interface
+	Extensions() extensions.Interface
 	Sources() sources.Interface
 	Targets() targets.Interface
 	Flow() transformation.Interface
 }
 
-func (f *sharedInformerFactory) Extensions() function.Interface {
-	return function.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Extensions() extensions.Interface {
+	return extensions.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Sources() sources.Interface {

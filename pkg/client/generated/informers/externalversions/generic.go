@@ -21,7 +21,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/function/v1alpha1"
+	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	transformationv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/transformation/v1alpha1"

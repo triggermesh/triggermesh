@@ -21,7 +21,7 @@ package internalclientset
 import (
 	"fmt"
 
-	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/function/v1alpha1"
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/extensions/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/transformation/v1alpha1"
