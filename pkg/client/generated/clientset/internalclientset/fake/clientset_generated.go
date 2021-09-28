@@ -22,12 +22,12 @@ import (
 	clientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
 	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/extensions/v1alpha1"
 	fakeextensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/extensions/v1alpha1/fake"
+	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/flow/v1alpha1"
+	fakeflowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/flow/v1alpha1/fake"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1"
 	fakesourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/sources/v1alpha1/fake"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1"
 	faketargetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/targets/v1alpha1/fake"
-	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/transformation/v1alpha1"
-	fakeflowv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/typed/transformation/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -87,6 +87,11 @@ func (c *Clientset) ExtensionsV1alpha1() extensionsv1alpha1.ExtensionsV1alpha1In
 	return &fakeextensionsv1alpha1.FakeExtensionsV1alpha1{Fake: &c.Fake}
 }
 
+// FlowV1alpha1 retrieves the FlowV1alpha1Client
+func (c *Clientset) FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface {
+	return &fakeflowv1alpha1.FakeFlowV1alpha1{Fake: &c.Fake}
+}
+
 // SourcesV1alpha1 retrieves the SourcesV1alpha1Client
 func (c *Clientset) SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface {
 	return &fakesourcesv1alpha1.FakeSourcesV1alpha1{Fake: &c.Fake}
@@ -95,9 +100,4 @@ func (c *Clientset) SourcesV1alpha1() sourcesv1alpha1.SourcesV1alpha1Interface {
 // TargetsV1alpha1 retrieves the TargetsV1alpha1Client
 func (c *Clientset) TargetsV1alpha1() targetsv1alpha1.TargetsV1alpha1Interface {
 	return &faketargetsv1alpha1.FakeTargetsV1alpha1{Fake: &c.Fake}
-}
-
-// FlowV1alpha1 retrieves the FlowV1alpha1Client
-func (c *Clientset) FlowV1alpha1() flowv1alpha1.FlowV1alpha1Interface {
-	return &fakeflowv1alpha1.FakeFlowV1alpha1{Fake: &c.Fake}
 }

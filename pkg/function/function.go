@@ -40,8 +40,8 @@ import (
 	servingv1client "knative.dev/serving/pkg/client/clientset/versioned"
 	servingv1listers "knative.dev/serving/pkg/client/listers/serving/v1"
 
-	functionv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/function/v1alpha1"
-	functionreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/function/v1alpha1/function"
+	"github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/extensions/v1alpha1/function"
 	"github.com/triggermesh/triggermesh/pkg/function/resources"
 	"github.com/triggermesh/triggermesh/pkg/function/semantic"
 )
@@ -73,7 +73,7 @@ type Reconciler struct {
 }
 
 // Check that our Reconciler implements Interface
-var _ functionreconciler.Interface = (*Reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // newReconciledNormal makes a new reconciler event with event type Normal, and
 // reason AddressableServiceReconciled.
@@ -82,7 +82,7 @@ func newReconciledNormal(namespace, name string) reconciler.Event {
 }
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, o *functionv1alpha1.Function) reconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Function) reconciler.Event {
 	logger := logging.FromContext(ctx)
 
 	// Reconcile configmap
@@ -152,7 +152,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *functionv1alpha1.Func
 	return newReconciledNormal(o.Namespace, o.Name)
 }
 
-func (r *Reconciler) resolveSink(ctx context.Context, f *functionv1alpha1.Function) (*apis.URL, error) {
+func (r *Reconciler) resolveSink(ctx context.Context, f *v1alpha1.Function) (*apis.URL, error) {
 	if f.Spec.Sink != nil {
 		dest := f.Spec.Sink.DeepCopy()
 		if dest.Ref != nil {
@@ -165,7 +165,7 @@ func (r *Reconciler) resolveSink(ctx context.Context, f *functionv1alpha1.Functi
 	return &apis.URL{}, nil
 }
 
-func (r *Reconciler) reconcileConfigmap(ctx context.Context, f *functionv1alpha1.Function) (*corev1.ConfigMap, error) {
+func (r *Reconciler) reconcileConfigmap(ctx context.Context, f *v1alpha1.Function) (*corev1.ConfigMap, error) {
 	logger := logging.FromContext(ctx)
 
 	expectedCm := resources.NewConfigmap(f.Name+"-"+rand.String(6), f.Namespace,
@@ -194,7 +194,7 @@ func (r *Reconciler) reconcileConfigmap(ctx context.Context, f *functionv1alpha1
 	return actualCm, nil
 }
 
-func (r *Reconciler) reconcileKnService(ctx context.Context, f *functionv1alpha1.Function, cm *corev1.ConfigMap, sink *apis.URL) (*servingv1.Service, error) {
+func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Function, cm *corev1.ConfigMap, sink *apis.URL) (*servingv1.Service, error) {
 	logger := logging.FromContext(ctx)
 
 	image, err := r.lookupRuntimeImage(f.Spec.Runtime)

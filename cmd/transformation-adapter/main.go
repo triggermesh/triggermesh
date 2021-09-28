@@ -23,7 +23,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/transformation/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline"
 )
 

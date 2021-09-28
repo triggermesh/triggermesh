@@ -25,7 +25,7 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/transformation/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/common/storage"
 )
 

@@ -34,8 +34,8 @@ import (
 	servingv1client "knative.dev/serving/pkg/client/injection/client"
 	knsvcinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
-	functioninformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/function/v1alpha1/function"
-	functionreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/function/v1alpha1/function"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/extensions/v1alpha1/function"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/extensions/v1alpha1/function"
 )
 
 const (
@@ -50,7 +50,7 @@ func NewController(
 ) *controller.Impl {
 	logger := logging.FromContext(ctx)
 
-	functionInformer := functioninformer.Get(ctx)
+	functionInformer := informerv1alpha1.Get(ctx)
 	knSvcInformer := knsvcinformer.Get(ctx)
 	cmInformer := cminformer.Get(ctx)
 
@@ -61,7 +61,7 @@ func NewController(
 		knServiceLister:    knSvcInformer.Lister(),
 	}
 
-	impl := functionreconciler.NewImpl(ctx, r)
+	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
 	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))
 	r.sinkResolver = resolver.NewURIResolver(ctx, impl.EnqueueKey)

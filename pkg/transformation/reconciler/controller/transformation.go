@@ -38,8 +38,8 @@ import (
 	servingv1client "knative.dev/serving/pkg/client/clientset/versioned"
 	servingv1listers "knative.dev/serving/pkg/client/listers/serving/v1"
 
-	transformationv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/transformation/v1alpha1"
-	transformationreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/transformation/v1alpha1/transformation"
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
 	"github.com/triggermesh/triggermesh/pkg/transformation/reconciler/controller/resources"
 )
 
@@ -72,10 +72,10 @@ type Reconciler struct {
 }
 
 // Check that our Reconciler implements Interface
-var _ transformationreconciler.Interface = (*Reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trn *transformationv1alpha1.Transformation) reconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, trn *v1alpha1.Transformation) reconciler.Event {
 	logger := logging.FromContext(ctx)
 
 	if err := r.Tracker.TrackReference(tracker.Reference{
@@ -111,7 +111,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, trn *transformationv1alp
 	return newReconciledNormal(trn.Namespace, trn.Name)
 }
 
-func (r *Reconciler) reconcileKnService(ctx context.Context, trn *transformationv1alpha1.Transformation) (*servingv1.Service, error) {
+func (r *Reconciler) reconcileKnService(ctx context.Context, trn *v1alpha1.Transformation) (*servingv1.Service, error) {
 	logger := logging.FromContext(ctx)
 
 	var sink string
@@ -159,7 +159,7 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, trn *transformation
 	return ksvc, nil
 }
 
-func (r *Reconciler) createCloudEventAttributes(ts *transformationv1alpha1.TransformationSpec) []duckv1.CloudEventAttributes {
+func (r *Reconciler) createCloudEventAttributes(ts *v1alpha1.TransformationSpec) []duckv1.CloudEventAttributes {
 	ceAttributes := make([]duckv1.CloudEventAttributes, 0)
 	for _, item := range ts.Context {
 		if item.Operation == "add" {
@@ -181,7 +181,7 @@ func (r *Reconciler) createCloudEventAttributes(ts *transformationv1alpha1.Trans
 	return ceAttributes
 }
 
-func (r *Reconciler) resolveDestination(ctx context.Context, trn *transformationv1alpha1.Transformation) (*apis.URL, error) {
+func (r *Reconciler) resolveDestination(ctx context.Context, trn *v1alpha1.Transformation) (*apis.URL, error) {
 	dest := trn.Spec.Sink.DeepCopy()
 	if dest.Ref != nil {
 		if dest.Ref.Namespace == "" {

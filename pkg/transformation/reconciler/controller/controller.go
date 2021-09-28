@@ -30,8 +30,8 @@ import (
 	servingv1client "knative.dev/serving/pkg/client/injection/client"
 	knsvcinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
-	transformationinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/transformation/v1alpha1/transformation"
-	transformationreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/transformation/v1alpha1/transformation"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/transformation"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
 )
 
 type envConfig struct {
@@ -45,7 +45,7 @@ func NewController(
 ) *controller.Impl {
 	logger := logging.FromContext(ctx)
 
-	transformationInformer := transformationinformer.Get(ctx)
+	transformationInformer := informerv1alpha1.Get(ctx)
 	knsvcInformer := knsvcinformer.Get(ctx)
 
 	r := &Reconciler{
@@ -63,7 +63,7 @@ func NewController(
 
 	r.transformerImage = env.Image
 
-	impl := transformationreconciler.NewImpl(ctx, r)
+	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))
 
 	r.sinkResolver = resolver.NewURIResolver(ctx, impl.EnqueueKey)
