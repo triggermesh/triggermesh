@@ -89,6 +89,7 @@ require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d // indirect
+	github.com/antlr/antlr4 v0.0.0-20200503195918-621b933c7a7f // indirect
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/beeker1121/goque v2.1.0+incompatible // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -158,7 +159,10 @@ require (
 	github.com/shirou/gopsutil v3.21.8+incompatible // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
+	github.com/tidwall/match v1.0.3 // indirect
+	github.com/tidwall/pretty v1.0.2 // indirect
 	github.com/trivago/tgo v1.0.1 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
@@ -189,8 +193,4 @@ require (
 	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.0.3 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
-	github.com/antlr/antlr4 v0.0.0-20200503195918-621b933c7a7f // indirect
-	github.com/stoewer/go-strcase v1.2.0 // indirect
-	github.com/tidwall/match v1.0.3 // indirect
-	github.com/tidwall/pretty v1.0.2 // indirect
 )
