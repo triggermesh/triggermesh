@@ -25,8 +25,8 @@ import (
 	"go.opencensus.io/tag"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+	eventingmetrics "knative.dev/eventing/pkg/metrics"
 	"knative.dev/pkg/metrics"
-	"knative.dev/pkg/metrics/metricskey"
 )
 
 const (
@@ -39,9 +39,9 @@ const (
 )
 
 var (
-	tagKeyResourceGroup = tag.MustNewKey(metricskey.LabelResourceGroup)
-	tagKeyNamespace     = tag.MustNewKey(metricskey.LabelNamespaceName)
-	tagKeyName          = tag.MustNewKey(metricskey.LabelName)
+	tagKeyResourceGroup = tag.MustNewKey(eventingmetrics.LabelResourceGroup)
+	tagKeyNamespace     = tag.MustNewKey(eventingmetrics.LabelNamespaceName)
+	tagKeyName          = tag.MustNewKey(eventingmetrics.LabelName)
 )
 
 // queueCapacityProcessM records the capacity of the processing queue.

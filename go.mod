@@ -9,18 +9,18 @@ replace k8s.io/client-go => k8s.io/client-go v0.20.7
 require (
 	github.com/cloudevents/sdk-go/v2 v2.4.1
 	github.com/google/go-cmp v0.5.6
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.23.0
-	go.uber.org/zap v1.17.0
+	go.uber.org/zap v1.18.1
 	k8s.io/api v0.20.7
 	k8s.io/apimachinery v0.20.7
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	k8s.io/code-generator v0.20.7
-	knative.dev/eventing v0.24.3
-	knative.dev/pkg v0.0.0-20210902173607-953af0138c75
-	knative.dev/serving v0.24.1
+	knative.dev/eventing v0.25.1
+	knative.dev/pkg v0.0.0-20210902173607-844a6bc45596
+	knative.dev/serving v0.25.1
 )
 
 require (
@@ -64,17 +64,13 @@ require (
 	google.golang.org/grpc v1.40.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.4.2
-	knative.dev/networking v0.0.0-20210622182128-53f45d6d2cfa
+	knative.dev/networking v0.0.0-20210803181815-acdfd41c575c
 )
 
 require (
 	cloud.google.com/go v0.94.1 // indirect
-	cloud.google.com/go/container v0.1.0 // indirect
-	cloud.google.com/go/monitoring v0.1.0 // indirect
-	cloud.google.com/go/trace v0.1.0 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.3.0 // indirect
-	contrib.go.opencensus.io/exporter/stackdriver v0.13.5 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
 	github.com/Azure/azure-pipeline-go v0.1.9 // indirect
 	github.com/Azure/go-amqp v0.13.12 // indirect
@@ -97,6 +93,7 @@ require (
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.4.1 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.4.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
@@ -113,13 +110,13 @@ require (
 	github.com/go-openapi/spec v0.20.2 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/gobuffalo/flect v0.2.2 // indirect
+	github.com/gobuffalo/flect v0.2.3 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
-	github.com/google/go-containerregistry v0.5.2-0.20210609162550-f0ce2270b3b4 // indirect
+	github.com/google/go-containerregistry v0.5.2-0.20210709161016-b448abac9a70 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.0 // indirect
@@ -141,7 +138,7 @@ require (
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/mapstructure v1.1.2 // indirect
+	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/openzipkin/zipkin-go v0.2.5 // indirect
@@ -166,7 +163,7 @@ require (
 	github.com/trivago/tgo v1.0.1 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	go.uber.org/atomic v1.8.0 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
