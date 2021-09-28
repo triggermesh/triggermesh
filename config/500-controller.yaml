@@ -147,6 +147,11 @@ spec:
         # Transformation adapter
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
+        # Routing adapters
+        - name: FILTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter
+        - name: SPLITTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/splitter-adapter
         # Function Runtimes
         - name: RUNTIME_KLR_PYTHON
           value: gcr.io/triggermesh/knative-lambda-python37:v1.9.1

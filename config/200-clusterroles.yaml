@@ -226,6 +226,24 @@ rules:
   verbs:
   - update
 
+# Read Routing resources and update their statuses
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters
+  - splitters
+  verbs:
+  - list
+  - watch
+  - get
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters/status
+  - splitters/status
+  verbs:
+  - update
+
 # Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
 # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
 - apiGroups:
@@ -314,6 +332,8 @@ rules:
   - webhooksource-adapter
   - zendesksource-adapter
   - tektontarget-adapter
+  - filter-adapter
+  - splitter-adapter
   verbs:
   - update
 - apiGroups:
@@ -357,6 +377,8 @@ rules:
   - webhooksource-adapter
   - zendesksource-adapter
   - tektontarget-adapter
+  - filter-adapter
+  - splitter-adapter
   verbs:
   - update
 
@@ -543,6 +565,86 @@ rules:
 
 ---
 
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: filter-adapter
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups: 
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources: 
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: splitter-adapter
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups: 
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - splitters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources: 
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
 # This role provides readonly access to "Source" duck types.
 # All the rules it contains get aggregated into the "source-observer" ClusterRole provided by Knative Eventing.
 # see https://github.com/knative/eventing/blob/release-0.26/docs/spec/sources.md#source-rbac
@@ -648,6 +750,15 @@ rules:
   - extensions.triggermesh.io
   resources:
   - functions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters
+  - splitters
   verbs:
   - get
   - list
