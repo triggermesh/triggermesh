@@ -17,36 +17,6 @@ kind: ClusterRole
 metadata:
   name: triggermesh-webhook
 rules:
-# Sources admin
-- apiGroups:
-  - sources.triggermesh.io
-  resources:
-  - azureeventhubsources
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-
-# Sources finalizer
-- apiGroups:
-  - sources.triggermesh.io
-  resources:
-  - azureeventhubsourcesources/finalizers
-  verbs:
-  - patch
-
-# Source statuses update
-- apiGroups:
-  - sources.triggermesh.io
-  resources:
-  - azureeventhubsources/status
-  verbs:
-  - update
-
 # Routing admin
 - apiGroups:
   - routing.triggermesh.io

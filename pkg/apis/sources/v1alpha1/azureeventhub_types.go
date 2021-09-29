@@ -20,7 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
@@ -39,27 +38,19 @@ type AzureEventHubSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object   = (*AzureEventHubSource)(nil)
-	_ apis.Validatable = (*AzureEventHubSource)(nil)
-	_ apis.Defaultable = (*AzureEventHubSource)(nil)
-	_ EventSource      = (*AzureEventHubSource)(nil)
+	_ runtime.Object = (*AzureEventHubSource)(nil)
+	_ EventSource    = (*AzureEventHubSource)(nil)
 )
 
 // AzureEventHubSourceSpec defines the desired state of the event source.
 type AzureEventHubSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	// The attributes below identify the Event Hubs instance.
-	// Both are optional, because this information may alternatively come
-	// from the SAS token's connection string, when this mode of
-	// authentication is selected.
+	// Resource ID of the Event Hubs instance.
 	//
-	// Event Hubs namespace containing the Event Hubs instance to source events from.
-	// +optional
-	HubNamespace string `json:"hubNamespace,omitempty"`
-	// Event Hubs instance to source events from.
-	// +optional
-	HubName string `json:"hubName,omitempty"`
+	// Expected format:
+	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
+	EventHubID EventHubResourceID `json:"eventHubID"`
 
 	// Authentication method to interact with the Azure Event Hubs API.
 	Auth AzureAuth `json:"auth"`

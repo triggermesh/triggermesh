@@ -30,7 +30,6 @@ require (
 	cloud.google.com/go/pubsub v1.16.0
 	cloud.google.com/go/storage v1.16.1
 	cloud.google.com/go/workflows v1.0.0
-	github.com/Azure/azure-amqp-common-go/v3 v3.0.1
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.13
 	github.com/Azure/azure-sdk-for-go v57.1.0+incompatible
 	github.com/Azure/azure-storage-queue-go v0.0.0-20191125232315-636801874cdd
@@ -72,6 +71,7 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
+	github.com/Azure/azure-amqp-common-go/v3 v3.0.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.1.9 // indirect
 	github.com/Azure/go-amqp v0.13.12 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect

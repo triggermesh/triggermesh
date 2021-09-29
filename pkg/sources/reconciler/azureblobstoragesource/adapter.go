@@ -54,31 +54,27 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	// the user may or may not provide an Event Hub name in the source's
 	// spec, so the source's status is unfortunately our only source of
 	// truth here
-	var eventHubID string
+	var hubResID string
+	var hubName string
 	if ehID := typedSrc.Status.EventHubID; ehID != nil {
-		eventHubID = ehID.EventHub
+		hubResID = ehID.String()
+		hubName = ehID.EventHub
 	}
 
-	eventHubEnvs := []corev1.EnvVar{
-		{
-			Name:  common.EnvHubName,
-			Value: eventHubID,
-		}, {
-			Name:  common.EnvHubNamespace,
-			Value: typedSrc.Spec.EventHubID.Namespace,
-		},
-	}
-
+	var hubEnvs []corev1.EnvVar
 	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
-		eventHubEnvs = common.MaybeAppendValueFromEnvVar(eventHubEnvs, common.EnvTenantID, spAuth.TenantID)
-		eventHubEnvs = common.MaybeAppendValueFromEnvVar(eventHubEnvs, common.EnvClientID, spAuth.ClientID)
-		eventHubEnvs = common.MaybeAppendValueFromEnvVar(eventHubEnvs, common.EnvClientSecret, spAuth.ClientSecret)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVars(eventHubEnvs...),
+		resource.EnvVar(common.EnvHubResourceID, hubResID),
+		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
+		resource.EnvVar(common.EnvHubName, hubName),
+		resource.EnvVars(hubEnvs...),
 		resource.EnvVar(envMessageProcessor, "eventgrid"),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)

@@ -52,15 +52,14 @@ spec:
             description: Desired state of the event source.
             type: object
             properties:
-              hubNamespace:
-                description: Event Hubs namespace containing the Event Hubs instance to source events from. Not required
-                  when 'auth.sasToken.connectionString' is provided, because the connection string already identifies
-                  the Event Hub.
+              eventHubID:
+                description: |-
+                  Resource ID of the Event Hubs instance.
+
+                  The expected format is
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
                 type: string
-              hubName:
-                description: Event Hubs instance to source events from. Not required when 'auth.sasToken.connectionString'
-                  is provided, because the connection string already identifies the Event Hub.
-                type: string
+                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}\/event[Hh]ubs\/[a-zA-Z0-9][\w.-]{0,49}$
               auth:
                 description: Authentication method to interact with the Azure Event Hubs REST API.
                 type: object
@@ -250,10 +249,7 @@ spec:
                 - required: [ref]
                 - required: [uri]
             required:
-            # 'hubNamespace' and 'hubName' aren't marked as required, because this information can alternatively be part
-            # of 'auth.sasToken.connectionString' (if this mode of authentication is selected).
-            # Because this validation is too complex to be expresses using OpenAPI schema constraints, we perform a
-            # second validation inside a Kubernetes validation webhook.
+            - eventHubID
             - auth
             - sink
           status:

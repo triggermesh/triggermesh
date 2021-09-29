@@ -29,14 +29,11 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/cloudevents/sdk-go/v2/protocol"
 
-	"github.com/Azure/azure-amqp-common-go/v3/aad"
-	"github.com/Azure/azure-amqp-common-go/v3/sas"
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureeventhubsource/trace"
 )
 
@@ -48,19 +45,9 @@ const connTimeout = 20 * time.Second
 type envConfig struct {
 	pkgadapter.EnvConfig
 
-	HubNamespace string `envconfig:"AZURE_HUB_NAMESPACE"`
-	HubName      string `envconfig:"AZURE_HUB_NAME"`
-
-	// SAS token provider
-	HubKeyName  string `envconfig:"EVENTHUB_KEY_NAME"`
-	HubKeyValue string `envconfig:"EVENTHUB_KEY_VALIE"`
-
-	ConnStr string `envconfig:"AZURE_CONN_STR"`
-
-	// AAD JWT token provider
-	TenantID     string `envconfig:"AZURE_TENANT_ID"`
-	ClientID     string `envconfig:"AZURE_CLIENT_ID"`
-	ClientSecret string `envconfig:"AZURE_CLIENT_SECRET"`
+	// Resource ID of the Event Hubs instance.
+	// Used to set the 'source' context attribute of CloudEvents.
+	HubResourceID string `envconfig:"EVENTHUB_RESOURCE_ID" required:"true"`
 
 	// Name of a message processor which takes care of converting Event
 	// Hubs messages to CloudEvents.
@@ -92,25 +79,12 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envConfig)
 
-	var hub *eventhub.Hub
-	var authErr error
-
-	switch {
-	case env.ConnStr != "":
-		hub, authErr = newHubWithConnStr(env)
-	case env.HubKeyName != "":
-		hub, authErr = newHubWithKey(env)
-	case env.TenantID != "":
-		hub, authErr = newHubWithSP(env)
-	default:
-		logger.Panic("neither SAS nor JWT auth env variables were detected")
+	hub, err := eventhub.NewHubFromEnvironment()
+	if err != nil {
+		logger.Panicw("Unable to create Event Hub client", zap.Error(err))
 	}
 
-	if authErr != nil {
-		logger.Panic(authErr)
-	}
-
-	ceSource := v1alpha1.AzureEventHubSourceName(env.HubNamespace, env.HubName)
+	ceSource := env.HubResourceID
 
 	var msgPrcsr MessageProcessor
 	switch env.MessageProcessor {
@@ -136,28 +110,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 		msgPrcsr: msgPrcsr,
 	}
-}
-
-func newHubWithConnStr(env *envConfig) (*eventhub.Hub, error) {
-	return eventhub.NewHubFromConnectionString(env.ConnStr)
-}
-
-func newHubWithKey(env *envConfig) (*eventhub.Hub, error) {
-	provider, err := sas.NewTokenProvider(sas.TokenProviderWithKey(env.HubKeyName, env.HubKeyValue))
-	if err != nil {
-		return nil, err
-	}
-	return eventhub.NewHub(env.HubNamespace, env.HubName, provider)
-}
-
-func newHubWithSP(env *envConfig) (*eventhub.Hub, error) {
-	provider, err := aad.NewJWTProvider(aad.JWTProviderWithEnvironmentVars())
-	if err != nil {
-		return nil, err
-	}
-
-	// get an existing hub for dataplane use
-	return eventhub.NewHub(env.HubNamespace, env.HubName, provider)
 }
 
 // Start implements adapter.Adapter.

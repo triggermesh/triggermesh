@@ -55,14 +55,7 @@ func (s *AzureEventHubSource) GetStatusManager() *EventSourceStatusManager {
 
 // AsEventSource implements EventSource.
 func (s *AzureEventHubSource) AsEventSource() string {
-	if s.Spec.HubNamespace != "" && s.Spec.HubName != "" {
-		return AzureEventHubSourceName(s.Spec.HubNamespace, s.Spec.HubName)
-	}
-	return "io.triggermesh.azureeventhubsource/" + s.Namespace + "/" + s.Name
-}
-
-func AzureEventHubSourceName(hubNamespace, hubName string) string {
-	return hubNamespace + "/" + hubName
+	return s.Spec.EventHubID.String()
 }
 
 // Supported event types

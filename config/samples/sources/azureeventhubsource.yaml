@@ -19,10 +19,9 @@ kind: AzureEventHubSource
 metadata:
   name: sample
 spec:
-  hubName: insights-activity-logs
-  hubNamespace: demo-event-source
+  eventHubID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace/eventhubs/MyEvents
+
   auth:
-    # sasToken:
     servicePrincipal:
       tenantID: 
         valueFromSecret:
@@ -36,6 +35,7 @@ spec:
         valueFromSecret:
           name: azure
           key: clientSecret
+
   sink:
     ref:
       apiVersion: serving.knative.dev/v1

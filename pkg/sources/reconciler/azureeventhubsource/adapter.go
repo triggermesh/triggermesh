@@ -48,42 +48,25 @@ var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.AzureEventHubSource)
 
-	var authEnvs []corev1.EnvVar
-	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvConnStr, typedSrc.Spec.Auth.SASToken.ConnectionString)
-	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvHubKeyName, typedSrc.Spec.Auth.SASToken.KeyName)
-	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvHubKeyValue, typedSrc.Spec.Auth.SASToken.KeyValue)
-
-	if typedSrc.Spec.Auth.ServicePrincipal != nil {
-		authEnvs = append(authEnvs, []corev1.EnvVar{
-			{
-				Name:  common.EnvHubName,
-				Value: typedSrc.Spec.HubName,
-			}, {
-				Name:  common.EnvHubNamespace,
-				Value: typedSrc.Spec.HubNamespace,
-			}, {
-				Name: common.EnvTenantID,
-				ValueFrom: &corev1.EnvVarSource{
-					SecretKeyRef: typedSrc.Spec.Auth.ServicePrincipal.TenantID.ValueFromSecret,
-				},
-			}, {
-				Name: common.EnvClientID,
-				ValueFrom: &corev1.EnvVarSource{
-					SecretKeyRef: typedSrc.Spec.Auth.ServicePrincipal.ClientID.ValueFromSecret,
-				},
-			}, {
-				Name: common.EnvClientSecret,
-				ValueFrom: &corev1.EnvVarSource{
-					SecretKeyRef: typedSrc.Spec.Auth.ServicePrincipal.ClientSecret.ValueFromSecret,
-				},
-			},
-		}...)
+	var hubEnvs []corev1.EnvVar
+	if sasAuth := typedSrc.Spec.Auth.SASToken; sasAuth != nil {
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyName, sasAuth.KeyName)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyValue, sasAuth.KeyValue)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubConnStr, sasAuth.ConnectionString)
+	}
+	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVars(authEnvs...),
+		resource.EnvVar(common.EnvHubResourceID, typedSrc.Spec.EventHubID.String()),
+		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
+		resource.EnvVar(common.EnvHubName, typedSrc.Spec.EventHubID.EventHub),
+		resource.EnvVars(hubEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }

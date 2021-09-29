@@ -31,16 +31,18 @@ const (
 	EnvSecretAccessKey = "AWS_SECRET_ACCESS_KEY" //nolint:gosec
 
 	// Common Azure attributes
-	EnvTenantID     = "AZURE_TENANT_ID"
-	EnvClientID     = "AZURE_CLIENT_ID"
-	EnvClientSecret = "AZURE_CLIENT_SECRET"
-	EnvConnStr      = "AZURE_CONN_STR"
+	EnvAADTenantID     = "AZURE_TENANT_ID"
+	EnvAADClientID     = "AZURE_CLIENT_ID"
+	EnvAADClientSecret = "AZURE_CLIENT_SECRET"
 
-	// Azure EventHub auth attributes
-	EnvHubName      = "AZURE_HUB_NAME"
-	EnvHubNamespace = "AZURE_HUB_NAMESPACE"
-	EnvHubKeyName   = "EVENTHUB_KEY_NAME"
-	EnvHubKeyValue  = "EVENTHUB_KEY_VALUE"
+	// Azure Event Hub attributes
+	// https://pkg.go.dev/github.com/Azure/azure-event-hubs-go/v3#readme-environment-variables
+	EnvHubNamespace  = "EVENTHUB_NAMESPACE"
+	EnvHubName       = "EVENTHUB_NAME"
+	EnvHubKeyName    = "EVENTHUB_KEY_NAME"
+	EnvHubKeyValue   = "EVENTHUB_KEY_VALUE"
+	EnvHubConnStr    = "EVENTHUB_CONNECTION_STRING"
+	EnvHubResourceID = "EVENTHUB_RESOURCE_ID"
 
 	// Google Cloud
 	EnvGCloudProject = "GCLOUD_PROJECT"

@@ -55,25 +55,21 @@ var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.AzureActivityLogsSource)
 
-	hubName := defaultActivityLogsEventHubName
-	if typedSrc.Spec.EventHubID.EventHub != "" {
+	hubResID := typedSrc.Spec.EventHubID
+
+	var hubName string
+	if hubResID.EventHub != "" {
 		hubName = typedSrc.Spec.EventHubID.EventHub
+	} else {
+		hubName = defaultActivityLogsEventHubName
+		hubResID.EventHub = hubName
 	}
 
-	eventHubEnvs := []corev1.EnvVar{
-		{
-			Name:  common.EnvHubName,
-			Value: hubName,
-		}, {
-			Name:  common.EnvHubNamespace,
-			Value: typedSrc.Spec.EventHubID.Namespace,
-		},
-	}
-
+	var hubEnvs []corev1.EnvVar
 	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
-		eventHubEnvs = common.MaybeAppendValueFromEnvVar(eventHubEnvs, common.EnvTenantID, spAuth.TenantID)
-		eventHubEnvs = common.MaybeAppendValueFromEnvVar(eventHubEnvs, common.EnvClientID, spAuth.ClientID)
-		eventHubEnvs = common.MaybeAppendValueFromEnvVar(eventHubEnvs, common.EnvClientSecret, spAuth.ClientSecret)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
 	ceOverridesStr := ceOverridesJSON(typedSrc.Spec.CloudEventOverrides)
@@ -81,7 +77,10 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVars(eventHubEnvs...),
+		resource.EnvVar(common.EnvHubResourceID, hubResID.String()),
+		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
+		resource.EnvVar(common.EnvHubName, hubName),
+		resource.EnvVars(hubEnvs...),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
