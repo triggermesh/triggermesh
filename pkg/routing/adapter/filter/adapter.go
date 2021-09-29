@@ -35,11 +35,9 @@ import (
 	"knative.dev/pkg/injection"
 	"knative.dev/pkg/logging"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/filter"
 	routinglisters "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/routing/adapter/common/env"
 	"github.com/triggermesh/triggermesh/pkg/routing/eventfilter"
 	"github.com/triggermesh/triggermesh/pkg/routing/eventfilter/cel"
 )
@@ -63,44 +61,31 @@ type Handler struct {
 
 // NewEnvConfig satisfies env.ConfigConstructor.
 // Returns an accessor for the source's adapter envConfig.
-func NewEnvConfig() env.ConfigAccessor {
-	return &env.Config{}
+func NewEnvConfig() pkgadapter.EnvConfigAccessor {
+	return &pkgadapter.EnvConfig{}
 }
 
 // NewAdapter creates a new Handler and its associated MessageReceiver. The caller is responsible for
 // Start()ing the returned Handler.
-func NewAdapter(component string) pkgadapter.AdapterConstructor {
-	return func(ctx context.Context, _ pkgadapter.EnvConfigAccessor,
-		ceClient cloudevents.Client) pkgadapter.Adapter {
-		logger := logging.FromContext(ctx)
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+	logger := logging.FromContext(ctx)
 
-		sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
-		if err != nil {
-			logger.Panicf("failed to create message sender: %v", err)
-		}
-
-		informer := informerv1alpha1.Get(ctx)
-		ns := injection.GetNamespaceScope(ctx)
-
-		return &Handler{
-			receiver:     kncloudevents.NewHTTPMessageReceiver(serverPort),
-			sender:       sender,
-			filterLister: informer.Lister().Filters(ns),
-			logger:       logger,
-
-			expressions: newExpressionStorage(),
-		}
+	sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
+	if err != nil {
+		logger.Panicf("failed to create message sender: %v", err)
 	}
-}
 
-// RegisterHandlerFor implements MTAdapter.
-func (*Handler) RegisterHandlerFor(ctx context.Context, f *v1alpha1.Filter) error {
-	return nil
-}
+	informer := informerv1alpha1.Get(ctx)
+	ns := injection.GetNamespaceScope(ctx)
 
-// DeregisterHandlerFor implements MTAdapter.
-func (*Handler) DeregisterHandlerFor(ctx context.Context, f *v1alpha1.Filter) error {
-	return nil
+	return &Handler{
+		receiver:     kncloudevents.NewHTTPMessageReceiver(serverPort),
+		sender:       sender,
+		filterLister: informer.Lister().Filters(ns),
+		logger:       logger,
+
+		expressions: newExpressionStorage(),
+	}
 }
 
 // Start begins to receive messages for the handler.
