@@ -73,16 +73,68 @@ spec:
                     properties:
                       keyName:
                         description: Name of the key used by the SAS token. Mutually exclusive with 'connectionString'.
-                        type: string
-                        nullable: true
+                        type: object
+                        properties:
+                          value:
+                            description: Literal name of the key.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the key's name.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
                       keyValue:
                         description: Value of the key used by the SAS token. Mutually exclusive with 'connectionString'.
-                        type: string
-                        nullable: true
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the key.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the key's value.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
                       connectionString:
                         description: Connection string containing both the resource URI of the Event Hubs instance, and
                           the SAS token. Mutually exclusive with 'keyName' and 'keyValue'.
-                        type: string
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the connection string.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the connection string.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
                     oneOf:
                     - required:
                       - keyName

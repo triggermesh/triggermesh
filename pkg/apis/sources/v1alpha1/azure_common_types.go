@@ -47,9 +47,9 @@ type AzureServicePrincipal struct {
 
 // AzureSASToken represents an Azure SAS token.
 type AzureSASToken struct {
-	KeyName          *string `json:"keyName"`
-	KeyValue         *string `json:"keyValue"`
-	ConnectionString *string `json:"connectionString"`
+	KeyName          ValueFromField `json:"keyName"`
+	KeyValue         ValueFromField `json:"keyValue"`
+	ConnectionString ValueFromField `json:"connectionString"`
 }
 
 // AzureResourceID represents a resource ID for an Azure resource.

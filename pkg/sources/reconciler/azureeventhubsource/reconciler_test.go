@@ -66,9 +66,9 @@ func newEventSource() *v1alpha1.AzureEventHubSource {
 		Spec: v1alpha1.AzureEventHubSourceSpec{
 			Auth: v1alpha1.AzureAuth{
 				SASToken: &v1alpha1.AzureSASToken{
-					ConnectionString: func(s string) *string {
-						return &s
-					}("foo"),
+					ConnectionString: v1alpha1.ValueFromField{
+						Value: "foo",
+					},
 				},
 			},
 		},

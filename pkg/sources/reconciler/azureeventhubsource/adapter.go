@@ -49,24 +49,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	typedSrc := src.(*v1alpha1.AzureEventHubSource)
 
 	var authEnvs []corev1.EnvVar
-	if typedSrc.Spec.Auth.SASToken != nil {
-		if typedSrc.Spec.Auth.SASToken.ConnectionString != nil {
-			authEnvs = append(authEnvs, corev1.EnvVar{
-				Name:  common.EnvConnStr,
-				Value: *typedSrc.Spec.Auth.SASToken.ConnectionString,
-			})
-		} else if typedSrc.Spec.Auth.SASToken.KeyName != nil && typedSrc.Spec.Auth.SASToken.KeyValue != nil {
-			authEnvs = append(authEnvs, []corev1.EnvVar{
-				{
-					Name:  common.EnvHubKeyName,
-					Value: *typedSrc.Spec.Auth.SASToken.KeyName,
-				}, {
-					Name:  common.EnvHubKeyValue,
-					Value: *typedSrc.Spec.Auth.SASToken.KeyValue,
-				},
-			}...)
-		}
-	}
+	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvConnStr, typedSrc.Spec.Auth.SASToken.ConnectionString)
+	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvHubKeyName, typedSrc.Spec.Auth.SASToken.KeyName)
+	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvHubKeyValue, typedSrc.Spec.Auth.SASToken.KeyValue)
 
 	if typedSrc.Spec.Auth.ServicePrincipal != nil {
 		authEnvs = append(authEnvs, []corev1.EnvVar{

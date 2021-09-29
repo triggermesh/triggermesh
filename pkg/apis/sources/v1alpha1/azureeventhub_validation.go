@@ -36,14 +36,14 @@ func (s *AzureEventHubSourceSpec) ValidateSpec(_ context.Context) *apis.FieldErr
 	var errs *apis.FieldError
 
 	if s.Auth.SASToken != nil {
-		if s.Auth.SASToken.ConnectionString != nil {
+		if fieldIsSet(s.Auth.SASToken.ConnectionString) {
 			return nil
 		}
-		if s.Auth.SASToken.KeyName == nil {
-			errs = errs.Also(apis.ErrMissingField("spec.sasToken.keyName"))
+		if !fieldIsSet(s.Auth.SASToken.KeyName) {
+			errs = errs.Also(apis.ErrMissingField("spec.auth.sasToken.keyName"))
 		}
-		if s.Auth.SASToken.KeyValue == nil {
-			errs = errs.Also(apis.ErrMissingField("spec.sasToken.keyValue"))
+		if !fieldIsSet(s.Auth.SASToken.KeyValue) {
+			errs = errs.Also(apis.ErrMissingField("spec.auth.sasToken.keyValue"))
 		}
 	}
 
@@ -53,5 +53,10 @@ func (s *AzureEventHubSourceSpec) ValidateSpec(_ context.Context) *apis.FieldErr
 	if s.HubNamespace == "" {
 		errs = errs.Also(apis.ErrMissingField("spec.hubNamespace"))
 	}
+
 	return errs
+}
+
+func fieldIsSet(f ValueFromField) bool {
+	return f.Value != "" || f.ValueFromSecret != nil
 }

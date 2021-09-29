@@ -24,10 +24,6 @@ import (
 	"knative.dev/pkg/apis"
 )
 
-func stringPtr(s string) *string {
-	return &s
-}
-
 // Validate implements apis.Validatable.
 func TestValidate(t *testing.T) {
 	testCases := []struct {
@@ -40,7 +36,9 @@ func TestValidate(t *testing.T) {
 			Spec: AzureEventHubSourceSpec{
 				Auth: AzureAuth{
 					SASToken: &AzureSASToken{
-						ConnectionString: stringPtr("foo"),
+						ConnectionString: ValueFromField{
+							Value: "foo",
+						},
 					},
 				},
 			},
@@ -52,8 +50,12 @@ func TestValidate(t *testing.T) {
 				HubNamespace: "baz",
 				Auth: AzureAuth{
 					SASToken: &AzureSASToken{
-						KeyName:  stringPtr("foo"),
-						KeyValue: stringPtr("bar"),
+						KeyName: ValueFromField{
+							Value: "foo",
+						},
+						KeyValue: ValueFromField{
+							Value: "foo",
+						},
 					},
 				},
 			},
@@ -66,12 +68,14 @@ func TestValidate(t *testing.T) {
 				HubName: "foo",
 				Auth: AzureAuth{
 					SASToken: &AzureSASToken{
-						KeyName: stringPtr("bar"),
+						KeyName: ValueFromField{
+							Value: "foo",
+						},
 					},
 				},
 			},
 		},
-		expectedErr: apis.ErrMissingField("spec.hubNamespace", "spec.sasToken.keyValue"),
+		expectedErr: apis.ErrMissingField("spec.hubNamespace", "spec.auth.sasToken.keyValue"),
 	}}
 
 	for _, tc := range testCases {
