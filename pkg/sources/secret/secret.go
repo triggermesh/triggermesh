@@ -60,7 +60,7 @@ func (g *GetterWithClientset) Get(refs ...v1alpha1.ValueFromField) (Secrets, err
 
 	// cache Secret objects by name between iterations to avoid multiple
 	// round trips to the Kubernetes API for the same Secret object.
-	secretCache := make(map[string]*corev1.Secret, 0)
+	secretCache := make(map[string]*corev1.Secret)
 
 	for _, ref := range refs {
 		val := ref.Value

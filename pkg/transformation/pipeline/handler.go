@@ -59,7 +59,7 @@ func NewHandler(context, data []v1alpha1.Transform) (Handler, error) {
 	contextPipeline.setStorage(sharedVars)
 	dataPipeline.setStorage(sharedVars)
 
-	ceClient, err := cloudevents.NewDefaultClient()
+	ceClient, err := cloudevents.NewClientHTTP()
 	if err != nil {
 		return Handler{}, err
 	}

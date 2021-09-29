@@ -165,7 +165,10 @@ func (h *Handler) split(path string, e *event.Event) []*event.Event {
 	}
 	for _, v := range val.Array() {
 		newCE := cloudevents.NewEvent()
-		newCE.SetData(cloudevents.ApplicationJSON, v.Raw)
+		if err := newCE.SetData(cloudevents.ApplicationJSON, v.Raw); err != nil {
+			h.logger.Errorw("Failed to set event data", zap.Error(err))
+			continue
+		}
 		result = append(result, &newCE)
 	}
 	return result
