@@ -21,7 +21,6 @@ const (
 	EnvName      = "NAME"
 	EnvNamespace = "NAMESPACE"
 
-	envSink                  = "K_SINK"
 	envComponent             = "K_COMPONENT"
 	envMetricsPrometheusPort = "METRICS_PROMETHEUS_PORT"
 )

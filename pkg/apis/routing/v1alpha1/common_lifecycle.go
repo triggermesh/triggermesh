@@ -17,18 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
 	"path"
 
-	"go.uber.org/zap"
-
-	appsv1 "k8s.io/api/apps/v1"
-	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
-
-	"knative.dev/eventing/pkg/apis/duck"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/logging"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/routing/status"
@@ -90,51 +82,6 @@ func (m *RouterStatusManager) MarkNoSink() {
 func (m *RouterStatusManager) MarkRBACNotBound() {
 	m.ConditionSet.Manage(m).MarkFalse(ConditionDeployed,
 		ReasonRBACNotBound, "The adapter's ServiceAccount can not be bound")
-}
-
-// PropagateDeploymentAvailability uses the readiness of the provided
-// Deployment to determine whether the Deployed condition should be marked as
-// True or False.
-// Given an optional PodInterface, the status of dependant Pods is inspected to
-// generate a more meaningful failure reason in case of non-ready status of the
-// Deployment.
-func (m *RouterStatusManager) PropagateDeploymentAvailability(ctx context.Context,
-	d *appsv1.Deployment, pi coreclientv1.PodInterface) {
-
-	// Deployments are not addressable
-	m.Address = nil
-
-	if d == nil {
-		m.ConditionSet.Manage(m).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Deployment can not be determined")
-		return
-	}
-
-	if duck.DeploymentIsAvailable(&d.Status, false) {
-		m.ConditionSet.Manage(m).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	reason := ReasonUnavailable
-	msg := "The adapter Deployment is unavailable"
-
-	for _, cond := range d.Status.Conditions {
-		if cond.Type == appsv1.DeploymentAvailable && cond.Message != "" {
-			msg += ": " + cond.Message
-		}
-	}
-
-	if pi != nil {
-		ws, err := status.DeploymentPodsWaitingState(d, pi)
-		if err != nil {
-			logging.FromContext(ctx).Warn("Unable to look up statuses of dependant Pods", zap.Error(err))
-		} else if ws != nil {
-			reason = status.ExactReason(ws)
-			msg += ": " + ws.Message
-		}
-	}
-
-	m.ConditionSet.Manage(m).MarkFalse(ConditionDeployed, reason, msg)
 }
 
 // PropagateServiceAvailability uses the readiness of the provided Service to

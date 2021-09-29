@@ -136,7 +136,7 @@ func setEnvVar(envVars *[]corev1.EnvVar, name, value string, valueFrom *corev1.E
 	})
 }
 
-// Probe sets the HTTP readiness probe of a Deployment's first container.
+// Probe sets the HTTP readiness probe of a Container or PodSpecable's first container.
 func Probe(path, port string) ObjectOption {
 	return func(object interface{}) {
 		var rp **corev1.Probe
@@ -171,7 +171,7 @@ func Probe(path, port string) ObjectOption {
 	}
 }
 
-// StartupProbe sets the HTTP startup probe of a Deployment's first container.
+// StartupProbe sets the HTTP startup probe of a Container or PodSpecable's first container.
 func StartupProbe(path, port string) ObjectOption {
 	return func(object interface{}) {
 		var sp **corev1.Probe
@@ -195,14 +195,14 @@ func StartupProbe(path, port string) ObjectOption {
 	}
 }
 
-// Requests sets the CPU and memory requests of a Deployment's first container.
+// Requests sets the CPU and memory requests of a Container or PodSpecable's first container.
 func Requests(cpu, mem resource.Quantity) ObjectOption {
 	return func(object interface{}) {
 		setResources(&resourcesFrom(object).Requests, cpu, mem)
 	}
 }
 
-// Limits sets the CPU and memory limits of a Deployment's first container.
+// Limits sets the CPU and memory limits of a Container or PodSpecable's first container.
 func Limits(cpu, mem resource.Quantity) ObjectOption {
 	return func(object interface{}) {
 		setResources(&resourcesFrom(object).Limits, cpu, mem)

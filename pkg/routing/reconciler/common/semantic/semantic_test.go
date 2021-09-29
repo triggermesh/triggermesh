@@ -23,91 +23,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 const (
-	fixtureDeploymentPath = "../../../../../test/fixtures/deployment.json"
-	fixtureKnServicePath  = "../../../../../test/fixtures/knService.json"
+	fixtureKnServicePath = "../../../../../test/fixtures/knService.json"
 )
-
-func TestDeploymentEqual(t *testing.T) {
-	current := &appsv1.Deployment{}
-	loadFixture(t, fixtureDeploymentPath, current)
-
-	assert.GreaterOrEqual(t, len(current.Labels), 2,
-		"Test suite requires a reference object with at least 2 labels to run properly")
-
-	assert.True(t, deploymentEqual(nil, nil), "Two nil elements should be equal")
-
-	testCases := map[string]struct {
-		prep   func() *appsv1.Deployment
-		expect bool
-	}{
-		"not equal when one element is nil": {
-			func() *appsv1.Deployment {
-				return nil
-			},
-			false,
-		},
-		// counter intuitive but expected result for deep derivative comparisons
-		"equal when all desired attributes are empty": {
-			func() *appsv1.Deployment {
-				return &appsv1.Deployment{}
-			},
-			true,
-		},
-		"not equal when some existing attribute differs": {
-			func() *appsv1.Deployment {
-				desired := current.DeepCopy()
-				for k := range desired.Labels {
-					desired.Labels[k] += "test"
-					break // changing one is enough
-				}
-				return desired
-			},
-			false,
-		},
-		"equal when current has more attributes than desired": {
-			func() *appsv1.Deployment {
-				desired := current.DeepCopy()
-				for k := range desired.Labels {
-					delete(desired.Labels, k)
-					break // deleting one is enough
-				}
-				return desired
-			},
-			true,
-		},
-		"not equal when desired has more attributes than current": {
-			func() *appsv1.Deployment {
-				desired := current.DeepCopy()
-				for k := range desired.Labels {
-					desired.Labels[k+"test"] = "test"
-					break // adding one is enough
-				}
-				return desired
-			},
-			false,
-		},
-	}
-
-	for name, tc := range testCases {
-		//nolint:scopelint
-		t.Run(name, func(t *testing.T) {
-			desired := tc.prep()
-			switch tc.expect {
-			case true:
-				assert.True(t, deploymentEqual(desired, current))
-			case false:
-				assert.False(t, deploymentEqual(desired, current))
-			}
-		})
-	}
-}
 
 func TestKnServiceEqual(t *testing.T) {
 	current := &servingv1.Service{}

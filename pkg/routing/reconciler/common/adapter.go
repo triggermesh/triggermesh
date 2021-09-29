@@ -20,14 +20,12 @@ import (
 	"strconv"
 	"strings"
 
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
 	network "knative.dev/networking/pkg"
-	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/ptr"
 	"knative.dev/pkg/system"
@@ -46,93 +44,9 @@ func ComponentName(src kmeta.OwnerRefable) string {
 }
 
 // MTAdapterObjectName returns a unique name to apply to all objects related to
-// the given source's multi-tenant adapter (RBAC, Deployment/KnService, ...).
+// the given source's multi-tenant adapter (RBAC, KnService, ...).
 func MTAdapterObjectName(src kmeta.OwnerRefable) string {
 	return ComponentName(src) + "-" + componentAdapter
-}
-
-// NewAdapterDeployment is a wrapper around resource.NewDeployment which
-// pre-populates attributes common to all adapters backed by a Deployment.
-func NewAdapterDeployment(src v1alpha1.Router, sinkURI *apis.URL, opts ...resource.ObjectOption) *appsv1.Deployment {
-	srcNs := src.GetNamespace()
-	srcName := src.GetName()
-
-	var sinkURIStr string
-	if sinkURI != nil {
-		sinkURIStr = sinkURI.String()
-	}
-
-	return resource.NewDeployment(srcNs, kmeta.ChildName(ComponentName(src)+"-", srcName),
-		append(commonAdapterDeploymentOptions(src), append([]resource.ObjectOption{
-			resource.Controller(src),
-
-			resource.Label(appInstanceLabel, srcName),
-			resource.Selector(appInstanceLabel, srcName),
-
-			resource.EnvVar(envSink, sinkURIStr),
-		}, opts...)...)...,
-	)
-}
-
-// NewMTAdapterDeployment is a wrapper around resource.NewDeployment which
-// pre-populates attributes common to all multi-tenant adapters backed by a
-// Deployment.
-func NewMTAdapterDeployment(src v1alpha1.Router, opts ...resource.ObjectOption) *appsv1.Deployment {
-	srcNs := src.GetNamespace()
-
-	return resource.NewDeployment(srcNs, MTAdapterObjectName(src),
-		append(commonAdapterDeploymentOptions(src), append([]resource.ObjectOption{
-			resource.EnvVar(EnvNamespace, srcNs),
-			resource.EnvVar(system.NamespaceEnvKey, srcNs), // required to enable HA
-		}, opts...)...)...,
-	)
-}
-
-// commonAdapterDeploymentOptions returns a set of ObjectOptions common to all
-// adapters backed by a Deployment.
-func commonAdapterDeploymentOptions(src v1alpha1.Router) []resource.ObjectOption {
-	app := ComponentName(src)
-
-	return []resource.ObjectOption{
-		resource.TerminationErrorToLogs,
-
-		resource.Label(appNameLabel, app),
-		resource.Label(appComponentLabel, componentAdapter),
-		resource.Label(appPartOfLabel, partOf),
-		resource.Label(appManagedByLabel, managedBy),
-
-		resource.Selector(appNameLabel, app),
-		resource.Selector(appComponentLabel, componentAdapter),
-		resource.PodLabel(appPartOfLabel, partOf),
-		resource.PodLabel(appManagedByLabel, managedBy),
-
-		resource.ServiceAccount(MTAdapterObjectName(src)),
-
-		resource.EnvVar(envComponent, app),
-	}
-}
-
-// NewAdapterKnService is a wrapper around resource.NewKnService which
-// pre-populates attributes common to all adapters backed by a Knative Service.
-func NewAdapterKnService(src v1alpha1.Router, sinkURI *apis.URL, opts ...resource.ObjectOption) *servingv1.Service {
-	srcNs := src.GetNamespace()
-	srcName := src.GetName()
-
-	var sinkURIStr string
-	if sinkURI != nil {
-		sinkURIStr = sinkURI.String()
-	}
-
-	return resource.NewKnService(srcNs, kmeta.ChildName(ComponentName(src)+"-", srcName),
-		append(commonAdapterKnServiceOptions(src), append([]resource.ObjectOption{
-			resource.Controller(src),
-
-			resource.Label(appInstanceLabel, srcName),
-			resource.PodLabel(appInstanceLabel, srcName),
-
-			resource.EnvVar(envSink, sinkURIStr),
-		}, opts...)...)...,
-	)
 }
 
 // NewMTAdapterKnService is a wrapper around resource.NewKnService which

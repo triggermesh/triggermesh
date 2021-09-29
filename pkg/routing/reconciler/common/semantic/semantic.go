@@ -17,7 +17,6 @@ limitations under the License.
 package semantic
 
 import (
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -35,7 +34,6 @@ import (
 // 'a' should always be the desired state, and 'b' the current state for
 // DeepDerivative comparisons to work as expected.
 var Semantic = conversion.EqualitiesOrDie(
-	deploymentEqual,
 	knServiceEqual,
 )
 
@@ -89,26 +87,6 @@ var eq = conversion.EqualitiesOrDie(
 		return (conversion.Equalities{}).DeepDerivative(a.Handler, b.Handler)
 	},
 )
-
-// deploymentEqual returns whether two Deployments are semantically equivalent.
-func deploymentEqual(a, b *appsv1.Deployment) bool {
-	if a == b {
-		return true
-	}
-	if a == nil || b == nil {
-		return false
-	}
-
-	if !eq.DeepDerivative(&a.ObjectMeta, &b.ObjectMeta) {
-		return false
-	}
-
-	if !eq.DeepDerivative(&a.Spec, &b.Spec) {
-		return false
-	}
-
-	return true
-}
 
 // knServiceEqual returns whether two Knative Services are semantically equivalent.
 func knServiceEqual(a, b *servingv1.Service) bool {

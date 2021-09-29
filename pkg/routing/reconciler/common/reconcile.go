@@ -22,7 +22,6 @@ import (
 	"reflect"
 	"strings"
 
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -55,140 +54,11 @@ type RBACOwnersLister interface {
 	RBACOwners(namespace string) ([]kmeta.OwnerRefable, error)
 }
 
-// AdapterDeploymentBuilder provides all the necessary information for building
-// objects related to a Router's adapter backed by a Deployment.
-type AdapterDeploymentBuilder interface {
-	RBACOwnersLister
-	BuildAdapter(r v1alpha1.Router, sinkURI *apis.URL) *appsv1.Deployment
-}
-
 // AdapterServiceBuilder provides all the necessary information for building
 // objects related to a Router's adapter backed by a Knative Service.
 type AdapterServiceBuilder interface {
 	RBACOwnersLister
 	BuildAdapter(r v1alpha1.Router, sinkURI *apis.URL) *servingv1.Service
-}
-
-// ReconcileAdapter reconciles a receive adapter.
-func (r *GenericDeploymentReconciler) ReconcileAdapter(ctx context.Context, ab AdapterDeploymentBuilder) reconciler.Event {
-	router := v1alpha1.RouterFromContext(ctx)
-
-	router.GetStatusManager().CloudEventAttributes = CreateCloudEventAttributes(
-		router.AsEventSource(), router.GetEventTypes())
-
-	sinkURI, err := r.resolveSinkURL(ctx)
-	if err != nil {
-		router.GetStatusManager().MarkNoSink()
-		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning,
-			ReasonBadSinkURI, "Could not resolve sink URI: %s", err))
-	}
-	router.GetStatusManager().MarkSink(sinkURI)
-
-	desiredAdapter := ab.BuildAdapter(router, sinkURI)
-
-	saOwners, err := ab.RBACOwners(router.GetNamespace())
-	if err != nil {
-		return fmt.Errorf("listing ServiceAccount owners: %w", err)
-	}
-
-	if err := r.reconcileAdapter(ctx, desiredAdapter, saOwners); err != nil {
-		return fmt.Errorf("failed to reconcile adapter: %w", err)
-	}
-	return nil
-}
-
-// resolveSinkURL resolves the URL of a sink reference.
-func (r *GenericDeploymentReconciler) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
-	router := v1alpha1.RouterFromContext(ctx)
-	sink := router.GetSink()
-
-	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
-		sinkRef.Namespace = router.GetNamespace()
-	}
-
-	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, router)
-}
-
-// reconcileAdapter reconciles the state of the Router's adapter.
-func (r *GenericDeploymentReconciler) reconcileAdapter(ctx context.Context,
-	desiredAdapter *appsv1.Deployment, rbacOwners []kmeta.OwnerRefable) error {
-
-	router := v1alpha1.RouterFromContext(ctx)
-
-	sa, err := r.reconcileRBAC(ctx, rbacOwners)
-	if err != nil {
-		router.GetStatusManager().MarkRBACNotBound()
-		return fmt.Errorf("reconciling RBAC objects: %w", err)
-	}
-
-	if v1alpha1.IsMultiTenant(router) {
-		// delegate ownership to the ServiceAccount in order to cause a
-		// garbage collection once all instances of the given Router
-		// type have been deleted from the namespace
-		OwnByServiceAccount(desiredAdapter, sa)
-	}
-
-	currentAdapter, err := r.getOrCreateAdapter(ctx, desiredAdapter)
-	if err != nil {
-		router.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodClient(router.GetNamespace()))
-		return err
-	}
-
-	currentAdapter, err = r.syncAdapterDeployment(ctx, currentAdapter, desiredAdapter)
-	if err != nil {
-		return fmt.Errorf("failed to synchronize adapter Deployment: %w", err)
-	}
-	router.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodClient(router.GetNamespace()))
-
-	return nil
-}
-
-// getOrCreateAdapter returns the existing adapter Deployment for a given
-// Router, or creates it if it is missing.
-func (r *GenericDeploymentReconciler) getOrCreateAdapter(ctx context.Context, desiredAdapter *appsv1.Deployment) (*appsv1.Deployment, error) {
-	router := v1alpha1.RouterFromContext(ctx)
-
-	adapter, err := findAdapter(r, router, metav1.GetControllerOfNoCopy(desiredAdapter))
-	switch {
-	case apierrors.IsNotFound(err):
-		adapter, err = r.Client(router.GetNamespace()).Create(ctx, desiredAdapter, metav1.CreateOptions{})
-		if err != nil {
-			return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterCreate,
-				"Failed to create adapter Deployment %q: %s", desiredAdapter.Name, err)
-		}
-		event.Normal(ctx, ReasonAdapterCreate, "Created adapter Deployment %q", adapter.GetName())
-
-	case err != nil:
-		return nil, fmt.Errorf("failed to get adapter Deployment from cache: %w", err)
-	}
-
-	return adapter.(*appsv1.Deployment), nil
-}
-
-// syncAdapterDeployment synchronizes the desired state of an adapter Deployment
-// against its current state in the running cluster.
-func (r *GenericDeploymentReconciler) syncAdapterDeployment(ctx context.Context,
-	currentAdapter, desiredAdapter *appsv1.Deployment) (*appsv1.Deployment, error) {
-
-	if semantic.Semantic.DeepEqual(desiredAdapter, currentAdapter) {
-		return currentAdapter, nil
-	}
-
-	// resourceVersion must be returned to the API server unmodified for
-	// optimistic concurrency, as per Kubernetes API conventions
-	desiredAdapter.ResourceVersion = currentAdapter.ResourceVersion
-
-	// (fake Clientset) preserve status to avoid resetting conditions
-	desiredAdapter.Status = currentAdapter.Status
-
-	adapter, err := r.Client(currentAdapter.Namespace).Update(ctx, desiredAdapter, metav1.UpdateOptions{})
-	if err != nil {
-		return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterUpdate,
-			"Failed to update adapter Deployment %q: %s", desiredAdapter.Name, err)
-	}
-	event.Normal(ctx, ReasonAdapterUpdate, "Updated adapter Deployment %q", adapter.Name)
-
-	return adapter, nil
 }
 
 // ReconcileAdapter reconciles a receive adapter.
@@ -327,7 +197,7 @@ func (r *GenericServiceReconciler) syncAdapterService(ctx context.Context,
 }
 
 // findAdapter returns the adapter object for a given Router if it exists.
-func findAdapter(genericReconciler interface{},
+func findAdapter(genericReconciler *GenericServiceReconciler,
 	router v1alpha1.Router, owner *metav1.OwnerReference) (metav1.Object, error) {
 
 	ls := CommonObjectLabels(router)
@@ -341,33 +211,17 @@ func findAdapter(genericReconciler interface{},
 	sel := labels.SelectorFromValidatedSet(ls)
 
 	var objs []metav1.Object
-	var gr schema.GroupResource
 
-	switch r := genericReconciler.(type) {
-	case *GenericDeploymentReconciler:
-		depls, err := r.Lister(router.GetNamespace()).List(sel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, d := range depls {
-			objs = append(objs, d)
-		}
-
-		gr = appsv1.Resource("deployment")
-
-	case *GenericServiceReconciler:
-		svcs, err := r.Lister(router.GetNamespace()).List(sel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, s := range svcs {
-			objs = append(objs, s)
-		}
-
-		gr = servingv1.Resource("service")
+	svcs, err := genericReconciler.Lister(router.GetNamespace()).List(sel)
+	if err != nil {
+		return nil, err
 	}
+
+	for _, s := range svcs {
+		objs = append(objs, s)
+	}
+
+	gr := servingv1.Resource("service")
 
 	for _, obj := range objs {
 		objOwner := metav1.GetControllerOfNoCopy(obj)

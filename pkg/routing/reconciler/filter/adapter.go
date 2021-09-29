@@ -43,7 +43,7 @@ type adapterConfig struct {
 // Verify that Reconciler implements common.AdapterServiceBuilder.
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-// BuildAdapter implements common.AdapterDeploymentBuilder.
+// BuildAdapter implements common.AdapterServiceBuilder.
 func (r *Reconciler) BuildAdapter(src v1alpha1.Router, _ *apis.URL) *servingv1.Service {
 	return common.NewMTAdapterKnService(src,
 		resource.Image(r.adapterCfg.Image),
@@ -51,7 +51,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.Router, _ *apis.URL) *servingv1.S
 	)
 }
 
-// RBACOwners implements common.AdapterDeploymentBuilder.
+// RBACOwners implements common.AdapterServiceBuilder.
 func (r *Reconciler) RBACOwners(namespace string) ([]kmeta.OwnerRefable, error) {
 	srcs, err := r.filterLister(namespace).List(labels.Everything())
 	if err != nil {

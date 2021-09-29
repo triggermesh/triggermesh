@@ -50,7 +50,7 @@ func makeEnvVars(count int, name, val string) []corev1.EnvVar {
 }
 
 func TestMetaObjectOptions(t *testing.T) {
-	objMeta := NewDeployment(tNs, tName,
+	objMeta := NewKnService(tNs, tName,
 		Label("test.label/2", "val2"),
 		Controller(makeOwnerRefable()),
 		Label("test.label/1", "val1"),
