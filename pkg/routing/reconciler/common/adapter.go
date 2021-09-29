@@ -115,7 +115,6 @@ func commonAdapterDeploymentOptions(src v1alpha1.Router) []resource.ObjectOption
 // NewAdapterKnService is a wrapper around resource.NewKnService which
 // pre-populates attributes common to all adapters backed by a Knative Service.
 func NewAdapterKnService(src v1alpha1.Router, sinkURI *apis.URL, opts ...resource.ObjectOption) *servingv1.Service {
-	app := ComponentName(src)
 	srcNs := src.GetNamespace()
 	srcName := src.GetName()
 
@@ -124,7 +123,7 @@ func NewAdapterKnService(src v1alpha1.Router, sinkURI *apis.URL, opts ...resourc
 		sinkURIStr = sinkURI.String()
 	}
 
-	return resource.NewKnService(srcNs, kmeta.ChildName(app+"-", srcName),
+	return resource.NewKnService(srcNs, kmeta.ChildName(ComponentName(src)+"-", srcName),
 		append(commonAdapterKnServiceOptions(src), append([]resource.ObjectOption{
 			resource.Controller(src),
 

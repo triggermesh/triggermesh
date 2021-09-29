@@ -33,7 +33,7 @@ const (
 
 // Common label values
 const (
-	partOf           = "knative-sources"
-	managedBy        = "knative-sources-controller"
+	partOf           = "triggermesh"
+	managedBy        = "triggermesh-controller"
 	componentAdapter = "adapter"
 )

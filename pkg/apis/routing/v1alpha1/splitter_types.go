@@ -83,7 +83,7 @@ func (s *Splitter) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// AsRouter implements Router.
-func (s *Splitter) AsRouter() string {
+// AsEventSource implements Router.
+func (s *Splitter) AsEventSource() string {
 	return "splitter/" + s.Name
 }

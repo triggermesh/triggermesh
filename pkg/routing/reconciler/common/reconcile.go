@@ -56,25 +56,25 @@ type RBACOwnersLister interface {
 }
 
 // AdapterDeploymentBuilder provides all the necessary information for building
-// objects related to a source's adapter backed by a Deployment.
+// objects related to a Router's adapter backed by a Deployment.
 type AdapterDeploymentBuilder interface {
 	RBACOwnersLister
 	BuildAdapter(r v1alpha1.Router, sinkURI *apis.URL) *appsv1.Deployment
 }
 
 // AdapterServiceBuilder provides all the necessary information for building
-// objects related to a source's adapter backed by a Knative Service.
+// objects related to a Router's adapter backed by a Knative Service.
 type AdapterServiceBuilder interface {
 	RBACOwnersLister
 	BuildAdapter(r v1alpha1.Router, sinkURI *apis.URL) *servingv1.Service
 }
 
-// ReconcileSource reconciles an event source type.
+// ReconcileAdapter reconciles a receive adapter.
 func (r *GenericDeploymentReconciler) ReconcileAdapter(ctx context.Context, ab AdapterDeploymentBuilder) reconciler.Event {
 	router := v1alpha1.RouterFromContext(ctx)
 
 	router.GetStatusManager().CloudEventAttributes = CreateCloudEventAttributes(
-		router.AsRouter(), router.GetEventTypes())
+		router.AsEventSource(), router.GetEventTypes())
 
 	sinkURI, err := r.resolveSinkURL(ctx)
 	if err != nil {
@@ -100,16 +100,16 @@ func (r *GenericDeploymentReconciler) ReconcileAdapter(ctx context.Context, ab A
 // resolveSinkURL resolves the URL of a sink reference.
 func (r *GenericDeploymentReconciler) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
 	router := v1alpha1.RouterFromContext(ctx)
-	sink := *router.GetSink()
+	sink := router.GetSink()
 
-	if sinkRef := &router.GetSink().Ref; *sinkRef != nil && (*sinkRef).Namespace == "" {
-		(*sinkRef).Namespace = router.GetNamespace()
+	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
+		sinkRef.Namespace = router.GetNamespace()
 	}
 
-	return r.SinkResolver.URIFromDestinationV1(ctx, sink, router)
+	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, router)
 }
 
-// reconcileAdapter reconciles the state of the source's adapter.
+// reconcileAdapter reconciles the state of the Router's adapter.
 func (r *GenericDeploymentReconciler) reconcileAdapter(ctx context.Context,
 	desiredAdapter *appsv1.Deployment, rbacOwners []kmeta.OwnerRefable) error {
 
@@ -123,7 +123,7 @@ func (r *GenericDeploymentReconciler) reconcileAdapter(ctx context.Context,
 
 	if v1alpha1.IsMultiTenant(router) {
 		// delegate ownership to the ServiceAccount in order to cause a
-		// garbage collection once all instances of the given source
+		// garbage collection once all instances of the given Router
 		// type have been deleted from the namespace
 		OwnByServiceAccount(desiredAdapter, sa)
 	}
@@ -144,7 +144,7 @@ func (r *GenericDeploymentReconciler) reconcileAdapter(ctx context.Context,
 }
 
 // getOrCreateAdapter returns the existing adapter Deployment for a given
-// source, or creates it if it is missing.
+// Router, or creates it if it is missing.
 func (r *GenericDeploymentReconciler) getOrCreateAdapter(ctx context.Context, desiredAdapter *appsv1.Deployment) (*appsv1.Deployment, error) {
 	router := v1alpha1.RouterFromContext(ctx)
 
@@ -191,12 +191,12 @@ func (r *GenericDeploymentReconciler) syncAdapterDeployment(ctx context.Context,
 	return adapter, nil
 }
 
-// ReconcileSource reconciles an event source type.
+// ReconcileAdapter reconciles a receive adapter.
 func (r *GenericServiceReconciler) ReconcileAdapter(ctx context.Context, ab AdapterServiceBuilder) reconciler.Event {
 	router := v1alpha1.RouterFromContext(ctx)
 
 	router.GetStatusManager().CloudEventAttributes = CreateCloudEventAttributes(
-		router.AsRouter(), router.GetEventTypes())
+		router.AsEventSource(), router.GetEventTypes())
 
 	sinkURI, err := r.resolveSinkURL(ctx)
 	if err != nil {
@@ -222,16 +222,16 @@ func (r *GenericServiceReconciler) ReconcileAdapter(ctx context.Context, ab Adap
 // resolveSinkURL resolves the URL of a sink reference.
 func (r *GenericServiceReconciler) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
 	router := v1alpha1.RouterFromContext(ctx)
-	sink := *router.GetSink()
+	sink := router.GetSink()
 
-	if sinkRef := &router.GetSink().Ref; *sinkRef != nil && (*sinkRef).Namespace == "" {
-		(*sinkRef).Namespace = router.GetNamespace()
+	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
+		sinkRef.Namespace = router.GetNamespace()
 	}
 
-	return r.SinkResolver.URIFromDestinationV1(ctx, sink, router)
+	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, router)
 }
 
-// reconcileAdapter reconciles the state of the source's adapter.
+// reconcileAdapter reconciles the state of the Router's adapter.
 func (r *GenericServiceReconciler) reconcileAdapter(ctx context.Context,
 	desiredAdapter *servingv1.Service, rbacOwners []kmeta.OwnerRefable) error {
 
@@ -247,7 +247,7 @@ func (r *GenericServiceReconciler) reconcileAdapter(ctx context.Context,
 
 	if isMultiTenant {
 		// delegate ownership to the ServiceAccount in order to cause a
-		// garbage collection once all instances of the given source
+		// garbage collection once all instances of the given Router
 		// type have been deleted from the namespace
 		OwnByServiceAccount(desiredAdapter, sa)
 	}
@@ -272,7 +272,7 @@ func (r *GenericServiceReconciler) reconcileAdapter(ctx context.Context,
 }
 
 // getOrCreateAdapter returns the existing adapter Service for a given
-// source, or creates it if it is missing.
+// Router, or creates it if it is missing.
 func (r *GenericServiceReconciler) getOrCreateAdapter(ctx context.Context, desiredAdapter *servingv1.Service) (*servingv1.Service, error) {
 	router := v1alpha1.RouterFromContext(ctx)
 
@@ -326,7 +326,7 @@ func (r *GenericServiceReconciler) syncAdapterService(ctx context.Context,
 	return adapter, nil
 }
 
-// findAdapter returns the adapter object for a given source if it exists.
+// findAdapter returns the adapter object for a given Router if it exists.
 func findAdapter(genericReconciler interface{},
 	router v1alpha1.Router, owner *metav1.OwnerReference) (metav1.Object, error) {
 
@@ -334,7 +334,7 @@ func findAdapter(genericReconciler interface{},
 
 	if !v1alpha1.IsMultiTenant(router) {
 		// the combination of standard labels {name,instance} is unique
-		// and immutable for single-tenant sources
+		// and immutable for single-tenant Routers
 		ls[appInstanceLabel] = router.GetName()
 	}
 
@@ -394,9 +394,9 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 	owners []kmeta.OwnerRefable) (*corev1.ServiceAccount, error) {
 
 	// The ServiceAccount's ownership is shared between all instances of a
-	// given source type. It gets garbage collected by Kubernetes as soon
-	// as its last owner (source) is deleted, so we don't need to clean
-	// things up explicitly once the last source gets deleted.
+	// given Router type. It gets garbage collected by Kubernetes as soon
+	// as its last owner (Router) is deleted, so we don't need to clean
+	// things up explicitly once the last Router gets deleted.
 	if len(owners) == 0 {
 		return nil, nil
 	}
@@ -427,7 +427,7 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 }
 
 // getOrCreateAdapterServiceAccount returns the existing adapter ServiceAccount
-// for a given source, or creates it if it is missing.
+// for a given Router, or creates it if it is missing.
 func (r *GenericRBACReconciler) getOrCreateAdapterServiceAccount(ctx context.Context,
 	desiredSA *corev1.ServiceAccount) (*corev1.ServiceAccount, error) {
 

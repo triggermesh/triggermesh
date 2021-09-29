@@ -70,7 +70,7 @@ type AdapterServiceBuilder interface {
 	BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *servingv1.Service
 }
 
-// ReconcileSource reconciles an event source type.
+// ReconcileSource reconciles a receive adapter for an event source type.
 func (r *GenericDeploymentReconciler) ReconcileSource(ctx context.Context, ab AdapterDeploymentBuilder) reconciler.Event {
 	src := v1alpha1.SourceFromContext(ctx)
 
@@ -101,13 +101,13 @@ func (r *GenericDeploymentReconciler) ReconcileSource(ctx context.Context, ab Ad
 // resolveSinkURL resolves the URL of a sink reference.
 func (r *GenericDeploymentReconciler) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
 	src := v1alpha1.SourceFromContext(ctx)
-	sink := *src.GetSink()
+	sink := src.GetSink()
 
-	if sinkRef := &src.GetSink().Ref; *sinkRef != nil && (*sinkRef).Namespace == "" {
-		(*sinkRef).Namespace = src.GetNamespace()
+	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
+		sinkRef.Namespace = src.GetNamespace()
 	}
 
-	return r.SinkResolver.URIFromDestinationV1(ctx, sink, src)
+	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, src)
 }
 
 // reconcileAdapter reconciles the state of the source's adapter.
@@ -192,7 +192,7 @@ func (r *GenericDeploymentReconciler) syncAdapterDeployment(ctx context.Context,
 	return adapter, nil
 }
 
-// ReconcileSource reconciles an event source type.
+// ReconcileSource reconciles a receive adapter for an event source type.
 func (r *GenericServiceReconciler) ReconcileSource(ctx context.Context, ab AdapterServiceBuilder) reconciler.Event {
 	src := v1alpha1.SourceFromContext(ctx)
 
@@ -223,13 +223,13 @@ func (r *GenericServiceReconciler) ReconcileSource(ctx context.Context, ab Adapt
 // resolveSinkURL resolves the URL of a sink reference.
 func (r *GenericServiceReconciler) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
 	src := v1alpha1.SourceFromContext(ctx)
-	sink := *src.GetSink()
+	sink := src.GetSink()
 
-	if sinkRef := &src.GetSink().Ref; *sinkRef != nil && (*sinkRef).Namespace == "" {
-		(*sinkRef).Namespace = src.GetNamespace()
+	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
+		sinkRef.Namespace = src.GetNamespace()
 	}
 
-	return r.SinkResolver.URIFromDestinationV1(ctx, sink, src)
+	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, src)
 }
 
 // reconcileAdapter reconciles the state of the source's adapter.

@@ -78,7 +78,7 @@ func (f *Filter) GetStatus() *duckv1.Status {
 	return &f.Status.Status
 }
 
-// AsRouter implements Router.
-func (f *Filter) AsRouter() string {
+// AsEventSource implements Router.
+func (f *Filter) AsEventSource() string {
 	return "filter/" + f.Name
 }
