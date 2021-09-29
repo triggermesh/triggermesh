@@ -21,9 +21,11 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/controller"
+	"knative.dev/pkg/logging"
 	"knative.dev/pkg/reconciler"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -39,7 +41,7 @@ type Reconciler struct {
 var (
 	_ reconcilerv1alpha1.Interface         = (*Reconciler)(nil)
 	_ reconcilerv1alpha1.ReadOnlyInterface = (*Reconciler)(nil)
-	_ reconcilerv1alpha1.ReadOnlyFinalizer = (*Reconciler)(nil)
+	_ reconciler.OnDeletionInterface       = (*Reconciler)(nil)
 )
 
 // ReconcileKind implements reconcilerv1alpha1.Interface.
@@ -81,8 +83,12 @@ func (r *Reconciler) reconcile(ctx context.Context, src *v1alpha1.AWSSNSSource) 
 	return nil
 }
 
-// ObserveFinalizeKind implements reconcilerv1alpha1.ReadOnlyFinalizer.
-func (r *Reconciler) ObserveFinalizeKind(ctx context.Context, src *v1alpha1.AWSSNSSource) reconciler.Event {
+// ObserveDeletion implements reconciler.OnDeletionInterface.
+func (r *Reconciler) ObserveDeletion(ctx context.Context, key types.NamespacedName) error {
+	src := &v1alpha1.AWSSNSSource{}
+	src.SetName(key.Name)
+	src.SetNamespace(key.Namespace)
+
 	return r.finalize(ctx, src)
 }
 
@@ -91,6 +97,7 @@ func (r *Reconciler) finalize(ctx context.Context, src *v1alpha1.AWSSNSSource) e
 		return fmt.Errorf("deregistering HTTP handler: %w", err)
 	}
 
-	return reconciler.NewEvent(corev1.EventTypeNormal, ReasonHandlerDeregistered,
-		"HTTP handler deregistered")
+	logging.FromContext(ctx).Info("HTTP handler deregistered")
+
+	return nil
 }

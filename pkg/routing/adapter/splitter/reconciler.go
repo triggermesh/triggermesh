@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
@@ -38,7 +39,7 @@ type Reconciler struct {
 var (
 	_ reconcilerv1alpha1.Interface         = (*Reconciler)(nil)
 	_ reconcilerv1alpha1.ReadOnlyInterface = (*Reconciler)(nil)
-	_ reconcilerv1alpha1.ReadOnlyFinalizer = (*Reconciler)(nil)
+	_ reconciler.OnDeletionInterface       = (*Reconciler)(nil)
 )
 
 // ReconcileKind implements reconcilerv1alpha1.Interface.
@@ -67,8 +68,12 @@ func (r *Reconciler) reconcile(ctx context.Context, s *v1alpha1.Splitter) error 
 	return nil
 }
 
-// ObserveFinalizeKind implements reconcilerv1alpha1.ReadOnlyFinalizer.
-func (r *Reconciler) ObserveFinalizeKind(ctx context.Context, s *v1alpha1.Splitter) reconciler.Event {
+// ObserveDeletion implements reconciler.OnDeletionInterface.
+func (r *Reconciler) ObserveDeletion(ctx context.Context, key types.NamespacedName) error {
+	s := &v1alpha1.Splitter{}
+	s.SetName(key.Name)
+	s.SetNamespace(key.Namespace)
+
 	return r.finalize(ctx, s)
 }
 
