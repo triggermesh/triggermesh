@@ -24,7 +24,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/types"
 	appsclientv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	rbacclientv1 "k8s.io/client-go/kubernetes/typed/rbac/v1"
@@ -40,6 +39,7 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/resolver"
+	"knative.dev/pkg/tracker"
 	servingclientv1 "knative.dev/serving/pkg/client/clientset/versioned/typed/serving/v1"
 	servingclient "knative.dev/serving/pkg/client/injection/client"
 	serviceinformerv1 "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
@@ -84,14 +84,14 @@ type GenericRBACReconciler struct {
 // NewGenericDeploymentReconciler creates a new GenericDeploymentReconciler and
 // attaches a default event handler to its Deployment informer.
 func NewGenericDeploymentReconciler(ctx context.Context, gvk schema.GroupVersionKind,
-	resolverCallback func(types.NamespacedName),
+	tracker tracker.Interface,
 	adapterHandlerFn func(obj interface{}),
 ) GenericDeploymentReconciler {
 
 	informer := deploymentinformerv1.Get(ctx)
 
 	r := GenericDeploymentReconciler{
-		SinkResolver:          resolver.NewURIResolver(ctx, resolverCallback),
+		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker),
 		Client:                k8sclient.Get(ctx).AppsV1().Deployments,
 		PodClient:             k8sclient.Get(ctx).CoreV1().Pods,
 		Lister:                informer.Lister().Deployments,
@@ -109,7 +109,7 @@ func NewGenericDeploymentReconciler(ctx context.Context, gvk schema.GroupVersion
 // NewGenericServiceReconciler creates a new GenericServiceReconciler and
 // attaches a default event handler to its Service informer.
 func NewGenericServiceReconciler(ctx context.Context, gvk schema.GroupVersionKind,
-	resolverCallback func(types.NamespacedName),
+	tracker tracker.Interface,
 	adapterHandlerFn func(obj interface{}),
 ) GenericServiceReconciler {
 
@@ -118,14 +118,14 @@ func NewGenericServiceReconciler(ctx context.Context, gvk schema.GroupVersionKin
 		Handler:    controller.HandleAll(adapterHandlerFn),
 	})
 
-	return newGenericServiceReconciler(ctx, resolverCallback)
+	return newGenericServiceReconciler(ctx, tracker)
 }
 
 // NewMTGenericServiceReconciler creates a new GenericServiceReconciler for a
 // multi-tenant adapter and attaches a default event handler to its Service
 // informer.
 func NewMTGenericServiceReconciler(ctx context.Context, typ kmeta.OwnerRefable,
-	resolverCallback func(types.NamespacedName),
+	tracker tracker.Interface,
 	adapterHandlerFn func(obj interface{}),
 ) GenericServiceReconciler {
 
@@ -134,7 +134,7 @@ func NewMTGenericServiceReconciler(ctx context.Context, typ kmeta.OwnerRefable,
 		Handler:    controller.HandleAll(adapterHandlerFn),
 	})
 
-	return newGenericServiceReconciler(ctx, resolverCallback)
+	return newGenericServiceReconciler(ctx, tracker)
 }
 
 // NewGenericRBACReconciler creates a new GenericRBACReconciler.
@@ -149,11 +149,11 @@ func NewGenericRBACReconciler(ctx context.Context) *GenericRBACReconciler {
 
 // newMTGenericServiceReconciler creates a new GenericServiceReconciler.
 func newGenericServiceReconciler(ctx context.Context,
-	resolverCallback func(types.NamespacedName),
+	tracker tracker.Interface,
 ) GenericServiceReconciler {
 
 	return GenericServiceReconciler{
-		SinkResolver:          resolver.NewURIResolver(ctx, resolverCallback),
+		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker),
 		Client:                servingclient.Get(ctx).ServingV1().Services,
 		Lister:                serviceinformerv1.Get(ctx).Lister().Services,
 		GenericRBACReconciler: NewGenericRBACReconciler(ctx),

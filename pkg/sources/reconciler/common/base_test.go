@@ -17,6 +17,7 @@ limitations under the License.
 package common
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -49,7 +50,7 @@ func TestEnqueueObjectsInNamespaceOf(t *testing.T) {
 		store: storedObjects,
 	}
 
-	impl := controller.NewImplFull(nil, controller.ControllerOptions{
+	impl := controller.NewContext(context.Background(), nil, controller.ControllerOptions{
 		Logger: logtesting.TestLogger(t),
 	})
 	t.Cleanup(impl.WorkQueue().ShutDown)

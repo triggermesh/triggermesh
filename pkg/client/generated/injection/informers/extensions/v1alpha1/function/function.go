@@ -21,8 +21,15 @@ package function
 import (
 	context "context"
 
+	apisextensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
+	internalclientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/extensions/v1alpha1"
+	client "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client"
 	factory "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/factory"
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/extensions/v1alpha1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	cache "k8s.io/client-go/tools/cache"
 	controller "knative.dev/pkg/controller"
 	injection "knative.dev/pkg/injection"
 	logging "knative.dev/pkg/logging"
@@ -30,6 +37,7 @@ import (
 
 func init() {
 	injection.Default.RegisterInformer(withInformer)
+	injection.Dynamic.RegisterDynamicInformer(withDynamicInformer)
 }
 
 // Key is used for associating the Informer inside the context.Context.
@@ -41,6 +49,11 @@ func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 	return context.WithValue(ctx, Key{}, inf), inf.Informer()
 }
 
+func withDynamicInformer(ctx context.Context) context.Context {
+	inf := &wrapper{client: client.Get(ctx)}
+	return context.WithValue(ctx, Key{}, inf)
+}
+
 // Get extracts the typed informer from the context.
 func Get(ctx context.Context) v1alpha1.FunctionInformer {
 	untyped := ctx.Value(Key{})
@@ -49,4 +62,45 @@ func Get(ctx context.Context) v1alpha1.FunctionInformer {
 			"Unable to fetch github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/extensions/v1alpha1.FunctionInformer from context.")
 	}
 	return untyped.(v1alpha1.FunctionInformer)
+}
+
+type wrapper struct {
+	client internalclientset.Interface
+
+	namespace string
+}
+
+var _ v1alpha1.FunctionInformer = (*wrapper)(nil)
+var _ extensionsv1alpha1.FunctionLister = (*wrapper)(nil)
+
+func (w *wrapper) Informer() cache.SharedIndexInformer {
+	return cache.NewSharedIndexInformer(nil, &apisextensionsv1alpha1.Function{}, 0, nil)
+}
+
+func (w *wrapper) Lister() extensionsv1alpha1.FunctionLister {
+	return w
+}
+
+func (w *wrapper) Functions(namespace string) extensionsv1alpha1.FunctionNamespaceLister {
+	return &wrapper{client: w.client, namespace: namespace}
+}
+
+func (w *wrapper) List(selector labels.Selector) (ret []*apisextensionsv1alpha1.Function, err error) {
+	lo, err := w.client.ExtensionsV1alpha1().Functions(w.namespace).List(context.TODO(), v1.ListOptions{
+		LabelSelector: selector.String(),
+		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+	})
+	if err != nil {
+		return nil, err
+	}
+	for idx := range lo.Items {
+		ret = append(ret, &lo.Items[idx])
+	}
+	return ret, nil
+}
+
+func (w *wrapper) Get(name string) (*apisextensionsv1alpha1.Function, error) {
+	return w.client.ExtensionsV1alpha1().Functions(w.namespace).Get(context.TODO(), name, v1.GetOptions{
+		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+	})
 }

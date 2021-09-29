@@ -66,7 +66,7 @@ func NewController(
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))
 
-	r.sinkResolver = resolver.NewURIResolver(ctx, impl.EnqueueKey)
+	r.sinkResolver = resolver.NewURIResolverFromTracker(ctx, impl.Tracker)
 
 	logger.Info("Setting up event handlers.")
 

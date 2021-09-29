@@ -34,6 +34,7 @@ import (
 	"knative.dev/pkg/reconciler"
 	rt "knative.dev/pkg/reconciler/testing"
 	"knative.dev/pkg/resolver"
+	"knative.dev/pkg/tracker"
 	fakeservinginjectionclient "knative.dev/serving/pkg/client/injection/client/fake"
 
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
@@ -115,7 +116,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 // test clients.
 func NewTestDeploymentReconciler(ctx context.Context, ls *Listers) common.GenericDeploymentReconciler {
 	return common.GenericDeploymentReconciler{
-		SinkResolver:          resolver.NewURIResolver(ctx, func(types.NamespacedName) {}),
+		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker.New(func(types.NamespacedName) {}, 0)),
 		Lister:                ls.GetDeploymentLister().Deployments,
 		Client:                fakek8sinjectionclient.Get(ctx).AppsV1().Deployments,
 		PodClient:             fakek8sinjectionclient.Get(ctx).CoreV1().Pods,
@@ -127,7 +128,7 @@ func NewTestDeploymentReconciler(ctx context.Context, ls *Listers) common.Generi
 // test clients.
 func NewTestServiceReconciler(ctx context.Context, ls *Listers) common.GenericServiceReconciler {
 	return common.GenericServiceReconciler{
-		SinkResolver:          resolver.NewURIResolver(ctx, func(types.NamespacedName) {}),
+		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker.New(func(types.NamespacedName) {}, 0)),
 		Lister:                ls.GetServiceLister().Services,
 		Client:                fakeservinginjectionclient.Get(ctx).ServingV1().Services,
 		GenericRBACReconciler: newTestRBACReconciler(ctx, ls),

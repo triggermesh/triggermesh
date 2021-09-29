@@ -64,7 +64,7 @@ func NewController(
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
 	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))
-	r.sinkResolver = resolver.NewURIResolver(ctx, impl.EnqueueKey)
+	r.sinkResolver = resolver.NewURIResolverFromTracker(ctx, impl.Tracker)
 	r.runtimes = make(map[string]string)
 	for _, e := range os.Environ() {
 		if !strings.HasPrefix(e, runtimeEnvPrefix) {

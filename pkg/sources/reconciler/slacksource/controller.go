@@ -58,7 +58,7 @@ func NewController(
 	r.base = common.NewGenericServiceReconciler(
 		ctx,
 		typ.GetGroupVersionKind(),
-		impl.EnqueueKey,
+		impl.Tracker,
 		impl.EnqueueControllerOf,
 	)
 

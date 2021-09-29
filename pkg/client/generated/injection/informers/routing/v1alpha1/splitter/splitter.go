@@ -21,8 +21,15 @@ package splitter
 import (
 	context "context"
 
+	apisroutingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
+	internalclientset "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset"
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/routing/v1alpha1"
+	client "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client"
 	factory "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/factory"
+	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	cache "k8s.io/client-go/tools/cache"
 	controller "knative.dev/pkg/controller"
 	injection "knative.dev/pkg/injection"
 	logging "knative.dev/pkg/logging"
@@ -30,6 +37,7 @@ import (
 
 func init() {
 	injection.Default.RegisterInformer(withInformer)
+	injection.Dynamic.RegisterDynamicInformer(withDynamicInformer)
 }
 
 // Key is used for associating the Informer inside the context.Context.
@@ -41,6 +49,11 @@ func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 	return context.WithValue(ctx, Key{}, inf), inf.Informer()
 }
 
+func withDynamicInformer(ctx context.Context) context.Context {
+	inf := &wrapper{client: client.Get(ctx)}
+	return context.WithValue(ctx, Key{}, inf)
+}
+
 // Get extracts the typed informer from the context.
 func Get(ctx context.Context) v1alpha1.SplitterInformer {
 	untyped := ctx.Value(Key{})
@@ -49,4 +62,45 @@ func Get(ctx context.Context) v1alpha1.SplitterInformer {
 			"Unable to fetch github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/routing/v1alpha1.SplitterInformer from context.")
 	}
 	return untyped.(v1alpha1.SplitterInformer)
+}
+
+type wrapper struct {
+	client internalclientset.Interface
+
+	namespace string
+}
+
+var _ v1alpha1.SplitterInformer = (*wrapper)(nil)
+var _ routingv1alpha1.SplitterLister = (*wrapper)(nil)
+
+func (w *wrapper) Informer() cache.SharedIndexInformer {
+	return cache.NewSharedIndexInformer(nil, &apisroutingv1alpha1.Splitter{}, 0, nil)
+}
+
+func (w *wrapper) Lister() routingv1alpha1.SplitterLister {
+	return w
+}
+
+func (w *wrapper) Splitters(namespace string) routingv1alpha1.SplitterNamespaceLister {
+	return &wrapper{client: w.client, namespace: namespace}
+}
+
+func (w *wrapper) List(selector labels.Selector) (ret []*apisroutingv1alpha1.Splitter, err error) {
+	lo, err := w.client.RoutingV1alpha1().Splitters(w.namespace).List(context.TODO(), v1.ListOptions{
+		LabelSelector: selector.String(),
+		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+	})
+	if err != nil {
+		return nil, err
+	}
+	for idx := range lo.Items {
+		ret = append(ret, &lo.Items[idx])
+	}
+	return ret, nil
+}
+
+func (w *wrapper) Get(name string) (*apisroutingv1alpha1.Splitter, error) {
+	return w.client.RoutingV1alpha1().Splitters(w.namespace).Get(context.TODO(), name, v1.GetOptions{
+		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+	})
 }

@@ -62,7 +62,7 @@ func NewController(
 	r.base = common.NewMTGenericServiceReconciler(
 		ctx,
 		typ,
-		impl.EnqueueKey,
+		impl.Tracker,
 		common.EnqueueObjectsInNamespaceOf(informer.Informer(), impl.FilteredGlobalResync, logger),
 	)
 
