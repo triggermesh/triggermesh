@@ -35,7 +35,7 @@ import (
 )
 
 type envConfig struct {
-	Image string `envconfig:"TRANSFORMER_IMAGE" required:"true"`
+	Image string `envconfig:"TRANSFORMER_IMAGE" default:"gcr.io/triggermesh/transformation-adapter"`
 }
 
 // NewController creates a Reconciler and returns the result of NewImpl.
@@ -54,12 +54,7 @@ func NewController(
 	}
 
 	env := &envConfig{}
-	if err := envconfig.Process("", env); err != nil {
-		logger.Panicf("unable to process Transformation required environment variables: %v", err)
-	}
-	if env.Image == "" {
-		logger.Panic("unable to process Transformation required environment variables (missing TRANSFORMER_IMAGE)")
-	}
+	envconfig.MustProcess("", env)
 
 	r.transformerImage = env.Image
 
