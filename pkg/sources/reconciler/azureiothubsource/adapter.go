@@ -40,7 +40,7 @@ const (
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
-	Image string `envconfig:"AZUREIOTHUBSOURCE_IMAGE"  default:"gcr.io/triggermesh/azureiothubsource-adapter"`
+	Image string `default:"gcr.io/triggermesh/azureiothubsource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
