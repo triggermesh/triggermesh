@@ -55,15 +55,18 @@ spec:
               serviceName:
                 description: The name of the API service performing the operation. For example, "pubsub.googleapis.com".
                 type: string
+                pattern: ^[a-z\d][a-z\d\-\.]*[a-z\d]$
               methodName:
                 description: The name of the service method or operation. For API calls, this should be the name of the
                   API method. For example, "google.pubsub.v1.Publisher.CreateTopic".
                 type: string
+                pattern: ^[A-Za-z\d][A-Za-z\d\-\.]*[A-Za-z\d]$
               resourceName:
                 description: The resource or collection that is the target of the operation. The name is a scheme-less
                   URI, not including the API service name.
                   https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog
                 type: string
+                pattern: ^[a-z\d][a-z\d\-\.\/]*[a-z\d]$
               pubsub:
                 description: Attributes related to the configuration of Pub/Sub resources associated with the Cloud
                   Audit Log.
