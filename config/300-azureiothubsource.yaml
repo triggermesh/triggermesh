@@ -24,7 +24,7 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.microsoft.azure.iothub" }
+        { "type": "com.microsoft.azure.iothub.message" }
       ]
 spec:
   group: sources.triggermesh.io
@@ -53,17 +53,17 @@ spec:
             type: object
             properties:
               auth:
-                description: Authentication method to interact with the Azure Service Bus Queue.
+                description: Authentication method to interact with the Azure IOT Hub.
                 type: object
                 properties:
                   sasToken:
                     description: An Azure shared access signature (SAS) token. For more information about SAS tokens,
-                      please refer to the Azure Service Bus Queue documentation at
-                      https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas.
+                      please refer to the Azure IOT Hub documentation at
+                      https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-dev-guide-sas?tabs=node.
                     type: object
                     properties:
                       connectionString:
-                        description: Connection string containing both the resource URI of the Event Service Bus instance, and
+                        description: Connection string containing both the resource URI of the IOT Hub Bus instance, and
                           the SAS token.
                         type: object
                         properties:
@@ -106,7 +106,7 @@ spec:
                 - required: [ref]
                 - required: [uri]
             required:
-            - connectionString
+            - auth
             - sink
           status:
             description: Reported status of the event source.
@@ -161,9 +161,6 @@ spec:
     - name: Reason
       type: string
       jsonPath: .status.conditions[?(@.type=='Ready')].reason
-    - name: URL
-      type: string
-      jsonPath: .status.address.url
     - name: Sink
       type: string
       jsonPath: .status.sinkUri

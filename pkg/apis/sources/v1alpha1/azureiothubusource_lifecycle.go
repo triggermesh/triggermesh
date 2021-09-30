@@ -43,7 +43,7 @@ func (s *AzureIOTHubSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (s *AzureIOTHubSource) GetConditionSet() apis.ConditionSet {
-	return azureIOTHubSourceConditionSet
+	return eventSourceConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -73,27 +73,4 @@ func (s *AzureIOTHubSource) AsEventSource() string {
 // as as a CloudEvent source.
 func AzureIOTHubSourceName(namespace, name string) string {
 	return "io.triggermesh.azureiothubsource/" + namespace + "/" + name
-}
-
-// Status conditions
-const (
-	// AzureIOTHubConditionSubscribed has status True when an event subscription exists for the source.
-	AzureIOTHubConditionSubscribed apis.ConditionType = "Subscribed"
-)
-
-// azureIOTHubSourceConditionSet is a set of conditions for
-// AzureIOTHubSource objects.
-var azureIOTHubSourceConditionSet = NewEventSourceConditionSet(
-	AzureIOTHubConditionSubscribed,
-)
-
-// MarkSubscribed sets the Subscribed condition to True.
-func (s *AzureIOTHubSourceStatus) MarkSubscribed() {
-	azureIOTHubSourceConditionSet.Manage(s).MarkTrue(AzureIOTHubConditionSubscribed)
-}
-
-// MarkNotSubscribed sets the Subscribed condition to False with the given
-// reason and message.
-func (s *AzureIOTHubSourceStatus) MarkNotSubscribed(reason, msg string) {
-	azureIOTHubSourceConditionSet.Manage(s).MarkFalse(AzureIOTHubConditionSubscribed, reason, msg)
 }

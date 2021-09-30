@@ -22,13 +22,16 @@ import (
 	"log"
 	"strings"
 
-	"github.com/amenzhinsky/iothub/iotservice"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/amenzhinsky/iothub/iotservice"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -88,7 +91,7 @@ func (a *adapter) Start(ctx context.Context) error {
 
 func (a *adapter) sendCloudEvent(msg *iotservice.Event) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType(v1alpha1.AzureIOTHubGenericEventType)
+	event.SetType(v1alpha1.AzureEventType(sources.AzureIOTHub, v1alpha1.AzureIOTHubGenericEventType))
 	event.SetSource(a.source)
 	if err := event.SetData(cloudevents.ApplicationJSON, msg); err != nil {
 		return fmt.Errorf("setting event data: %w", err)
