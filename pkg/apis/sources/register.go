@@ -142,6 +142,13 @@ var (
 		Resource: "googlecloudpubsubsources",
 	}
 
+	// GoogleCloudRepositoriesSourceResource respresents an event source for Google
+	// Cloud Source Repositories.
+	GoogleCloudRepositoriesSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "googlecloudrepositoriessources",
+	}
+
 	// GoogleCloudStorageSourceResource respresents an event source for Google
 	// Cloud Storage.
 	GoogleCloudStorageSourceResource = schema.GroupResource{

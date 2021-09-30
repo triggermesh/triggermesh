@@ -45,6 +45,7 @@ type SourcesV1alpha1Interface interface {
 	GoogleCloudAuditLogsSourcesGetter
 	GoogleCloudBillingSourcesGetter
 	GoogleCloudPubSubSourcesGetter
+	GoogleCloudRepositoriesSourcesGetter
 	GoogleCloudStorageSourcesGetter
 	HTTPPollerSourcesGetter
 	OCIMetricsSourcesGetter
@@ -134,6 +135,10 @@ func (c *SourcesV1alpha1Client) GoogleCloudBillingSources(namespace string) Goog
 
 func (c *SourcesV1alpha1Client) GoogleCloudPubSubSources(namespace string) GoogleCloudPubSubSourceInterface {
 	return newGoogleCloudPubSubSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) GoogleCloudRepositoriesSources(namespace string) GoogleCloudRepositoriesSourceInterface {
+	return newGoogleCloudRepositoriesSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) GoogleCloudStorageSources(namespace string) GoogleCloudStorageSourceInterface {

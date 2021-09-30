@@ -56,6 +56,8 @@ type GoogleCloudBillingSourceExpansion interface{}
 
 type GoogleCloudPubSubSourceExpansion interface{}
 
+type GoogleCloudRepositoriesSourceExpansion interface{}
+
 type GoogleCloudStorageSourceExpansion interface{}
 
 type HTTPPollerSourceExpansion interface{}

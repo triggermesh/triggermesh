@@ -109,6 +109,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudBillingSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudpubsubsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudPubSubSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudrepositoriessources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudRepositoriesSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudstoragesources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudStorageSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("httppollersources"):

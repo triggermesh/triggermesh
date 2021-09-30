@@ -77,6 +77,7 @@ rules:
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudpubsubsources
+  - googlecloudrepositoriessources
   - googlecloudstoragesources
   - httppollersources
   - ocimetricssources
@@ -111,6 +112,7 @@ rules:
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
   - googlecloudpubsubsources/status
+  - googlecloudrepositoriessources/status
   - googlecloudstoragesources/status
   - httppollersources/status
   - ocimetricssources/status
@@ -285,6 +287,7 @@ rules:
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudpubsubsources
+  - googlecloudrepositoriessources
   - googlecloudstoragesources
   - zendesksources
   verbs:
@@ -323,6 +326,7 @@ rules:
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
   - googlecloudpubsubsource-adapter
+  - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
   - httppollersource-adapter
   - ocimetricssource-adapter
@@ -368,6 +372,7 @@ rules:
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
   - googlecloudpubsubsource-adapter
+  - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
   - httppollersource-adapter
   - ocimetricssource-adapter
@@ -677,6 +682,7 @@ rules:
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudpubsubsources
+  - googlecloudrepositoriessources
   - googlecloudstoragesources
   - httppollersources
   - ocimetricssources

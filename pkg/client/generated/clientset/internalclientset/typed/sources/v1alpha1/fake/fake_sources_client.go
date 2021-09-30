@@ -104,6 +104,10 @@ func (c *FakeSourcesV1alpha1) GoogleCloudPubSubSources(namespace string) v1alpha
 	return &FakeGoogleCloudPubSubSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) GoogleCloudRepositoriesSources(namespace string) v1alpha1.GoogleCloudRepositoriesSourceInterface {
+	return &FakeGoogleCloudRepositoriesSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) GoogleCloudStorageSources(namespace string) v1alpha1.GoogleCloudStorageSourceInterface {
 	return &FakeGoogleCloudStorageSources{c, namespace}
 }

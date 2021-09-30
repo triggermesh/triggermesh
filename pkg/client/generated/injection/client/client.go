@@ -3177,6 +3177,137 @@ func (w *wrapSourcesV1alpha1GoogleCloudPubSubSourceImpl) Watch(ctx context.Conte
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapSourcesV1alpha1) GoogleCloudRepositoriesSources(namespace string) typedsourcesv1alpha1.GoogleCloudRepositoriesSourceInterface {
+	return &wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "sources.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "googlecloudrepositoriessources",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedsourcesv1alpha1.GoogleCloudRepositoriesSourceInterface = (*wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl)(nil)
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.GoogleCloudRepositoriesSource, opts v1.CreateOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "GoogleCloudRepositoriesSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSourceList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.GoogleCloudRepositoriesSourceList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.GoogleCloudRepositoriesSource, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.GoogleCloudRepositoriesSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "GoogleCloudRepositoriesSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.GoogleCloudRepositoriesSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "GoogleCloudRepositoriesSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapSourcesV1alpha1) GoogleCloudStorageSources(namespace string) typedsourcesv1alpha1.GoogleCloudStorageSourceInterface {
 	return &wrapSourcesV1alpha1GoogleCloudStorageSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{

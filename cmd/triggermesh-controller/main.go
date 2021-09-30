@@ -41,6 +41,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudauditlogssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudbillingsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudpubsubsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudrepositoriessource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudstoragesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/httppollersource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ocimetricssource"
@@ -98,6 +99,7 @@ func main() {
 		googlecloudauditlogssource.NewController,
 		googlecloudbillingsource.NewController,
 		googlecloudpubsubsource.NewController,
+		googlecloudrepositoriessource.NewController,
 		googlecloudstoragesource.NewController,
 		httppollersource.NewController,
 		ocimetricssource.NewController,

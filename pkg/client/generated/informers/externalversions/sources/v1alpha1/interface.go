@@ -62,6 +62,8 @@ type Interface interface {
 	GoogleCloudBillingSources() GoogleCloudBillingSourceInformer
 	// GoogleCloudPubSubSources returns a GoogleCloudPubSubSourceInformer.
 	GoogleCloudPubSubSources() GoogleCloudPubSubSourceInformer
+	// GoogleCloudRepositoriesSources returns a GoogleCloudRepositoriesSourceInformer.
+	GoogleCloudRepositoriesSources() GoogleCloudRepositoriesSourceInformer
 	// GoogleCloudStorageSources returns a GoogleCloudStorageSourceInformer.
 	GoogleCloudStorageSources() GoogleCloudStorageSourceInformer
 	// HTTPPollerSources returns a HTTPPollerSourceInformer.
@@ -184,6 +186,11 @@ func (v *version) GoogleCloudBillingSources() GoogleCloudBillingSourceInformer {
 // GoogleCloudPubSubSources returns a GoogleCloudPubSubSourceInformer.
 func (v *version) GoogleCloudPubSubSources() GoogleCloudPubSubSourceInformer {
 	return &googleCloudPubSubSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GoogleCloudRepositoriesSources returns a GoogleCloudRepositoriesSourceInformer.
+func (v *version) GoogleCloudRepositoriesSources() GoogleCloudRepositoriesSourceInformer {
+	return &googleCloudRepositoriesSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GoogleCloudStorageSources returns a GoogleCloudStorageSourceInformer.
