@@ -36,7 +36,7 @@ import (
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
-	Image string `envconfig:"AZUREQUEUESTORAGESOURCE_IMAGE"  default:"gcr.io/triggermesh/azurequeuestoragesource-adapter"`
+	Image string `default:"gcr.io/triggermesh/azurequeuestoragesource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
