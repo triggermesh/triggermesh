@@ -50,6 +50,8 @@ type AzureEventHubSourceExpansion interface{}
 
 type AzureQueueStorageSourceExpansion interface{}
 
+type AzureServiceBusQueueSourceExpansion interface{}
+
 type GoogleCloudAuditLogsSourceExpansion interface{}
 
 type GoogleCloudBillingSourceExpansion interface{}

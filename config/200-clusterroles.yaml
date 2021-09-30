@@ -74,6 +74,7 @@ rules:
   - azureeventgridsources
   - azureeventhubsources
   - azurequeuestoragesources
+  - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudpubsubsources
@@ -109,6 +110,7 @@ rules:
   - azureeventgridsources/status
   - azureeventhubsources/status
   - azurequeuestoragesources/status
+  - azureservicebusqueuesources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
   - googlecloudpubsubsources/status
@@ -284,6 +286,7 @@ rules:
   - azureactivitylogssources
   - azureblobstoragesources
   - azureeventgridsources
+  - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudpubsubsources
@@ -323,6 +326,7 @@ rules:
   - azureeventgridsource-adapter
   - azureeventhubsource-adapter
   - azurequeuestoragesource-adapter
+  - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
   - googlecloudpubsubsource-adapter
@@ -369,6 +373,7 @@ rules:
   - azureeventgridsource-adapter
   - azureeventhubsource-adapter
   - azurequeuestoragesource-adapter
+  - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
   - googlecloudpubsubsource-adapter
@@ -679,6 +684,7 @@ rules:
   - azureeventgridsources
   - azureeventhubsources
   - azurequeuestoragesources
+  - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudpubsubsources

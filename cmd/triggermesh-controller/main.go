@@ -38,6 +38,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureeventgridsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureeventhubsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azurequeuestoragesource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureservicebusqueuesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudauditlogssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudbillingsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudpubsubsource"
@@ -96,6 +97,7 @@ func main() {
 		azureeventgridsource.NewController,
 		azureeventhubsource.NewController,
 		azurequeuestoragesource.NewController,
+		azureservicebusqueuesource.NewController,
 		googlecloudauditlogssource.NewController,
 		googlecloudbillingsource.NewController,
 		googlecloudpubsubsource.NewController,

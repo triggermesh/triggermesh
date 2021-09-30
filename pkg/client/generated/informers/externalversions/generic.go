@@ -103,6 +103,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureEventHubSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("azurequeuestoragesources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureQueueStorageSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("azureservicebusqueuesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AzureServiceBusQueueSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudauditlogssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudAuditLogsSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudbillingsources"):

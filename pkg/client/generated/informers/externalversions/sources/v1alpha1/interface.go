@@ -56,6 +56,8 @@ type Interface interface {
 	AzureEventHubSources() AzureEventHubSourceInformer
 	// AzureQueueStorageSources returns a AzureQueueStorageSourceInformer.
 	AzureQueueStorageSources() AzureQueueStorageSourceInformer
+	// AzureServiceBusQueueSources returns a AzureServiceBusQueueSourceInformer.
+	AzureServiceBusQueueSources() AzureServiceBusQueueSourceInformer
 	// GoogleCloudAuditLogsSources returns a GoogleCloudAuditLogsSourceInformer.
 	GoogleCloudAuditLogsSources() GoogleCloudAuditLogsSourceInformer
 	// GoogleCloudBillingSources returns a GoogleCloudBillingSourceInformer.
@@ -171,6 +173,11 @@ func (v *version) AzureEventHubSources() AzureEventHubSourceInformer {
 // AzureQueueStorageSources returns a AzureQueueStorageSourceInformer.
 func (v *version) AzureQueueStorageSources() AzureQueueStorageSourceInformer {
 	return &azureQueueStorageSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureServiceBusQueueSources returns a AzureServiceBusQueueSourceInformer.
+func (v *version) AzureServiceBusQueueSources() AzureServiceBusQueueSourceInformer {
+	return &azureServiceBusQueueSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GoogleCloudAuditLogsSources returns a GoogleCloudAuditLogsSourceInformer.
