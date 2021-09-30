@@ -43,6 +43,7 @@ var (
 type AzureIOTHubSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
+	// AzureAuth contains multiple authentication methods for Azure services.
 	Auth AzureAuth `json:"auth,omitempty"`
 }
 

@@ -23,6 +23,8 @@ WORKDIR /go/src/azureiothubsource-adapter
 COPY go.mod go.sum ./
 RUN go mod download
 
+# NOTE: try not to modify the instructions above to keep cached layers for all targets
+
 COPY . .
 RUN BIN_OUTPUT_DIR=/bin make azureiothubsource-adapter && \
     mkdir /kodata && \
@@ -39,10 +41,9 @@ LABEL release "1"
 LABEL summary "The TriggerMesh Azure IOT Hub Source"
 LABEL description "This is the TriggerMesh Knative Event Source for Azure IOT Hub"
 
-# Emulate ko builds
-# https://github.com/google/ko/blob/v0.5.0/README.md#including-static-assets
 ENV KO_DATA_PATH /kodata
 
+COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
 COPY --from=builder /bin/azureiothubsource-adapter /
 COPY licenses/ /licenses/
