@@ -138,6 +138,14 @@ type AzureEventHubSourceListerExpansion interface{}
 // AzureEventHubSourceNamespaceLister.
 type AzureEventHubSourceNamespaceListerExpansion interface{}
 
+// AzureIOTHubSourceListerExpansion allows custom methods to be added to
+// AzureIOTHubSourceLister.
+type AzureIOTHubSourceListerExpansion interface{}
+
+// AzureIOTHubSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureIOTHubSourceNamespaceLister.
+type AzureIOTHubSourceNamespaceListerExpansion interface{}
+
 // AzureQueueStorageSourceListerExpansion allows custom methods to be added to
 // AzureQueueStorageSourceLister.
 type AzureQueueStorageSourceListerExpansion interface{}

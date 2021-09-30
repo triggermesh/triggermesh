@@ -54,6 +54,8 @@ type Interface interface {
 	AzureEventGridSources() AzureEventGridSourceInformer
 	// AzureEventHubSources returns a AzureEventHubSourceInformer.
 	AzureEventHubSources() AzureEventHubSourceInformer
+	// AzureIOTHubSources returns a AzureIOTHubSourceInformer.
+	AzureIOTHubSources() AzureIOTHubSourceInformer
 	// AzureQueueStorageSources returns a AzureQueueStorageSourceInformer.
 	AzureQueueStorageSources() AzureQueueStorageSourceInformer
 	// AzureServiceBusQueueSources returns a AzureServiceBusQueueSourceInformer.
@@ -168,6 +170,11 @@ func (v *version) AzureEventGridSources() AzureEventGridSourceInformer {
 // AzureEventHubSources returns a AzureEventHubSourceInformer.
 func (v *version) AzureEventHubSources() AzureEventHubSourceInformer {
 	return &azureEventHubSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureIOTHubSources returns a AzureIOTHubSourceInformer.
+func (v *version) AzureIOTHubSources() AzureIOTHubSourceInformer {
+	return &azureIOTHubSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // AzureQueueStorageSources returns a AzureQueueStorageSourceInformer.

@@ -22,6 +22,7 @@ const (
 	AzureServiceEventHub  = "eventhub"
 	AzureServiceMonitor   = "monitor"
 	AzureServiceBusQueue  = "servicebus.queue"
+	AzureIOTHub           = "iothub"
 )
 
 // SubscriptionResourceID returns the Azure resource ID for the given

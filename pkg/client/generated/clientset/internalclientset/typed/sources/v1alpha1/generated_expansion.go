@@ -48,6 +48,8 @@ type AzureEventGridSourceExpansion interface{}
 
 type AzureEventHubSourceExpansion interface{}
 
+type AzureIOTHubSourceExpansion interface{}
+
 type AzureQueueStorageSourceExpansion interface{}
 
 type AzureServiceBusQueueSourceExpansion interface{}
