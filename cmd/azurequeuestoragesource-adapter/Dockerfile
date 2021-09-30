@@ -32,7 +32,7 @@ RUN BIN_OUTPUT_DIR=/bin make azurequeuestoragesource-adapter && \
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-LABEL name "TriggerMesh Azure Queue Storage  Source"
+LABEL name "TriggerMesh Azure Queue Storage Source"
 LABEL vendor "TriggerMesh"
 LABEL version "v0.1.0"
 LABEL release "1"

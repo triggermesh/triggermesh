@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.15-buster AS builder
+FROM golang:1.17-bullseye AS builder
 
 ENV CGO_ENABLED 0
 ENV GOOS linux
@@ -45,6 +45,6 @@ ENV KO_DATA_PATH /kodata
 
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
 COPY --from=builder /bin/azureservicebusqueuesource-adapter /
-COPY licenses/ /licenses/
+COPY LICENSE EULA.pdf /licenses/
 
 ENTRYPOINT ["/azureservicebusqueuesource-adapter"]
