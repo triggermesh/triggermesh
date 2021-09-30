@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright (c) 2021 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,9 +49,10 @@ type InfraTargetSpec struct {
 	// Script to be executed at every request.
 	Script *InfraTargetScript `json:"script,omitempty"`
 
-	// State actions and options
+	// State actions and options.
 	State *InfraTargetState `json:"state,omitempty"`
 
+	// TypeLoopProtection protect against infinite loops when the cloudevent type does not change.
 	TypeLoopProtection *bool `json:"typeLoopProtection,omitempty"`
 }
 

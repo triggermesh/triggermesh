@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright (c) 2021 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,13 +50,20 @@ var (
 
 // UiPathTargetSpec defines the desired state of the event target.
 type UiPathTargetSpec struct {
-	UserKey            *SecretValueFromSource `json:"userKey"`
-	RobotName          string                 `json:"robotName"`
-	ProcessName        string                 `json:"processName"`
-	TenantName         string                 `json:"tenantName"`
-	AccountLogicalName string                 `json:"accountLogicalName"`
-	ClientID           string                 `json:"clientID"`
-	OrganizationUnitID string                 `json:"organizationUnitID"`
+	// UserKey An OAuth token used to obtain an access key.
+	UserKey *SecretValueFromSource `json:"userKey"`
+	// RobotName is the robot to invoke with this target.
+	RobotName string `json:"robotName"`
+	// ProccessName is the process name that will be used by UiPath for the target.
+	ProcessName string `json:"processName"`
+	// TenantName is the tenant that contains the components that will be invoked by the target.
+	TenantName string `json:"tenantName"`
+	// AccountLogicalName is the unique site URL used to identif the UiPath tenant.
+	AccountLogicalName string `json:"accountLogicalName"`
+	// ClientID is the OAuth id registered to this target.
+	ClientID string `json:"clientID"`
+	// OrganizationUnitID is the organization unit within the tenant that the UiPath proccess will run under.
+	OrganizationUnitID string `json:"organizationUnitID"`
 }
 
 // UiPathTargetStatus defines the observed state of the event target.

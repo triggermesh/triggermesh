@@ -1,4 +1,4 @@
-# Copyright 2021 TriggerMesh Inc.
+# Copyright (c) 2021 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,18 +55,24 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Google Cloud Firestore.
         properties:
           spec:
             type: object
+            description: Desired state of event target.
             properties:
               defaultCollection:
+                description: Default firestore collection to stream events into.
                 type: string
               projectID:
+                description: Google Cloud Project ID associated with the firestore database.
                 type: string
               discardCloudEventContext:
+                description: Indicate whether the full cloud event payload should be sent to the target, or the data component only.
                 type: boolean
               credentialsJson:
                 type: object
+                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information, refer to https://cloud.google.com/docs/authentication/production
                 properties:
                   secretKeyRef:
                     type: object
@@ -77,6 +83,7 @@ spec:
                         type: string
               eventOptions:
                 type: object
+                description: "When should this target generate a response event for processing: always, on error, or never"
                 properties:
                   payloadPolicy:
                     type: string

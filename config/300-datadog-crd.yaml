@@ -51,12 +51,15 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Datadog.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               apiKey:
                 type: object
+                description: Datadog API Key with access to receive metrics.
                 properties:
                   secretKeyRef:
                     type: object
@@ -66,6 +69,7 @@ spec:
                       name:
                         type: string
               eventOptions:
+                description: "When should this target generate a response event for processing: always, on error, or never"
                 type: object
                 properties:
                   payloadPolicy:
@@ -75,6 +79,7 @@ spec:
             - apiKey
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               acceptedEventTypes:
                 type: array

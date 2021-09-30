@@ -39,12 +39,16 @@ spec:
       status: {}
     schema:
       openAPIV3Schema:
+        description: TriggerMesh event target to manipulate cloud events using JavaScript.
+          An event is consumed by the target, and a new event is produced in the response.
         type: object
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               script:
+                description: JavaScript code to invoke when an event comes in.
                 type: object
                 properties:
                   code:
@@ -55,6 +59,7 @@ spec:
                 - code
               state:
                 type: object
+                description: Indicate whether stateful headers should be created (ensure), propagated (propagate), or dropped (none).
                 properties:
                   headersPolicy:
                     type: string
@@ -62,12 +67,14 @@ spec:
                   bridge:
                     type: string
               typeLoopProtection:
+                description: Prevent the InfraTarget from consuming events it just produced.
                 type: boolean
             anyOf:
             - required: [script]
             - required: [state]
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer

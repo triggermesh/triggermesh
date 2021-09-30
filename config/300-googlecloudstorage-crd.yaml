@@ -50,13 +50,17 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Google Cloud Storage.
         properties:
           spec:
             type: object
+            description: Desired state of event target.
             properties:
               bucketName:
+                description: GCP Storage bucket to stream events to.
                 type: string
               credentialsJson:
+                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information, refer to https://cloud.google.com/docs/authentication/production
                 type: object
                 properties:
                   secretKeyRef:
@@ -68,6 +72,7 @@ spec:
                         type: string
               eventOptions:
                 type: object
+                description: "When should this target generate a response event for processing: always, on error, or never"
                 properties:
                   payloadPolicy:
                     type: string
@@ -77,6 +82,7 @@ spec:
             - bucketName
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               acceptedEventTypes:
                 type: array

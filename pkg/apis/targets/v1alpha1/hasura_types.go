@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright (c) 2021 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,11 +50,20 @@ var (
 
 // HasuraTargetSpec defines the desired state of the event target.
 type HasuraTargetSpec struct {
-	Endpoint    string                 `json:"endpoint"`
-	JwtToken    *SecretValueFromSource `json:"jwt,omitempty"`
-	AdminToken  *SecretValueFromSource `json:"admin,omitempty"`
-	DefaultRole *string                `json:"defaultRole,omitempty"`
-	Queries     *map[string]string     `json:"queries,omitempty"`
+	// The GraphQL server endpoint.
+	Endpoint string `json:"endpoint"`
+	// A user token for interfacing with Hasura.
+	// +optional
+	JwtToken *SecretValueFromSource `json:"jwt,omitempty"`
+	// An alternate token for interfacing with Hasura using admin privileges.
+	// +optional
+	AdminToken *SecretValueFromSource `json:"admin,omitempty"`
+	// A default role that the queries should use when running the query.
+	// +optional
+	DefaultRole *string `json:"defaultRole,omitempty"`
+	// A predefined list of queries that an event can specify in the io.triggermesh.graphql.query event type.
+	// +optional
+	Queries *map[string]string `json:"queries,omitempty"`
 }
 
 // HasuraTargetStatus defines the observed state of the event target.

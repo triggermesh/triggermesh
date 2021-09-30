@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright (c) 2021 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -53,11 +53,11 @@ var (
 
 // ElasticsearchTargetSpec holds the desired state of the ElasticsearchTarget.
 type ElasticsearchTargetSpec struct {
-	// Connection information to elasticsearch
+	// Connection information to elasticsearch.
 	// +optional
 	Connection Connection `json:"connection"`
 
-	// IndexName to write to
+	// IndexName to write to.
 	IndexName string `json:"indexName"`
 
 	// Whether to omit CloudEvent context attributes in created documents.
@@ -65,20 +65,25 @@ type ElasticsearchTargetSpec struct {
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
 
-	// EventOptions for targets
+	// EventOptions for targets.
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
 // Connection contains connection and configuration parameters
 type Connection struct {
-	Addresses  []string `json:"addresses,omitempty"`
-	CACert     *string  `json:"caCert,omitempty"`
-	SkipVerify *bool    `json:"skipVerify,omitempty"`
+	// Array of hostnames or IP addresses to connect the target to.
+	Addresses []string `json:"addresses,omitempty"`
+	// CA Certificate used to verify connection with the Elasticsearch instance.
+	CACert *string `json:"caCert,omitempty"`
+	// Skip verification of the SSL certificate during the connection.
+	SkipVerify *bool `json:"skipVerify,omitempty"`
 
-	Username *string                `json:"username,omitempty"`
+	// Elasticsearch account username.
+	Username *string `json:"username,omitempty"`
+	// Elasticsearch account password.
 	Password *SecretValueFromSource `json:"password,omitempty"`
 
-	// When informed supersedes username and password
+	// When informed supersedes username and password.
 	APIKey *SecretValueFromSource `json:"apiKey,omitempty"`
 }
 

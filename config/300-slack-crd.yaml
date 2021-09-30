@@ -49,12 +49,15 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Slack Web API.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               token:
                 type: object
+                description: Slack API token used to interface with Slack. Consult the Slack API documenation for details on how to setup an app for the target https://api.slack.com/web#authentication
                 properties:
                   secretKeyRef:
                     type: object
@@ -67,6 +70,7 @@ spec:
             - token
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               acceptedEventTypes:
                 type: array

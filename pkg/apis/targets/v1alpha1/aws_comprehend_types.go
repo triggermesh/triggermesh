@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright (c) 2021 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -51,18 +51,19 @@ var (
 )
 
 type AWSComprehendTargetSpec struct {
-	// AWS account Key
+	// AWS account Key.
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
 
-	// AWS account secret key
+	// AWS account secret key.
 	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
 
-	// Region
+	// Region to use for calling into Comprehend API.
 	Region string `json:"region"`
 
-	// EventOptions for targets
+	// EventOptions for targets.
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
+	// Language code to use to interact with Comprehend. The supported list can be found at: https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html
 	Language string `json:"language"`
 }
 

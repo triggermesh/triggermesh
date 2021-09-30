@@ -46,12 +46,17 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for AWS DynamoDB.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               awsApiKey:
                 type: object
+                description: API Key to interact with the Amazon DynamoDB API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -61,6 +66,9 @@ spec:
                       name:
                         type: string
               awsApiSecret:
+                description: API Key to interact with the Amazon DynamoDB API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 type: object
                 properties:
                   secretKeyRef:
@@ -71,6 +79,8 @@ spec:
                       name:
                         type: string
               arn:
+                description: ARN of the DynamoDB table to post events to. The expected format is documented at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondynamodb.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:dynamodb:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:table\/[a-zA-Z0-9-_.]{3,255}$
             required:
@@ -79,6 +89,7 @@ spec:
             - awsApiKey
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer
@@ -153,12 +164,17 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for AWS Lambda.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               awsApiKey:
                 type: object
+                description: API Key to interact with the Amazon Lambda API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -169,6 +185,9 @@ spec:
                         type: string
               awsApiSecret:
                 type: object
+                description: API Secret to interact with the Amazon Lambda API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -178,12 +197,16 @@ spec:
                       name:
                         type: string
               arn:
+                description: ARN of the Lambda function that will receive events. The expected format is documented at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_awslambda.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:(function|layer|event-source-mapping):.+$
               discardCloudEventContext:
+                description: Produce a new cloud event based on the response from the lambda function.
                 type: boolean
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer
@@ -258,12 +281,17 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for AWS Simple Notification Service.
         properties:
           spec:
             type: object
+            description: Desired state of event target.
             properties:
               awsApiKey:
                 type: object
+                description: API Key to interact with the SNS API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -274,6 +302,9 @@ spec:
                         type: string
               awsApiSecret:
                 type: object
+                description: API Secret to interact with the SNS API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -283,12 +314,16 @@ spec:
                       name:
                         type: string
               arn:
+                description: ARN of the SNS queue that will receive events. The expected format is documented at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonsns.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:sns:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               discardCloudEventContext:
+                description: Produce a new cloud event based on the response from the SNS API call.
                 type: boolean
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer
@@ -363,11 +398,16 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for AWS Simple Queue Service.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               awsApiKey:
+                description: API Key to interact with the Amazon SQS API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 type: object
                 properties:
                   secretKeyRef:
@@ -378,6 +418,9 @@ spec:
                       name:
                         type: string
               awsApiSecret:
+                description: API Secret to interact with the Amazon SQS API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 type: object
                 properties:
                   secretKeyRef:
@@ -388,12 +431,16 @@ spec:
                       name:
                         type: string
               arn:
+                description: ARN of the SQS queue that will receive events. The expected format is documented at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_awslambda.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:sqs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               discardCloudEventContext:
+                description: Produce a new cloud event based on the response from the lambda function.
                 type: boolean
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer
@@ -468,12 +515,16 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: An event target that can stream events into an AWS Kinesis stream.
         properties:
           spec:
             type: object
             properties:
               awsApiKey:
                 type: object
+                description: API Key to interact with the Amazon Kinesis API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -484,6 +535,9 @@ spec:
                         type: string
               awsApiSecret:
                 type: object
+                description: API Secret to interact with the Amazon Kinesis API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -493,14 +547,19 @@ spec:
                       name:
                         type: string
               arn:
+                description: ARN of the Kinesis stream that will receive events. The expected format is documented at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonkinesis.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:kinesis:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:stream/.+$
               partition:
+                description: A Kinesis partition name is required for the target to know where to stream the events to.
                 type: string
               discardCloudEventContext:
+                description: Produce a new cloud event based on the response from the Kinesis invocation.
                 type: boolean
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer
@@ -585,12 +644,17 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: An event target that can stream events into an AWS S3 bucket.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               awsApiKey:
                 type: object
+                description: API Key to interact with the Amazon S3 API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -601,6 +665,9 @@ spec:
                         type: string
               awsApiSecret:
                 type: object
+                description: API Secret to interact with the Amazon S3 API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     type: object
@@ -611,11 +678,15 @@ spec:
                         type: string
               arn:
                 type: string
+                description: ARN of the S3 bucket that will receive events. The expected format is documented at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
                 pattern: ^arn:aws(-cn|-us-gov)?:s3:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               discardCloudEventContext:
+                description: Produce a new cloud event based on the response from the Kinesis invocation.
                 type: boolean
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               acceptedEventTypes:
                 type: array

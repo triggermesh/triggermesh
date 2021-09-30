@@ -40,14 +40,18 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Confluent Kafka.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               username:
+                description: Confluent account username when using SASL.
                 type: string
                 minLength: 1
               password:
+                description: Confluent account password when using SASL.
                 type: object
                 properties:
                   secretKeyRef:
@@ -58,22 +62,31 @@ spec:
                       name:
                         type: string
               topic:
+                description: Topic name to stream the target events to.
                 type: string
                 minLength: 1
               topicReplicationFactor:
+                description: The number of replicas required to stream to the topic.
                 type: integer
               topicPartitions:
+                description: The number of partitions used by the topic to stream an event to.
                 type: integer
               bootstrapServers:
+                description: Array of Confluent Kafka servers used to bootstrap the connection.
                 type: array
                 items:
                   type: string
                   minLength: 1
               securityProtocol:
+                description: Encryption protocol to use for connecting to Confluent Kafka.
+                  This can be "Plaintext", "SslPlaintext", "SaslSsl", or "Ssl". Additional information can be found at https://docs.confluent.io/platform/current/connect/security.html
                 type: string
               saslMechanism:
+                description: When using the "saslSsl" securityProtocol attribute, indicate which
+                  mechanism to use. This can be "Gssapi", "OAuthBearer", "Plain", "ScramSha256", and "ScramSha512".
                 type: string
               discardCloudEventContext:
+                description: Produce a new cloud event based on the response from calling Kafka.
                 type: boolean
             required:
             - username
@@ -82,6 +95,7 @@ spec:
             - bootstrapServers
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer

@@ -1,4 +1,4 @@
-# Copyright 2021 TriggerMesh Inc.
+# Copyright (c) 2021 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,11 +46,16 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: An event targte for sending messages to the AWS Comprehend API.
         properties:
           spec:
             type: object
+            description: Desired state of event target.
             properties:
               awsApiKey:
+                description: API Key to interact with the Comprehend API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 type: object
                 properties:
                   secretKeyRef:
@@ -61,6 +66,9 @@ spec:
                       name:
                         type: string
               awsApiSecret:
+                description: API Secret to interact with the Comprehend API. For more information about AWS
+                  security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 type: object
                 properties:
                   secretKeyRef:
@@ -71,8 +79,11 @@ spec:
                       name:
                         type: string
               region:
+                description: Code of the AWS region to use for the Comprehend API. Available region codes are documented in the
+                  AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
                 type: string
               language:
+                description: Language code to use for Comprehend. Available languages can be found at https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html
                 type: string
             required:
             - region
@@ -81,6 +92,7 @@ spec:
             - awsApiKey
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer
