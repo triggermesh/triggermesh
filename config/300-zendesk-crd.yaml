@@ -50,18 +50,24 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Zendesk.
         properties:
           spec:
             type: object
+            description: Desired state of event target.
             properties:
               subject:
+                description: Default subject line to use for tickets created using this target.
                 type: string
               subdomain:
+                description: User's subdomain on zendesk being targeted.
                 type: string
               email:
+                description: Default registered email address for interacting with Zendesk.
                 type: string
               token:
                 type: object
+                description: Zendesk API token for interacting with Zendesk.
                 properties:
                   secretKeyRef:
                     type: object
@@ -75,6 +81,7 @@ spec:
             - email
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               acceptedEventTypes:
                 type: array

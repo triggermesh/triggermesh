@@ -49,23 +49,32 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Sendgrid.
         properties:
           spec:
             type: object
+            description: Desired state of event target.
             properties:
               defaultFromName:
+                description: Default name to use for the from field when sending email via Sendgrid.
                 type: string
               defaultToName:
+                description: Default name to use for the to field when sending email via Sendgrid.
                 type: string
               defaultToEmail:
+                description: Default email address to send mail to via Sendgrid.
                 type: string
               defaultFromEmail:
+                description: Default sender email address for sending mail via Sendgrid.
                 type: string
               defaultSubject:
+                description: Default subject to use for email sent via this target
                 type: string
               defaultMessage:
+                description: Default message to use for all email sent via this target.
                 type: string
               apiKey:
+                description: The Sendgrid API key used to authenticate access.
                 type: object
                 properties:
                   secretKeyRef:
@@ -77,6 +86,7 @@ spec:
                         type: string
               eventOptions:
                 type: object
+                description: "When should this target generate a response event for processing: always, on error, or never"
                 properties:
                   payloadPolicy:
                     type: string
@@ -85,6 +95,7 @@ spec:
             - apiKey
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               acceptedEventTypes:
                 type: array

@@ -63,10 +63,14 @@ type SalesforceTargetSpec struct {
 
 // SalesforceAuth contains Salesforce credentials.
 type SalesforceAuth struct {
-	ClientID string                `json:"clientID"`
-	Server   string                `json:"server"`
-	User     string                `json:"user"`
-	CertKey  SecretValueFromSource `json:"certKey"`
+	// ClientID The OAuth ClientID used to identify the target integrating with Salesforce.
+	ClientID string `json:"clientID"`
+	// Server is the Salesforce instance used to integrate.
+	Server string `json:"server"`
+	// User is the username who the target will masquerade as when interacting with Salesforce.
+	User string `json:"user"`
+	// CertKey is the private key used to sign requests from the target.
+	CertKey SecretValueFromSource `json:"certKey"`
 }
 
 // SalesforceTargetStatus communicates the observed state of the SalesforceTarget (from the controller).

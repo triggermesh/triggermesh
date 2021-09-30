@@ -49,9 +49,10 @@ type InfraTargetSpec struct {
 	// Script to be executed at every request.
 	Script *InfraTargetScript `json:"script,omitempty"`
 
-	// State actions and options
+	// State actions and options.
 	State *InfraTargetState `json:"state,omitempty"`
 
+	// TypeLoopProtection protect against infinite loops when the cloudevent type does not change.
 	TypeLoopProtection *bool `json:"typeLoopProtection,omitempty"`
 }
 

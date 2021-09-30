@@ -53,13 +53,13 @@ var (
 // ZendeskTargetSpec holds the desired state of the ZendeskTarget.
 type ZendeskTargetSpec struct {
 
-	// Token contains the Zendesk account Token
+	// Token contains the Zendesk account Token.
 	Token SecretValueFromSource `json:"token"`
 
-	// Subdomain the Zendesk subdomain
+	// Subdomain the Zendesk subdomain.
 	Subdomain string `json:"subdomain"`
 
-	// Email the regestierd Zendesk email account
+	// Email the registered Zendesk email account.
 	Email string `json:"email"`
 
 	// Subject a static subject assignemnt for every ticket.
@@ -79,7 +79,7 @@ type ZendeskTargetStatus struct {
 	// AddressStatus fulfills the Addressable contract.
 	duckv1.AddressStatus `json:",inline"`
 
-	// Accepted/emitted CloudEvent attributes
+	// Accepted/emitted CloudEvent attributes.
 	CloudEventStatus `json:",inline"`
 }
 

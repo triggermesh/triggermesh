@@ -40,37 +40,45 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for generic HTTP endpoints.
         properties:
           spec:
             type: object
+            description: Desired state of event target.
             properties:
               response:
                 type: object
                 properties:
                   eventType:
-                    description: EventType is required to set the Type for the ingested event
+                    description: EventType is required to set the Type for the ingested event.
                     type: string
                     minLength: 1
                   eventSource:
-                    description: EventSource is an optional but recommended field for identifying the instance producing the events
+                    description: EventSource is an optional but recommended field for identifying the instance producing the events.
                     type: string
                 required:
                 - eventType
               endpoint:
+                description: An HTTP based REST endpoint to stream events to.
                 type: string
                 format: url
                 pattern: ^https?:\/\/.+$
               method:
+                description: The HTTP method to use for the request.
                 type: string
                 enum: [GET, POST, PUT, PATCH, DELETE]
               skipVerify:
+                description: Skip validation and verification of the SSL/TLS certificate.
                 type: boolean
                 default: false
               caCertificate:
+                description: The CA certificate used to sign the certificated used by the target server.
                 type: string
               basicAuthUsername:
+                description: When using HTTP Basic authentication, the username to connect to the target service.
                 type: string
               basicAuthPassword:
+                description: When using HTTP Basic authentication, the password to connect to the target service.
                 type: object
                 properties:
                   secretKeyRef:
@@ -81,8 +89,10 @@ spec:
                       name:
                         type: string
               oauthClientID:
+                description: When using OAuth, the client id used to authenticate against the target service.
                 type: string
               oauthClientSecret:
+                description: When using OAuth, the client secret used to authenticate against the target service
                 type: object
                 properties:
                   secretKeyRef:
@@ -93,12 +103,15 @@ spec:
                       name:
                         type: string
               oauthTokenURL:
+                description: When using OAuth, the Token URL used to sign the request against.
                 type: string
               oauthScopes:
+                description: When using OAuth, the scopes required by the target to use the service.
                 type: array
                 items:
                   type: string
               headers:
+                description: Additional headers required to be set when communicating wiht the target service.
                 type: object
                 additionalProperties:
                   type: string
@@ -107,6 +120,7 @@ spec:
             - method
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer

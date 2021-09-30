@@ -52,17 +52,22 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Jira.
         properties:
           spec:
+            description: Desired state of event target.
             type: object
             properties:
               auth:
                 type: object
+                description: Credentials to authenticate against the Jira instance.
                 properties:
                   user:
+                    description: Jira username for the target to use.
                     type: string
                     minLength: 1
                   token:
+                    description: Jira API token associated with the Jira user.
                     type: object
                     properties:
                       secretKeyRef:
@@ -76,10 +81,12 @@ spec:
                 - user
                 - token
               url:
+                description: Jira instance url.
                 type: string
                 format: url
                 pattern: ^https?:\/\/.+$
               eventOptions:
+                description: "When should this target generate a response event for processing: always, on error, or never"
                 type: object
                 properties:
                   payloadPolicy:
@@ -90,6 +97,7 @@ spec:
             - url
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer

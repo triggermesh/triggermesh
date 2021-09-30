@@ -49,28 +49,29 @@ var (
 )
 
 type OracleTargetSpec struct {
-	// Oracle User API private key
+	// Oracle User API private key.
 	OracleApiPrivateKey SecretValueFromSource `json:"oracleApiPrivateKey"`
 
-	// Oracle User API private key passphrase
+	// Oracle User API private key passphrase.
 	OracleApiPrivateKeyPassphrase SecretValueFromSource `json:"oracleApiPrivateKeyPassphrase"`
 
-	// Oracle User API cert fingerprint
+	// Oracle User API cert fingerprint.
 	OracleApiPrivateKeyFingerprint SecretValueFromSource `json:"oracleApiPrivateKeyFingerprint"`
 
-	// Oracle Tenancy OCID
+	// Oracle Tenancy OCID.
 	Tenancy string `json:"oracleTenancy"`
 
-	// Oracle User OCID associated with the API key
+	// Oracle User OCID associated with the API key.
 	User string `json:"oracleUser"`
 
-	// Oracle Cloud Region
+	// Oracle Cloud Region.
 	Region string `json:"oracleRegion"`
 
 	OracleFunctionSpec *OracleFunctionSpecSpec `json:"function,omitempty"`
 }
 
 type OracleFunctionSpecSpec struct {
+	// Oracle Cloud ID of the function to invoke.
 	Function string `json:"function,inline"`
 }
 

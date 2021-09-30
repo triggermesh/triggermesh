@@ -49,25 +49,32 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: TriggerMesh event target for Elasticsearch.
         properties:
           spec:
             type: object
             properties:
               indexName:
+                description: Elasticsearch index to stream the events to.
                 type: string
               connection:
                 type: object
+                description: Attributes for connecting to a private Elasticsearch instance or Elastic cloud.
                 properties:
                   addresses:
+                    description: Hostname/IP Address of the Elasticsearch instance to stream events to.
                     type: array
                     items:
                       type: string
                       minLength: 1
                   skipVerify:
+                    description: Skip verification of SSL/TLS certificates.
                     type: boolean
                   username:
+                    description: Elasticsearch instance username.
                     type: string
                   password:
+                    description: Elasticsearch instance password.
                     type: object
                     properties:
                       secretKeyRef:
@@ -78,6 +85,7 @@ spec:
                           name:
                             type: string
                   apiKey:
+                    description: API Key to connect to the Elasticsearch instance.
                     type: object
                     properties:
                       secretKeyRef:
@@ -95,17 +103,20 @@ spec:
 
               eventOptions:
                 type: object
+                description: "When should this target generate a response event for processing: always, on error, or never"
                 properties:
                   payloadPolicy:
                     type: string
                     enum: [always, error, never]
               discardCloudEventContext:
+                description: Discard cloud event metadata from payload being sent to Elasticsearch.
                 type: boolean
             required:
             - connection
             - indexName
           status:
             type: object
+            description: Reported status of the event target.
             properties:
               observedGeneration:
                 type: integer

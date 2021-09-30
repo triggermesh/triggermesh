@@ -49,13 +49,15 @@ type JiraTargetSpec struct {
 	// Authentication to interact with the Salesforce API.
 	Auth JiraAuth `json:"auth"`
 
-	// URL for Jira service
+	// URL for Jira service.
 	URL string `json:"url"`
 }
 
 // JiraAuth contains Jira credentials.
 type JiraAuth struct {
-	User  string                `json:"user"`
+	// Jira username to connect to the instance as.
+	User string `json:"user"`
+	// Jira API token bound to the user.
 	Token SecretValueFromSource `json:"token"`
 }
 

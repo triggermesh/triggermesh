@@ -49,12 +49,20 @@ var (
 
 // AlibabaOSSTargetSpec holds the desired state of the AlibabaOSSTarget.
 type AlibabaOSSTargetSpec struct {
+	// Alibaba SDK access key id as registered. For more information on how to
+	// create an access key pair, please refer to
+	// https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
 	AccessKeyID SecretValueFromSource `json:"accessKeyID"`
 
+	// Alibaba SDK access key secret as registered.
 	AccessKeySecret SecretValueFromSource `json:"accessKeySecret"`
 
+	// The domain name used to access the OSS. For more information, please refer
+	// to the region and endpoint guide at
+	// https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db
 	Endpoint string `json:"endpoint"`
 
+	// The unique container to store objects in OSS.
 	Bucket string `json:"bucket"`
 
 	// EventOptions for targets
