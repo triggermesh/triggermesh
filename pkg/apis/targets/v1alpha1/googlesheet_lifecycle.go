@@ -104,7 +104,7 @@ func (s *GoogleSheetTargetStatus) PropagateAvailability(ksvc *servingv1.Service)
 
 // MarkNoKService sets the condition that the service is not ready
 func (s *GoogleSheetTargetStatus) MarkNoService(reason, messageFormat string, messageA ...interface{}) {
-	AwsCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
+	GoogleSheetCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
 }
 
 // IsReady returns true if the resource is ready overall.
