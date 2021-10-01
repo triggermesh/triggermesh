@@ -1,0 +1,28 @@
+name: Static Code Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    name: Code linting
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'
+
+    # This action takes care of caching/restoring pkg and build caches.
+    # It needs to be the first step executed after the Go setup.
+    - name: Lint
+      uses: golangci/golangci-lint-action@v2
+      with:
+        skip-go-installation: true

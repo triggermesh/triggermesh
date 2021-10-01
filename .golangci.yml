@@ -1,0 +1,13 @@
+# golangci-lint configuration
+#
+# For a list of all available configuration options with their default values, see:
+#  - https://github.com/golangci/golangci-lint/blob/master/.golangci.example.yml
+#  - https://golangci-lint.run/usage/configuration/
+
+linters:
+  enable:
+  - gofmt
+  - stylecheck
+
+run:
+  timeout: 5m
