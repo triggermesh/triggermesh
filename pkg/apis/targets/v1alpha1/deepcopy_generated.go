@@ -2817,6 +2817,11 @@ func (in *SplunkTargetSpec) DeepCopyInto(out *SplunkTargetSpec) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.EventOptions != nil {
+		in, out := &in.EventOptions, &out.EventOptions
+		*out = new(EventOptions)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

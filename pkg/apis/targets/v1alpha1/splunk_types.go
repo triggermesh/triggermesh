@@ -63,6 +63,9 @@ type SplunkTargetSpec struct {
 	// chain and host name when communicating over TLS.
 	// +optional
 	SkipTLSVerify *bool `json:"skipTLSVerify,omitempty"`
+
+	// EventOptions for targets
+	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
 // SplunkTargetStatus defines the observed state of the event target.

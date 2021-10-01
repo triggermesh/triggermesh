@@ -24,6 +24,16 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
+// Managed event types
+const EventTypeSplunkResponse = "io.triggermesh.splunk.response"
+
+// GetEventTypes implements EventSource.
+func (*SplunkTarget) GetEventTypes() []string {
+	return []string{
+		EventTypeSplunkResponse,
+	}
+}
+
 // GetGroupVersionKind implements kmeta.OwnerRefable.
 func (s *SplunkTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("SplunkTarget")

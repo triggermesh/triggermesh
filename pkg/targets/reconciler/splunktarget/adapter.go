@@ -37,10 +37,11 @@ import (
 const adapterName = "splunktarget"
 
 const (
-	envHECEndpoint   = "SPLUNK_HEC_ENDPOINT"
-	envHECToken      = "SPLUNK_HEC_TOKEN"
-	envIndex         = "SPLUNK_INDEX"
-	envSkipTLSVerify = "SPLUNK_SKIP_TLS_VERIFY"
+	envHECEndpoint         = "SPLUNK_HEC_ENDPOINT"
+	envHECToken            = "SPLUNK_HEC_TOKEN"
+	envIndex               = "SPLUNK_INDEX"
+	envSkipTLSVerify       = "SPLUNK_SKIP_TLS_VERIFY"
+	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -121,6 +122,13 @@ func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *serving
 		env = append(env, corev1.EnvVar{
 			Name:  envSkipTLSVerify,
 			Value: strconv.FormatBool(*o.Spec.SkipTLSVerify),
+		})
+	}
+
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envEventsPayloadPolicy,
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
 		})
 	}
 

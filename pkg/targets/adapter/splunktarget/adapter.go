@@ -19,6 +19,7 @@ package splunktarget
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -27,6 +28,8 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 )
@@ -40,12 +43,12 @@ type SplunkClient interface {
 
 // adapter implements the target's adapter.
 type adapter struct {
-	logger *zap.SugaredLogger
-
-	ceClient cloudevents.Client
-	spClient SplunkClient
-
+	spClient     SplunkClient
 	defaultIndex string
+
+	replier  *targetce.Replier
+	ceClient cloudevents.Client
+	logger   *zap.SugaredLogger
 }
 
 var _ pkgadapter.Adapter = (*adapter)(nil)
@@ -59,6 +62,11 @@ type envConfig struct {
 	Index       string `envconfig:"SPLUNK_INDEX"`
 
 	SkipTLSVerify bool `envconfig:"SPLUNK_SKIP_TLS_VERIFY"`
+
+	// CloudEvents responses parametrization
+	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"always"`
+	// BridgeIdentifier is the name of the bridge workflow this target is part of
+	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 }
 
 // NewEnvConfig returns an accessor for the source's adapter envConfig.
@@ -82,13 +90,21 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicw("Invalid HEC endpoint URL "+env.HECEndpoint, zap.Error(err))
 	}
 
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeSplunkResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	if err != nil {
+		logger.Panicf("Error creating CloudEvents replier: %v", err)
+	}
+
 	return &adapter{
-		logger: logger,
-
-		ceClient: ceClient,
-		spClient: newClient(*hecURL, env.HECToken, env.Index, hostname(envAcc), env.SkipTLSVerify),
-
+		spClient:     newClient(*hecURL, env.HECToken, env.Index, hostname(envAcc), env.SkipTLSVerify),
 		defaultIndex: env.Index,
+
+		replier:  replier,
+		ceClient: ceClient,
+		logger:   logger,
 	}
 }
 
@@ -131,7 +147,7 @@ func (a *adapter) Start(ctx context.Context) error {
 }
 
 // receive implements the handler's receive logic.
-func (a *adapter) receive(ctx context.Context, event cloudevents.Event) cloudevents.Result {
+func (a *adapter) receive(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	a.logger.Debugw("Processing event", zap.Any("event", event))
 
 	e := a.spClient.NewEventWithTime(
@@ -145,10 +161,11 @@ func (a *adapter) receive(ctx context.Context, event cloudevents.Event) cloudeve
 	err := a.spClient.LogEvent(e)
 	if err != nil {
 		a.logger.Debugw("Failed to send event to HEC", zap.Error(err))
-		return cloudevents.NewHTTPResult(a.extractHTTPStatus(err), "failed to send event to HEC: %s", err)
+		info := fmt.Sprintf("failed to send event to HEC. Status code: %v", a.extractHTTPStatus(err))
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, info)
 	}
 
-	return cloudevents.ResultACK
+	return a.replier.Ok(&event, nil)
 }
 
 // extractHTTPStatus attempts to extract the HTTP status code from the given
