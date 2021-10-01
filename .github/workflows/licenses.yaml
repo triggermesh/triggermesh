@@ -34,7 +34,12 @@ jobs:
         REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         reviewdog -conf=.github/workflows/config/reviewdog.yaml \
-          -runners=license \
+          -runners=license-go \
+          -filter-mode=diff_context \
+          -reporter=github-check \
+          -fail-on-error=true
+        reviewdog -conf=.github/workflows/config/reviewdog.yaml \
+          -runners=license-yaml \
           -filter-mode=diff_context \
           -reporter=github-check \
           -fail-on-error=true
