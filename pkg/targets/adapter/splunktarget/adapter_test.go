@@ -18,14 +18,15 @@ package splunktarget
 
 import (
 	"context"
-	"net/http"
+	"fmt"
 	"testing"
 	"time"
 
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/stretchr/testify/assert"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	logtesting "knative.dev/pkg/logging/testing"
 
@@ -58,36 +59,43 @@ func (c *mockedSplunkClient) LogEvent(in *splunk.Event) error {
 func TestReceive(t *testing.T) {
 	testCases := map[string]struct {
 		client       *mockedSplunkClient
-		expectResult cloudevents.Result
+		expectResult *errorEvent
 	}{
 		"Successful request": {
 			client:       &mockedSplunkClient{},
-			expectResult: cloudevents.ResultACK,
+			expectResult: &errorEvent{},
 		},
 		"Failed request": {
 			client: &mockedSplunkClient{
 				err: assert.AnError,
 			},
-			expectResult: cloudevents.NewHTTPResult(http.StatusBadRequest,
-				"failed to send event to HEC: %s", assert.AnError),
+			expectResult: &errorEvent{Code: "adapter-process", Description: "assert.AnError general error for testing", Details: "failed to send event to HEC. Status code: 400"},
 		},
 	}
 
 	for name, tc := range testCases {
 		//nolint:scopelint
 		t.Run(name, func(t *testing.T) {
+			replier, _ := targetce.New("test", logtesting.TestLogger(t),
+				targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeSplunkResponse))
+
 			a := adapter{
 				logger:       logtesting.TestLogger(t),
 				ceClient:     adaptertest.NewTestClient(),
 				spClient:     tc.client,
 				defaultIndex: tDefaultIndex,
+				replier:      replier,
 			}
 
 			// invoke event callback
-			res := a.receive(context.Background(), newEvent(t))
+			fmt.Println(a)
+			e, _ := a.receive(context.Background(), newEvent(t))
 
-			assert.Lenf(t, tc.client.inputRecorder, 1, "Client records a single request")
-			assert.EqualError(t, res, tc.expectResult.Error())
+			fmt.Println(e)
+			eE := &errorEvent{}
+			e.DataAs(eE)
+
+			assert.Equal(t, eE, tc.expectResult)
 		})
 	}
 }
@@ -104,4 +112,10 @@ func newEvent(t *testing.T) cloudevents.Event {
 	}
 
 	return ce
+}
+
+type errorEvent struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Details     string `json:"details"`
 }
