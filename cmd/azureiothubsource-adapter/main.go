@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2021 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package sources
+package main
 
-// Name of Azure services
-const (
-	AzureServiceEventGrid = "eventgrid"
-	AzureServiceEventHub  = "eventhub"
-	AzureServiceMonitor   = "monitor"
-	AzureServiceBusQueue  = "servicebus.queue"
-	AzureIOTHub           = "iothub"
+import (
+	"knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureiothubsource"
 )
 
-// SubscriptionResourceID returns the Azure resource ID for the given
-// subscription ID.
-func SubscriptionResourceID(subID string) string {
-	return "/subscriptions/" + subID
+func main() {
+	adapter.Main("azureiothubsource", azureiothubsource.NewEnvConfig, azureiothubsource.NewAdapter)
 }

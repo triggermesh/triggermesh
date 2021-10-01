@@ -41,6 +41,7 @@ type SourcesV1alpha1Interface interface {
 	AzureBlobStorageSourcesGetter
 	AzureEventGridSourcesGetter
 	AzureEventHubSourcesGetter
+	AzureIOTHubSourcesGetter
 	AzureQueueStorageSourcesGetter
 	AzureServiceBusQueueSourcesGetter
 	GoogleCloudAuditLogsSourcesGetter
@@ -120,6 +121,10 @@ func (c *SourcesV1alpha1Client) AzureEventGridSources(namespace string) AzureEve
 
 func (c *SourcesV1alpha1Client) AzureEventHubSources(namespace string) AzureEventHubSourceInterface {
 	return newAzureEventHubSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) AzureIOTHubSources(namespace string) AzureIOTHubSourceInterface {
+	return newAzureIOTHubSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) AzureQueueStorageSources(namespace string) AzureQueueStorageSourceInterface {

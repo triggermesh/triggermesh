@@ -73,6 +73,7 @@ rules:
   - azureblobstoragesources
   - azureeventgridsources
   - azureeventhubsources
+  - azureiothubsources
   - azurequeuestoragesources
   - azureservicebusqueuesources
   - googlecloudauditlogssources
@@ -109,6 +110,7 @@ rules:
   - azureblobstoragesources/status
   - azureeventgridsources/status
   - azureeventhubsources/status
+  - azureiothubsources/status
   - azurequeuestoragesources/status
   - azureservicebusqueuesources/status
   - googlecloudauditlogssources/status
@@ -325,6 +327,7 @@ rules:
   - azureblobstoragesource-adapter
   - azureeventgridsource-adapter
   - azureeventhubsource-adapter
+  - azureiothubsource-adapter
   - azurequeuestoragesource-adapter
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
@@ -372,6 +375,7 @@ rules:
   - azureblobstoragesource-adapter
   - azureeventgridsource-adapter
   - azureeventhubsource-adapter
+  - azureiothubsource-adapter
   - azurequeuestoragesource-adapter
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
@@ -683,6 +687,7 @@ rules:
   - azureblobstoragesources
   - azureeventgridsources
   - azureeventhubsources
+  - azureiothubsources
   - azurequeuestoragesources
   - azureservicebusqueuesources
   - googlecloudauditlogssources
