@@ -21,6 +21,6 @@ import (
 )
 
 // SetDefaults implements apis.Defaultable
-func (as *Transformation) SetDefaults(ctx context.Context) {
+func (t *Transformation) SetDefaults(ctx context.Context) {
 	// Nothing to default.
 }

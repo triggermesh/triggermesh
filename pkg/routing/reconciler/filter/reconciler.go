@@ -22,7 +22,6 @@ import (
 	"knative.dev/pkg/reconciler"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
-	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	filterreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/filter"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common"
@@ -40,7 +39,7 @@ type Reconciler struct {
 var _ filterreconciler.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, o *routingv1alpha1.Filter) reconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Filter) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
 	ctx = v1alpha1.WithRouter(ctx, o)
 
