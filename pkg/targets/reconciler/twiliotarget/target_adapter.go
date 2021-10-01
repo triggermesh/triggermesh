@@ -28,7 +28,15 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
-const adapterName = "twiliotarget"
+const (
+	adapterName = "twiliotarget"
+
+	envTwilioSID           = "TWILIO_SID"
+	envTwilioToken         = "TWILIO_TOKEN"
+	envTwilioDefaultFrom   = "TWILIO_DEFAULT_FROM"
+	envTwilioDefaultTo     = "TWILIO_DEFAULT_TO"
+	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
+)
 
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
@@ -69,12 +77,12 @@ func makeTargetAdapterKService(target *v1alpha1.TwilioTarget, cfg *adapterConfig
 func makeAppEnv(spec *v1alpha1.TwilioTargetSpec) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name: "TWILIO_SID",
+			Name: envTwilioSID,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: spec.AccountSID.SecretKeyRef,
 			},
 		}, {
-			Name: "TWILIO_TOKEN",
+			Name: envTwilioToken,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: spec.Token.SecretKeyRef,
 			},
@@ -83,15 +91,22 @@ func makeAppEnv(spec *v1alpha1.TwilioTargetSpec) []corev1.EnvVar {
 
 	if spec.DefaultPhoneFrom != nil {
 		env = append(env, corev1.EnvVar{
-			Name:  "TWILIO_DEFAULT_FROM",
+			Name:  envTwilioDefaultFrom,
 			Value: *spec.DefaultPhoneFrom,
 		})
 	}
 
 	if spec.DefaultPhoneTo != nil {
 		env = append(env, corev1.EnvVar{
-			Name:  "TWILIO_DEFAULT_TO",
+			Name:  envTwilioDefaultTo,
 			Value: *spec.DefaultPhoneTo,
+		})
+	}
+
+	if spec.EventOptions != nil && spec.EventOptions.PayloadPolicy != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envEventsPayloadPolicy,
+			Value: string(*spec.EventOptions.PayloadPolicy),
 		})
 	}
 

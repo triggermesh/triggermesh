@@ -29,6 +29,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
@@ -36,13 +37,23 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeTwilioSMSSendResponse),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	if err != nil {
+		logger.Panicf("Error creating CloudEvents replier: %v", err)
+	}
+
 	// TODO custom port
 	return &twilioAdapter{
 		client:      twilio.NewClient(env.AccountSID, env.Token, nil),
 		defaultFrom: env.PhoneFrom,
 		defaultTo:   env.PhoneTo,
-		ceClient:    ceClient,
-		logger:      logger,
+
+		replier:  replier,
+		ceClient: ceClient,
+		logger:   logger,
 	}
 }
 
@@ -53,6 +64,7 @@ type twilioAdapter struct {
 	defaultFrom string
 	defaultTo   string
 
+	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
@@ -67,14 +79,14 @@ func (a *twilioAdapter) Start(ctx context.Context) error {
 	return nil
 }
 
-func (a *twilioAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
+func (a *twilioAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if typ := event.Type(); typ != v1alpha1.EventTypeTwilioSMSSend {
-		return fmt.Errorf("cannot process event with type %q", typ)
+		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
 	}
 
 	sms := &SMSMessage{}
 	if err := event.DataAs(sms); err != nil {
-		return fmt.Errorf("error processing incoming event data: %w", err)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	if sms.From == "" {
@@ -85,9 +97,10 @@ func (a *twilioAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 	}
 
 	if _, err := a.client.Messages.SendMessage(sms.From, sms.To, sms.Message, sms.MediaURLs); err != nil {
-		return fmt.Errorf("error sending message: %w", err)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
-	a.logger.Infof("Sent message: %s", event.String())
-	return cloudevents.ResultACK
+	info := fmt.Sprintf("Sent message: %s", event.String())
+	a.logger.Info(info)
+	return a.replier.Ok(&event, info)
 }

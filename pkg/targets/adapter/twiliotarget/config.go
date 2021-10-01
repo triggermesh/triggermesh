@@ -27,8 +27,16 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 
 type envAccessor struct {
 	pkgadapter.EnvConfig
+	// AccountSID is the Twilio account SID
 	AccountSID string `envconfig:"TWILIO_SID" required:"true"`
-	Token      string `envconfig:"TWILIO_TOKEN" required:"true"`
-	PhoneFrom  string `envconfig:"TWILIO_DEFAULT_FROM" required:"false"`
-	PhoneTo    string `envconfig:"TWILIO_DEFAULT_TO" required:"false"`
+	// Token is the API key for the Twilio account.
+	Token string `envconfig:"TWILIO_TOKEN" required:"true"`
+	// PhoneFrom is the phone number to use as the sender of the SMS
+	PhoneFrom string `envconfig:"TWILIO_DEFAULT_FROM" required:"false"`
+	// PhoneTo is the phone number to send the message to
+	PhoneTo string `envconfig:"TWILIO_DEFAULT_TO" required:"false"`
+	// CloudEvents responses parametrization
+	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"always"`
+	// BridgeIdentifier is the name of the bridge workflow this target is part of
+	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 }
