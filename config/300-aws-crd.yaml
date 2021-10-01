@@ -21,11 +21,14 @@ metadata:
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
   annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
     registry.knative.dev/eventTypes: |
       [
         { "type": "io.triggermesh.targets.aws.dynamodb.result" }
       ]
-
 spec:
   group: targets.triggermesh.io
   names:
@@ -144,6 +147,15 @@ metadata:
     knative.dev/crd-install: 'true'
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "io.triggermesh.targets.aws.lambda.result" }
+      ]
 spec:
   group: targets.triggermesh.io
   names:
@@ -261,6 +273,15 @@ metadata:
     knative.dev/crd-install: 'true'
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "io.triggermesh.targets.aws.sns.result" }
+      ]
 spec:
   group: targets.triggermesh.io
   names:
@@ -378,6 +399,15 @@ metadata:
     knative.dev/crd-install: 'true'
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "io.triggermesh.targets.aws.sqs.result" }
+      ]
 spec:
   group: targets.triggermesh.io
   names:
@@ -495,6 +525,15 @@ metadata:
     knative.dev/crd-install: 'true'
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "io.triggermesh.targets.aws.kinesis.result" }
+      ]
 spec:
   group: targets.triggermesh.io
   names:
