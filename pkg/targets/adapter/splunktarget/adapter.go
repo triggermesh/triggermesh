@@ -64,7 +64,7 @@ type envConfig struct {
 	SkipTLSVerify bool `envconfig:"SPLUNK_SKIP_TLS_VERIFY"`
 
 	// CloudEvents responses parametrization
-	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"always"`
+	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 }
