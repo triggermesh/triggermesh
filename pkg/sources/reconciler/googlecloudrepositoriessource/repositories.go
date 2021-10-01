@@ -79,7 +79,7 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicR
 // ensureNoTopicAssociated looks at status.Repositories and if non-empty will delete it
 // Required permissions:
 // - source.repos.updateRepoConfig
-func (c *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcerepo.Service) error {
+func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcerepo.Service) error {
 	if skip.Skip(ctx) {
 		return nil
 	}

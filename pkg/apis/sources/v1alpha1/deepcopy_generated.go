@@ -2830,9 +2830,9 @@ func (in *OCIMetricsSourceList) DeepCopyObject() runtime.Object {
 func (in *OCIMetricsSourceSpec) DeepCopyInto(out *OCIMetricsSourceSpec) {
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
-	in.OracleApiPrivateKey.DeepCopyInto(&out.OracleApiPrivateKey)
-	in.OracleApiPrivateKeyPassphrase.DeepCopyInto(&out.OracleApiPrivateKeyPassphrase)
-	in.OracleApiPrivateKeyFingerprint.DeepCopyInto(&out.OracleApiPrivateKeyFingerprint)
+	in.OracleAPIPrivateKey.DeepCopyInto(&out.OracleAPIPrivateKey)
+	in.OracleAPIPrivateKeyPassphrase.DeepCopyInto(&out.OracleAPIPrivateKeyPassphrase)
+	in.OracleAPIPrivateKeyFingerprint.DeepCopyInto(&out.OracleAPIPrivateKeyFingerprint)
 	if in.PollingFrequency != nil {
 		in, out := &in.PollingFrequency, &out.PollingFrequency
 		*out = new(string)

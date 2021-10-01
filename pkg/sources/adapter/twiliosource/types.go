@@ -26,7 +26,7 @@ type Message struct {
 	NumMeda       string `json:"num_meda"`
 	AccountSid    string `json:"account_sid"`
 	SmsMessageSid string `json:"sms_message_sid"`
-	ApiVersion    string `json:"api_version"`
+	APIVersion    string `json:"api_version"`
 	ToCountry     string `json:"to_country"`
 	ToCity        string `json:"to_city"`
 	FromZip       string `json:"from_zip"`

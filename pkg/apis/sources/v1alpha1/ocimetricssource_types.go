@@ -55,13 +55,13 @@ type OCIMetricsSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
 	// Oracle User API private key
-	OracleApiPrivateKey ValueFromField `json:"oracleApiPrivateKey"`
+	OracleAPIPrivateKey ValueFromField `json:"oracleApiPrivateKey"`
 
 	// Oracle User API private key passphrase
-	OracleApiPrivateKeyPassphrase ValueFromField `json:"oracleApiPrivateKeyPassphrase"`
+	OracleAPIPrivateKeyPassphrase ValueFromField `json:"oracleApiPrivateKeyPassphrase"`
 
 	// Oracle User API cert fingerprint
-	OracleApiPrivateKeyFingerprint ValueFromField `json:"oracleApiPrivateKeyFingerprint"`
+	OracleAPIPrivateKeyFingerprint ValueFromField `json:"oracleApiPrivateKeyFingerprint"`
 
 	// Oracle Tenancy OCID
 	Tenancy string `json:"oracleTenancy"`

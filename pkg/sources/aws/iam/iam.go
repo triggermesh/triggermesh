@@ -26,7 +26,7 @@ const latestPolicyLanguageVersion = "2012-10-17"
 // See https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#access_policies-json
 type Policy struct {
 	Version   string            `json:"Version"`
-	Id        string            `json:"Id,omitempty"`
+	ID        string            `json:"Id,omitempty"`
 	Statement []PolicyStatement `json:"Statement,omitempty"`
 }
 
@@ -64,7 +64,7 @@ type PolicyStatementCondition struct {
 func NewPolicy(stmts ...PolicyStatement) Policy {
 	return Policy{
 		Version:   latestPolicyLanguageVersion,
-		Id:        uuid.New().String(),
+		ID:        uuid.New().String(),
 		Statement: stmts,
 	}
 }

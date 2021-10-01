@@ -91,7 +91,7 @@ func TestCollectMetrics(t *testing.T) {
 	ceClient := adaptertest.NewTestClient()
 
 	const (
-		metricId         = "testmetrics"
+		metricID         = "testmetrics"
 		metricNamespace  = "AWS/Lambda"
 		metricLabel      = "Duration"
 		metricStatusCode = "Complete"
@@ -116,7 +116,7 @@ func TestCollectMetrics(t *testing.T) {
 		ceClient: ceClient,
 		metricQueries: []*cloudwatch.MetricDataQuery{{
 			Expression: nil,
-			Id:         aws.String(metricId),
+			Id:         aws.String(metricID),
 			MetricStat: &cloudwatch.MetricStat{
 				Metric: &cloudwatch.Metric{
 					Dimensions: []*cloudwatch.Dimension{{
@@ -134,7 +134,7 @@ func TestCollectMetrics(t *testing.T) {
 			Resp: cloudwatch.GetMetricDataOutput{
 				Messages: nil,
 				MetricDataResults: []*cloudwatch.MetricDataResult{{
-					Id:         aws.String(metricId),
+					Id:         aws.String(metricID),
 					Label:      aws.String(metricLabel),
 					Messages:   nil,
 					StatusCode: aws.String(metricStatusCode),
@@ -152,7 +152,7 @@ func TestCollectMetrics(t *testing.T) {
 	metricOutput := cloudwatch.GetMetricDataOutput{
 		Messages: nil,
 		MetricDataResults: []*cloudwatch.MetricDataResult{{
-			Id:         aws.String(metricId),
+			Id:         aws.String(metricID),
 			Label:      aws.String(metricLabel),
 			Messages:   nil,
 			StatusCode: aws.String(metricStatusCode),
@@ -187,7 +187,7 @@ func TestSendMetricEvent(t *testing.T) {
 	}
 
 	const (
-		metricId         = "testmetrics"
+		metricID         = "testmetrics"
 		metricLabel      = "Duration"
 		metricStatusCode = "Complete"
 		val              = float64(37.566818845509246) // must keep this cast to ensure proper [de]serialization
@@ -198,7 +198,7 @@ func TestSendMetricEvent(t *testing.T) {
 	metricOutput := cloudwatch.GetMetricDataOutput{
 		Messages: nil,
 		MetricDataResults: []*cloudwatch.MetricDataResult{{
-			Id:         aws.String(metricId),
+			Id:         aws.String(metricID),
 			Label:      aws.String(metricLabel),
 			Messages:   nil,
 			StatusCode: aws.String(metricStatusCode),

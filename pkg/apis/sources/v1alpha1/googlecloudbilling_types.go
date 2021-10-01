@@ -47,12 +47,12 @@ type GoogleCloudBillingSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
 	// The identifier for the Cloud Billing account owning the budget.
-	BillingAccountId string `json:"billingAccountId"`
+	BillingAccountID string `json:"billingAccountId"`
 
 	// The identifier for the Cloud Billing budget.
 	// You can locate the budget's ID in your budget under Manage notifications.
 	// The ID is displayed after you select Connect a Pub/Sub topic to this budget.
-	BudgetId string `json:"budgetId"`
+	BudgetID string `json:"budgetId"`
 
 	// Settings related to the Pub/Sub resources associated with the Billing budget event sink.
 	PubSub GoogleCloudBillingSourcePubSubSpec `json:"pubsub"`

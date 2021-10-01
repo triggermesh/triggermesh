@@ -61,7 +61,7 @@ func NewOCIMetricsAPIHandler(ceClient cloudevents.Client, aEnv adapter.EnvConfig
 		logger.Panic("interval is out of range")
 	}
 
-	provider := common.NewRawConfigurationProvider(env.TenantOCID, env.UserOCID, env.OracleRegion, env.OracleApiKeyFingerprint, env.OracleApiKey, &env.OracleApiKeyPassphrase)
+	provider := common.NewRawConfigurationProvider(env.TenantOCID, env.UserOCID, env.OracleRegion, env.OracleAPIKeyFingerprint, env.OracleAPIKey, &env.OracleAPIKeyPassphrase)
 
 	monitoringClient, err := monitoring.NewMonitoringClientWithConfigurationProvider(provider)
 	if err != nil {

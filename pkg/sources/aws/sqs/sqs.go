@@ -49,7 +49,7 @@ func CreateQueue(cli sqsiface.SQSAPI, name string, tags map[string]string) (stri
 //
 // See also https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-authentication-and-access-control.html
 func SetQueuePolicy(cli sqsiface.SQSAPI, url string, pol iam.Policy) error {
-	polJson, err := json.Marshal(pol)
+	polJSON, err := json.Marshal(pol)
 	if err != nil {
 		return fmt.Errorf("serializing queue policy to JSON: %w", err)
 	}
@@ -57,7 +57,7 @@ func SetQueuePolicy(cli sqsiface.SQSAPI, url string, pol iam.Policy) error {
 	attrs := &sqs.SetQueueAttributesInput{
 		QueueUrl: &url,
 		Attributes: aws.StringMap(map[string]string{
-			sqs.QueueAttributeNamePolicy: string(polJson),
+			sqs.QueueAttributeNamePolicy: string(polJSON),
 		}),
 	}
 

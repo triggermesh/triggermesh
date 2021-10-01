@@ -152,7 +152,7 @@ func parseFormToMessage(req *http.Request) *Message {
 	m.ToZip = req.FormValue("ToZip")
 	m.NumMeda = req.FormValue("NumMeda")
 	m.AccountSid = req.FormValue("AccountSid")
-	m.ApiVersion = req.FormValue("ApiVersion")
+	m.APIVersion = req.FormValue("ApiVersion")
 	m.ToCountry = req.FormValue("ToCountry")
 	m.ToCity = req.FormValue("ToCity")
 	m.FromZip = req.FormValue("FromZip")

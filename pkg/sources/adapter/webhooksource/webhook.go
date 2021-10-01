@@ -106,11 +106,11 @@ func (h *webhookHandler) handleAll(w http.ResponseWriter, r *http.Request) {
 	if h.username != "" && h.password != "" {
 		us, ps, ok := r.BasicAuth()
 		if !ok {
-			h.handleError(errors.New("Wrong authentication header"), http.StatusBadRequest, w)
+			h.handleError(errors.New("wrong authentication header"), http.StatusBadRequest, w)
 			return
 		}
 		if us != h.username || ps != h.password {
-			h.handleError(errors.New("Credentials are not valid"), http.StatusUnauthorized, w)
+			h.handleError(errors.New("credentials are not valid"), http.StatusUnauthorized, w)
 			return
 		}
 	}

@@ -34,9 +34,9 @@ import (
 )
 
 const (
-	oracleApiKey            = "ORACLE_API_PRIVATE_KEY"
-	oracleApiKeyPassphrase  = "ORACLE_API_PRIVATE_KEY_PASSPHRASE"
-	oracleApiKeyFingerprint = "ORACLE_API_PRIVATE_KEY_FINGERPRINT"
+	oracleAPIKey            = "ORACLE_API_PRIVATE_KEY"
+	oracleAPIKeyPassphrase  = "ORACLE_API_PRIVATE_KEY_PASSPHRASE"
+	oracleAPIKeyFingerprint = "ORACLE_API_PRIVATE_KEY_FINGERPRINT"
 	userOCID                = "ORACLE_USER_OCID"
 	tenantOCID              = "ORACLE_TENANT_OCID"
 	oracleRegion            = "ORACLE_REGION"
@@ -123,9 +123,9 @@ func makeOCIMetricsEnvs(src *v1alpha1.OCIMetricsSource) []corev1.EnvVar {
 			Value: string(m),
 		}}
 
-	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleApiKey, src.Spec.OracleApiPrivateKey)
-	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleApiKeyPassphrase, src.Spec.OracleApiPrivateKeyPassphrase)
-	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleApiKeyFingerprint, src.Spec.OracleApiPrivateKeyFingerprint)
+	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleAPIKey, src.Spec.OracleAPIPrivateKey)
+	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleAPIKeyPassphrase, src.Spec.OracleAPIPrivateKeyPassphrase)
+	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleAPIKeyFingerprint, src.Spec.OracleAPIPrivateKeyFingerprint)
 
 	return ociEnvs
 }

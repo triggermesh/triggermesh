@@ -45,7 +45,7 @@ func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, to
 	status := &src.Status
 
 	budgetRequest := &budgets.GetBudgetRequest{
-		Name: generateBudgetId(src),
+		Name: generateBudgetID(src),
 	}
 
 	budget, err := cli.GetBudget(ctx, budgetRequest)
@@ -53,14 +53,14 @@ func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, to
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Access denied to Cloud Billing API: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Budget does not exists: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case err != nil:
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-			"Cannot obtain budget configuration %q: %s", src.Spec.BudgetId, toErrMsg(err))
+			"Cannot obtain budget configuration %q: %s", src.Spec.BudgetID, toErrMsg(err))
 	}
 
 	// SchemaVersion Only "1.0" is accepted. It represents the JSON schema as defined in
@@ -78,14 +78,14 @@ func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, to
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Access denied to Cloud Billing API: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Budget does not exists: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case err != nil:
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-			"Cannot create budget notification %q: %s", src.Spec.BudgetId, toErrMsg(err))
+			"Cannot create budget notification %q: %s", src.Spec.BudgetID, toErrMsg(err))
 	}
 
 	event.Normal(ctx, ReasonSubscribed, "Created Billing budget notification %q", budget.DisplayName)
@@ -107,7 +107,7 @@ func ensureNoBudgetNotification(ctx context.Context, cli *billing.BudgetClient) 
 	status := &src.Status
 
 	budgetRequest := &budgets.GetBudgetRequest{
-		Name: generateBudgetId(src),
+		Name: generateBudgetID(src),
 	}
 
 	budget, err := cli.GetBudget(ctx, budgetRequest)
@@ -115,14 +115,14 @@ func ensureNoBudgetNotification(ctx context.Context, cli *billing.BudgetClient) 
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Access denied to Cloud Billing API: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Budget does not exist: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case err != nil:
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-			"Cannot obtain budget configuration %q: %s", src.Spec.BudgetId, toErrMsg(err))
+			"Cannot obtain budget configuration %q: %s", src.Spec.BudgetID, toErrMsg(err))
 	}
 
 	budget.NotificationsRule = &budgets.NotificationsRule{}
@@ -135,14 +135,14 @@ func ensureNoBudgetNotification(ctx context.Context, cli *billing.BudgetClient) 
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Access denied to Cloud Billing API: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Budget does not exist: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetId, err))
+		return controller.NewPermanentError(failCreatingBudgetNotification(src.Spec.BudgetID, err))
 	case err != nil:
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-			"Cannot delete budget notification %q: %s", src.Spec.BudgetId, toErrMsg(err))
+			"Cannot delete budget notification %q: %s", src.Spec.BudgetID, toErrMsg(err))
 	}
 
 	event.Normal(ctx, ReasonUnsubscribed, "Deleted Billing budget notification "+budget.DisplayName)
@@ -162,6 +162,6 @@ func generateTopicResourceName(s *v1alpha1.GoogleCloudBillingSource, topicID str
 }
 
 // Generates the budgetId for the budget request used by a CloudBillingSource.
-func generateBudgetId(s *v1alpha1.GoogleCloudBillingSource) string {
-	return fmt.Sprintf("billingAccounts/%s/budgets/%s", s.Spec.BillingAccountId, s.Spec.BudgetId)
+func generateBudgetID(s *v1alpha1.GoogleCloudBillingSource) string {
+	return fmt.Sprintf("billingAccounts/%s/budgets/%s", s.Spec.BillingAccountID, s.Spec.BudgetID)
 }

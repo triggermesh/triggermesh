@@ -71,8 +71,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newEventSource() *v1alpha1.GoogleCloudBillingSource {
 	src := &v1alpha1.GoogleCloudBillingSource{
 		Spec: v1alpha1.GoogleCloudBillingSourceSpec{
-			BillingAccountId: "my-billing-account-id",
-			BudgetId:         "my-budget-id",
+			BillingAccountID: "my-billing-account-id",
+			BudgetID:         "my-budget-id",
 			PubSub: v1alpha1.GoogleCloudBillingSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},

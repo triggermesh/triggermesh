@@ -31,7 +31,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const apiAppIdCeExtension = "comslackapiappid"
+const apiAppIDCeExtension = "comslackapiappid"
 
 // SlackEventAPIHandler listen for Slack API Events
 type SlackEventAPIHandler interface {
@@ -209,7 +209,7 @@ func cloudEventFromEventWrapper(wrapper *SlackEventWrapper) (*cloudevents.Event,
 	event.SetID(wrapper.EventID)
 	event.SetType(v1alpha1.SlackGenericEventType)
 	event.SetSource(wrapper.TeamID)
-	event.SetExtension(apiAppIdCeExtension, wrapper.APIAppID)
+	event.SetExtension(apiAppIDCeExtension, wrapper.APIAppID)
 	event.SetTime(time.Unix(int64(wrapper.EventTime), 0))
 	event.SetSubject(wrapper.Event.Type())
 	if err := event.SetData(cloudevents.ApplicationJSON, wrapper.Event); err != nil {

@@ -72,7 +72,7 @@ func newEventSource() *v1alpha1.OCIMetricsSource {
 
 	src := &v1alpha1.OCIMetricsSource{
 		Spec: v1alpha1.OCIMetricsSourceSpec{
-			OracleApiPrivateKey: v1alpha1.ValueFromField{
+			OracleAPIPrivateKey: v1alpha1.ValueFromField{
 				ValueFromSecret: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "test-private-secret",
@@ -80,7 +80,7 @@ func newEventSource() *v1alpha1.OCIMetricsSource {
 					Key: "keyId",
 				},
 			},
-			OracleApiPrivateKeyPassphrase: v1alpha1.ValueFromField{
+			OracleAPIPrivateKeyPassphrase: v1alpha1.ValueFromField{
 				ValueFromSecret: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "test-private-secret-passphrase",
@@ -88,7 +88,7 @@ func newEventSource() *v1alpha1.OCIMetricsSource {
 					Key: "passphrase",
 				},
 			},
-			OracleApiPrivateKeyFingerprint: v1alpha1.ValueFromField{
+			OracleAPIPrivateKeyFingerprint: v1alpha1.ValueFromField{
 				ValueFromSecret: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "test-private-secret-fingerprint",

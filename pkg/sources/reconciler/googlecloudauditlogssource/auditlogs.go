@@ -129,7 +129,7 @@ func ensureSinkIsPublisher(ctx context.Context, sink *logadmin.Sink, cli *pubsub
 }
 
 // ensureNoSink looks at status.AuditLogSink and if non-empty will delete it
-func (c *Reconciler) ensureNoSink(ctx context.Context, cli *logadmin.Client) error {
+func (r *Reconciler) ensureNoSink(ctx context.Context, cli *logadmin.Client) error {
 	if skip.Skip(ctx) {
 		return nil
 	}

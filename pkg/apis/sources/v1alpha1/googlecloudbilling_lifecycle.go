@@ -53,7 +53,7 @@ func (s *GoogleCloudBillingSource) GetStatusManager() *EventSourceStatusManager 
 
 // AsEventSource implements EventSource.
 func (s *GoogleCloudBillingSource) AsEventSource() string {
-	return s.Spec.BudgetId
+	return s.Spec.BudgetID
 }
 
 // Supported event types
