@@ -24,7 +24,6 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
@@ -125,8 +124,8 @@ func makeAppEnv(o *v1alpha1.SendGridTarget) []corev1.EnvVar {
 	}
 
 	env = append(env, corev1.EnvVar{
-		Name:  pkgreconciler.EnvBridgeID,
-		Value: pkgreconciler.GetStatefulBridgeID(o),
+		Name:  libreconciler.EnvBridgeID,
+		Value: libreconciler.GetStatefulBridgeID(o),
 	})
 
 	return env

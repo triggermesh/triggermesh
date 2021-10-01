@@ -65,25 +65,25 @@ func makeTargetAdapterKService(target *v1alpha1.OracleTarget, cfg *adapterConfig
 }
 
 func makeAppEnv(spec *v1alpha1.OracleTargetSpec) []corev1.EnvVar {
-	var fnId string
+	var fnID string
 	if spec.OracleFunctionSpec != nil {
-		fnId = spec.OracleFunctionSpec.Function
+		fnID = spec.OracleFunctionSpec.Function
 	}
 
 	return []corev1.EnvVar{{
 		Name: "ORACLE_API_PRIVATE_KEY",
 		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: spec.OracleApiPrivateKey.SecretKeyRef,
+			SecretKeyRef: spec.OracleAPIPrivateKey.SecretKeyRef,
 		},
 	}, {
 		Name: "ORACLE_API_PRIVATE_KEY_PASSPHRASE",
 		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: spec.OracleApiPrivateKeyPassphrase.SecretKeyRef,
+			SecretKeyRef: spec.OracleAPIPrivateKeyPassphrase.SecretKeyRef,
 		},
 	}, {
 		Name: "ORACLE_API_PRIVATE_KEY_FINGERPRINT",
 		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: spec.OracleApiPrivateKeyFingerprint.SecretKeyRef,
+			SecretKeyRef: spec.OracleAPIPrivateKeyFingerprint.SecretKeyRef,
 		},
 	}, {
 		Name:  "TENANT_OCID",
@@ -96,6 +96,6 @@ func makeAppEnv(spec *v1alpha1.OracleTargetSpec) []corev1.EnvVar {
 		Value: spec.User,
 	}, {
 		Name:  "ORACLE_FUNCTION",
-		Value: fnId,
+		Value: fnID,
 	}}
 }

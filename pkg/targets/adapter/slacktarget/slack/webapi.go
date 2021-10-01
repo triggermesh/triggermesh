@@ -49,16 +49,16 @@ type webAPIClient struct {
 func (c *webAPIClient) Do(methodURL string, data []byte) (Response, error) {
 	method, ok := c.methods[methodURL]
 	if !ok {
-		return nil, fmt.Errorf("Slack method %q not supported", methodURL)
+		return nil, fmt.Errorf("Slack method %q not supported", methodURL) //nolint:stylecheck
 	}
 
 	if !method.enabled {
-		return nil, fmt.Errorf("Slack method %q is not enabled", methodURL)
+		return nil, fmt.Errorf("Slack method %q is not enabled", methodURL) //nolint:stylecheck
 	}
 
 	// this should not happen
 	if method.fn == nil {
-		return nil, fmt.Errorf("Slack method %q is not implemented", methodURL)
+		return nil, fmt.Errorf("Slack method %q is not implemented", methodURL) //nolint:stylecheck
 	}
 
 	return method.fn(data, c.apiURL, c.token, methodURL, c.client)

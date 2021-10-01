@@ -139,13 +139,13 @@ func (j *javascriptVM) Exec(event *cloudevents.Event) (*cloudevents.Event, error
 
 		b, err := json.Marshal(t)
 		if err != nil {
-			return nil, fmt.Errorf("Error serializing exec response: %w", err)
+			return nil, fmt.Errorf("error serializing exec response: %w", err)
 		}
 
 		event := &cloudevents.Event{}
 		err = event.UnmarshalJSON(b)
 		if err != nil {
-			return nil, fmt.Errorf("Error unmarshaling exec response into event: %w", err)
+			return nil, fmt.Errorf("error unmarshaling exec response into event: %w", err)
 		}
 		return event, nil
 

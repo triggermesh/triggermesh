@@ -43,7 +43,7 @@ func (s *TektonTargetStatus) InitializeConditions() {
 }
 
 // GetGroupVersionKind returns the GroupVersionKind.
-func (t *TektonTarget) GetGroupVersionKind() schema.GroupVersionKind {
+func (*TektonTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("TektonTarget")
 }
 
@@ -71,9 +71,9 @@ func (*TektonTarget) GetEventTypes() []string {
 }
 
 // AsEventSource implements targets.EventSource.
-func (s *TektonTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
+func (t *TektonTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
@@ -102,11 +102,11 @@ func (s *TektonTargetStatus) IsReady() bool {
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *TektonTarget) GetConditionSet() apis.ConditionSet {
+func (*TektonTarget) GetConditionSet() apis.ConditionSet {
 	return TektonCondSet
 }
 
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *TektonTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+func (t *TektonTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
 }

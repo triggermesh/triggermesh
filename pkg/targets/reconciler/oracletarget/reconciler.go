@@ -45,22 +45,22 @@ func (r *reconciler) ReconcileKind(ctx context.Context, trg *oraclev1alpha1.Orac
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
 
-	if trg.Spec.OracleApiPrivateKey.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleApiPrivateKey.SecretKeyRef)
+	if trg.Spec.OracleAPIPrivateKey.SecretKeyRef != nil {
+		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleAPIPrivateKey.SecretKeyRef)
 		if err != nil {
 			trg.Status.MarkNoSecrets("OracleApiPrivateKeySecretNotFound", "%s", err)
 			return err
 		}
 	}
-	if trg.Spec.OracleApiPrivateKeyPassphrase.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleApiPrivateKeyPassphrase.SecretKeyRef)
+	if trg.Spec.OracleAPIPrivateKeyPassphrase.SecretKeyRef != nil {
+		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleAPIPrivateKeyPassphrase.SecretKeyRef)
 		if err != nil {
 			trg.Status.MarkNoSecrets("OracleApiPrivateKeyPassphraseNotFound", "%s", err)
 			return err
 		}
 	}
-	if trg.Spec.OracleApiPrivateKeyFingerprint.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleApiPrivateKeyFingerprint.SecretKeyRef)
+	if trg.Spec.OracleAPIPrivateKeyFingerprint.SecretKeyRef != nil {
+		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleAPIPrivateKeyFingerprint.SecretKeyRef)
 		if err != nil {
 			trg.Status.MarkNoSecrets("OracleApiPrivateKeyFingerprintNotFound", "%s", err)
 			return err

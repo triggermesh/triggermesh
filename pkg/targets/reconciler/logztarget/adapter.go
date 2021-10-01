@@ -24,7 +24,6 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	logzv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
@@ -47,7 +46,7 @@ type adapterConfig struct {
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *logzv1alpha1.LogzTarget, cfg *adapterConfig) *servingv1.Service {
+func makeTargetAdapterKService(target *v1alpha1.LogzTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)

@@ -39,7 +39,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	fn := env.OracleFunction
 	provider := common.NewRawConfigurationProvider(env.TenantOCID, env.UserOCID, env.OracleRegion,
-		env.OracleApiKeyFingerprint, env.OracleApiKey, &env.OracleApiKeyPassphrase)
+		env.OracleAPIKeyFingerprint, env.OracleAPIKey, &env.OracleAPIKeyPassphrase)
 
 	return &oracleAdapter{
 		provider: provider,

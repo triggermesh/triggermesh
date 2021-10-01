@@ -28,9 +28,9 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	OracleApiKey            string `envconfig:"ORACLE_API_PRIVATE_KEY" required:"true"`
-	OracleApiKeyPassphrase  string `envconfig:"ORACLE_API_PRIVATE_KEY_PASSPHRASE" required:"true"`
-	OracleApiKeyFingerprint string `envconfig:"ORACLE_API_PRIVATE_KEY_FINGERPRINT" required:"true"`
+	OracleAPIKey            string `envconfig:"ORACLE_API_PRIVATE_KEY" required:"true"`
+	OracleAPIKeyPassphrase  string `envconfig:"ORACLE_API_PRIVATE_KEY_PASSPHRASE" required:"true"`
+	OracleAPIKeyFingerprint string `envconfig:"ORACLE_API_PRIVATE_KEY_FINGERPRINT" required:"true"`
 	UserOCID                string `envconfig:"USER_OCID" required:"true"`
 	TenantOCID              string `envconfig:"TENANT_OCID" required:"true"`
 	OracleRegion            string `envconfig:"ORACLE_REGION" required:"true"`

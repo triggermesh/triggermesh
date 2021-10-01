@@ -34,7 +34,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
-const baseUrl = "/v1/graphql"
+const baseURL = "/v1/graphql"
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
@@ -151,7 +151,7 @@ func (h *hasuraAdapter) dispatch(ctx context.Context, event cloudevents.Event) (
 		return h.reportError("Unsupported event type "+strconv.Quote(typ), nil)
 	}
 
-	req, err := http.NewRequest("POST", h.endpoint+baseUrl, bytes.NewReader(data))
+	req, err := http.NewRequest("POST", h.endpoint+baseURL, bytes.NewReader(data))
 	if err != nil {
 		return h.reportError("Unable to build request", err)
 	}

@@ -105,7 +105,7 @@ func (c *SalesforceClient) Authenticate(ctx context.Context) error {
 		// If there was an error with refresh, let's try to
 		// use a new access token next time
 		c.creds = nil
-		return fmt.Errorf("Could not perform authentication: %w", err)
+		return fmt.Errorf("could not perform authentication: %w", err)
 	}
 	c.creds = creds
 
@@ -118,7 +118,7 @@ func (c *SalesforceClient) Authenticate(ctx context.Context) error {
 	// we already have the lock
 	res, err := c.doCall(ctx, http.MethodGet, salesforceAPIData, nil, nil)
 	if err != nil {
-		return fmt.Errorf("Could not retrieve available versions: %w", err)
+		return fmt.Errorf("could not retrieve available versions: %w", err)
 	}
 
 	if res.StatusCode != 200 {
@@ -128,7 +128,7 @@ func (c *SalesforceClient) Authenticate(ctx context.Context) error {
 	var versions []salesforceVersion
 	err = json.NewDecoder(res.Body).Decode(&versions)
 	if err != nil {
-		return fmt.Errorf("Cannot decode Salesforce versions: %w", err)
+		return fmt.Errorf("cannot decode Salesforce versions: %w", err)
 	}
 
 	var maxV float64 = 0

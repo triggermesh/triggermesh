@@ -100,7 +100,7 @@ func (a *sendGridAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event,
 func (a *sendGridAdapter) sendEmail(event cloudevents.Event) (string, error) {
 	email, err := a.defaultMessageData(event)
 	if err != nil {
-		return "", fmt.Errorf("Error processing incoming message")
+		return "", fmt.Errorf("error processing incoming message")
 	}
 
 	from := mail.NewEmail(email.FromName, email.FromEmail)

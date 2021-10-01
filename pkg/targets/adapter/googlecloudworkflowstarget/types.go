@@ -18,11 +18,11 @@ package googlecloudworkflowstarget
 
 type CreateWorkflowEvent struct {
 	Parent     string `json:"parent"`
-	WorkflowId string `json:"workflow_id"`
+	WorkflowID string `json:"workflow_id"`
 	Workflow   struct {
 		Name        string             `json:"name"`
 		State       int32              `json:"state"`
-		RevisionId  string             `json:"revision_id"`
+		RevisionID  string             `json:"revision_id"`
 		Description *string            `json:"description"`
 		Labels      *map[string]string `json:"labels,omitempty"`
 		SourceCode  string             `json:"source_code,omitempty"`

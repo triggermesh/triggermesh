@@ -25,7 +25,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	"knative.dev/eventing/pkg/reconciler/source"
 
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	corev1 "k8s.io/api/core/v1"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
@@ -80,8 +79,8 @@ func makeAppEnv(o *v1alpha1.ElasticsearchTarget) []corev1.EnvVar {
 			Name:  "ELASTICSEARCH_DISCARD_CE_CONTEXT",
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
 		}, {
-			Name:  pkgreconciler.EnvBridgeID,
-			Value: pkgreconciler.GetStatefulBridgeID(o),
+			Name:  libreconciler.EnvBridgeID,
+			Value: libreconciler.GetStatefulBridgeID(o),
 		},
 	}
 

@@ -38,7 +38,7 @@ func (s *GoogleSheetTargetStatus) GetCondition(t apis.ConditionType) *apis.Condi
 }
 
 // GetGroupVersionKind returns the GroupVersionKind.
-func (s *GoogleSheetTarget) GetGroupVersionKind() schema.GroupVersionKind {
+func (*GoogleSheetTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("GoogleSheetTarget")
 }
 
@@ -103,8 +103,8 @@ func (s *GoogleSheetTargetStatus) PropagateAvailability(ksvc *servingv1.Service)
 }
 
 // MarkNoKService sets the condition that the service is not ready
-func (a *GoogleSheetTargetStatus) MarkNoService(reason, messageFormat string, messageA ...interface{}) {
-	AwsCondSet.Manage(a).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
+func (s *GoogleSheetTargetStatus) MarkNoService(reason, messageFormat string, messageA ...interface{}) {
+	AwsCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
 }
 
 // IsReady returns true if the resource is ready overall.
@@ -124,7 +124,7 @@ func (s *GoogleSheetTargetStatus) MarkNoSecrets(err error) {
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *GoogleSheetTarget) GetConditionSet() apis.ConditionSet {
+func (*GoogleSheetTarget) GetConditionSet() apis.ConditionSet {
 	return GoogleSheetCondSet
 }
 

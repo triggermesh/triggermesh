@@ -43,7 +43,7 @@ func (s *SlackTargetStatus) InitializeConditions() {
 }
 
 // GetGroupVersionKind returns the GroupVersionKind.
-func (t *SlackTarget) GetGroupVersionKind() schema.GroupVersionKind {
+func (*SlackTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("SlackTarget")
 }
 
@@ -100,7 +100,7 @@ func (s *SlackTargetStatus) IsReady() bool {
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *SlackTarget) GetConditionSet() apis.ConditionSet {
+func (*SlackTarget) GetConditionSet() apis.ConditionSet {
 	return SlackCondSet
 }
 

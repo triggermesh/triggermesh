@@ -26,6 +26,7 @@ import (
 )
 
 // Accepted event types
+//nolint:stylecheck
 const (
 	// EventTypeUiPathStartJob represents job data to be initiated
 	EventTypeUiPathStartJob = "io.triggermesh.uipath.job.start"
@@ -34,7 +35,7 @@ const (
 )
 
 // UiPathCondSet is the group of possible conditions
-var UiPathCondSet = apis.NewLivingConditionSet(
+var UiPathCondSet = apis.NewLivingConditionSet( //nolint:stylecheck
 	ConditionServiceReady,
 )
 

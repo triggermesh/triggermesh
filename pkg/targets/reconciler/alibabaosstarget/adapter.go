@@ -24,9 +24,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	alibabaossv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
@@ -69,7 +67,7 @@ func makeTargetAdapterKService(target *v1alpha1.AlibabaOSSTarget, cfg *adapterCo
 	)
 }
 
-func makeAppEnv(o *alibabaossv1alpha1.AlibabaOSSTarget) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.AlibabaOSSTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  envEndpoint,
@@ -89,8 +87,8 @@ func makeAppEnv(o *alibabaossv1alpha1.AlibabaOSSTarget) []corev1.EnvVar {
 			},
 		},
 		{
-			Name:  pkgreconciler.EnvBridgeID,
-			Value: pkgreconciler.GetStatefulBridgeID(o),
+			Name:  libreconciler.EnvBridgeID,
+			Value: libreconciler.GetStatefulBridgeID(o),
 		},
 	}
 

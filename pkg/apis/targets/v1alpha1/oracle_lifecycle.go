@@ -41,7 +41,7 @@ func (a *OracleTargetStatus) InitializeConditions() {
 }
 
 // GetGroupVersionKind returns the GroupVersionKind.
-func (o *OracleTarget) GetGroupVersionKind() schema.GroupVersionKind {
+func (*OracleTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("OracleTarget")
 }
 
@@ -81,11 +81,11 @@ func (a *OracleTargetStatus) MarkNoSecrets(reason, messageFormat string, message
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *OracleTarget) GetConditionSet() apis.ConditionSet {
+func (*OracleTarget) GetConditionSet() apis.ConditionSet {
 	return OracleCondSet
 }
 
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *OracleTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+func (t *OracleTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
 }

@@ -84,8 +84,8 @@ func TestSheetHasAvailableRows(t *testing.T) {
 			response, err := httpmock.NewJsonResponder(testCase.responseStatus, testCase.response)
 			assert.NoError(t, err)
 
-			mockUrl := fmt.Sprintf("/v4/spreadsheets/%s/values/!2:%d", sheetID, maxSheetRow+1)
-			httpmock.RegisterResponder("GET", mockUrl, response)
+			mockURL := fmt.Sprintf("/v4/spreadsheets/%s/values/!2:%d", sheetID, maxSheetRow+1)
+			httpmock.RegisterResponder("GET", mockURL, response)
 
 			result, err := adapter.sheetHasAvailableRows(&sheets.Sheet{Properties: &sheets.SheetProperties{}})
 
@@ -185,8 +185,8 @@ func TestGetLatestSheetByName(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			response, err := httpmock.NewJsonResponder(testCase.responseStatus, testCase.response)
 			assert.NoError(t, err)
-			mockUrl := fmt.Sprintf("/v4/spreadsheets/%s", sheetID)
-			httpmock.RegisterResponder("GET", mockUrl, response)
+			mockURL := fmt.Sprintf("/v4/spreadsheets/%s", sheetID)
+			httpmock.RegisterResponder("GET", mockURL, response)
 
 			sheet, err := adapter.getLatestSheetByName(sheetsPrefix)
 			assert.Equal(t, testCase.expectedError, err)
@@ -250,8 +250,8 @@ func TestAppendValuesToSheet(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			response, err := httpmock.NewJsonResponder(testCase.responseStatus, testCase.response)
 			assert.NoError(t, err)
-			mockUrl := fmt.Sprintf("/v4/spreadsheets/%s:batchUpdate", sheetID)
-			httpmock.RegisterResponder("POST", mockUrl, response)
+			mockURL := fmt.Sprintf("/v4/spreadsheets/%s:batchUpdate", sheetID)
+			httpmock.RegisterResponder("POST", mockURL, response)
 
 			err = adapter.appendDataToSheet(testCase.sheetToUpdate, testCase.dataToInsert)
 			assert.Equal(t, testCase.expectedError, err)
@@ -337,8 +337,8 @@ func TestCreateSheet(t *testing.T) {
 
 	for name, testCase := range testCases {
 		t.Run(name, func(t *testing.T) {
-			mockUrl := fmt.Sprintf("/v4/spreadsheets/%s:batchUpdate", sheetID)
-			httpmock.RegisterResponder("POST", mockUrl,
+			mockURL := fmt.Sprintf("/v4/spreadsheets/%s:batchUpdate", sheetID)
+			httpmock.RegisterResponder("POST", mockURL,
 				// because of two http requests to the same endpoint need to check when and what to response
 				func(request *http.Request) (*http.Response, error) {
 					var requestData sheets.BatchUpdateSpreadsheetRequest

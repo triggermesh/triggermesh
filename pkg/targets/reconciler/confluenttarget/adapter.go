@@ -26,7 +26,6 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	confluentv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
@@ -46,11 +45,11 @@ type adapterConfig struct {
 // Every field is required.
 type TargetAdapterArgs struct {
 	Image  string
-	Target *confluentv1alpha1.ConfluentTarget
+	Target *v1alpha1.ConfluentTarget
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *confluentv1alpha1.ConfluentTarget, cfg *adapterConfig) *servingv1.Service {
+func makeTargetAdapterKService(target *v1alpha1.ConfluentTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)

@@ -43,7 +43,6 @@ import (
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/alibabaosstarget"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 )
@@ -368,7 +367,7 @@ func newAdapterService() *servingv1.Service {
 											SecretKeyRef: tSecretSelector,
 										},
 									}, {
-										Name: pkgreconciler.EnvBridgeID,
+										Name: libreconciler.EnvBridgeID,
 									}, {
 										Name: source.EnvLoggingCfg,
 									}, {

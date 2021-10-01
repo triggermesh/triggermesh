@@ -25,8 +25,6 @@ import (
 
 	"knative.dev/pkg/reconciler"
 
-	pkgreconciler "knative.dev/pkg/reconciler"
-
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/hasuratarget"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
@@ -55,7 +53,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.HasuraTarget
 
 	svc, err := makeAdapterKnService(o, r.adapterCfg)
 	if err != nil {
-		return pkgreconciler.NewEvent(corev1.EventTypeWarning, "KServiceFailed", "failed to create kservice: \"%s/%s\", %w", o.Namespace, o.Name, err)
+		return reconciler.NewEvent(corev1.EventTypeWarning, "KServiceFailed", "failed to create kservice: \"%s/%s\", %w", o.Namespace, o.Name, err)
 	}
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, o, svc)

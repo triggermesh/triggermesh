@@ -50,13 +50,13 @@ var (
 
 type OracleTargetSpec struct {
 	// Oracle User API private key.
-	OracleApiPrivateKey SecretValueFromSource `json:"oracleApiPrivateKey"`
+	OracleAPIPrivateKey SecretValueFromSource `json:"oracleApiPrivateKey"`
 
 	// Oracle User API private key passphrase.
-	OracleApiPrivateKeyPassphrase SecretValueFromSource `json:"oracleApiPrivateKeyPassphrase"`
+	OracleAPIPrivateKeyPassphrase SecretValueFromSource `json:"oracleApiPrivateKeyPassphrase"`
 
 	// Oracle User API cert fingerprint.
-	OracleApiPrivateKeyFingerprint SecretValueFromSource `json:"oracleApiPrivateKeyFingerprint"`
+	OracleAPIPrivateKeyFingerprint SecretValueFromSource `json:"oracleApiPrivateKeyFingerprint"`
 
 	// Oracle Tenancy OCID.
 	Tenancy string `json:"oracleTenancy"`

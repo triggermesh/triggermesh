@@ -31,7 +31,7 @@ import (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // UiPathTarget is the Schema for the event target.
-type UiPathTarget struct {
+type UiPathTarget struct { //nolint:stylecheck
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
@@ -49,7 +49,7 @@ var (
 )
 
 // UiPathTargetSpec defines the desired state of the event target.
-type UiPathTargetSpec struct {
+type UiPathTargetSpec struct { //nolint:stylecheck
 	// UserKey An OAuth token used to obtain an access key.
 	UserKey *SecretValueFromSource `json:"userKey"`
 	// RobotName is the robot to invoke with this target.
@@ -67,7 +67,7 @@ type UiPathTargetSpec struct {
 }
 
 // UiPathTargetStatus defines the observed state of the event target.
-type UiPathTargetStatus struct {
+type UiPathTargetStatus struct { //nolint:stylecheck
 	duckv1.Status        `json:",inline"`
 	duckv1.AddressStatus `json:",inline"`
 
@@ -78,7 +78,7 @@ type UiPathTargetStatus struct {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // UiPathTargetList contains a list of event targets.
-type UiPathTargetList struct {
+type UiPathTargetList struct { //nolint:stylecheck
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []UiPathTarget `json:"items"`
