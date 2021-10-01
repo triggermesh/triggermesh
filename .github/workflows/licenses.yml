@@ -1,0 +1,70 @@
+name: OSS Licenses
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  boilerplate:
+    name: Apache 2.0 License
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'
+
+    - name: Install reviewdog
+      uses: reviewdog/action-setup@v1
+
+    - name: Install boilerplate-check
+      env:
+        GO111MODULE: 'off'
+      run: |
+        go get github.com/mattmoor/boilerplate-check/cmd/boilerplate-check
+
+    - name: Check license boilerplate
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        reviewdog -conf=.github/workflows/config/reviewdog.yaml \
+          -runners=license \
+          -filter-mode=diff_context \
+          -reporter=github-check \
+          -fail-on-error=true
+
+  vendor:
+    name: Third-party licenses
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'
+
+    - name: Install go-licenses
+      env:
+        GO111MODULE: 'off'
+      run: |
+        go get github.com/google/go-licenses
+
+    - name: Check third-party licenses
+      run: |
+        rm -rf LICENSES/vendor/
+        go-licenses save ./... --save_path LICENSES/vendor/
+
+        git_status="$(git status --porcelain)"
+        if [[ ${git_status} ]]; then
+            echo -e "Third-party licenses are out-of-date. Please run go-licenses\n"
+            echo "${git_status}"
+            exit 1
+        fi
