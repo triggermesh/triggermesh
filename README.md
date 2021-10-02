@@ -2,6 +2,12 @@
 
 <!-- TODO: add repository description, docs, contribution guidelines, etc. -->
 
+When installing the TriggerMesh components by hand or a tool like [ko][ko], the `triggermesh`
+namespace must be created first.
+```shell
+$ kubectl create ns triggermesh
+```
+
 The current codebase can be built and deployed locally using [ko][ko] as:
 ```shell
 $ CGO_ENABLED=1 ko apply -f config/

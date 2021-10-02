@@ -15,12 +15,11 @@
 KREPO      = triggermesh
 KREPO_DESC = TriggerMesh Open Source Components (sources and targets)
 
-
 BASE_DIR          ?= $(CURDIR)
 OUTPUT_DIR        ?= $(BASE_DIR)/_output
 
 # Dynamically generate the list of commands based on the directory name cited in the cmd directory
-COMMANDS          := $(shell ls $(BASE_DIR)/cmd)
+COMMANDS          := $(notdir $(wildcard cmd/*))
 TARGETS           ?= linux/amd64
 
 BIN_OUTPUT_DIR    ?= $(OUTPUT_DIR)
@@ -57,17 +56,13 @@ all: codegen build test lint
 # Verify lint and tests
 install-gotestsum:
 ifndef HAS_GOTESTSUM
-	curl -SL https://github.com/gotestyourself/gotestsum/releases/download/v0.4.2/gotestsum_0.4.2_linux_amd64.tar.gz | tar -C $(shell go env GOPATH)/bin -zxf -
+	curl -SL https://github.com/gotestyourself/gotestsum/releases/download/v1.7.0/gotestsum_1.7.0_linux_amd64.tar.gz | tar -C $(shell go env GOPATH)/bin -zxf -
 endif
 
 install-golangci-lint:
 ifndef HAS_GOLANGCI_LINT
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.26.0
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.41.1
 endif
-
-# Go pkg management
-mod-download: ## Download go modules
-	$(GO) mod download
 
 help: ## Display this help
 	@awk 'BEGIN {FS = ":.*?## "; printf "\n$(KREPO_DESC)\n\nUsage:\n  make \033[36m<cmd>\033[0m\n"} /^[a-zA-Z0-9._-]+:.*?## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)

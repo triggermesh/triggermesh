@@ -1,0 +1,12 @@
+#!include:.dockerignore
+!Dockerfile
+
+# Explicit inclusions are handled differently from .dockerignore files.
+# Ref. https://stackoverflow.com/a/29932318
+!/.git/
+/.git/*
+!/.git/HEAD
+!.git/refs/
+!/hack/
+/hack/*
+!/hack/inc.Codegen.mk
