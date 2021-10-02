@@ -28,7 +28,15 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
-const adapterName = "twiliotarget"
+const (
+	adapterName = "twiliotarget"
+
+	envTwilioSID           = "TWILIO_SID"
+	envTwilioToken         = "TWILIO_TOKEN"
+	envTwilioDefaultFrom   = "TWILIO_DEFAULT_FROM"
+	envTwilioDefaultTo     = "TWILIO_DEFAULT_TO"
+	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
+)
 
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
@@ -52,7 +60,7 @@ func makeTargetAdapterKService(target *v1alpha1.TwilioTarget, cfg *adapterConfig
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(&target.Spec)
+	envApp := makeAppEnv(target)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
@@ -66,32 +74,42 @@ func makeTargetAdapterKService(target *v1alpha1.TwilioTarget, cfg *adapterConfig
 	)
 }
 
-func makeAppEnv(spec *v1alpha1.TwilioTargetSpec) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.TwilioTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name: "TWILIO_SID",
+			Name: envTwilioSID,
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.AccountSID.SecretKeyRef,
+				SecretKeyRef: o.Spec.AccountSID.SecretKeyRef,
 			},
 		}, {
-			Name: "TWILIO_TOKEN",
+			Name:  libreconciler.EnvBridgeID,
+			Value: libreconciler.GetStatefulBridgeID(o),
+		}, {
+			Name: envTwilioToken,
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.Token.SecretKeyRef,
+				SecretKeyRef: o.Spec.Token.SecretKeyRef,
 			},
 		},
 	}
 
-	if spec.DefaultPhoneFrom != nil {
+	if o.Spec.DefaultPhoneFrom != nil {
 		env = append(env, corev1.EnvVar{
-			Name:  "TWILIO_DEFAULT_FROM",
-			Value: *spec.DefaultPhoneFrom,
+			Name:  envTwilioDefaultFrom,
+			Value: *o.Spec.DefaultPhoneFrom,
 		})
 	}
 
-	if spec.DefaultPhoneTo != nil {
+	if o.Spec.DefaultPhoneTo != nil {
 		env = append(env, corev1.EnvVar{
-			Name:  "TWILIO_DEFAULT_TO",
-			Value: *spec.DefaultPhoneTo,
+			Name:  envTwilioDefaultTo,
+			Value: *o.Spec.DefaultPhoneTo,
+		})
+	}
+
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envEventsPayloadPolicy,
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
 		})
 	}
 

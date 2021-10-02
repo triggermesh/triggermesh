@@ -68,6 +68,9 @@ type TwilioTargetSpec struct {
 	// DefaultPhoneTo is the destination phone
 	// +optional
 	DefaultPhoneTo *string `json:"defaultPhoneTo,omitempty"`
+
+	// EventOptions for targets
+	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
 // TwilioTargetStatus communicates the observed state of the TwilioTarget (from the controller).

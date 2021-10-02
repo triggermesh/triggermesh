@@ -27,7 +27,7 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.targets.response" }
+        { "type": "io.triggermesh.twilio.sms.send.response" }
       ]
 spec:
   group: targets.triggermesh.io
@@ -83,6 +83,13 @@ spec:
                         type: string
                       name:
                         type: string
+              eventOptions:
+                type: object
+                description: "When should this target generate a response event for processing: always, on error, or never"
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
             required:
             - sid
             - token
