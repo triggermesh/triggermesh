@@ -75,6 +75,7 @@ help: ## Display this help
 build: $(COMMANDS)  ## Build all artifacts
 
 $(COMMANDS): $(OUTPUT_DIR)/$@ ## Build artifct
+	if [ ! -d $(OUTPUT_DIR) ]; then mkdir $(OUTPUT_DIR) ; fi
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
