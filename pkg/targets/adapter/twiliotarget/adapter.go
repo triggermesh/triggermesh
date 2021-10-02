@@ -100,7 +100,7 @@ func (a *twilioAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, c
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
-	info := fmt.Sprintf("message sent to: %s", sms.To)
+	info := fmt.Sprint("message sent to: ", sms.To)
 	a.logger.Debug(info)
 	return a.replier.Ok(&event, info)
 }
