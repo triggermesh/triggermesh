@@ -49,7 +49,7 @@ LDFLAGS            = -extldflags=-static -w -s
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
-.PHONY: help mod-download build install release test coverage lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lintall deploy undeploy verify
+.PHONY: help mod-download build install release test coverage lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lintall deploy undeploy 
 
 all: codegen build test lint
 
@@ -107,8 +107,6 @@ fmt: ## Format source files
 
 fmt-test: ## Check source formatting
 	@test -z $(shell $(GOFMT) -l $(shell $(GO) list -f '{{$$d := .Dir}}{{range .GoFiles}}{{$$d}}/{{.}} {{end}} {{$$d := .Dir}}{{range .TestGoFiles}}{{$$d}}/{{.}} {{end}}' $(GOPKGS)))
-
-verify: lint fmt-test ## Verify code base with lint and fmt
 
 IMAGES = $(foreach cmd,$(COMMANDS),$(cmd).image)
 images: $(IMAGES) ## Builds container images
