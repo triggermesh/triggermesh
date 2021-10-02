@@ -17,8 +17,6 @@ limitations under the License.
 package cloudevents
 
 import (
-	"fmt"
-
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
 
@@ -44,7 +42,7 @@ func MappedResponseType(eventTypes map[string]string) ResponseHeaderValue {
 		if ok {
 			return v, nil
 		}
-		return "", fmt.Errorf("incoming type %q cannot be mapped to an outgoing event type", event.Type())
+		return event.Type() + ".response", nil
 	}
 }
 

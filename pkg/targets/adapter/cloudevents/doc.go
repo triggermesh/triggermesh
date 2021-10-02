@@ -98,6 +98,10 @@ Usage:
 
 	// Create replier that will use a different static type response
 	// depending on the incoming type.
+	// If the incoming event type is not mapped the response will be
+	// the same as the incoming event type with `.response` appended.
+	// ie. if the incoming event type is `com.example.myevent` the
+	// response will be `com.example.myevent.response`
 	mt = map[string]string{
 		"search.snowball.io": "list.snowball.io",
 		"update.snowball.io": "product.snowball.io",
