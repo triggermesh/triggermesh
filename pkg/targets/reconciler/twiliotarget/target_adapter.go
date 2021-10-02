@@ -60,7 +60,7 @@ func makeTargetAdapterKService(target *v1alpha1.TwilioTarget, cfg *adapterConfig
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(&target.Spec)
+	envApp := makeAppEnv(target)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
