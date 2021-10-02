@@ -2,15 +2,19 @@
 
 <!-- TODO: add repository description, docs, contribution guidelines, etc. -->
 
-The current codebase can be built using [ko][ko] as:
+The current codebase can be built and deployed locally using [ko][ko] as:
 ```shell
 $ CGO_ENABLED=1 ko apply -f config/
 ```
 
-To regenerate the client code run:
+Make can used to build all of the TriggerMesh binaries. By default, Make will
+generate the Kubernetes specific code, build the artifacts, run the test framework,
+and lastly run lint.
 ```shell
 $ make
 ```
+
+To run a specific Make command, `make help` will provide a list of valid commands.
 
 ## Contributions and Support
 
