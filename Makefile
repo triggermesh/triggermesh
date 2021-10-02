@@ -13,7 +13,7 @@
 # limitations under the License.
 
 KREPO      = triggermesh
-KREPO_DESC = TriggerMesh Open Source Components (sources and targets)
+KREPO_DESC = TriggerMesh Open Source Components (sources, targets, filter, router, etc.)
 
 BASE_DIR          ?= $(CURDIR)
 OUTPUT_DIR        ?= $(BASE_DIR)/_output
