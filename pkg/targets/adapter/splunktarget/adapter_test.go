@@ -18,7 +18,6 @@ package splunktarget
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -27,6 +26,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
+
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	logtesting "knative.dev/pkg/logging/testing"
 
@@ -59,17 +59,20 @@ func (c *mockedSplunkClient) LogEvent(in *splunk.Event) error {
 func TestReceive(t *testing.T) {
 	testCases := map[string]struct {
 		client       *mockedSplunkClient
-		expectResult *errorEvent
+		expectEvent  *errorEvent
+		expectResult *cloudevents.Result
 	}{
 		"Successful request": {
 			client:       &mockedSplunkClient{},
-			expectResult: &errorEvent{},
+			expectEvent:  &errorEvent{},
+			expectResult: &cloudevents.ResultACK,
 		},
 		"Failed request": {
 			client: &mockedSplunkClient{
 				err: assert.AnError,
 			},
-			expectResult: &errorEvent{Code: "adapter-process", Description: "assert.AnError general error for testing", Details: "failed to send event to HEC. Status code: 400"},
+			expectEvent:  &errorEvent{Code: "adapter-process", Description: "assert.AnError general error for testing", Details: "failed to send event to HEC. Status code: 400"},
+			expectResult: &cloudevents.ResultACK,
 		},
 	}
 
@@ -88,14 +91,13 @@ func TestReceive(t *testing.T) {
 			}
 
 			// invoke event callback
-			fmt.Println(a)
-			e, _ := a.receive(context.Background(), newEvent(t))
-
-			fmt.Println(e)
+			e, r := a.receive(context.Background(), newEvent(t))
 			eE := &errorEvent{}
-			e.DataAs(eE)
 
-			assert.Equal(t, eE, tc.expectResult)
+			e.DataAs(eE)
+			assert.Lenf(t, tc.client.inputRecorder, 1, "Client records a single request")
+			assert.Equal(t, &r, tc.expectResult)
+			assert.Equal(t, eE, tc.expectEvent)
 		})
 	}
 }
