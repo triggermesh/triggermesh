@@ -35,6 +35,7 @@ type envAccessor struct {
 	PhoneFrom string `envconfig:"TWILIO_DEFAULT_FROM" required:"false"`
 	// PhoneTo is the phone number to send the message to
 	PhoneTo string `envconfig:"TWILIO_DEFAULT_TO" required:"false"`
+
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"always"`
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
