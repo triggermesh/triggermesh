@@ -74,39 +74,42 @@ func makeTargetAdapterKService(target *v1alpha1.TwilioTarget, cfg *adapterConfig
 	)
 }
 
-func makeAppEnv(spec *v1alpha1.TwilioTargetSpec) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.TwilioTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name: envTwilioSID,
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.AccountSID.SecretKeyRef,
+				SecretKeyRef: o.Spec.AccountSID.SecretKeyRef,
 			},
+		}, {
+			Name:  libreconciler.EnvBridgeID,
+			Value: libreconciler.GetStatefulBridgeID(o),
 		}, {
 			Name: envTwilioToken,
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.Token.SecretKeyRef,
+				SecretKeyRef: o.Spec.Token.SecretKeyRef,
 			},
 		},
 	}
 
-	if spec.DefaultPhoneFrom != nil {
+	if o.Spec.DefaultPhoneFrom != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envTwilioDefaultFrom,
-			Value: *spec.DefaultPhoneFrom,
+			Value: *o.Spec.DefaultPhoneFrom,
 		})
 	}
 
-	if spec.DefaultPhoneTo != nil {
+	if o.Spec.DefaultPhoneTo != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envTwilioDefaultTo,
-			Value: *spec.DefaultPhoneTo,
+			Value: *o.Spec.DefaultPhoneTo,
 		})
 	}
 
-	if spec.EventOptions != nil && spec.EventOptions.PayloadPolicy != nil {
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envEventsPayloadPolicy,
-			Value: string(*spec.EventOptions.PayloadPolicy),
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
 		})
 	}
 
