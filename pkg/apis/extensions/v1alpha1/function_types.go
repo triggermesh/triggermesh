@@ -55,7 +55,7 @@ type FunctionSpec struct {
 	Entrypoint          string                      `json:"entrypoint"`
 	Public              bool                        `json:"public,omitempty"`
 	Code                string                      `json:"code"`
-	ResponseMode        string                      `json:"responseMode,omitempty"`
+	ResponseIsEvent     bool                        `json:"responseIsEvent,omitempty"`
 	EventStore          EventStoreConnection        `json:"eventStore,omitempty"`
 	CloudEventOverrides *duckv1.CloudEventOverrides `json:"ceOverrides"`
 	Sink                *duckv1.Destination         `json:"sink"`
