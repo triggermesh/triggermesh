@@ -58,9 +58,15 @@ type CloudEventStatus struct {
 	ResponseAttributes []duckv1.CloudEventAttributes `json:"ceAttributes,omitempty"`
 }
 
-// EventOptions modifies target adapter management of CloudEvents.
+// EventOptions modifies CloudEvents management at Targets.
 type EventOptions struct {
-	// PayloadPolicy sets when to send a new event at replies.
+	// PayloadPolicy indicates if replies from the target should include
+	// a payload if available. Possible values are:
+	//
+	// - always: will return a with the reply payload if avaliable.
+	// - errors: will only reply with payload in case of an error.
+	// - never: will not reply with payload.
+	//
 	// +optional
 	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
 }
