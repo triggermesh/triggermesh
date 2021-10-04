@@ -37,55 +37,73 @@ spec:
       status: {}
     schema:
       openAPIV3Schema:
+        description: TriggerMesh CloudEvents transformation engine.
         type: object
         properties:
           spec:
+            description: Desired state of the transformation object.
             type: object
             properties:
               context:
+                description: CloudEvents Context attributes transformation spec.
                 type: array
-                items: 
+                items:
+                  description: The list of transformation operations executed on the event context sequentially.
                   type: object
                   properties:
                     operation:
+                      description: Name of the transformation operation.
                       type: string
+                      enum: ['add', 'delete', 'shift', 'store']
                     paths:
+                      description: Key-value event pairs to apply the transformations on.
                       type: array
                       items:
                         type: object
                         properties:
                           key:
+                            description: JSON path or variable name. Depends on the operation type.
                             nullable: true
                             type: string
                           value:
+                            description: JSON path or variable name. Depends on the operation type.
                             nullable: true
                             type: string
                   required:
                   - operation
               data:
+                description: CloudEvents Data transformation spec.
                 type: array
-                items: 
+                items:
+                  description: The list of transformation operations executed on the event data sequentially.
                   type: object
                   properties:
                     operation:
+                      description: Name of the transformation operation.
                       type: string
+                      enum: ['add', 'delete', 'shift', 'store']
                     paths:
+                      description: Key-value event pairs to apply the transformations on.
                       type: array
-                      items:
+                      items: 
                         type: object
                         properties:
                           key:
+                            description: JSON path or variable name. Depends on the operation type.
                             nullable: true
                             type: string
                           value:
+                            description: JSON path or variable name. Depends on the operation type.
                             nullable: true
                             type: string
                   required:
                   - operation
               sink:
+                description: The destination of events sourced from the transformation object.
                 type: object
                 properties:
                   ref:
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
                     type: object
                     properties:
                       apiVersion:
@@ -101,18 +119,22 @@ spec:
                     - kind
                     - name
                   uri:
+                    description: URI to use as the destination of events.
                     type: string
                     format: uri
                 oneOf:
                 - required: ['ref']
                 - required: ['uri']
           status:
+            description: Reported status of Transformation.
             type: object
             properties:
               sinkUri:
+                description: URI of the sink where events are currently sent to.
                 type: string
                 format: uri
               ceAttributes:
+                description: CloudEvents context attributes overrides.
                 type: array
                 items:
                   type: object
@@ -148,6 +170,7 @@ spec:
                   - type
                   - status
               address:
+                description: Address of the HTTP/S endpoint where Transformation is serving incoming CloudEvents.
                 type: object
                 properties:
                   url:

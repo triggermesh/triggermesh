@@ -18,7 +18,7 @@ metadata:
   name: inline-python-function
 spec:
   runtime: python
-  responseMode: event
+  responseIsEvent: true
   public: true
   ceOverrides:
     extensions:
