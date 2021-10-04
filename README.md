@@ -1,4 +1,6 @@
 # TriggerMesh
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftriggermesh%2Ftriggermesh.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftriggermesh%2Ftriggermesh?ref=badge_shield)
+
 
 <!-- TODO: add repository description, docs, contribution guidelines, etc. -->
 
@@ -33,3 +35,7 @@ Although this project is not part of the [CNCF][cncf], we abide by its [code of 
 [cncf-conduct]: https://github.com/cncf/foundation/blob/master/code-of-conduct.md
 
 [ko]: https://github.com/google/ko
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftriggermesh%2Ftriggermesh.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftriggermesh%2Ftriggermesh?ref=badge_large)
