@@ -1,0 +1,130 @@
+version: 2.1
+
+orbs:
+  aws-eks: circleci/aws-eks@1
+  gcp-cli: circleci/gcp-cli@1
+  go: circleci/go@1
+
+jobs:
+  checkout:
+    executor:
+      name: go/default
+      tag: '1.17'
+    steps:
+      - checkout
+      - go/mod-download-cached
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - go
+            - project
+
+  build:
+    executor:
+      name: go/default
+      tag: '1.17'
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Building package
+          command: make build
+
+  test:
+    executor:
+      name: go/default
+      tag: '1.17'
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Run fmt-test
+          command: make fmt-test
+      - run:
+          name: Run test/cover
+          command: make cover
+          environment:
+            TEST_OUTPUT_DIR: /tmp/test-results/
+            COVER_OUTPUT_DIR: /tmp/cover-results/
+      - store_test_results:
+          path: /tmp/test-results/
+      - store_artifacts:
+          path: /tmp/cover-results/
+
+  publish-image:
+    executor:
+      name: gcp-cli/google
+    steps:
+      - attach_workspace:
+          at: ~/
+      - gcp-cli/initialize
+      - run:
+          name: Publishing docker image
+          command: IMAGE_SHA=${CIRCLE_SHA1} IMAGE_TAG=${CIRCLE_TAG:-latest} make -j6 cloudbuild
+
+  release:
+    executor:
+      name: go/default
+      tag: '1.17'
+    steps:
+      - attach_workspace:
+          at: ~/
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: $AWS_CLUSTER_NAME
+          aws-region: $AWS_REGION
+          install-kubectl: true
+      - run:
+          name: Building release packages
+          command: IMAGE_TAG=${CIRCLE_TAG:-latest} make release
+          environment:
+            DIST_DIR: /tmp/dist/
+      - run:
+          name: Installing github-release tool
+          command: go get github.com/meterup/github-release
+      - run:
+          name: Creating github release
+          command: |
+            PRE_RELEASE=${CIRCLE_TAG/${CIRCLE_TAG%-rc[0-9]*}/}
+            github-release delete -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} 2>/dev/null ||:
+            ./hack/release-notes.sh ${CIRCLE_TAG} | github-release release ${PRE_RELEASE:+-p} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -d -
+            for f in $(find /tmp/dist -type f); do github-release upload -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -n $(basename ${f}) -f ${f} ; done
+
+workflows:
+  build-test-and-publish:
+    jobs:
+      - checkout:
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      - build:
+          context: production
+          requires:
+            - checkout
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      - test:
+          requires:
+            - checkout
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      - publish-image:
+          context: production
+          requires:
+            - build
+            - test
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+            branches:
+              only: main
+      - release:
+          context: production
+          requires:
+            - publish-image
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+            branches:
+              ignore: /.*/
