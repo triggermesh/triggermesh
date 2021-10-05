@@ -14,7 +14,7 @@
 
 FROM golang:1.17-bullseye AS builder
 
-ENV CGO_ENABLED 1
+ENV CGO_ENABLED 0
 ENV GOOS linux
 ENV GOARCH amd64
 
