@@ -36,10 +36,19 @@ details.
 
 Although this project is not part of the [CNCF][cncf], we abide by its [code of conduct][cncf-conduct].
 
+## License
+
+This software is licensed under the [Apache License, Version 2.0][asl2].
+
+Additionally, the End User License Agreement included in the [`EULA.pdf`](./EULA.pdf) file applies to software artifacts
+released by TriggerMesh Inc.: compiled executables and container images.
+
 [gh-issue]: https://github.com/triggermesh/triggermesh/issues
 [gh-pr]: https://github.com/triggermesh/triggermesh/pulls
 
 [cncf]: https://www.cncf.io/
 [cncf-conduct]: https://github.com/cncf/foundation/blob/master/code-of-conduct.md
+
+[asl2]: https://www.apache.org/licenses/LICENSE-2.0
 
 [ko]: https://github.com/google/ko
