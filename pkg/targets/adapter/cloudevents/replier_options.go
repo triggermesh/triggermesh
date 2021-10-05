@@ -43,6 +43,21 @@ func ReplierWithMappedResponseType(resTypes map[string]string) ReplierOption {
 	}
 }
 
+// ReplierWithMappedErrorAndSuffixDefaultResponseType uses a map string to look up response type, if
+// no match is found it fallsback to a default Suffix being added to the incoming type.
+func ReplierWithMappedErrorAndSuffixDefaultResponseType(resTypes map[string]string, defaultSuffix string) ReplierOption {
+	return func(c *Replier) error {
+		x := MappedResponseTypeWithDefault(resTypes, defaultSuffix)
+		if x != nil {
+			c.responseType = x
+		} else {
+			c.responseType = SuffixResponseType(defaultSuffix)
+		}
+
+		return nil
+	}
+}
+
 // ReplierWithStaticErrorResponseType option uses a static string for error response type.
 func ReplierWithStaticErrorResponseType(resType string) ReplierOption {
 	return func(c *Replier) error {

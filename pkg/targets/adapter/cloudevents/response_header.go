@@ -37,7 +37,6 @@ func StaticResponse(value string) ResponseHeaderValue {
 }
 
 // MappedResponseType returns an static eventType based on the incoming eventType.
-// When no type is mapped a default value is returned.
 func MappedResponseType(eventTypes map[string]string) ResponseHeaderValue {
 	return func(event *cloudevents.Event) (string, error) {
 		v, ok := eventTypes[event.Type()]
@@ -48,9 +47,34 @@ func MappedResponseType(eventTypes map[string]string) ResponseHeaderValue {
 	}
 }
 
+// MappedResponseTypeWithDefault returns an static eventType based on the incoming eventType.
+// When no type is mapped a default value is returned.
+func MappedResponseTypeWithDefault(eventTypes map[string]string, defaultSuffix string) ResponseHeaderValue {
+	return func(event *cloudevents.Event) (string, error) {
+		v, ok := eventTypes[event.Type()]
+		if ok {
+			return v, nil
+		}
+		return event.Type() + defaultSuffix, nil
+	}
+}
+
 // SuffixResponseType appends a string to the the incoming eventType.
 func SuffixResponseType(suffix string) ResponseHeaderValue {
 	return func(event *cloudevents.Event) (string, error) {
 		return event.Type() + suffix, nil
+	}
+}
+
+// ResponseFallbackOptionsType uses an array of ResponseHeaderValue options to
+// iterate on until one of them returns a type.
+func ResponseFallbackOptionsType(rs []ResponseHeaderValue) ResponseHeaderValue {
+	return func(event *cloudevents.Event) (t string, err error) {
+		for _, r := range rs {
+			if t, err = r(event); err != nil {
+				return t, nil
+			}
+		}
+		return "", err
 	}
 }
