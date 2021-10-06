@@ -54,6 +54,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awscomprehendtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awskinesistarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awslambdatarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awss3target"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awstarget"
@@ -116,12 +117,12 @@ func main() {
 		zendesksource.NewController,
 		// targets
 		alibabaosstarget.NewController,
+		awskinesistarget.NewController,
 		awslambdatarget.NewController,
 		awss3target.NewController,
 		awstarget.NewDynamoDBController,
 		awstarget.NewSNSController,
 		awstarget.NewSQSController,
-		awstarget.NewKinesisController,
 		awscomprehendtarget.NewController,
 		confluenttarget.NewController,
 		elasticsearchtarget.NewController,

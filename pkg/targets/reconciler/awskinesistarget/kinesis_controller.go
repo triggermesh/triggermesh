@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awstarget
+package awskinesistarget
 
 import (
 	"context"
@@ -39,7 +39,7 @@ import (
 
 // NewKinesisController initializes the controller and is called by the generated code
 // Registers event handlers to enqueue events
-func NewKinesisController(
+func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
