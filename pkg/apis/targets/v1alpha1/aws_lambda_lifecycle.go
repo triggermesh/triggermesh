@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
@@ -38,11 +37,6 @@ func (a *AWSLambdaTargetStatus) GetCondition(t apis.ConditionType) *apis.Conditi
 func (a *AWSLambdaTargetStatus) InitializeConditions() {
 	AwsLambdaCondSet.Manage(a).InitializeConditions()
 	a.Address = &duckv1.Addressable{}
-}
-
-// GetGroupVersionKind returns the GroupVersionKind.
-func (a *AWSLambdaTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSLambdaTarget")
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if

@@ -20,7 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
 )
@@ -82,14 +81,4 @@ type AWSLambdaTargetList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []AWSLambdaTarget `json:"items"`
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AWSLambdaTarget) GetConditionSet() apis.ConditionSet {
-	return AwsLambdaCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AWSLambdaTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
 }

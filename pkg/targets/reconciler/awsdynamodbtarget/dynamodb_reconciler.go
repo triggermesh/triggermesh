@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awssqstarget
+package awsdynamodbtarget
 
 import (
 	"context"
@@ -22,12 +22,12 @@ import (
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	awsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/awssqstarget"
+	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/awsdynamodbtarget"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
-// Reconciler reconciles the target adapter object
-type sqsReconciler struct {
+// dynamodbReconciler reconciles the target adapter object
+type dynamodbReconciler struct {
 	ksvcr libreconciler.KServiceReconciler
 	vg    libreconciler.ValueGetter
 
@@ -35,10 +35,10 @@ type sqsReconciler struct {
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilers.Interface = (*sqsReconciler)(nil)
+var _ reconcilers.Interface = (*dynamodbReconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *sqsReconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSSQSTarget) pkgreconciler.Event {
+func (r *dynamodbReconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSDynamoDBTarget) pkgreconciler.Event {
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
 
@@ -58,7 +58,7 @@ func (r *sqsReconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSS
 	}
 	trg.Status.MarkSecrets()
 
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetSQSAdapterKService(trg, r.adapterCfg))
+	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetDynamoDBAdapterKService(trg, r.adapterCfg))
 
 	trg.Status.PropagateKServiceAvailability(adapter)
 

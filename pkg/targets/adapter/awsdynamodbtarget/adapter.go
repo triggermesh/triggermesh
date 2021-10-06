@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awssnstarget
+package awsdynamodbtarget
 
 import (
 	"context"
@@ -26,11 +26,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
 // Adapter implementation
@@ -38,13 +41,21 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	env := envAcc.(*envAccessor)
 	config := env.GetAwsConfig()
 	logger := logging.FromContext(ctx)
+
 	a := MustParseARN(env.AwsTargetArn)
+
 	config = config.WithRegion(a.Region)
 
+	var dynamodbTable string
+	if a.Service == dynamodb.ServiceName {
+		dynamodbTable = MustParseDynamoDBResource(a.Resource)
+	}
+
 	return &awsAdapter{
-		config:       config, // define configuration for the aws client
-		awsArnString: env.AwsTargetArn,
-		awsArn:       a,
+		config:               config, // define configuration for the aws client
+		awsArnString:         env.AwsTargetArn,
+		awsArn:               a,
+		awsDynamoDBTableName: dynamodbTable,
 
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
@@ -55,11 +66,12 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*awsAdapter)(nil)
 
 type awsAdapter struct {
-	awsArnString string
-	awsArn       arn.ARN
-	config       *aws.Config
-	session      *session.Session
-	sns          *sns.SNS
+	awsArnString         string
+	awsArn               arn.ARN
+	awsDynamoDBTableName string
+	config               *aws.Config
+	session              *session.Session
+	dynamoDB             *dynamodb.DynamoDB
 
 	discardCEContext bool
 	ceClient         cloudevents.Client
@@ -67,7 +79,7 @@ type awsAdapter struct {
 }
 
 func (a *awsAdapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting AWS SNS adapter")
+	a.logger.Info("Starting AWS DynamoDB Target adapter")
 	s := session.Must(session.NewSession(a.config))
 	a.session = s
 
@@ -79,36 +91,45 @@ func (a *awsAdapter) Start(ctx context.Context) error {
 
 // Parse and send the aws event
 func (a *awsAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	var msg []byte
+	var eventJSONMap map[string]interface{}
 
 	if a.discardCEContext {
-		msg = event.Data()
-	} else {
-		jsonEvent, err := json.Marshal(event)
-		if err != nil {
-			return a.reportError("Error marshalling CloudEvent", err)
+		if err := event.DataAs(&eventJSONMap); err != nil {
+			return a.reportError("Error deserializing event data to map", err)
 		}
-		msg = jsonEvent
+	} else {
+		b, err := json.Marshal(event)
+		if err != nil {
+			return a.reportError("Error serializing event to JSON", err)
+		}
+		if err := json.Unmarshal(b, &eventJSONMap); err != nil {
+			return a.reportError("Error deserializing JSON event to map", err)
+		}
 	}
 
-	result, err := a.sns.Publish(&sns.PublishInput{
-		Message:  aws.String(string(msg)),
-		TopicArn: &a.awsArnString,
-	})
-
+	av, err := dynamodbattribute.MarshalMap(eventJSONMap)
 	if err != nil {
-		return a.reportError("error publishing to sns", err)
+		return a.reportError("Error marshalling attribute", err)
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: &a.awsDynamoDBTableName,
+	}
+
+	resp, err := a.dynamoDB.PutItem(input)
+	if err != nil {
+		return a.reportError("Error invoking DynamoDB", err)
 	}
 
 	responseEvent := cloudevents.NewEvent(cloudevents.VersionV1)
-	err = responseEvent.SetData(cloudevents.ApplicationJSON, result.GoString())
+	err = responseEvent.SetData(cloudevents.ApplicationJSON, resp)
 	if err != nil {
 		return a.reportError("error generating response event", err)
 	}
 
-	responseEvent.SetType("io.triggermesh.targets.aws.sns.result")
+	responseEvent.SetType(v1alpha1.EventTypeAWSDynamoDBResult)
 	responseEvent.SetSource(a.awsArnString)
-
 	return &responseEvent, cloudevents.ResultACK
 }
 

@@ -54,12 +54,12 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awscomprehendtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awsdynamodbtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awskinesistarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awslambdatarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awss3target"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awssnstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awssqstarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/confluenttarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/datadogtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/elasticsearchtarget"
@@ -119,13 +119,13 @@ func main() {
 		zendesksource.NewController,
 		// targets
 		alibabaosstarget.NewController,
+		awscomprehendtarget.NewController,
+		awsdynamodbtarget.NewController,
 		awskinesistarget.NewController,
 		awslambdatarget.NewController,
+		awss3target.NewController,
 		awssnstarget.NewController,
 		awssqstarget.NewController,
-		awss3target.NewController,
-		awstarget.NewDynamoDBController,
-		awscomprehendtarget.NewController,
 		confluenttarget.NewController,
 		elasticsearchtarget.NewController,
 		googlecloudstoragetarget.NewController,

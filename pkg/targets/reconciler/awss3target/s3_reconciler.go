@@ -62,11 +62,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSS3Ta
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
 
-	if adapter != nil {
-		trg.Status.PropagateKServiceAvailability(adapter)
-	} else {
-		trg.Status.MarkNoKService("ServicePending", event.Error())
-	}
+	trg.Status.PropagateKServiceAvailability(adapter)
 
 	return event
 }

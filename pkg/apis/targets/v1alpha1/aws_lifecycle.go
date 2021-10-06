@@ -61,6 +61,10 @@ func (s *AWSS3Target) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSS3Target")
 }
 
+func (s *AWSLambdaTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSLambdaTarget")
+}
+
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
 // ConditionServiceReady should be marked as true or false.
 func (a *AWSTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
