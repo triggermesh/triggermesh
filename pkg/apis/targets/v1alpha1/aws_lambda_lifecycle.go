@@ -23,50 +23,34 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
-// AwsCondSet is the group of possible conditions
-var AwsCondSet = apis.NewLivingConditionSet(
+// AwsLambdaCondSet is the group of possible conditions
+var AwsLambdaCondSet = apis.NewLivingConditionSet(
 	ConditionServiceReady,
 	ConditionSecretsProvided,
 )
 
 // GetCondition returns the condition currently associated with the given type, or nil.
-func (a *AWSTargetStatus) GetCondition(t apis.ConditionType) *apis.Condition {
-	return AwsCondSet.Manage(a).GetCondition(t)
+func (a *AWSLambdaTargetStatus) GetCondition(t apis.ConditionType) *apis.Condition {
+	return AwsLambdaCondSet.Manage(a).GetCondition(t)
 }
 
 // InitializeConditions sets relevant unset conditions to Unknown state.
-func (a *AWSTargetStatus) InitializeConditions() {
-	AwsCondSet.Manage(a).InitializeConditions()
+func (a *AWSLambdaTargetStatus) InitializeConditions() {
+	AwsLambdaCondSet.Manage(a).InitializeConditions()
 	a.Address = &duckv1.Addressable{}
 }
 
 // GetGroupVersionKind returns the GroupVersionKind.
-func (s *AWSDynamoDBTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSDynamoDBTarget")
-}
-
-func (s *AWSSNSTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSSNSTarget")
-}
-
-func (s *AWSSQSTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSSQSTarget")
-}
-
-func (s *AWSKinesisTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSKinesisTarget")
-}
-
-func (s *AWSS3Target) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSS3Target")
+func (a *AWSLambdaTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSLambdaTarget")
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
 // ConditionServiceReady should be marked as true or false.
-func (a *AWSTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
+func (a *AWSLambdaTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
 	if ksvc != nil && ksvc.IsReady() {
 		a.Address.URL = ksvc.Status.Address.URL
-		AwsCondSet.Manage(a).MarkTrue(ConditionServiceReady)
+		AwsLambdaCondSet.Manage(a).MarkTrue(ConditionServiceReady)
 		return
 	} else if ksvc == nil {
 		a.MarkNoKService(ReasonUnavailable, "Adapter service unknown: ksvc is not available")
@@ -77,21 +61,21 @@ func (a *AWSTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service)
 }
 
 // MarkNoKService sets the condition that the service is not ready
-func (a *AWSTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	AwsCondSet.Manage(a).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
+func (a *AWSLambdaTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
+	AwsLambdaCondSet.Manage(a).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
 }
 
 // IsReady returns true if the resource is ready overall.
-func (a *AWSTargetStatus) IsReady() bool {
-	return AwsCondSet.Manage(a).IsHappy()
+func (a *AWSLambdaTargetStatus) IsReady() bool {
+	return AwsLambdaCondSet.Manage(a).IsHappy()
 }
 
 // MarkSecrets sets the condition that the resource is valid when the associated secrets are provided
-func (a *AWSTargetStatus) MarkSecrets() {
-	AwsCondSet.Manage(a).MarkTrue(ConditionSecretsProvided)
+func (a *AWSLambdaTargetStatus) MarkSecrets() {
+	AwsLambdaCondSet.Manage(a).MarkTrue(ConditionSecretsProvided)
 }
 
 // MarkNoSecrets sets the condition that the resource is not valid  when the associated secrets are missing
-func (a *AWSTargetStatus) MarkNoSecrets(reason, messageFormat string, messageA ...interface{}) {
-	AwsCondSet.Manage(a).MarkFalse(ConditionSecretsProvided, reason, messageFormat, messageA...)
+func (a *AWSLambdaTargetStatus) MarkNoSecrets(reason, messageFormat string, messageA ...interface{}) {
+	AwsLambdaCondSet.Manage(a).MarkFalse(ConditionSecretsProvided, reason, messageFormat, messageA...)
 }

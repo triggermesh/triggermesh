@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awstarget
+package awslambdatarget
 
 import (
 	"context"
@@ -27,7 +27,7 @@ import (
 )
 
 // lambdaReconciler reconciles the target adapter object
-type lambdaReconciler struct {
+type reconciler struct {
 	ksvcr libreconciler.KServiceReconciler
 	vg    libreconciler.ValueGetter
 
@@ -35,10 +35,10 @@ type lambdaReconciler struct {
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilers.Interface = (*lambdaReconciler)(nil)
+var _ reconcilers.Interface = (*reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *lambdaReconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSLambdaTarget) pkgreconciler.Event {
+func (r *reconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSLambdaTarget) pkgreconciler.Event {
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
 
@@ -60,11 +60,7 @@ func (r *lambdaReconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.A
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetLambdaAdapterKService(trg, r.adapterCfg))
 
-	if adapter != nil {
-		trg.Status.PropagateKServiceAvailability(adapter)
-	} else {
-		trg.Status.MarkNoKService("ServicePending", event.Error())
-	}
+	trg.Status.PropagateKServiceAvailability(adapter)
 
 	return event
 }

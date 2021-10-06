@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awstarget
+package awslambdatarget
 
 import (
 	"context"
@@ -36,9 +36,9 @@ import (
 	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 )
 
-// NewLambdaController initializes the controller and is called by the generated code
+// NewController initializes the controller and is called by the generated code
 // Registers event handlers to enqueue events
-func NewLambdaController(
+func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
@@ -51,7 +51,7 @@ func NewLambdaController(
 
 	serviceInformer := kserviceinformer.Get(ctx)
 
-	impl := awslambdatarget.NewImpl(ctx, &lambdaReconciler{
+	impl := awslambdatarget.NewImpl(ctx, &reconciler{
 		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
 		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
