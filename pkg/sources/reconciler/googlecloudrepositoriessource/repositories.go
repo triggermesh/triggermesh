@@ -66,14 +66,14 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicR
 		return controller.NewPermanentError(failCreatingRepositories(repoName, err))
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
-			"Repo does not exists: "+toErrMsg(err))
+			"Repo not found: "+toErrMsg(err))
 		return controller.NewPermanentError(failCreatingRepositories(repoName, err))
 	case err != nil:
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-			"Cannot create repo notification %q: %s", repoName, toErrMsg(err))
+			"Failed to create notification for repo %q: %s", repoName, toErrMsg(err))
 	}
 
-	event.Normal(ctx, ReasonSubscribed, "Created Repo notification %q", repoName)
+	event.Normal(ctx, ReasonSubscribed, "Created notification for Repo %q", repoName)
 	status.MarkSubscribed()
 
 	return err
@@ -110,14 +110,14 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcere
 		return nil
 	case isNotFound(err):
 		event.Warn(ctx, ReasonUnsubscribed,
-			fmt.Sprintf("Repo %q not found, skipping deletion: ", repoName))
+			fmt.Sprintf("Repo %q not found, skipping deletion", repoName))
 		return nil
 	case err != nil:
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
 			"Cannot delete Repo notification %q: %s", repoName, toErrMsg(err))
 	}
 
-	event.Normal(ctx, ReasonUnsubscribed, "Deleted Repo notification %q", repoName)
+	event.Normal(ctx, ReasonUnsubscribed, "Deleted notification for Repo %q", repoName)
 
 	return err
 }
