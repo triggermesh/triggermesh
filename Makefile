@@ -36,6 +36,9 @@ IMAGE_SHA         ?= $(shell git rev-parse HEAD)
 # Rely on ko for dev style deployment
 KO                ?= ko
 
+KUBECTL           ?= kubectl
+SED               ?= sed
+
 # Go build variables
 GO                ?= go
 GOFMT             ?= gofmt
@@ -95,6 +98,9 @@ release: ## Build release binaries
 			GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin ; \
 		done ; \
 	done
+
+	$(KUBECTL) create -f config --dry-run=client -o yaml | \
+	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh.yaml
 
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
