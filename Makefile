@@ -92,9 +92,9 @@ release: ## Build release binaries
 			[ $${bin} == "confluent-target-adapter" ] && CGO_ENABLED=1 ; \
 			[ $${GOOS} = "windows" ] && RELEASE_BINARY=$${RELEASE_BINARY}.exe ; \
 			echo "GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin" ; \
+			GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin ; \
 		done ; \
 	done
-# 			GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin ; \
 
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
