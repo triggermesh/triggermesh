@@ -57,6 +57,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awskinesistarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awslambdatarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awss3target"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awssnstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/confluenttarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/datadogtarget"
@@ -119,9 +120,9 @@ func main() {
 		alibabaosstarget.NewController,
 		awskinesistarget.NewController,
 		awslambdatarget.NewController,
+		awssnstarget.NewController,
 		awss3target.NewController,
 		awstarget.NewDynamoDBController,
-		awstarget.NewSNSController,
 		awstarget.NewSQSController,
 		awscomprehendtarget.NewController,
 		confluenttarget.NewController,
