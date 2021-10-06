@@ -49,7 +49,7 @@ LDFLAGS            = -extldflags=-static -w -s
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
-.PHONY: help mod-download build install release test coverage lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lintall deploy undeploy 
+.PHONY: help build install release test lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
 
 all: codegen build test lint
 
@@ -69,7 +69,10 @@ help: ## Display this help
 
 build: $(COMMANDS)  ## Build all artifacts
 
-$(COMMANDS): ## Build artifct
+$(filter-out confluent-target-adapter, $(COMMANDS)): ## Build artifact
+	$(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
+
+confluent-target-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
@@ -85,11 +88,13 @@ release: ## Build release binaries
 			GOOS=$${platform%/*} ; \
 			GOARCH=$${platform#*/} ; \
 			RELEASE_BINARY=$$bin-$${GOOS}-$${GOARCH} ; \
+			CGO_ENABLED= ; \
+			[ $${bin} == "confluent-target-adapter" ] && CGO_ENABLED=1 ; \
 			[ $${GOOS} = "windows" ] && RELEASE_BINARY=$${RELEASE_BINARY}.exe ; \
-			echo "GOOS=$${GOOS} GOARCH=$${GOARCH} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY}" ./cmd/$$bin ; \
-			GOOS=$${GOOS} GOARCH=$${GOARCH} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin ; \
+			echo "GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin" ; \
 		done ; \
 	done
+# 			GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin ; \
 
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
