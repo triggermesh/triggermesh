@@ -84,7 +84,7 @@ undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster using ko
 	$(KO) delete -f $(BASE_DIR)/config
 
 release-yaml: ## Generate triggermesh.yaml
-	$(KUBECTL) create -f config --dry-run=client -o yaml | \
+	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml | \
 	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh.yaml
 
 test: install-gotestsum ## Run unit tests
