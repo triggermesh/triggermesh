@@ -49,7 +49,56 @@ jobs:
       - gcp-cli/initialize
       - run:
           name: Publishing docker image
-          command: IMAGE_SHA=${CIRCLE_SHA1} IMAGE_TAG=${CIRCLE_TAG:-latest} make -j8 cloudbuild
+          command: IMAGE_SHA=${CIRCLE_SHA1} IMAGE_TAG=${CIRCLE_TAG:-latest} make -j6 cloudbuild
+
+  deploy:
+    description: Patches target cluster configuration
+    executor:
+      name: go/default
+      tag: '1.17'
+    parameters:
+      cluster:
+        type: string
+      committer_name:
+        type: string
+        default: TriggerMesh Bot
+      committer_email:
+        type: string
+        default: bot@triggermesh.com
+    steps:
+      - attach_workspace:
+          at: ~/
+      - add_ssh_keys
+      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run:
+          name: Configuring git
+          command: |
+            git config --global user.name '<< parameters.committer_name >>'
+            git config --global user.email '<< parameters.committer_email >>'
+      - run:
+          name: Cloning config repository
+          command: git clone --single-branch git@github.com:triggermesh/config.git tmconfig
+      - run:
+          name: Updating overlays/<< parameters.cluster >>/triggermesh-core manifests
+          working_directory: tmconfig/
+          command: |
+            IMAGE_REPO=$(sed -n -e 's/^IMAGE_REPO[[:space:]].*=[[:space:]]*\(.*\)$/\1/p' ~/project/Makefile)
+            for cmd in $(sed -n -e 's/^COMMANDS[[:space:]]*=[[:space:]]*\(.*\)$/\1/p' ~/project/Makefile); do
+              sed -i overlays/<< parameters.cluster >>/triggermesh-core/deployments.yaml \
+                -e "s|gcr.io/triggermesh\(-private\)\?/${cmd}:.*|${IMAGE_REPO}/${cmd}:${CIRCLE_TAG:-${CIRCLE_SHA1}}|g"
+            done
+
+            sed -i overlays/<< parameters.cluster >>/triggermesh-core/kustomization.yaml \
+              -e "s|github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}\(?ref=.*\)\?|github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}?ref=${CIRCLE_TAG:-${CIRCLE_SHA1}}|g"
+
+            git --no-pager diff
+      - run:
+          name: Committing overlays/<< parameters.cluster >>/triggermesh-core updates
+          working_directory: tmconfig/
+          command: |
+            git add overlays
+            git commit -m "Update overlays/<< parameters.cluster >>/triggermesh-core aws deployments to '${CIRCLE_TAG:-${CIRCLE_SHA1}}'"
+            git push origin main
 
   release:
     executor:
@@ -100,6 +149,26 @@ workflows:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
             branches:
               only: main
+      - deploy:
+          name: update-staging-config
+          cluster: staging
+          requires:
+            - publish-image
+          filters:
+            branches:
+              only: main
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      # - deploy:
+      #     name: update-production-config
+      #     cluster: prod
+      #     requires:
+      #       - update-staging-config
+      #     filters:
+      #       tags:
+      #         only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #       branches:
+      #         ignore: /.*/
       - release:
           context: production
           requires:
