@@ -214,8 +214,8 @@ func belongsToTopic(ctx context.Context, cli *pubsub.Client, subsID, topicID str
 }
 
 // makeSubscriptionResourceName returns a Pub/Sub resource name for the given subscription.
-func makeSubscriptionResourceName(proj, subsID string) *v1alpha1.GCloudPubSubResourceName {
-	return &v1alpha1.GCloudPubSubResourceName{
+func makeSubscriptionResourceName(proj, subsID string) *v1alpha1.GCloudResourceName {
+	return &v1alpha1.GCloudResourceName{
 		Project:    proj,
 		Collection: pubsubCollectionSubs,
 		Resource:   subsID,

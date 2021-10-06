@@ -47,7 +47,7 @@ const (
 
 // ensurePubSub ensures the existence of a Pub/Sub topic and associated
 // subscription for receiving notifications from a Cloud Billing budget.
-func ensurePubSub(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudPubSubResourceName /*topic*/, error) {
+func ensurePubSub(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudResourceName /*topic*/, error) {
 	if skip.Skip(ctx) {
 		return nil, nil
 	}
@@ -87,7 +87,7 @@ func ensureNoPubSub(ctx context.Context, cli *pubsub.Client) error {
 // Required permissions:
 // - pubsub.topic.get
 // - pubsub.topics.create
-func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudPubSubResourceName, error) {
+func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudResourceName, error) {
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
@@ -170,7 +170,7 @@ func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GClou
 		event.Normal(ctx, ReasonSubscribed, "Created topic %q", topic)
 	}
 
-	topicResName := &v1alpha1.GCloudPubSubResourceName{}
+	topicResName := &v1alpha1.GCloudResourceName{}
 	if err := json.Unmarshal([]byte(strconv.Quote(topic.String())), topicResName); err != nil {
 		return nil, fmt.Errorf("failed to deserialize topic name: %w", err)
 	}
@@ -249,7 +249,7 @@ func ensureNoPubSubTopic(ctx context.Context, cli *pubsub.Client) error {
 // Required permissions:
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.create
-func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResName *v1alpha1.GCloudPubSubResourceName) error {
+func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
@@ -372,8 +372,8 @@ func ensureNoPubSubSubscription(ctx context.Context, cli *pubsub.Client) error {
 }
 
 // makeSubscriptionResourceName returns a Pub/Sub resource name for the given subscription.
-func makeSubscriptionResourceName(proj, subsID string) *v1alpha1.GCloudPubSubResourceName {
-	return &v1alpha1.GCloudPubSubResourceName{
+func makeSubscriptionResourceName(proj, subsID string) *v1alpha1.GCloudResourceName {
+	return &v1alpha1.GCloudResourceName{
 		Project:    proj,
 		Collection: pubsubCollectionSubs,
 		Resource:   subsID,

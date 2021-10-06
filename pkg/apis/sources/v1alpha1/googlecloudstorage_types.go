@@ -81,7 +81,7 @@ type GoogleCloudStorageSourcePubSubSpec struct {
 	//   "projects/{project_name}/topics/{topic_name}"
 	//
 	// +optional
-	Topic *GCloudPubSubResourceName `json:"topic,omitempty"`
+	Topic *GCloudResourceName `json:"topic,omitempty"`
 
 	// Name of the GCP project where Pub/Sub resources associated with the
 	// Cloud Storage bucket are to be created.
@@ -101,10 +101,10 @@ type GoogleCloudStorageSourceStatus struct {
 	NotificationID *string `json:"notificationID,omitempty"`
 
 	// Resource name of the target Pub/Sub topic.
-	Topic *GCloudPubSubResourceName `json:"topic,omitempty"`
+	Topic *GCloudResourceName `json:"topic,omitempty"`
 	// Resource name of the managed Pub/Sub subscription associated with
 	// the managed topic.
-	Subscription *GCloudPubSubResourceName `json:"subscription,omitempty"`
+	Subscription *GCloudResourceName `json:"subscription,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
