@@ -18,6 +18,7 @@ package googlecloudrepositoriessource
 
 import (
 	"context"
+	"fmt"
 
 	gsourcerepo "google.golang.org/api/sourcerepo/v1"
 
@@ -71,7 +72,9 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicR
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
 			"Cannot create repo notification %q: %s", repoName, toErrMsg(err))
 	}
+
 	event.Normal(ctx, ReasonSubscribed, "Created Repo notification %q", repoName)
+	status.MarkSubscribed()
 
 	return err
 }
@@ -85,7 +88,6 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcere
 	}
 
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudRepositoriesSource)
-	status := &src.Status
 
 	repoName := src.Spec.Repository.String()
 
@@ -101,18 +103,21 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcere
 	_, err := patchRepo.Do()
 	switch {
 	case isDenied(err):
-		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
-			"Access denied to Cloud Source Repositories API: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingRepositories(repoName, err))
+		// it is unlikely that we recover from auth errors in the
+		// finalizer, so we simply record a warning event and return
+		event.Warn(ctx, ReasonFailedUnsubscribe,
+			"Access denied to Cloud Source Repositories API. Ignoring: %s", toErrMsg(err))
+		return nil
 	case isNotFound(err):
-		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
-			"Repo does not exist: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingRepositories(repoName, err))
+		event.Warn(ctx, ReasonUnsubscribed,
+			fmt.Sprintf("Repo %q not found, skipping deletion: ", repoName))
+		return nil
 	case err != nil:
-		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
+		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
 			"Cannot delete Repo notification %q: %s", repoName, toErrMsg(err))
 	}
-	event.Normal(ctx, ReasonSubscribed, "Deleted Repo notification %q", repoName)
+
+	event.Normal(ctx, ReasonUnsubscribed, "Deleted Repo notification %q", repoName)
 
 	return err
 }
