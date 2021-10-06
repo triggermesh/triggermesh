@@ -25,13 +25,12 @@ if [ $? -ne 0 ]; then
 fi
 
 IMAGE_REPO=$(sed -n -e 's/^IMAGE_REPO[[:space:]].*=[[:space:]]*\(.*\)$/\1/p' Makefile)
-COMMANDS=$(ls cmd)
 PLATFORMS=$(sed -n -e "s/^\(TARGETS[[:space:]]*?=[[:space:]]*\)\(.*\)$/\2/p" Makefile)
 RELEASE_ASSETS_TABLE=$(
   echo -n "| component | container |"; echo
   echo -n "| -- | -- |"; echo
-  for command in ${COMMANDS}; do
-    echo -n "| ${command} | [${IMAGE_REPO}/${command}:${RELEASE}](https://${IMAGE_REPO}/${command}:${RELEASE})"
+  for cmd in cmd/*; do
+    echo -n "| ${cmd##*/} | [${IMAGE_REPO}/${cmd##*/}:${RELEASE}](https://${IMAGE_REPO}/${cmd##*/}:${RELEASE})"
     echo -n " |"; echo
   done
   echo
