@@ -20,7 +20,6 @@ OUTPUT_DIR        ?= $(BASE_DIR)/_output
 
 # Dynamically generate the list of commands based on the directory name cited in the cmd directory
 COMMANDS          := $(notdir $(wildcard cmd/*))
-TARGETS           ?= linux/amd64
 
 BIN_OUTPUT_DIR    ?= $(OUTPUT_DIR)
 TEST_OUTPUT_DIR   ?= $(OUTPUT_DIR)
@@ -36,6 +35,9 @@ IMAGE_SHA         ?= $(shell git rev-parse HEAD)
 # Rely on ko for dev style deployment
 KO                ?= ko
 
+KUBECTL           ?= kubectl
+SED               ?= sed
+
 # Go build variables
 GO                ?= go
 GOFMT             ?= gofmt
@@ -49,7 +51,7 @@ LDFLAGS            = -extldflags=-static -w -s
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
-.PHONY: help build install release test lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
+.PHONY: help build install release-yaml test lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
 
 all: codegen build test lint
 
@@ -81,20 +83,9 @@ deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
 undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster using ko
 	$(KO) delete -f $(BASE_DIR)/config
 
-release: ## Build release binaries
-	@set -e ; \
-	for bin in $(COMMANDS) ; do \
-		for platform in $(TARGETS); do \
-			GOOS=$${platform%/*} ; \
-			GOARCH=$${platform#*/} ; \
-			RELEASE_BINARY=$$bin-$${GOOS}-$${GOARCH} ; \
-			CGO_ENABLED= ; \
-			[ $${bin} == "confluent-target-adapter" ] && CGO_ENABLED=1 ; \
-			[ $${GOOS} = "windows" ] && RELEASE_BINARY=$${RELEASE_BINARY}.exe ; \
-			echo "GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin" ; \
-			GOOS=$${GOOS} GOARCH=$${GOARCH} $${CGO_ENABLED:+CGO_ENABLED=$${CGO_ENABLED}} $(GO) build -ldflags "$(LDFLAGS)" -o $(DIST_DIR)/$${RELEASE_BINARY} ./cmd/$$bin ; \
-		done ; \
-	done
+release-yaml: ## Generate triggermesh.yaml
+	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml | \
+	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh.yaml
 
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
@@ -133,13 +124,6 @@ $(CLOUDBUILD): %.cloudbuild:
 
 clean: ## Clean build artifacts
 	@for bin in $(COMMANDS) ; do \
-		for platform in $(TARGETS); do \
-			GOOS=$${platform%/*} ; \
-			GOARCH=$${platform#*/} ; \
-			RELEASE_BINARY=$$bin-$${GOOS}-$${GOARCH} ; \
-			[ $${GOOS} = "windows" ] && RELEASE_BINARY=$${RELEASE_BINARY}.exe ; \
-			$(RM) -v $(DIST_DIR)/$${RELEASE_BINARY}; \
-		done ; \
 		$(RM) -v $(BIN_OUTPUT_DIR)/$$bin; \
 	done
 	@$(RM) -v $(TEST_OUTPUT_DIR)/$(KREPO)-c.out $(TEST_OUTPUT_DIR)/$(KREPO)-unit-tests.xml

@@ -113,7 +113,7 @@ jobs:
           install-kubectl: true
       - run:
           name: Building release packages
-          command: IMAGE_TAG=${CIRCLE_TAG:-latest} make release
+          command: IMAGE_TAG=${CIRCLE_TAG:-latest} make release-yaml
           environment:
             DIST_DIR: /tmp/dist/
       - run:

@@ -28,13 +28,10 @@ IMAGE_REPO=$(sed -n -e 's/^IMAGE_REPO[[:space:]].*=[[:space:]]*\(.*\)$/\1/p' Mak
 COMMANDS=$(ls cmd)
 PLATFORMS=$(sed -n -e "s/^\(TARGETS[[:space:]]*?=[[:space:]]*\)\(.*\)$/\2/p" Makefile)
 RELEASE_ASSETS_TABLE=$(
-  echo -n "| component | artifacts |"; echo
+  echo -n "| component | container |"; echo
   echo -n "| -- | -- |"; echo
   for command in ${COMMANDS}; do
-    echo -n "| ${command} | ([container](https://${IMAGE_REPO}/${command}:${RELEASE}))"
-    for platform in ${PLATFORMS}; do
-      echo -n " ([${platform}](${BASE_URL}/${command}-${platform%/*}-${platform#*/}))"
-    done
+    echo -n "| ${command} | [${IMAGE_REPO}/${command}:${RELEASE}](https://${IMAGE_REPO}/${command}:${RELEASE})"
     echo -n " |"; echo
   done
   echo
