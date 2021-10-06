@@ -42,7 +42,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"LOGZTARGET_IMAGE" default:"gcr.io/triggermesh/logz-target-adapter"`
+	Image string `envconfig:"LOGZTARGET_IMAGE" default:"gcr.io/triggermesh/logztarget-adapter"`
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.

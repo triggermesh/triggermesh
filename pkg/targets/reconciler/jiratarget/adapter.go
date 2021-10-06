@@ -42,7 +42,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 	// Container image
-	Image string `default:"gcr.io/triggermesh/jira-target-adapter"`
+	Image string `default:"gcr.io/triggermesh/jiratarget-adapter"`
 }
 
 // makeAdapterKnService returns a Knative Service object for the target's adapter.

@@ -41,7 +41,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `default:"gcr.io/triggermesh/datadog-target-adapter"`
+	Image string `default:"gcr.io/triggermesh/datadogtarget-adapter"`
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.

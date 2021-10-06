@@ -35,7 +35,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"SENDGRID_ADAPTER_IMAGE" default:"gcr.io/triggermesh/sendgrid-target-adapter"`
+	Image string `envconfig:"SENDGRID_ADAPTER_IMAGE" default:"gcr.io/triggermesh/sendgridtarget-adapter"`
 }
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.

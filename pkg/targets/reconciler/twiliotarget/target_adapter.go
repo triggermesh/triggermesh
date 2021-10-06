@@ -44,7 +44,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"TWILIO_ADAPTER_IMAGE" default:"gcr.io/triggermesh/twilio-target-adapter"`
+	Image string `envconfig:"TWILIO_ADAPTER_IMAGE" default:"gcr.io/triggermesh/twiliotarget-adapter"`
 }
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.
