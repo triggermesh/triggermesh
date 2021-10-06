@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awstarget
+package awss3target
 
 import (
 	"context"
@@ -39,7 +39,7 @@ import (
 
 // NewS3Controller initializes the controller and is called by the generated code
 // Registers event handlers to enqueue events
-func NewS3Controller(
+func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
@@ -52,7 +52,7 @@ func NewS3Controller(
 
 	serviceInformer := kserviceinformer.Get(ctx)
 
-	impl := awss3target.NewImpl(ctx, &s3Reconciler{
+	impl := awss3target.NewImpl(ctx, &Reconciler{
 		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
 		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,

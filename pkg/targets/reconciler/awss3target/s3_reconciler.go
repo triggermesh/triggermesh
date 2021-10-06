@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awstarget
+package awss3target
 
 import (
 	"context"
@@ -27,7 +27,7 @@ import (
 )
 
 // Reconciler reconciles the target adapter object
-type s3Reconciler struct {
+type Reconciler struct {
 	ksvcr libreconciler.KServiceReconciler
 	vg    libreconciler.ValueGetter
 
@@ -35,10 +35,10 @@ type s3Reconciler struct {
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilers.Interface = (*s3Reconciler)(nil)
+var _ reconcilers.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *s3Reconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSS3Target) pkgreconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSS3Target) pkgreconciler.Event {
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
@@ -60,7 +60,7 @@ func (r *s3Reconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSS3
 	}
 	trg.Status.MarkSecrets()
 
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetS3AdapterKService(trg, r.adapterCfg))
+	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
 
 	if adapter != nil {
 		trg.Status.PropagateKServiceAvailability(adapter)

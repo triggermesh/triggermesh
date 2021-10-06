@@ -102,12 +102,14 @@ spec:
         # Target adapters
         - name: ALIBABAOSS_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/alibabaoss-target-adapter
-        - name: AWS_LAMBDA_ADAPTER_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/awslambda-target-adapter
-        - name: AWS_ADAPTER_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/aws-target-adapter
         - name: AWS_COMPREHEND_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehend-target-adapter
+        - name: AWS_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/aws-target-adapter
+        - name: AWS_LAMBDA_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awslambda-target-adapter
+        - name: AWS_S3_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awss3-target-adapter
         - name: CONFLUENT_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/confluent-target-adapter
         - name: DATADOGTARGET_IMAGE
