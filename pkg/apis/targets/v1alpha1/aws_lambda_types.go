@@ -20,6 +20,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
 )
@@ -37,7 +38,7 @@ type AWSLambdaTarget struct {
 	Spec AWSLambdaTargetSpec `json:"spec"`
 
 	// Status communicates the observed state of the AWSLambdaTarget (from the controller).
-	Status AWSLambdaTargetStatus `json:"status,omitempty"`
+	Status AWSTargetStatus `json:"status,omitempty"`
 }
 
 // Check the interfaces AWSLambdaTarget should be implementing.
@@ -64,15 +65,6 @@ type AWSLambdaTargetSpec struct {
 	DiscardCEContext bool `json:"discardCloudEventContext"`
 }
 
-// AWSLambdaTargetStatus communicates the observed state of the GoogleCloudWorkflowsTarget (from the controller).
-type AWSLambdaTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
-}
-
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // AWSLambdaTargetList is a list of AWSLambdaTarget resources
@@ -81,4 +73,14 @@ type AWSLambdaTargetList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []AWSLambdaTarget `json:"items"`
+}
+
+// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
+func (s *AWSLambdaTarget) GetConditionSet() apis.ConditionSet {
+	return AwsCondSet
+}
+
+// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
+func (s *AWSLambdaTarget) GetStatus() *duckv1.Status {
+	return &s.Status.Status
 }

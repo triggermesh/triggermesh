@@ -45,6 +45,11 @@ func (s *AWSDynamoDBTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSDynamoDBTarget")
 }
 
+// GetGroupVersionKind returns the GroupVersionKind.
+func (s *AWSLambdaTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSLambdaTarget")
+}
+
 func (s *AWSSNSTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSSNSTarget")
 }
@@ -59,10 +64,6 @@ func (s *AWSKinesisTarget) GetGroupVersionKind() schema.GroupVersionKind {
 
 func (s *AWSS3Target) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSS3Target")
-}
-
-func (s *AWSLambdaTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSLambdaTarget")
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
