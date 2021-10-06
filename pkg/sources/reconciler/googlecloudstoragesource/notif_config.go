@@ -40,7 +40,7 @@ import (
 // - storage.buckets.get
 // - storage.buckets.update
 func ensureNotificationConfig(ctx context.Context, cli *storage.Client,
-	topicResName *v1alpha1.GCloudPubSubResourceName) error {
+	topicResName *v1alpha1.GCloudResourceName) error {
 
 	if skip.Skip(ctx) {
 		return nil

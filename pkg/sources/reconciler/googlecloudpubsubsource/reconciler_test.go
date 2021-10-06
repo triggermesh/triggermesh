@@ -69,7 +69,7 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newEventSource() *v1alpha1.GoogleCloudPubSubSource {
 	src := &v1alpha1.GoogleCloudPubSubSource{
 		Spec: v1alpha1.GoogleCloudPubSubSourceSpec{
-			Topic: v1alpha1.GCloudPubSubResourceName{
+			Topic: v1alpha1.GCloudResourceName{
 				Project:    "my-project",
 				Collection: pubsubCollectionTopics,
 				Resource:   "my-topic",
