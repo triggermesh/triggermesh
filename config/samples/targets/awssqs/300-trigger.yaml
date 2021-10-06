@@ -12,17 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: targets.triggermesh.io/v1alpha1
-kind: AWSSNSTarget
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
 metadata:
-  name: triggermesh-aws-sns
+  name: aws-sample-sqs-trigger
 spec:
-  arn: arn:aws:sns:us-west-2:<PROJECT_ID>:tmtest
-  awsApiKey:
-    secretKeyRef:
-      name: aws
-      key: AWS_ACCESS_KEY_ID
-  awsApiSecret:
-    secretKeyRef:
-      name: aws
-      key: AWS_SECRET_ACCESS_KEY
+  broker: default
+  subscriber:
+    ref:
+      apiVersion: targets.triggermesh.io/v1alpha1
+      kind: AWSSQSTarget
+      name: triggermesh-aqs-sns
