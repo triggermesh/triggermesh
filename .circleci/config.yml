@@ -50,6 +50,7 @@ jobs:
       - run:
           name: Publishing docker image
           command: IMAGE_SHA=${CIRCLE_SHA1} IMAGE_TAG=${CIRCLE_TAG:-latest} make -j6 cloudbuild
+          no_output_timeout: 30m
 
   deploy:
     description: Patches target cluster configuration
