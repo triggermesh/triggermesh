@@ -26,7 +26,7 @@ RUN go mod download
 # NOTE: try not to modify the instructions above to keep cached layers for all targets
 
 COPY ./ .
-RUN BIN_OUTPUT_DIR=/bin make awslambda-target-adapter && \
+RUN BIN_OUTPUT_DIR=/bin make awssnstarget-adapter && \
     mkdir /kodata && \
     mv .git/* /kodata/ && \
     rm -rf ${GOPATH} && \
@@ -34,17 +34,17 @@ RUN BIN_OUTPUT_DIR=/bin make awslambda-target-adapter && \
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-LABEL name "TriggerMesh Event Target Adapter for AWS Lambda"
+LABEL name "TriggerMesh Event Target Adapter for AWS SNS"
 LABEL vendor "TriggerMesh"
 LABEL version "v0.1.0"
 LABEL release "1"
-LABEL summary "The TriggerMesh Event Target Adapter for AWS Lambda"
-LABEL description "This is the TriggerMesh Knative Event Target Adapter for AWS Lambda"
+LABEL summary "The TriggerMesh Event Target Adapter for AWS SNS"
+LABEL description "This is the TriggerMesh Knative Event Target Adapter for AWS SNS"
 
 ENV KO_DATA_PATH /kodata
 
 COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
-COPY --from=builder /bin/awslambda-target-adapter /awslambda-target-adapter
+COPY --from=builder /bin/awssnstarget-adapter /awssnstarget-adapter
 
-ENTRYPOINT ["/awslambda-target-adapter"]
+ENTRYPOINT ["/awssnstarget-adapter"]

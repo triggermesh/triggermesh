@@ -26,7 +26,7 @@ RUN go mod download
 # NOTE: try not to modify the instructions above to keep cached layers for all targets
 
 COPY ./ .
-RUN BIN_OUTPUT_DIR=/bin make awss3-target-adapter && \
+RUN BIN_OUTPUT_DIR=/bin make awsdynamodbtarget-adapter && \
     mkdir /kodata && \
     mv .git/* /kodata/ && \
     rm -rf ${GOPATH} && \
@@ -34,17 +34,17 @@ RUN BIN_OUTPUT_DIR=/bin make awss3-target-adapter && \
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
-LABEL name "TriggerMesh Event Target Adapter for AWS S3"
+LABEL name "TriggerMesh Event Target Adapter for AWS DynamoDB"
 LABEL vendor "TriggerMesh"
 LABEL version "v0.1.0"
 LABEL release "1"
-LABEL summary "The TriggerMesh Event Target Adapter for AWS S3"
-LABEL description "This is the TriggerMesh Knative Event Target Adapter for AWS S3"
+LABEL summary "The TriggerMesh Event Target Adapter for AWS DynamoDB"
+LABEL description "This is the TriggerMesh Knative Event Target Adapter for AWS DynamoDB"
 
 ENV KO_DATA_PATH /kodata
 
 COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
-COPY --from=builder /bin/awss3-target-adapter /awss3-target-adapter
+COPY --from=builder /bin/awsdynamodbtarget-adapter /awsdynamodbtarget-adapter
 
-ENTRYPOINT ["/awss3-target-adapter"]
+ENTRYPOINT ["/awsdynamodbtarget-adapter"]
