@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"strings"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -32,6 +34,12 @@ func (*SplunkTarget) GetEventTypes() []string {
 	return []string{
 		EventTypeSplunkResponse,
 	}
+}
+
+// AsEventSource implements targets.EventSource.
+func (s *SplunkTarget) AsEventSource() string {
+	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
 }
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.

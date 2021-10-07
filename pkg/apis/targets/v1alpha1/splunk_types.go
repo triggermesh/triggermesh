@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -40,9 +41,10 @@ type SplunkTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*SplunkTarget)(nil)
-	_ kmeta.OwnerRefable = (*SplunkTarget)(nil)
-	_ duckv1.KRShaped    = (*SplunkTarget)(nil)
+	_ runtime.Object      = (*SplunkTarget)(nil)
+	_ kmeta.OwnerRefable  = (*SplunkTarget)(nil)
+	_ duckv1.KRShaped     = (*SplunkTarget)(nil)
+	_ targets.EventSource = (*SplunkTarget)(nil)
 )
 
 // SplunkTargetSpec defines the desired state of the event target.
