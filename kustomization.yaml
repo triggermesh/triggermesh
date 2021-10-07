@@ -1,0 +1,86 @@
+# Copyright 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+resources:
+- config/200-clusterrole-webhook.yaml
+- config/200-clusterroles.yaml
+- config/201-serviceaccounts.yaml
+- config/202-clusterrolebinding-webhook.yaml
+- config/202-clusterrolebindings.yaml
+- config/300-awscloudwatchlogssource.yaml
+- config/300-awscloudwatchsource.yaml
+- config/300-awscodecommitsource.yaml
+- config/300-awscognitoidentitysource.yaml
+- config/300-awscognitouserpoolsource.yaml
+- config/300-awsdynamodbsource.yaml
+- config/300-awskinesissource.yaml
+- config/300-awsperformanceinsightssource.yaml
+- config/300-awss3source.yaml
+- config/300-awssnssource.yaml
+- config/300-awssqssource.yaml
+- config/300-azureactivitylogssource.yaml
+- config/300-azureblobstoragesource.yaml
+- config/300-azureeventgridsource.yaml
+- config/300-azureeventhubsource.yaml
+- config/300-azureiothubsource.yaml
+- config/300-azurequeuestoragesource.yaml
+- config/300-azureservicebusqueuesource.yaml
+- config/300-googlecloudauditlogssource.yaml
+- config/300-googlecloudbillingsource.yaml
+- config/300-googlecloudpubsubsource.yaml
+- config/300-googlecloudrepositoriessource.yaml
+- config/300-googlecloudstoragesource.yaml
+- config/300-httppollersource.yaml
+- config/300-ocimetricssource.yaml
+- config/300-salesforcesource.yaml
+- config/300-slacksource.yaml
+- config/300-twiliosource.yaml
+- config/300-webhooksource.yaml
+- config/300-zendesksource.yaml
+- config/301-alibabaosstarget.yaml
+- config/301-awscomprehendtarget.yaml
+- config/301-awsdynamodbtarget.yaml
+- config/301-awskinesistarget.yaml
+- config/301-awslambdatarget.yaml
+- config/301-awss3target.yaml
+- config/301-awssnstarget.yaml
+- config/301-awssqstarget.yaml
+- config/301-confluenttarget.yaml
+- config/301-datadogtarget.yaml
+- config/301-elasticsearchtarget.yaml
+- config/301-googlecloudstoragetarget.yaml
+- config/301-googlecloudworkflowstarget.yaml
+- config/301-googlefirestoretarget.yaml
+- config/301-googlesheettarget.yaml
+- config/301-hasuratarget.yaml
+- config/301-httptarget.yaml
+- config/301-infratarget.yaml
+- config/301-jiratarget.yaml
+- config/301-logztarget.yaml
+- config/301-oracletarget.yaml
+- config/301-salesforcetarget.yaml
+- config/301-sendgridtarget.yaml
+- config/301-slacktarget.yaml
+- config/301-splunktarget.yaml
+- config/301-tektontarget.yaml
+- config/301-twiliotarget.yaml
+- config/301-uipathtarget.yaml
+- config/301-zendesktarget.yaml
+- config/302-filter.yaml
+- config/302-splitter.yaml
+- config/303-function.yaml
+- config/304-transformation.yaml
+- config/500-controller.yaml
+- config/500-webhook-configuration.yaml
+- config/500-webhook.yaml

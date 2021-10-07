@@ -30,7 +30,7 @@ import (
 
 // reconciler reconciles the target adapter object
 type reconciler struct {
-	TargetAdapterImage string `envconfig:"SLACK_ADAPTER_IMAGE" default:"gcr.io/triggermesh/slack-target-adapter"`
+	TargetAdapterImage string `envconfig:"SLACK_ADAPTER_IMAGE" default:"gcr.io/triggermesh/slacktarget-adapter"`
 
 	ksvcr libreconciler.KServiceReconciler
 

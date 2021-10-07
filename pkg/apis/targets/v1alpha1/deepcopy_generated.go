@@ -3056,6 +3056,11 @@ func (in *TwilioTargetSpec) DeepCopyInto(out *TwilioTargetSpec) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.EventOptions != nil {
+		in, out := &in.EventOptions, &out.EventOptions
+		*out = new(EventOptions)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

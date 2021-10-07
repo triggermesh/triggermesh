@@ -34,7 +34,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"ORACLE_ADAPTER_IMAGE" default:"gcr.io/triggermesh/oracle-target-adapter"`
+	Image string `envconfig:"ORACLE_ADAPTER_IMAGE" default:"gcr.io/triggermesh/oracletarget-adapter"`
 }
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.

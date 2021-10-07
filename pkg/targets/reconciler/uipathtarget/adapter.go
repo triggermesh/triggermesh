@@ -35,7 +35,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"UIPATH_ADAPTER_IMAGE" default:"gcr.io/triggermesh/uipath-target-adapter"`
+	Image string `envconfig:"UIPATH_ADAPTER_IMAGE" default:"gcr.io/triggermesh/uipathtarget-adapter"`
 }
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.

@@ -44,7 +44,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"ALIBABAOSS_ADAPTER_IMAGE" default:"gcr.io/triggermesh-private/alibabaoss-target-adapter"`
+	Image string `envconfig:"ALIBABAOSS_ADAPTER_IMAGE" default:"gcr.io/triggermesh-private/alibabaosstarget-adapter"`
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.

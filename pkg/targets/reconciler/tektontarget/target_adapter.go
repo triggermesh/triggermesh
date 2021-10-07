@@ -36,7 +36,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image           string `envconfig:"TEKTON_ADAPTER_IMAGE" default:"gcr.io/triggermesh/tekton-target-adapter"`
+	Image           string `envconfig:"TEKTON_ADAPTER_IMAGE" default:"gcr.io/triggermesh/tektontarget-adapter"`
 	ReapingInterval string `envconfig:"TEKTON_REAPING_INTERVAL" default:"5m"`
 }
 

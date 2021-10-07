@@ -1,7 +1,7 @@
 # reviewdog configuration
 
 runner:
-  license:
+  license-go:
     # Uses https://github.com/mattmoor/boilerplate-check
     cmd: >-
       boilerplate-check check
@@ -9,6 +9,15 @@ runner:
       --file-extension=go
       --exclude=vendor
     # See 'errorformat' documentation at https://vimhelp.org/quickfix.txt.html#error-file-format
+    errorformat:
+      - '%A%f:%l: %m'
+      - '%C%.%#'
+  license-yaml:
+    cmd: >-
+      boilerplate-check check
+      --boilerplate=hack/boilerplate/boilerplate.yaml.txt
+      --file-extension=yaml
+      --exclude='(^\.|vendor)'
     errorformat:
       - '%A%f:%l: %m'
       - '%C%.%#'

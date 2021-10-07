@@ -71,7 +71,7 @@ func TestWebhookEvent(t *testing.T) {
 			password: "bar",
 
 			expectedCode:             http.StatusBadRequest,
-			expectedResponseContains: "Wrong authentication header",
+			expectedResponseContains: "wrong authentication header",
 		},
 
 		"basic auth wrong header": {
@@ -84,7 +84,7 @@ func TestWebhookEvent(t *testing.T) {
 			password: "bar",
 
 			expectedCode:             http.StatusBadRequest,
-			expectedResponseContains: "Wrong authentication header",
+			expectedResponseContains: "wrong authentication header",
 		},
 
 		"basic auth wrong creds": {
@@ -97,7 +97,7 @@ func TestWebhookEvent(t *testing.T) {
 			password: "bar",
 
 			expectedCode:             http.StatusUnauthorized,
-			expectedResponseContains: "Credentials are not valid",
+			expectedResponseContains: "credentials are not valid",
 		},
 
 		"basic auth success": {

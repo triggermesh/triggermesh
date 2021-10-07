@@ -37,7 +37,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 	// Container image
-	Image string `default:"gcr.io/triggermesh/hasura-target-adapter"`
+	Image string `default:"gcr.io/triggermesh/hasuratarget-adapter"`
 }
 
 // makeAdapterKnService returns a Knative Service object for the target's adapter.

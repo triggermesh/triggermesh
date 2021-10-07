@@ -36,7 +36,7 @@ const (
 	publisherRole = "roles/pubsub.publisher"
 )
 
-func reconcileSink(ctx context.Context, lacli *logadmin.Client, pscli *pubsub.Client, topicResName *v1alpha1.GCloudPubSubResourceName) error {
+func reconcileSink(ctx context.Context, lacli *logadmin.Client, pscli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -53,7 +53,7 @@ func reconcileSink(ctx context.Context, lacli *logadmin.Client, pscli *pubsub.Cl
 }
 
 // Ensures that the Audit Logs sink has been created.
-func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *v1alpha1.GCloudPubSubResourceName) (*logadmin.Sink, error) {
+func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *v1alpha1.GCloudResourceName) (*logadmin.Sink, error) {
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
@@ -102,7 +102,7 @@ func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *
 }
 
 // Ensures that the sink has been granted the pubsub.publisher role on the source topic.
-func ensureSinkIsPublisher(ctx context.Context, sink *logadmin.Sink, cli *pubsub.Client, topicResName *v1alpha1.GCloudPubSubResourceName) error {
+func ensureSinkIsPublisher(ctx context.Context, sink *logadmin.Sink, cli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 

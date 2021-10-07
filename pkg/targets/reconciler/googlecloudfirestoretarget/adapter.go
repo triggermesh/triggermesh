@@ -45,7 +45,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"GOOGLECLOUDFIRESTORE_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlecloudfirestore-target-adapter"`
+	Image string `envconfig:"GOOGLECLOUDFIRESTORE_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlecloudfirestoretarget-adapter"`
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.

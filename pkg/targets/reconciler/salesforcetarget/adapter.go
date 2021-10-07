@@ -45,7 +45,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 	// Container image
-	Image string `default:"gcr.io/triggermesh/salesforce-target-adapter"`
+	Image string `default:"gcr.io/triggermesh/salesforcetarget-adapter"`
 }
 
 // makeAdapterKnService returns a Knative Service object for the target's adapter.

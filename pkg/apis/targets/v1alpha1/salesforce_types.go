@@ -30,7 +30,14 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SalesforceTarget is the Schema for the Salesforce Target.
+// SalesforceTarget receives CloudEvents typed `io.triggermesh.salesforce.apicall`
+// that fullfil the schema at https://docs.triggermesh.io/schemas/salesforce.apicall.json
+// and consumes the Salesforce API.
+//
+// Upon a successful call a response is returned typed `io.triggermesh.salesforce.apicall.response`
+// containing the returned payload as the CloudEvent data and a `category: success` extension.
+// In case of an error the payload will be conformant with https://docs.triggermesh.io/schemas/triggermesh.error.json
+// and the CloudEvent extension will be set to `category: error`.
 type SalesforceTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -50,24 +57,27 @@ var (
 
 // SalesforceTargetSpec holds the desired state of the SalesforceTarget.
 type SalesforceTargetSpec struct {
-	// Authentication method to interact with the Salesforce API.
+	// Authentication information to interact with the Salesforce API.
 	Auth SalesforceAuth `json:"auth"`
 
-	// APIVersion at Salesforce.
+	// APIVersion at Salesforce. If not set the latest version will be used.
 	// +optional
 	APIVersion *string `json:"apiVersion"`
 
 	// EventOptions for targets
+	// +optional
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
-// SalesforceAuth contains Salesforce credentials.
+// SalesforceAuth contains OAuth JWT information to interact with the
+// Salesforce API. See:
+// https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm
 type SalesforceAuth struct {
-	// ClientID The OAuth ClientID used to identify the target integrating with Salesforce.
+	// ClientID for the Salesforce connected app.
 	ClientID string `json:"clientID"`
-	// Server is the Salesforce instance used to integrate.
+	// Server points to the authorization URL.
 	Server string `json:"server"`
-	// User is the username who the target will masquerade as when interacting with Salesforce.
+	// User configuring the connected app.
 	User string `json:"user"`
 	// CertKey is the private key used to sign requests from the target.
 	CertKey SecretValueFromSource `json:"certKey"`

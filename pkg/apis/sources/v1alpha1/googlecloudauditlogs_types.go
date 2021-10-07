@@ -87,7 +87,7 @@ type GoogleCloudAuditLogsSourcePubSubSpec struct {
 	//   "projects/{project_name}/topics/{topic_name}"
 	//
 	// +optional
-	Topic *GCloudPubSubResourceName `json:"topic,omitempty"`
+	Topic *GCloudResourceName `json:"topic,omitempty"`
 
 	// Name of the GCP project where Pub/Sub resources associated with the
 	// Cloud Audit log are to be created.
@@ -107,11 +107,11 @@ type GoogleCloudAuditLogsSourceStatus struct {
 	AuditLogsSink *string `json:"auditLogsSink,omitempty"`
 
 	// Resource name of the target Pub/Sub topic.
-	Topic *GCloudPubSubResourceName `json:"topic,omitempty"`
+	Topic *GCloudResourceName `json:"topic,omitempty"`
 
 	// Resource name of the managed Pub/Sub subscription associated with
 	// the managed topic.
-	Subscription *GCloudPubSubResourceName `json:"subscription,omitempty"`
+	Subscription *GCloudResourceName `json:"subscription,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

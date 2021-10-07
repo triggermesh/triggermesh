@@ -40,7 +40,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"ELASTICSEARCH_ADAPTER_IMAGE" default:"gcr.io/triggermesh/elasticsearch-target-adapter"`
+	Image string `envconfig:"ELASTICSEARCH_ADAPTER_IMAGE" default:"gcr.io/triggermesh/elasticsearchtarget-adapter"`
 }
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.

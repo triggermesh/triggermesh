@@ -27,7 +27,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var errVarType = errors.New("variable type definition doesn't match expected format: \"$foo.(string)\"")
+var errVarType = errors.New("variable definition doesn't match expected format: \"$json_path.(type)\"")
 
 // CompileExpression accepts the expression string from the Filter spec,
 // parses variables and their types, compiles expression into CEL Program
@@ -83,6 +83,10 @@ func parseExpressionString(expression string) (string, []Variable, error) {
 		// integer as the variable name first symbol causes issue with matching
 		// var types. String prefix ensures that we don't have first integer symbol.
 		safeCELName = "var_" + safeCELName
+
+		if variable+1 > typ || typ+2 > end {
+			return "", []Variable{}, errVarType
+		}
 
 		vars = append(vars, Variable{
 			Name: safeCELName,

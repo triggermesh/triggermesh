@@ -52,6 +52,9 @@ func (s *TwilioTarget) GetGroupVersionKind() schema.GroupVersionKind {
 const (
 	// EventTypeTwilioSMSSend represents a task to send a SMS.
 	EventTypeTwilioSMSSend = "io.triggermesh.twilio.sms.send"
+
+	// EventTypeTwilioSMSSendResponse represents a response to a SMS send event.
+	EventTypeTwilioSMSSendResponse = "io.triggermesh.twilio.sms.send.response"
 )
 
 // AcceptedEventTypes implements IntegrationTarget.
@@ -64,7 +67,7 @@ func (*TwilioTarget) AcceptedEventTypes() []string {
 // GetEventTypes implements EventSource.
 func (*TwilioTarget) GetEventTypes() []string {
 	return []string{
-		EventTypeResponse,
+		EventTypeTwilioSMSSendResponse,
 	}
 }
 

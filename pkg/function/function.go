@@ -217,6 +217,11 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		}
 	}
 
+	var responseMode string
+	if f.Spec.ResponseIsEvent {
+		responseMode = "event"
+	}
+
 	expectedKsvc := resources.NewKnService(f.Name+"-"+rand.String(6), f.Namespace,
 		resources.KnSvcImage(image),
 		resources.KnSvcMountCm(cm.Name, filename),
@@ -225,7 +230,7 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		resources.KnSvcEnvVar("K_SINK", sink.String()),
 		resources.KnSvcEnvVar("_HANDLER", handler),
 		resources.KnSvcEnvVar("RESPONSE_FORMAT", "CLOUDEVENTS"),
-		resources.KnSvcEnvVar("CE_FUNCTION_RESPONSE_MODE", f.Spec.ResponseMode),
+		resources.KnSvcEnvVar("CE_FUNCTION_RESPONSE_MODE", responseMode),
 		resources.KnSvcEnvFromMap("CE_OVERRIDES_", overrides),
 		resources.KnSvcAnnotation("extensions.triggermesh.io/codeVersion", cm.ResourceVersion),
 		resources.KnSvcVisibility(f.Spec.Public),

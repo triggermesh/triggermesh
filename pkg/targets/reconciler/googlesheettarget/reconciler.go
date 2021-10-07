@@ -30,7 +30,7 @@ import (
 
 // reconciler reconciles the target adapter object
 type reconciler struct {
-	TargetAdapterImage string `envconfig:"GOOGLESHEET_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlesheet-target-adapter"`
+	TargetAdapterImage string `envconfig:"GOOGLESHEET_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlesheettarget-adapter"`
 
 	ksvcr libreconciler.KServiceReconciler
 	vg    libreconciler.ValueGetter

@@ -36,7 +36,7 @@ import (
 // Required permissions:
 // - billing.budgets.get
 // - billing.budgets.update
-func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, topicResName *v1alpha1.GCloudPubSubResourceName) error {
+func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, topicResName *v1alpha1.GCloudResourceName) error {
 	if skip.Skip(ctx) {
 		return nil
 	}

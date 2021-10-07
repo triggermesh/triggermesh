@@ -38,7 +38,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"CONFLUENT_ADAPTER_IMAGE" default:"gcr.io/triggermesh/confluent-target-adapter"`
+	Image string `envconfig:"CONFLUENT_ADAPTER_IMAGE" default:"gcr.io/triggermesh/confluenttarget-adapter"`
 }
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.

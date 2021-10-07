@@ -36,7 +36,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"ZENDESK_ADAPTER_IMAGE" default:"gcr.io/triggermesh/zendesk-target-adapter"`
+	Image string `envconfig:"ZENDESK_ADAPTER_IMAGE" default:"gcr.io/triggermesh/zendesktarget-adapter"`
 }
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.
