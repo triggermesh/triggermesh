@@ -132,6 +132,11 @@ func main() {
 	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/reconciler.go", temp.name)
 	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
 
+	// populate the config folder
+	// read 301-newtarget.yaml.go
+	path = fmt.Sprintf("../../config/301-%s.yaml", temp.name)
+	temp.replaceTemplates("scaffolding/config/301-newtarget.yaml", path)
+
 	fmt.Println("")
 	fmt.Println("done")
 
