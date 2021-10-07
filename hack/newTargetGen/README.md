@@ -8,7 +8,6 @@ creates the boilerplate for adding a new target
 what it creates:
 ```
 cmd/
-    kodata/
     newTarget
     (DOES NOT UPDATE) triggermesh-controller/main.go 
 
