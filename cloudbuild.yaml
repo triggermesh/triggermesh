@@ -14,15 +14,13 @@
 
 steps:
 
-- name: gcr.io/kaniko-project/executor:v1.6.0-debug
+- name: gcr.io/kaniko-project/executor:edge
   args:
   - --dockerfile=cmd/${_CMD}/Dockerfile
   - --destination=gcr.io/$PROJECT_ID/${_CMD}:${COMMIT_SHA}
   - --destination=gcr.io/$PROJECT_ID/${_CMD}:${_KANIKO_IMAGE_TAG}
   - --cache-repo=gcr.io/$PROJECT_ID/${_CMD}/cache
   - --cache=${_KANIKO_USE_BUILD_CACHE}
-  - --snapshotMode=redo
-  - --use-new-run
   - --no-push=${_KANIKO_NO_PUSH}
   - ${_KANIKO_EXTRA_ARGS}
   waitFor: ['-']
