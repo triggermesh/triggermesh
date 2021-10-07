@@ -48,7 +48,6 @@ const (
 var (
 	tPayload     = []byte(`bye-world`)
 	tOutType     = tEventType + ".response"
-	tOutBadType  = tBadEventType + ".response"
 	tOutSource   = tTargetName
 	tMappedTypes = map[string]string{tEventType: tOutAlternateType}
 
