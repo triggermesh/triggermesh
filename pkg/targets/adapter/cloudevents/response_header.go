@@ -47,9 +47,9 @@ func MappedResponseType(eventTypes map[string]string) ResponseHeaderValue {
 	}
 }
 
-// MappedResponseTypeWithDefault returns an static eventType based on the incoming eventType.
+// MappedResponseTypeWithDefaultSuffix returns an static eventType based on the incoming eventType.
 // When no type is mapped a default value is returned.
-func MappedResponseTypeWithDefault(eventTypes map[string]string, defaultSuffix string) ResponseHeaderValue {
+func MappedResponseTypeWithDefaultSuffix(eventTypes map[string]string, defaultSuffix string) ResponseHeaderValue {
 	return func(event *cloudevents.Event) (string, error) {
 		v, ok := eventTypes[event.Type()]
 		if ok {

@@ -211,13 +211,13 @@ func TestOkReplies(t *testing.T) {
 			expectedSubject:    tOutSubject,
 			expectedExtensions: createSuccessCategoryExtension(),
 		},
-		"mapped replier with no matching key": {
+		"mapped replier with default suffix": {
 			in:             createFakeEvent(tBadEventType),
 			payload:        tPayload,
-			replierOptions: []ReplierOption{ReplierWithMappedResponseType(tMappedTypes)},
+			replierOptions: []ReplierOption{ReplierWithMappedResponseTypeAndDefultSuffix(tMappedTypes, ".test")},
 
 			expectedNilEvent:   true,
-			expectedType:       tOutBadType,
+			expectedType:       tBadEventType + ".test",
 			expectedSource:     tOutSource,
 			expectedExtensions: createSuccessCategoryExtension(),
 		},
@@ -435,18 +435,6 @@ func TestErrorReplies(t *testing.T) {
 
 			expectedNilEvent:   false,
 			expectedType:       tOutType,
-			expectedSource:     tOutSource,
-			expectedSubject:    tOutSubject,
-			expectedExtensions: createErrorCategoryExtension(),
-		},
-		"error reply no matching event types ": {
-			in:                   createFakeEvent(tBadEventType),
-			code:                 tErrorCode,
-			reportedError:        errTest,
-			eventResponseOptions: []EventResponseOption{ResponseWithSubject(tOutSubject)},
-
-			expectedNilEvent:   false,
-			expectedType:       tOutBadType,
 			expectedSource:     tOutSource,
 			expectedSubject:    tOutSubject,
 			expectedExtensions: createErrorCategoryExtension(),
