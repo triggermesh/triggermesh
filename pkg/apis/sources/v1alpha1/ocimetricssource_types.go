@@ -80,6 +80,7 @@ type OCIMetricsSourceSpec struct {
 	Metrics []OCIMetrics `json:"metrics"`
 }
 
+// OCIMetrics represents OCI metrics structure.
 type OCIMetrics struct {
 	// Human description for the metrics entry
 	Name string `json:"name"`
@@ -94,8 +95,10 @@ type OCIMetrics struct {
 	Compartment *string `json:"oracleCompartment,omitempty"`
 }
 
+// OCIMetricsDecodedList is a list of OCI metrics.
 type OCIMetricsDecodedList []OCIMetrics
 
+// Decode deserializes a list of OCI metrics.
 func (o *OCIMetricsDecodedList) Decode(value string) error {
 	err := json.Unmarshal([]byte(value), o)
 	if err != nil {

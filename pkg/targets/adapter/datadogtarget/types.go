@@ -24,6 +24,8 @@ package datadogtarget
 type MetricData struct {
 	Series []Series `json:"series"`
 }
+
+// Series is an individual metric series.
 type Series struct {
 	Host     *string    `json:"host,omitempty"`
 	Interval *int       `json:"interval,omitempty"`

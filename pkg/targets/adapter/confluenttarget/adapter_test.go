@@ -149,7 +149,7 @@ func TestConfluentProduce(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 
 			ctx, cancel := context.WithCancel(context.Background())
-			ceClient := &adaptertest.TestCloudEventsClient{}
+			ceClient := &adaptertest.FakeCloudEventsClient{}
 
 			confluent := confluentAdapter{
 				kafkaClient: newFakeKafkaClient(

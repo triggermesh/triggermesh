@@ -31,6 +31,7 @@ import (
 	"knative.dev/eventing/pkg/adapter/v2"
 )
 
+// OCIMetricsAPIHandler handles OCI Metrics.
 type OCIMetricsAPIHandler interface {
 	Start(ctx context.Context) error
 }
@@ -48,6 +49,7 @@ type ociMetricsAPIHandler struct {
 	logger *zap.SugaredLogger
 }
 
+// NewOCIMetricsAPIHandler returns a new instance of OCIMetricsAPIHandler.
 func NewOCIMetricsAPIHandler(ceClient cloudevents.Client, aEnv adapter.EnvConfigAccessor, eventsource string, logger *zap.SugaredLogger) OCIMetricsAPIHandler {
 	env := aEnv.(*envAccessor)
 
@@ -80,6 +82,7 @@ func NewOCIMetricsAPIHandler(ceClient cloudevents.Client, aEnv adapter.EnvConfig
 	}
 }
 
+// Start starts the OCI Metrics events handler.
 func (o *ociMetricsAPIHandler) Start(ctx context.Context) error {
 	o.logger.Info("Starting OCI Metrics event handler with interval: ", o.interval)
 

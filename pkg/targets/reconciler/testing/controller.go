@@ -34,17 +34,18 @@ type constructorTestConfig struct {
 	numberInformers int
 }
 
-type controllerTestOptions func(*constructorTestConfig)
+// ControllerTestOptions is a functional option for a constructorTestConfig.
+type ControllerTestOptions func(*constructorTestConfig)
 
 // WithInformerNumber sets the number of expected informers for the test
-func WithInformerNumber(n int) controllerTestOptions {
+func WithInformerNumber(n int) ControllerTestOptions {
 	return func(c *constructorTestConfig) {
 		c.numberInformers = n
 	}
 }
 
 // TestControllerConstructor tests that a controller constructor meets our requirements.
-func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor, opts ...controllerTestOptions) {
+func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor, opts ...ControllerTestOptions) {
 	t.Helper()
 
 	cto := &constructorTestConfig{

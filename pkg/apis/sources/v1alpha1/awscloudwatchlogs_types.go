@@ -44,7 +44,7 @@ var (
 	_ EventSource    = (*AWSCloudWatchLogsSource)(nil)
 )
 
-// AWSCloudWatchSourceSpec defines the desired state of the event source.
+// AWSCloudWatchLogsSourceSpec defines the desired state of the event source.
 type AWSCloudWatchLogsSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 

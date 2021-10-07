@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package reconciler contains the reconciliation logic for the event target.
+// Package splunktarget contains the reconciliation logic for the event target.
 package splunktarget
 
 import (

@@ -16,19 +16,8 @@ limitations under the License.
 
 package googlecloudworkflowstarget
 
-type CreateWorkflowEvent struct {
-	Parent     string `json:"parent"`
-	WorkflowID string `json:"workflow_id"`
-	Workflow   struct {
-		Name        string             `json:"name"`
-		State       int32              `json:"state"`
-		RevisionID  string             `json:"revision_id"`
-		Description *string            `json:"description"`
-		Labels      *map[string]string `json:"labels,omitempty"`
-		SourceCode  string             `json:"source_code,omitempty"`
-	} `json:"workflow"`
-}
-
+// RunJobEvent is a structure of CloudEvents data payload
+// processed by the event target.
 type RunJobEvent struct {
 	Parent        string `json:"parent"`
 	ExecutionName string `json:"executionName"`

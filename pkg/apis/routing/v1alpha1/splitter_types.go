@@ -28,7 +28,7 @@ import (
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Splitter is an addressable object that splits incoming events according
-// to provided specification
+// to provided specification.
 type Splitter struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
@@ -55,20 +55,21 @@ var (
 	_ Router = (*Splitter)(nil)
 )
 
-// SplitterSpec holds the desired state of the Splitter
+// SplitterSpec holds the desired state of the Splitter.
 type SplitterSpec struct {
 	Path      string              `json:"path"`
 	CEContext CloudEventContext   `json:"ceContext"`
 	Sink      *duckv1.Destination `json:"sink"`
 }
 
+// CloudEventContext declares context attributes that will be propagated to resulting events.
 type CloudEventContext struct {
 	Type       string            `json:"type"`
 	Source     string            `json:"source"`
 	Extensions map[string]string `json:"extensions"`
 }
 
-// SplitterList is a list of Splitter resources
+// SplitterList is a list of Splitter resources.
 //
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type SplitterList struct {

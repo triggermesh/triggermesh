@@ -35,7 +35,7 @@ import (
 // the resync period ensures we regularly re-check the state of Routers.
 const informerResyncPeriod = time.Minute * 5
 
-// New creates a Reconciler and returns the result of NewImpl.
+// NewController creates a Reconciler and returns the result of NewImpl.
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,

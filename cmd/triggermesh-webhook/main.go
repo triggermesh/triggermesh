@@ -39,6 +39,7 @@ var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
 
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}
 
+// NewDefaultingAdmissionController returns defaulting webhook controller implementation.
 func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher) *controller.Impl {
 	return defaulting.NewAdmissionController(ctx,
 		// Name of the resource webhook.
@@ -60,6 +61,7 @@ func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher
 	)
 }
 
+// NewValidationAdmissionController returns validation webhook controller implementation.
 func NewValidationAdmissionController(ctx context.Context, cmw configmap.Watcher) *controller.Impl {
 	return validation.NewAdmissionController(ctx,
 		// Name of the resource webhook.

@@ -46,7 +46,7 @@ func TestExactReason(t *testing.T) {
 				Reason:  "ImagePullBackOff",
 				Message: "Some error message",
 			},
-			expectReason: ReasonBadContainerImage,
+			expectReason: reasonBadContainerImage,
 		},
 		{
 			name: "Runtime error",
@@ -54,7 +54,7 @@ func TestExactReason(t *testing.T) {
 				Reason:  "CrashLoopBackOff",
 				Message: "Some error message",
 			},
-			expectReason: ReasonAppRuntimeFailure,
+			expectReason: reasonAppRuntimeFailure,
 		},
 		{
 			name: "Missing resource error",
@@ -93,7 +93,7 @@ func TestExactReason(t *testing.T) {
 				Reason:  knRevisionFailedReason,
 				Message: "Some error message: Container failed with: oops",
 			},
-			expectReason: ReasonAppRuntimeFailure,
+			expectReason: reasonAppRuntimeFailure,
 		},
 		{
 			name: "Runtime error with wrong reason",
@@ -109,7 +109,7 @@ func TestExactReason(t *testing.T) {
 				Reason:  knRevisionFailedReason,
 				Message: `Unable to fetch image "foo": some error`,
 			},
-			expectReason: ReasonBadContainerImage,
+			expectReason: reasonBadContainerImage,
 		},
 		{
 			name: "Container image error with wrong reason",

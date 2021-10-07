@@ -101,7 +101,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 }
 
-// ExtractLogDetails: Take the resource string from the ARN, and extract the `log-group` and `log-stream`
+// ExtractLogDetails takes the resource string from the ARN, and extract the `log-group` and `log-stream`.
 func ExtractLogDetails(details string) (string, string) {
 	atoms := strings.Split(details, ":")
 
@@ -142,6 +142,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	}
 }
 
+// CollectLogs receives events from CloudWatch client and sends them to a sink.
 func (a *adapter) CollectLogs(priorTime *time.Time, currentTime time.Time) {
 	a.logger.Debug("Firing logs")
 	startTime := currentTime.Add(-a.pollingInterval).Unix() * 1000

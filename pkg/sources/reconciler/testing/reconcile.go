@@ -69,9 +69,9 @@ var (
 	}
 )
 
-// Test the Reconcile() method of the controller.Reconciler implemented by
-// source Reconcilers, with focus on the generic ReconcileSource logic executed
-// by the generic adapter reconciler embedded in every source Reconciler.
+// TestReconcileAdapter tests the Reconcile() method of the controller.Reconciler
+// implemented by source Reconcilers, with focus on the generic ReconcileSource
+// logic executed by the generic adapter reconciler embedded in every source Reconciler.
 //
 // The environment for each test case is set up as follows:
 //  1. MakeFactory initializes fake clients with the objects declared in the test case
@@ -530,9 +530,11 @@ func newAdressable() *eventingv1.Broker {
 
 /* RBAC */
 
-type serviceAccountCtorWithOptions func(...serviceAccountOption) *corev1.ServiceAccount
+// ServiceAccountCtorWithOptions returns a ServiceAccount constructor which accepts options.
+type ServiceAccountCtorWithOptions func(...serviceAccountOption) *corev1.ServiceAccount
 
-func NewServiceAccount(src kmeta.OwnerRefable) serviceAccountCtorWithOptions {
+// NewServiceAccount returns a ServiceAccountCtorWithOptions for the given source.
+func NewServiceAccount(src kmeta.OwnerRefable) ServiceAccountCtorWithOptions {
 	name := common.ComponentName(src) + "-adapter"
 	labels := common.CommonObjectLabels(src)
 
@@ -589,6 +591,7 @@ func noOwner(sa *corev1.ServiceAccount) {
 	sa.OwnerReferences = nil
 }
 
+// NewRoleBinding returns a RoleBinding constructor for the given ServiceAccount.
 func NewRoleBinding(sa *corev1.ServiceAccount) func() *rbacv1.RoleBinding {
 	return func() *rbacv1.RoleBinding {
 		return &rbacv1.RoleBinding{

@@ -11,3 +11,14 @@ linters:
 
 run:
   timeout: 5m
+
+linters-settings:
+  stylecheck:
+    checks:
+    - all
+
+issues:
+  include:
+    # don't exclude stylecheck issues about missing or malformed comments on package|func|type|var|const
+    # checks: ST1000,ST1020,ST1021,ST1022 (https://staticcheck.io/docs/checks)
+  - EXC0011

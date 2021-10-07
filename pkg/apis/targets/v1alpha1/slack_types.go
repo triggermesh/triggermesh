@@ -29,7 +29,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SlackTarget defines the schema for the Slack target
+// SlackTarget defines the schema for the Slack target.
 type SlackTarget struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
@@ -43,7 +43,7 @@ type SlackTarget struct {
 	Status SlackTargetStatus `json:"status,omitempty"`
 }
 
-// SlackTargetSpec defines the spec for the Slack Taret
+// SlackTargetSpec defines the spec for the Slack Taret.
 type SlackTargetSpec struct {
 	// Token for Slack App
 	Token SecretValueFromSource `json:"token"`
@@ -76,7 +76,7 @@ type SlackTargetStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SlackRequestTargetList is a list of SlackRequestTarget resources
+// SlackTargetList is a list of event targets.
 type SlackTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
