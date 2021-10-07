@@ -23,6 +23,7 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
@@ -59,19 +60,19 @@ func (c *mockedSplunkClient) LogEvent(in *splunk.Event) error {
 func TestReceive(t *testing.T) {
 	testCases := map[string]struct {
 		client       *mockedSplunkClient
-		expectEvent  *errorEvent
+		expectEvent  *targetce.EventError
 		expectResult *cloudevents.Result
 	}{
 		"Successful request": {
 			client:       &mockedSplunkClient{},
-			expectEvent:  &errorEvent{},
+			expectEvent:  &targetce.EventError{},
 			expectResult: &cloudevents.ResultACK,
 		},
 		"Failed request": {
 			client: &mockedSplunkClient{
 				err: assert.AnError,
 			},
-			expectEvent:  &errorEvent{Code: "adapter-process", Description: "assert.AnError general error for testing", Details: "failed to send event to HEC. Status code: 400"},
+			expectEvent:  &targetce.EventError{Code: "adapter-process", Description: "assert.AnError general error for testing", Details: "failed to send event to HEC. Status code: 400"},
 			expectResult: &cloudevents.ResultACK,
 		},
 	}
@@ -91,15 +92,15 @@ func TestReceive(t *testing.T) {
 			}
 
 			// invoke event callback
-			e, r := a.receive(context.Background(), newEvent(t))
-			eE := &errorEvent{}
-
-			if err := e.DataAs(eE); err != nil {
-				t.Log("error processing incoming event data: %w", err)
+			event, result := a.receive(context.Background(), newEvent(t))
+			errorEvent := &targetce.EventError{}
+			if err := event.DataAs(errorEvent); err != nil {
+				require.NoError(t, err)
 			}
+
 			assert.Lenf(t, tc.client.inputRecorder, 1, "Client records a single request")
-			assert.Equal(t, &r, tc.expectResult)
-			assert.Equal(t, eE, tc.expectEvent)
+			assert.Equal(t, &result, tc.expectResult)
+			assert.Equal(t, errorEvent, tc.expectEvent)
 		})
 	}
 }
@@ -116,10 +117,4 @@ func newEvent(t *testing.T) cloudevents.Event {
 	}
 
 	return ce
-}
-
-type errorEvent struct {
-	Code        string `json:"code"`
-	Description string `json:"description"`
-	Details     string `json:"details"`
 }

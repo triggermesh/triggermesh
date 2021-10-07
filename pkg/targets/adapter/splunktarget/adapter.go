@@ -29,9 +29,10 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // SplunkClient is the interface that must be implemented by Splunk HEC
