@@ -15,7 +15,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: alibabaosstargets.targets.triggermesh.io
+  name: $TARGETs.targets.triggermesh.io
   labels:
     knative.dev/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
@@ -32,8 +32,8 @@ metadata:
 spec:
   group: targets.triggermesh.io
   names:
-    kind: AlibabaOSSTarget
-    plural: alibabaosstargets
+    kind: $TARGETFULLCASE
+    plural: $TARGETs
     categories:
     - all
     - knative
@@ -55,47 +55,7 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
-              endpoint:
-                type: string
-                description: The domain name used to access the OSS. For more information, please refer to the region and endpoint guide at https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db
-                pattern: ^oss-([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{1,3}$
-              bucket:
-                type: string
-                description: The unique container to store objects in OSS.
-              accessKeySecret:
-                type: object
-                description: Alibaba SDK access key secret as registered. For more information on how to create an access key pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              accessKeyID:
-                type: object
-                description: Alibaba SDK access key id as registered. For more information on how to create an access key pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              eventOptions:
-                type: object
-                description: "When should this target generate a response event for processing: always, on error, or never"
-                properties:
-                  payloadPolicy:
-                    type: string
-                    enum: [always, error, never]
-            required:
-            - accessKeyID
-            - accessKeySecret
-            - bucket
-            - endpoint
+
           status:
             type: object
             description: Reported status of the event target.
