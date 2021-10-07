@@ -1,0 +1,163 @@
+# Copyright 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: alibabaosstargets.targets.triggermesh.io
+  labels:
+    knative.dev/crd-install: 'true'
+    duck.knative.dev/addressable: 'true'
+    triggermesh.io/crd-install: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "io.triggermesh.alibaba.oss.response" }
+      ]
+spec:
+  group: targets.triggermesh.io
+  names:
+    kind: AlibabaOSSTarget
+    plural: alibabaosstargets
+    categories:
+    - all
+    - knative
+    - eventing
+    - targets
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        type: object
+        description: TriggerMesh event target for Alibaba Object Storage Service.
+        properties:
+          spec:
+            description: Desired state of event target.
+            type: object
+            properties:
+              endpoint:
+                type: string
+                description: The domain name used to access the OSS. For more information, please refer to the region and endpoint guide at https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db
+                pattern: ^oss-([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{1,3}$
+              bucket:
+                type: string
+                description: The unique container to store objects in OSS.
+              accessKeySecret:
+                type: object
+                description: Alibaba SDK access key secret as registered. For more information on how to create an access key pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              accessKeyID:
+                type: object
+                description: Alibaba SDK access key id as registered. For more information on how to create an access key pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              eventOptions:
+                type: object
+                description: "When should this target generate a response event for processing: always, on error, or never"
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
+            required:
+            - accessKeyID
+            - accessKeySecret
+            - bucket
+            - endpoint
+          status:
+            type: object
+            description: Reported status of the event target.
+            properties:
+              acceptedEventTypes:
+                description: Array of cloud events this target will accept for processing.
+                type: array
+                items:
+                  type: string
+              ceAttributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    source:
+                      type: string
+                  required:
+                  - type
+                  - source
+              observedGeneration:
+                type: integer
+                format: int64
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ['True', 'False', Unknown]
+                    severity:
+                      type: string
+                      enum: [Error, Warning, Info]
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                  required:
+                  - type
+                  - status
+              address:
+                type: object
+                properties:
+                  url:
+                    type: string
+    additionalPrinterColumns:
+    - name: URL
+      type: string
+      jsonPath: .status.address.url
+    - name: Ready
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].status
+    - name: Reason
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].reason
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp
