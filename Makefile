@@ -84,7 +84,10 @@ undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster using ko
 	$(KO) delete -f $(BASE_DIR)/config
 
 release-yaml: ## Generate triggermesh.yaml
-	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml | \
+	@mkdir -p $(DIST_DIR)
+	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml -l triggermesh.io/crd-install=true | \
+	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh-crds.yaml
+	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml -l triggermesh.io/crd-install!=true | \
 	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh.yaml
 
 test: install-gotestsum ## Run unit tests
@@ -126,6 +129,7 @@ clean: ## Clean build artifacts
 	@for bin in $(COMMANDS) ; do \
 		$(RM) -v $(BIN_OUTPUT_DIR)/$$bin; \
 	done
+	@$(RM) -v $(DIST_DIR)/triggermesh-crds.yaml $(DIST_DIR)/triggermesh.yaml
 	@$(RM) -v $(TEST_OUTPUT_DIR)/$(KREPO)-c.out $(TEST_OUTPUT_DIR)/$(KREPO)-unit-tests.xml
 	@$(RM) -v $(COVER_OUTPUT_DIR)/$(KREPO)-coverage.html
 
