@@ -31,6 +31,7 @@ const (
 
 	tEventID      = "in-1234"
 	tEventType    = "in.type"
+	tBadEventType = "bad.type"
 	tEventSource  = "in.source"
 	tEventSubject = "in subject"
 	tEventData    = `{"hello":"world"}`
@@ -47,6 +48,7 @@ const (
 var (
 	tPayload     = []byte(`bye-world`)
 	tOutType     = tEventType + ".response"
+	tOutBadType  = tBadEventType + ".response"
 	tOutSource   = tTargetName
 	tMappedTypes = map[string]string{tEventType: tOutAlternateType}
 
@@ -90,7 +92,7 @@ func TestOkReplies(t *testing.T) {
 		expectedExtensions map[string]interface{}
 	}{
 		"default replier": {
-			in: createFakeEvent(),
+			in: createFakeEvent(tEventType),
 
 			payload: tPayload,
 
@@ -101,7 +103,7 @@ func TestOkReplies(t *testing.T) {
 		},
 		"payload on errors policy replier": {
 			replierOptions: []ReplierOption{ReplierWithPayloadPolicy(PayloadPolicyErrors)},
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			payload:        tPayload,
 
 			expectedNilEvent:   true,
@@ -111,7 +113,7 @@ func TestOkReplies(t *testing.T) {
 		},
 		"payload never policy replier": {
 			replierOptions: []ReplierOption{ReplierWithPayloadPolicy(PayloadPolicyNever)},
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			payload:        tPayload,
 
 			expectedNilEvent:   true,
@@ -120,7 +122,7 @@ func TestOkReplies(t *testing.T) {
 			expectedExtensions: createSuccessCategoryExtension(),
 		},
 		"custom ID replier": {
-			in:                   createFakeEvent(),
+			in:                   createFakeEvent(tEventType),
 			payload:              tPayload,
 			eventResponseOptions: []EventResponseOption{ResponseWithID(tOutID)},
 
@@ -131,7 +133,7 @@ func TestOkReplies(t *testing.T) {
 			expectedExtensions: createSuccessCategoryExtension(),
 		},
 		"type from static replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			payload:        tPayload,
 			replierOptions: []ReplierOption{ReplierWithStaticResponseType(tOutAlternateType)},
 
@@ -141,7 +143,7 @@ func TestOkReplies(t *testing.T) {
 			expectedExtensions: createSuccessCategoryExtension(),
 		},
 		"type from maped replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			payload:        tPayload,
 			replierOptions: []ReplierOption{ReplierWithMappedResponseType(tMappedTypes)},
 
@@ -151,7 +153,7 @@ func TestOkReplies(t *testing.T) {
 			expectedExtensions: createSuccessCategoryExtension(),
 		},
 		"stateful headers replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			payload:        tPayload,
 			replierOptions: []ReplierOption{ReplierWithStatefulHeaders(tBridge)},
 
@@ -165,7 +167,7 @@ func TestOkReplies(t *testing.T) {
 			},
 		},
 		"processed headers replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			payload:        tPayload,
 			replierOptions: []ReplierOption{ReplierWithProcessedHeaders()},
 
@@ -180,7 +182,7 @@ func TestOkReplies(t *testing.T) {
 			},
 		},
 		"processed and stateful headers replier": {
-			in:      createFakeEvent(),
+			in:      createFakeEvent(tEventType),
 			payload: tPayload,
 			replierOptions: []ReplierOption{
 				ReplierWithProcessedHeaders(),
@@ -199,7 +201,7 @@ func TestOkReplies(t *testing.T) {
 			},
 		},
 		"reply with subject headers replier": {
-			in:                   createFakeEvent(),
+			in:                   createFakeEvent(tEventType),
 			payload:              tPayload,
 			eventResponseOptions: []EventResponseOption{ResponseWithSubject(tOutSubject)},
 
@@ -207,6 +209,16 @@ func TestOkReplies(t *testing.T) {
 			expectedType:       tOutType,
 			expectedSource:     tOutSource,
 			expectedSubject:    tOutSubject,
+			expectedExtensions: createSuccessCategoryExtension(),
+		},
+		"mapped replier with no matching key": {
+			in:             createFakeEvent(tBadEventType),
+			payload:        tPayload,
+			replierOptions: []ReplierOption{ReplierWithMappedResponseType(tMappedTypes)},
+
+			expectedNilEvent:   true,
+			expectedType:       tOutBadType,
+			expectedSource:     tOutSource,
 			expectedExtensions: createSuccessCategoryExtension(),
 		},
 	}
@@ -275,7 +287,7 @@ func TestErrorReplies(t *testing.T) {
 		expectedExtensions map[string]interface{}
 	}{
 		"default replier": {
-			in:            createFakeEvent(),
+			in:            createFakeEvent(tEventType),
 			code:          tErrorCode,
 			reportedError: errTest,
 
@@ -286,7 +298,7 @@ func TestErrorReplies(t *testing.T) {
 		},
 		"payload on errors policy replier": {
 			replierOptions: []ReplierOption{ReplierWithPayloadPolicy(PayloadPolicyErrors)},
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			code:           tErrorCode,
 			reportedError:  errTest,
 
@@ -297,7 +309,7 @@ func TestErrorReplies(t *testing.T) {
 		},
 		"payload never policy replier": {
 			replierOptions: []ReplierOption{ReplierWithPayloadPolicy(PayloadPolicyNever)},
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			code:           tErrorCode,
 			reportedError:  errTest,
 
@@ -307,7 +319,7 @@ func TestErrorReplies(t *testing.T) {
 			expectedExtensions: createErrorCategoryExtension(),
 		},
 		"error with fields": {
-			in:            createFakeEvent(),
+			in:            createFakeEvent(tEventType),
 			code:          tErrorCode,
 			reportedError: errTest,
 			details:       createErrorFields(),
@@ -318,7 +330,7 @@ func TestErrorReplies(t *testing.T) {
 			expectedExtensions: createErrorCategoryExtension(),
 		},
 		"custom ID error": {
-			in:                   createFakeEvent(),
+			in:                   createFakeEvent(tEventType),
 			code:                 tErrorCode,
 			reportedError:        errTest,
 			eventResponseOptions: []EventResponseOption{ResponseWithID(tOutID)},
@@ -330,7 +342,7 @@ func TestErrorReplies(t *testing.T) {
 			expectedExtensions: createErrorCategoryExtension(),
 		},
 		"type from static replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			code:           tErrorCode,
 			reportedError:  errTest,
 			replierOptions: []ReplierOption{ReplierWithStaticErrorResponseType(tOutAlternateType)},
@@ -341,7 +353,7 @@ func TestErrorReplies(t *testing.T) {
 			expectedExtensions: createErrorCategoryExtension(),
 		},
 		"type from static replier, not equal to success type": {
-			in:            createFakeEvent(),
+			in:            createFakeEvent(tEventType),
 			code:          tErrorCode,
 			reportedError: errTest,
 			replierOptions: []ReplierOption{
@@ -354,7 +366,7 @@ func TestErrorReplies(t *testing.T) {
 			expectedExtensions: createErrorCategoryExtension(),
 		},
 		"type from maped replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			code:           tErrorCode,
 			reportedError:  errTest,
 			replierOptions: []ReplierOption{ReplierWithMappedErrorResponseType(tMappedTypes)},
@@ -365,7 +377,7 @@ func TestErrorReplies(t *testing.T) {
 			expectedExtensions: createErrorCategoryExtension(),
 		},
 		"stateful headers replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			code:           tErrorCode,
 			reportedError:  errTest,
 			replierOptions: []ReplierOption{ReplierWithStatefulHeaders(tBridge)},
@@ -380,7 +392,7 @@ func TestErrorReplies(t *testing.T) {
 			},
 		},
 		"processed headers replier": {
-			in:             createFakeEvent(),
+			in:             createFakeEvent(tEventType),
 			code:           tErrorCode,
 			reportedError:  errTest,
 			replierOptions: []ReplierOption{ReplierWithProcessedHeaders()},
@@ -396,7 +408,7 @@ func TestErrorReplies(t *testing.T) {
 			},
 		},
 		"processed and stateful headers replier": {
-			in:            createFakeEvent(),
+			in:            createFakeEvent(tEventType),
 			code:          tErrorCode,
 			reportedError: errTest,
 			replierOptions: []ReplierOption{
@@ -415,14 +427,26 @@ func TestErrorReplies(t *testing.T) {
 				ProcessedIDHeader:              tEventID,
 			},
 		},
-		"error reply with subject headers replier": {
-			in:                   createFakeEvent(),
+		"error reply with subject headers replier ": {
+			in:                   createFakeEvent(tEventType),
 			code:                 tErrorCode,
 			reportedError:        errTest,
 			eventResponseOptions: []EventResponseOption{ResponseWithSubject(tOutSubject)},
 
 			expectedNilEvent:   false,
 			expectedType:       tOutType,
+			expectedSource:     tOutSource,
+			expectedSubject:    tOutSubject,
+			expectedExtensions: createErrorCategoryExtension(),
+		},
+		"error reply no matching event types ": {
+			in:                   createFakeEvent(tBadEventType),
+			code:                 tErrorCode,
+			reportedError:        errTest,
+			eventResponseOptions: []EventResponseOption{ResponseWithSubject(tOutSubject)},
+
+			expectedNilEvent:   false,
+			expectedType:       tOutBadType,
 			expectedSource:     tOutSource,
 			expectedSubject:    tOutSubject,
 			expectedExtensions: createErrorCategoryExtension(),
@@ -477,11 +501,11 @@ func TestErrorReplies(t *testing.T) {
 	}
 }
 
-func createFakeEvent() *cloudevents.Event {
+func createFakeEvent(eventType string) *cloudevents.Event {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 
 	event.SetID(tEventID)
-	event.SetType(tEventType)
+	event.SetType(eventType)
 	event.SetSource(tEventSource)
 	event.SetSubject(tEventSubject)
 	if err := event.SetData(cloudevents.ApplicationJSON, tEventData); err != nil {
