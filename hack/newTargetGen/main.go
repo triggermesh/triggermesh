@@ -25,22 +25,47 @@ import (
 	"path/filepath"
 )
 
+type template struct {
+	name          string
+	uppercaseName string
+}
+
+func (a *template) replaceTemplates(filename, outputname string) {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		log.Panicf("failed reading data from file: %s", err)
+	}
+
+	filterUpper := bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(a.uppercaseName))
+	filterLowercase := bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(a.name))
+
+	file, err := os.Create(outputname)
+	if err != nil {
+		log.Fatalf("failed creating file: %s", err)
+	}
+
+	defer file.Close()
+	_, err = file.Write(filterLowercase)
+	if err != nil {
+		log.Fatalf("failed writing to file: %s", err)
+	}
+}
+
 func main() {
-	var name string
-	var uppercaseName string
+	temp := &template{}
 	// var capsName string
 
 	fmt.Print("Enter the LOWERCASE VERSION of the target name: ")
-	fmt.Scanf("%s", &name)
+	fmt.Scanf("%s", &temp.name)
 	fmt.Print("Enter the UPPERCASE VERSION of the target name: ")
-	fmt.Scanf("%s", &uppercaseName)
+	fmt.Scanf("%s", &temp.uppercaseName)
 	// fmt.Print("Enter the ALL CAPS VERISON of the target name: ")
 	// fmt.Scanf("%s", &capsName)
 	// TODO add naming validation here
-	fmt.Printf("Lets make a %s target!", uppercaseName)
+	fmt.Printf("Lets make a %s target!", temp.uppercaseName)
 
 	// make cmd folder
-	path := fmt.Sprintf("cmd/%s", name)
+	path := fmt.Sprintf("cmd/%s", temp.name)
 	newpath := filepath.Join("../../", path)
 	err := os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
@@ -48,7 +73,7 @@ func main() {
 	}
 
 	// // make adapter folder
-	path = fmt.Sprintf("pkg/targets/adapter/%s", name)
+	path = fmt.Sprintf("pkg/targets/adapter/%s", temp.name)
 	newpath = filepath.Join("../../", path)
 	err = os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
@@ -56,7 +81,7 @@ func main() {
 	}
 
 	// make reconciler folder
-	path = fmt.Sprintf("pkg/targets/reconciler/%s", name)
+	path = fmt.Sprintf("pkg/targets/reconciler/%s", temp.name)
 	newpath = filepath.Join("../../", path)
 	err = os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
@@ -65,228 +90,49 @@ func main() {
 
 	// populate cmd folder
 	// read dockerfile and replace the template variables
-	data, err := ioutil.ReadFile("scaffolding/cmd/newtarget-adapter/Dockerfile")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper := bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase := bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("cmd/%s/Dockerfile", name)
+	path = fmt.Sprintf("cmd/%s/Dockerfile", temp.name)
 	newpath = filepath.Join("../../", path)
-	file, err := os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
+	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/Dockerfile", newpath)
 
 	// read main.go and replace the template variables
-	data, err = ioutil.ReadFile("scaffolding/cmd/newtarget-adapter/main.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("cmd/%s/main.go", name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
+	path = fmt.Sprintf("../../cmd/%s/main.go", temp.name)
+	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
 
 	// populate adapter folder
-
 	// read adapter.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/adapter/newtarget/adapter.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
+	path = fmt.Sprintf("../../pkg/targets/adapter/%s/adapter.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/targets/adapter/newtarget/adapter.go", path)
 
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
+	// // read newtarget_lifecycle.go
+	path = fmt.Sprintf("../../pkg/apis/targets/v1alpha1/%s_lifecycle.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_lifecycle.go", path)
 
-	path = fmt.Sprintf("pkg/targets/adapter/%s/adapter.go", name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
-
-	// read newtarget_lifecycle.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/adapter/newtarget/newtarget_lifecycle.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("pkg/targets/adapter/%s/%s_lifecycle.go", name, name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
-
-	// read newtarget_types.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/adapter/newtarget/newtarget_types.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("pkg/targets/adapter/%s/%s_types.go", name, name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
+	// // read newtarget_types.go
+	path = fmt.Sprintf("../../pkg/apis/targets/v1alpha1/%s_types.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_types.go", path)
 
 	// populate reconciler folder
 	// read adapter.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/reconciler/newtarget/adapter.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("pkg/targets/reconciler/%s/adapter.go", name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
+	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/adapter.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/adapter.go", path)
 
 	// read controller_test.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/reconciler/newtarget/controller_test.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("pkg/targets/reconciler/%s/controller_test.go", name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
+	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/controller_test.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller_test.go", path)
 
 	// read controller.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/reconciler/newtarget/controller.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("pkg/targets/reconciler/%s/controller.go", name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
+	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/controller.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller.go", path)
 
 	// read reconciler_test.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/reconciler/newtarget/reconciler_test.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
-
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("pkg/targets/reconciler/%s/reconciler_test.go", name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
+	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/reconciler_test.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler_test.go", path)
 
 	// read reconciler.go
-	data, err = ioutil.ReadFile("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go")
-	if err != nil {
-		log.Panicf("failed reading data from file: %s", err)
-	}
+	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/reconciler.go", temp.name)
+	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
 
-	filterUpper = bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(uppercaseName))
-	filterLowercase = bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(name))
-
-	path = fmt.Sprintf("pkg/targets/reconciler/%s/reconciler.go", name)
-	newpath = filepath.Join("../../", path)
-	file, err = os.Create(newpath)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-
-	defer file.Close()
-	_, err = file.Write(filterLowercase)
-	if err != nil {
-		log.Fatalf("failed writing to file: %s", err)
-	}
-
+	fmt.Println("")
 	fmt.Println("done")
 
 }
