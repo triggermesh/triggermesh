@@ -30,10 +30,6 @@ func main() {
 	var uppercaseName string
 	// var capsName string
 
-	name = "testtarget"
-	uppercaseName = "TestTarget"
-	// capsName = "TEST"
-
 	fmt.Print("Enter the LOWERCASE VERSION of the target name: ")
 	fmt.Scanf("%s", &name)
 	fmt.Print("Enter the UPPERCASE VERSION of the target name: ")
