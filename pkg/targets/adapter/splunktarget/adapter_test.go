@@ -94,7 +94,9 @@ func TestReceive(t *testing.T) {
 			e, r := a.receive(context.Background(), newEvent(t))
 			eE := &errorEvent{}
 
-			e.DataAs(eE)
+			if err := e.DataAs(eE); err != nil {
+				t.Log("error processing incoming event data: %w", err)
+			}
 			assert.Lenf(t, tc.client.inputRecorder, 1, "Client records a single request")
 			assert.Equal(t, &r, tc.expectResult)
 			assert.Equal(t, eE, tc.expectEvent)
