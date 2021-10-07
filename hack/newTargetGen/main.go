@@ -62,7 +62,6 @@ func main() {
 	// fmt.Print("Enter the ALL CAPS VERISON of the target name: ")
 	// fmt.Scanf("%s", &capsName)
 	// TODO add naming validation here
-	fmt.Printf("Lets make a %s target!", temp.uppercaseName)
 
 	// make cmd folder
 	path := fmt.Sprintf("cmd/%s", temp.name)
@@ -137,7 +136,10 @@ func main() {
 	path = fmt.Sprintf("../../config/301-%s.yaml", temp.name)
 	temp.replaceTemplates("scaffolding/config/301-newtarget.yaml", path)
 
-	fmt.Println("")
 	fmt.Println("done")
-
+	fmt.Println("Next Steps:")
+	fmt.Println("Update `cmd/triggermesh-controller/main.go`")
+	fmt.Println("Update `config/500-controller.yaml`")
+	fmt.Println("Update `pkg/api/targets/v1alpha1/register.go`")
+	fmt.Printf("Create kodata symlinks in cmd/%s", temp.name)
 }
