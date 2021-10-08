@@ -85,6 +85,8 @@ type AWSCloudWatchMetricQuery struct {
 	Metric *AWSCloudWatchMetricStat `json:"metric,omitempty"`
 }
 
+// AWSCloudWatchMetricStat is a representation of a metric with statistics,
+// period, and units, but no math expression.
 type AWSCloudWatchMetricStat struct {
 	Metric AWSCloudWatchMetric `json:"metric"`         // Definition of the metric
 	Period int64               `json:"period"`         // metric resolution in seconds
@@ -92,12 +94,14 @@ type AWSCloudWatchMetricStat struct {
 	Unit   string              `json:"unit,omitempty"` // The unit of the metric being returned
 }
 
+// AWSCloudWatchMetric is a metric definition.
 type AWSCloudWatchMetric struct {
 	Dimensions []AWSCloudWatchMetricDimension `json:"dimensions"`
 	MetricName string                         `json:"metricName"`
 	Namespace  string                         `json:"namespace"`
 }
 
+// AWSCloudWatchMetricDimension represents the dimensions of a metric.
 type AWSCloudWatchMetricDimension struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`

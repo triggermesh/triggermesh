@@ -29,7 +29,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TektonTarget defines the schema for the Tekton target
+// TektonTarget defines the schema for the Tekton target.
 type TektonTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata"`
@@ -42,12 +42,14 @@ type TektonTarget struct {
 	Status TektonTargetStatus `json:"status,omitempty"`
 }
 
+// TektonTargetSpec holds the desired state of event target.
 type TektonTargetSpec struct {
 	// ReapPolicy dictates the reaping policy to be applied for the target
 	// +optional
 	ReapPolicy *TektonTargetReapPolicy `json:"reapPolicy,omitempty"`
 }
 
+// TektonTargetReapPolicy defines desired Repeating Policy.
 type TektonTargetReapPolicy struct {
 	// ReapSuccessAge How long to wait before reaping runs that were successful
 	ReapSuccessAge *string `json:"success,omitempty"`
@@ -82,7 +84,7 @@ type TektonTargetStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TektonBuildRequestTargetList is a list of TektonBuildRequestTarget resources
+// TektonTargetList is a list of event targets.
 type TektonTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

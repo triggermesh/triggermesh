@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	adapter.Main("ocimetrics", ocimetricssource.EnvAccessorCtor, ocimetricssource.NewAdapter)
+	adapter.Main("ocimetrics", ocimetricssource.NewEnvConfig, ocimetricssource.NewAdapter)
 }

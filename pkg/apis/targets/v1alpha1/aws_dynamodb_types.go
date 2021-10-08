@@ -50,6 +50,7 @@ var (
 	_ duckv1.KRShaped     = (*AWSDynamoDBTarget)(nil)
 )
 
+// AWSDynamoDBTargetSpec holds the desired state of the event target.
 type AWSDynamoDBTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -62,6 +63,7 @@ type AWSDynamoDBTargetSpec struct {
 	ARN string `json:"arn"`
 }
 
+// AWSDynamoDBTargetStatus communicates the observed state of the event target.
 type AWSDynamoDBTargetStatus struct {
 	AWSTargetStatus `json:",inline"`
 	// Accepted/emitted CloudEvent attributes

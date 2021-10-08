@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	adapter.Main("twiliosource", twiliosource.EnvAccessor, twiliosource.NewAdapter)
+	adapter.Main("twiliosource", twiliosource.NewEnvConfig, twiliosource.NewAdapter)
 }

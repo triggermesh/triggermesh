@@ -48,6 +48,7 @@ var (
 	_ duckv1.KRShaped    = (*AWSKinesisTarget)(nil)
 )
 
+// AWSLambdaTargetSpec holds the desired state of the event target.
 type AWSLambdaTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`

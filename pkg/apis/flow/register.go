@@ -17,5 +17,6 @@ limitations under the License.
 package flow
 
 const (
+	// GroupName is the name of the API group this package's resources belong to.
 	GroupName = "flow.triggermesh.io"
 )

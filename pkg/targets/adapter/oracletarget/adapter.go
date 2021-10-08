@@ -33,6 +33,7 @@ import (
 	"knative.dev/pkg/logging"
 )
 
+// NewTarget constructs a target's adapter.
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 	env := envAcc.(*envAccessor)

@@ -31,14 +31,14 @@ import (
 
 const (
 	defaultContainerName = "user-container"
-	MountPath            = "/opt"
+	mountPath            = "/opt"
 )
 
-// Option sets kn service options
-type knSvcOption func(*servingv1.Service)
+// KnSvcOption sets Kn service options.
+type KnSvcOption func(*servingv1.Service)
 
 // NewKnService creates a Knative Service object.
-func NewKnService(name, ns string, opts ...knSvcOption) *servingv1.Service {
+func NewKnService(name, ns string, opts ...KnSvcOption) *servingv1.Service {
 	d := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: ns,
@@ -50,7 +50,7 @@ func NewKnService(name, ns string, opts ...knSvcOption) *servingv1.Service {
 		opt(d)
 	}
 
-	// ensure the container name is not empty
+	// ensure the container name is not empty.
 	containers := d.Spec.Template.Spec.Containers
 	if len(containers) == 1 && containers[0].Name == "" {
 		containers[0].Name = defaultContainerName
@@ -59,30 +59,31 @@ func NewKnService(name, ns string, opts ...knSvcOption) *servingv1.Service {
 	return d
 }
 
-// Image sets a Container's image.
-func KnSvcImage(img string) knSvcOption {
+// KnSvcImage sets a Container's image.
+func KnSvcImage(img string) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		image := &firstContainer(svc).Image
 		*image = img
 	}
 }
 
-// EnvVars sets the value of multiple environment variables.
-func KnSvcEnvVars(evs ...corev1.EnvVar) knSvcOption {
+// KnSvcEnvVars sets the value of multiple environment variables.
+func KnSvcEnvVars(evs ...corev1.EnvVar) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		svcEnvVars := envVarsFrom(svc)
 		*svcEnvVars = append(*svcEnvVars, evs...)
 	}
 }
 
-// EnvVar sets the value of a Container's environment variable.
-func KnSvcEnvVar(name, val string) knSvcOption {
+// KnSvcEnvVar sets the value of a Container's environment variable.
+func KnSvcEnvVar(name, val string) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		setEnvVar(envVarsFrom(svc), name, val, nil)
 	}
 }
 
-func KnSvcAnnotation(key, value string) knSvcOption {
+// KnSvcAnnotation sets Kn service annotation.
+func KnSvcAnnotation(key, value string) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		if svc.Spec.Template.Annotations == nil {
 			svc.Spec.Template.Annotations = make(map[string]string)
@@ -91,7 +92,8 @@ func KnSvcAnnotation(key, value string) knSvcOption {
 	}
 }
 
-func KnSvcOwner(o kmeta.OwnerRefable) knSvcOption {
+// KnSvcOwner sets Kn service owner.
+func KnSvcOwner(o kmeta.OwnerRefable) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		svc.SetOwnerReferences([]metav1.OwnerReference{
 			*kmeta.NewControllerRef(o),
@@ -99,7 +101,8 @@ func KnSvcOwner(o kmeta.OwnerRefable) knSvcOption {
 	}
 }
 
-func KnSvcLabel(labels map[string]string) knSvcOption {
+// KnSvcLabel sets Kn service labels.
+func KnSvcLabel(labels map[string]string) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		if svc.Labels != nil {
 			for k, v := range labels {
@@ -111,13 +114,14 @@ func KnSvcLabel(labels map[string]string) knSvcOption {
 	}
 }
 
-func KnSvcMountCm(cmSrc, fileDst string) knSvcOption {
+// KnSvcMountCm sets Kn service volume mounts.
+func KnSvcMountCm(cmSrc, fileDst string) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		svc.Spec.ConfigurationSpec.Template.Spec.Containers[0].VolumeMounts = []corev1.VolumeMount{
 			{
 				Name:      "user-function",
 				ReadOnly:  true,
-				MountPath: path.Join(MountPath, fileDst),
+				MountPath: path.Join(mountPath, fileDst),
 				SubPath:   fileDst,
 			},
 		}
@@ -132,7 +136,7 @@ func KnSvcMountCm(cmSrc, fileDst string) knSvcOption {
 						Items: []corev1.KeyToPath{
 							{
 								Path: fileDst,
-								Key:  DefaultCmKey,
+								Key:  defaultCmKey,
 							},
 						},
 					},
@@ -142,13 +146,15 @@ func KnSvcMountCm(cmSrc, fileDst string) knSvcOption {
 	}
 }
 
-func KnSvcEntrypoint(command string) knSvcOption {
+// KnSvcEntrypoint sets Kn service entrypoint.
+func KnSvcEntrypoint(command string) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		svc.Spec.ConfigurationSpec.Template.Spec.Containers[0].Command = []string{command}
 	}
 }
 
-func KnSvcVisibility(public bool) knSvcOption {
+// KnSvcVisibility sets Kn service visibility scope.
+func KnSvcVisibility(public bool) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		if public {
 			return
@@ -186,7 +192,8 @@ func firstContainer(svc *servingv1.Service) *corev1.Container {
 	return &(*containers)[0]
 }
 
-func KnSvcEnvFromMap(prefix string, vars map[string]string) knSvcOption {
+// KnSvcEnvFromMap sets Kn service env variables from a map.
+func KnSvcEnvFromMap(prefix string, vars map[string]string) KnSvcOption {
 	return func(svc *servingv1.Service) {
 		svcEnvVars := envVarsFrom(svc)
 		for k, v := range vars {

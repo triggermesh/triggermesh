@@ -30,7 +30,7 @@ const (
 	typeValue   = "type.googleapis.com/google.cloud.audit.AuditLog"
 )
 
-// Google Cloud Audit Logs filter builder. Currently
+// FilterBuilder builds a filter for Google Cloud Audit Logs. Currently
 // supports querying by the Audit Logs serviceName, methodName (requireds), and
 // resourceName (optional).
 type FilterBuilder struct {
@@ -39,8 +39,10 @@ type FilterBuilder struct {
 	resourceName string
 }
 
+// FilterOption is used to apply custom options on FilterBuilder.
 type FilterOption func(*FilterBuilder)
 
+// NewFilterBuilder creates a new instance of FilterBuilder.
 func NewFilterBuilder(serviceName, methodName string, opts ...FilterOption) *FilterBuilder {
 	fb := &FilterBuilder{
 		serviceName: serviceName,
@@ -54,12 +56,14 @@ func NewFilterBuilder(serviceName, methodName string, opts ...FilterOption) *Fil
 	return fb
 }
 
+// WithResourceName sets FilterBuilder resource name.
 func WithResourceName(resourceName string) FilterOption {
 	return func(fb *FilterBuilder) {
 		fb.resourceName = resourceName
 	}
 }
 
+// GetFilter returns filter query string.
 func (fb *FilterBuilder) GetFilter() string {
 	var filters []string
 

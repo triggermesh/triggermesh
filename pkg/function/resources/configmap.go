@@ -22,12 +22,13 @@ import (
 	"knative.dev/pkg/kmeta"
 )
 
-const DefaultCmKey = "code"
+const defaultCmKey = "code"
 
-// Option sets configmap options
-type cmOption func(*corev1.ConfigMap)
+// CmOption sets configmap options.
+type CmOption func(*corev1.ConfigMap)
 
-func NewConfigmap(name, namespace string, opts ...cmOption) *corev1.ConfigMap {
+// NewConfigmap returns core configmap object.
+func NewConfigmap(name, namespace string, opts ...CmOption) *corev1.ConfigMap {
 	cm := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
@@ -42,15 +43,17 @@ func NewConfigmap(name, namespace string, opts ...cmOption) *corev1.ConfigMap {
 	return cm
 }
 
-func CmData(data string) cmOption {
+// CmData sets configmap data.
+func CmData(data string) CmOption {
 	return func(cm *corev1.ConfigMap) {
 		cm.Data = map[string]string{
-			DefaultCmKey: data,
+			defaultCmKey: data,
 		}
 	}
 }
 
-func CmOwner(o kmeta.OwnerRefable) cmOption {
+// CmOwner sets configmap owner.
+func CmOwner(o kmeta.OwnerRefable) CmOption {
 	return func(cm *corev1.ConfigMap) {
 		cm.SetOwnerReferences([]metav1.OwnerReference{
 			*kmeta.NewControllerRef(o),
@@ -58,7 +61,8 @@ func CmOwner(o kmeta.OwnerRefable) cmOption {
 	}
 }
 
-func CmLabel(labels map[string]string) cmOption {
+// CmLabel sets configmap labels.
+func CmLabel(labels map[string]string) CmOption {
 	return func(cm *corev1.ConfigMap) {
 		cm.SetLabels(labels)
 	}

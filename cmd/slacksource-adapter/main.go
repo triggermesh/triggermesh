@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	adapter.Main("slack", slacksource.EnvAccessor, slacksource.NewAdapter)
+	adapter.Main("slack", slacksource.NewEnvConfig, slacksource.NewAdapter)
 }

@@ -41,7 +41,7 @@ require (
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.1
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.9+incompatible
 	github.com/amenzhinsky/iothub v0.7.0
-	github.com/andygrunwald/go-jira v1.13.0
+	github.com/andygrunwald/go-jira v1.14.0
 	github.com/aws/aws-sdk-go v1.37.1
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
@@ -96,12 +96,11 @@ require (
 	github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.4.1 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.4.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/emicklei/go-restful v2.15.0+incompatible // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
-	github.com/fatih/structs v1.0.0 // indirect
+	github.com/fatih/structs v1.1.0 // indirect
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-kit/log v0.1.0 // indirect
@@ -163,7 +162,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tidwall/match v1.0.3 // indirect
 	github.com/tidwall/pretty v1.0.2 // indirect
-	github.com/trivago/tgo v1.0.1 // indirect
+	github.com/trivago/tgo v1.0.7 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect

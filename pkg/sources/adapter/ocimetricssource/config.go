@@ -22,8 +22,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
-// EnvAccessorCtor for configuration parameters
-func EnvAccessorCtor() adapter.EnvConfigAccessor {
+// NewEnvConfig for configuration parameters
+func NewEnvConfig() adapter.EnvConfigAccessor {
 	return &envAccessor{}
 }
 
