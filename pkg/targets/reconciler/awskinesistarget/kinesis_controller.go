@@ -37,7 +37,7 @@ import (
 	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 )
 
-// NewKinesisController initializes the controller and is called by the generated code
+// NewController initializes the controller and is called by the generated code
 // Registers event handlers to enqueue events
 func NewController(
 	ctx context.Context,
