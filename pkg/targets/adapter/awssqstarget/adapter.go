@@ -33,7 +33,7 @@ import (
 	"knative.dev/pkg/logging"
 )
 
-// Adapter implementation
+// NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	config := env.GetAwsConfig()
