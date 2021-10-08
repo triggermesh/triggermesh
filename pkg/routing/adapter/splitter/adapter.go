@@ -35,10 +35,8 @@ import (
 	"knative.dev/pkg/injection"
 	"knative.dev/pkg/logging"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/splitter"
 	routinglisters "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/routing/adapter/common/env"
 )
 
 const serverPort int = 8080
@@ -55,41 +53,28 @@ type Handler struct {
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
-func NewEnvConfig() env.ConfigAccessor {
-	return &env.Config{}
+func NewEnvConfig() pkgadapter.EnvConfigAccessor {
+	return &pkgadapter.EnvConfig{}
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(component string) pkgadapter.AdapterConstructor {
-	return func(ctx context.Context, _ pkgadapter.EnvConfigAccessor,
-		ceClient cloudevents.Client) pkgadapter.Adapter {
-		logger := logging.FromContext(ctx)
+func NewAdapter(ctx context.Context, _ pkgadapter.EnvConfigAccessor, _ cloudevents.Client) pkgadapter.Adapter {
+	logger := logging.FromContext(ctx)
 
-		sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
-		if err != nil {
-			logger.Panicf("failed to create message sender: %v", err)
-		}
-
-		informer := informerv1alpha1.Get(ctx)
-		ns := injection.GetNamespaceScope(ctx)
-
-		return &Handler{
-			receiver:       kncloudevents.NewHTTPMessageReceiver(serverPort),
-			sender:         sender,
-			splitterLister: informer.Lister().Splitters(ns),
-			logger:         logger,
-		}
+	sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
+	if err != nil {
+		logger.Panicf("failed to create message sender: %v", err)
 	}
-}
 
-// RegisterHandlerFor implements MTAdapter.
-func (h *Handler) RegisterHandlerFor(ctx context.Context, s *v1alpha1.Splitter) error {
-	return nil
-}
+	informer := informerv1alpha1.Get(ctx)
+	ns := injection.GetNamespaceScope(ctx)
 
-// DeregisterHandlerFor implements MTAdapter.
-func (h *Handler) DeregisterHandlerFor(ctx context.Context, s *v1alpha1.Splitter) error {
-	return nil
+	return &Handler{
+		receiver:       kncloudevents.NewHTTPMessageReceiver(serverPort),
+		sender:         sender,
+		splitterLister: informer.Lister().Splitters(ns),
+		logger:         logger,
+	}
 }
 
 // Start begins to receive messages for the handler.

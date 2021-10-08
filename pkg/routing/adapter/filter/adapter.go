@@ -65,7 +65,7 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+func NewAdapter(ctx context.Context, _ pkgadapter.EnvConfigAccessor, _ cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
 	sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
