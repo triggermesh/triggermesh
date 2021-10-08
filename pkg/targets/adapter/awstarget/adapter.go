@@ -44,7 +44,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
-// Adapter implementation
+// NewTarget constructs a target's adapter.
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	config := env.GetAwsConfig()
@@ -96,6 +96,7 @@ type awsAdapter struct {
 	logger   *zap.SugaredLogger
 }
 
+// Start implements adapter.Adapter.
 func (a *awsAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS adapter")
 	s := session.Must(session.NewSession(a.config))
@@ -124,7 +125,7 @@ func (a *awsAdapter) Start(ctx context.Context) error {
 	return nil
 }
 
-// Parse and send the aws event
+// Parse and send the aws event.
 func (a *awsAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var e *cloudevents.Event
 	var r cloudevents.Result

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package sqs contains helpers for AWS S3.
+// Package s3 contains helpers for AWS S3.
 package s3
 
 import "github.com/triggermesh/triggermesh/pkg/apis"

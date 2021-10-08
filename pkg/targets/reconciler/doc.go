@@ -14,5 +14,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package common contains constants shared by reconcilers.
+// Package reconciler contains constants shared by reconcilers.
 package reconciler

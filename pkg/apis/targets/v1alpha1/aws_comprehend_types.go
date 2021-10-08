@@ -50,6 +50,7 @@ var (
 	_ duckv1.KRShaped     = (*AWSComprehendTarget)(nil)
 )
 
+// AWSComprehendTargetSpec holds the desired state of the event target.
 type AWSComprehendTargetSpec struct {
 	// AWS account Key.
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -67,6 +68,7 @@ type AWSComprehendTargetSpec struct {
 	Language string `json:"language"`
 }
 
+// AWSComprehendTargetStatus communicates the observed state of the event target.
 type AWSComprehendTargetStatus struct {
 	AWSTargetStatus `json:",inline"`
 	// Accepted/emitted CloudEvent attributes

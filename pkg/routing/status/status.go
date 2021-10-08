@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	ReasonAppRuntimeFailure = "AppRuntimeFailure"
-	ReasonBadContainerImage = "BadContainerImage"
+	reasonAppRuntimeFailure = "AppRuntimeFailure"
+	reasonBadContainerImage = "BadContainerImage"
 
 	reasonMissingPrefix = "Missing"
 
@@ -55,11 +55,11 @@ func ExactReason(state interface{}) string /*reason*/ {
 
 func exactReason(reason, msg string) string /*reason*/ {
 	if isRuntimeError(reason, msg) {
-		return ReasonAppRuntimeFailure
+		return reasonAppRuntimeFailure
 	}
 
 	if isBadImageError(reason, msg) {
-		return ReasonBadContainerImage
+		return reasonBadContainerImage
 	}
 
 	if missing, typ := isResourceMissingError(reason, msg); missing {

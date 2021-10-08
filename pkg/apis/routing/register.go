@@ -17,5 +17,6 @@ limitations under the License.
 package routing
 
 const (
+	// GroupName is the name of the API group this package's resources belong to.
 	GroupName = "routing.triggermesh.io"
 )

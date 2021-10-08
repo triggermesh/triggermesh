@@ -16,6 +16,7 @@ limitations under the License.
 
 package awscomphrehendtarget
 
+// Response is the data structure returned by the event target.
 type Response struct {
 	Positive float64 `json:"positive"`
 	Negative float64 `json:"negative"`

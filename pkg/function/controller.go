@@ -43,7 +43,7 @@ const (
 	runtimeEnvPrefix = "RUNTIME_"
 )
 
-// New creates a Reconciler and returns the result of NewImpl.
+// NewController creates a Reconciler and returns the result of NewImpl.
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,

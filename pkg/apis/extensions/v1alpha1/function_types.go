@@ -26,6 +26,8 @@ import (
 // +genclient
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// Function is an addressable object that executes function code.
 type Function struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional

@@ -76,6 +76,7 @@ func EnvVar(name, val string) Option {
 	}
 }
 
+// Owner sets service owner.
 func Owner(o kmeta.OwnerRefable) Option {
 	return func(svc *servingv1.Service) {
 		svc.SetOwnerReferences([]metav1.OwnerReference{

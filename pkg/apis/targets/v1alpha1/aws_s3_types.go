@@ -51,6 +51,7 @@ var (
 	_ duckv1.KRShaped           = (*AWSS3Target)(nil)
 )
 
+// AWSS3TargetSpec holds the desired state of the even target.
 type AWSS3TargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -68,6 +69,7 @@ type AWSS3TargetSpec struct {
 	DiscardCEContext bool `json:"discardCloudEventContext"`
 }
 
+// AWSS3TargetStatus communicates the observed state of the event target.
 type AWSS3TargetStatus struct {
 	AWSTargetStatus `json:",inline"`
 	// Accepted/emitted CloudEvent attributes

@@ -35,6 +35,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
+// NewTarget constructs a target's adapter.
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	config := env.GetAwsConfig(env.Region)
@@ -71,6 +72,7 @@ type comprehendAdapter struct {
 	logger   *zap.SugaredLogger
 }
 
+// Start implements pkgadapter.Adapter.
 func (a *comprehendAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting The AWS Comprehend Target Adapter")
 	s := session.Must(session.NewSession(a.config))

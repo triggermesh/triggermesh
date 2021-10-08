@@ -1,5 +1,7 @@
 # TriggerMesh
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/triggermesh/triggermesh)](https://goreportcard.com/report/github.com/triggermesh/triggermesh)
+
 <!-- TODO: add repository description, docs, contribution guidelines, etc. -->
 
 When installing the TriggerMesh components by hand or a tool like [ko][ko], the `triggermesh`
