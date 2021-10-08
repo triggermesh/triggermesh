@@ -55,7 +55,7 @@ type eventDispatcher struct {
 var _ adapter.Adapter = (*salesforceAdapter)(nil)
 var _ sfclient.EventDispatcher = (*eventDispatcher)(nil)
 
-// NewAdapter implementation
+// NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
 	env := aEnv.(*envAccessor)
 	logger := logging.FromContext(ctx)

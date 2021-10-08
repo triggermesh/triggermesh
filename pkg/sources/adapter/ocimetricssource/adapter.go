@@ -33,7 +33,7 @@ type ociMetricsAdapter struct {
 	logger  *zap.SugaredLogger
 }
 
-// NewAdapter constructs a source's adapter.
+// NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
 	env := aEnv.(*envAccessor)
 	logger := logging.FromContext(ctx)

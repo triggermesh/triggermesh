@@ -22,7 +22,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
-// NewEnvConfig for configuration parameters
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() adapter.EnvConfigAccessor {
 	return &envAccessor{}
 }

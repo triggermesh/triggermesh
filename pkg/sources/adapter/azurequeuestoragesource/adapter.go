@@ -42,7 +42,7 @@ type envConfig struct {
 	QueueName   string `envconfig:"AZURE_QUEUE_NAME"`
 }
 
-// NewEnvConfig returns an accessor for the source's adapter envConfig.
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 	return &envConfig{}
 }
@@ -59,7 +59,7 @@ type adapter struct {
 	logger      *zap.SugaredLogger
 }
 
-// NewAdapter returns a constructor for the source's adapter.
+// NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envConfig)
 	logger := logging.FromContext(ctx)

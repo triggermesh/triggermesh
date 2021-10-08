@@ -59,14 +59,12 @@ type Handler struct {
 	expressions *expressionStorage
 }
 
-// NewEnvConfig satisfies env.ConfigConstructor.
-// Returns an accessor for the source's adapter envConfig.
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 	return &pkgadapter.EnvConfig{}
 }
 
-// NewAdapter creates a new Handler and its associated MessageReceiver. The caller is responsible for
-// Start()ing the returned Handler.
+// NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 

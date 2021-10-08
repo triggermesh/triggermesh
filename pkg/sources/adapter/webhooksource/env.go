@@ -20,7 +20,7 @@ import (
 	"knative.dev/eventing/pkg/adapter/v2"
 )
 
-// NewEnvConfig for configuration parameters
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() adapter.EnvConfigAccessor {
 	return &envAccessor{}
 }

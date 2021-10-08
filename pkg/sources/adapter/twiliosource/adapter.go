@@ -43,12 +43,12 @@ type adapter struct {
 	logger      *zap.SugaredLogger
 }
 
-// NewEnvConfig returns an accessor for the source's adapter envConfig.
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 	return &pkgadapter.EnvConfig{}
 }
 
-// NewAdapter returns a constructor for the source's adapter.
+// NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, env pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	return &adapter{
 		ceClient:    ceClient,

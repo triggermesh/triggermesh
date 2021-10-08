@@ -58,12 +58,12 @@ type MessageWithRawData struct {
 
 var _ pkgadapter.Adapter = (*adapter)(nil)
 
-// NewEnvConfig returns an accessor for the source's adapter envConfig.
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 	return &envConfig{}
 }
 
-// NewAdapter returns a constructor for the source's adapter.
+// NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 	env := envAcc.(*envConfig)

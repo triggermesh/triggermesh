@@ -54,14 +54,12 @@ type Handler struct {
 	logger         *zap.SugaredLogger
 }
 
-// NewEnvConfig satisfies env.ConfigConstructor.
-// Returns an accessor for the source's adapter envConfig.
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() env.ConfigAccessor {
 	return &env.Config{}
 }
 
-// NewAdapter creates a new Handler and its associated MessageReceiver. The caller is responsible for
-// Start()ing the returned Handler.
+// NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(component string) pkgadapter.AdapterConstructor {
 	return func(ctx context.Context, _ pkgadapter.EnvConfigAccessor,
 		ceClient cloudevents.Client) pkgadapter.Adapter {

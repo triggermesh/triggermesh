@@ -59,7 +59,6 @@ var (
 )
 
 // NewEnvConfig satisfies env.ConfigConstructor.
-// Returns an accessor for the source's adapter envConfig.
 func NewEnvConfig() env.ConfigAccessor {
 	return &env.Config{}
 }
