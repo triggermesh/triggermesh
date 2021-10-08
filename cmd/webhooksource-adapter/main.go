@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	adapter.Main("webhook", webhooksource.EnvAccessor, webhooksource.NewAdapter)
+	adapter.Main("webhook", webhooksource.NewEnvConfig, webhooksource.NewAdapter)
 }

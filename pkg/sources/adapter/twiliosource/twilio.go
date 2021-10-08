@@ -43,8 +43,8 @@ type adapter struct {
 	logger      *zap.SugaredLogger
 }
 
-// EnvAccessor returns an accessor for the source's adapter envConfig.
-func EnvAccessor() pkgadapter.EnvConfigAccessor {
+// NewEnvConfig returns an accessor for the source's adapter envConfig.
+func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 	return &pkgadapter.EnvConfig{}
 }
 

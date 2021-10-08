@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	adapter.Main("salesforce", salesforcesource.EnvAccessor, salesforcesource.NewAdapter)
+	adapter.Main("salesforce", salesforcesource.NewEnvConfig, salesforcesource.NewAdapter)
 }
