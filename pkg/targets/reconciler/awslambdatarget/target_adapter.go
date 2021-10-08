@@ -38,7 +38,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AWS_LAMBDA_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awslambda-target-adapter"`
+	Image string `envconfig:"AWS_LAMBDA_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awslambdatarget-adapter"`
 }
 
 // MakeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.

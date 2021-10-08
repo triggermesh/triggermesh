@@ -45,6 +45,6 @@ ENV KO_DATA_PATH /kodata
 
 COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
-COPY --from=builder /bin/awslambdatarget-adapter /awslambdatarget-adapter
+COPY --from=builder /bin/awslambdatarget-adapter /
 
 ENTRYPOINT ["/awslambdatarget-adapter"]

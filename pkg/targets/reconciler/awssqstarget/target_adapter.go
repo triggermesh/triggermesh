@@ -38,7 +38,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AWS_SQS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awssqs-target-adapter"`
+	Image string `envconfig:"AWS_SQS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awssqstarget-adapter"`
 }
 
 func makeTargetSQSAdapterKService(target *v1alpha1.AWSSQSTarget, cfg *adapterConfig) *servingv1.Service {

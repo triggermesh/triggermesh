@@ -40,7 +40,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AWS_DYNAMODB_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awsdynamodb-target-adapter"`
+	Image string `envconfig:"AWS_DYNAMODB_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awsdynamodbtarget-adapter"`
 }
 
 // makeTargetDynamoDBAdapterKService generates (but does not insert into K8s) the Target Adapter KService.

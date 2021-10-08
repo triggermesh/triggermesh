@@ -45,6 +45,6 @@ ENV KO_DATA_PATH /kodata
 
 COPY LICENSE EULA.pdf /licenses/
 COPY --from=builder /kodata/ ${KO_DATA_PATH}/
-COPY --from=builder /bin/awsdynamodbtarget-adapter /awsdynamodbtarget-adapter
+COPY --from=builder /bin/awsdynamodbtarget-adapter /
 
 ENTRYPOINT ["/awsdynamodbtarget-adapter"]

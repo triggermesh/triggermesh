@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awskinesis-target-adapter", awskinesistarget.EnvAccessorCtor, awskinesistarget.NewTarget)
+	pkgadapter.Main("awskinesistarget-adapter", awskinesistarget.EnvAccessorCtor, awskinesistarget.NewTarget)
 }

@@ -38,7 +38,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AWS_SNS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awssns-target-adapter"`
+	Image string `envconfig:"AWS_SNS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awssnstarget-adapter"`
 }
 
 func makeTargetSNSAdapterKService(target *v1alpha1.AWSSNSTarget, cfg *adapterConfig) *servingv1.Service {

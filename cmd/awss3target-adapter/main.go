@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awss3-target-adapter", awss3target.EnvAccessorCtor, awss3target.NewTarget)
+	pkgadapter.Main("awss3target-adapter", awss3target.EnvAccessorCtor, awss3target.NewTarget)
 }

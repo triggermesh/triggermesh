@@ -38,7 +38,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AWS_KINESIS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awskinesis-target-adapter"`
+	Image string `envconfig:"AWS_KINESIS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awskinesistarget-adapter"`
 }
 
 func makeTargetKinesisAdapterKService(target *v1alpha1.AWSKinesisTarget, cfg *adapterConfig) *servingv1.Service {

@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awssqs-target-adapter", awssqstarget.EnvAccessorCtor, awssqstarget.NewTarget)
+	pkgadapter.Main("awssqstarget-adapter", awssqstarget.EnvAccessorCtor, awssqstarget.NewTarget)
 }
