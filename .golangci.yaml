@@ -22,3 +22,7 @@ issues:
     # don't exclude stylecheck issues about missing or malformed comments on package|func|type|var|const
     # checks: ST1000,ST1020,ST1021,ST1022 (https://staticcheck.io/docs/checks)
   - EXC0011
+  exclude-rules:
+    - linters:
+       - stylecheck
+      text: "ST1000:"

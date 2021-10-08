@@ -62,7 +62,7 @@ func TwilioSourceName(namespace, name string) string {
 	return "io.triggermesh.twilio/" + namespace + "/" + name
 }
 
-// Supported event types 
+// Supported event types.
 const (
 	TwilioSourceGenericEventType = "com.triggermesh.twilio.sms"
 )
