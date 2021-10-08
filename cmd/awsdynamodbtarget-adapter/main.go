@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awsdynamodbtarget-adapter", awsdynamodbtarget.EnvAccessorCtor, awsdynamodbtarget.NewTarget)
+	pkgadapter.Main("awsdynamodbtarget-adapter", awsdynamodbtarget.NewEnvConfig, awsdynamodbtarget.NewTarget)
 }

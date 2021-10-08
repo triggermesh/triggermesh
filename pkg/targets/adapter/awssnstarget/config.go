@@ -23,8 +23,8 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
-// EnvAccessorCtor for configuration parameters
-func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
+// NewEnvConfig for configuration parameters
+func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 	return &envAccessor{}
 }
 

@@ -41,7 +41,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	logger := logging.FromContext(ctx)
 	a := MustParseARN(env.AwsTargetArn)
 	config = config.WithRegion(a.Region)
-	return &awsAdapter{
+	return &adapter{
 		config:              config, // define configuration for the aws client
 		awsArnString:        env.AwsTargetArn,
 		awsArn:              a,
@@ -53,9 +53,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 }
 
-var _ pkgadapter.Adapter = (*awsAdapter)(nil)
+var _ pkgadapter.Adapter = (*adapter)(nil)
 
-type awsAdapter struct {
+type adapter struct {
 	awsArnString        string
 	awsArn              arn.ARN
 	awsKinesisPartition string
@@ -69,7 +69,7 @@ type awsAdapter struct {
 	logger   *zap.SugaredLogger
 }
 
-func (a *awsAdapter) Start(ctx context.Context) error {
+func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS Kinesis Target adapter")
 	s := session.Must(session.NewSession(a.config))
 	a.session = s
@@ -81,7 +81,7 @@ func (a *awsAdapter) Start(ctx context.Context) error {
 }
 
 // Parse and send the aws event
-func (a *awsAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var data []byte
 
 	if a.discardCEContext {
@@ -122,7 +122,7 @@ func (a *awsAdapter) dispatch(event cloudevents.Event) (*cloudevents.Event, clou
 	return &responseEvent, cloudevents.ResultACK
 }
 
-func (a *awsAdapter) reportError(msg string, err error) (*cloudevents.Event, cloudevents.Result) {
+func (a *adapter) reportError(msg string, err error) (*cloudevents.Event, cloudevents.Result) {
 	a.logger.Errorw(msg, zap.Error(err))
 	return nil, cloudevents.NewHTTPResult(http.StatusInternalServerError, msg)
 }
