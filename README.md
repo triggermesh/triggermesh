@@ -12,7 +12,7 @@ $ kubectl create ns triggermesh
 
 The current codebase can be built and deployed locally using [ko][ko] as:
 ```shell
-$ CGO_ENABLED=1 ko apply -f config/
+$ ko apply -f config/
 ```
 
 Make can used to build all of the TriggerMesh binaries. By default, Make will

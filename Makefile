@@ -79,7 +79,7 @@ confluenttarget-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
-	CGO_ENABLED=1 $(KO) apply -f $(BASE_DIR)/config
+	$(KO) apply -f $(BASE_DIR)/config
 
 undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster using ko
 	$(KO) delete -f $(BASE_DIR)/config
