@@ -105,19 +105,31 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 				newAdressable(),
 				newEventSource(noCEAttributes),
 			},
-			WantCreates: []runtime.Object{
-				newServiceAccount(noToken),
-				newRoleBinding(),
-				newAdapter(),
-			},
+			WantCreates: func() []runtime.Object {
+				objs := []runtime.Object{
+					newServiceAccount(noToken),
+					newAdapter(),
+				}
+				// only multi-tenant sources expect a RoleBinding
+				if v1alpha1.IsMultiTenant(s) {
+					return insertObject(objs, newRoleBinding(), 1)
+				}
+				return objs
+			}(),
 			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
 				Object: newEventSource(withSink, notDeployed(a)),
 			}},
-			WantEvents: []string{
-				createServiceAccountEvent(s),
-				createRoleBindingEvent(s),
-				createAdapterEvent(n, k),
-			},
+			WantEvents: func() []string {
+				events := []string{
+					createServiceAccountEvent(s),
+					createAdapterEvent(n, k),
+				}
+				// only multi-tenant sources expect a RoleBinding
+				if v1alpha1.IsMultiTenant(s) {
+					return insertString(events, createRoleBindingEvent(s), 1)
+				}
+				return events
+			}(),
 		},
 		{
 			Name: "Source object deletion",
@@ -309,6 +321,28 @@ func nameKindAndResource(object runtime.Object) (string /*name*/, string /*kind*
 	}
 
 	return name, kind, resource
+}
+
+// insertObject inserts an runtime.Object into a slice at the given position.
+// https://github.com/golang/go/wiki/SliceTricks#insert
+func insertObject(objs []runtime.Object, obj runtime.Object, pos int) []runtime.Object {
+	objs = append(objs, (runtime.Object)(nil))
+	copy(objs[pos+1:], objs[pos:])
+
+	objs[pos] = obj
+
+	return objs
+}
+
+// insertString inserts an string into a slice at the given position.
+// https://github.com/golang/go/wiki/SliceTricks#insert
+func insertString(strs []string, str string, pos int) []string {
+	strs = append(strs, "")
+	copy(strs[pos+1:], strs[pos:])
+
+	strs[pos] = str
+
+	return strs
 }
 
 /* Event sources */
