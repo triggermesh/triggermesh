@@ -29,16 +29,16 @@ jobs:
       - run:
           name: Run fmt-test
           command: make fmt-test
-      - run:
-          name: Run test/cover
-          command: make cover
-          environment:
-            TEST_OUTPUT_DIR: /tmp/test-results/
-            COVER_OUTPUT_DIR: /tmp/cover-results/
-      - store_test_results:
-          path: /tmp/test-results/
-      - store_artifacts:
-          path: /tmp/cover-results/
+      # - run:
+      #     name: Run test/cover
+      #     command: make cover
+      #     environment:
+      #       TEST_OUTPUT_DIR: /tmp/test-results/
+      #       COVER_OUTPUT_DIR: /tmp/cover-results/
+      # - store_test_results:
+      #     path: /tmp/test-results/
+      # - store_artifacts:
+      #     path: /tmp/cover-results/
 
   gen-apidocs:
     executor:
@@ -189,12 +189,12 @@ workflows:
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              only: main
+            # branches:
+            #   only: main
       - publish-image:
           context: production
           requires:
-            - test
+            - gen-apidocs
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
