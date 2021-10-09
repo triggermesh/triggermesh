@@ -161,7 +161,7 @@ jobs:
             DIST_DIR: /tmp/dist/
       - run:
           name: Installing github-release tool
-          command: go get github.com/meterup/github-release
+          command: go install github.com/meterup/github-release@latest
       - run:
           name: Creating github release
           command: |
