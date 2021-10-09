@@ -22,6 +22,7 @@ OUTPUT_DIR        ?= $(BASE_DIR)/_output
 COMMANDS          := $(notdir $(wildcard cmd/*))
 
 BIN_OUTPUT_DIR    ?= $(OUTPUT_DIR)
+DOCS_OUTPUT_DIR   ?= $(OUTPUT_DIR)
 TEST_OUTPUT_DIR   ?= $(OUTPUT_DIR)
 COVER_OUTPUT_DIR  ?= $(OUTPUT_DIR)
 DIST_DIR          ?= $(OUTPUT_DIR)
@@ -89,6 +90,9 @@ release-yaml: ## Generate triggermesh.yaml
 	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh-crds.yaml
 	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml -l triggermesh.io/crd-install!=true | \
 	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh.yaml
+
+gen-apidocs: ## Generate API docs
+	GOPATH="" OUTPUT_DIR=$(DOCS_OUTPUT_DIR) ./hack/gen-api-reference-docs.sh
 
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
