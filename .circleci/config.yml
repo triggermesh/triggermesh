@@ -40,6 +40,46 @@ jobs:
       - store_artifacts:
           path: /tmp/cover-results/
 
+  gen-apidocs:
+    executor:
+      name: go/default
+      tag: '1.17'
+    parameters:
+      committer_name:
+        type: string
+        default: TriggerMesh Bot
+      committer_email:
+        type: string
+        default: bot@triggermesh.com
+    steps:
+      - attach_workspace:
+          at: ~/
+      - add_ssh_keys
+      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run:
+          name: Configuring git
+          command: |
+            git config --global user.name '<< parameters.committer_name >>'
+            git config --global user.email '<< parameters.committer_email >>'
+      - run:
+          name: Cloning docs repository
+          command: git clone --single-branch git@github.com:triggermesh/docs.git tm-docs
+      - run:
+          name: Run gen-apidocs
+          command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} TRIGGERMESH_OUT_FILE=apis.md make gen-apidocs
+          environment:
+            DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/apis/
+      - run:
+          name: Committing triggermesh/docs updates
+          working_directory: tm-docs/
+          command: |
+            if ! git diff --exit-code --quiet; then
+              git --no-pager diff
+              git add docs/
+              git commit -m "Generated with gen-crd-api-reference-docs on git commit ${CIRCLE_TAG:-${CIRCLE_SHA1}}"
+              git push origin main
+            fi
+
   publish-image:
     executor:
       name: gcp-cli/google
@@ -97,9 +137,11 @@ jobs:
           name: Committing overlays/<< parameters.cluster >>/triggermesh-core updates
           working_directory: tmconfig/
           command: |
-            git add overlays
-            git commit -m "Update overlays/<< parameters.cluster >>/triggermesh-core deployments to '${CIRCLE_TAG:-${CIRCLE_SHA1}}'"
-            git push origin main
+            if ! git diff --exit-code --quiet; then
+              git add overlays
+              git commit -m "Update overlays/<< parameters.cluster >>/triggermesh-core deployments to '${CIRCLE_TAG:-${CIRCLE_SHA1}}'"
+              git push origin main
+            fi
 
   release:
     executor:
@@ -141,6 +183,14 @@ workflows:
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      - gen-apidocs:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+            branches:
+              only: main
       - publish-image:
           context: production
           requires:
