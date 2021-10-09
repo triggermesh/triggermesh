@@ -157,7 +157,7 @@ main() {
     mkdir -p "$OUTPUT_DIR/"
     cp "${out_dir}/${TRIGGERMESH_OUT_FILE}" "$OUTPUT_DIR/${TRIGGERMESH_OUT_FILE}"
 
-    log "SUCCESS: Generated docs written to ${out_dir}/."
+    log "SUCCESS: Generated docs written to $OUTPUT_DIR/${TRIGGERMESH_OUT_FILE}."
 }
 
 main "$@"
