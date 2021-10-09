@@ -82,15 +82,25 @@ jobs:
 
   publish-image:
     executor:
-      name: gcp-cli/google
+      name: go/default
+      tag: '1.17'
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/
+      - gcp-cli/install
       - gcp-cli/initialize
       - run:
-          name: Publishing docker image
-          command: IMAGE_SHA=${CIRCLE_SHA1} IMAGE_TAG=${CIRCLE_TAG:-latest} make -j4 cloudbuild
-          no_output_timeout: 30m
+          name: Adding Docker credHelpers for GCR
+          command: gcloud auth configure-docker
+      - run:
+          name: Installing ko
+          command: go install github.com/google/ko@v0.9.3
+      - run:
+          name: Publishing container images
+          command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
+          environment:
+            KO_DOCKER_REPO: gcr.io/triggermesh
 
   deploy:
     description: Patches target cluster configuration
@@ -155,9 +165,13 @@ jobs:
           aws-region: $AWS_REGION
           install-kubectl: true
       - run:
-          name: Building release packages
-          command: IMAGE_TAG=${CIRCLE_TAG:-latest} make release-yaml
+          name: Installing ko
+          command: go install github.com/google/ko@v0.9.3
+      - run:
+          name: Publishing container images and generating release manifests
+          command: IMAGE_TAG=${CIRCLE_TAG:-latest} make release
           environment:
+            KO_DOCKER_REPO: gcr.io/triggermesh
             DIST_DIR: /tmp/dist/
       - run:
           name: Installing github-release tool
