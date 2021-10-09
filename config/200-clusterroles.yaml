@@ -16,6 +16,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: triggermesh-controller
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+
 rules:
 
 # Record Kubernetes events
@@ -470,6 +473,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awscloudwatchlogssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -478,6 +483,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awscloudwatchsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -486,6 +493,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awscodecommitsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -494,6 +503,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awscognitoidentitysource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -502,6 +513,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awscognitouserpoolsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -510,6 +523,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awsdynamodbsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -518,6 +533,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awskinesissource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -526,6 +543,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awsperformanceinsightssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -534,6 +553,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awss3source-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -542,6 +563,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awssnssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 
 # Record Kubernetes events
@@ -593,6 +616,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: awssqssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -601,6 +626,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: azureactivitylogssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -609,6 +636,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: azureblobstoragesource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -617,6 +646,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: azureeventgridsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -625,6 +656,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: azureeventhubsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -633,6 +666,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: azurequeuestoragesource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -641,6 +676,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: azureservicebusqueuesource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -649,6 +686,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: googlecloudauditlogssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -657,6 +696,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: googlecloudbillingsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -665,6 +706,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: googlecloudpubsubsource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -673,6 +716,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: googlecloudrepositoriessource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -681,6 +726,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: googlecloudstoragesource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -689,6 +736,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: httppollersource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -697,6 +746,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: ocimetricssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -705,6 +756,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: salesforcesource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -713,6 +766,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: slacksource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -721,6 +776,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: twiliosource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -729,6 +786,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: webhooksource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules: []
 
 ---
@@ -737,6 +796,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: zendesksource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 
 # Record Kubernetes events
@@ -782,6 +843,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: tektontarget-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 - apiGroups:
   - tekton.dev
@@ -799,6 +862,8 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: filter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 - apiGroups:
   - ''
@@ -839,6 +904,8 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: splitter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 - apiGroups:
   - ''
@@ -883,6 +950,7 @@ kind: ClusterRole
 metadata:
   name: triggermesh-source-observer
   labels:
+    app.kubernetes.io/part-of: triggermesh
     duck.knative.dev/source: 'true'
 rules:
 - apiGroups:
@@ -933,6 +1001,7 @@ kind: ClusterRole
 metadata:
   name: triggermesh-addressable-resolver
   labels:
+    app.kubernetes.io/part-of: triggermesh
     duck.knative.dev/addressable: 'true'
 rules:
 - apiGroups:

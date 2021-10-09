@@ -17,6 +17,8 @@ kind: Deployment
 metadata:
   name: triggermesh-controller
   namespace: triggermesh
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 
 spec:
   replicas: 1
