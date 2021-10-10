@@ -42,17 +42,18 @@ SED               ?= sed
 # Go build variables
 GO                ?= go
 GOFMT             ?= gofmt
-GOLINT            ?= golangci-lint run --timeout 5m
+GOLINT            ?= golangci-lint run
 GOTOOL            ?= go tool
 GOTEST            ?= gotestsum --junitfile $(TEST_OUTPUT_DIR)/$(KREPO)-unit-tests.xml --format pkgname-and-test-fails --
 
 GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/function/... ./pkg/routing/... ./pkg/sources/... ./pkg/targets/... ./pkg/transformation/...
 LDFLAGS            = -extldflags=-static -w -s
+GOTESTFLAGS       ?=
 
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
-.PHONY: help build install release-yaml test lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
+.PHONY: help build install release-yaml test cover lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
 
 all: codegen build test lint
 
@@ -96,7 +97,7 @@ gen-apidocs: ## Generate API docs
 
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
-	$(GOTEST) -p=1 -race -cover -coverprofile=$(TEST_OUTPUT_DIR)/$(KREPO)-c.out $(GOPKGS)
+	$(GOTEST) $(GOTESTFLAGS) -race -cover -coverprofile=$(TEST_OUTPUT_DIR)/$(KREPO)-c.out $(GOPKGS)
 
 cover: test ## Generate code coverage
 	@mkdir -p $(COVER_OUTPUT_DIR)

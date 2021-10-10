@@ -6,35 +6,61 @@ orbs:
   go: circleci/go@1
 
 jobs:
-  checkout:
+  checkout-build:
     executor:
       name: go/default
       tag: '1.17'
     steps:
       - checkout
       - go/mod-download-cached
-      - persist_to_workspace:
-          root: ~/
+      - restore_cache:
+          name: Restoring Go build cache
+          # Multi-key caching strategy, as documented at https://circleci.com/docs/2.0/caching/
+          # All keys include the 'go.sum' checksum to ensure caches get invalidated
+          # when we update either our dependencies or the Go toolchain.
+          keys:
+              # If a workflow gets retried, the previous run may have already
+              # populated the build cache for the current revision.
+              # This is the freshest cache we can get.
+            - go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
+              # Fall back to the secondary build cache.
+              # Although it may not be fresh for the latest code revision, this cache
+              # should at least be up-to-date for the current dependencies' versions.
+            - go-build-{{ arch }}-{{ checksum "go.sum" }}
+      - run:
+          name: Populating Go build cache
+          command: |
+            # Cap parallelism to 1 to prevent maxing out the worker's memory:
+            #   /usr/local/go/pkg/tool/linux_amd64/link: signal: killed
+            go build -p=1 -v ./cmd/... ./pkg/...
+      - save_cache:
+          name: Saving primary Go build cache
+          key: go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
           paths:
-            - go
-            - project
+            - ~/.cache/go-build
+      - save_cache:
+          name: Saving secondary Go build cache
+          key: go-build-{{ arch }}-{{ checksum "go.sum" }}
+          paths:
+            - ~/.cache/go-build
 
   test:
     executor:
       name: go/default
       tag: '1.17'
     steps:
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Run fmt-test
-          command: make fmt-test
+      - checkout
+      - go/load-cache
+      - restore_cache:
+          name: Restoring Go build cache
+          key: go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
       - run:
           name: Run test/cover
           command: make cover
           environment:
             TEST_OUTPUT_DIR: /tmp/test-results/
             COVER_OUTPUT_DIR: /tmp/cover-results/
+            GOTESTFLAGS: -p=1
       - store_test_results:
           path: /tmp/test-results/
       - store_artifacts:
@@ -52,8 +78,7 @@ jobs:
         type: string
         default: bot@triggermesh.com
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - add_ssh_keys
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run:
@@ -84,9 +109,12 @@ jobs:
     executor:
       name: gcp-cli/google
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - gcp-cli/initialize
+      - go/load-cache
+      - restore_cache:
+          name: Restoring Go build cache
+          key: go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
       - run:
           name: Publishing docker image
           command: IMAGE_SHA=${CIRCLE_SHA1} IMAGE_TAG=${CIRCLE_TAG:-latest} make -j4 cloudbuild
@@ -107,8 +135,7 @@ jobs:
         type: string
         default: bot@triggermesh.com
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - add_ssh_keys
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run:
@@ -148,8 +175,7 @@ jobs:
       name: go/default
       tag: '1.17'
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: $AWS_CLUSTER_NAME
           aws-region: $AWS_REGION
@@ -173,13 +199,13 @@ jobs:
 workflows:
   test-and-publish:
     jobs:
-      - checkout:
+      - checkout-build:
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
       - test:
           requires:
-            - checkout
+            - checkout-build
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
