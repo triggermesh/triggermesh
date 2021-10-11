@@ -90,7 +90,7 @@ jobs:
           command: git clone --single-branch git@github.com:triggermesh/docs.git tm-docs
       - run:
           name: Run gen-apidocs
-          command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} TRIGGERMESH_OUT_FILE=apis.md make gen-apidocs
+          command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} make gen-apidocs
           environment:
             DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/apis/
       - run:
@@ -99,9 +99,9 @@ jobs:
           command: |
             if ! git diff --exit-code --quiet; then
               git --no-pager diff
-              # git add docs/
-              # git commit -m "Generated with gen-crd-api-reference-docs on git commit ${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-              # git push origin main
+              git add docs/
+              git commit -m "Generated with gen-crd-api-reference-docs on git commit ${CIRCLE_TAG:-${CIRCLE_SHA1}}"
+              git push origin main
             fi
 
   publish-image:

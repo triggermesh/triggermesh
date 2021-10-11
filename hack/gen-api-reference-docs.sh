@@ -27,7 +27,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 [[ -n "${DEBUG:-}" ]] && set -x
 
 OUTPUT_DIR="${OUTPUT_DIR:-$SCRIPTDIR/../output}"
-TEMPLATE_DIR="${TEMPLATE_DIR:-$SCRIPTDIR/../template}"
+TEMPLATE_DIR="${TEMPLATE_DIR:-$SCRIPTDIR/../hack/api-docs-template}"
 
 REFDOCS_PKG="github.com/ahmetb/gen-crd-api-reference-docs"
 REFDOCS_REPO="https://${REFDOCS_PKG}.git"
@@ -35,7 +35,7 @@ REFDOCS_VER="v0.3.0"
 
 TRIGGERMESH_REPO="github.com/triggermesh/triggermesh"
 TRIGGERMESH_COMMIT="${TRIGGERMESH_COMMIT:-main}"
-TRIGGERMESH_OUT_FILE="${TRIGGERMESH_OUT_FILE:-triggermesh.md}"
+TRIGGERMESH_OUTPUT_FILE_PREFIX=""
 
 cleanup_refdocs_root=
 cleanup_repo_clone_root=
@@ -131,7 +131,7 @@ main() {
     # clone repo for ./templates
     git clone --quiet --depth=1 "${REFDOCS_REPO}" "${refdocs_dir}"
 
-    template_dir="${refdocs_dir}/template"
+    template_dir="${TEMPLATE_DIR}"
 
     # install bin
     install_go_bin "${REFDOCS_PKG}@${REFDOCS_VER}"
@@ -151,13 +151,23 @@ main() {
     triggermesh_root="${clone_root}/src/${TRIGGERMESH_REPO}"
     clone_at_commit "https://${TRIGGERMESH_REPO}.git" "${TRIGGERMESH_COMMIT}" \
         "${triggermesh_root}"
-    gen_refdocs "${refdocs_bin}" "${clone_root}" "${template_dir}" \
-        "${out_dir}/${TRIGGERMESH_OUT_FILE}" "${triggermesh_root}" "./pkg/apis"
 
     mkdir -p "$OUTPUT_DIR/"
-    cp "${out_dir}/${TRIGGERMESH_OUT_FILE}" "$OUTPUT_DIR/${TRIGGERMESH_OUT_FILE}"
 
-    log "SUCCESS: Generated docs written to $OUTPUT_DIR/${TRIGGERMESH_OUT_FILE}."
+    array=(${triggermesh_root}/pkg/apis/*/)
+    for dir in "${array[@]}"
+    do
+        local group output
+        group="$(basename $dir)"
+        out_file="${TRIGGERMESH_OUTPUT_FILE_PREFIX}${group}.md"
+
+        gen_refdocs "${refdocs_bin}" "${clone_root}" "${template_dir}" \
+            "${out_dir}/${out_file}" "${triggermesh_root}" "./pkg/apis/${group}"
+
+        cp "${out_dir}/${out_file}" "$OUTPUT_DIR/${out_file}"
+    done
+
+    log "SUCCESS: Generated docs written to $OUTPUT_DIR/."
 }
 
 main "$@"
