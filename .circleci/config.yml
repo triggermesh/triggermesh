@@ -25,6 +25,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
+      - go/load-cache
       - restore_cache:
           name: Restoring Go build cache
           # Multi-key caching strategy, as documented at https://circleci.com/docs/2.0/caching/.
@@ -120,6 +121,7 @@ jobs:
       - run:
           name: Installing ko
           command: go install github.com/google/ko@v0.9.3
+      - go/load-cache
       - restore_cache:
           name: Restoring Go build cache
           keys:
