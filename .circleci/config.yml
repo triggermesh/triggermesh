@@ -54,7 +54,9 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - add_ssh_keys
+      - add_ssh_keys:
+          fingerprints:
+            - "aa:03:46:c4:da:eb:da:02:ad:c0:3a:bc:5f:62:02:9c"
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run:
           name: Configuring git
@@ -69,16 +71,16 @@ jobs:
           command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} TRIGGERMESH_OUT_FILE=apis.md make gen-apidocs
           environment:
             DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/apis/
-      # - run:
-      #     name: Committing triggermesh/docs updates
-      #     working_directory: tm-docs/
-      #     command: |
-      #       if ! git diff --exit-code --quiet; then
-      #         git --no-pager diff
-      #         git add docs/
-      #         git commit -m "Generated with gen-crd-api-reference-docs on git commit ${CIRCLE_TAG:-${CIRCLE_SHA1}}"
-      #         git push origin main
-      #       fi
+      - run:
+          name: Committing updates to triggermesh/docs
+          working_directory: tm-docs/
+          command: |
+            if ! git diff --exit-code --quiet; then
+              git --no-pager diff
+              git add docs/
+              git commit -m "Generated with gen-crd-api-reference-docs on git commit ${CIRCLE_TAG:-${CIRCLE_SHA1}}"
+              git push origin main
+            fi
 
   publish-image:
     executor:
@@ -102,7 +104,7 @@ jobs:
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
 
-  deploy:
+  update-manifests:
     description: Patches target cluster configuration
     executor:
       name: go/default
@@ -119,7 +121,9 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - add_ssh_keys
+      - add_ssh_keys:
+          fingerprints:
+            - "07:8f:e8:44:ce:54:16:26:00:98:e5:1c:a6:c6:00:34"
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run:
           name: Configuring git
@@ -128,10 +132,10 @@ jobs:
             git config --global user.email '<< parameters.committer_email >>'
       - run:
           name: Cloning config repository
-          command: git clone --single-branch git@github.com:triggermesh/config.git tmconfig
+          command: git clone --single-branch git@github.com:triggermesh/config.git tm-config
       - run:
           name: Updating overlays/<< parameters.cluster >>/triggermesh-core manifests
-          working_directory: tmconfig/
+          working_directory: tm-config/
           environment:
             IMAGE_REPO: gcr.io/triggermesh
           command: |
@@ -146,7 +150,7 @@ jobs:
             git --no-pager diff
       - run:
           name: Committing overlays/<< parameters.cluster >>/triggermesh-core updates
-          working_directory: tmconfig/
+          working_directory: tm-config/
           command: |
             if ! git diff --exit-code --quiet; then
               git add overlays
@@ -215,7 +219,7 @@ workflows:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
             branches:
               only: main
-      - deploy:
+      - update-manifests:
           name: update-staging-config
           cluster: staging
           requires:
@@ -225,7 +229,7 @@ workflows:
               only: main
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      # - deploy:
+      # - update-manifests:
       #     name: update-production-config
       #     cluster: prod
       #     requires:
