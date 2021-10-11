@@ -206,6 +206,7 @@ jobs:
           command: IMAGE_TAG=${CIRCLE_TAG:-latest} make release
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
+            KOFLAGS: --push=false
             DIST_DIR: /tmp/dist/
       - run:
           name: Installing github-release tool

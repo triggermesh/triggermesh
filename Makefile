@@ -29,6 +29,7 @@ DIST_DIR          ?= $(OUTPUT_DIR)
 
 # Rely on ko for building/publishing images and generating/deploying manifests
 KO                ?= ko
+KOFLAGS           ?=
 IMAGE_TAG         ?= $(shell git rev-parse HEAD)
 
 # Go build variables
@@ -80,7 +81,7 @@ release: ## Publish container images and generate release manifests
 	@mkdir -p $(DIST_DIR)
 	$(KO) resolve -f config/ -l 'triggermesh.io/crd-install' > $(DIST_DIR)/triggermesh-crds.yaml
 	@cp config/namespace/100-namespace.yaml $(DIST_DIR)/triggermesh.yaml
-	$(KO) resolve -B -t $(IMAGE_TAG),latest -f config/ -l '!triggermesh.io/crd-install' >> $(DIST_DIR)/triggermesh.yaml
+	$(KO) resolve $(KOFLAGS) -B -t $(IMAGE_TAG),latest -f config/ -l '!triggermesh.io/crd-install' >> $(DIST_DIR)/triggermesh.yaml
 
 gen-apidocs: ## Generate API docs
 	GOPATH="" OUTPUT_DIR=$(DOCS_OUTPUT_DIR) ./hack/gen-api-reference-docs.sh
