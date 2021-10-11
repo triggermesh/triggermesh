@@ -37,6 +37,7 @@ import (
 
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/splitter"
 	routinglisters "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/routing/adapter/common/env"
 )
 
 const serverPort int = 8080
@@ -52,28 +53,30 @@ type Handler struct {
 	logger         *zap.SugaredLogger
 }
 
-// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
-func NewEnvConfig() pkgadapter.EnvConfigAccessor {
-	return &pkgadapter.EnvConfig{}
+// NewEnvConfig satisfies env.ConfigConstructor.
+func NewEnvConfig() env.ConfigAccessor {
+	return &env.Config{}
 }
 
-// NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, _ pkgadapter.EnvConfigAccessor, _ cloudevents.Client) pkgadapter.Adapter {
-	logger := logging.FromContext(ctx)
+// NewAdapter returns a constructor for the source's adapter.
+func NewAdapter(string) pkgadapter.AdapterConstructor {
+	return func(ctx context.Context, _ pkgadapter.EnvConfigAccessor, _ cloudevents.Client) pkgadapter.Adapter {
+		logger := logging.FromContext(ctx)
 
-	sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
-	if err != nil {
-		logger.Panicf("failed to create message sender: %v", err)
-	}
+		sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
+		if err != nil {
+			logger.Panicf("failed to create message sender: %v", err)
+		}
 
-	informer := informerv1alpha1.Get(ctx)
-	ns := injection.GetNamespaceScope(ctx)
+		informer := informerv1alpha1.Get(ctx)
+		ns := injection.GetNamespaceScope(ctx)
 
-	return &Handler{
-		receiver:       kncloudevents.NewHTTPMessageReceiver(serverPort),
-		sender:         sender,
-		splitterLister: informer.Lister().Splitters(ns),
-		logger:         logger,
+		return &Handler{
+			receiver:       kncloudevents.NewHTTPMessageReceiver(serverPort),
+			sender:         sender,
+			splitterLister: informer.Lister().Splitters(ns),
+			logger:         logger,
+		}
 	}
 }
 

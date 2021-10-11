@@ -14,13 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+// Package controller contains helpers shared between controllers embedded in
+// routing adapters.
+package controller
 
-import (
-	"github.com/triggermesh/triggermesh/pkg/routing/adapter/common/sharedmain"
-	"github.com/triggermesh/triggermesh/pkg/routing/adapter/splitter"
-)
+import "knative.dev/pkg/controller"
 
-func main() {
-	sharedmain.MainWithController(splitter.NewEnvConfig, splitter.NewController, splitter.NewAdapter)
+// Opts returns a callback function that sets the controller's agent name and
+// configures the reconciler to skip status updates.
+func Opts(component string) controller.OptionsFn {
+	return func(impl *controller.Impl) controller.Options {
+		return controller.Options{
+			AgentName:         component,
+			SkipStatusUpdates: true,
+		}
+	}
 }
