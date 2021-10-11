@@ -132,8 +132,9 @@ jobs:
       - run:
           name: Updating overlays/<< parameters.cluster >>/triggermesh-core manifests
           working_directory: tmconfig/
+          environment:
+            IMAGE_REPO: gcr.io/triggermesh
           command: |
-            IMAGE_REPO=$(sed -n -e 's/^IMAGE_REPO[[:space:]].*=[[:space:]]*\(.*\)$/\1/p' ~/project/Makefile)
             for cmd in ~/project/cmd/*; do
               sed -i overlays/<< parameters.cluster >>/triggermesh-core/deployments.yaml \
                 -e "s|gcr.io/triggermesh\(-private\)\?/${cmd##*/}:.*|${IMAGE_REPO}/${cmd##*/}:${CIRCLE_TAG:-${CIRCLE_SHA1}}|g"
