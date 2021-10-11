@@ -78,6 +78,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
@@ -115,6 +116,7 @@ rules:
   - azureservicebusqueuesources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
+  - googlecloudiotsources/status
   - googlecloudpubsubsources/status
   - googlecloudrepositoriessources/status
   - googlecloudstoragesources/status
@@ -291,6 +293,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
@@ -332,6 +335,7 @@ rules:
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
+  - googlecloudiotsource-adapter
   - googlecloudpubsubsource-adapter
   - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
@@ -380,6 +384,7 @@ rules:
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
+  - googlecloudiotsource-adapter
   - googlecloudpubsubsource-adapter
   - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
@@ -664,6 +669,14 @@ rules: []
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  name: googlecloudiotsource-adapter
+rules: []
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
   name: googlecloudpubsubsource-adapter
 rules: []
 
@@ -908,6 +921,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
