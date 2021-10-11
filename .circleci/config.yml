@@ -68,7 +68,7 @@ jobs:
           command: git clone --single-branch git@github.com:triggermesh/docs.git tm-docs
       - run:
           name: Run gen-apidocs
-          command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} TRIGGERMESH_OUT_FILE=apis.md make gen-apidocs
+          command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} make gen-apidocs
           environment:
             DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/apis/
       - run:
