@@ -132,10 +132,10 @@ jobs:
             git config --global user.email '<< parameters.committer_email >>'
       - run:
           name: Cloning config repository
-          command: git clone --single-branch git@github.com:triggermesh/config.git tmconfig
+          command: git clone --single-branch git@github.com:triggermesh/config.git tm-config
       - run:
           name: Updating overlays/<< parameters.cluster >>/triggermesh-core manifests
-          working_directory: tmconfig/
+          working_directory: tm-config/
           environment:
             IMAGE_REPO: gcr.io/triggermesh
           command: |
@@ -150,7 +150,7 @@ jobs:
             git --no-pager diff
       - run:
           name: Committing overlays/<< parameters.cluster >>/triggermesh-core updates
-          working_directory: tmconfig/
+          working_directory: tm-config/
           command: |
             if ! git diff --exit-code --quiet; then
               git add overlays
