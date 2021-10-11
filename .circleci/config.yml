@@ -12,7 +12,7 @@ jobs:
       tag: '1.17'
     steps:
       - checkout
-      - go/mod-download-cached
+      # - go/mod-download-cached
       - persist_to_workspace:
           root: ~/
           paths:
@@ -29,16 +29,16 @@ jobs:
       - run:
           name: Run fmt-test
           command: make fmt-test
-      - run:
-          name: Run test/cover
-          command: make cover
-          environment:
-            TEST_OUTPUT_DIR: /tmp/test-results/
-            COVER_OUTPUT_DIR: /tmp/cover-results/
-      - store_test_results:
-          path: /tmp/test-results/
-      - store_artifacts:
-          path: /tmp/cover-results/
+      # - run:
+      #     name: Run test/cover
+      #     command: make cover
+      #     environment:
+      #       TEST_OUTPUT_DIR: /tmp/test-results/
+      #       COVER_OUTPUT_DIR: /tmp/cover-results/
+      # - store_test_results:
+      #     path: /tmp/test-results/
+      # - store_artifacts:
+      #     path: /tmp/cover-results/
 
   gen-apidocs:
     executor:
@@ -54,7 +54,9 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - add_ssh_keys
+      - add_ssh_keys:
+          fingerprints:
+            - "aa:03:46:c4:da:eb:da:02:ad:c0:3a:bc:5f:62:02:9c"
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run:
           name: Configuring git
@@ -64,13 +66,13 @@ jobs:
       - run:
           name: Cloning docs repository
           command: git clone --single-branch git@github.com:triggermesh/docs.git tm-docs
-      - run:
-          name: Run gen-apidocs
-          command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} TRIGGERMESH_OUT_FILE=apis.md make gen-apidocs
-          environment:
-            DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/apis/
       # - run:
-      #     name: Committing triggermesh/docs updates
+      #     name: Run gen-apidocs
+      #     command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} TRIGGERMESH_OUT_FILE=apis.md make gen-apidocs
+      #     environment:
+      #       DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/apis/
+      # - run:
+      #     name: Committing updates to triggermesh/docs
       #     working_directory: tm-docs/
       #     command: |
       #       if ! git diff --exit-code --quiet; then
@@ -79,6 +81,13 @@ jobs:
       #         git commit -m "Generated with gen-crd-api-reference-docs on git commit ${CIRCLE_TAG:-${CIRCLE_SHA1}}"
       #         git push origin main
       #       fi
+      - run:
+          name: Check write access to triggermesh/docs
+          working_directory: tm-docs/
+          command: |
+            git checkout -b branch-test
+            git push origin branch-test
+            git push origin :branch-test
 
   publish-image:
     executor:
@@ -189,8 +198,8 @@ workflows:
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              only: main
+            # branches:
+            #   only: main
       - publish-image:
           context: production
           requires:
