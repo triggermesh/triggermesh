@@ -118,15 +118,15 @@ jobs:
       - run:
           name: Adding Docker credHelpers for GCR
           command: gcloud auth configure-docker
-      - run:
-          name: Installing ko
-          command: go install github.com/google/ko@v0.9.3
       - go/load-cache
       - restore_cache:
           name: Restoring Go build cache
           keys:
             - go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
+      - run:
+          name: Installing ko
+          command: go install github.com/google/ko@v0.9.3
       - run:
           name: Publishing container images
           command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
