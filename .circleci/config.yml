@@ -6,25 +6,20 @@ orbs:
   go: circleci/go@1
 
 jobs:
-  checkout:
+  gomod-cache:
     executor:
       name: go/default
       tag: '1.17'
     steps:
       - checkout
       - go/mod-download-cached
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project
 
   test:
     executor:
       name: go/default
       tag: '1.17'
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - go/load-cache
       - restore_cache:
           name: Restoring Go build cache
@@ -75,8 +70,7 @@ jobs:
         type: string
         default: bot@triggermesh.com
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "aa:03:46:c4:da:eb:da:02:ad:c0:3a:bc:5f:62:02:9c"
@@ -111,8 +105,7 @@ jobs:
       tag: '1.17'
     resource_class: large
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - gcp-cli/install
       - gcp-cli/initialize
       - run:
@@ -132,6 +125,13 @@ jobs:
           command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
+            DIST_DIR: /tmp/dist/
+      - persist_to_workspace:
+          root: /tmp/
+          paths:
+            - dist/
+      - store_artifacts:
+          path: /tmp/dist/
 
   update-manifests:
     description: Patches target cluster configuration
@@ -148,8 +148,7 @@ jobs:
         type: string
         default: bot@triggermesh.com
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - add_ssh_keys:
           fingerprints:
             - "07:8f:e8:44:ce:54:16:26:00:98:e5:1c:a6:c6:00:34"
@@ -192,43 +191,36 @@ jobs:
       name: go/default
       tag: '1.17'
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: $AWS_CLUSTER_NAME
           aws-region: $AWS_REGION
           install-kubectl: true
       - run:
-          name: Installing ko
-          command: go install github.com/google/ko@v0.9.3
-      - run:
-          name: Publishing container images and generating release manifests
-          command: IMAGE_TAG=${CIRCLE_TAG:-latest} make release
-          environment:
-            KO_DOCKER_REPO: gcr.io/triggermesh
-            KOFLAGS: --push=false
-            DIST_DIR: /tmp/dist/
-      - run:
           name: Installing github-release tool
           command: go install github.com/meterup/github-release@latest
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
-          name: Creating github release
+          name: Creating GitHub release
           command: |
             PRE_RELEASE=${CIRCLE_TAG/${CIRCLE_TAG%-rc[0-9]*}/}
             github-release delete -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} 2>/dev/null ||:
             ./hack/release-notes.sh ${CIRCLE_TAG} | github-release release ${PRE_RELEASE:+-p} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -d -
-            for f in $(find /tmp/dist -type f); do github-release upload -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -n $(basename ${f}) -f ${f} ; done
+            for f in $(find /tmp/workspace/dist/ -type f); do
+              github-release upload -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -n $(basename ${f}) -f ${f}
+            done
 
 workflows:
   test-and-publish:
     jobs:
-      - checkout:
+      - gomod-cache:
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
       - test:
           requires:
-            - checkout
+            - gomod-cache
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
