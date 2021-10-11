@@ -104,7 +104,7 @@ jobs:
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
 
-  deploy:
+  update-manifests:
     description: Patches target cluster configuration
     executor:
       name: go/default
@@ -219,7 +219,7 @@ workflows:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
             branches:
               only: main
-      - deploy:
+      - update-manifests:
           name: update-staging-config
           cluster: staging
           requires:
@@ -229,7 +229,7 @@ workflows:
               only: main
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      # - deploy:
+      # - update-manifests:
       #     name: update-production-config
       #     cluster: prod
       #     requires:
