@@ -36,7 +36,7 @@ spec:
     spec:
       serviceAccountName: triggermesh-webhook
       containers:
-      - name: triggermesh-webhook
+      - name: webhook
         terminationMessagePolicy: FallbackToLogsOnError
         image: ko://github.com/triggermesh/triggermesh/cmd/triggermesh-webhook
         env:
