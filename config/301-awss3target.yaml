@@ -63,6 +63,7 @@ spec:
                   https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the access key ID.
                     type: object
                     properties:
                       key:
@@ -76,6 +77,7 @@ spec:
                   https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the secret access key.
                     type: object
                     properties:
                       key:
@@ -90,6 +92,10 @@ spec:
               discardCloudEventContext:
                 description: Produce a new cloud event based on the response from the Kinesis invocation.
                 type: boolean
+            required:
+            - arn
+            - awsApiSecret
+            - awsApiKey
           status:
             type: object
             description: Reported status of the event target.

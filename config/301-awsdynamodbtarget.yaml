@@ -62,6 +62,7 @@ spec:
                   https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the access key ID.
                     type: object
                     properties:
                       key:
@@ -75,6 +76,7 @@ spec:
                 type: object
                 properties:
                   secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the secret access key.
                     type: object
                     properties:
                       key:
