@@ -114,7 +114,7 @@ func TestUnmarshalGCloudIoTResourceName(t *testing.T) {
 		},
 	}, {
 		name:              "Some required fields are empty",
-		input:             `"projects//c/r"`,
+		input:             `"projects//locations/l/c/r"`,
 		expectErrContains: "resource name contains empty attributes",
 	}, {
 		name:              "Invalid format",
