@@ -16,7 +16,6 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - go
             - project
 
   test:
@@ -26,9 +25,20 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - run:
-          name: Run fmt-test
-          command: make fmt-test
+      - restore_cache:
+          name: Restoring Go build cache
+          # Multi-key caching strategy, as documented at https://circleci.com/docs/2.0/caching/.
+          # All keys include the 'go.sum' checksum to ensure caches get invalidated
+          # when we update either our dependencies or the Go toolchain.
+          keys:
+              # If a workflow gets retried, the previous run may have already
+              # populated the build cache for the current revision.
+              # This is the freshest cache we can get.
+            - go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
+              # Fall back to the secondary build cache.
+              # Although it may not be fresh for the latest code revision, this cache
+              # should at least be up-to-date for the current dependencies' versions.
+            - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Run test/cover
           command: make cover
@@ -39,6 +49,18 @@ jobs:
           path: /tmp/test-results/
       - store_artifacts:
           path: /tmp/cover-results/
+      # Running tests populates the Go build cache.
+      # We save it here to allow subsequent jobs to re-use what's already been compiled.
+      - save_cache:
+          name: Saving primary Go build cache
+          key: go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
+          paths:
+            - ~/.cache/go-build
+      - save_cache:
+          name: Saving secondary Go build cache
+          key: go-build-{{ arch }}-{{ checksum "go.sum" }}
+          paths:
+            - ~/.cache/go-build
 
   gen-apidocs:
     executor:
@@ -98,6 +120,11 @@ jobs:
       - run:
           name: Installing ko
           command: go install github.com/google/ko@v0.9.3
+      - restore_cache:
+          name: Restoring Go build cache
+          keys:
+            - go-build-{{ arch }}-{{ checksum "go.sum" }}-{{ .Revision }}
+            - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Publishing container images
           command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
