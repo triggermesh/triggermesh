@@ -67,6 +67,7 @@ type SplunkTargetSpec struct {
 	SkipTLSVerify *bool `json:"skipTLSVerify,omitempty"`
 
 	// EventOptions for targets
+	// +optional
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
