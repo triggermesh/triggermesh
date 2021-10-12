@@ -16,17 +16,17 @@ The TriggerMesh Cloud-Native Integration Platform consists of a set of APIs whic
 
 ## Installation
 
-To install TriggerMesh follow the installation [instructions](https://docs.triggermesh.io/guides/installation/)
+To install TriggerMesh, follow the [installation instructions](https://docs.triggermesh.io/guides/installation/).
 
 ### TL;DR
 
-Install the CRDs:
+Register TriggerMesh APIs by deploying the Custom Resources Definitions:
 
 ```shell
 kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/v1.10.1/triggermesh-crds.yaml
 ```
 
-Deploy the controller:
+Deploy the platform:
 
 ```shell
 kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/v1.10.1/triggermesh.yaml
