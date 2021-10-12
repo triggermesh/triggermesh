@@ -1,4 +1,4 @@
-# TriggerMesh
+![](./logo.png)
 
 [![Release](https://img.shields.io/github/v/release/triggermesh/triggermesh?label=release)](https://github.com/triggermesh/triggermesh/releases)
 [![CircleCI](https://circleci.com/gh/triggermesh/triggermesh/tree/main.svg?style=shield)](https://circleci.com/gh/triggermesh/triggermesh/tree/main)
@@ -6,6 +6,33 @@
 [![Slack](https://img.shields.io/badge/Slack-Join%20chat-4a154b?style=flat&logo=slack)](https://join.slack.com/t/triggermesh-community/shared_invite/zt-wk5axnac-79BoPtk~xLip9fFhGAYYhg)
 
 <!-- TODO: add repository description, docs, contribution guidelines, etc. -->
+
+The TriggerMesh Cloud-Native Integration Platform consists of a set of APIs which allows you to build event-driven applications. Implemented as a set of Kubernetes CRDs and a Kubernetes controller it gives you a way to declaratively define your event sources and event targets in addition to potential actions needed in your applications: event filtering, event splitting, event transformation and event processing via functions.
+
+## Getting Started
+
+* [Guides](https://docs.triggermesh.io/guides/creatingasource/)
+* [Documentation](https://docs.triggermesh.io)
+
+## Installation
+
+To install TriggerMesh follow the installation [instructions](https://docs.triggermesh.io/guides/installation/)
+
+### TL;DR
+
+Install the CRDs:
+
+```shell
+kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/v1.10.1/triggermesh-crds.yaml
+```
+
+Deploy the controller:
+
+```shell
+kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/v1.10.1/triggermesh.yaml
+```
+
+### For Developers
 
 When installing the TriggerMesh components by hand or a tool like [ko][ko], the `triggermesh`
 namespace must be created first.
