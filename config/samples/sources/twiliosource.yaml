@@ -13,26 +13,19 @@
 # limitations under the License.
 
 # Sample TwilioSource object.
+#
+# For a list and description of all available attributes, execute the following command against a cluster where this
+# Custom Resource Definition has been registered:
+#
+#   kubectl explain twiliosources.sources.triggermesh.io
 
 apiVersion: sources.triggermesh.io/v1alpha1
 kind: TwilioSource
 metadata:
-  name: twilio-test
+  name: sample
 spec:
   sink:
     ref:
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: event-display
----
-
-
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: event-display
-spec:
-  template:
-    spec:
-      containers:
-        - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
+      apiVersion: eventing.knative.dev/v1
+      kind: broker
+      name: default
