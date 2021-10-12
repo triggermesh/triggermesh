@@ -1,4 +1,4 @@
-![](./logo.png)
+![TriggerMesh Logo](.assets/triggermesh-logo.png)
 
 [![Release](https://img.shields.io/github/v/release/triggermesh/triggermesh?label=release)](https://github.com/triggermesh/triggermesh/releases)
 [![CircleCI](https://circleci.com/gh/triggermesh/triggermesh/tree/main.svg?style=shield)](https://circleci.com/gh/triggermesh/triggermesh/tree/main)
