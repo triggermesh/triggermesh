@@ -16,6 +16,8 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   name: defaulting.webhook.triggermesh.io
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 webhooks:
 - admissionReviewVersions:
   - v1beta1
@@ -33,6 +35,8 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   name: validation.webhook.triggermesh.io
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 webhooks:
 - admissionReviewVersions:
   - v1beta1
@@ -51,4 +55,6 @@ kind: Secret
 metadata:
   name: triggermesh-webhook-certs
   namespace: triggermesh
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 # The data is populated at install time.

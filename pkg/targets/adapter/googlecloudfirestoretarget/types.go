@@ -16,6 +16,8 @@ limitations under the License.
 
 package googlecloudfirestoretarget
 
+// EventPayload is a structure of CloudEvents data payload
+// processed by the event target.
 type EventPayload struct {
 	Collection string                 `json:"collection"`
 	Document   string                 `json:"document"`

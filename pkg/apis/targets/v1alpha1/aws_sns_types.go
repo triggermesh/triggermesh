@@ -29,7 +29,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSTarget is the Schema for an AWS Target.
+// AWSSNSTarget is the Schema for the event target.
 type AWSSNSTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -48,6 +48,7 @@ var (
 	_ duckv1.KRShaped    = (*AWSSNSTarget)(nil)
 )
 
+// AWSSNSTargetSpec holds the desired state of the event target.
 type AWSSNSTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`

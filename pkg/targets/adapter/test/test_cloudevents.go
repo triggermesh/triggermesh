@@ -29,15 +29,17 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
 
-type TestCloudEventsClient struct {
+// FakeCloudEventsClient is an implementation of a test CloudEvents client.
+type FakeCloudEventsClient struct {
 	lock sync.Mutex
 	sent []cloudevents.Event
 	fn   interface{}
 }
 
-var _ cloudevents.Client = (*TestCloudEventsClient)(nil)
+var _ cloudevents.Client = (*FakeCloudEventsClient)(nil)
 
-func (c *TestCloudEventsClient) Send(ctx context.Context, out event.Event) protocol.Result {
+// Send is a mock method to send events.
+func (c *FakeCloudEventsClient) Send(ctx context.Context, out event.Event) protocol.Result {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	// TODO: improve later.
@@ -54,7 +56,8 @@ func (c *TestCloudEventsClient) Send(ctx context.Context, out event.Event) proto
 	return http.NewResult(200, "%w", res)
 }
 
-func (c *TestCloudEventsClient) Request(ctx context.Context, out event.Event) (*event.Event, protocol.Result) {
+// Request is a mock method to send events.
+func (c *FakeCloudEventsClient) Request(ctx context.Context, out event.Event) (*event.Event, protocol.Result) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	// TODO: improve later.
@@ -62,33 +65,35 @@ func (c *TestCloudEventsClient) Request(ctx context.Context, out event.Event) (*
 	return nil, http.NewResult(200, "%w", protocol.ResultACK)
 }
 
-func (c *TestCloudEventsClient) StartReceiver(ctx context.Context, fn interface{}) error {
+// StartReceiver is a mock method to start events receiver.
+func (c *FakeCloudEventsClient) StartReceiver(ctx context.Context, fn interface{}) error {
 	c.setDispatcher(fn)
 	<-ctx.Done()
 	return nil
 }
 
-func (c *TestCloudEventsClient) setDispatcher(fn interface{}) {
+func (c *FakeCloudEventsClient) setDispatcher(fn interface{}) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.fn = fn
 }
 
-func (c *TestCloudEventsClient) Reset() {
+// Reset flushes events array.
+func (c *FakeCloudEventsClient) Reset() {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.sent = make([]cloudevents.Event, 0)
 }
 
 // IsReceiverReady returns true if the dispatcher
-func (c *TestCloudEventsClient) IsReceiverReady() bool {
+func (c *FakeCloudEventsClient) IsReceiverReady() bool {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	return c.fn != nil
 }
 
 // WaitForReceiverReady will poll the client to check if the receiver dispatcher function is configured.
-func (c *TestCloudEventsClient) WaitForReceiverReady(wait time.Duration) error {
+func (c *FakeCloudEventsClient) WaitForReceiverReady(wait time.Duration) error {
 	timeout := time.After(wait)
 	tick := time.NewTicker(100 * time.Millisecond)
 	defer tick.Stop()
@@ -106,7 +111,8 @@ func (c *TestCloudEventsClient) WaitForReceiverReady(wait time.Duration) error {
 
 }
 
-func (c *TestCloudEventsClient) Sent() []cloudevents.Event {
+// Sent returns the slice of events that were sent with test client.
+func (c *FakeCloudEventsClient) Sent() []cloudevents.Event {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	r := make([]cloudevents.Event, len(c.sent))
@@ -116,8 +122,9 @@ func (c *TestCloudEventsClient) Sent() []cloudevents.Event {
 	return r
 }
 
-func NewTestClient() *TestCloudEventsClient {
-	c := &TestCloudEventsClient{
+// NewTestClient returns a new instance of test client.
+func NewTestClient() *FakeCloudEventsClient {
+	c := &FakeCloudEventsClient{
 		sent: make([]cloudevents.Event, 0),
 	}
 	return c

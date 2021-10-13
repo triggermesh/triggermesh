@@ -13,17 +13,11 @@
 # limitations under the License.
 
 # Sample AzureQueueStorageSource object.
-
-
-apiVersion: v1
-kind: Secret
-metadata:
-  name: azure
-type: Opaque
-stringData:
-  accountKey: 
-
----
+#
+# For a list and description of all available attributes, execute the following command against a cluster where this
+# Custom Resource Definition has been registered:
+#
+#   kubectl explain azurequeuestoragesources.sources.triggermesh.io
 
 apiVersion: sources.triggermesh.io/v1alpha1
 kind: AzureQueueStorageSource
@@ -32,24 +26,14 @@ metadata:
 spec:
   accountName: demoaccount
   queueName: testqueue
+
   accountKey:
     valueFromSecret:
-      name: azure
-      key: accountKey 
+      name: azure-queue-storage
+      key: account_key
+
   sink:
     ref:
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: event-display
----
-
-
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: event-display
-spec:
-  template:
-    spec:
-      containers:
-        - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
+      apiVersion: eventing.knative.dev/v1
+      kind: broker
+      name: default

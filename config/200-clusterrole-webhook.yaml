@@ -16,6 +16,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: triggermesh-webhook
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+
 rules:
 # Routing admin
 - apiGroups:

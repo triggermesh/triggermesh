@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	adapter.Main("httppoller", httppollersource.EnvAccessor, httppollersource.NewAdapter)
+	adapter.Main("httppoller", httppollersource.NewEnvConfig, httppollersource.NewAdapter)
 }

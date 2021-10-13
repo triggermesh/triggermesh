@@ -18,8 +18,8 @@ package salesforcesource
 
 import "knative.dev/eventing/pkg/adapter/v2"
 
-// EnvAccessor for configuration parameters
-func EnvAccessor() adapter.EnvConfigAccessor {
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
+func NewEnvConfig() adapter.EnvConfigAccessor {
 	return &envAccessor{}
 }
 

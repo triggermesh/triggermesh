@@ -69,9 +69,9 @@ var (
 	}
 )
 
-// Test the Reconcile() method of the controller.Reconciler implemented by
-// source Reconcilers, with focus on the generic ReconcileSource logic executed
-// by the generic adapter reconciler embedded in every source Reconciler.
+// TestReconcileAdapter tests the Reconcile() method of the controller.Reconciler
+// implemented by source Reconcilers, with focus on the generic ReconcileSource
+// logic executed by the generic adapter reconciler embedded in every source Reconciler.
 //
 // The environment for each test case is set up as follows:
 //  1. MakeFactory initializes fake clients with the objects declared in the test case
@@ -105,19 +105,31 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 				newAdressable(),
 				newEventSource(noCEAttributes),
 			},
-			WantCreates: []runtime.Object{
-				newServiceAccount(noToken),
-				newRoleBinding(),
-				newAdapter(),
-			},
+			WantCreates: func() []runtime.Object {
+				objs := []runtime.Object{
+					newServiceAccount(noToken),
+					newAdapter(),
+				}
+				// only multi-tenant sources expect a RoleBinding
+				if v1alpha1.IsMultiTenant(s) {
+					return insertObject(objs, newRoleBinding(), 1)
+				}
+				return objs
+			}(),
 			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
 				Object: newEventSource(withSink, notDeployed(a)),
 			}},
-			WantEvents: []string{
-				createServiceAccountEvent(s),
-				createRoleBindingEvent(s),
-				createAdapterEvent(n, k),
-			},
+			WantEvents: func() []string {
+				events := []string{
+					createServiceAccountEvent(s),
+					createAdapterEvent(n, k),
+				}
+				// only multi-tenant sources expect a RoleBinding
+				if v1alpha1.IsMultiTenant(s) {
+					return insertString(events, createRoleBindingEvent(s), 1)
+				}
+				return events
+			}(),
 		},
 		{
 			Name: "Source object deletion",
@@ -309,6 +321,28 @@ func nameKindAndResource(object runtime.Object) (string /*name*/, string /*kind*
 	}
 
 	return name, kind, resource
+}
+
+// insertObject inserts an runtime.Object into a slice at the given position.
+// https://github.com/golang/go/wiki/SliceTricks#insert
+func insertObject(objs []runtime.Object, obj runtime.Object, pos int) []runtime.Object {
+	objs = append(objs, (runtime.Object)(nil))
+	copy(objs[pos+1:], objs[pos:])
+
+	objs[pos] = obj
+
+	return objs
+}
+
+// insertString inserts an string into a slice at the given position.
+// https://github.com/golang/go/wiki/SliceTricks#insert
+func insertString(strs []string, str string, pos int) []string {
+	strs = append(strs, "")
+	copy(strs[pos+1:], strs[pos:])
+
+	strs[pos] = str
+
+	return strs
 }
 
 /* Event sources */
@@ -530,9 +564,11 @@ func newAdressable() *eventingv1.Broker {
 
 /* RBAC */
 
-type serviceAccountCtorWithOptions func(...serviceAccountOption) *corev1.ServiceAccount
+// ServiceAccountCtorWithOptions returns a ServiceAccount constructor which accepts options.
+type ServiceAccountCtorWithOptions func(...serviceAccountOption) *corev1.ServiceAccount
 
-func NewServiceAccount(src kmeta.OwnerRefable) serviceAccountCtorWithOptions {
+// NewServiceAccount returns a ServiceAccountCtorWithOptions for the given source.
+func NewServiceAccount(src kmeta.OwnerRefable) ServiceAccountCtorWithOptions {
 	name := common.ComponentName(src) + "-adapter"
 	labels := common.CommonObjectLabels(src)
 
@@ -589,6 +625,7 @@ func noOwner(sa *corev1.ServiceAccount) {
 	sa.OwnerReferences = nil
 }
 
+// NewRoleBinding returns a RoleBinding constructor for the given ServiceAccount.
 func NewRoleBinding(sa *corev1.ServiceAccount) func() *rbacv1.RoleBinding {
 	return func() *rbacv1.RoleBinding {
 		return &rbacv1.RoleBinding{

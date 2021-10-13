@@ -30,9 +30,13 @@ type ConfigAccessor interface {
 	GetComponent() string
 }
 
-// Config is the minimal set of configuration parameters source adapters should support.
+// Config is the minimal set of configuration parameters routing adapters should support.
 type Config struct {
 	*adapter.EnvConfig
+	// Environment variable containing the namespace of the adapter.
+	Namespace string `envconfig:"NAMESPACE" required:"true"`
+	// Component is the kind of this adapter.
+	Component string `envconfig:"K_COMPONENT" required:"true"`
 }
 
 // Verify that Config implements ConfigAccessor.

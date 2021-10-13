@@ -17,6 +17,8 @@ kind: Deployment
 metadata:
   name: triggermesh-webhook
   namespace: triggermesh
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 
 spec:
   replicas: 1
@@ -34,7 +36,7 @@ spec:
     spec:
       serviceAccountName: triggermesh-webhook
       containers:
-      - name: triggermesh-webhook
+      - name: webhook
         terminationMessagePolicy: FallbackToLogsOnError
         image: ko://github.com/triggermesh/triggermesh/cmd/triggermesh-webhook
         env:
@@ -75,10 +77,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: triggermesh-webhook
   name: triggermesh-webhook
   namespace: triggermesh
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 spec:
   ports:
     - name: https-webhook

@@ -22,21 +22,15 @@ OUTPUT_DIR        ?= $(BASE_DIR)/_output
 COMMANDS          := $(notdir $(wildcard cmd/*))
 
 BIN_OUTPUT_DIR    ?= $(OUTPUT_DIR)
+DOCS_OUTPUT_DIR   ?= $(OUTPUT_DIR)
 TEST_OUTPUT_DIR   ?= $(OUTPUT_DIR)
 COVER_OUTPUT_DIR  ?= $(OUTPUT_DIR)
 DIST_DIR          ?= $(OUTPUT_DIR)
 
-# Docker build variables
-DOCKER            ?= docker
-IMAGE_REPO        ?= gcr.io/triggermesh
-IMAGE_TAG         ?= latest
-IMAGE_SHA         ?= $(shell git rev-parse HEAD)
-
-# Rely on ko for dev style deployment
+# Rely on ko for building/publishing images and generating/deploying manifests
 KO                ?= ko
-
-KUBECTL           ?= kubectl
-SED               ?= sed
+KOFLAGS           ?=
+IMAGE_TAG         ?= $(shell git rev-parse HEAD)
 
 # Go build variables
 GO                ?= go
@@ -51,7 +45,7 @@ LDFLAGS            = -extldflags=-static -w -s
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
-.PHONY: help build install release-yaml test lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
+.PHONY: help build install release test lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
 
 all: codegen build test lint
 
@@ -78,17 +72,20 @@ confluenttarget-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
-	CGO_ENABLED=1 $(KO) apply -f $(BASE_DIR)/config
+	$(KO) apply -f $(BASE_DIR)/config
 
 undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster using ko
 	$(KO) delete -f $(BASE_DIR)/config
 
-release-yaml: ## Generate triggermesh.yaml
+release: ## Publish container images and generate release manifests
 	@mkdir -p $(DIST_DIR)
-	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml -l triggermesh.io/crd-install=true | \
-	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh-crds.yaml
-	$(KUBECTL) create -f config -f config/namespace --dry-run=client -o yaml -l triggermesh.io/crd-install!=true | \
-	  $(SED) 's|ko://github.com/triggermesh/triggermesh/cmd/\(.*\)|$(IMAGE_REPO)/\1:${IMAGE_TAG}|' > $(DIST_DIR)/triggermesh.yaml
+	$(KO) resolve -f config/ -l 'triggermesh.io/crd-install' > $(DIST_DIR)/triggermesh-crds.yaml
+	@cp config/namespace/100-namespace.yaml $(DIST_DIR)/triggermesh.yaml
+	$(KO) resolve $(KOFLAGS) -B -t latest -f config/ -l '!triggermesh.io/crd-install' > /dev/null
+	$(KO) resolve $(KOFLAGS) -B -t $(IMAGE_TAG) --tag-only -f config/ -l '!triggermesh.io/crd-install' >> $(DIST_DIR)/triggermesh.yaml
+
+gen-apidocs: ## Generate API docs
+	GOPATH="" OUTPUT_DIR=$(DOCS_OUTPUT_DIR) ./hack/gen-api-reference-docs.sh
 
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
@@ -108,22 +105,9 @@ fmt-test: ## Check source formatting
 	@test -z $(shell $(GOFMT) -l $(shell $(GO) list -f '{{$$d := .Dir}}{{range .GoFiles}}{{$$d}}/{{.}} {{end}} {{$$d := .Dir}}{{range .TestGoFiles}}{{$$d}}/{{.}} {{end}}' $(GOPKGS)))
 
 IMAGES = $(foreach cmd,$(COMMANDS),$(cmd).image)
-images: $(IMAGES) ## Builds container images
+images: $(IMAGES) ## Build container images
 $(IMAGES): %.image:
-	$(DOCKER) build -t $(IMAGE_REPO)/$* -f ./cmd/$*/Dockerfile .
-
-CLOUDBUILD_TEST = $(foreach cmd,$(COMMANDS),$(cmd).cloudbuild-test)
-cloudbuild-test: $(CLOUDBUILD_TEST) ## Test container image build with Google Cloud Build
-$(CLOUDBUILD_TEST): %.cloudbuild-test:
-
-# NOTE (antoineco): Cloud Build started failing recently with authentication errors when --no-push is specified.
-# Pushing images with the "_" tag is our hack to avoid those errors and ensure the build cache is always updated.
-	gcloud builds submit $(BASE_DIR) --config cloudbuild.yaml --substitutions _CMD=$*,COMMIT_SHA=${IMAGE_SHA},_KANIKO_IMAGE_TAG=_
-
-CLOUDBUILD = $(foreach cmd,$(COMMANDS),$(cmd).cloudbuild)
-cloudbuild: $(CLOUDBUILD) ## Build and publish image to GCR
-$(CLOUDBUILD): %.cloudbuild:
-	gcloud builds submit $(BASE_DIR) --config cloudbuild.yaml --substitutions _CMD=$*,COMMIT_SHA=${IMAGE_SHA},_KANIKO_IMAGE_TAG=${IMAGE_TAG}
+	$(KO) publish --push=false -B --tag-only -t $(IMAGE_TAG) ./cmd/$*
 
 clean: ## Clean build artifacts
 	@for bin in $(COMMANDS) ; do \

@@ -26,7 +26,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
-// GoogleSheetCondSet is the group of possible conditions
+// GoogleSheetCondSet is the group of possible conditions.
 var GoogleSheetCondSet = apis.NewLivingConditionSet(
 	ConditionServiceReady,
 	ConditionSecretsProvided,
@@ -102,7 +102,7 @@ func (s *GoogleSheetTargetStatus) PropagateAvailability(ksvc *servingv1.Service)
 	GoogleSheetCondSet.Manage(s).MarkFalse(ConditionServiceReady, ReasonUnavailable, msg)
 }
 
-// MarkNoKService sets the condition that the service is not ready
+// MarkNoService sets the condition that the service is not ready.
 func (s *GoogleSheetTargetStatus) MarkNoService(reason, messageFormat string, messageA ...interface{}) {
 	GoogleSheetCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
 }
@@ -112,12 +112,12 @@ func (s *GoogleSheetTargetStatus) IsReady() bool {
 	return GoogleSheetCondSet.Manage(s).IsHappy()
 }
 
-// MarkSecrets sets the condition that the resource is valid
+// MarkSecrets sets the condition that the resource is valid.
 func (s *GoogleSheetTargetStatus) MarkSecrets() {
 	GoogleSheetCondSet.Manage(s).MarkTrue(ConditionSecretsProvided)
 }
 
-// MarkNoSecrets sets the condition that the resource is not valid
+// MarkNoSecrets sets the condition that the resource is not valid.
 func (s *GoogleSheetTargetStatus) MarkNoSecrets(err error) {
 	GoogleSheetCondSet.Manage(s).MarkFalse(ConditionSecretsProvided,
 		ReasonNotFound, err.Error())

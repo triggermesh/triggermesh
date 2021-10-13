@@ -30,6 +30,6 @@ const (
 	ReasonUnsubscribed = "Unsubscribed"
 	// ReasonFailedSubscribe indicates a failure while enabling event notifications for a S3 bucket.
 	ReasonFailedSubscribe = "FailedSubscribe"
-	// ReasonFailedSubscribe indicates a failure while disabling event notifications for a S3 bucket.
+	// ReasonFailedUnsubscribe indicates a failure while disabling event notifications for a S3 bucket.
 	ReasonFailedUnsubscribe = "FailedUnsubscribe"
 )

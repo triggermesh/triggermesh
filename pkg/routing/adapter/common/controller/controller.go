@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 // Package controller contains helpers shared between controllers embedded in
-// source adapters.
+// routing adapters.
 package controller
 
 import "knative.dev/pkg/controller"

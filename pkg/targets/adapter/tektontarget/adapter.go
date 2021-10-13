@@ -45,7 +45,7 @@ type tektonMsg struct {
 }
 
 const (
-	TektonTargetLabel = "name.tekton.targets.triggermesh.io"
+	tektonTargetLabel = "name.tekton.targets.triggermesh.io"
 )
 
 // NewTarget adapter implementation
@@ -187,14 +187,14 @@ func (t *tektonAdapter) reapRuns(ctx context.Context) cloudevents.Result {
 	}
 
 	taskList, err := t.tektonClient.TektonV1beta1().TaskRuns(t.namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: TektonTargetLabel + "=" + t.targetName,
+		LabelSelector: tektonTargetLabel + "=" + t.targetName,
 	})
 	if err != nil {
 		return fmt.Errorf("error retrieving list of jobs: %w", err)
 	}
 
 	pipelineList, err := t.tektonClient.TektonV1beta1().PipelineRuns(t.namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: TektonTargetLabel + "=" + t.targetName,
+		LabelSelector: tektonTargetLabel + "=" + t.targetName,
 	})
 	if err != nil {
 		return fmt.Errorf("error retrieving list of jobs: %w", err)
@@ -272,7 +272,7 @@ func generateParam(params map[string]string) []tektonapi.Param {
 func (t *tektonAdapter) generateTargetLabel() map[string]string {
 	labels := make(map[string]string)
 
-	labels[TektonTargetLabel] = t.targetName
+	labels[tektonTargetLabel] = t.targetName
 
 	return labels
 }

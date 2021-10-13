@@ -48,6 +48,7 @@ var (
 	_ duckv1.KRShaped    = (*OracleTarget)(nil)
 )
 
+// OracleTargetSpec holds the desired state of the event target.
 type OracleTargetSpec struct {
 	// Oracle User API private key.
 	OracleAPIPrivateKey SecretValueFromSource `json:"oracleApiPrivateKey"`
@@ -70,6 +71,7 @@ type OracleTargetSpec struct {
 	OracleFunctionSpec *OracleFunctionSpecSpec `json:"function,omitempty"`
 }
 
+// OracleFunctionSpecSpec holds the Oracle Cloud ID of the function to invoke.
 type OracleFunctionSpecSpec struct {
 	// Oracle Cloud ID of the function to invoke.
 	Function string `json:"function,inline"`

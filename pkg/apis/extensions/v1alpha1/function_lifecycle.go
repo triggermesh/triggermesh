@@ -22,18 +22,18 @@ import (
 )
 
 var condSet = apis.NewLivingConditionSet(
-	ConditionReady,
-	ConditionSinkReady,
-	ConditionServiceReady,
-	ConditionConfigmapReady,
+	conditionReady,
+	conditionSinkReady,
+	conditionServiceReady,
+	conditionConfigmapReady,
 )
 
 const (
-	ConditionReady = apis.ConditionReady
+	conditionReady = apis.ConditionReady
 
-	ConditionSinkReady      apis.ConditionType = "SinkReady"
-	ConditionServiceReady   apis.ConditionType = "ServiceReady"
-	ConditionConfigmapReady apis.ConditionType = "ConfigmapReady"
+	conditionSinkReady      apis.ConditionType = "SinkReady"
+	conditionServiceReady   apis.ConditionType = "ServiceReady"
+	conditionConfigmapReady apis.ConditionType = "ConfigmapReady"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
@@ -54,38 +54,38 @@ func (fs *FunctionStatus) InitializeConditions() {
 // MarkServiceUnavailable updates Function status with Function Service Not Ready condition
 func (fs *FunctionStatus) MarkServiceUnavailable(name string) {
 	condSet.Manage(fs).MarkFalse(
-		ConditionServiceReady,
+		conditionServiceReady,
 		"FunctionServiceUnavailable",
 		"Function Service %q is not ready.", name)
 }
 
 // MarkServiceAvailable updates Function status with Function Service Is Ready condition
 func (fs *FunctionStatus) MarkServiceAvailable() {
-	condSet.Manage(fs).MarkTrue(ConditionServiceReady)
+	condSet.Manage(fs).MarkTrue(conditionServiceReady)
 }
 
 // MarkSinkUnavailable updates Function status with Sink Not Ready condition
 func (fs *FunctionStatus) MarkSinkUnavailable() {
 	condSet.Manage(fs).MarkFalse(
-		ConditionSinkReady,
+		conditionSinkReady,
 		"SinkUnavailable",
 		"Sink is unavailable")
 }
 
 // MarkSinkAvailable updates Function status with Sink Is Ready condition
 func (fs *FunctionStatus) MarkSinkAvailable() {
-	condSet.Manage(fs).MarkTrue(ConditionSinkReady)
+	condSet.Manage(fs).MarkTrue(conditionSinkReady)
 }
 
-// MarkSinkUnavailable updates Function status with Sink Not Ready condition
+// MarkConfigmapUnavailable updates Function status with Configmap Unavailable condition
 func (fs *FunctionStatus) MarkConfigmapUnavailable(name string) {
 	condSet.Manage(fs).MarkFalse(
-		ConditionConfigmapReady,
+		conditionConfigmapReady,
 		"ConfigmapUnavailable",
 		"Configmap is not ready")
 }
 
-// MarkSinkAvailable updates Function status with Sink Is Ready condition
+// MarkConfigmapAvailable updates Function status with Configmap Is Ready condition
 func (fs *FunctionStatus) MarkConfigmapAvailable() {
-	condSet.Manage(fs).MarkTrue(ConditionConfigmapReady)
+	condSet.Manage(fs).MarkTrue(conditionConfigmapReady)
 }

@@ -18,12 +18,7 @@ package splitter
 
 import (
 	"context"
-	"fmt"
 
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/types"
-
-	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
@@ -31,57 +26,12 @@ import (
 )
 
 // Reconciler implements controller.Reconciler for the event source type.
-type Reconciler struct {
-	adapter MTAdapter
-}
+type Reconciler struct{}
 
 // Check the interfaces Reconciler should implement.
-var (
-	_ reconcilerv1alpha1.Interface         = (*Reconciler)(nil)
-	_ reconcilerv1alpha1.ReadOnlyInterface = (*Reconciler)(nil)
-	_ reconciler.OnDeletionInterface       = (*Reconciler)(nil)
-)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements reconcilerv1alpha1.Interface.
 func (r *Reconciler) ReconcileKind(ctx context.Context, s *v1alpha1.Splitter) reconciler.Event {
-	return r.reconcile(ctx, s)
-}
-
-// ObserveKind implements reconcilerv1alpha1.ReadOnlyInterface.
-func (r *Reconciler) ObserveKind(ctx context.Context, s *v1alpha1.Splitter) reconciler.Event {
-	return r.reconcile(ctx, s)
-}
-
-func (r *Reconciler) reconcile(ctx context.Context, s *v1alpha1.Splitter) error {
-	if s.Status.SinkURI == nil {
-		// Mark that error as permanent so we don't retry until the
-		// source's status has been updated, which automatically
-		// triggers a new reconciliation.
-		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning, ReasonSourceNotReady,
-			"Event sink URL wasn't resolved yet. Skipping adapter configuration"))
-	}
-
-	if err := r.adapter.RegisterHandlerFor(ctx, s); err != nil {
-		return fmt.Errorf("registering HTTP handler: %w", err)
-	}
-
 	return nil
-}
-
-// ObserveDeletion implements reconciler.OnDeletionInterface.
-func (r *Reconciler) ObserveDeletion(ctx context.Context, key types.NamespacedName) error {
-	s := &v1alpha1.Splitter{}
-	s.SetName(key.Name)
-	s.SetNamespace(key.Namespace)
-
-	return r.finalize(ctx, s)
-}
-
-func (r *Reconciler) finalize(ctx context.Context, s *v1alpha1.Splitter) error {
-	if err := r.adapter.DeregisterHandlerFor(ctx, s); err != nil {
-		return fmt.Errorf("deregistering HTTP handler: %w", err)
-	}
-
-	return reconciler.NewEvent(corev1.EventTypeNormal, ReasonHandlerDeregistered,
-		"HTTP handler deregistered")
 }

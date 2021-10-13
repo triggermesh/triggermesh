@@ -47,6 +47,7 @@ var (
 	_ duckv1.KRShaped    = (*AWSSQSTarget)(nil)
 )
 
+// AWSSQSTargetSpec holds the desired state of the event target.
 type AWSSQSTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`

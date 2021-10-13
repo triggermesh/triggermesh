@@ -35,7 +35,6 @@ import (
 	"knative.dev/pkg/injection"
 	"knative.dev/pkg/logging"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/splitter"
 	routinglisters "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/routing/adapter/common/env"
@@ -55,16 +54,13 @@ type Handler struct {
 }
 
 // NewEnvConfig satisfies env.ConfigConstructor.
-// Returns an accessor for the source's adapter envConfig.
 func NewEnvConfig() env.ConfigAccessor {
 	return &env.Config{}
 }
 
-// NewAdapter creates a new Handler and its associated MessageReceiver. The caller is responsible for
-// Start()ing the returned Handler.
-func NewAdapter(component string) pkgadapter.AdapterConstructor {
-	return func(ctx context.Context, _ pkgadapter.EnvConfigAccessor,
-		ceClient cloudevents.Client) pkgadapter.Adapter {
+// NewAdapter returns a constructor for the source's adapter.
+func NewAdapter(string) pkgadapter.AdapterConstructor {
+	return func(ctx context.Context, _ pkgadapter.EnvConfigAccessor, _ cloudevents.Client) pkgadapter.Adapter {
 		logger := logging.FromContext(ctx)
 
 		sender, err := kncloudevents.NewHTTPMessageSenderWithTarget("")
@@ -82,16 +78,6 @@ func NewAdapter(component string) pkgadapter.AdapterConstructor {
 			logger:         logger,
 		}
 	}
-}
-
-// RegisterHandlerFor implements MTAdapter.
-func (h *Handler) RegisterHandlerFor(ctx context.Context, s *v1alpha1.Splitter) error {
-	return nil
-}
-
-// DeregisterHandlerFor implements MTAdapter.
-func (h *Handler) DeregisterHandlerFor(ctx context.Context, s *v1alpha1.Splitter) error {
-	return nil
 }
 
 // Start begins to receive messages for the handler.

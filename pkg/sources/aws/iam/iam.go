@@ -43,6 +43,7 @@ type PolicyStatement struct {
 // PolicyStatementEffect represents the Effect element of a Statement.
 type PolicyStatementEffect string
 
+// List of acceptable PolicyStatementEffect values.
 const (
 	EffectAllow PolicyStatementEffect = "Allow"
 )

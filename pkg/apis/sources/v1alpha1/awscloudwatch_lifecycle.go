@@ -59,7 +59,7 @@ const (
 	AWSCloudWatchMessageEventType = "metrics.message"
 )
 
-// Name of the CloudWatch service, as exposed in ARNs.
+// ServiceCloudWatch is the name of the CloudWatch service, as exposed in ARNs.
 // https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatch.html#amazoncloudwatch-resources-for-iam-policies
 const ServiceCloudWatch = "cloudwatch"
 

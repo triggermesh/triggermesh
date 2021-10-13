@@ -16,6 +16,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: triggermesh-controller
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+
 rules:
 
 # Record Kubernetes events
@@ -474,79 +477,9 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: awscloudwatchlogssource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awscloudwatchsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awscodecommitsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awscognitoidentitysource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awscognitouserpoolsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awsdynamodbsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awskinesissource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awsperformanceinsightssource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: awss3source-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
   name: awssnssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 
 # Record Kubernetes events
@@ -597,159 +530,9 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: awssqssource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: azureactivitylogssource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: azureblobstoragesource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: azureeventgridsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: azureeventhubsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: azurequeuestoragesource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: azureservicebusqueuesource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudauditlogssource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudbillingsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudiotsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudpubsubsource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudrepositoriessource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: googlecloudstoragesource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: httppollersource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: ocimetricssource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: salesforcesource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: slacksource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: twiliosource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: webhooksource-adapter
-rules: []
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
   name: zendesksource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 
 # Record Kubernetes events
@@ -795,6 +578,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: tektontarget-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 - apiGroups:
   - tekton.dev
@@ -808,10 +593,12 @@ rules:
 
 ---
 
-kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
   name: filter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 - apiGroups:
   - ''
@@ -848,10 +635,12 @@ rules:
 
 ---
 
-kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
 metadata:
   name: splitter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 rules:
 - apiGroups:
   - ''
@@ -896,6 +685,7 @@ kind: ClusterRole
 metadata:
   name: triggermesh-source-observer
   labels:
+    app.kubernetes.io/part-of: triggermesh
     duck.knative.dev/source: 'true'
 rules:
 - apiGroups:
@@ -947,6 +737,7 @@ kind: ClusterRole
 metadata:
   name: triggermesh-addressable-resolver
   labels:
+    app.kubernetes.io/part-of: triggermesh
     duck.knative.dev/addressable: 'true'
 rules:
 - apiGroups:

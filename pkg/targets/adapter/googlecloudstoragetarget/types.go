@@ -16,6 +16,8 @@ limitations under the License.
 
 package googlecloudstoragetarget
 
+// EventPayload is a structure of CloudEvents data payload
+// processed by the event target.
 type EventPayload struct {
 	Data     []byte `json:"data"`
 	FileName string `json:"fileName"`

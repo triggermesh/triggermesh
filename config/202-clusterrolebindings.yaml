@@ -16,6 +16,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: triggermesh-controller
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
   name: triggermesh-controller
@@ -38,6 +40,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: awssnssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
   name: triggermesh-controller
@@ -51,6 +55,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: zendesksource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
   name: triggermesh-controller
@@ -64,6 +70,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: tektontarget-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
   name: triggermesh-controller
@@ -77,6 +85,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: filter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
   name: triggermesh-controller
@@ -90,6 +100,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: splitter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
   name: triggermesh-controller
@@ -106,6 +118,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: triggermesh-controller-addressable-resolver
+  labels:
+    app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
   name: triggermesh-controller

@@ -22,30 +22,19 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	pkgcontroller "knative.dev/pkg/controller"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
-	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/splitter"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/splitter"
 	"github.com/triggermesh/triggermesh/pkg/routing/adapter/common/controller"
 )
 
-// MTAdapter allows the multi-tenant adapter to expose methods the reconciler
-// can call while reconciling a source object.
-type MTAdapter interface {
-	// Registers a HTTP handler for the given source.
-	RegisterHandlerFor(context.Context, *v1alpha1.Splitter) error
-	// Deregisters the HTTP handler for the given source.
-	DeregisterHandlerFor(context.Context, *v1alpha1.Splitter) error
-}
-
-// NewController returns a constructor for the event source's Reconciler.
+// NewController returns a constructor for the Router's Reconciler.
+//
+// NOTE(antoineco): although the returned controller doesn't do anything, it is
+// necessary to return a valid implementation in order to trigger the Informer
+// injection in Knative's sharedmain.Main.
 func NewController(component string) pkgadapter.ControllerConstructor {
-	return func(ctx context.Context, a pkgadapter.Adapter) *pkgcontroller.Impl {
-		r := &Reconciler{
-			adapter: a.(MTAdapter),
-		}
+	return func(ctx context.Context, _ pkgadapter.Adapter) *pkgcontroller.Impl {
+		r := (*Reconciler)(nil)
 		impl := reconcilerv1alpha1.NewImpl(ctx, r, controller.Opts(component))
-
-		informerv1alpha1.Get(ctx).Informer().AddEventHandler(pkgcontroller.HandleAll(impl.Enqueue))
 
 		return impl
 	}

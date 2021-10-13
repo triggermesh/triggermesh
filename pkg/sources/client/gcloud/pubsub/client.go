@@ -41,6 +41,7 @@ func NewClientGetter(sg NamespacedSecretsGetter) *ClientGetterWithSecretGetter {
 	}
 }
 
+// NamespacedSecretsGetter returns a SecretInterface for the given namespace.
 type NamespacedSecretsGetter func(namespace string) coreclientv1.SecretInterface
 
 // ClientGetterWithSecretGetter gets Google Cloud clients using static

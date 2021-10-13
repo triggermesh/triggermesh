@@ -410,18 +410,20 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 		return nil, err
 	}
 
-	desiredRB := newRoleBinding(src, currentSA)
-	currentRB, err := r.getOrCreateAdapterRoleBinding(ctx, desiredRB)
-	if err != nil {
-		return nil, err
-	}
-
 	if currentSA, err = r.syncAdapterServiceAccount(ctx, currentSA, desiredSA); err != nil {
 		return nil, fmt.Errorf("synchronizing adapter ServiceAccount: %w", err)
 	}
 
-	if _, err = r.syncAdapterRoleBinding(ctx, currentRB, desiredRB); err != nil {
-		return nil, fmt.Errorf("synchronizing adapter RoleBinding: %w", err)
+	if v1alpha1.IsMultiTenant(src) {
+		desiredRB := newRoleBinding(src, currentSA)
+		currentRB, err := r.getOrCreateAdapterRoleBinding(ctx, desiredRB)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err = r.syncAdapterRoleBinding(ctx, currentRB, desiredRB); err != nil {
+			return nil, fmt.Errorf("synchronizing adapter RoleBinding: %w", err)
+		}
 	}
 
 	return currentSA, nil

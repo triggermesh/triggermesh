@@ -48,6 +48,7 @@ var (
 	_ duckv1.KRShaped    = (*AWSKinesisTarget)(nil)
 )
 
+// AWSKinesisTargetSpec holds the desired state of the event target.
 type AWSKinesisTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
