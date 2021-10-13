@@ -45,7 +45,7 @@ spec:
       status: {}
     schema:
       openAPIV3Schema:
-        description: TriggerMesh event source for Google Cloud Source IoT.
+        description: TriggerMesh event source for Google Cloud IoT.
         type: object
         properties:
           spec:
@@ -58,11 +58,11 @@ spec:
                 pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/locations\/[a-z][a-z0-9-]{3,29}\/registries\/[a-zA-Z][\w-.~%+]{2,254}$
               pubsub:
                 description: Attributes related to the configuration of Pub/Sub resources associated with the Cloud
-                  IoT.
+                  IoT Registry.
                 type: object
                 properties:
                   topic:
-                    description: Full resource name of the Pub/Sub topic where change notifications originating from the
+                    description: Full resource name of the Pub/Sub topic where change messages originating from the
                       configured IoT Registry are sent to. If not supplied, a topic is created on behalf of the user, in the
                       GCP project referenced by the 'project' attribute. The expected format is described at
                       https://cloud.google.com/pubsub/docs/admin#resource_names
@@ -100,7 +100,7 @@ spec:
                 - required: [value]
                 - required: [valueFromSecret]
               sink:
-                description: The destination of events received via change notifications.
+                description: The destination of events received via messages.
                 type: object
                 properties:
                   ref:
@@ -136,11 +136,11 @@ spec:
             type: object
             properties:
               topic:
-                description: Resource name of the Pub/Sub topic where IoT events are currently sent to.
+                description: Resource name of the Pub/Sub topic where IoT messages are currently sent to.
                 type: string
               subscription:
                 description: Resource name of the Pub/Sub subscription currently used by the event source for pulling
-                  events from IoT.
+                  events from the IoT Registry.
                 type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.

@@ -45,7 +45,7 @@ const (
 type adapterConfig struct {
 	// Container image
 	// Uses the adapter for Google Cloud Pub/Sub instead of a source-specific image.
-	Image string `envconfig:"GOOGLECLOUDPUBSUBSOURCE_IMAGE" default:"gcr.io/triggermesh-private/googlecloudpubsubsource-adapter"`
+	Image string `envconfig:"GOOGLECLOUDPUBSUBSOURCE_IMAGE" default:"gcr.io/triggermesh/googlecloudpubsubsource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }

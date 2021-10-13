@@ -52,10 +52,10 @@ var (
 type GoogleCloudIoTSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	// Name of the Cloud IoT Registry to receive notifications from.
+	// Resource name of the Cloud IoT Registry to receive messages from.
 	Registry GCloudIoTResourceName `json:"registry"`
 
-	// Settings related to the Pub/Sub resources associated with the repo events.
+	// Settings related to the Pub/Sub resources associated with the Cloud IoT Registry.
 	PubSub GoogleCloudIoTSourcePubSubSpec `json:"pubsub"`
 
 	// Service account key in JSON format.
@@ -69,7 +69,7 @@ type GoogleCloudIoTSourcePubSubSpec struct {
 	// Optional: no more than one of the following may be specified.
 
 	// Full resource name of the Pub/Sub topic where change notifications
-	// originating from the configured sink are sent to. If not supplied,
+	// originating from the configured IoT Registry are sent to. If not supplied,
 	// a topic is created on behalf of the user, in the GCP project
 	// referenced by the Project attribute.
 	//
@@ -80,7 +80,7 @@ type GoogleCloudIoTSourcePubSubSpec struct {
 	Topic *GCloudResourceName `json:"topic,omitempty"`
 
 	// Name of the GCP project where Pub/Sub resources associated with the
-	// Cloud IoT are to be created.
+	// Cloud IoT Registry are to be created.
 	//
 	// Mutually exclusive with Topic which, if supplied, already contains
 	// the project name.
@@ -130,8 +130,8 @@ var (
 )
 
 const (
-	GCloudIoTResourceNameFormat        = "projects/{project_name}/locations/{location_name}/{resource_type}/{resource_name}"
-	GCloudIoTResourceNameSplitElements = 6
+	gGloudIoTResourceNameFormat        = "projects/{project_name}/locations/{location_name}/{resource_type}/{resource_name}"
+	gCloudIoTResourceNameSplitElements = 6
 )
 
 // UnmarshalJSON implements json.Unmarshaler
@@ -142,7 +142,7 @@ func (n *GCloudIoTResourceName) UnmarshalJSON(data []byte) error {
 	}
 
 	sections := strings.Split(dataStr, "/")
-	if len(sections) != GCloudIoTResourceNameSplitElements {
+	if len(sections) != gCloudIoTResourceNameSplitElements {
 		return newParseGCloudIoTResourceNameError(dataStr)
 	}
 
@@ -224,5 +224,5 @@ func newParseGCloudIoTResourceNameError(got string) error {
 // Error implements the error interface.
 func (e *errParseGCloudIoTResourceName) Error() string {
 	return fmt.Sprintf("Resource name %q does not match expected format %q",
-		e.gotInput, GCloudIoTResourceNameFormat)
+		e.gotInput, gGloudIoTResourceNameFormat)
 }
