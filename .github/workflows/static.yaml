@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build:
+  lint:
     name: Code linting
     runs-on: ubuntu-latest
 
@@ -26,3 +26,10 @@ jobs:
       uses: golangci/golangci-lint-action@v2
       with:
         skip-go-installation: true
+
+    - name: RBAC check
+      run: |
+        pushd hack/rbac-check
+        go install .
+        popd
+        rbac-check
