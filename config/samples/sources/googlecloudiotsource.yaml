@@ -21,11 +21,6 @@ metadata:
 spec:
   registry: projects/my-project/locations/my-location/registries/my-registry
 
-  pubsub:
-    project: my-project
-    # Alternatively, provide a pre-existing Pub/Sub topic:
-    # topic: projects/my-project/topics/my-topic
-
   serviceAccountKey:
     value: >-
       {

@@ -68,15 +68,6 @@ spec:
                       https://cloud.google.com/pubsub/docs/admin#resource_names
                     type: string
                     pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
-                  project:
-                    description: Name of the GCP project where Pub/Sub resources associated with the Cloud IoT
-                      are to be created. Mutually exclusive with 'topic' which, if supplied, already contains
-                      the project name.
-                    type: string
-                    pattern: ^[a-z][a-z0-9-]{3,29}$
-                oneOf:
-                - required: [project]
-                - required: [topic]
               serviceAccountKey:
                 description: Service account key used to authenticate the event source and allow it to interact with
                   Google Cloud APIs. Only the JSON format is supported.
@@ -128,7 +119,6 @@ spec:
                 - required: [uri]
             required:
             - registry
-            - pubsub
             - serviceAccountKey
             - sink
           status:
