@@ -81,6 +81,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
@@ -118,6 +119,7 @@ rules:
   - azureservicebusqueuesources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
+  - googlecloudiotsources/status
   - googlecloudpubsubsources/status
   - googlecloudrepositoriessources/status
   - googlecloudstoragesources/status
@@ -294,6 +296,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
@@ -335,6 +338,7 @@ rules:
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
+  - googlecloudiotsource-adapter
   - googlecloudpubsubsource-adapter
   - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
@@ -383,6 +387,7 @@ rules:
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
+  - googlecloudiotsource-adapter
   - googlecloudpubsubsource-adapter
   - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
@@ -706,6 +711,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources

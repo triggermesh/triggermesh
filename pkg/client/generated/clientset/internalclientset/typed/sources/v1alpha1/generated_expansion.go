@@ -58,6 +58,8 @@ type GoogleCloudAuditLogsSourceExpansion interface{}
 
 type GoogleCloudBillingSourceExpansion interface{}
 
+type GoogleCloudIoTSourceExpansion interface{}
+
 type GoogleCloudPubSubSourceExpansion interface{}
 
 type GoogleCloudRepositoriesSourceExpansion interface{}
