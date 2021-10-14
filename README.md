@@ -24,13 +24,13 @@ To install TriggerMesh, follow the [installation instructions](https://docs.trig
 Register TriggerMesh APIs by deploying the Custom Resources Definitions:
 
 ```shell
-kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/v1.10.1/triggermesh-crds.yaml
+kubectl apply -f https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh-crds.yaml
 ```
 
 Deploy the platform:
 
 ```shell
-kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/v1.10.1/triggermesh.yaml
+kubectl apply -f https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh.yaml
 ```
 
 ### For Developers
