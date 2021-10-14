@@ -64,11 +64,11 @@ func ensureTopicAssociated(ctx context.Context, cli *gcloudiot.Service, topicRes
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"Access denied to Cloud Source IoT API: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingRegistry(registryName, err))
+		return controller.NewPermanentError(failUpdatingRegistry(registryName, err))
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
 			"IoT Registry not found: "+toErrMsg(err))
-		return controller.NewPermanentError(failCreatingRegistry(registryName, err))
+		return controller.NewPermanentError(failUpdatingRegistry(registryName, err))
 	case err != nil:
 		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
 			"Failed to create notification for IoT Registry %q: %s", registryName, toErrMsg(err))
@@ -124,10 +124,10 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gcloudiot
 	return err
 }
 
-// failCreatingRegistry returns a reconciler event which indicates
+// failUpdatingRegistry returns a reconciler event which indicates
 // that a IoT Registry could not be retrieved or created from the
 // Google Cloud API.
-func failCreatingRegistry(registryName string, origErr error) reconciler.Event {
+func failUpdatingRegistry(registryName string, origErr error) reconciler.Event {
 	return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-		"Error creating Notification for IoT Registry %q: %s", registryName, toErrMsg(origErr))
+		"Error updating event notification for IoT Registry %q: %s", registryName, toErrMsg(origErr))
 }

@@ -83,7 +83,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudI
 	}
 
 	if err = ensureTopicAssociated(ctx, iotCli, topic); err != nil {
-		return fmt.Errorf("failed to reconcile IoT notification: %w", err)
+		return fmt.Errorf("failed to reconcile IoT notification configuration: %w", err)
 	}
 
 	return r.base.ReconcileSource(ctx, r)
@@ -112,7 +112,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudIo
 	// we don't leave any dangling resources behind us.
 
 	if err := r.ensureNoTopicAssociated(ctx, iotCli); err != nil {
-		return fmt.Errorf("failed to clean up IoT notification: %w", err)
+		return fmt.Errorf("failed to clean up IoT notification configuration: %w", err)
 	}
 
 	if err := ensureNoPubSub(ctx, pubsubCli); err != nil {

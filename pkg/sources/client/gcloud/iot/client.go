@@ -65,12 +65,9 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudIoTSource) (
 
 	ctx := context.Background()
 
-	var pubsubProject string
-
+	pubsubProject := src.Spec.Registry.Project
 	if topic := src.Spec.PubSub.Topic; topic != nil {
 		pubsubProject = topic.Project
-	} else if project := src.Spec.Registry.Project; project != "" {
-		pubsubProject = project
 	}
 
 	psCli, err := pubsub.NewClient(ctx, pubsubProject, credsCliOpt)
