@@ -62,7 +62,7 @@ resources:
 - config/301-elasticsearchtarget.yaml
 - config/301-googlecloudstoragetarget.yaml
 - config/301-googlecloudworkflowstarget.yaml
-- config/301-googlefirestoretarget.yaml
+- config/301-googlecloudfirestoretarget.yaml
 - config/301-googlesheettarget.yaml
 - config/301-hasuratarget.yaml
 - config/301-httptarget.yaml
