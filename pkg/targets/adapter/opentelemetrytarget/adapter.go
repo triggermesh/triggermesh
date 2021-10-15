@@ -1,0 +1,231 @@
+/*
+Copyright 2021 TriggerMesh Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package opentelemetrytarget
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	"go.opentelemetry.io/contrib/exporters/metric/cortex"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/number"
+	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"go.uber.org/zap"
+	"knative.dev/pkg/logging"
+
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+)
+
+// NewTarget adapter implementation
+func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+	env := envAcc.(*envAccessor)
+	logger := logging.FromContext(ctx)
+
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	if err != nil {
+		logger.Panicf("Error creating CloudEvents replier: %v", err)
+	}
+
+	if len(env.Instruments) == 0 {
+		logger.Panic("No instruments informed")
+	}
+
+	// instruments structure is a map nested with two keys.
+	//
+	// - Instrument name: this will usually be unique, but it could
+	//   happen that two different Instrument kinds share the same name
+	// - Instrument kind: there will usually be only one kind per name
+	// 	 but that is not guaranteed.
+	//
+	// We use it to keep the registered set of instruments in order to
+	// match with the incoming CloudEvent requests.
+	instruments := map[string]map[string]*instrumentRef{}
+	for _, i := range env.Instruments {
+		if _, ok := instruments[i.Name]; !ok {
+			instruments[i.Name] = map[string]*instrumentRef{}
+		}
+		instruments[i.Name][i.Instrument] = &instrumentRef{descriptor: i.Descriptor}
+	}
+
+	ccfg := &cortex.Config{
+		Endpoint:      env.CortexEndpoint,
+		BearerToken:   env.CortexBearerToken,
+		RemoteTimeout: env.CortexRemoteTimeout,
+		PushInterval:  env.CortexPushInterval,
+	}
+
+	if err = ccfg.Validate(); err != nil {
+		logger.Panicf("Error validating Cortex configuration: %v", err)
+	}
+
+	return &cortexAdapter{
+		cortexConfig: ccfg,
+		opentelemetryAdapter: opentelemetryAdapter{
+			instruments: instruments,
+
+			replier:  replier,
+			ceClient: ceClient,
+			logger:   logger,
+		},
+	}
+}
+
+var _ pkgadapter.Adapter = (*cortexAdapter)(nil)
+
+// instrumentRef is a reference to an instrument
+// desciptor and its implementation.
+type instrumentRef struct {
+	descriptor metric.Descriptor
+
+	// sync or async implementation choice
+	sync metric.SyncImpl
+	// TODO: add async ref to metric.AsyncImpl
+}
+
+type opentelemetryAdapter struct {
+	instruments map[string]map[string]*instrumentRef
+
+	replier  *targetce.Replier
+	ceClient cloudevents.Client
+	logger   *zap.SugaredLogger
+}
+
+type cortexAdapter struct {
+	opentelemetryAdapter
+
+	cortexConfig *cortex.Config
+}
+
+// Returns if stopCh is closed or Send() returns an error.
+func (a *cortexAdapter) Start(ctx context.Context) error {
+	a.logger.Info("Starting Cortex adapter")
+
+	cortexctl, err := cortex.InstallNewPipeline(
+		*a.cortexConfig,
+		controller.WithCollectPeriod(a.cortexConfig.PushInterval),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create Cortex controller: %v", err)
+	}
+
+	defer func() {
+		if err := cortexctl.Stop(ctx); err != nil {
+			// Warning only, this will be most of the time a context
+			// cancelation error, which is not an issue.
+			a.logger.Warnw("Error stopping Cortex adapter", zap.Error(err))
+		}
+	}()
+
+	meter := cortexctl.Meter("TriggerMesh")
+
+	// Iterate over all instruments, create their instances and
+	// store the link back to the instruments map.
+	for name, kindm := range a.instruments {
+		for kind, i := range kindm {
+
+			if i.descriptor.InstrumentKind().Synchronous() {
+				i.sync, err = meter.MeterImpl().NewSyncInstrument(i.descriptor)
+				if err != nil {
+					return fmt.Errorf("failed to create Instrument: %v", err)
+				}
+				continue
+			}
+
+			// TODO implement async instruments
+			return fmt.Errorf("async Instrument %s/%s not supported", name, kind)
+		}
+	}
+
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
+}
+
+func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+
+	m := &Measure{}
+	if err := event.DataAs(m); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
+	}
+
+	attrs := make([]attribute.KeyValue, 0, len(m.Attributes))
+	for _, at := range m.Attributes {
+		attr, err := at.ParseAttribute()
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
+		}
+		attrs = append(attrs, *attr)
+	}
+
+	// Match the measure with an instrument
+	kindm, ok := a.instruments[m.Name]
+	if !ok {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			fmt.Errorf("instrument %q has not been configured", m.Name), nil)
+	}
+
+	// Look for matching Kind or defaulting if there is only
+	// one for the instrument.
+	var ir *instrumentRef
+	switch {
+	case m.Kind != "":
+		if ir, ok = kindm[m.Kind]; !ok {
+			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+				fmt.Errorf("incorret kind %q for instrument %q", m.Kind, m.Name), nil)
+		}
+
+	case len(kindm) == 1:
+		for _, v := range kindm {
+			ir = v
+		}
+
+	default:
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			fmt.Errorf("instrument %q has mnay kinds. Measure did not specify one", m.Name), nil)
+	}
+
+	// Parse value according to the instrument number kind
+	var value number.Number
+	switch ir.descriptor.NumberKind() {
+	case number.Int64Kind:
+		var v int64
+		if err := json.Unmarshal(m.Value, &v); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+				fmt.Errorf("value %v cannot be parsed as int64: %w", m.Name, err), nil)
+		}
+		value = number.NewInt64Number(v)
+
+	case number.Float64Kind:
+		var v float64
+		if err := json.Unmarshal(m.Value, &v); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+				fmt.Errorf("value %v cannot be parsed as float64: %w", m.Name, err), nil)
+		}
+		value = number.NewFloat64Number(v)
+	}
+
+	if ir.descriptor.InstrumentKind().Synchronous() {
+		ir.sync.RecordOne(ctx, value, attrs)
+	}
+
+	return a.replier.Ack()
+}
