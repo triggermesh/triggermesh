@@ -28,7 +28,7 @@ import (
 
 const (
 	tInstName          = "inst-name"
-	tInstKindString    = "HistogramInstrument"
+	tInstKindString    = "Histogram"
 	tInstNumKindString = "Int64"
 	tInstDescription   = "instrument one"
 	tInstrumentsEnv    = "OPENTELEMETRY_INSTRUMENTS"
@@ -64,7 +64,7 @@ func TestEnvironmentInstruments(t *testing.T) {
 				metric.NewDescriptor(tInstName, tInstKind, tInstNumKind, tInstDescription, tInstUnit),
 			}},
 		"unknown instrument": {
-			envInstruments: `[{"name":"` + tInstName + `","instrument":"UnknownInstrument","number":"` + tInstNumKindString + `"}]`,
+			envInstruments: `[{"name":"` + tInstName + `","instrument":"Unknown","number":"` + tInstNumKindString + `"}]`,
 			expectedErr:    "unknown metric instrument kind",
 		},
 		"unknown number": {

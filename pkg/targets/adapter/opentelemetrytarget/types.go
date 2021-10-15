@@ -28,8 +28,8 @@ type attributeValueType string
 
 const (
 	attributeValueTypeString  attributeValueType = "string"
-	attributeValueTypeInt64   attributeValueType = "int64"
-	attributeValueTypeFloat64 attributeValueType = "float64"
+	attributeValueTypeInt64   attributeValueType = "int"
+	attributeValueTypeFloat64 attributeValueType = "float"
 	attributeValueTypeBool    attributeValueType = "bool"
 )
 
@@ -76,7 +76,10 @@ func (a *Attribute) ParseAttribute() (*attribute.KeyValue, error) {
 		return &a, nil
 
 	case attributeValueTypeString:
-		v := string(a.Value)
+		var v string
+		if err := json.Unmarshal(a.Value, &v); err != nil {
+			return nil, fmt.Errorf("value for %q attribute does not match type: %w", a.Key, err)
+		}
 		a := attribute.String(a.Key, v)
 		return &a, nil
 	}
