@@ -66,10 +66,8 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudRepositories
 
 	ctx := context.Background()
 
-	var pubsubProject string
-	if project := src.Spec.PubSub.Project; project != nil {
-		pubsubProject = *project
-	} else if topic := src.Spec.PubSub.Topic; topic != nil {
+	pubsubProject := src.Spec.Repository.Project
+	if topic := src.Spec.PubSub.Topic; topic != nil {
 		pubsubProject = topic.Project
 	}
 
