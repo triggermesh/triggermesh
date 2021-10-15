@@ -19,7 +19,10 @@ package opentelemetrytarget
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+
+	kerrors "k8s.io/apimachinery/pkg/util/errors"
 
 	"go.opentelemetry.io/contrib/exporters/metric/cortex"
 	"go.opentelemetry.io/otel/attribute"
@@ -97,10 +100,7 @@ var _ pkgadapter.Adapter = (*cortexAdapter)(nil)
 // desciptor and its implementation.
 type instrumentRef struct {
 	descriptor metric.Descriptor
-
-	// sync or async implementation choice
-	sync metric.SyncImpl
-	// TODO: add async ref to metric.AsyncImpl
+	sync       metric.SyncImpl
 }
 
 type opentelemetryAdapter struct {
@@ -147,13 +147,15 @@ func (a *cortexAdapter) Start(ctx context.Context) error {
 			if i.descriptor.InstrumentKind().Synchronous() {
 				i.sync, err = meter.MeterImpl().NewSyncInstrument(i.descriptor)
 				if err != nil {
-					return fmt.Errorf("failed to create Instrument: %v", err)
+					return fmt.Errorf("failed to create sync instrument: %v", err)
 				}
 				continue
 			}
 
-			// TODO implement async instruments
-			return fmt.Errorf("async Instrument %s/%s not supported", name, kind)
+			if i.descriptor.InstrumentKind().Asynchronous() {
+				return fmt.Errorf("async instrument %s/%s not supported", name, kind)
+			}
+			return fmt.Errorf("cannot find out if instrument %s/%s is sync or async", name, kind)
 		}
 	}
 
@@ -162,16 +164,32 @@ func (a *cortexAdapter) Start(ctx context.Context) error {
 
 func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 
-	m := &Measure{}
-	if err := event.DataAs(m); err != nil {
+	ms := []Measure{}
+	if err := event.DataAs(&ms); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
+	errs := []error{}
+	for i := range ms {
+		if err := a.processSingleMeasure(ctx, ms[i]); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if len(errs) == 0 {
+		return a.replier.Ack()
+	}
+
+	kerrs := kerrors.NewAggregate(errs)
+	return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, kerrs, nil)
+}
+
+func (a *opentelemetryAdapter) processSingleMeasure(ctx context.Context, m Measure) error {
 	attrs := make([]attribute.KeyValue, 0, len(m.Attributes))
 	for _, at := range m.Attributes {
 		attr, err := at.ParseAttribute()
 		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
+			return err
 		}
 		attrs = append(attrs, *attr)
 	}
@@ -179,8 +197,7 @@ func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.E
 	// Match the measure with an instrument
 	kindm, ok := a.instruments[m.Name]
 	if !ok {
-		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-			fmt.Errorf("instrument %q has not been configured", m.Name), nil)
+		return fmt.Errorf("instrument %q has not been configured", m.Name)
 	}
 
 	// Look for matching Kind or defaulting if there is only
@@ -189,8 +206,7 @@ func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.E
 	switch {
 	case m.Kind != "":
 		if ir, ok = kindm[m.Kind]; !ok {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-				fmt.Errorf("incorret kind %q for instrument %q", m.Kind, m.Name), nil)
+			return fmt.Errorf("incorret kind %q for instrument %q", m.Kind, m.Name)
 		}
 
 	case len(kindm) == 1:
@@ -199,8 +215,7 @@ func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.E
 		}
 
 	default:
-		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-			fmt.Errorf("instrument %q has mnay kinds. Measure did not specify one", m.Name), nil)
+		return fmt.Errorf("instrument %q has mnay kinds. Measure did not specify one", m.Name)
 	}
 
 	// Parse value according to the instrument number kind
@@ -209,23 +224,27 @@ func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.E
 	case number.Int64Kind:
 		var v int64
 		if err := json.Unmarshal(m.Value, &v); err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-				fmt.Errorf("value %v cannot be parsed as int64: %w", m.Name, err), nil)
+			return fmt.Errorf("value %v cannot be parsed as int64: %w", m.Name, err)
 		}
 		value = number.NewInt64Number(v)
 
 	case number.Float64Kind:
 		var v float64
 		if err := json.Unmarshal(m.Value, &v); err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-				fmt.Errorf("value %v cannot be parsed as float64: %w", m.Name, err), nil)
+			return fmt.Errorf("value %v cannot be parsed as float64: %w", m.Name, err)
 		}
 		value = number.NewFloat64Number(v)
 	}
 
-	if ir.descriptor.InstrumentKind().Synchronous() {
+	switch {
+	case ir.descriptor.InstrumentKind().Synchronous():
 		ir.sync.RecordOne(ctx, value, attrs)
-	}
 
-	return a.replier.Ack()
+	case ir.descriptor.InstrumentKind().Asynchronous():
+		return errors.New("async instrument is not supported")
+
+	default:
+		return errors.New("instrument is not sync nor async")
+	}
+	return nil
 }

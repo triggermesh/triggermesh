@@ -48,12 +48,14 @@ type Instruments []*Instrument
 // MAINTENANCE: instrumentKinds needs to be kept in sync with
 // sdkapi.InstrumentKind enum.
 var instrumentKinds = map[string]sdkapi.InstrumentKind{
-	"Histogram":             sdkapi.HistogramInstrumentKind,
-	"GaugeObserver":         sdkapi.GaugeObserverInstrumentKind,
-	"Counter":               sdkapi.CounterInstrumentKind,
-	"UpDownCounter":         sdkapi.UpDownCounterInstrumentKind,
-	"CounterObserver":       sdkapi.CounterObserverInstrumentKind,
-	"UpDownCounterObserver": sdkapi.UpDownCounterObserverInstrumentKind,
+	"Histogram":     sdkapi.HistogramInstrumentKind,
+	"Counter":       sdkapi.CounterInstrumentKind,
+	"UpDownCounter": sdkapi.UpDownCounterInstrumentKind,
+
+	// Comment async instruments, they are not supported
+	// "GaugeObserver":         sdkapi.GaugeObserverInstrumentKind,
+	// "CounterObserver":       sdkapi.CounterObserverInstrumentKind,
+	// "UpDownCounterObserver": sdkapi.UpDownCounterObserverInstrumentKind,
 }
 
 // MAINTENANCE: numberKinds needs to be kept in sync with
