@@ -57,7 +57,7 @@ rules:
   - delete
   - patch
 
-# Read Source resources and update their statuses
+# Read reconciled TriggerMesh resources and update their statuses
 # +rbac-check
 - apiGroups:
   - sources.triggermesh.io
@@ -134,8 +134,6 @@ rules:
   - zendesksources/status
   verbs:
   - update
-
-# Read Target resources and update their statuses
 # +rbac-check
 - apiGroups:
   - targets.triggermesh.io
@@ -208,8 +206,6 @@ rules:
   - zendesktargets/status
   verbs:
   - update
-
-# Read Flow resources and update their statuses
 # +rbac-check
 - apiGroups:
   - flow.triggermesh.io
@@ -226,8 +222,6 @@ rules:
   - transformations/status
   verbs:
   - update
-
-# Read Extension resources and update their statuses
 # +rbac-check
 - apiGroups:
   - extensions.triggermesh.io
@@ -244,8 +238,6 @@ rules:
   - functions/status
   verbs:
   - update
-
-# Read Routing resources and update their statuses
 # +rbac-check
 - apiGroups:
   - routing.triggermesh.io
