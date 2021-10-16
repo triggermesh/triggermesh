@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  lint:
+  lint-code:
     name: Code linting
     runs-on: ubuntu-latest
 
@@ -22,12 +22,26 @@ jobs:
 
     # This action takes care of caching/restoring pkg and build caches.
     # It needs to be the first step executed after the Go setup.
-    - name: Lint
+    - name: Lint Go code
       uses: golangci/golangci-lint-action@v2
       with:
         skip-go-installation: true
 
-    - name: RBAC check
+  lint-config:
+    name: Configuration linting
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Lint Kubernetes manifests
+      uses: ibiqlik/action-yamllint@v3
+      with:
+        file_or_dir: config/
+        config_file: .github/workflows/config/yamllint-k8s.yaml
+        format: github
+
+    - name: RBAC rules consistency
       run: |
         pushd hack/rbac-check
         go install .
