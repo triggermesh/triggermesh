@@ -58,10 +58,12 @@ spec:
                   CloudEvents specification for more details: https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#source-1"
                 type: string
               basicAuthUsername:
-                description: User name HTTP clients must set to authenticate with the webhook using HTTP Basic authentication.
+                description: User name HTTP clients must set to authenticate with the webhook using HTTP Basic
+                  authentication.
                 type: string
               basicAuthPassword:
-                description: Password HTTP clients must set to authenticate with the webhook using HTTP Basic authentication.
+                description: Password HTTP clients must set to authenticate with the webhook using HTTP Basic
+                  authentication.
                 type: object
                 properties:
                   value:
@@ -181,4 +183,3 @@ spec:
     - name: Age
       type: date
       jsonPath: .metadata.creationTimestamp
-

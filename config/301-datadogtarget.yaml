@@ -69,7 +69,8 @@ spec:
                       name:
                         type: string
               eventOptions:
-                description: "When should this target generate a response event for processing: always, on error, or never"
+                description: 'When should this target generate a response event for processing: always, on error, or
+                  never.'
                 type: object
                 properties:
                   payloadPolicy:

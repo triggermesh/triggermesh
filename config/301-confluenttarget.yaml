@@ -78,8 +78,9 @@ spec:
                   type: string
                   minLength: 1
               securityProtocol:
-                description: Encryption protocol to use for connecting to Confluent Kafka.
-                  This can be "Plaintext", "SslPlaintext", "SaslSsl", or "Ssl". Additional information can be found at https://docs.confluent.io/platform/current/connect/security.html
+                description: Encryption protocol to use for connecting to Confluent Kafka. This can be "Plaintext",
+                  "SslPlaintext", "SaslSsl", or "Ssl". Additional information can be found at
+                  https://docs.confluent.io/platform/current/connect/security.html.
                 type: string
               saslMechanism:
                 description: When using the "saslSsl" securityProtocol attribute, indicate which

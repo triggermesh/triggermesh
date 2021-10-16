@@ -31,7 +31,7 @@ spec:
     - routing
     shortNames:
     - spl
-  versions: 
+  versions:
   - name: v1alpha1
     served: true
     storage: true
@@ -51,7 +51,8 @@ spec:
             properties:
               path:
                 type: string
-                description: JSONPath expression representing the key containing the data array to split. Defaults to the root.
+                description: JSONPath expression representing the key containing the data array to split. Defaults to
+                  the root.
               ceContext:
                 type: object
                 required:
@@ -64,7 +65,8 @@ spec:
                     description: CloudEvent "type" context attribute.
                   source:
                     type: string
-                    description: CloudEvent "source" context attribute. Accepts a JSONPath expressions in brackets (e.g. "user/{.name}").
+                    description: CloudEvent "source" context attribute. Accepts a JSONPath expressions in brackets (e.g.
+                      "user/{.name}").
                   extensions:
                     type: object
                     description: Additional context extensions to set on produced CloudEvents.
@@ -75,8 +77,8 @@ spec:
                     a uri to use as the sink.
                 type: object
                 oneOf:
-                - required: ["ref"]
-                - required: ["uri"]
+                - required: [ref]
+                - required: [uri]
                 properties:
                   ref:
                     description: Ref points to an Addressable.
@@ -86,10 +88,12 @@ spec:
                         description: API version of the referent.
                         type: string
                       kind:
-                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        description: 'Kind of the referent. More info:
+                          https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
                         type: string
                       name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        description: 'Name of the referent. More info:
+                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
                         type: string
                       namespace:
                         description: 'Namespace of the referent. More info:
@@ -147,7 +151,7 @@ spec:
       jsonPath: .status.address.url
     - name: Ready
       type: string
-      jsonPath: ".status.conditions[?(@.type=='Ready')].status"
+      jsonPath: .status.conditions[?(@.type=='Ready')].status
     - name: Reason
       type: string
-      jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
+      jsonPath: .status.conditions[?(@.type=='Ready')].reason

@@ -59,7 +59,8 @@ spec:
                 - code
               state:
                 type: object
-                description: Indicate whether stateful headers should be created (ensure), propagated (propagate), or dropped (none).
+                description: Indicate whether stateful headers should be created (ensure), propagated (propagate), or
+                  dropped (none).
                 properties:
                   headersPolicy:
                     type: string

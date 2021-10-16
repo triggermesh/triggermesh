@@ -70,7 +70,8 @@ spec:
 
                   If not specified, Azure automatically selects all available event types for the provided 'scope'.
 
-                  For a list of all available event types, please refer to the list of Azure services that support system topics at https://docs.microsoft.com/en-us/azure/event-grid/system-topics.
+                  For a list of all available event types, please refer to the list of Azure services that support
+                  system topics at https://docs.microsoft.com/en-us/azure/event-grid/system-topics.
                 type: array
                 items:
                   type: string
@@ -82,7 +83,8 @@ spec:
                     - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
                     - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
 
-                  If the resource ID represents an Event Hubs namespace, an Event Hubs instance is created on behalf of the user inside that namespace. Otherwise, the user-provided Event Hub is used.
+                  If the resource ID represents an Event Hubs namespace, an Event Hubs instance is created on behalf of
+                  the user inside that namespace. Otherwise, the user-provided Event Hub is used.
                 type: string
                 pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}(?:\/eventHubs\/[a-zA-Z0-9][\w.-]{0,49})?$
               auth:

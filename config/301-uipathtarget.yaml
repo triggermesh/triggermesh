@@ -57,7 +57,8 @@ spec:
             type: object
             properties:
               userKey:
-                description: UiPath user refresh token to support OAuth based authentication. For additional details, refer to https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps
+                description: UiPath user refresh token to support OAuth based authentication. For additional details,
+                  refer to https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps.
                 type: object
                 properties:
                   secretKeyRef:
@@ -68,22 +69,27 @@ spec:
                       name:
                         type: string
               robotName:
-                description: Robot to invoke. For additional details, refer to https://docs.uipath.com/orchestrator/docs/about-robots
+                description: Robot to invoke. For additional details, refer to
+                  https://docs.uipath.com/orchestrator/docs/about-robots.
                 type: string
               processName:
-                description: UiProccess encompassing the robot. For additional details, refer to https://docs.uipath.com/orchestrator/docs/about-processes
+                description: UiProccess encompassing the robot. For additional details, refer to
+                  https://docs.uipath.com/orchestrator/docs/about-processes
                 type: string
               tenantName:
-                description: UiPath tenant name. For additional details, refer to https://docs.uipath.com/orchestrator/docs/about-tenants
+                description: UiPath tenant name. For additional details, refer to
+                  https://docs.uipath.com/orchestrator/docs/about-tenants.
                 type: string
               accountLogicalName:
                 description: The unique site URL used to identify the UiPath tenant.
                 type: string
               clientID:
-                description: OAuth ClientID registered by UiPath to identify the target. For details on registering a new client, please see https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps
+                description: OAuth ClientID registered by UiPath to identify the target. For details on registering a
+                  new client, please see https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps.
                 type: string
               organizationUnitID:
-                description: A grouping of orchestrator components within a tenant. For additional details, please see https://docs.uipath.com/orchestrator/docs/about-organization-units
+                description: A grouping of orchestrator components within a tenant. For additional details, please see
+                  https://docs.uipath.com/orchestrator/docs/about-organization-units.
                 type: string
             required:
             - organizationUnitID

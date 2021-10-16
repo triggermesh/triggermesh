@@ -56,7 +56,8 @@ spec:
             type: object
             properties:
               credentialsJson:
-                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information, refer to https://cloud.google.com/docs/authentication/production
+                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional
+                  information, refer to https://cloud.google.com/docs/authentication/production.
                 type: object
                 properties:
                   secretKeyRef:
@@ -68,7 +69,8 @@ spec:
                         type: string
               eventOptions:
                 type: object
-                description: "When should this target generate a response event for processing: always, on error, or never"
+                description: 'When should this target generate a response event for processing: always, on error, or
+                  never.'
                 properties:
                   payloadPolicy:
                     type: string

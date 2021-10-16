@@ -54,8 +54,9 @@ spec:
             type: object
             properties:
               arn:
-                description: ARN of the CodeCommit repository to receive events from. The expected format is documented at
-                  https://docs.aws.amazon.com/IAM/latest/UserGuide/list_awscodecommit.html#awscodecommit-resources-for-iam-policies
+                description: ARN of the CodeCommit repository to receive events from.
+                  The expected format is documented at
+                  https://docs.aws.amazon.com/IAM/latest/UserGuide/list_awscodecommit.html#awscodecommit-resources-for-iam-policies.
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:codecommit:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               branch:

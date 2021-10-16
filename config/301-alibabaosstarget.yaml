@@ -57,14 +57,18 @@ spec:
             properties:
               endpoint:
                 type: string
-                description: The domain name used to access the OSS. For more information, please refer to the region and endpoint guide at https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db
+                description: The domain name used to access the OSS.
+                  For more information, please refer to the region and endpoint guide at
+                  https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db.
                 pattern: ^oss-([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{1,3}$
               bucket:
                 type: string
                 description: The unique container to store objects in OSS.
               accessKeySecret:
                 type: object
-                description: Alibaba SDK access key secret as registered. For more information on how to create an access key pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
+                description: Alibaba SDK access key secret as registered.
+                  For more information on how to create an access key pair, please refer to
+                  https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
                 properties:
                   secretKeyRef:
                     type: object
@@ -75,7 +79,9 @@ spec:
                         type: string
               accessKeyID:
                 type: object
-                description: Alibaba SDK access key id as registered. For more information on how to create an access key pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
+                description: Alibaba SDK access key id as registered.
+                  For more information on how to create an access key pair, please refer to
+                  https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
                 properties:
                   secretKeyRef:
                     type: object
@@ -86,7 +92,8 @@ spec:
                         type: string
               eventOptions:
                 type: object
-                description: "When should this target generate a response event for processing: always, on error, or never"
+                description: 'When should this target generate a response event for processing: always, on error, or
+                  never.'
                 properties:
                   payloadPolicy:
                     type: string

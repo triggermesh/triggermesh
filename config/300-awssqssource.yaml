@@ -65,13 +65,14 @@ spec:
                     description: Period of time during which Amazon SQS prevents other consumers from receiving and
                       processing a message that has been received via ReceiveMessage. Expressed as a duration string,
                       which format is documented at https://pkg.go.dev/time#ParseDuration. If not defined, the overall
-                      visibility timeout for the queue is used. For more details, please refer to the Amazon SQS
-                      Developer Guide at https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html.
+                      visibility timeout for the queue is used.
+                      For more details, please refer to the Amazon SQS Developer Guide at
+                      https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html.
                     type: string
               credentials:
-                description: Credentials to interact with the Amazon SQS API. For more information about AWS security
-                  credentials, please refer to the AWS General Reference at
-                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                description: Credentials to interact with the Amazon SQS API.
+                  For more information about AWS security credentials, please refer to the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
                 type: object
                 properties:
                   accessKeyID:

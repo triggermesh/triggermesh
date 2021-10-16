@@ -49,7 +49,8 @@ spec:
               oracleApiPrivateKey:
                 type: object
                 description: Oracle API Private Key to sign each request to the Oracle Cloud.
-                  For details on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm
+                  For details on how to create a private keypair for Oracle Cloud, refer to
+                  https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
                 properties:
                   secretKeyRef:
                     type: object
@@ -61,7 +62,8 @@ spec:
               oracleApiPrivateKeyPassphrase:
                 type: object
                 description: Passphrase to unlock the private key used to sign each request to the Oracle Cloud.
-                  For details on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm
+                  For details on how to create a private keypair for Oracle Cloud, refer to
+                  https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
                 properties:
                   secretKeyRef:
                     type: object
@@ -72,8 +74,10 @@ spec:
                         type: string
               oracleApiPrivateKeyFingerprint:
                 type: object
-                description: MD5 fingerprint to identify the keypair associated with the key used to sign each request to the Oracle Cloud.
-                  For details on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm
+                description: MD5 fingerprint to identify the keypair associated with the key used to sign each request
+                  to the Oracle Cloud.
+                  For details on how to create a private keypair for Oracle Cloud, refer to
+                  https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
                 properties:
                   secretKeyRef:
                     type: object
@@ -83,13 +87,16 @@ spec:
                       name:
                         type: string
               oracleTenancy:
-                description: The Oracle Cloud ID (OCID) of the tenant containing the service to be used on the Oracle Cloud.
+                description: The Oracle Cloud ID (OCID) of the tenant containing the service to be used on the Oracle
+                  Cloud.
                 type: string
               oracleUser:
-                description: The Oracle Cloud ID (OCID) of the user who owns the key used to interact with the Oracle Cloud.
+                description: The Oracle Cloud ID (OCID) of the user who owns the key used to interact with the Oracle
+                  Cloud.
                 type: string
               oracleRegion:
-                description: The Oracle Cloud region containing the service being executed. A full list of supported regions can be found at https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm
+                description: The Oracle Cloud region containing the service being executed. A full list of supported
+                  regions can be found at https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm.
                 type: string
               function:
                 type: object

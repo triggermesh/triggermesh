@@ -67,7 +67,8 @@ spec:
                   The accepted format is
                     /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{storageAccountName}
 
-                  Besides the Storage Account name itself, the resource ID contains the subscription ID and resource group name which all together uniquely identify the Storage Account within Azure.
+                  Besides the Storage Account name itself, the resource ID contains the subscription ID and resource
+                  group name which all together uniquely identify the Storage Account within Azure.
                 type: string
                 pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.Storage\/storageAccounts\/[a-z0-9]{3,24}$
               eventHubID:
@@ -78,14 +79,16 @@ spec:
                     - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
                     - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
 
-                  If the resource ID represents an Event Hubs namespace, an Event Hubs instance is created on behalf of the user inside that namespace. Otherwise, the user-provided Event Hub is used.
+                  If the resource ID represents an Event Hubs namespace, an Event Hubs instance is created on behalf of
+                  the user inside that namespace. Otherwise, the user-provided Event Hub is used.
                 type: string
                 pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}(?:\/eventHubs\/[a-zA-Z0-9][\w.-]{0,49})?$
               eventTypes:
                 description: |-
                   Types of events to subscribe to.
 
-                  The list of available event types can be found at https://docs.microsoft.com/en-us/azure/event-grid/event-schema-blob-storage.
+                  The list of available event types can be found at
+                  https://docs.microsoft.com/en-us/azure/event-grid/event-schema-blob-storage.
 
                   When this attribute is not set, the source automatically subscribes to the following event types
                   - Microsoft.Storage.BlobCreated
@@ -102,9 +105,10 @@ spec:
                   - Microsoft.Storage.DirectoryRenamed
                   - Microsoft.Storage.BlobTierChanged
                   - Microsoft.Storage.AsyncOperationInitiated
-                    # A special type of event documented at https://docs.microsoft.com/en-us/azure/storage/blobs/blob-inventory.
-                    # Allowed for completeness, but users should be aware that those events use a different schema from
-                    # the other Storage event types.
+                  # A special type of event documented at
+                  # https://docs.microsoft.com/en-us/azure/storage/blobs/blob-inventory.
+                  # Allowed for completeness, but users should be aware that those events use a different schema from
+                  # the other Storage event types.
                   - Microsoft.Storage.BlobInventoryPolicyCompleted
               auth:
                 description: Authentication method to interact with the Azure Storage and Azure Event Hubs REST APIs.

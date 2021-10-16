@@ -54,7 +54,8 @@ spec:
                     type: string
                     minLength: 1
                   eventSource:
-                    description: EventSource is an optional but recommended field for identifying the instance producing the events.
+                    description: EventSource is an optional but recommended field for identifying the instance producing
+                      the events.
                     type: string
                 required:
                 - eventType

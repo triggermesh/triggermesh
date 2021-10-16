@@ -57,7 +57,8 @@ spec:
             properties:
               auth:
                 type: object
-                description: Attributes required to setup OAuth authentication with Salesforce. To create the credentials, refer to https://help.salesforce.com/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm
+                description: Attributes required to setup OAuth authentication with Salesforce. To create the
+                  credentials, refer to https://help.salesforce.com/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm.
                 properties:
                   clientID:
                     description: OAuth Client ID used to identify the target.
@@ -94,7 +95,8 @@ spec:
                 pattern: v\d+\.\d+$
               eventOptions:
                 type: object
-                description: "When should this target generate a response event for processing: always, on error, or never"
+                description: 'When should this target generate a response event for processing: always, on error, or
+                  never.'
                 properties:
                   payloadPolicy:
                     type: string

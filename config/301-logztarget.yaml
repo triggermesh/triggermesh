@@ -51,7 +51,7 @@ spec:
           spec:
             description: Desired state of event target.
             type: object
-            properties:               
+            properties:
               shippingToken:
                 description: API token used to authenticate the event being streamed.
                 type: object
@@ -65,7 +65,8 @@ spec:
                         type: string
               eventOptions:
                 type: object
-                description: "When should this target generate a response event for processing: always, on error, or never"
+                description: 'When should this target generate a response event for processing: always, on error, or
+                  never.'
                 properties:
                   payloadPolicy:
                     type: string
