@@ -51,13 +51,13 @@ spec:
 apiVersion: sources.knative.dev/v1beta2
 kind: PingSource
 metadata:
-    name: minute-calendar-request
-    namespace: mynamespace
+  name: minute-calendar-request
+  namespace: mynamespace
 spec:
-    data: '{"query_string":"country=ES&year=2020"}'
-    schedule: '*/1 * * * *'
-    sink:
-      ref:
-        apiVersion: eventing.knative.dev/v1
-        kind: Broker
-        name: calendar-requests
+  data: '{"query_string":"country=ES&year=2020"}'
+  schedule: '*/1 * * * *'
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: calendar-requests

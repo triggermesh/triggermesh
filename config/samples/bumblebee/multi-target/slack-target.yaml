@@ -54,7 +54,7 @@ spec:
   - operation: store
     paths:
     - key: $object
-      value: object 
+      value: object
     - key: $subject
       value: subject
     - key: $verb
@@ -79,7 +79,7 @@ metadata:
   name: slack-target-trigger
 spec:
   broker: transformation-demo
-  filter: 
+  filter:
     attributes:
       type: com.slack.webapi.chat.postMessage
   subscriber:

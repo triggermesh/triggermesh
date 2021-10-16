@@ -15,10 +15,9 @@
 apiVersion: targets.triggermesh.io/v1alpha1
 kind: DatadogTarget
 metadata:
- name: datadogtarget
+  name: datadogtarget
 spec:
- apiKey:
-  secretKeyRef:
-    name: ddapitoken
-    key: apiKey
-
+  apiKey:
+    secretKeyRef:
+      name: ddapitoken
+      key: apiKey

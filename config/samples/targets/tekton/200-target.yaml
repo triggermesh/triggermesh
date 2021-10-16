@@ -18,5 +18,5 @@ metadata:
   name: triggermesh-tekton-target
 spec:
   reapPolicy:
-    success: 5m # clean up all successfully completed task runs
-    fail: 1h # clean up all failed task runs
+    success: 5m  # clean up all successfully completed task runs
+    fail: 1h  # clean up all failed task runs

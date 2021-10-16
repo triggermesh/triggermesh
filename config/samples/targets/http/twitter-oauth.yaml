@@ -69,16 +69,16 @@ spec:
 apiVersion: sources.knative.dev/v1beta2
 kind: PingSource
 metadata:
-    name: minute-twitter-request
-    namespace: mynamespace
+  name: minute-twitter-request
+  namespace: mynamespace
 spec:
-    data: '{"path_suffix":"2/tweets/20"}'
-    schedule: '*/1 * * * *'
-    sink:
-      ref:
-        apiVersion: eventing.knative.dev/v1
-        kind: Broker
-        name: twitter-requests
+  data: '{"path_suffix":"2/tweets/20"}'
+  schedule: '*/1 * * * *'
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: twitter-requests
 
 ---
 
@@ -91,7 +91,7 @@ spec:
   template:
     spec:
       containers:
-        - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
+      - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
 
 ---
 

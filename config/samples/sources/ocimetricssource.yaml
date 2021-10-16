@@ -46,8 +46,8 @@ spec:
     metricsNamespace: oci_computeagent
     metricsQuery: CPUUtilization[1m].mean()
 
-  # optional polling frequency. default to 5m
-  #metricsPollingFrequency: 5m
+  # optional. default to 5m
+  metricsPollingFrequency: 3m
 
   sink:
     ref:

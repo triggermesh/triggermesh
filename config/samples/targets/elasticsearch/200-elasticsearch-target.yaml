@@ -19,7 +19,7 @@ metadata:
 spec:
   connection:
     addresses:
-      - https://elasticsearch-host:9200
+    - https://elasticsearch-host:9200
     skipVerify: true
     username: elastic
     password:
@@ -29,5 +29,3 @@ spec:
   indexName: tmindex
   eventOptions:
     payloadPolicy: error
-
-

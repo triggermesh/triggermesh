@@ -17,12 +17,12 @@ kind: SendGridTarget
 metadata:
   name: triggermesh-email
 spec:
-   defaultFromName: "Knative"
-   defaultToName: "bar"
-   defaultToEmail: "bob@gmail.com"
-   defaultFromEmail: "bar@gmail.com"
-   defaultSubject: "Hello World"
-   apiKey:
-     secretKeyRef:
-       name: sendgrid
-       key: apiKey
+  defaultFromName: Knative
+  defaultToName: bar
+  defaultToEmail: bob@gmail.com
+  defaultFromEmail: bar@gmail.com
+  defaultSubject: Hello World
+  apiKey:
+    secretKeyRef:
+      name: sendgrid
+      key: apiKey

@@ -15,12 +15,12 @@
 apiVersion: targets.triggermesh.io/v1alpha1
 kind: GoogleCloudFirestoreTarget
 metadata:
- name: googlecloudfirestore
+  name: googlecloudfirestore
 spec:
- defaultCollection: ''
- projectID: ''
- discardCloudEventContext: true
- credentialsJson:
-  secretKeyRef:
-    name: googlecloudfirestore
-    key: creds
+  defaultCollection: ''
+  projectID: ''
+  discardCloudEventContext: true
+  credentialsJson:
+    secretKeyRef:
+      name: googlecloudfirestore
+      key: creds

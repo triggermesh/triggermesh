@@ -15,9 +15,9 @@
 apiVersion: targets.triggermesh.io/v1alpha1
 kind: GoogleCloudWorkflowsTarget
 metadata:
- name: googlecloudworkflows
+  name: googlecloudworkflows
 spec:
- credentialsJson:
-  secretKeyRef:
-    name: googlecloudworkflows
-    key: creds
+  credentialsJson:
+    secretKeyRef:
+      name: googlecloudworkflows
+      key: creds

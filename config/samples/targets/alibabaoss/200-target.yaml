@@ -15,16 +15,15 @@
 apiVersion: targets.triggermesh.io/v1alpha1
 kind: AlibabaOSSTarget
 metadata:
- name: oss
+  name: oss
 spec:
- endpoint: <datacenter-endpoint>
- bucket: <bucket-name>
- accessKeyID:
-  secretKeyRef:
-    name: osscreds
-    key: id
- accessKeySecret:
-  secretKeyRef:
-    name: osscreds
-    key: secret
-
+  endpoint: <datacenter-endpoint>
+  bucket: <bucket-name>
+  accessKeyID:
+    secretKeyRef:
+      name: osscreds
+      key: id
+  accessKeySecret:
+    secretKeyRef:
+      name: osscreds
+      key: secret

@@ -35,7 +35,7 @@ metadata:
   name: eventdisplay-transformation-trigger
 spec:
   broker: transformation-demo
-  filter: 
+  filter:
     attributes:
       type: io.triggermesh.transformation.pingsource
   subscriber:

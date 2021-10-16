@@ -23,7 +23,7 @@ spec:
     "First Name": "Barbara",
     "Last Name": "Singh",
     "Date of birth": {
-      "year": 1955, 
+      "year": 1955,
       "month": 1,
       "day" : 23
     },
@@ -31,7 +31,7 @@ spec:
     "Children":
     [
         {"Name": "Martin", "Year of birth": 1980},
-        {"Name": "Margaret", "Year of birth": 1983}        
+        {"Name": "Margaret", "Year of birth": 1983}
     ],
     "Mobile phone": null
   }'

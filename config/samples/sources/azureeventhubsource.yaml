@@ -28,11 +28,11 @@ spec:
 
   auth:
     servicePrincipal:
-      tenantID: 
+      tenantID:
         valueFromSecret:
           name: azure
           key: tenantID
-      clientID: 
+      clientID:
         valueFromSecret:
           name: azure
           key: clientID

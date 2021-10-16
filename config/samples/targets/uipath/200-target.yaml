@@ -17,13 +17,13 @@ kind: UiPathTarget
 metadata:
   name: triggermesh-uipath
 spec:
-   robotName: DemoRobot
-   processName: helloworld_demoEnv
-   tenantName: DemoName
-   accountLogicalName: DemoAccount
-   clientID: UiPathClientID
-   organizationUnitID: "666999"
-   userKey:
-     secretKeyRef:
-       name: uipath
-       key: userKey
+  robotName: DemoRobot
+  processName: helloworld_demoEnv
+  tenantName: DemoName
+  accountLogicalName: DemoAccount
+  clientID: UiPathClientID
+  organizationUnitID: "666999"
+  userKey:
+    secretKeyRef:
+      name: uipath
+      key: userKey

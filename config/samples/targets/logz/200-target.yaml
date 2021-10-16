@@ -17,8 +17,8 @@ kind: LogzTarget
 metadata:
   name: tmlogz
 spec:
-   logsListenerURL: listener.logz.io
-   shippingToken:
-     secretKeyRef:
-       name: logz
-       key: token
+  logsListenerURL: listener.logz.io
+  shippingToken:
+    secretKeyRef:
+      name: logz
+      key: token
