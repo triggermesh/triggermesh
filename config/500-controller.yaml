@@ -142,6 +142,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/jiratarget-adapter
         - name: LOGZTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/logztarget-adapter
+        - name: OPENTELEMETRYTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/opentelemetrytarget-adapter
         - name: ORACLE_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/oracletarget-adapter
         - name: SALESFORCETARGET_IMAGE

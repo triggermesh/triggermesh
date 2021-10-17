@@ -62,6 +62,8 @@ type Interface interface {
 	InfraTargets() InfraTargetInformer
 	// JiraTargets returns a JiraTargetInformer.
 	JiraTargets() JiraTargetInformer
+	// LogzMetricsTargets returns a LogzMetricsTargetInformer.
+	LogzMetricsTargets() LogzMetricsTargetInformer
 	// LogzTargets returns a LogzTargetInformer.
 	LogzTargets() LogzTargetInformer
 	// OracleTargets returns a OracleTargetInformer.
@@ -188,6 +190,11 @@ func (v *version) InfraTargets() InfraTargetInformer {
 // JiraTargets returns a JiraTargetInformer.
 func (v *version) JiraTargets() JiraTargetInformer {
 	return &jiraTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// LogzMetricsTargets returns a LogzMetricsTargetInformer.
+func (v *version) LogzMetricsTargets() LogzMetricsTargetInformer {
+	return &logzMetricsTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // LogzTargets returns a LogzTargetInformer.

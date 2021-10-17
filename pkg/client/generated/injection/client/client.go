@@ -7122,6 +7122,137 @@ func (w *wrapTargetsV1alpha1JiraTargetImpl) Watch(ctx context.Context, opts v1.L
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapTargetsV1alpha1) LogzMetricsTargets(namespace string) typedtargetsv1alpha1.LogzMetricsTargetInterface {
+	return &wrapTargetsV1alpha1LogzMetricsTargetImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "targets.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "logzmetricstargets",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapTargetsV1alpha1LogzMetricsTargetImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedtargetsv1alpha1.LogzMetricsTargetInterface = (*wrapTargetsV1alpha1LogzMetricsTargetImpl)(nil)
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.LogzMetricsTarget, opts v1.CreateOptions) (*targetsv1alpha1.LogzMetricsTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "LogzMetricsTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.LogzMetricsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.LogzMetricsTarget, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.LogzMetricsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.LogzMetricsTargetList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.LogzMetricsTargetList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.LogzMetricsTarget, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.LogzMetricsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.LogzMetricsTarget, opts v1.UpdateOptions) (*targetsv1alpha1.LogzMetricsTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "LogzMetricsTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.LogzMetricsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.LogzMetricsTarget, opts v1.UpdateOptions) (*targetsv1alpha1.LogzMetricsTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "LogzMetricsTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.LogzMetricsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1LogzMetricsTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapTargetsV1alpha1) LogzTargets(namespace string) typedtargetsv1alpha1.LogzTargetInterface {
 	return &wrapTargetsV1alpha1LogzTargetImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{

@@ -1,0 +1,171 @@
+# Copyright 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: logzmetricstargets.targets.triggermesh.io
+  labels:
+    knative.dev/crd-install: 'true'
+    triggermesh.io/crd-install: 'true'
+    duck.knative.dev/addressable: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type" : "io.triggermesh.opentelemetry.metrics.push" },
+      ]
+spec:
+  group: targets.triggermesh.io
+  names:
+    kind: LogzMetricsTarget
+    plural: logzmetricstargets
+    categories:
+    - all
+    - knative
+    - eventing
+    - targets
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    subresources:
+      status: {}
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              connection:
+                type: object
+                description: Connection information for LogzMetrics.
+                properties:
+                  listenerURL:
+                    type: string
+                    description: Listener URL for pushing metrics.
+                  token:
+                    type: object
+                    description: Token for connecting to Logz metrics listener.
+                    properties:
+                      secretKeyRef:
+                        type: object
+                        properties:
+                          key:
+                            type: string
+                          name:
+                            type: string
+              instruments:
+                type: array
+                description: 	Instruments configured for pushing metrics. It is mandatory that all metrics pushed by using this target are pre-registered using this list.
+                items:
+                  type: object
+                  minLength: 1
+                  properties:
+                    name:
+                      type: string
+                      description: Name for the Instrument.
+                    description:
+                      type: string
+                      description: Description for the Instrument.
+                    instrument:
+                      type: string
+                      enum: ['Histogram', 'Counter', 'UpDownCounter']
+                      description: Instrument Kind as defined by OpenTelemetry. Supported values are
+                          - Histogram, for absolute values that can be aggregated.
+                          - Counter, for delta values that increase monotonically.
+                          - UpDownCounter, for delta values that can increase and decrease.
+                    number:
+                      type: string
+                      enum: ['Int64', 'Float64']
+                      description: Number Kind as defined by OpenTelemetry, defines the measure data type accepted by the Instrument. Supported values are
+                          - Int64
+                          - Float64
+                  required:
+                  - name
+                  - instrument
+                  - number
+              eventOptions:
+                type: object
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
+            required:
+            - connection
+            - instruments
+          status:
+            type: object
+            properties:
+              acceptedEventTypes:
+                type: array
+                items:
+                  type: string
+              ceAttributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    source:
+                      type: string
+                  required:
+                  - type
+                  - source
+              observedGeneration:
+                type: integer
+                format: int64
+              conditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    status:
+                      type: string
+                      enum: ['True', 'False', Unknown]
+                    severity:
+                      type: string
+                      enum: [Error, Warning, Info]
+                    reason:
+                      type: string
+                    message:
+                      type: string
+                    lastTransitionTime:
+                      type: string
+                      format: date-time
+                  required:
+                  - type
+                  - status
+              address:
+                type: object
+                properties:
+                  url:
+                    type: string
+    additionalPrinterColumns:
+    - name: URL
+      type: string
+      jsonPath: .status.address.url
+    - name: Ready
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].status
+    - name: Reason
+      type: string
+      jsonPath: .status.conditions[?(@.type=='Ready')].reason
+    - name: Age
+      type: date
+      jsonPath: .metadata.creationTimestamp

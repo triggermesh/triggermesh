@@ -36,9 +36,10 @@ K_METRICS_CONFIG={} \
 K_LOGGING_CONFIG={} \
 OPENTELEMETRY_CORTEX_ENDPOINT=http://localhost:9009/api/prom/push \
 OPENTELEMETRY_INSTRUMENTS='[
-	{"name":"total_requests","instrument":"Counter","number":"Int64","description":"total requests"},
-  {"name":"quacking_ducks","instrument":"UpDownCounter","number":"Int64","description":"number of quacking ducks observed"},
-  {"name":"request_duration_ms","instrument":"Histogram","number":"Float64","description":"request duration in milliseconds"}]' \
+      {"name":"total_requests","instrument":"Counter","number":"Int64","description":"total requests"},
+      {"name":"quacking_ducks","instrument":"UpDownCounter","number":"Int64","description":"number of quacking ducks observed"},
+      {"name":"request_duration_ms","instrument":"Histogram","number":"Float64","description":"request duration in milliseconds"}
+]' \
 go run ./cmd/opentelemetrytarget-adapter/main.go
 ```
 
@@ -154,7 +155,7 @@ curl -v -X POST http://localhost:8080  \
 -H "content-type: application/json"  \
 -H "ce-specversion: 1.0"  \
 -H "ce-source: curl.client"  \
--H "ce-type: curl.sent.metrics"  \
+-H "ce-type: io.triggermesh.opentelemetry.metrics.push"  \
 -H "ce-id: 123-abc" \
 -H "ce-statefulid: my-stateful-12345" \
 -d '[{

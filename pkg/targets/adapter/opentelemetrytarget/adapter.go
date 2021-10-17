@@ -22,7 +22,11 @@ import (
 	"errors"
 	"fmt"
 
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"go.uber.org/zap"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+	"knative.dev/pkg/logging"
 
 	"go.opentelemetry.io/contrib/exporters/metric/cortex"
 	"go.opentelemetry.io/otel/attribute"
@@ -30,12 +34,8 @@ import (
 	"go.opentelemetry.io/otel/metric/number"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"go.uber.org/zap"
-	"knative.dev/pkg/logging"
-
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
-	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 // NewTarget adapter implementation
@@ -163,6 +163,10 @@ func (a *cortexAdapter) Start(ctx context.Context) error {
 }
 
 func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+
+	if typ := event.Type(); typ != v1alpha1.EventTypeOpenTelemetryMetricsPush {
+		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
+	}
 
 	ms := []Measure{}
 	if err := event.DataAs(&ms); err != nil {

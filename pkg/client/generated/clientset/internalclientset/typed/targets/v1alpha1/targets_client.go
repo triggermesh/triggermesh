@@ -45,6 +45,7 @@ type TargetsV1alpha1Interface interface {
 	HasuraTargetsGetter
 	InfraTargetsGetter
 	JiraTargetsGetter
+	LogzMetricsTargetsGetter
 	LogzTargetsGetter
 	OracleTargetsGetter
 	SalesforceTargetsGetter
@@ -136,6 +137,10 @@ func (c *TargetsV1alpha1Client) InfraTargets(namespace string) InfraTargetInterf
 
 func (c *TargetsV1alpha1Client) JiraTargets(namespace string) JiraTargetInterface {
 	return newJiraTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) LogzMetricsTargets(namespace string) LogzMetricsTargetInterface {
+	return newLogzMetricsTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) LogzTargets(namespace string) LogzTargetInterface {

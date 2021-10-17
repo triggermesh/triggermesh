@@ -155,6 +155,7 @@ rules:
   - infratargets
   - jiratargets
   - logztargets
+  - logzmetricstargets
   - oracletargets
   - salesforcetargets
   - sendgridtargets
@@ -191,6 +192,7 @@ rules:
   - infratargets/status
   - jiratargets/status
   - logztargets/status
+  - logzmetricstargets/status
   - oracletargets/status
   - salesforcetargets/status
   - sendgridtargets/status
@@ -603,7 +605,7 @@ rules:
   - create
   - patch
   - update
-- apiGroups: 
+- apiGroups:
   - ""
   resources:
   - configmaps
@@ -621,7 +623,7 @@ rules:
   - watch
 - apiGroups:
   - coordination.k8s.io
-  resources: 
+  resources:
   - leases
   verbs:
   - get
@@ -645,7 +647,7 @@ rules:
   - create
   - patch
   - update
-- apiGroups: 
+- apiGroups:
   - ""
   resources:
   - configmaps
@@ -663,7 +665,7 @@ rules:
   - watch
 - apiGroups:
   - coordination.k8s.io
-  resources: 
+  resources:
   - leases
   verbs:
   - get
@@ -757,6 +759,7 @@ rules:
   - infratargets
   - jiratargets
   - logztargets
+  - logzmetricstargets
   - salesforcetargets
   - oracletargets
   - sendgridtargets

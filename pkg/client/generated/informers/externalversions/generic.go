@@ -171,6 +171,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().InfraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("jiratargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().JiraTargets().Informer()}, nil
+	case targetsv1alpha1.SchemeGroupVersion.WithResource("logzmetricstargets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().LogzMetricsTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("logztargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().LogzTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("oracletargets"):

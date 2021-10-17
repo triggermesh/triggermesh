@@ -56,6 +56,8 @@ type InfraTargetExpansion interface{}
 
 type JiraTargetExpansion interface{}
 
+type LogzMetricsTargetExpansion interface{}
+
 type LogzTargetExpansion interface{}
 
 type OracleTargetExpansion interface{}
