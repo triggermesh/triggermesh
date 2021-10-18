@@ -55,7 +55,7 @@ spec:
     - key: $type
       value: type
     - key: $object
-      value: object 
+      value: object
     - key: $subject
       value: subject
     - key: $verb
@@ -78,7 +78,7 @@ metadata:
   name: googlesheet-target-trigger
 spec:
   broker: transformation-demo
-  filter: 
+  filter:
     attributes:
       type: io.triggermesh.transformation.googlesheet
   subscriber:

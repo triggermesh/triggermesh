@@ -20,7 +20,7 @@ spec:
   broker: default
   filter:
     attributes:
-      type: io.triggermesh.uipath.job.start # OR 'io.triggermesh.uipath.queue.post'
+      type: io.triggermesh.uipath.job.start  # OR 'io.triggermesh.uipath.queue.post'
   subscriber:
     ref:
       apiVersion: targets.triggermesh.io/v1alpha1

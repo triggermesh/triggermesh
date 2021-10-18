@@ -26,4 +26,3 @@ spec:
     secretKeyRef:
       name: twilio
       key: token
-

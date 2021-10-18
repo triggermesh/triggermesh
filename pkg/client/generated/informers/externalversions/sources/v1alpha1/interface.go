@@ -64,6 +64,8 @@ type Interface interface {
 	GoogleCloudAuditLogsSources() GoogleCloudAuditLogsSourceInformer
 	// GoogleCloudBillingSources returns a GoogleCloudBillingSourceInformer.
 	GoogleCloudBillingSources() GoogleCloudBillingSourceInformer
+	// GoogleCloudIoTSources returns a GoogleCloudIoTSourceInformer.
+	GoogleCloudIoTSources() GoogleCloudIoTSourceInformer
 	// GoogleCloudPubSubSources returns a GoogleCloudPubSubSourceInformer.
 	GoogleCloudPubSubSources() GoogleCloudPubSubSourceInformer
 	// GoogleCloudRepositoriesSources returns a GoogleCloudRepositoriesSourceInformer.
@@ -195,6 +197,11 @@ func (v *version) GoogleCloudAuditLogsSources() GoogleCloudAuditLogsSourceInform
 // GoogleCloudBillingSources returns a GoogleCloudBillingSourceInformer.
 func (v *version) GoogleCloudBillingSources() GoogleCloudBillingSourceInformer {
 	return &googleCloudBillingSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GoogleCloudIoTSources returns a GoogleCloudIoTSourceInformer.
+func (v *version) GoogleCloudIoTSources() GoogleCloudIoTSourceInformer {
+	return &googleCloudIoTSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GoogleCloudPubSubSources returns a GoogleCloudPubSubSourceInformer.

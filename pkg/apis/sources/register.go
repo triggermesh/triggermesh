@@ -135,6 +135,13 @@ var (
 		Resource: "googlecloudbillingsources",
 	}
 
+	// GoogleCloudIoTSourceResource respresents an event source for Google
+	// Cloud IoT.
+	GoogleCloudIoTSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "googlecloudiotsources",
+	}
+
 	// GoogleCloudPubSubSourceResource respresents an event source for Google Cloud
 	// Pub/Sub.
 	GoogleCloudPubSubSourceResource = schema.GroupResource{

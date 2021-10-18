@@ -38,6 +38,7 @@ resources:
 - config/300-azureservicebusqueuesource.yaml
 - config/300-googlecloudauditlogssource.yaml
 - config/300-googlecloudbillingsource.yaml
+- config/300-googlecloudiotsource.yaml
 - config/300-googlecloudpubsubsource.yaml
 - config/300-googlecloudrepositoriessource.yaml
 - config/300-googlecloudstoragesource.yaml
@@ -61,7 +62,7 @@ resources:
 - config/301-elasticsearchtarget.yaml
 - config/301-googlecloudstoragetarget.yaml
 - config/301-googlecloudworkflowstarget.yaml
-- config/301-googlefirestoretarget.yaml
+- config/301-googlecloudfirestoretarget.yaml
 - config/301-googlesheettarget.yaml
 - config/301-hasuratarget.yaml
 - config/301-httptarget.yaml

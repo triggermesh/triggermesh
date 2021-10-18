@@ -99,6 +99,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 			splunkclient,
 			httpclient,
 			logzclient,
+			logzmetricsclient,
 
 			k8sClient,
 			servingClient,

@@ -15,13 +15,13 @@
 apiVersion: targets.triggermesh.io/v1alpha1
 kind: ZendeskTarget
 metadata:
- name: zendesktarget
+  name: zendesktarget
 
 spec:
-  subject: '' #Example: tmTickets0
-  subdomain: '' #Example: triggermesh
-  email: '' #Example: woodford@triggermesh.com
+  subject: ''  # Example: tmTickets0
+  subdomain: ''  # Example: triggermesh
+  email: ''  # Example: woodford@triggermesh.com
   token:
-     secretKeyRef:
-       name: zendesktargetsecret
-       key: token
+    secretKeyRef:
+      name: zendesktargetsecret
+      key: token

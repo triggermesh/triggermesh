@@ -251,16 +251,16 @@ workflows:
               only: main
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      # - update-manifests:
-      #     name: update-production-config
-      #     cluster: prod
-      #     requires:
-      #       - update-staging-config
-      #     filters:
-      #       tags:
-      #         only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      #       branches:
-      #         ignore: /.*/
+      - update-manifests:
+          name: update-production-config
+          cluster: prod
+          requires:
+            - update-staging-config
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+            branches:
+              ignore: /.*/
       - release:
           context: production
           requires:

@@ -61,7 +61,8 @@ spec:
                 type: string
                 minLength: 1
               defaultRole:
-                description: The default role a query from this target should assume when it is not specified in the event payload.
+                description: The default role a query from this target should assume when it is not specified in the
+                  event payload.
                 type: string
               queries:
                 type: object

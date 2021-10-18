@@ -63,8 +63,8 @@ spec:
                     type: object
                     properties:
                       connectionString:
-                        description: Connection string containing both the resource URI of the Event Service Bus instance, and
-                          the SAS token.
+                        description: Connection string containing both the resource URI of the Event Service Bus
+                          instance, and the SAS token.
                         type: object
                         properties:
                           value:

@@ -119,54 +119,54 @@ func TestReconcile(t *testing.T) {
 
 		// Lifecycle
 
-		// {
-		// 	Name: "Adapter becomes Ready",
-		// 	Key:  tKey,
-		// 	Objects: []runtime.Object{
-		// 		newEventTargetNotDeployed(),
-		// 		newAdapterServiceReady(),
-		// 	},
-		// 	WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
-		// 		Object: newEventTargetDeployed(),
-		// 	}},
-		// },
-		// {
-		// 	Name: "Adapter becomes NotReady",
-		// 	Key:  tKey,
-		// 	Objects: []runtime.Object{
-		// 		newEventTargetDeployed(),
-		// 		newAdapterServiceNotReady(),
-		// 	},
-		// 	WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
-		// 		Object: newEventTargetNotDeployed(),
-		// 	}},
-		// },
-		// {
-		// 	Name: "Adapter is outdated",
-		// 	Key:  tKey,
-		// 	Objects: []runtime.Object{
-		// 		newEventTargetDeployed(),
-		// 		setAdapterImage(
-		// 			newAdapterServiceReady(),
-		// 			tImg+":old",
-		// 		),
-		// 	},
-		// 	WantUpdates: []clientgotesting.UpdateActionImpl{{
-		// 		Object: newAdapterServiceReady(),
-		// 	}},
-		// 	WantEvents: []string{
-		// 		updateAdapterEvent(),
-		// 	},
-		// },
+		{
+			Name: "Adapter becomes Ready",
+			Key:  tKey,
+			Objects: []runtime.Object{
+				newEventTargetNotDeployed(),
+				newAdapterServiceReady(),
+			},
+			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
+				Object: newEventTargetDeployed(),
+			}},
+		},
+		{
+			Name: "Adapter becomes NotReady",
+			Key:  tKey,
+			Objects: []runtime.Object{
+				newEventTargetDeployed(),
+				newAdapterServiceNotReady(),
+			},
+			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
+				Object: newEventTargetNotDeployed(),
+			}},
+		},
+		{
+			Name: "Adapter is outdated",
+			Key:  tKey,
+			Objects: []runtime.Object{
+				newEventTargetDeployed(),
+				setAdapterImage(
+					newAdapterServiceReady(),
+					tImg+":old",
+				),
+			},
+			WantUpdates: []clientgotesting.UpdateActionImpl{{
+				Object: newAdapterServiceReady(),
+			}},
+			WantEvents: []string{
+				updateAdapterEvent(),
+			},
+		},
 
-		// // Edge cases
+		// Edge cases
 
-		// {
-		// 	Name:    "Reconcile a non-existing object",
-		// 	Key:     tKey,
-		// 	Objects: nil,
-		// 	WantErr: false,
-		// },
+		{
+			Name:    "Reconcile a non-existing object",
+			Key:     tKey,
+			Objects: nil,
+			WantErr: false,
+		},
 	}
 
 	testCases.Test(t, MakeFactory(reconcilerCtor))

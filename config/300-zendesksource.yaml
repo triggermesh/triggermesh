@@ -83,10 +83,12 @@ spec:
                 - required: [value]
                 - required: [valueFromSecret]
               webhookUsername:
-                description: User name Zendesk requests must set to authenticate with the webhook using HTTP Basic authentication.
+                description: User name Zendesk requests must set to authenticate with the webhook using HTTP Basic
+                  authentication.
                 type: string
               webhookPassword:
-                description: Password Zendesk requests must set to authenticate with the webhook using HTTP Basic authentication.
+                description: Password Zendesk requests must set to authenticate with the webhook using HTTP Basic
+                  authentication.
                 type: object
                 properties:
                   value:
@@ -189,7 +191,8 @@ spec:
                   - type
                   - status
               address:
-                description: Public address of the HTTP/S endpoint that is subscribed for receiving Zendesk webhhook events.
+                description: Public address of the HTTP/S endpoint that is subscribed for receiving Zendesk webhhook
+                  events.
                 type: object
                 properties:
                   url:

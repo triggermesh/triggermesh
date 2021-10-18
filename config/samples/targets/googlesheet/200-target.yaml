@@ -17,11 +17,11 @@ kind: GoogleSheetTarget
 metadata:
   name: triggermesh-googlesheet
 spec:
-#Below is an example Spreadsheet ID. Change this 
+  # Below is an example Spreadsheet ID. Change this.
   id: 14GKZKWVB2TsYy31cCZ43YwA1LoOlVeL4nB7jlZbgFAk
-#Static prefix assignment for reciving CloudEvents without prior transformation
+  # Static prefix assignment for reciving CloudEvents without prior transformation.
   defaultPrefix: <Default Prefix>
-#These values should not change
+  # These values should not change.
   googleServiceAccount:
     secretKeyRef:
       name: googlesheet

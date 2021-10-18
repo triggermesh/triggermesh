@@ -1,0 +1,27 @@
+# yamllint configuration for Kubernetes manifests.
+#
+# For a list of all available configuration options with their default values, see:
+#   https://yamllint.readthedocs.io/en/stable/configuration.html
+
+extends: default
+
+rules:
+  # Use the same indentation rules as Kubernetes' marshaler. It avoids friction
+  # while diff-ing local manifests with in-cluster objects.
+  indentation:
+    spaces: 2
+    indent-sequences: false
+
+  # The default value of 80 is too low for OpenAPI schemas with deeply nested
+  # attributes inside CustomResourceDefinitions.
+  # Long words, such as URLs, tokens and some identifiers, are non-breakable
+  # and should not trigger errors.
+  line-length:
+    max: 120
+    allow-non-breakable-inline-mappings: true
+
+  # Our manifests don't include directives, so we don't use the "---" marker to
+  # start the first document inside a file.
+  #  - https://yaml.org/spec/1.2.2/#directives
+  #  - https://yaml.org/spec/1.2.2/#structures
+  document-start: disable

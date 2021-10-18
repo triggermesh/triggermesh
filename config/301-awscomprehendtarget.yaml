@@ -81,11 +81,14 @@ spec:
                       name:
                         type: string
               region:
-                description: Code of the AWS region to use for the Comprehend API. Available region codes are documented in the
-                  AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
+                description: Code of the AWS region to use for the Comprehend API.
+                  Available region codes are documented in the AWS General Reference at
+                  https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
                 type: string
               language:
-                description: Language code to use for Comprehend. Available languages can be found at https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html
+                description: Language code to use for Comprehend.
+                  Available languages can be found at
+                  https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html.
                 type: string
             required:
             - region

@@ -28,8 +28,8 @@ spec:
   branch: master
 
   eventTypes:
-    - push
-    - pull_request
+  - push
+  - pull_request
 
   credentials:
     accessKeyID:

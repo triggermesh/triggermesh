@@ -21,7 +21,7 @@ spec:
   template:
     spec:
       containers:
-        - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
+      - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
 
 ---
 
@@ -32,7 +32,7 @@ metadata:
   namespace: mynamespace
 spec:
   script:
-    code:  |-
+    code: |-
 
       // add extra field
       input.data.extra = "this is an extra field";
@@ -105,15 +105,13 @@ spec:
 apiVersion: sources.knative.dev/v1alpha2
 kind: PingSource
 metadata:
-    name: minute-request
-    namespace: mynamespace
+  name: minute-request
+  namespace: mynamespace
 spec:
-    jsonData: '{"hello":"world","sensible-info":"sensible-value", "name":"Ignatius", "lastname":"Reilly"}'
-    schedule: '*/1 * * * *'
-    sink:
-      ref:
-        apiVersion: eventing.knative.dev/v1
-        kind: Broker
-        name: infra-ex1
-
-
+  jsonData: '{"hello":"world","sensible-info":"sensible-value", "name":"Ignatius", "lastname":"Reilly"}'
+  schedule: '*/1 * * * *'
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: infra-ex1

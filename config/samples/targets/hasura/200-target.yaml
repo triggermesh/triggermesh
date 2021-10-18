@@ -15,16 +15,16 @@
 apiVersion: targets.triggermesh.io/v1alpha1
 kind: HasuraTarget
 metadata:
- name: hasuratarget
+  name: hasuratarget
 
 spec:
-  endpoint: 'http://hasura.example.com:8080' # Target hasura instance
+  endpoint: 'http://hasura.example.com:8080'  # Target hasura instance
   admin:
-     secretKeyRef:
-       name: hasuratargetadminsecret
-       key: token
+    secretKeyRef:
+      name: hasuratargetadminsecret
+      key: token
   queries:
-      MyQuery: "query MyQuery($person_id: Int) { foo(where: {id: {_eq: $person_id}} ) { id name } }"
+    MyQuery: "query MyQuery($person_id: Int) { foo(where: {id: {_eq: $person_id}} ) { id name } }"
 
 ---
 apiVersion: targets.triggermesh.io/v1alpha1
@@ -33,8 +33,9 @@ metadata:
   name: hasuratargetjwt
 
 spec:
-  endpoint: 'http://hasura.example.com:8080' # Target hasura instance
-  defaultRole: reader # This is optional and more useful with a trigger specific jwt token or if the endpoint uses a webhook
+  endpoint: 'http://hasura.example.com:8080'  # Target hasura instance
+  # This is optional and more useful with a trigger specific jwt token or if the endpoint uses a webhook.
+  defaultRole: reader
   jwt:
     secretKeyRef:
       name: hasuratargetjwtsecret

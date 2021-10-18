@@ -13,6 +13,11 @@
 # limitations under the License.
 
 # Sample AzureServiceBusQueueSource object.
+#
+# For a list and description of all available attributes, execute the following command against a cluster where this
+# Custom Resource Definition has been registered:
+#
+#   kubectl explain azureservicebusqueuesources.sources.triggermesh.io
 
 apiVersion: sources.triggermesh.io/v1alpha1
 kind: AzureServiceBusQueueSource

@@ -69,9 +69,9 @@ spec:
                 properties:
                   topic:
                     description: Full resource name of the Pub/Sub topic where notifications originating from the
-                      configured billing budget are sent to. If not supplied, a topic is created on behalf of the user, in the
-                      GCP project referenced by the 'project' attribute. The expected format is described at
-                      https://cloud.google.com/pubsub/docs/admin#resource_names
+                      configured billing budget are sent to. If not supplied, a topic is created on behalf of the user,
+                      in the GCP project referenced by the 'project' attribute. The expected format is described at
+                      https://cloud.google.com/pubsub/docs/admin#resource_names.
                     type: string
                     pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
                   project:

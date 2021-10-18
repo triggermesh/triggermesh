@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Sample GoogleCloudRepositoriesSource object.
+# Sample GoogleCloudIoTSource object.
+#
+# For a list and description of all available attributes, execute the following command against a cluster where this
+# Custom Resource Definition has been registered:
+#
+#   kubectl explain googlecloudiotsources.sources.triggermesh.io
 
 apiVersion: sources.triggermesh.io/v1alpha1
-kind: GoogleCloudRepositoriesSource
+kind: GoogleCloudIoTSource
 metadata:
   name: sample
 spec:
-  repository: projects/my-project/repos/my-repo
-
-  pubsub:
-    project: my-project
-    # Alternatively, provide a pre-existing Pub/Sub topic:
-    # topic: projects/my-project/topics/my-topic
+  registry: projects/my-project/locations/my-location/registries/my-registry
 
   serviceAccountKey:
     value: >-
@@ -33,12 +33,12 @@ spec:
         "project_id": "my-project",
         "private_key_id": "0000000000000000000000000000000000000000",
         "private_key": "-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n",
-        "client_email": "triggermesh-repositories-source@my-project.iam.gserviceaccount.com",
+        "client_email": "triggermesh-iot-source@my-project.iam.gserviceaccount.com",
         "client_id": "000000000000000000000",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://oauth2.googleapis.com/token",
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/triggermesh-repositories-source%40my-project.iam.gserviceaccount.com"
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/triggermesh-iot-source%40my-project.iam.gserviceaccount.com"
       }
 
   sink:

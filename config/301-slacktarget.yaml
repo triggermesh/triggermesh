@@ -57,7 +57,8 @@ spec:
             properties:
               token:
                 type: object
-                description: Slack API token used to interface with Slack. Consult the Slack API documenation for details on how to setup an app for the target https://api.slack.com/web#authentication
+                description: Slack API token used to interface with Slack. Consult the Slack API documenation for
+                  details on how to setup an app for the target https://api.slack.com/web#authentication.
                 properties:
                   secretKeyRef:
                     type: object

@@ -58,6 +58,7 @@ rules:
   - patch
 
 # Read Source resources and update their statuses
+# +rbac-check
 - apiGroups:
   - sources.triggermesh.io
   resources:
@@ -81,6 +82,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
@@ -95,6 +97,7 @@ rules:
   - list
   - watch
   - get
+# +rbac-check:subresource=status
 - apiGroups:
   - sources.triggermesh.io
   resources:
@@ -118,6 +121,7 @@ rules:
   - azureservicebusqueuesources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
+  - googlecloudiotsources/status
   - googlecloudpubsubsources/status
   - googlecloudrepositoriessources/status
   - googlecloudstoragesources/status
@@ -132,6 +136,7 @@ rules:
   - update
 
 # Read Target resources and update their statuses
+# +rbac-check
 - apiGroups:
   - targets.triggermesh.io
   resources:
@@ -146,10 +151,10 @@ rules:
   - confluenttargets
   - datadogtargets
   - elasticsearchtargets
-  - googlecloudworkflowstargets
-  - googlesheettargets
   - googlecloudfirestoretargets
   - googlecloudstoragetargets
+  - googlecloudworkflowstargets
+  - googlesheettargets
   - hasuratargets
   - httptargets
   - infratargets
@@ -169,6 +174,7 @@ rules:
   - list
   - watch
   - get
+# +rbac-check:subresource=status
 - apiGroups:
   - targets.triggermesh.io
   resources:
@@ -183,10 +189,10 @@ rules:
   - confluenttargets/status
   - datadogtargets/status
   - elasticsearchtargets/status
-  - googlesheettargets/status
   - googlecloudfirestoretargets/status
   - googlecloudstoragetargets/status
   - googlecloudworkflowstargets/status
+  - googlesheettargets/status
   - hasuratargets/status
   - httptargets/status
   - infratargets/status
@@ -205,7 +211,8 @@ rules:
   verbs:
   - update
 
-# Read Transformation resources and update their statuses
+# Read Flow resources and update their statuses
+# +rbac-check
 - apiGroups:
   - flow.triggermesh.io
   resources:
@@ -214,6 +221,7 @@ rules:
   - list
   - watch
   - get
+# +rbac-check:subresource=status
 - apiGroups:
   - flow.triggermesh.io
   resources:
@@ -221,7 +229,8 @@ rules:
   verbs:
   - update
 
-# Read Function resources and update their statuses
+# Read Extension resources and update their statuses
+# +rbac-check
 - apiGroups:
   - extensions.triggermesh.io
   resources:
@@ -230,6 +239,7 @@ rules:
   - list
   - watch
   - get
+# +rbac-check:subresource=status
 - apiGroups:
   - extensions.triggermesh.io
   resources:
@@ -238,6 +248,7 @@ rules:
   - update
 
 # Read Routing resources and update their statuses
+# +rbac-check
 - apiGroups:
   - routing.triggermesh.io
   resources:
@@ -247,6 +258,7 @@ rules:
   - list
   - watch
   - get
+# +rbac-check:subresource=status
 - apiGroups:
   - routing.triggermesh.io
   resources:
@@ -257,6 +269,7 @@ rules:
 
 # Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
 # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
+# +rbac-check:subresource=finalizers
 - apiGroups:
   - sources.triggermesh.io
   resources:
@@ -271,16 +284,84 @@ rules:
   - awss3sources/finalizers
   - awssnssources/finalizers
   - awssqssources/finalizers
+  - azureactivitylogssources/finalizers
+  - azureblobstoragesources/finalizers
+  - azureeventgridsources/finalizers
+  - azureeventhubsources/finalizers
+  - azureiothubsources/finalizers
+  - azurequeuestoragesources/finalizers
+  - azureservicebusqueuesources/finalizers
+  - googlecloudauditlogssources/finalizers
+  - googlecloudbillingsources/finalizers
+  - googlecloudiotsources/finalizers
+  - googlecloudpubsubsources/finalizers
+  - googlecloudrepositoriessources/finalizers
+  - googlecloudstoragesources/finalizers
   - httppollersources/finalizers
+  - ocimetricssources/finalizers
+  - salesforcesources/finalizers
   - slacksources/finalizers
+  - twiliosources/finalizers
   - webhooksources/finalizers
   - zendesksources/finalizers
   verbs:
   - update
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - targets.triggermesh.io
+  resources:
+  - alibabaosstargets/finalizers
+  - awscomprehendtargets/finalizers
+  - awsdynamodbtargets/finalizers
+  - awskinesistargets/finalizers
+  - awslambdatargets/finalizers
+  - awss3targets/finalizers
+  - awssnstargets/finalizers
+  - awssqstargets/finalizers
+  - confluenttargets/finalizers
+  - datadogtargets/finalizers
+  - elasticsearchtargets/finalizers
+  - googlecloudfirestoretargets/finalizers
+  - googlecloudstoragetargets/finalizers
+  - googlecloudworkflowstargets/finalizers
+  - googlesheettargets/finalizers
+  - hasuratargets/finalizers
+  - httptargets/finalizers
+  - infratargets/finalizers
+  - jiratargets/finalizers
+  - logztargets/finalizers
+  - logzmetricstargets/finalizers
+  - oracletargets/finalizers
+  - salesforcetargets/finalizers
+  - sendgridtargets/finalizers
+  - slacktargets/finalizers
+  - splunktargets/finalizers
+  - tektontargets/finalizers
+  - twiliotargets/finalizers
+  - uipathtargets/finalizers
+  - zendesktargets/finalizers
+  verbs:
+  - update
+# +rbac-check:subresource=finalizers
 - apiGroups:
   - flow.triggermesh.io
   resources:
   - transformations/finalizers
+  verbs:
+  - update
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions/finalizers
+  verbs:
+  - update
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters/finalizers
+  - splitters/finalizers
   verbs:
   - update
 
@@ -296,6 +377,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
@@ -337,6 +419,7 @@ rules:
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
+  - googlecloudiotsource-adapter
   - googlecloudpubsubsource-adapter
   - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
@@ -385,6 +468,7 @@ rules:
   - azureservicebusqueuesource-adapter
   - googlecloudauditlogssource-adapter
   - googlecloudbillingsource-adapter
+  - googlecloudiotsource-adapter
   - googlecloudpubsubsource-adapter
   - googlecloudrepositoriessource-adapter
   - googlecloudstoragesource-adapter
@@ -606,7 +690,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -648,7 +732,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - ""
+  - ''
   resources:
   - configmaps
   verbs:
@@ -685,6 +769,7 @@ metadata:
     app.kubernetes.io/part-of: triggermesh
     duck.knative.dev/source: 'true'
 rules:
+# +rbac-check
 - apiGroups:
   - sources.triggermesh.io
   resources:
@@ -708,6 +793,7 @@ rules:
   - azureservicebusqueuesources
   - googlecloudauditlogssources
   - googlecloudbillingsources
+  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudrepositoriessources
   - googlecloudstoragesources
@@ -736,6 +822,7 @@ metadata:
     app.kubernetes.io/part-of: triggermesh
     duck.knative.dev/addressable: 'true'
 rules:
+# +rbac-check
 - apiGroups:
   - targets.triggermesh.io
   resources:
@@ -750,18 +837,18 @@ rules:
   - confluenttargets
   - datadogtargets
   - elasticsearchtargets
-  - googlesheettargets
   - googlecloudfirestoretargets
   - googlecloudstoragetargets
   - googlecloudworkflowstargets
+  - googlesheettargets
   - hasuratargets
   - httptargets
   - infratargets
   - jiratargets
   - logztargets
   - logzmetricstargets
-  - salesforcetargets
   - oracletargets
+  - salesforcetargets
   - sendgridtargets
   - slacktargets
   - splunktargets
@@ -773,6 +860,7 @@ rules:
   - get
   - list
   - watch
+# +rbac-check
 - apiGroups:
   - flow.triggermesh.io
   resources:
@@ -781,6 +869,7 @@ rules:
   - get
   - list
   - watch
+# +rbac-check
 - apiGroups:
   - extensions.triggermesh.io
   resources:
@@ -789,6 +878,7 @@ rules:
   - get
   - list
   - watch
+# +rbac-check
 - apiGroups:
   - routing.triggermesh.io
   resources:

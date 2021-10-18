@@ -17,17 +17,16 @@ kind: ConfluentTarget
 metadata:
   name: triggermesh-confluent
 spec:
-  saslMechanism: PLAIN        #optional. Defaults to "PLAIN"
-  securityProtocol: SASL_SSL  #optional. Defaults to : "SASL_SSL"
+  saslMechanism: PLAIN        # optional. Defaults to "PLAIN"
+  securityProtocol: SASL_SSL  # optional. Defaults to : "SASL_SSL"
 
   # The following settings are NOT OPTIONAL.
   topic: test1
   bootstrapServers:
-    - <SERVER1>
-    - <SERVER2>
+  - <SERVER1>
+  - <SERVER2>
   username: <USER NAME>
   password:
     secretKeyRef:
       name: confluent
       key: password
-

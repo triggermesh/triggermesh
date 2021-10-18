@@ -39,7 +39,7 @@ spec:
     paths:
     - key: $ceType
       value: type
-  
+
   - operation: add
     paths:
     - key: type
@@ -47,24 +47,24 @@ spec:
 
   data:
   - operation: store
-    paths: 
+    paths:
     - key: $repository
-      value: repository.name 
+      value: repository.name
     - key: $message
       value: head_commit.message
     - key: $author
       value: head_commit.author.username
-  
+
   - operation: delete
     paths:
-    - key: 
+    - key:
 
   - operation: add
     paths:
     - key: type
       value: $ceType
     - key: object
-      value: $author 
+      value: $author
     - key: subject
       value: $repository
     - key: verb
@@ -99,7 +99,7 @@ spec:
     paths:
     - key: $ceType
       value: type
-  
+
   - operation: add
     paths:
     - key: type
@@ -107,7 +107,7 @@ spec:
 
   data:
   - operation: store
-    paths: 
+    paths:
     - key: $action
       value: action
     - key: $repository
@@ -116,17 +116,17 @@ spec:
       value: issue.title
     - key: $author
       value: issue.user.login
-  
+
   - operation: delete
     paths:
-    - key: 
+    - key:
 
   - operation: add
     paths:
     - key: type
       value: $ceType
     - key: object
-      value: $author 
+      value: $author
     - key: subject
       value: $repository
     - key: verb

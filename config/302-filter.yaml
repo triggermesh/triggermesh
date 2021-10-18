@@ -31,7 +31,7 @@ spec:
     - routing
     shortNames:
     - fl
-  versions: 
+  versions:
   - name: v1alpha1
     served: true
     storage: true
@@ -57,8 +57,8 @@ spec:
                     a uri to use as the sink.
                 type: object
                 oneOf:
-                - required: ["ref"]
-                - required: ["uri"]
+                - required: [ref]
+                - required: [uri]
                 properties:
                   ref:
                     description: Ref points to an Addressable.
@@ -68,16 +68,17 @@ spec:
                         description: API version of the referent.
                         type: string
                       kind:
-                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        description: 'Kind of the referent. More info:
+                          https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
                         type: string
                       name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        description: 'Name of the referent. More info:
+                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
                         type: string
                       namespace:
                         description: 'Namespace of the referent. More info:
                           https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-                          This is optional field, it gets defaulted to the
-                          object holding it if left out.'
+                          This is optional field, it gets defaulted to the object holding it if left out.'
                         type: string
                   uri:
                     description: URI can be an absolute URL(non-empty scheme and
@@ -129,7 +130,7 @@ spec:
       jsonPath: .status.address.url
     - name: Ready
       type: string
-      jsonPath: ".status.conditions[?(@.type=='Ready')].status"
+      jsonPath: .status.conditions[?(@.type=='Ready')].status
     - name: Reason
       type: string
-      jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
+      jsonPath: .status.conditions[?(@.type=='Ready')].reason
