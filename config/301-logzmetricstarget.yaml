@@ -69,7 +69,8 @@ spec:
                             type: string
               instruments:
                 type: array
-                description: 	Instruments configured for pushing metrics. It is mandatory that all metrics pushed by using this target are pre-registered using this list.
+                description: Instruments configured for pushing metrics.
+                  It is mandatory that all metrics pushed by using this target are pre-registered using this list.
                 items:
                   type: object
                   minLength: 1
@@ -83,14 +84,19 @@ spec:
                     instrument:
                       type: string
                       enum: ['Histogram', 'Counter', 'UpDownCounter']
-                      description: Instrument Kind as defined by OpenTelemetry. Supported values are
+                      description: Instrument Kind as defined by OpenTelemetry.
+                        Supported values are
+
                           - Histogram, for absolute values that can be aggregated.
                           - Counter, for delta values that increase monotonically.
                           - UpDownCounter, for delta values that can increase and decrease.
                     number:
                       type: string
                       enum: ['Int64', 'Float64']
-                      description: Number Kind as defined by OpenTelemetry, defines the measure data type accepted by the Instrument. Supported values are
+                      description: Number Kind as defined by OpenTelemetry.
+                        Defines the measure data type accepted by the Instrument.
+                        Supported values are
+
                           - Int64
                           - Float64
                   required:
