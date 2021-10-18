@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 
 	"go.uber.org/zap"
@@ -231,7 +232,7 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		resources.KnSvcEnvVar("_HANDLER", handler),
 		resources.KnSvcEnvVar("RESPONSE_FORMAT", "CLOUDEVENTS"),
 		resources.KnSvcEnvVar("CE_FUNCTION_RESPONSE_MODE", responseMode),
-		resources.KnSvcEnvFromMap("CE_OVERRIDES_", overrides),
+		resources.KnSvcEnvVars(sortedEnvVarsWithPrefix("CE_OVERRIDES_", overrides)...),
 		resources.KnSvcAnnotation("extensions.triggermesh.io/codeVersion", cm.ResourceVersion),
 		resources.KnSvcVisibility(f.Spec.Public),
 		resources.KnSvcLabel(map[string]string{labelKey: f.Name}),
@@ -247,6 +248,7 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		return r.knServingClientSet.ServingV1().Services(f.Namespace).Create(ctx, expectedKsvc, v1.CreateOptions{})
 	}
 	actualKsvc := ksvcList[0]
+	expectedKsvc.Name = actualKsvc.Name
 
 	if semantic.Semantic.DeepEqual(expectedKsvc, actualKsvc) {
 		return actualKsvc, nil
@@ -301,4 +303,23 @@ func fileExtension(runtime string) string {
 		return "sh"
 	}
 	return "txt"
+}
+
+// Env variables from extensions override map are sorted alphabetically before
+// passing to container env to prevent reconciliation loop when map keys are randomized.
+func sortedEnvVarsWithPrefix(prefix string, overrides map[string]string) []corev1.EnvVar {
+	keys := make([]string, 0, len(overrides))
+	for key := range overrides {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	res := make([]corev1.EnvVar, 0, len(keys))
+	for _, key := range keys {
+		res = append(res, corev1.EnvVar{
+			Name:  strings.ToUpper(prefix + key),
+			Value: overrides[key],
+		})
+	}
+	return res
 }
