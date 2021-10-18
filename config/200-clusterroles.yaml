@@ -159,8 +159,8 @@ rules:
   - httptargets
   - infratargets
   - jiratargets
-  - logztargets
   - logzmetricstargets
+  - logztargets
   - oracletargets
   - salesforcetargets
   - sendgridtargets
@@ -197,8 +197,8 @@ rules:
   - httptargets/status
   - infratargets/status
   - jiratargets/status
-  - logztargets/status
   - logzmetricstargets/status
+  - logztargets/status
   - oracletargets/status
   - salesforcetargets/status
   - sendgridtargets/status
@@ -329,8 +329,8 @@ rules:
   - httptargets/finalizers
   - infratargets/finalizers
   - jiratargets/finalizers
-  - logztargets/finalizers
   - logzmetricstargets/finalizers
+  - logztargets/finalizers
   - oracletargets/finalizers
   - salesforcetargets/finalizers
   - sendgridtargets/finalizers
@@ -845,8 +845,8 @@ rules:
   - httptargets
   - infratargets
   - jiratargets
-  - logztargets
   - logzmetricstargets
+  - logztargets
   - oracletargets
   - salesforcetargets
   - sendgridtargets
