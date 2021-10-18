@@ -20,9 +20,9 @@ spec:
   connection:
     listenerURL: http://listener.logz.io:8052
     token:
-     secretKeyRef:
-       name: logzmetrics
-       key: token
+      secretKeyRef:
+        name: logzmetrics
+        key: token
   instruments:
   - name: total_requests
     instrument: Counter
