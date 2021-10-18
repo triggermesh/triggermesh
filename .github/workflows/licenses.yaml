@@ -69,3 +69,6 @@ jobs:
             echo "${git_status}"
             exit 1
         fi
+
+    - name: Check kodata
+      run: hack/kodata-check.sh
