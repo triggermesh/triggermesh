@@ -23,7 +23,7 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type" : "io.triggermesh.opentelemetry.metrics.push" },
+        { "type" : "io.triggermesh.opentelemetry.metrics.push" }
       ]
 spec:
   group: targets.triggermesh.io
