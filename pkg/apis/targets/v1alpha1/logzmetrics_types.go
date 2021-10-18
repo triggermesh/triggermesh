@@ -62,11 +62,11 @@ var (
 type LogzMetricsTargetSpec struct {
 
 	// Connection information for LogzMetrics.
-	Connection LogzMetricsConnection
+	Connection LogzMetricsConnection `json:"connection"`
 
 	// Instruments configured for pushing metrics. It is mandatory that all metrics
 	// pushed by using this target are pre-registered using this list.
-	Instruments []Instrument
+	Instruments []Instrument `json:"instruments"`
 
 	// EventOptions for targets
 	// +optional
@@ -102,25 +102,25 @@ const (
 // Instrument push metrics for.
 type Instrument struct {
 	// Name for the Instrument.
-	Name string
+	Name string `json:"name"`
 
 	// Description for the Instrument
 	// +optional
-	Description *string
+	Description *string `json:"description,omitempty"`
 
 	// Instrument Kind as defined by OpenTelemetry. Supported values are:
 	//
 	// - Histogram: for absolute values that can be aggregated.
 	// - Counter: for delta values that increase monotonically.
 	// - UpDownCounter: for delta values that can increase and decrease.
-	Instrument InstrumentKind
+	Instrument InstrumentKind `json:"instrument"`
 
 	// Number Kind as defined by OpenTelemetry, defines the measure data type
 	// accepted by the Instrument. Supported values are:
 	//
 	// - Int64.
 	// - Float64.
-	Number NumberKind
+	Number NumberKind `json:"number"`
 }
 
 // LogzMetricsTargetStatus communicates the observed state of the LogzMetricsTarget from the controller.

@@ -97,6 +97,11 @@ func (l *Listers) GetHasuraTargetsObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
 }
 
+// GetLogzMetricsTargetObjects returns objects from Kubernetes APIs.
+func (l *Listers) GetLogzMetricsTargetObjects() []runtime.Object {
+	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
+}
+
 // GetLogzTargetObjects returns objects from Kubernetes APIs.
 func (l *Listers) GetLogzTargetObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
@@ -145,6 +150,11 @@ func (l *Listers) GetInfraTargetLister() targetslisters.InfraTargetLister {
 // GetJiraTargetLister returns a Lister for JiraTarget objects.
 func (l *Listers) GetJiraTargetLister() targetslisters.JiraTargetLister {
 	return targetslisters.NewJiraTargetLister(l.IndexerFor(&targetsv1alpha1.JiraTarget{}))
+}
+
+// GetLogzMetricsTargetLister returns a Lister for LogzMetricsTarget objects.
+func (l *Listers) GetLogzMetricsTargetLister() targetslisters.LogzMetricsTargetLister {
+	return targetslisters.NewLogzMetricsTargetLister(l.IndexerFor(&targetsv1alpha1.LogzMetricsTarget{}))
 }
 
 // GetLogzTargetLister returns a Lister for LogzTarget objects.

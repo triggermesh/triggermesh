@@ -71,6 +71,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/httptarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/infratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/jiratarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/logzmetricstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/logztarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/oracletarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/salesforcetarget"
@@ -138,6 +139,7 @@ func main() {
 		infratarget.NewController,
 		jiratarget.NewController,
 		logztarget.NewController,
+		logzmetricstarget.NewController,
 		oracletarget.NewController,
 		salesforcetarget.NewController,
 		sendgridtarget.NewController,

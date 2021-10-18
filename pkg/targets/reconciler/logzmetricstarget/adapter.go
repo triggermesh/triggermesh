@@ -72,7 +72,6 @@ func makeTargetAdapterKService(o *v1alpha1.LogzMetricsTarget, cfg *adapterConfig
 }
 
 func makeAppEnv(o *v1alpha1.LogzMetricsTarget) ([]corev1.EnvVar, error) {
-
 	instruments, err := json.Marshal(o.Spec.Instruments)
 	if err != nil {
 		return nil, err
@@ -86,7 +85,7 @@ func makeAppEnv(o *v1alpha1.LogzMetricsTarget) ([]corev1.EnvVar, error) {
 			},
 		}, {
 			Name:  envCortexEndpoint,
-			Value: string(o.Spec.Connection.ListenerURL),
+			Value: o.Spec.Connection.ListenerURL,
 		}, {
 			Name:  envOpenTelemetryInstruments,
 			Value: string(instruments),
