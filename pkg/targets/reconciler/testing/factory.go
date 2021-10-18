@@ -85,7 +85,6 @@ func MakeFactory(ctor Ctor) rt.Factory {
 			gsclient.PrependReactor("*", "*", reactor)
 			splunkclient.PrependReactor("*", "*", reactor)
 			httpclient.PrependReactor("*", "*", reactor)
-			logzmetricsclient.PrependReactor("*", "*", reactor)
 			logzclient.PrependReactor("*", "*", reactor)
 			k8sClient.PrependReactor("*", "*", reactor)
 			servingClient.PrependReactor("*", "*", reactor)

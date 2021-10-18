@@ -41,13 +41,13 @@ type Attribute struct {
 
 func (a *Attribute) ParseAttribute() (*attribute.KeyValue, error) {
 	if a.Key == "" {
-		return nil, errors.New("field 'key' must be informed at attributes")
+		return nil, errors.New("field 'key' must be included in attributes")
 	}
 	if a.Type == "" {
-		return nil, errors.New("field 'type' must be informed at attributes")
+		return nil, errors.New("field 'type' must be included in attributes")
 	}
 	if len(a.Value) == 0 {
-		return nil, errors.New("field 'value' must be informed at attributes")
+		return nil, errors.New("field 'value' must be included in attributes")
 	}
 
 	switch a.Type {

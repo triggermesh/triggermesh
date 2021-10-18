@@ -97,17 +97,17 @@ func (l *Listers) GetHasuraTargetsObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
 }
 
-// GetLogzMetricsTargetObjects returns objects from Kubernetes APIs.
+// GetLogzMetricsTargetObjects returns objects from the targets API.
 func (l *Listers) GetLogzMetricsTargetObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
 }
 
-// GetLogzTargetObjects returns objects from Kubernetes APIs.
+// GetLogzTargetObjects returns objects from the targets API.
 func (l *Listers) GetLogzTargetObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
 }
 
-// GetKubeObjects returns objects from Kubernetes APIs.
+// GetKubeObjects returns objects from the targets API.
 func (l *Listers) GetKubeObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakek8sclient.AddToScheme)
 }

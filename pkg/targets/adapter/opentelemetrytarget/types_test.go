@@ -108,7 +108,7 @@ func TestMeasuresAttributesParsing(t *testing.T) {
 				]
 			}
 			`,
-			expectedErr: "field 'key' must be informed at attributes",
+			expectedErr: "field 'key' must be included in attributes",
 		},
 
 		"value not informed": {
@@ -121,7 +121,7 @@ func TestMeasuresAttributesParsing(t *testing.T) {
 				]
 			}
 			`,
-			expectedErr: "field 'value' must be informed at attributes",
+			expectedErr: "field 'value' must be included in attributes",
 		},
 
 		"type not informed": {
@@ -134,7 +134,7 @@ func TestMeasuresAttributesParsing(t *testing.T) {
 				]
 			}
 			`,
-			expectedErr: "field 'type' must be informed at attributes",
+			expectedErr: "field 'type' must be included in attributes",
 		},
 
 		"wrong string attribute": {

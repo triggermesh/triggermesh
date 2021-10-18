@@ -86,19 +86,12 @@ func TestEnvironmentInstruments(t *testing.T) {
 	}
 
 	for k, v := range baseEnv {
-		os.Setenv(k, v)
+		t.Setenv(k, v)
 	}
-
-	defer func() {
-		for k := range baseEnv {
-			os.Unsetenv(k)
-		}
-		os.Unsetenv(tInstrumentsEnv)
-	}()
 
 	for n, tc := range testCases {
 		t.Run(n, func(t *testing.T) {
-			os.Setenv(tInstrumentsEnv, tc.envInstruments)
+			t.Setenv(tInstrumentsEnv, tc.envInstruments)
 
 			env := EnvAccessorCtor().(*envAccessor)
 			err := envconfig.Process("", env)

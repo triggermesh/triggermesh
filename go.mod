@@ -58,6 +58,10 @@ require (
 	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
 	github.com/tektoncd/pipeline v0.24.1
 	github.com/tidwall/gjson v1.6.8
+	go.opentelemetry.io/contrib/exporters/metric/cortex v0.25.0
+	go.opentelemetry.io/otel v1.0.1
+	go.opentelemetry.io/otel/metric v0.24.0
+	go.opentelemetry.io/otel/sdk/metric v0.24.0
 	golang.org/x/net v0.0.0-20211011170408-caeb26a5c8c0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	google.golang.org/api v0.57.0
@@ -166,13 +170,9 @@ require (
 	github.com/trivago/tgo v1.0.7 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	go.opentelemetry.io/contrib/exporters/metric/cortex v0.25.0 // indirect
-	go.opentelemetry.io/otel v1.0.1 // indirect
 	go.opentelemetry.io/otel/internal/metric v0.24.0 // indirect
-	go.opentelemetry.io/otel/metric v0.24.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.0.1 // indirect
 	go.opentelemetry.io/otel/sdk/export/metric v0.24.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v0.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.0.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
