@@ -73,15 +73,15 @@ func TestEnvironmentInstruments(t *testing.T) {
 		},
 		"missing name": {
 			envInstruments: `[{"instrument":"` + tInstKindString + `","number":"` + tInstNumKindString + `"}]`,
-			expectedErr:    "metrics must inform a name",
+			expectedErr:    "metrics must include a name",
 		},
 		"missing instrument": {
 			envInstruments: `[{"name":"` + tInstName + `","number":"` + tInstNumKindString + `"}]`,
-			expectedErr:    "metrics must inform instrument kind",
+			expectedErr:    "metrics must include an instrument kind",
 		},
 		"missing number": {
 			envInstruments: `[{"name":"` + tInstName + `","instrument":"` + tInstKindString + `"}]`,
-			expectedErr:    "metrics must inform number kind",
+			expectedErr:    "metrics must include a number kind",
 		},
 	}
 

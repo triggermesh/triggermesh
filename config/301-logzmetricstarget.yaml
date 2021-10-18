@@ -45,9 +45,11 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
+        description: The OpenTelemetry metrics target pushes metrics to a range of backends.
         properties:
           spec:
             type: object
+            description: The OpenTelemetry target exposes a common interface to a range of metrics backends.
             properties:
               connection:
                 type: object
@@ -105,8 +107,16 @@ spec:
                   - number
               eventOptions:
                 type: object
+                description: Event replies options.
                 properties:
                   payloadPolicy:
+                    description: Whether this target should generate response events. Possible
+                      values are
+
+                      - always, if a response is available it will be sent.
+                      - error, only responses categorized as errors will be sent.
+                      - never, no responses will be sent.
+
                     type: string
                     enum: [always, error, never]
             required:

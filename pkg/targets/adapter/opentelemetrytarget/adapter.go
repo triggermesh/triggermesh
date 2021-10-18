@@ -38,6 +38,28 @@ import (
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
+var _ pkgadapter.Adapter = (*cortexAdapter)(nil)
+
+// instrumentRef is a reference to an instrument descriptor and its implementation.
+type instrumentRef struct {
+	descriptor metric.Descriptor
+	sync       metric.SyncImpl
+}
+
+type opentelemetryAdapter struct {
+	instruments map[string]map[string]*instrumentRef
+
+	replier  *targetce.Replier
+	ceClient cloudevents.Client
+	logger   *zap.SugaredLogger
+}
+
+type cortexAdapter struct {
+	opentelemetryAdapter
+
+	cortexConfig *cortex.Config
+}
+
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
@@ -51,7 +73,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	if len(env.Instruments) == 0 {
-		logger.Panic("No instruments informed")
+		logger.Panic("No instruments present")
 	}
 
 	// instruments structure is a map nested with two keys.
@@ -94,30 +116,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 }
 
-var _ pkgadapter.Adapter = (*cortexAdapter)(nil)
-
-// instrumentRef is a reference to an instrument
-// desciptor and its implementation.
-type instrumentRef struct {
-	descriptor metric.Descriptor
-	sync       metric.SyncImpl
-}
-
-type opentelemetryAdapter struct {
-	instruments map[string]map[string]*instrumentRef
-
-	replier  *targetce.Replier
-	ceClient cloudevents.Client
-	logger   *zap.SugaredLogger
-}
-
-type cortexAdapter struct {
-	opentelemetryAdapter
-
-	cortexConfig *cortex.Config
-}
-
-// Returns if stopCh is closed or Send() returns an error.
+// Start is a blocking function and will return if an error occurs
+// or the context is cancelled.
 func (a *cortexAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Cortex adapter")
 
@@ -132,7 +132,7 @@ func (a *cortexAdapter) Start(ctx context.Context) error {
 	defer func() {
 		if err := cortexctl.Stop(ctx); err != nil {
 			// Warning only, this will be most of the time a context
-			// cancelation error, which is not an issue.
+			// cancellation error, which is not an issue.
 			a.logger.Warnw("Error stopping Cortex adapter", zap.Error(err))
 		}
 	}()
@@ -155,7 +155,7 @@ func (a *cortexAdapter) Start(ctx context.Context) error {
 			if i.descriptor.InstrumentKind().Asynchronous() {
 				return fmt.Errorf("async instrument %s/%s not supported", name, kind)
 			}
-			return fmt.Errorf("cannot find out if instrument %s/%s is sync or async", name, kind)
+			return fmt.Errorf("cannot determine if the instrument %s/%s is sync or async", name, kind)
 		}
 	}
 
@@ -190,12 +190,12 @@ func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.E
 
 func (a *opentelemetryAdapter) processSingleMeasure(ctx context.Context, m Measure) error {
 	attrs := make([]attribute.KeyValue, 0, len(m.Attributes))
-	for _, at := range m.Attributes {
-		attr, err := at.ParseAttribute()
+	for i := range m.Attributes {
+		attr, err := m.Attributes[i].ParseAttribute()
 		if err != nil {
 			return err
 		}
-		attrs = append(attrs, *attr)
+		attrs[i] = *attr
 	}
 
 	// Match the measure with an instrument
@@ -210,7 +210,7 @@ func (a *opentelemetryAdapter) processSingleMeasure(ctx context.Context, m Measu
 	switch {
 	case m.Kind != "":
 		if ir, ok = kindm[m.Kind]; !ok {
-			return fmt.Errorf("incorret kind %q for instrument %q", m.Kind, m.Name)
+			return fmt.Errorf("undefined kind %q for instrument %q", m.Kind, m.Name)
 		}
 
 	case len(kindm) == 1:
@@ -219,7 +219,7 @@ func (a *opentelemetryAdapter) processSingleMeasure(ctx context.Context, m Measu
 		}
 
 	default:
-		return fmt.Errorf("instrument %q has mnay kinds. Measure did not specify one", m.Name)
+		return fmt.Errorf("instrument %q has multiple kinds. Measure did not specify one", m.Name)
 	}
 
 	// Parse value according to the instrument number kind

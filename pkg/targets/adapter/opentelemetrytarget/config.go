@@ -72,13 +72,13 @@ func (is *Instruments) Decode(value string) error {
 
 	for _, i := range *is {
 		if i.Name == "" {
-			return errors.New("metrics must inform a name")
+			return errors.New("metrics must include a name")
 		}
 		if i.Instrument == "" {
-			return errors.New("metrics must inform instrument kind")
+			return errors.New("metrics must include an instrument kind")
 		}
 		if i.Number == "" {
-			return errors.New("metrics must inform number kind")
+			return errors.New("metrics must include a number kind")
 		}
 
 		ikind, ok := instrumentKinds[i.Instrument]
