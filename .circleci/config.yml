@@ -210,6 +210,17 @@ jobs:
             for f in $(find /tmp/workspace/dist/ -type f); do
               github-release upload -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -n $(basename ${f}) -f ${f}
             done
+      - run:
+          name: Installing packer
+          command: |
+            curl -sSLO https://releases.hashicorp.com/packer/1.7.6/packer_1.7.6_linux_amd64.zip
+            unzip packer_1.7.6_linux_amd64.zip -d $(go env GOPATH)/bin/
+      - run:
+          name: Building and publishing VM images
+          command: TRIGGERMESH_VERSION=${CIRCLE_TAG:-${CIRCLE_SHA1:0:5}} make vm-images
+          environment:
+            AWS_AMI_GROUPS: all
+            AWS_AMI_REGIONS: us-east-1,us-east-2,us-west-1,us-west-2,ap-southeast-1,ap-southeast-2,ap-northeast-1,eu-central-1,eu-west-1,eu-west-2
 
 workflows:
   test-and-publish:

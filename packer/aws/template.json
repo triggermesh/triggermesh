@@ -40,6 +40,12 @@
     },
     {
       "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+      ],
+      "type": "shell"
+    },
+    {
+      "inline": [
         "sudo apt-get update -y",
         "sudo apt-get install -y dosfstools parted",
         "sudo bash -x /tmp/install.sh --takeover --poweroff --debug --tty ttyS0 --config /tmp/config.yaml --no-format $(findmnt / -o SOURCE -n) \"{{user `iso_url`}}\""
