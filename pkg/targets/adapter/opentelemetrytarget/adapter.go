@@ -189,7 +189,7 @@ func (a *opentelemetryAdapter) dispatch(ctx context.Context, event cloudevents.E
 }
 
 func (a *opentelemetryAdapter) processSingleMeasure(ctx context.Context, m Measure) error {
-	attrs := make([]attribute.KeyValue, 0, len(m.Attributes))
+	attrs := make([]attribute.KeyValue, len(m.Attributes))
 	for i := range m.Attributes {
 		attr, err := m.Attributes[i].ParseAttribute()
 		if err != nil {
