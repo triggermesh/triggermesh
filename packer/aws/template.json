@@ -1,0 +1,74 @@
+{
+  "builders": [
+    {
+      "access_key": "{{user `aws_access_key`}}",
+      "ami_name": "triggermesh-os-{{user `tm_version`}}-amd64-{{isotime `200601020304`}}",
+      "instance_type": "t3.small",
+      "region": "{{user `region`}}",
+      "ami_groups": "{{user `ami_groups`}}",
+      "ami_regions": "{{user `ami_regions`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "source_ami_filter": {
+        "filters": {
+          "name": "ubuntu/images/hvm-ssd/ubuntu-focal-*-amd64-server-*",
+          "root-device-type": "ebs",
+          "virtualization-type": "hvm"
+        },
+        "most_recent": true,
+        "owners": [
+          "099720109477"
+        ]
+      },
+      "ssh_username": "ubuntu",
+      "tags": {
+        "Name": "TriggerMesh OS",
+        "Version": "{{user `tm_version`}}"
+      },
+      "type": "amazon-ebs"
+    }
+  ],
+  "provisioners": [
+    {
+      "destination": "/tmp/config.yaml",
+      "source": "{{ user `k3os_config`}}",
+      "type": "file"
+    },
+    {
+      "destination": "/tmp/install.sh",
+      "source": "./k3os-install.sh",
+      "type": "file"
+    },
+    {
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+      ],
+      "type": "shell"
+    },
+    {
+      "inline": [
+        "sudo apt-get update -y",
+        "sudo apt-get install -y dosfstools parted",
+        "sudo bash -x /tmp/install.sh --takeover --poweroff --debug --tty ttyS0 --config /tmp/config.yaml --no-format $(findmnt / -o SOURCE -n) \"{{user `iso_url`}}\""
+      ],
+      "type": "shell"
+    },
+    {
+      "inline": [
+        "set -x; sudo systemd-run --on-active=3 --timer-property=AccuracySec=100ms sudo systemctl reboot --force --force; sync; echo Rebooting"
+      ],
+      "pause_after": "3m",
+      "type": "shell"
+    }
+  ],
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "ami_groups": "{{env `AWS_AMI_GROUPS`}}",
+    "ami_regions": "{{env `AWS_AMI_REGIONS`}}",
+    "k3os_config": "{{env `K3OS_CONFIG`}}",
+    "iso_url": "https://github.com/rancher/k3os/releases/download/v0.21.5-k3s2r1/k3os-amd64.iso",
+    "tm_version": "{{env `TRIGGERMESH_VERSION`}}",
+    "region": "{{env `AWS_DEFAULT_REGION`}}"
+  }
+}
+

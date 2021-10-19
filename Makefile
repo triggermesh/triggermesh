@@ -45,7 +45,7 @@ LDFLAGS            = -extldflags=-static -w -s
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
 
-.PHONY: help build install release test lint fmt fmt-test images cloudbuild-test cloudbuild clean install-gotestsum install-golangci-lint deploy undeploy
+.PHONY: help build release vm-images test lint fmt fmt-test images clean install-gotestsum install-golangci-lint deploy undeploy
 
 all: codegen build test lint
 
@@ -76,6 +76,9 @@ deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
 
 undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster using ko
 	$(KO) delete -f $(BASE_DIR)/config
+
+vm-images:
+	@$(MAKE) -C packer/
 
 release: ## Publish container images and generate release manifests
 	@mkdir -p $(DIST_DIR)
