@@ -1,20 +1,28 @@
-TRIGGERMESH_VERSION ?= $(shell cat TRIGGERMESH_VERSION)
-
 BASE_DIR   ?= $(CURDIR)
 OUTPUT_DIR ?= $(BASE_DIR)/_output
 
-.PHONY: build config.yaml
+TRIGGERMESH_VERSION ?= $(shell git describe --tags --abbrev=0)
+K3OS_CONFIG=$(OUTPUT_DIR)/config.yaml
+
+export TRIGGERMESH_VERSION
+export K3OS_CONFIG
+
+.PHONY: build gen-config
 
 all: build
 
 gen-config:
 	@echo "Generating config.yaml..."
 	@mkdir -p _output/
-	@TRIGGERMESH_VERSION=$(TRIGGERMESH_VERSION) ./scripts/gen-config > $(OUTPUT_DIR)/config.yaml
+	@./scripts/gen-config > $(K3OS_CONFIG)
 
+# Requires AWS environment for Packer as per your preferred method:
+# - https://www.packer.io/docs/builders/amazon/#static-credentials
+# - https://www.packer.io/docs/builders/amazon/#environment-variables
+# - https://www.packer.io/docs/builders/amazon/#shared-credentials-file
 build: gen-config
 	@echo "Building AMI..."
-	@TRIGGERMESH_VERSION=$(TRIGGERMESH_VERSION) K3OS_CONFIG=$(OUTPUT_DIR)/config.yaml packer build template.json
+	@packer build template.json
 
 clean:
-	@rm -rf $(OUTPUT_DIR)/config.yaml
+	@rm -rvf $(K3OS_CONFIG)
