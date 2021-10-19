@@ -39,7 +39,18 @@ RELEASE_ASSETS_TABLE=$(
 cat <<EOF
 ## Installation
 
-Download TriggerMesh Open Source Components ${RELEASE}
+Install all TriggerMesh custom resources:
+
+
+\`\`\`console
+kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/${RELEASE}/triggermesh-crds.yaml
+\`\`\`
+
+Install the TriggerMesh open source platform components:
+
+\`\`\`console
+kubectl apply -f https://github.com/triggermesh/triggermesh/releases/download/${RELEASE}/triggermesh.yaml
+\`\`\`
 
 ${RELEASE_ASSETS_TABLE}
 
