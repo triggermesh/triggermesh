@@ -74,6 +74,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&JiraTargetList{},
 		&InfraTarget{},
 		&InfraTargetList{},
+		&LogzMetricsTarget{},
+		&LogzMetricsTargetList{},
 		&LogzTarget{},
 		&LogzTargetList{},
 		&OracleTarget{},

@@ -59,6 +59,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		ctx, splunkclient := faketargetsinjectionclient.With(ctx, ls.GetSplunkTargetsObjects()...)
 		ctx, httpclient := faketargetsinjectionclient.With(ctx, ls.GetHTTPTargetsObjects()...)
 		ctx, logzclient := faketargetsinjectionclient.With(ctx, ls.GetLogzTargetObjects()...)
+		ctx, logzmetricsclient := faketargetsinjectionclient.With(ctx, ls.GetLogzMetricsTargetObjects()...)
 
 		// all clients used inside reconciler implementations should be
 		// injected as well
@@ -97,6 +98,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 			splunkclient,
 			httpclient,
 			logzclient,
+			logzmetricsclient,
 
 			k8sClient,
 			servingClient,

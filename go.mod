@@ -58,11 +58,15 @@ require (
 	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
 	github.com/tektoncd/pipeline v0.24.1
 	github.com/tidwall/gjson v1.6.8
-	golang.org/x/net v0.0.0-20210825183410-e898025ed96a
+	go.opentelemetry.io/contrib/exporters/metric/cortex v0.25.0
+	go.opentelemetry.io/otel v1.0.1
+	go.opentelemetry.io/otel/metric v0.24.0
+	go.opentelemetry.io/otel/sdk/metric v0.24.0
+	golang.org/x/net v0.0.0-20211011170408-caeb26a5c8c0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	google.golang.org/api v0.57.0
-	google.golang.org/genproto v0.0.0-20210921142501-181ce0d877f6
-	google.golang.org/grpc v1.40.0
+	google.golang.org/genproto v0.0.0-20211013025323-ce878158c4d4
+	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.4.2
 	knative.dev/networking v0.0.0-20210914225408-69ad45454096
@@ -117,7 +121,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/golang/snappy v0.0.3 // indirect
+	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-containerregistry v0.6.0 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
@@ -151,6 +155,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.30.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
+	github.com/prometheus/prometheus v2.5.0+incompatible // indirect
 	github.com/prometheus/statsd_exporter v0.21.0 // indirect
 	github.com/rickb777/date v1.13.0 // indirect
 	github.com/rickb777/plural v1.2.1 // indirect
@@ -165,15 +170,19 @@ require (
 	github.com/trivago/tgo v1.0.7 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
+	go.opentelemetry.io/otel/internal/metric v0.24.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.0.1 // indirect
+	go.opentelemetry.io/otel/sdk/export/metric v0.24.0 // indirect
+	go.opentelemetry.io/otel/trace v1.0.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20210908233432-aa78b53d3365 // indirect
+	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/tools v0.1.6 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect

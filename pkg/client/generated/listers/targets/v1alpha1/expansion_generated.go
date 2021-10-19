@@ -170,6 +170,14 @@ type JiraTargetListerExpansion interface{}
 // JiraTargetNamespaceLister.
 type JiraTargetNamespaceListerExpansion interface{}
 
+// LogzMetricsTargetListerExpansion allows custom methods to be added to
+// LogzMetricsTargetLister.
+type LogzMetricsTargetListerExpansion interface{}
+
+// LogzMetricsTargetNamespaceListerExpansion allows custom methods to be added to
+// LogzMetricsTargetNamespaceLister.
+type LogzMetricsTargetNamespaceListerExpansion interface{}
+
 // LogzTargetListerExpansion allows custom methods to be added to
 // LogzTargetLister.
 type LogzTargetListerExpansion interface{}
