@@ -2,26 +2,17 @@ module github.com/triggermesh/triggermesh
 
 go 1.17
 
-// Top-level module control over the exact version used for important direct dependencies.
-// https://github.com/golang/go/wiki/Modules#when-should-i-use-the-replace-directive
-replace k8s.io/client-go => k8s.io/client-go v0.21.4
-
+// Knative and CloudEvents are the common denominator to all TriggerMesh components.
 require (
 	github.com/cloudevents/sdk-go/v2 v2.4.1
-	github.com/google/go-cmp v0.5.6
-	github.com/google/uuid v1.3.0
-	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/stretchr/testify v1.7.0
-	go.opencensus.io v0.23.0
-	go.uber.org/zap v1.19.0
-	k8s.io/api v0.21.4
-	k8s.io/apimachinery v0.21.4
-	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
-	k8s.io/code-generator v0.21.4
 	knative.dev/eventing v0.26.0
 	knative.dev/pkg v0.0.0-20210919202233-5ae482141474
 	knative.dev/serving v0.26.0
 )
+
+// Top-level module control over the exact version used for important direct dependencies.
+// https://github.com/golang/go/wiki/Modules#when-should-i-use-the-replace-directive
+replace k8s.io/client-go => k8s.io/client-go v0.21.4
 
 require (
 	cloud.google.com/go/billing v0.1.0
@@ -48,20 +39,26 @@ require (
 	github.com/elastic/go-elasticsearch/v7 v7.6.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/cel-go v0.7.2
+	github.com/google/go-cmp v0.5.6
+	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-uuid v1.0.1
 	github.com/jarcoal/httpmock v1.0.8
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
 	github.com/nukosuke/go-zendesk v0.9.2
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/robertkrimen/otto v0.0.0-20200922221731-ef014fd054ac
 	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
+	github.com/stretchr/testify v1.7.0
 	github.com/tektoncd/pipeline v0.24.1
 	github.com/tidwall/gjson v1.6.8
+	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.25.0
 	go.opentelemetry.io/otel v1.0.1
 	go.opentelemetry.io/otel/metric v0.24.0
 	go.opentelemetry.io/otel/sdk/metric v0.24.0
+	go.uber.org/zap v1.19.0
 	golang.org/x/net v0.0.0-20211011170408-caeb26a5c8c0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	google.golang.org/api v0.57.0
@@ -69,6 +66,10 @@ require (
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.4.2
+	k8s.io/api v0.21.4
+	k8s.io/apimachinery v0.21.4
+	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
+	k8s.io/code-generator v0.21.4
 	knative.dev/networking v0.0.0-20210914225408-69ad45454096
 )
 
