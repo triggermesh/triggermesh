@@ -1,0 +1,20 @@
+# Dependabot configuration
+#
+# For more information, please refer to:
+#   https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically
+
+version: 2
+
+updates:
+
+# Maintain Go modules
+- package-ecosystem: gomod
+  directory: /
+  schedule:
+    interval: weekly
+
+# Maintain dependencies for GitHub Actions
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
