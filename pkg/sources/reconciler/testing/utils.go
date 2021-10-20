@@ -17,28 +17,9 @@ limitations under the License.
 package testing
 
 import (
-	"os"
-	"testing"
-
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-// SetEnvVar sets the value of an env var and returns a function that can be
-// deferred to unset that variable.
-func SetEnvVar(t *testing.T, name, val string) (unset func()) {
-	t.Helper()
-
-	if err := os.Setenv(name, val); err != nil {
-		t.Errorf("Failed to set env var %s: %v", name, err)
-	}
-
-	return func() {
-		if err := os.Unsetenv(name); err != nil {
-			t.Logf("Failed to unset env var %q: %s", name, err)
-		}
-	}
-}
 
 // NewConfigMap returns a ConfigMap object.
 func NewConfigMap(name string, data map[string]string) *corev1.ConfigMap {

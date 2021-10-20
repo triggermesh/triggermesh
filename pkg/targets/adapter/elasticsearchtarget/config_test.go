@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
 	"reflect"
 	"testing"
 
@@ -130,15 +129,11 @@ func TestEnvironment(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testName, func(t *testing.T) {
 			for k, v := range tc.env {
-				os.Setenv(k, v)
+				t.Setenv(k, v)
 			}
 
 			env := EnvAccessorCtor().(*envAccessor)
 			err := envconfig.Process("", env)
-			// clean up for next test case
-			for k := range tc.env {
-				os.Unsetenv(k)
-			}
 
 			if err != nil {
 				t.Fatalf("Error parsing environment: %s", err)

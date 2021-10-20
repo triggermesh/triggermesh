@@ -48,7 +48,7 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 	}
 
 	// updateAdapterMetricsConfig panics when METRICS_DOMAIN is unset
-	defer SetEnvVar(t, metrics.DomainEnv, "testing")()
+	t.Setenv(metrics.DomainEnv, "testing")
 
 	cmw := configmap.NewStaticWatcher(
 		NewConfigMap(metrics.ConfigMapName(), nil),
