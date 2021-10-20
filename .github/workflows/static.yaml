@@ -9,7 +9,7 @@ on:
 jobs:
 
   lint-code:
-    name: Code linting
+    name: Code Linting
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +28,7 @@ jobs:
         skip-go-installation: true
 
   lint-config:
-    name: Configuration linting
+    name: Configuration Linting
     runs-on: ubuntu-latest
 
     steps:
