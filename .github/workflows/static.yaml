@@ -20,12 +20,22 @@ jobs:
       with:
         go-version: '1.17'
 
-    # This action takes care of caching/restoring pkg and build caches.
-    # It needs to be the first step executed after the Go setup.
+    - name: Restore Go caches
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
     - name: Lint Go code
       uses: golangci/golangci-lint-action@v2
       with:
         skip-go-installation: true
+        skip-pkg-cache: true
+        skip-build-cache: true
 
   lint-config:
     name: Configuration Linting
@@ -38,6 +48,16 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '1.17'
+
+    - name: Restore Go caches
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
 
     - name: Lint Kubernetes manifests
       uses: ibiqlik/action-yamllint@v3
