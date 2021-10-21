@@ -12,6 +12,12 @@ updates:
   directory: /
   schedule:
     interval: weekly
+  ignore:
+  # We prefer to keep control over Knative module imports.
+  - dependency-name: knative.dev/*
+  # The version of Kubernetes module imports needs to be consistent across all
+  # modules. Besides, that version is determined by the current Knative version.
+  - dependency-name: k8s.io/*
 
 # Maintain dependencies for GitHub Actions
 - package-ecosystem: github-actions
