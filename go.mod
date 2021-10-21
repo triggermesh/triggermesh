@@ -45,7 +45,7 @@ require (
 	github.com/aws/aws-sdk-go v1.37.1
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
-	github.com/elastic/go-elasticsearch/v7 v7.6.0
+	github.com/elastic/go-elasticsearch/v7 v7.15.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/cel-go v0.7.2
 	github.com/hashicorp/go-uuid v1.0.1
@@ -89,7 +89,6 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
-	github.com/antlr/antlr4 v0.0.0-20200503195918-621b933c7a7f // indirect
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/beeker1121/goque v2.1.0+incompatible // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
