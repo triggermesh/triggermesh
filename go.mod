@@ -19,7 +19,7 @@ require (
 	cloud.google.com/go/firestore v1.1.0
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/pubsub v1.16.0
-	cloud.google.com/go/storage v1.16.1
+	cloud.google.com/go/storage v1.18.2
 	cloud.google.com/go/workflows v1.0.0
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.13
 	github.com/Azure/azure-sdk-for-go v57.1.0+incompatible
@@ -60,9 +60,9 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.24.0
 	go.uber.org/zap v1.19.0
 	golang.org/x/net v0.0.0-20211011170408-caeb26a5c8c0
-	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
-	google.golang.org/api v0.57.0
-	google.golang.org/genproto v0.0.0-20211013025323-ce878158c4d4
+	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
+	google.golang.org/api v0.58.0
+	google.golang.org/genproto v0.0.0-20211016002631-37fc39342514
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.4.2
@@ -74,7 +74,7 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.94.1 // indirect
+	cloud.google.com/go v0.97.0 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
@@ -126,7 +126,7 @@ require (
 	github.com/google/go-containerregistry v0.6.0 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/googleapis/gax-go/v2 v2.1.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/googleapis/gnostic v0.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
