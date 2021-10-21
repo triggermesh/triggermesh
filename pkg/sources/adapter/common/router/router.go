@@ -17,6 +17,7 @@ limitations under the License.
 package router
 
 import (
+	"html"
 	"net/http"
 	"sync"
 )
@@ -45,7 +46,7 @@ func (r *Router) DeregisterPath(urlPath string) {
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	h, ok := r.handlers.Load(req.URL.Path)
 	if !ok {
-		http.Error(w, "No handler for path "+req.URL.Path, http.StatusNotFound)
+		http.Error(w, "No handler for path "+html.EscapeString(req.URL.Path), http.StatusNotFound)
 		return
 	}
 

@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -87,7 +88,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// handle semicolon-separated header value (e.g. "application/json; charset=utf-8")
 	ctHeader := r.Header.Get(headerContentTypeKey)
 	if strings.TrimSpace(strings.SplitN(ctHeader, ";", 2)[0]) != headerContentTypeJSON {
-		http.Error(w, "Unsupported media type "+ctHeader, http.StatusUnsupportedMediaType)
+		http.Error(w, "Unsupported media type "+html.EscapeString(ctHeader), http.StatusUnsupportedMediaType)
 		return
 	}
 

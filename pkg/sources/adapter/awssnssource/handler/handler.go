@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"net/http"
 
@@ -154,7 +155,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.logger.Debug("Successfully confirmed SNS subscription: ", *resp)
 
 	default:
-		http.Error(w, "Unrecognized message type "+msgType, http.StatusBadRequest)
+		http.Error(w, "Unrecognized message type "+html.EscapeString(msgType), http.StatusBadRequest)
 	}
 }
 
