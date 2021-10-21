@@ -146,7 +146,7 @@ func newEventSubscription(eventHubResID string, eventTypes []string) eventgrid.E
 				MaxDeliveryAttempts:      to.Int32Ptr(defaultMaxDeliveryAttempts), // *
 				EventTimeToLiveInMinutes: to.Int32Ptr(defaultEventTTL),            // *
 			},
-			EventDeliverySchema: eventgrid.CloudEventSchemaV10,
+			EventDeliverySchema: eventgrid.EventDeliverySchemaCloudEventSchemaV10,
 		},
 	}
 }
