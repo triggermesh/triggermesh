@@ -1,0 +1,45 @@
+name: CodeQL
+
+on:
+  schedule:
+  - cron: '0 0 * * 0'  # At 00:00 every Sunday
+
+jobs:
+
+  codeql:
+    name: Code Analysis
+    runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'
+
+    - name: Go caches
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ github.job }}-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ github.job }}-${{ runner.os }}-go-
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: go
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v1
+
+    # This step follows the three-step extraction process described at
+    # https://lgtm.com/help/lgtm/go-extraction
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
