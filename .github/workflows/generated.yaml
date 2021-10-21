@@ -35,7 +35,7 @@ jobs:
 
         git_status="$(git status --porcelain)"
         if [[ ${git_status} ]]; then
-            echo -e "Go modules are out-of-date. Please run `go mod tidy`\n"
+            echo -e 'Go modules are out-of-date. Please run `go mod tidy`\n'
             echo "${git_status}"
             exit 1
         fi
@@ -77,7 +77,7 @@ jobs:
 
         git_status="$(git status --porcelain)"
         if [[ ${git_status} ]]; then
-            echo -e "Generated Kubernetes code is out-of-date. Please run `make codegen`\n"
+            echo -e 'Generated Kubernetes code is out-of-date. Please run `make codegen`\n'
             echo "${git_status}"
             exit 1
         fi
