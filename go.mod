@@ -36,7 +36,7 @@ require (
 	github.com/aws/aws-sdk-go v1.37.1
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
-	github.com/elastic/go-elasticsearch/v7 v7.6.0
+	github.com/elastic/go-elasticsearch/v7 v7.15.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/cel-go v0.7.2
 	github.com/google/go-cmp v0.5.6
