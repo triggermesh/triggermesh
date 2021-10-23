@@ -38,7 +38,7 @@ require (
 	github.com/devigned/tab v0.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.15.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/google/cel-go v0.7.2
+	github.com/google/cel-go v0.9.0
 	github.com/google/go-cmp v0.5.6
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-uuid v1.0.1
@@ -48,7 +48,7 @@ require (
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
 	github.com/nukosuke/go-zendesk v0.9.2
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
-	github.com/robertkrimen/otto v0.0.0-20200922221731-ef014fd054ac
+	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
 	github.com/stretchr/testify v1.7.0
 	github.com/tektoncd/pipeline v0.24.1
@@ -90,7 +90,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
-	github.com/antlr/antlr4 v0.0.0-20200503195918-621b933c7a7f // indirect
+	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20210826220005-b48c857c3a0e // indirect
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/beeker1121/goque v2.1.0+incompatible // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -181,9 +181,9 @@ require (
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
+	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-	golang.org/x/text v0.3.6 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
