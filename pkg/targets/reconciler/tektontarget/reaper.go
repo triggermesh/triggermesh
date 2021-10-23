@@ -21,7 +21,7 @@ import (
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/hashicorp/go-uuid"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -75,7 +75,7 @@ func reaperThread(ctx context.Context, r *reconciler) {
 				// Send the reap cloudevent
 				cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
 
-				id, _ := uuid.GenerateUUID()
+				id := uuid.NewString()
 
 				newEvent := cloudevents.NewEvent(cloudevents.VersionV1)
 				newEvent.SetType(v1alpha1.EventTypeTektonReap)
