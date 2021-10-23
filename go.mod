@@ -46,7 +46,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
-	github.com/nukosuke/go-zendesk v0.9.2
+	github.com/nukosuke/go-zendesk v0.9.4
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
@@ -124,7 +124,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-containerregistry v0.6.0 // indirect
-	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/googleapis/gnostic v0.5.3 // indirect

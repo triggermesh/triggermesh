@@ -699,8 +699,9 @@ github.com/google/go-containerregistry/pkg/authn/k8schain v0.0.0-20210624211700-
 github.com/google/go-github/v27 v27.0.6/go.mod h1:/0Gr8pJ55COkmv+S/yPKCczSkUPIM/LnFyubufRNIS0=
 github.com/google/go-licenses v0.0.0-20200602185517-f29a4c695c3d/go.mod h1:g1VOUGKZYIqe8lDq2mL7plhAWXqrEaGUs7eIjthN1sk=
 github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
-github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASuANWTrk=
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
+github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
+github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/gofuzz v1.1.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/gofuzz v1.2.0 h1:xRy4A+RhZaiKjJ1bPfwQ8sedCA+YS2YcCHW6ec7JMi0=
@@ -982,8 +983,8 @@ github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32/go.mod h1:9wM+0iRr9ahx58uY
 github.com/ncw/swift v1.0.47/go.mod h1:23YIA4yWVnGwv2dQlN4bB7egfYX6YLn0Yo/S6zZO/ZM=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
-github.com/nukosuke/go-zendesk v0.9.2 h1:FI5OE0Kmv6JvScesOZL929L8zs64uQSXK5Y+XTBG2AA=
-github.com/nukosuke/go-zendesk v0.9.2/go.mod h1:ttbNWKkYPYcrGXxnC3/4lF6ZewLm2Fz71VjIqD97FVs=
+github.com/nukosuke/go-zendesk v0.9.4 h1:Q/0UL4OdfQmZNL9dc7VDs+CEhfxjomNRgC7ew+CD/iY=
+github.com/nukosuke/go-zendesk v0.9.4/go.mod h1:FMC25ZV0/fo2kP9c0jleOmSoKsKmTdnycPkyQCkiykI=
 github.com/nxadm/tail v1.4.4 h1:DQuhQpB1tVlglWS2hLQ5OV6B5r8aGxSrPc5Qo6uTN78=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/oklog/oklog v0.3.2/go.mod h1:FCV+B7mhrz4o+ueLpx+KqkyXRGMWOYEvfiXtdGtbWGs=
