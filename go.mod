@@ -41,7 +41,6 @@ require (
 	github.com/google/cel-go v0.9.0
 	github.com/google/go-cmp v0.5.6
 	github.com/google/uuid v1.3.0
-	github.com/hashicorp/go-uuid v1.0.2
 	github.com/jarcoal/httpmock v1.0.8
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
@@ -52,7 +51,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
 	github.com/stretchr/testify v1.7.0
 	github.com/tektoncd/pipeline v0.24.1
-	github.com/tidwall/gjson v1.6.8
+	github.com/tidwall/gjson v1.10.1
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.25.0
 	go.opentelemetry.io/otel v1.0.1
@@ -166,8 +165,8 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
-	github.com/tidwall/match v1.0.3 // indirect
-	github.com/tidwall/pretty v1.0.2 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/trivago/tgo v1.0.7 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
