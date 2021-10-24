@@ -45,20 +45,25 @@ func (r *reconciler) ReconcileKind(ctx context.Context, trg *elasticsearchv1alph
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
 
-	if trg.Spec.Connection.APIKey.SecretKeyRef != nil {
+	switch {
+	case trg.Spec.Connection.APIKey != nil && trg.Spec.Connection.APIKey.SecretKeyRef != nil:
 		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.Connection.APIKey.SecretKeyRef)
 		if err != nil {
 			trg.Status.MarkNoSecrets("APIKeySecretNotFound", "%s", err)
 			return err
 		}
-	}
-	if trg.Spec.Connection.Password.SecretKeyRef != nil {
+
+	case trg.Spec.Connection.Password != nil && trg.Spec.Connection.Password.SecretKeyRef != nil:
 		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.Connection.Password.SecretKeyRef)
 		if err != nil {
 			trg.Status.MarkNoSecrets("PasswordSecretNotFound", "%s", err)
 			return err
 		}
+
+	default:
+		// Elasticsearch can be configured without credentials.
 	}
+
 	trg.Status.MarkSecrets()
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
