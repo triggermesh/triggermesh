@@ -53,7 +53,7 @@ type JWTAuthenticator struct {
 var _ Authenticator = (*JWTAuthenticator)(nil)
 
 type claims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 // NewJWTAuthenticator creates an OAuth JWT authenticator for Salesforce.
@@ -66,10 +66,10 @@ func NewJWTAuthenticator(certKey, clientID, user, server string, client *http.Cl
 	}
 
 	claims := &claims{
-		StandardClaims: jwt.StandardClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:   clientID,
 			Subject:  user,
-			Audience: audience,
+			Audience: jwt.ClaimStrings{audience},
 		},
 	}
 
@@ -86,7 +86,7 @@ func NewJWTAuthenticator(certKey, clientID, user, server string, client *http.Cl
 func (j *JWTAuthenticator) NewCredentials() (*Credentials, error) {
 	// expiry needs to be set to 3 minutes or less
 	// See: https://help.salesforce.com/articleView?id=remoteaccess_oauth_jwt_flow.htm
-	j.claims.ExpiresAt = time.Now().Add(time.Minute * 3).Unix()
+	j.claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Minute * 3))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, j.claims)
 	signedToken, err := token.SignedString(j.signKey)
