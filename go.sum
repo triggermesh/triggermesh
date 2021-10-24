@@ -40,8 +40,9 @@ cloud.google.com/go/billing v0.1.0 h1:ujwVE/eDdc5fcQU+xsF+M1H2Fpbuhq0IQ/9Zj8vnsD
 cloud.google.com/go/billing v0.1.0/go.mod h1:q5Iwzia7ctuAkNMQdl7jQMZqKhML2FrWPGYS89Nq2ks=
 cloud.google.com/go/datastore v1.0.0/go.mod h1:LXYbyblFSglQ5pkeyhO+Qmw7ukd3C+pD7TKLgZqpHYE=
 cloud.google.com/go/datastore v1.1.0/go.mod h1:umbIZjpQpHh4hmRpGhH4tLFup+FVzqBi1b3c64qFpCk=
-cloud.google.com/go/firestore v1.1.0 h1:9x7Bx0A9R5/M9jibeJeZWqjeVEIxYW9fZYqB9a70/bY=
 cloud.google.com/go/firestore v1.1.0/go.mod h1:ulACoGHTpvq5r8rxGJ4ddJZBZqakUQqClKRT5SZwBmk=
+cloud.google.com/go/firestore v1.6.0 h1:dMIWvm+3O0E3DM7kcZPH0FBQ94Xg/OMkdTNDaY9itbI=
+cloud.google.com/go/firestore v1.6.0/go.mod h1:afJwI0vaXwAG54kI7A//lP/lSPDkQORQuMkv56TxEPU=
 cloud.google.com/go/kms v0.1.0 h1:VXAb5OzejDcyhFzIDeZ5n5AUdlsFnCyexuascIwWMj0=
 cloud.google.com/go/kms v0.1.0/go.mod h1:8Qp8PCAypHg4FdmlyW1QRAv09BGQ9Uzh7JnmIZxPk+c=
 cloud.google.com/go/logging v1.4.2 h1:Mu2Q75VBDQlW1HlBMjTX4X84UFR73G1TiLlRYc/b7tA=
