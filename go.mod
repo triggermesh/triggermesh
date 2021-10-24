@@ -48,7 +48,7 @@ require (
 	github.com/nukosuke/go-zendesk v0.9.4
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
-	github.com/sendgrid/sendgrid-go v3.6.3+incompatible
+	github.com/sendgrid/sendgrid-go v3.10.3+incompatible
 	github.com/stretchr/testify v1.7.0
 	github.com/tektoncd/pipeline v0.29.0
 	github.com/tidwall/gjson v1.10.1
