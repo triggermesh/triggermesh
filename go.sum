@@ -1113,8 +1113,8 @@ github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ
 github.com/tektoncd/pipeline v0.29.0 h1:d6EOBqqSulk1nw2CkORw8aegFx3ad4Wwsr2YPA0aH3g=
 github.com/tektoncd/pipeline v0.29.0/go.mod h1:aPxBLtRAcvu6TAg5juhMwChQTi9lja+KDTi3yXgNi0E=
 github.com/tektoncd/plumbing v0.0.0-20211012143332-c7cc43d9bc0c/go.mod h1:b9esRuV1absBvaPzKkjYdKXjC5Tgs8/vh1sz++RiTdc=
-github.com/tidwall/gjson v1.10.1 h1:Midn39zaqkz9SPTBDuEe0RdW9T4T+MpBOAC10e9/qFE=
-github.com/tidwall/gjson v1.10.1/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
+github.com/tidwall/gjson v1.10.2 h1:APbLGOM0rrEkd8WBw9C24nllro4ajFuJu0Sc9hRz8Bo=
+github.com/tidwall/gjson v1.10.2/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=
 github.com/tidwall/match v1.1.1/go.mod h1:eRSPERbgtNPcGhD8UCthc6PmLEQXEWd3PRB5JTxsfmM=
 github.com/tidwall/pretty v1.2.0 h1:RWIZEg2iJ8/g6fDDYzMpobmaoGh5OLl4AXtGUGPcqCs=
