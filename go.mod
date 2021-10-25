@@ -18,7 +18,7 @@ require (
 	cloud.google.com/go/billing v0.1.0
 	cloud.google.com/go/firestore v1.6.0
 	cloud.google.com/go/logging v1.4.2
-	cloud.google.com/go/pubsub v1.17.0
+	cloud.google.com/go/pubsub v1.17.1
 	cloud.google.com/go/storage v1.18.2
 	cloud.google.com/go/workflows v1.0.0
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
@@ -61,7 +61,7 @@ require (
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	google.golang.org/api v0.59.0
-	google.golang.org/genproto v0.0.0-20211016002631-37fc39342514
+	google.golang.org/genproto v0.0.0-20211019152133-63b7e35f4404
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.7.0
