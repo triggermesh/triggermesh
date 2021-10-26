@@ -17,9 +17,7 @@ limitations under the License.
 package $TARGET
 
 import (
-	"bytes"
 	"context"
-	"fmt"
 
 	"go.uber.org/zap"
 
@@ -27,7 +25,6 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -71,6 +68,7 @@ var _ pkgadapter.Adapter = (*$TARGETAdapter)(nil)
 type $TARGETAdapter struct {
 
 	replier  *targetce.Replier
+	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
 
