@@ -27,7 +27,7 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.alibaba.oss.response" }
+        { "type": "io.triggermesh.$TARGET.response" }
       ]
 spec:
   group: targets.triggermesh.io
