@@ -68,6 +68,7 @@ resources:
 - config/301-httptarget.yaml
 - config/301-infratarget.yaml
 - config/301-jiratarget.yaml
+- config/301-logzmetricstarget.yaml
 - config/301-logztarget.yaml
 - config/301-oracletarget.yaml
 - config/301-salesforcetarget.yaml
