@@ -41,7 +41,7 @@ const (
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
-	Image string `default:"gcr.io/triggermesh/azureservicebustopicsource-adapter"`
+	Image string `envconfig:"AZURESERVICEBUSTOPICSOURCE_IMAGE" default:"gcr.io/triggermesh/azureservicebustopicsource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
