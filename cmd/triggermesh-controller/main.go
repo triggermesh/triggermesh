@@ -40,6 +40,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureiothubsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azurequeuestoragesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureservicebusqueuesource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/azureservicebustopicsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudauditlogssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudbillingsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudiotsource"
@@ -107,6 +108,7 @@ func main() {
 		azureiothubsource.NewController,
 		azurequeuestoragesource.NewController,
 		azureservicebusqueuesource.NewController,
+		azureservicebustopicsource.NewController,
 		googlecloudauditlogssource.NewController,
 		googlecloudbillingsource.NewController,
 		googlecloudiotsource.NewController,

@@ -3046,6 +3046,137 @@ func (w *wrapSourcesV1alpha1AzureServiceBusQueueSourceImpl) Watch(ctx context.Co
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapSourcesV1alpha1) AzureServiceBusTopicSources(namespace string) typedsourcesv1alpha1.AzureServiceBusTopicSourceInterface {
+	return &wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "sources.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "azureservicebustopicsources",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedsourcesv1alpha1.AzureServiceBusTopicSourceInterface = (*wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl)(nil)
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.AzureServiceBusTopicSource, opts v1.CreateOptions) (*sourcesv1alpha1.AzureServiceBusTopicSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AzureServiceBusTopicSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.AzureServiceBusTopicSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.AzureServiceBusTopicSource, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.AzureServiceBusTopicSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.AzureServiceBusTopicSourceList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.AzureServiceBusTopicSourceList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.AzureServiceBusTopicSource, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.AzureServiceBusTopicSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.AzureServiceBusTopicSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureServiceBusTopicSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AzureServiceBusTopicSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.AzureServiceBusTopicSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.AzureServiceBusTopicSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureServiceBusTopicSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AzureServiceBusTopicSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.AzureServiceBusTopicSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1AzureServiceBusTopicSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapSourcesV1alpha1) GoogleCloudAuditLogsSources(namespace string) typedsourcesv1alpha1.GoogleCloudAuditLogsSourceInterface {
 	return &wrapSourcesV1alpha1GoogleCloudAuditLogsSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{

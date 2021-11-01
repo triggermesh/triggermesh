@@ -162,6 +162,14 @@ type AzureServiceBusQueueSourceListerExpansion interface{}
 // AzureServiceBusQueueSourceNamespaceLister.
 type AzureServiceBusQueueSourceNamespaceListerExpansion interface{}
 
+// AzureServiceBusTopicSourceListerExpansion allows custom methods to be added to
+// AzureServiceBusTopicSourceLister.
+type AzureServiceBusTopicSourceListerExpansion interface{}
+
+// AzureServiceBusTopicSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureServiceBusTopicSourceNamespaceLister.
+type AzureServiceBusTopicSourceNamespaceListerExpansion interface{}
+
 // GoogleCloudAuditLogsSourceListerExpansion allows custom methods to be added to
 // GoogleCloudAuditLogsSourceLister.
 type GoogleCloudAuditLogsSourceListerExpansion interface{}
