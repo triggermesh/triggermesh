@@ -891,8 +891,8 @@ github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32/go.mod h1:9wM+0iRr9ahx58uY
 github.com/ncw/swift v1.0.47/go.mod h1:23YIA4yWVnGwv2dQlN4bB7egfYX6YLn0Yo/S6zZO/ZM=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
-github.com/nukosuke/go-zendesk v0.9.4 h1:Q/0UL4OdfQmZNL9dc7VDs+CEhfxjomNRgC7ew+CD/iY=
-github.com/nukosuke/go-zendesk v0.9.4/go.mod h1:FMC25ZV0/fo2kP9c0jleOmSoKsKmTdnycPkyQCkiykI=
+github.com/nukosuke/go-zendesk v0.10.0 h1:EwZo366+7QYLYYTdEcbWmc/FfIOtrHv3QtWRYIPCB9o=
+github.com/nukosuke/go-zendesk v0.10.0/go.mod h1:FMC25ZV0/fo2kP9c0jleOmSoKsKmTdnycPkyQCkiykI=
 github.com/nxadm/tail v1.4.4 h1:DQuhQpB1tVlglWS2hLQ5OV6B5r8aGxSrPc5Qo6uTN78=
 github.com/nxadm/tail v1.4.4/go.mod h1:kenIhsEOeOJmVchQTgglprH7qJGnHDVpk1VPCcaMI8A=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=

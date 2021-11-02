@@ -45,7 +45,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
-	github.com/nukosuke/go-zendesk v0.9.4
+	github.com/nukosuke/go-zendesk v0.10.0
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sendgrid/sendgrid-go v3.10.3+incompatible
