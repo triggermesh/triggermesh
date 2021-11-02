@@ -22,6 +22,7 @@ require (
 	cloud.google.com/go/storage v1.18.2
 	cloud.google.com/go/workflows v1.0.0
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
+	github.com/Azure/azure-sdk-for-go v58.3.0+incompatible
 	github.com/Azure/azure-service-bus-go v0.11.3
 	github.com/Azure/azure-storage-queue-go v0.0.0-20191125232315-636801874cdd
 	github.com/Azure/go-autorest/autorest v0.11.21
@@ -66,8 +67,8 @@ require (
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.7.0
 	k8s.io/api v0.22.1
 	k8s.io/apimachinery v0.22.1
-	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
-	k8s.io/code-generator v0.21.4
+	k8s.io/client-go v0.22.1
+	k8s.io/code-generator v0.22.1
 	knative.dev/networking v0.0.0-20210914225408-69ad45454096
 )
 
@@ -82,6 +83,7 @@ require (
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.2 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
+	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
@@ -159,7 +161,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.30.1 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
-	github.com/prometheus/prometheus v2.5.0+incompatible // indirect
+	github.com/prometheus/prometheus v1.8.2-0.20210928085443-fafb309d4027 // indirect
 	github.com/prometheus/statsd_exporter v0.21.0 // indirect
 	github.com/rickb777/date v1.13.0 // indirect
 	github.com/rickb777/plural v1.2.1 // indirect
@@ -201,7 +203,7 @@ require (
 	k8s.io/klog v1.0.0 // indirect
 	k8s.io/klog/v2 v2.10.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210421082810-95288971da7e // indirect
-	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect
+	k8s.io/utils v0.0.0-20210707171843-4b05e18ac7d9 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
