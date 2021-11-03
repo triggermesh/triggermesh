@@ -10,7 +10,7 @@ linters:
   - stylecheck
 
 run:
-  timeout: 5m
+  timeout: 10m
 
 linters-settings:
   stylecheck:
