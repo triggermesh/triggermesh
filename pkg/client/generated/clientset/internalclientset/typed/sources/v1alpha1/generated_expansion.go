@@ -54,6 +54,8 @@ type AzureQueueStorageSourceExpansion interface{}
 
 type AzureServiceBusQueueSourceExpansion interface{}
 
+type AzureServiceBusTopicSourceExpansion interface{}
+
 type GoogleCloudAuditLogsSourceExpansion interface{}
 
 type GoogleCloudBillingSourceExpansion interface{}

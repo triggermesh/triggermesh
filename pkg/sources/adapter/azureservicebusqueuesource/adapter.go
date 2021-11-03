@@ -126,7 +126,7 @@ func (a *adapter) handleMessage(ctx context.Context, msg *servicebus.Message) er
 
 func (a *adapter) sendCloudEvent(m interface{}) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType(v1alpha1.AzureEventType(sources.AzureServiceBusQueue, v1alpha1.AzureServiceBusbGenericEventType))
+	event.SetType(v1alpha1.AzureEventType(sources.AzureServiceServiceBus, v1alpha1.AzureServiceBusQueueGenericEventType))
 	event.SetSource(a.source)
 	if err := event.SetData(cloudevents.ApplicationJSON, m); err != nil {
 		return fmt.Errorf("setting event data: %w", err)

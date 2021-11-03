@@ -100,6 +100,10 @@ func (c *FakeSourcesV1alpha1) AzureServiceBusQueueSources(namespace string) v1al
 	return &FakeAzureServiceBusQueueSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) AzureServiceBusTopicSources(namespace string) v1alpha1.AzureServiceBusTopicSourceInterface {
+	return &FakeAzureServiceBusTopicSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) GoogleCloudAuditLogsSources(namespace string) v1alpha1.GoogleCloudAuditLogsSourceInterface {
 	return &FakeGoogleCloudAuditLogsSources{c, namespace}
 }

@@ -54,6 +54,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&AzureIOTHubSource{}, &AzureIOTHubSourceList{},
 		&AzureQueueStorageSource{}, &AzureQueueStorageSourceList{},
 		&AzureServiceBusQueueSource{}, &AzureServiceBusQueueSourceList{},
+		&AzureServiceBusTopicSource{}, &AzureServiceBusTopicSourceList{},
 		&GoogleCloudAuditLogsSource{}, &GoogleCloudAuditLogsSourceList{},
 		&GoogleCloudBillingSource{}, &GoogleCloudBillingSourceList{},
 		&GoogleCloudIoTSource{}, &GoogleCloudIoTSourceList{},
