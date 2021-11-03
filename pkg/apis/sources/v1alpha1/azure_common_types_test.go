@@ -52,6 +52,40 @@ func TestStringerAzureResourceID(t *testing.T) {
 		},
 		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn",
 	}, {
+		name: "Valid resource ID (namespace)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "namespaces",
+			ResourceName:     "ns",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns",
+	}, {
+		name: "Valid resource ID (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn",
+	}, {
+		name: "Valid resource ID (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn",
+	}, {
 		name: "Invalid resource ID (subscription)",
 		input: AzureResourceID{
 			SubscriptionID: "",
@@ -74,6 +108,30 @@ func TestStringerAzureResourceID(t *testing.T) {
 			ResourceName:     "rn",
 		},
 		expectOutput: "",
+	}, {
+		name: "Invalid resource ID (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "",
+			ResourceName:     "rn",
+		},
+		expectOutput: "",
+	}, {
+		name: "Invalid resource ID (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "",
+			SubResourceName:  "srn",
+		},
+		expectOutput: "",
 	}}
 
 	for _, tc := range testCases {
@@ -92,7 +150,7 @@ func TestMarshalAzureResourceID(t *testing.T) {
 		expectOutput      string
 		expectErrContains string
 	}{{
-		name: "All fields are filled in",
+		name: "All fields are filled in (resource)",
 		input: AzureResourceID{
 			SubscriptionID:   "s",
 			ResourceGroup:    "rg",
@@ -102,6 +160,40 @@ func TestMarshalAzureResourceID(t *testing.T) {
 		},
 		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn"`,
 	}, {
+		name: "All fields are filled in (namespace)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "namespaces",
+			ResourceName:     "ns",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns"`,
+	}, {
+		name: "All fields are filled in (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn"`,
+	}, {
+		name: "All fields are filled in (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn"`,
+	}, {
 		name: "Resource fields are empty",
 		input: AzureResourceID{
 			SubscriptionID: "s",
@@ -109,13 +201,37 @@ func TestMarshalAzureResourceID(t *testing.T) {
 		},
 		expectOutput: `"/subscriptions/s/resourceGroups/rg"`,
 	}, {
-		name: "Some required fields are empty",
+		name: "Some required fields are empty (resource)",
 		input: AzureResourceID{
 			SubscriptionID:   "s",
 			ResourceGroup:    "rg",
 			ResourceProvider: "rp",
 			ResourceType:     "",
 			ResourceName:     "rn",
+		},
+		expectErrContains: "resource ID contains empty attributes",
+	}, {
+		name: "Some required fields are empty (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "",
+			ResourceName:     "rn",
+		},
+		expectErrContains: "resource ID contains empty attributes",
+	}, {
+		name: "Some required fields are empty (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "",
+			SubResourceName:  "srn",
 		},
 		expectErrContains: "resource ID contains empty attributes",
 	}, {

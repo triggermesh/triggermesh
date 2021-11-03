@@ -18,39 +18,50 @@ package azureservicebustopicsource
 
 import (
 	"context"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 
 	"knative.dev/eventing/pkg/reconciler/source"
+	k8sclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/azureservicebustopicsource"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureservicebustopicsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/servicebustopics"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 )
 
-// NewController initializes the controller and is called by the generated code
-// Registers event handlers to enqueue events
+// the resync period ensures we regularly re-check the state of Azure resources.
+const informerResyncPeriod = time.Minute * 5
+
+// NewController creates a Reconciler for the event source and returns the result of NewImpl.
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
+
 	typ := (*v1alpha1.AzureServiceBusTopicSource)(nil)
 	app := common.ComponentName(typ)
+
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYSOURCE_IMAGE.
 	adapterCfg := &adapterConfig{
 		configs: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
-
 	envconfig.MustProcess(app, adapterCfg)
-	informer := informerv1alpha1.Get(ctx)
-	r := &Reconciler{
-		adapterCfg: adapterCfg,
-		srcLister:  informer.Lister().AzureServiceBusTopicSources,
-	}
 
+	informer := informerv1alpha1.Get(ctx)
+
+	r := &Reconciler{
+		cg:         servicebustopics.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
+		srcLister:  informer.Lister().AzureServiceBusTopicSources,
+		adapterCfg: adapterCfg,
+	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
+
 	r.base = common.NewGenericDeploymentReconciler(
 		ctx,
 		typ.GetGroupVersionKind(),
@@ -58,6 +69,7 @@ func NewController(
 		impl.EnqueueControllerOf,
 	)
 
-	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)
+
 	return impl
 }

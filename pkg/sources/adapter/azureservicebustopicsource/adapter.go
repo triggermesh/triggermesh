@@ -20,45 +20,48 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"strings"
+	"strconv"
+
+	"github.com/devigned/tab"
+	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"go.uber.org/zap"
+	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/cloudevents/sdk-go/v2/protocol"
+
+	servicebus "github.com/Azure/azure-service-bus-go"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
-	servicebus "github.com/Azure/azure-service-bus-go"
-
-	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureservicebustopicsource/trace"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
 // adapter.
 type envConfig struct {
 	pkgadapter.EnvConfig
-	ConnectionString string `envconfig:"SERVICEBUS_CONNECTION_STRING" required:"true"`
-	Subscription     string `envconfig:"SERVICEBUS_SUBSCRIPTION" required:"true"`
+
+	// Resource ID of the Service Bus Subscription.
+	SubsResourceID string `envconfig:"SERVICEBUS_SUBSCRIPTION_RESOURCE_ID" required:"true"`
+
+	// Name of a message processor which takes care of converting Service
+	// Bus messages to CloudEvents.
+	//
+	// Supported values: [ default ]
+	MessageProcessor string `envconfig:"SERVICEBUS_MESSAGE_PROCESSOR" default:"default"`
 }
 
 // adapter implements the source's adapter.
 type adapter struct {
-	sub    *servicebus.Subscription
-	source string
+	logger *zap.SugaredLogger
 
-	logger   *zap.SugaredLogger
+	msgRcvr  *servicebus.Receiver
 	ceClient cloudevents.Client
-}
 
-// MessageWithRawData is an *servicebus.Message with RawMessage-typed data.
-type MessageWithRawData struct {
-	Data json.RawMessage
-	*servicebus.Message
+	msgPrcsr MessageProcessor
 }
-
-var _ pkgadapter.Adapter = (*adapter)(nil)
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
 func NewEnvConfig() pkgadapter.EnvConfigAccessor {
@@ -68,107 +71,149 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
 	env := envAcc.(*envConfig)
-	var tn string
 
-	s := strings.Split(env.ConnectionString, ";")
-	entityPath := strings.Split(s[3], "=")
-	tn = entityPath[1]
-	ns, err := servicebus.NewNamespace(servicebus.NamespaceWithConnectionString(env.ConnectionString))
+	subsResourceID, err := parseSubscriptionResID(env.SubsResourceID)
 	if err != nil {
-		log.Fatal(err)
-		return nil
+		logger.Panicw("Unable to parse Subscription ID", zap.Error(err))
 	}
 
-	tm := ns.NewTopicManager()
-	te, err := tm.Get(ctx, tn)
+	nsName := subsResourceID.Namespace
+	topicName := subsResourceID.ResourceName
+	subsName := subsResourceID.SubResourceName
+
+	ns, err := servicebus.NewNamespace(servicebus.NamespaceWithEnvironmentBinding(nsName))
 	if err != nil {
-		log.Fatal(err)
-		return nil
+		logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
 	}
 
-	topic, err := ns.NewTopic(te.Name)
+	subsEntityPath := topicName + "/Subscriptions/" + subsName
+	rcvr, err := ns.NewReceiver(ctx, subsEntityPath)
 	if err != nil {
-		log.Fatal(err)
-		return nil
+		logger.Panicw("Unable to obtain message receiver for Service Bus Subscription", zap.Error(err))
 	}
 
-	sub, err := topic.NewSubscription(env.Subscription)
-	if err != nil {
-		log.Fatal(err)
-		return nil
+	ceSource := env.SubsResourceID
+
+	var msgPrcsr MessageProcessor
+	switch env.MessageProcessor {
+	case "default":
+		msgPrcsr = &defaultMessageProcessor{ceSource: ceSource}
+	default:
+		panic("unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
-	source := v1alpha1.AzureServiceBusTopicSourceName(env.Namespace, env.Name)
+	// The Service Bus client uses the default "NoOpTracer" tab.Tracer
+	// implementation, which does not produce any log message. We register
+	// a custom implementation so that event handling errors are logged via
+	// Knative's logging facilities.
+	tab.Register(trace.NewNoOpTracerWithLogger(logger))
+
 	return &adapter{
-		sub:    sub,
-		source: source,
+		logger: logger,
 
-		logger:   logger,
 		ceClient: ceClient,
+
+		msgRcvr:  rcvr,
+		msgPrcsr: msgPrcsr,
 	}
+}
+
+// parseSubscriptionResID parses the given Subscription resource ID string to a
+// structured resource ID.
+func parseSubscriptionResID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
+	resID := &v1alpha1.AzureResourceID{}
+
+	err := json.Unmarshal([]byte(strconv.Quote(resIDStr)), resID)
+	if err != nil {
+		return nil, fmt.Errorf("deserializing resource ID string: %w", err)
+	}
+
+	return resID, nil
 }
 
 // Start implements adapter.Adapter.
+// Required permissions:
+//  - Microsoft.ServiceBus/namespaces/topics/read
+//  - Microsoft.ServiceBus/namespaces/topics/subscriptions/read
 func (a *adapter) Start(ctx context.Context) error {
-	var printMessage servicebus.HandlerFunc = func(ctx context.Context, msg *servicebus.Message) error {
-		if err := a.handleMessage(ctx, msg); err != nil {
-			return err
-		}
-		if err := msg.Complete(ctx); err != nil {
-			a.logger.Error(err)
-			return err
-		}
+	handle := a.msgRcvr.Listen(ctx, servicebus.HandlerFunc(a.handleMessage))
+	<-handle.Done()
+	return handle.Err()
+}
+
+// handleMessage satisfies servicebus.HandlerFunc.
+func (a *adapter) handleMessage(ctx context.Context, msg *servicebus.Message) error {
+	if msg == nil {
 		return nil
 	}
 
-	if err := a.sub.Receive(ctx, printMessage); err != nil {
-		a.logger.Error(err)
-		return err
+	events, err := a.msgPrcsr.Process(msg)
+	if err != nil {
+		return fmt.Errorf("processing Service Bus message with ID %s: %w", msg.ID, err)
 	}
 
-	return nil
-}
+	var sendErrs errList
 
-func (a *adapter) handleMessage(ctx context.Context, msg *servicebus.Message) error {
-	ced := toCloudEventData(msg)
-	if err := a.sendCloudEvent(ced); err != nil {
-		a.logger.Error(err)
-		return err
-	}
+	for _, ev := range events {
+		if err := ev.Validate(); err != nil {
+			ev = sanitizeEvent(err.(event.ValidationError), ev)
+		}
 
-	return nil
-}
-
-func (a *adapter) sendCloudEvent(m interface{}) error {
-	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType(v1alpha1.AzureEventType(sources.AzureServiceBusTopic, v1alpha1.AzureServiceBusbGenericEventType))
-	event.SetSource(a.source)
-	if err := event.SetData(cloudevents.ApplicationJSON, m); err != nil {
-		return fmt.Errorf("setting event data: %w", err)
-	}
-
-	if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
-		return fmt.Errorf("sending CloudEvent: %w", result)
-	}
-
-	return nil
-}
-
-func toCloudEventData(e *servicebus.Message) interface{} {
-	var data interface{}
-	data = e
-
-	// if event.Data contains raw JSON data, type it as json.RawMessage so
-	// it doesn't get encoded to base64 during the serialization of the
-	// CloudEvent data.
-	var rawData json.RawMessage
-	if err := json.Unmarshal(e.Data, &rawData); err == nil {
-		data = MessageWithRawData{
-			Data:    rawData,
-			Message: e,
+		if err := sendCloudEvent(ctx, a.ceClient, ev); err != nil {
+			sendErrs.errs = append(sendErrs.errs,
+				fmt.Errorf("failed to send event with ID %s: %w", ev.ID(), err),
+			)
+			continue
 		}
 	}
 
-	return data
+	if len(sendErrs.errs) != 0 {
+		return fmt.Errorf("sending events to the sink: %w", sendErrs)
+	}
+
+	return nil
+}
+
+// sendCloudEvent sends a single CloudEvent to the event sink.
+func sendCloudEvent(ctx context.Context, cli cloudevents.Client, event *cloudevents.Event) protocol.Result {
+	if result := cli.Send(ctx, *event); !cloudevents.IsACK(result) {
+		return result
+	}
+	return nil
+}
+
+// errList is an aggregate of errors.
+type errList struct {
+	errs []error
+}
+
+var _ error = (*errList)(nil)
+
+// Error implements the error interface.
+func (e errList) Error() string {
+	if len(e.errs) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%q", e.errs)
+}
+
+// sanitizeEvent tries to fix the validation issues listed in the given
+// cloudevents.ValidationError, and returns a sanitized version of the event.
+//
+// For now, this helper exists solely to fix CloudEvents sent by Azure Event
+// Grid, which often contain
+//   "dataschema": "#"
+func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event) *cloudevents.Event {
+	for attr := range validErrs {
+		// we don't bother cloning, events are garbage collected after
+		// being sent to the sink
+		switch attr {
+		case "dataschema":
+			origEvent.SetDataSchema("")
+		}
+	}
+
+	return origEvent
 }

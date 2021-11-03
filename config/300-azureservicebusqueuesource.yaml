@@ -24,7 +24,7 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.microsoft.azure.servicebus.queue.message" }
+        { "type": "com.microsoft.azure.servicebus.message" }
       ]
 spec:
   group: sources.triggermesh.io

@@ -18,12 +18,11 @@ package sources
 
 // Name of Azure services
 const (
-	AzureServiceEventGrid = "eventgrid"
-	AzureServiceEventHub  = "eventhub"
-	AzureServiceMonitor   = "monitor"
-	AzureServiceBusQueue  = "servicebus.queue"
-	AzureServiceBusTopic  = "servicebus.topic"
-	AzureIOTHub           = "iothub"
+	AzureServiceEventGrid  = "eventgrid"
+	AzureServiceEventHub   = "eventhub"
+	AzureServiceMonitor    = "monitor"
+	AzureServiceServiceBus = "servicebus"
+	AzureIOTHub            = "iothub"
 )
 
 // SubscriptionResourceID returns the Azure resource ID for the given

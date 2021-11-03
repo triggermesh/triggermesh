@@ -32,16 +32,13 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
-const (
-	envAzureConnString   = "SERVICEBUS_CONNECTION_STRING"
-	envAzureSubscription = "SERVICEBUS_SUBSCRIPTION"
-)
+const envServiceBusSubscription = "SERVICEBUS_SUBSCRIPTION_RESOURCE_ID"
 
-// adapterConfig contains properties used to configure the adapter.
+// adapterConfig contains properties used to configure the source's adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
-	Image string `envconfig:"AZURESERVICEBUSTOPICSOURCE_IMAGE" default:"gcr.io/triggermesh/azureservicebustopicsource-adapter"`
+	Image string `default:"gcr.io/triggermesh/azureservicebustopicsource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
@@ -52,15 +49,24 @@ var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 // BuildAdapter implements common.AdapterDeploymentBuilder.
 func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.AzureServiceBusTopicSource)
-	serviceBusEnvs := []corev1.EnvVar{}
-	serviceBusEnvs = common.MaybeAppendValueFromEnvVar(serviceBusEnvs, envAzureConnString, typedSrc.Spec.Auth.SASToken.ConnectionString)
+
+	var subsID string
+	if sID := typedSrc.Status.SubscriptionID; sID != nil {
+		subsID = sID.String()
+	}
+
+	var authEnvs []corev1.EnvVar
+	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientID, spAuth.ClientID)
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
+	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVar(envAzureSubscription, typedSrc.Spec.Subscription),
-		resource.EnvVars(serviceBusEnvs...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
+
+		resource.EnvVar(envServiceBusSubscription, subsID),
+		resource.EnvVars(authEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }

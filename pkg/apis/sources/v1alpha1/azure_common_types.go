@@ -57,8 +57,11 @@ type AzureResourceID struct {
 	SubscriptionID   string
 	ResourceGroup    string
 	ResourceProvider string
+	Namespace        string
 	ResourceType     string
 	ResourceName     string
+	SubResourceType  string
+	SubResourceName  string
 }
 
 var (
@@ -71,11 +74,26 @@ const (
 	azureResourceIDFormat = "/subscriptions/{subscriptionId}" +
 		"[/resourceGroups/{resourceGroupName}" +
 		"[/providers/{resourceProviderNamespace}" +
-		"/{resourceType}/{resourceName}]]"
+		"[/namespaces/{namespaceName}]" +
+		"/{resourceType}/{resourceName}" +
+		"[/{subresourceType}/{subresourceName}]]]"
 
-	azureSubscriptionResourceIDSplitElements  = 3
+	// Subscription
+	//   /subscriptions/s
+	azureSubscriptionResourceIDSplitElements = 3
+	// Resource group
+	//   /subscriptions/s/resourceGroups/rg
 	azureResourceGroupResourceIDSplitElements = 5
-	azureResourceResourceIDSplitElements      = 9
+	// Resource (including namespaces)
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/rt/rn
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns
+	azureResourceResourceIDSplitElements = 9
+	// Namespaced resource
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn
+	azureNamespacedResourceResourceIDSplitElements = 11
+	// Namespaced resource with subresource
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn
+	azureNamespacedSubResourceResourceIDSplitElements = 13
 )
 
 // UnmarshalJSON implements json.Unmarshaler
@@ -88,7 +106,9 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 	sections := strings.Split(dataStr, "/")
 	if n := len(sections); n != azureSubscriptionResourceIDSplitElements &&
 		n != azureResourceGroupResourceIDSplitElements &&
-		n != azureResourceResourceIDSplitElements {
+		n != azureResourceResourceIDSplitElements &&
+		n != azureNamespacedResourceResourceIDSplitElements &&
+		n != azureNamespacedSubResourceResourceIDSplitElements {
 
 		return newParseAzureResourceIDError(dataStr)
 	}
@@ -99,6 +119,12 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 		resourceProviderIdx = 6
 		resourceTypeIdx     = 7
 		resourceNameIdx     = 8
+		// with namespace
+		namespaceIdx         = 8
+		resourceTypeNsIdx    = 9
+		resourceNameNsIdx    = 10
+		subresourceTypeNsIdx = 11
+		subresourceNameNsIdx = 12
 	)
 
 	// An Azure resource ID always includes a subscription ID. Whether
@@ -120,7 +146,7 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 	var resourceProvider string
 	var resourceType string
 	var resourceName string
-	if len(sections) == azureResourceResourceIDSplitElements {
+	if len(sections) >= azureResourceResourceIDSplitElements {
 		resourceProvider = sections[resourceProviderIdx]
 		resourceType = sections[resourceTypeIdx]
 		resourceName = sections[resourceNameIdx]
@@ -129,11 +155,34 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 		}
 	}
 
+	var namespace string
+	if len(sections) >= azureNamespacedResourceResourceIDSplitElements {
+		namespace = sections[namespaceIdx]
+		resourceType = sections[resourceTypeNsIdx]
+		resourceName = sections[resourceNameNsIdx]
+		if namespace == "" || resourceType == "" || resourceName == "" {
+			return errAzureResourceIDEmptyAttrs
+		}
+	}
+
+	var subresourceType string
+	var subresourceName string
+	if len(sections) == azureNamespacedSubResourceResourceIDSplitElements {
+		subresourceType = sections[subresourceTypeNsIdx]
+		subresourceName = sections[subresourceNameNsIdx]
+		if subresourceType == "" || subresourceName == "" {
+			return errAzureResourceIDEmptyAttrs
+		}
+	}
+
 	rID.SubscriptionID = subscriptionID
 	rID.ResourceGroup = resourceGroup
 	rID.ResourceProvider = resourceProvider
+	rID.Namespace = namespace
 	rID.ResourceType = resourceType
 	rID.ResourceName = resourceName
+	rID.SubResourceType = subresourceType
+	rID.SubResourceName = subresourceName
 
 	return nil
 }
@@ -167,10 +216,28 @@ func (rID AzureResourceID) MarshalJSON() ([]byte, error) {
 
 		b.WriteString("/providers/")
 		b.WriteString(rID.ResourceProvider)
+		if rID.Namespace != "" {
+			b.WriteString("/namespaces/")
+			b.WriteString(rID.Namespace)
+		}
 		b.WriteByte('/')
 		b.WriteString(rID.ResourceType)
 		b.WriteByte('/')
 		b.WriteString(rID.ResourceName)
+	}
+
+	if rID.SubResourceType != "" || rID.SubResourceName != "" {
+		// entering this condition means _all_ fields should be set
+		if rID.SubResourceType == "" ||
+			rID.SubResourceName == "" {
+
+			return nil, errAzureResourceIDEmptyAttrs
+		}
+
+		b.WriteByte('/')
+		b.WriteString(rID.SubResourceType)
+		b.WriteByte('/')
+		b.WriteString(rID.SubResourceName)
 	}
 
 	b.WriteByte('"')

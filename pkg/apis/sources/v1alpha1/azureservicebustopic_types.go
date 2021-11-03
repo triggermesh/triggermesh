@@ -46,13 +46,25 @@ var (
 type AzureServiceBusTopicSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	Auth         AzureAuth `json:"auth,omitempty"`
-	Subscription string    `json:"subscription"`
+	// The resource ID the Service Bus Topic to subscribe to.
+	//
+	// Expected format:
+	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}
+	TopicID AzureResourceID `json:"topicID"`
+
+	// Authentication method to interact with the Azure REST API.
+	// This event source only supports the ServicePrincipal authentication.
+	Auth AzureAuth `json:"auth"`
 }
 
 // AzureServiceBusTopicSourceStatus defines the observed state of the event source.
 type AzureServiceBusTopicSourceStatus struct {
 	EventSourceStatus `json:",inline"`
+
+	// Resource ID of the Service Bus Subscription that is currently used
+	// by the event source for consuming events from the configured Service
+	// Bus Topic.
+	SubscriptionID *AzureResourceID `json:"subscriptionID,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

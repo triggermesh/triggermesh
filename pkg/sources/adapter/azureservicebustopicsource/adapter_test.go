@@ -25,13 +25,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	servicebus "github.com/Azure/azure-service-bus-go"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	loggingtesting "knative.dev/pkg/logging/testing"
 )
-
-var sbs = &servicebus.Subscription{}
 
 func TestHandleMessage(t *testing.T) {
 	testCases := []struct {
@@ -55,23 +52,19 @@ func TestHandleMessage(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
 
-			event := servicebus.Message{
-				ContentType:   "application/json",
-				CorrelationID: "some-id",
-				DeliveryCount: 1,
-				SessionID:     to.StringPtr("12"),
-				Data:          tc.eventData,
+			msg := &servicebus.Message{
+				Data: tc.eventData,
 			}
 
 			a := &adapter{
 				logger:   loggingtesting.TestLogger(t),
 				ceClient: ceClient,
-				sub:      sbs,
-				source:   "test-source",
+				msgPrcsr: &defaultMessageProcessor{},
 			}
 
-			err := a.handleMessage(context.Background(), &event)
+			err := a.handleMessage(context.Background(), msg)
 			assert.NoError(t, err)
+
 			events := ceClient.Sent()
 			require.Len(t, events, 1)
 

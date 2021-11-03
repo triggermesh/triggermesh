@@ -1931,6 +1931,7 @@ func (in *AzureServiceBusTopicSourceList) DeepCopyObject() runtime.Object {
 func (in *AzureServiceBusTopicSourceSpec) DeepCopyInto(out *AzureServiceBusTopicSourceSpec) {
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	out.TopicID = in.TopicID
 	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
@@ -1949,6 +1950,11 @@ func (in *AzureServiceBusTopicSourceSpec) DeepCopy() *AzureServiceBusTopicSource
 func (in *AzureServiceBusTopicSourceStatus) DeepCopyInto(out *AzureServiceBusTopicSourceStatus) {
 	*out = *in
 	in.EventSourceStatus.DeepCopyInto(&out.EventSourceStatus)
+	if in.SubscriptionID != nil {
+		in, out := &in.SubscriptionID, &out.SubscriptionID
+		*out = new(AzureResourceID)
+		**out = **in
+	}
 	return
 }
 

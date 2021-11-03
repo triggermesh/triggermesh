@@ -24,7 +24,7 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.microsoft.azure.servicebus.topic.message" }
+        { "type": "com.microsoft.azure.servicebus.message" }
       ]
 spec:
   group: sources.triggermesh.io
@@ -45,44 +45,108 @@ spec:
       status: {}
     schema:
       openAPIV3Schema:
-        description: TriggerMesh event source for Azure Service Bus Topic.
+        description: TriggerMesh event source for Azure Service Bus Topics.
         type: object
         properties:
           spec:
             description: Desired state of the event source.
             type: object
             properties:
-              subscription:
+              topicID:
+                description: |-
+                  The resource ID the Service Bus Topic to subscribe to.
+
+                  The expected format is
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}
                 type: string
-                description: Azure Service Bus Topic subscription name.
+                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.ServiceBus\/namespaces\/[A-Za-z0-9-]{6,50}\/topics\/[A-Za-z0-9][\w.~/-]{0,258}[A-Za-z0-9]$
               auth:
-                description: Authentication method to interact with the Azure Service Bus Topic.
+                description: Authentication method to interact with the Azure Service Bus API.
+                  This event source only supports the Service Principal authentication.
                 type: object
                 properties:
-                  sasToken:
-                    description: An Azure shared access signature (SAS) token. For more information about SAS tokens,
-                      please refer to the Azure Service Bus Topic documentation at
-                      https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas.
+                  servicePrincipal:
+                    description: Credentials of an Azure Service Principal. For more information about service
+                      principals, please refer to the Azure Active Directory documentation at
+                      https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals.
                     type: object
                     properties:
-                      connectionString:
-                        description: Connection string containing both the resource URI of the Event Service Bus
-                          instance, and the SAS token.
+                      tenantID:
+                        description: ID of the Azure Active Directory tenant.
                         type: object
                         properties:
                           value:
-                            description: Literal value of the connection string.
+                            description: Literal value of the tenant ID.
                             type: string
+                            format: guid
+                            pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
                           valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the connection string.
+                            description: A reference to a Kubernetes Secret object containing the tenant ID.
                             type: object
                             properties:
                               name:
                                 type: string
                               key:
                                 type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientID:
+                        description: ID of the registered client/application.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the client ID.
+                            type: string
+                            format: guid
+                            pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the client ID.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientSecret:
+                        description: Secret associated with the registered client/application.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the client secret.
+                            type: string
+                            format: password
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the client secret.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                    required:
+                    - tenantID
+                    - clientID
+                    - clientSecret
+                required:
+                - servicePrincipal
               sink:
-                description: The destination of events sourced from Azure Service Bus Topic.
+                description: The destination of events sourced from the Azure Service Bus Topic.
                 type: object
                 properties:
                   ref:
@@ -109,12 +173,17 @@ spec:
                 - required: [ref]
                 - required: [uri]
             required:
+            - topicID
             - auth
             - sink
           status:
             description: Reported status of the event source.
             type: object
             properties:
+              subscriptionID:
+                description: Resource ID of the Service Bus Subscription that is currently used by the event source for
+                  consuming events from the configured Service Bus Topic.
+                type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.
                 type: string
