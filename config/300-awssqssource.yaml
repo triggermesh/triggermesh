@@ -118,6 +118,14 @@ spec:
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
+              endpoint:
+                description: Customizations of the AWS REST API endpoint.
+                type: object
+                properties:
+                  url:
+                    description: URL of the endpoint.
+                    type: string
+                    format: uri
               sink:
                 description: The destination of events sourced from Amazon SQS.
                 type: object

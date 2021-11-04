@@ -307,3 +307,22 @@ func envVarValueFromSecret(secretName, secretKey string) *corev1.EnvVarSource {
 		},
 	}
 }
+
+// MakeAWSEndpointEnvVars returns environment variables for the given AWS
+// endpoint parameters.
+func MakeAWSEndpointEnvVars(endpoint *v1alpha1.AWSEndpoint) []corev1.EnvVar {
+	if endpoint == nil {
+		return nil
+	}
+
+	var endpointEnvVars []corev1.EnvVar
+
+	if url := endpoint.URL; url != nil {
+		endpointEnvVars = append(endpointEnvVars, corev1.EnvVar{
+			Name:  EnvEndpointURL,
+			Value: url.String(),
+		})
+	}
+
+	return endpointEnvVars
+}
