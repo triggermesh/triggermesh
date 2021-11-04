@@ -34,6 +34,8 @@ type AWSSQSTargetExpansion interface{}
 
 type AlibabaOSSTargetExpansion interface{}
 
+type AzureEventHubsTargetExpansion interface{}
+
 type ConfluentTargetExpansion interface{}
 
 type DatadogTargetExpansion interface{}

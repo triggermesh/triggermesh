@@ -82,6 +82,14 @@ type AlibabaOSSTargetListerExpansion interface{}
 // AlibabaOSSTargetNamespaceLister.
 type AlibabaOSSTargetNamespaceListerExpansion interface{}
 
+// AzureEventHubsTargetListerExpansion allows custom methods to be added to
+// AzureEventHubsTargetLister.
+type AzureEventHubsTargetListerExpansion interface{}
+
+// AzureEventHubsTargetNamespaceListerExpansion allows custom methods to be added to
+// AzureEventHubsTargetNamespaceLister.
+type AzureEventHubsTargetNamespaceListerExpansion interface{}
+
 // ConfluentTargetListerExpansion allows custom methods to be added to
 // ConfluentTargetLister.
 type ConfluentTargetListerExpansion interface{}

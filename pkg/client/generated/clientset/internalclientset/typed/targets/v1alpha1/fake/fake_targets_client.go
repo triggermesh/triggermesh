@@ -60,6 +60,10 @@ func (c *FakeTargetsV1alpha1) AlibabaOSSTargets(namespace string) v1alpha1.Aliba
 	return &FakeAlibabaOSSTargets{c, namespace}
 }
 
+func (c *FakeTargetsV1alpha1) AzureEventHubsTargets(namespace string) v1alpha1.AzureEventHubsTargetInterface {
+	return &FakeAzureEventHubsTargets{c, namespace}
+}
+
 func (c *FakeTargetsV1alpha1) ConfluentTargets(namespace string) v1alpha1.ConfluentTargetInterface {
 	return &FakeConfluentTargets{c, namespace}
 }
