@@ -267,6 +267,18 @@ func MaybeAppendValueFromEnvVar(envs []corev1.EnvVar, key string, valueFrom v1al
 	return envs
 }
 
+// MakeAWSAuthEnvVars returns environment variables for the given AWS
+// authentication method.
+func MakeAWSAuthEnvVars(auth v1alpha1.AWSAuth) []corev1.EnvVar {
+	var authEnvVars []corev1.EnvVar
+
+	if creds := auth.Credentials; creds != nil {
+		authEnvVars = append(authEnvVars, MakeSecurityCredentialsEnvVars(*creds)...)
+	}
+
+	return authEnvVars
+}
+
 // MakeSecurityCredentialsEnvVars returns environment variables for the given
 // AWS security credentials.
 func MakeSecurityCredentialsEnvVars(creds v1alpha1.AWSSecurityCredentials) []corev1.EnvVar {

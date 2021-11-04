@@ -69,21 +69,23 @@ func newEventSource(skipCEAtrributes ...interface{}) *v1alpha1.AWSSQSSource {
 	src := &v1alpha1.AWSSQSSource{
 		Spec: v1alpha1.AWSSQSSourceSpec{
 			ARN: NewARN(sqs.ServiceName, "triggermeshtest"),
-			Credentials: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
+			Auth: v1alpha1.AWSAuth{
+				Credentials: &v1alpha1.AWSSecurityCredentials{
+					AccessKeyID: v1alpha1.ValueFromField{
+						ValueFromSecret: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: "test-secret",
+							},
+							Key: "keyId",
 						},
-						Key: "keyId",
 					},
-				},
-				SecretAccessKey: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
+					SecretAccessKey: v1alpha1.ValueFromField{
+						ValueFromSecret: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: "test-secret",
+							},
+							Key: "secret",
 						},
-						Key: "secret",
 					},
 				},
 			},

@@ -18,8 +18,16 @@ package v1alpha1
 
 import "knative.dev/pkg/apis"
 
+// AWSAuth contains multiple authentication methods for AWS services.
+type AWSAuth struct {
+	// Security credentials allow AWS to authenticate and authorize
+	// requests based on a signature composed of an access key ID and a
+	// corresponding secret access key.
+	// See https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+	Credentials *AWSSecurityCredentials `json:"credentials,omitempty"`
+}
+
 // AWSSecurityCredentials represents a set of AWS security credentials.
-// See https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
 type AWSSecurityCredentials struct {
 	AccessKeyID     ValueFromField `json:"accessKeyID"`
 	SecretAccessKey ValueFromField `json:"secretAccessKey"`

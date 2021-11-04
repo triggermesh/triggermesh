@@ -56,8 +56,8 @@ type AWSSQSSourceSpec struct {
 	// +optional
 	ReceiveOptions *AWSSQSSourceReceiveOptions `json:"receiveOptions,omitempty"`
 
-	// Credentials to interact with the Amazon SQS API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon SQS API.
+	Auth AWSAuth `json:"auth"`
 
 	// Customizations of the AWS REST API endpoint.
 	// +optional
