@@ -42,9 +42,14 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	hub, err := eventhub.NewHubFromConnectionString(env.ConnectionString)
+	// hub, err := eventhub.NewHubFromConnectionString(env.ConnectionString)
+	// if err != nil {
+	// 	logger.Panicf("Error creating EventHub connection: %v", err)
+	// }
+
+	hub, err := eventhub.NewHubFromEnvironment()
 	if err != nil {
-		logger.Panicf("Error creating EventHub connection: %v", err)
+		logger.Panicw("Unable to create Event Hub client", zap.Error(err))
 	}
 
 	return &adapter{

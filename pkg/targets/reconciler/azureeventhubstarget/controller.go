@@ -44,7 +44,7 @@ func NewController(
 ) *controller.Impl {
 
 	adapterCfg := &adapterConfig{
-		obsConfig: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
+		configs: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
 	}
 	envconfig.MustProcess(adapterName, adapterCfg)
 

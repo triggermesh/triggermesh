@@ -313,6 +313,7 @@ rules:
   - awss3targets/finalizers
   - awssnstargets/finalizers
   - awssqstargets/finalizers
+  - azureeventhubstargets/finalizers
   - confluenttargets/finalizers
   - datadogtargets/finalizers
   - elasticsearchtargets/finalizers
@@ -833,6 +834,7 @@ rules:
   - awss3targets
   - awssnstargets
   - awssqstargets
+  - azureeventbridgetargets
   - confluenttargets
   - datadogtargets
   - elasticsearchtargets

@@ -49,21 +49,14 @@ var (
 
 // AzureEventHubsTargetSpec holds the desired state of the AzureEventHubsTarget.
 type AzureEventHubsTargetSpec struct {
-	// Alibaba SDK access key id as registered. For more information on how to
-	// create an access key pair, please refer to
-	// https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
-	AccessKeyID SecretValueFromSource `json:"accessKeyID"`
+	// Authentication method to interact with the Azure Event Hubs API.
+	Auth AzureAuth `json:"auth"`
 
-	// Alibaba SDK access key secret as registered.
-	AccessKeySecret SecretValueFromSource `json:"accessKeySecret"`
-
-	// The domain name used to access the OSS. For more information, please refer
-	// to the region and endpoint guide at
-	// https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db
-	Endpoint string `json:"endpoint"`
-
-	// The unique container to store objects in OSS.
-	Bucket string `json:"bucket"`
+	// Resource ID of the Event Hubs instance.
+	//
+	// Expected format:
+	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
+	EventHubID EventHubResourceID `json:"eventHubID"`
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
