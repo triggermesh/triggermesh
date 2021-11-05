@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -66,4 +67,14 @@ func (s *AWSSQSSource) GetEventTypes() []string {
 // AsEventSource implements EventSource.
 func (s *AWSSQSSource) AsEventSource() string {
 	return s.Spec.ARN.String()
+}
+
+// WantsOwnServiceAccount implements serviceAccountProvider.
+func (*AWSSQSSource) WantsOwnServiceAccount() bool {
+	return false
+}
+
+// ServiceAccountOptions implements serviceAccountProvider.
+func (*AWSSQSSource) ServiceAccountOptions() []func(*corev1.ServiceAccount) {
+	return nil
 }

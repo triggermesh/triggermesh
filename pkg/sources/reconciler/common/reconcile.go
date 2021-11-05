@@ -53,7 +53,7 @@ var knativeServingAnnotations = []string{
 // RBACOwnersLister returns a list of OwnerRefable to be set as a the
 // OwnerReferences metadata attribute of a ServiceAccount.
 type RBACOwnersLister interface {
-	RBACOwners(namespace string) ([]kmeta.OwnerRefable, error)
+	RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error)
 }
 
 // AdapterDeploymentBuilder provides all the necessary information for building
@@ -87,7 +87,7 @@ func (r *GenericDeploymentReconciler) ReconcileSource(ctx context.Context, ab Ad
 
 	desiredAdapter := ab.BuildAdapter(src, sinkURI)
 
-	saOwners, err := ab.RBACOwners(src.GetNamespace())
+	saOwners, err := ab.RBACOwners(src)
 	if err != nil {
 		return fmt.Errorf("listing ServiceAccount owners: %w", err)
 	}
@@ -209,7 +209,7 @@ func (r *GenericServiceReconciler) ReconcileSource(ctx context.Context, ab Adapt
 
 	desiredAdapter := ab.BuildAdapter(src, sinkURI)
 
-	saOwners, err := ab.RBACOwners(src.GetNamespace())
+	saOwners, err := ab.RBACOwners(src)
 	if err != nil {
 		return fmt.Errorf("listing ServiceAccount owners: %w", err)
 	}
@@ -405,6 +405,10 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 	src := v1alpha1.SourceFromContext(ctx)
 
 	desiredSA := newServiceAccount(src, owners)
+	for _, m := range serviceAccountMutations(src) {
+		m(desiredSA)
+	}
+
 	currentSA, err := r.getOrCreateAdapterServiceAccount(ctx, desiredSA)
 	if err != nil {
 		return nil, err
@@ -489,6 +493,18 @@ func (r *GenericRBACReconciler) syncAdapterServiceAccount(ctx context.Context,
 		sa.Name, v1alpha1.SourceFromContext(ctx).GetGroupVersionKind().Kind)
 
 	return sa, nil
+}
+
+// serviceAccountMutations returns functional options for mutating the
+// ServiceAccount associated with the given source instance.
+func serviceAccountMutations(src v1alpha1.EventSource) []func(*corev1.ServiceAccount) {
+	if !v1alpha1.WantsOwnServiceAccount(src) {
+		return nil
+	}
+
+	var saMutations []func(*corev1.ServiceAccount)
+
+	return append(saMutations, v1alpha1.ServiceAccountOptions(src)...)
 }
 
 // getOrCreateAdapterRoleBinding returns the existing adapter RoleBinding, or

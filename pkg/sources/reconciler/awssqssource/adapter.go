@@ -79,8 +79,12 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(namespace string) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.srcLister(namespace).List(labels.Everything())
+func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error) {
+	if v1alpha1.WantsOwnServiceAccount(src) {
+		return []kmeta.OwnerRefable{src}, nil
+	}
+
+	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}

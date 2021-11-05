@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -56,6 +57,31 @@ type multiTenant interface {
 func IsMultiTenant(src EventSource) bool {
 	mt, ok := src.(multiTenant)
 	return ok && mt.IsMultiTenant()
+}
+
+// serviceAccountProvider is implemented by source types which are able to
+// influence the shape of the ServiceAccount used by their own receive adapter.
+type serviceAccountProvider interface {
+	WantsOwnServiceAccount() bool
+	ServiceAccountOptions() []func(*corev1.ServiceAccount)
+}
+
+// WantsOwnServiceAccount returns whether the given source instance should have
+// a dedicated ServiceAccount associated with its receive adapter.
+func WantsOwnServiceAccount(src EventSource) bool {
+	saProvider, ok := src.(serviceAccountProvider)
+	return ok && saProvider.WantsOwnServiceAccount()
+}
+
+// ServiceAccountOptions returns functional options for mutating the
+// ServiceAccount associated with a given source instance.
+func ServiceAccountOptions(src EventSource) []func(*corev1.ServiceAccount) {
+	saProvider, ok := src.(serviceAccountProvider)
+	if !ok {
+		return nil
+	}
+
+	return saProvider.ServiceAccountOptions()
 }
 
 type sourceKey struct{}

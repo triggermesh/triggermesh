@@ -49,6 +49,23 @@ func MTAdapterObjectName(src kmeta.OwnerRefable) string {
 	return ComponentName(src) + "-" + componentAdapter
 }
 
+// ServiceAccountName returns the name to set on the ServiceAccount associated
+// with the given source.
+func ServiceAccountName(src v1alpha1.EventSource) string {
+	if v1alpha1.WantsOwnServiceAccount(src) {
+		srcName := src.GetName()
+
+		// Edge case: we need to make sure some characters are inserted
+		// between the component name and the source name to avoid
+		// clashing with the shared "{kind}-adapter" ServiceAccount in
+		// case the source is named "adapter". We picked 'i' for
+		// "instance" to keep it short yet distinguishable.
+		return kmeta.ChildName(ComponentName(src)+"-i-", srcName)
+	}
+
+	return MTAdapterObjectName(src)
+}
+
 // NewAdapterDeployment is a wrapper around resource.NewDeployment which
 // pre-populates attributes common to all adapters backed by a Deployment.
 func NewAdapterDeployment(src v1alpha1.EventSource, sinkURI *apis.URL, opts ...resource.ObjectOption) *appsv1.Deployment {
@@ -104,7 +121,7 @@ func commonAdapterDeploymentOptions(src v1alpha1.EventSource) []resource.ObjectO
 		resource.PodLabel(appPartOfLabel, partOf),
 		resource.PodLabel(appManagedByLabel, managedBy),
 
-		resource.ServiceAccount(MTAdapterObjectName(src)),
+		resource.ServiceAccount(ServiceAccountName(src)),
 
 		resource.EnvVar(envComponent, app),
 	}
@@ -182,7 +199,7 @@ func newServiceAccount(src v1alpha1.EventSource, owners []kmeta.OwnerRefable) *c
 	return &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:       src.GetNamespace(),
-			Name:            MTAdapterObjectName(src),
+			Name:            ServiceAccountName(src),
 			OwnerReferences: ownerRefs,
 			Labels:          CommonObjectLabels(src),
 		},

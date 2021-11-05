@@ -40,8 +40,9 @@ type AWSSQSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object = (*AWSSQSSource)(nil)
-	_ EventSource    = (*AWSSQSSource)(nil)
+	_ runtime.Object         = (*AWSSQSSource)(nil)
+	_ EventSource            = (*AWSSQSSource)(nil)
+	_ serviceAccountProvider = (*AWSSQSSource)(nil)
 )
 
 // AWSSQSSourceSpec defines the desired state of the event source.
