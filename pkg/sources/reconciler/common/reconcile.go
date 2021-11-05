@@ -464,7 +464,7 @@ func (r *GenericRBACReconciler) getOrCreateAdapterServiceAccount(ctx context.Con
 func (r *GenericRBACReconciler) syncAdapterServiceAccount(ctx context.Context,
 	currentSA, desiredSA *corev1.ServiceAccount) (*corev1.ServiceAccount, error) {
 
-	if reflect.DeepEqual(desiredSA.OwnerReferences, currentSA.OwnerReferences) {
+	if semantic.Semantic.DeepEqual(desiredSA, currentSA) {
 		return currentSA, nil
 	}
 

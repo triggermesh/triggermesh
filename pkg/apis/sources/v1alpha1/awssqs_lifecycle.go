@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -70,11 +71,21 @@ func (s *AWSSQSSource) AsEventSource() string {
 }
 
 // WantsOwnServiceAccount implements serviceAccountProvider.
-func (*AWSSQSSource) WantsOwnServiceAccount() bool {
-	return false
+func (s *AWSSQSSource) WantsOwnServiceAccount() bool {
+	return s.Spec.Auth.EksIAMRole != nil
 }
 
 // ServiceAccountOptions implements serviceAccountProvider.
-func (*AWSSQSSource) ServiceAccountOptions() []func(*corev1.ServiceAccount) {
-	return nil
+func (s *AWSSQSSource) ServiceAccountOptions() []func(*corev1.ServiceAccount) {
+	var saOpts []func(*corev1.ServiceAccount)
+
+	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
+		setIAMRoleAnnotation := func(sa *corev1.ServiceAccount) {
+			metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationEksIAMRole, iamRole.String())
+		}
+
+		saOpts = append(saOpts, setIAMRoleAnnotation)
+	}
+
+	return saOpts
 }

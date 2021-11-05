@@ -107,7 +107,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			},
 			WantCreates: func() []runtime.Object {
 				objs := []runtime.Object{
-					newServiceAccount(noToken),
+					newServiceAccount(NoToken),
 					newAdapter(),
 				}
 				// only multi-tenant sources expect a RoleBinding
@@ -565,14 +565,14 @@ func newAdressable() *eventingv1.Broker {
 /* RBAC */
 
 // ServiceAccountCtorWithOptions returns a ServiceAccount constructor which accepts options.
-type ServiceAccountCtorWithOptions func(...serviceAccountOption) *corev1.ServiceAccount
+type ServiceAccountCtorWithOptions func(...ServiceAccountOption) *corev1.ServiceAccount
 
 // NewServiceAccount returns a ServiceAccountCtorWithOptions for the given source.
-func NewServiceAccount(src kmeta.OwnerRefable) ServiceAccountCtorWithOptions {
-	name := common.ComponentName(src) + "-adapter"
+func NewServiceAccount(src v1alpha1.EventSource) ServiceAccountCtorWithOptions {
+	name := common.ServiceAccountName(src)
 	labels := common.CommonObjectLabels(src)
 
-	return func(opts ...serviceAccountOption) *corev1.ServiceAccount {
+	return func(opts ...ServiceAccountOption) *corev1.ServiceAccount {
 		sa := &corev1.ServiceAccount{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tNs,
@@ -598,14 +598,14 @@ func NewServiceAccount(src kmeta.OwnerRefable) ServiceAccountCtorWithOptions {
 	}
 }
 
-// serviceAccountOption is a functional option for a ServiceAccount.
-type serviceAccountOption func(*corev1.ServiceAccount)
+// ServiceAccountOption is a functional option for a ServiceAccount.
+type ServiceAccountOption func(*corev1.ServiceAccount)
 
-// noToken ensures the ServiceAccount's secrets list doesn't contain any
+// NoToken ensures the ServiceAccount's secrets list doesn't contain any
 // reference to auto-generated tokens.
 // Useful in tests that expect the creation of a ServiceAccount, when this list
 // is supposed to always be empty.
-func noToken(sa *corev1.ServiceAccount) {
+func NoToken(sa *corev1.ServiceAccount) {
 	filteredSecr := sa.Secrets[:0]
 
 	for _, secr := range sa.Secrets {

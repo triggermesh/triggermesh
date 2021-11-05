@@ -36,6 +36,11 @@ func (in *AWSAuth) DeepCopyInto(out *AWSAuth) {
 		*out = new(AWSSecurityCredentials)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.EksIAMRole != nil {
+		in, out := &in.EksIAMRole, &out.EksIAMRole
+		*out = new(apis.ARN)
+		**out = **in
+	}
 	return
 }
 

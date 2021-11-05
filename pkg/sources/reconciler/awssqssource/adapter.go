@@ -89,9 +89,11 @@ func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable,
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}
 
-	ownerRefables := make([]kmeta.OwnerRefable, len(srcs))
-	for i := range srcs {
-		ownerRefables[i] = srcs[i]
+	ownerRefables := make([]kmeta.OwnerRefable, 0, len(srcs))
+	for _, src := range srcs {
+		if !v1alpha1.WantsOwnServiceAccount(src) {
+			ownerRefables = append(ownerRefables, src)
+		}
 	}
 
 	return ownerRefables, nil

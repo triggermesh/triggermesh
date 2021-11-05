@@ -16,7 +16,11 @@ limitations under the License.
 
 package v1alpha1
 
-import "knative.dev/pkg/apis"
+import (
+	pkgapis "knative.dev/pkg/apis"
+
+	"github.com/triggermesh/triggermesh/pkg/apis"
+)
 
 // AWSAuth contains multiple authentication methods for AWS services.
 type AWSAuth struct {
@@ -25,6 +29,11 @@ type AWSAuth struct {
 	// corresponding secret access key.
 	// See https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
 	Credentials *AWSSecurityCredentials `json:"credentials,omitempty"`
+
+	// (Amazon EKS only) The ARN of an IAM role which can be impersonated
+	// to obtain AWS permissions.
+	// See https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+	EksIAMRole *apis.ARN `json:"iamRole"`
 }
 
 // AWSSecurityCredentials represents a set of AWS security credentials.
@@ -39,5 +48,5 @@ type AWSSecurityCredentials struct {
 // AWS cloud (Localstack, Minio, ElasticMQ, ...).
 type AWSEndpoint struct {
 	// URL of the endpoint.
-	URL *apis.URL `json:"url,omitempty"`
+	URL *pkgapis.URL `json:"url,omitempty"`
 }
