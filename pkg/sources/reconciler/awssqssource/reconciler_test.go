@@ -39,6 +39,7 @@ import (
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/awssqssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
 	eventtesting "github.com/triggermesh/triggermesh/pkg/sources/testing/event"
 )
@@ -213,7 +214,7 @@ func podServiceAccount(name string) adapterOption {
 
 // newReconciledServiceAccount returns a test ServiceAccount object that is
 // identical to what ReconcileKind generates.
-func newReconciledServiceAccount(opts ...ServiceAccountOption) *corev1.ServiceAccount {
+func newReconciledServiceAccount(opts ...resource.ServiceAccountOption) *corev1.ServiceAccount {
 	return NewServiceAccount(newEventSource())(opts...)
 }
 
@@ -224,7 +225,7 @@ func iamRoleAnnotation(sa *corev1.ServiceAccount) {
 }
 
 // saName overrides the object's Name.
-func saName(name string) ServiceAccountOption {
+func saName(name string) resource.ServiceAccountOption {
 	return func(sa *corev1.ServiceAccount) {
 		sa.Name = name
 	}

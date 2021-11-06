@@ -19,12 +19,13 @@ package v1alpha1
 import (
 	"context"
 
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
+
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
 // EventSource is implemented by all event source types.
@@ -63,7 +64,7 @@ func IsMultiTenant(src EventSource) bool {
 // influence the shape of the ServiceAccount used by their own receive adapter.
 type serviceAccountProvider interface {
 	WantsOwnServiceAccount() bool
-	ServiceAccountOptions() []func(*corev1.ServiceAccount)
+	ServiceAccountOptions() []resource.ServiceAccountOption
 }
 
 // WantsOwnServiceAccount returns whether the given source instance should have
@@ -75,7 +76,7 @@ func WantsOwnServiceAccount(src EventSource) bool {
 
 // ServiceAccountOptions returns functional options for mutating the
 // ServiceAccount associated with a given source instance.
-func ServiceAccountOptions(src EventSource) []func(*corev1.ServiceAccount) {
+func ServiceAccountOptions(src EventSource) []resource.ServiceAccountOption {
 	saProvider, ok := src.(serviceAccountProvider)
 	if !ok {
 		return nil

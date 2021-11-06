@@ -39,6 +39,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/semantic"
 	"github.com/triggermesh/triggermesh/pkg/sources/routing"
 )
@@ -497,12 +498,12 @@ func (r *GenericRBACReconciler) syncAdapterServiceAccount(ctx context.Context,
 
 // serviceAccountMutations returns functional options for mutating the
 // ServiceAccount associated with the given source instance.
-func serviceAccountMutations(src v1alpha1.EventSource) []func(*corev1.ServiceAccount) {
+func serviceAccountMutations(src v1alpha1.EventSource) []resource.ServiceAccountOption {
 	if !v1alpha1.WantsOwnServiceAccount(src) {
 		return nil
 	}
 
-	var saMutations []func(*corev1.ServiceAccount)
+	var saMutations []resource.ServiceAccountOption
 
 	return append(saMutations, v1alpha1.ServiceAccountOptions(src)...)
 }

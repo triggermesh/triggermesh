@@ -44,6 +44,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/routing"
 	eventtesting "github.com/triggermesh/triggermesh/pkg/sources/testing/event"
@@ -565,14 +566,14 @@ func newAdressable() *eventingv1.Broker {
 /* RBAC */
 
 // ServiceAccountCtorWithOptions returns a ServiceAccount constructor which accepts options.
-type ServiceAccountCtorWithOptions func(...ServiceAccountOption) *corev1.ServiceAccount
+type ServiceAccountCtorWithOptions func(...resource.ServiceAccountOption) *corev1.ServiceAccount
 
 // NewServiceAccount returns a ServiceAccountCtorWithOptions for the given source.
 func NewServiceAccount(src v1alpha1.EventSource) ServiceAccountCtorWithOptions {
 	name := common.ServiceAccountName(src)
 	labels := common.CommonObjectLabels(src)
 
-	return func(opts ...ServiceAccountOption) *corev1.ServiceAccount {
+	return func(opts ...resource.ServiceAccountOption) *corev1.ServiceAccount {
 		sa := &corev1.ServiceAccount{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tNs,
@@ -597,9 +598,6 @@ func NewServiceAccount(src v1alpha1.EventSource) ServiceAccountCtorWithOptions {
 		return sa
 	}
 }
-
-// ServiceAccountOption is a functional option for a ServiceAccount.
-type ServiceAccountOption func(*corev1.ServiceAccount)
 
 // NoToken ensures the ServiceAccount's secrets list doesn't contain any
 // reference to auto-generated tokens.

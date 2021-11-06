@@ -23,6 +23,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -76,8 +78,8 @@ func (s *AWSSQSSource) WantsOwnServiceAccount() bool {
 }
 
 // ServiceAccountOptions implements serviceAccountProvider.
-func (s *AWSSQSSource) ServiceAccountOptions() []func(*corev1.ServiceAccount) {
-	var saOpts []func(*corev1.ServiceAccount)
+func (s *AWSSQSSource) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
 
 	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
 		setIAMRoleAnnotation := func(sa *corev1.ServiceAccount) {

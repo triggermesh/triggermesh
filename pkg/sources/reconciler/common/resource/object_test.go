@@ -24,10 +24,12 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
 	"knative.dev/pkg/kmeta"
+	"knative.dev/pkg/ptr"
 )
 
 const (
@@ -50,21 +52,34 @@ func makeEnvVars(count int, name, val string) []corev1.EnvVar {
 }
 
 func TestMetaObjectOptions(t *testing.T) {
+	owner1 := makeOwnerRefable("fake1")
+	owner2 := makeOwnerRefable("fake2")
+	owner3 := makeOwnerRefable("fake3")
+
 	objMeta := NewDeployment(tNs, tName,
 		Label("test.label/2", "val2"),
-		Controller(makeOwnerRefable()),
+		Controller(owner1),
+		Labels(labels.Set{
+			"test.label/3": "val3",
+			"test.label/4": "val4",
+		}),
 		Label("test.label/1", "val1"),
+		Owners(owner2, owner3),
 	).ObjectMeta
 
 	expectObjMeta := metav1.ObjectMeta{
 		Namespace: tNs,
 		Name:      tName,
 		OwnerReferences: []metav1.OwnerReference{
-			*kmeta.NewControllerRef(makeOwnerRefable()),
+			*kmeta.NewControllerRef(owner1),
+			newRegularOwnerRef(owner2),
+			newRegularOwnerRef(owner3),
 		},
 		Labels: map[string]string{
 			"test.label/1": "val1",
 			"test.label/2": "val2",
+			"test.label/3": "val3",
+			"test.label/4": "val4",
 		},
 	}
 
@@ -73,11 +88,18 @@ func TestMetaObjectOptions(t *testing.T) {
 	}
 }
 
+// newRegularOwnerRef returns a regular owner reference to the given object.
+func newRegularOwnerRef(o kmeta.OwnerRefable) metav1.OwnerReference {
+	owner := kmeta.NewControllerRef(o)
+	owner.Controller = ptr.Bool(false)
+	return *owner
+}
+
 // makeOwnerRefable returns a OwnerRefable with fake attributes values.
-func makeOwnerRefable() *fakeOwnerRefable {
+func makeOwnerRefable(name string) *fakeOwnerRefable {
 	return &fakeOwnerRefable{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "fake",
+			Name: name,
 			UID:  types.UID("00000000-0000-0000-0000-000000000000"),
 		},
 		GroupVersionKind: schema.GroupVersionKind{

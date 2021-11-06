@@ -28,7 +28,6 @@ import (
 
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
-	"knative.dev/pkg/ptr"
 	"knative.dev/pkg/system"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
@@ -190,21 +189,10 @@ func commonAdapterKnServiceOptions(src v1alpha1.EventSource) []resource.ObjectOp
 // newServiceAccount returns a ServiceAccount object with its OwnerReferences
 // metadata attribute populated from the given owners.
 func newServiceAccount(src v1alpha1.EventSource, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
-	ownerRefs := make([]metav1.OwnerReference, len(owners))
-	for i, owner := range owners {
-		ownerRefs[i] = *kmeta.NewControllerRef(owner)
-		ownerRefs[i].Controller = ptr.Bool(false)
-	}
-
-	return &corev1.ServiceAccount{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace:       src.GetNamespace(),
-			Name:            ServiceAccountName(src),
-			OwnerReferences: ownerRefs,
-			Labels:          CommonObjectLabels(src),
-		},
-	}
-
+	return resource.NewServiceAccount(src.GetNamespace(), ServiceAccountName(src),
+		resource.Owners(owners...),
+		resource.Labels(CommonObjectLabels(src)),
+	)
 }
 
 // newRoleBinding returns a RoleBinding object that binds a ServiceAccount
