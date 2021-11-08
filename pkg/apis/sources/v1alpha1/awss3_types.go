@@ -51,9 +51,12 @@ type AWSS3SourceSpec struct {
 	// Bucket ARN
 	// https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html#amazons3-resources-for-iam-policies
 	//
-	// Although not technically required by S3, we enforce that bucket ARNs
-	// include a region and an account ID, because this information is
-	// required by the reconciler to operate properly.
+	// Although not technically supported by S3, the ARN provided via this
+	// attribute may include a region and an account ID. When this
+	// information is provided, it is used to set an accurate
+	// identity-based access policy between the S3 bucket and the
+	// reconciled SQS queue, unless an existing queue is provided via the
+	// QueueARN attribute.
 	ARN apis.ARN `json:"arn"`
 
 	// List of event types that the source should subscribe to.

@@ -24,7 +24,7 @@ kind: AWSS3Source
 metadata:
   name: sample
 spec:
-  arn: arn:aws:s3:us-west-2:123456789012:triggermeshtest
+  arn: arn:aws:s3:::triggermeshtest
 
   eventTypes:
   - s3:ObjectCreated:*

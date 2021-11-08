@@ -58,15 +58,18 @@ spec:
             type: object
             properties:
               arn:
-                description: ARN of the S3 bucket to receive notifications from. The expected format is
-                  'arn:${Partition}:s3:${Region}:${Account}:${BucketName}'. Although not technically required by S3, we
-                  enforce that bucket ARNs include a region and an account ID, because this information is required by
-                  the source to operate properly. See also
+                description: |-
+                  ARN of the S3 bucket to receive notifications from. The expected format is documented at
                   https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html#amazons3-resources-for-iam-policies.
+
+                  Although not technically supported by S3, the ARN provided via this attribute may include a region and
+                  an account ID. When this information is provided, it is used to set an accurate identity-based access
+                  policy between the S3 bucket and the reconciled SQS queue, unless an existing queue is provided via
+                  the queueARN attribute.
                 type: string
                 # Bucket naming rules
                 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
-                pattern: ^arn:aws(-cn|-us-gov)?:s3:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:[0-9a-z][0-9a-z.-]{2,62}$
+                pattern: ^arn:aws(-cn|-us-gov)?:s3:([a-z]{2}(-gov)?-[a-z]+-\d)?:(\d{12})?:[0-9a-z][0-9a-z.-]{2,62}$
               eventTypes:
                 description: List of event types that the source should subscribe to. Accepted values are listed at
                   https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html.

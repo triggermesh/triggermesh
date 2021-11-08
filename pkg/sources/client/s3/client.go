@@ -28,10 +28,16 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"github.com/aws/aws-sdk-go/service/sts"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/aws"
 )
+
+// Per AWS conventions, a bucket which does not explicitly specify its location
+// is located in the "us-east-1" region.
+// https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
+const defaultS3Region = "us-east-1"
 
 // Client is an alias for the S3API interface.
 type Client = s3iface.S3API
@@ -70,12 +76,118 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 		return nil, nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
 	}
 
+	// The ARN of a S3 bucket differs from other ARNs because it doesn't
+	// typically include an account ID or region.
+	// However, the reconciliation logic *requires* both of these inputs to
+	// be able to set an accurate identity-based access policy between the
+	// S3 bucket and the reconciled SQS queue (unless the user provides
+	// their own SQS queue).
+	// To avoid having to handle user-provided credentials in multiple
+	// places, we bake the very specific logic of retrieving both the
+	// account ID and region into the ClientGetter for the time being.
+
+	region, err := determineS3Region(src, creds)
+	if err != nil {
+		return nil, nil, fmt.Errorf("determining suitable S3 region: %w", err)
+	}
+	if src.Spec.ARN.Region == "" {
+		src.Spec.ARN.Region = region
+	}
+
+	accID, err := determineBucketOwnerAccount(src, creds)
+	if err != nil {
+		return nil, nil, fmt.Errorf("determining bucket's owner: %w", err)
+	}
+	if src.Spec.ARN.AccountID == "" {
+		src.Spec.ARN.AccountID = accID
+	}
+
 	sess := session.Must(session.NewSession(awscore.NewConfig().
 		WithRegion(src.Spec.ARN.Region).
 		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
 	))
 
 	return s3.New(sess), sqs.New(sess), nil
+}
+
+// determineS3Region determines the most suitable region for interacting with
+// AWS S3 based on the provided source's spec.
+// In order of preference:
+// - Value provided in the ARN of the S3 bucket
+// - Value provided in the ARN of the SQS queue
+// - Value retrieved from the S3 API
+func determineS3Region(src *v1alpha1.AWSS3Source, creds *credentials.Value) (string, error) {
+	if src.Spec.ARN.Region != "" {
+		return src.Spec.ARN.Region, nil
+	}
+
+	if queueARN := src.Spec.QueueARN; queueARN != nil {
+		return src.Spec.QueueARN.Region, nil
+	}
+
+	region, err := getBucketRegion(src.Spec.ARN.Resource, creds)
+	if err != nil {
+		return "", fmt.Errorf("getting location of bucket %q: %w", src.Spec.ARN.Resource, err)
+	}
+
+	return region, nil
+}
+
+// getBucketRegion retrieves the region the provided bucket resides in.
+func getBucketRegion(bucketName string, creds *credentials.Value) (string, error) {
+	sess := session.Must(session.NewSession(awscore.NewConfig().
+		WithRegion(defaultS3Region).
+		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
+	))
+
+	resp, err := s3.New(sess).GetBucketLocation(&s3.GetBucketLocationInput{
+		Bucket: &bucketName,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	if loc := resp.LocationConstraint; loc != nil {
+		return *loc, nil
+	}
+	return defaultS3Region, nil
+}
+
+// determineBucketOwnerAccount determines the ID of the AWS account that owns
+// the S3 bucket configured in the given source.
+// In order of preference:
+// - Value provided in the ARN of the S3 bucket
+// - Value provided in the ARN of the SQS queue
+// - Value retrieved from the STS API
+func determineBucketOwnerAccount(src *v1alpha1.AWSS3Source, creds *credentials.Value) (string, error) {
+	if src.Spec.ARN.AccountID != "" {
+		return src.Spec.ARN.AccountID, nil
+	}
+
+	if queueARN := src.Spec.QueueARN; queueARN != nil {
+		return src.Spec.QueueARN.AccountID, nil
+	}
+
+	accID, err := getCallerAccountID(creds)
+	if err != nil {
+		return "", fmt.Errorf("getting ID of caller: %w", err)
+	}
+
+	return accID, nil
+}
+
+// getCallerAccountID retrieves the account ID of the caller.
+func getCallerAccountID(creds *credentials.Value) (string, error) {
+	sess := session.Must(session.NewSession(awscore.NewConfig().
+		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
+	))
+
+	resp, err := sts.New(sess).GetCallerIdentity(&sts.GetCallerIdentityInput{})
+	if err != nil {
+		return "", err
+	}
+
+	return *resp.Account, nil
 }
 
 // ClientGetterFunc allows the use of ordinary functions as ClientGetter.
