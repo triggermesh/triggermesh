@@ -44,14 +44,14 @@ func NewController(
 ) *controller.Impl {
 
 	adapterCfg := &adapterConfig{
-		configs: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
+		obsConfig: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
 	}
 	envconfig.MustProcess(adapterName, adapterCfg)
 
 	targetInformer := informerv1alpha1.Get(ctx)
 	serviceInformer := serviceinformerv1.Get(ctx)
 
-	r := &Reconciler{
+	r := &reconciler{
 		ksvcr:      libreconciler.NewKServiceReconciler(servingclient.Get(ctx), serviceInformer.Lister()),
 		adapterCfg: adapterCfg,
 	}

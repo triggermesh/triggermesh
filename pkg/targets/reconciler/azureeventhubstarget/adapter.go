@@ -17,15 +17,15 @@ limitations under the License.
 package azureeventhubstarget
 
 import (
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-
 	"knative.dev/eventing/pkg/reconciler/source"
-	"knative.dev/pkg/apis"
+	"knative.dev/pkg/kmeta"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 const (
@@ -44,95 +44,43 @@ const (
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
-// BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.AzureEventHubsTarget, sinkURI *apis.URL) *appsv1.Deployment {
-
-	var hubEnvs []corev1.EnvVar
-
-	if sasAuth := src.Spec.Auth.SASToken; sasAuth != nil {
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, envHubKeyName, sasAuth.KeyName)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, envHubKeyValue, sasAuth.KeyValue)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, envHubConnStr, sasAuth.ConnectionString)
-	}
-
-	if spAuth := src.Spec.Auth.ServicePrincipal; spAuth != nil {
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, envAADTenantID, spAuth.TenantID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, envAADClientID, spAuth.ClientID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, envAADClientSecret, spAuth.ClientSecret)
-	}
-
-	return common.NewAdapterDeployment(src, sinkURI,
-		resource.Image(r.adapterCfg.Image),
-
-		resource.EnvVar(common.EnvHubResourceID, src.Spec.EventHubID.String()),
-		resource.EnvVar(common.EnvHubNamespace, src.Spec.EventHubID.Namespace),
-		resource.EnvVar(common.EnvHubName, src.Spec.EventHubID.EventHub),
-		resource.EnvVars(hubEnvs...),
-		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	)
-}
-
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
 type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AZURE_EVENTHUBS_ADAPTER_IMAGE" default:"gcr.io/triggermesh-private/azureeventhubstarget-adapter"`
+	Image string `envconfig:"AZURE_EVENTHUBS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/azureeventhubstarget-adapter"`
 }
 
-// // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-// func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapterConfig) *servingv1.Service {
-// 	name := kmeta.ChildName(adapterName+"-", target.Name)
-// 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
-// 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
-// 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-// 	envApp := makeAppEnv(target)
-// 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-// 	envs := append(envSvc, envApp...)
-// 	envs = append(envs, envObs...)
+// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
+func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapterConfig) *servingv1.Service {
+	name := kmeta.ChildName(adapterName+"-", target.Name)
+	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
+	// envApp := makeAppEnv(&target.Spec)
+	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
+	envs := []corev1.EnvVar{}
+	envs = append(envs, envSvc...)
+	envs = append(envs, envObs...)
 
-// 	return resources.MakeKService(target.Namespace, name, cfg.Image,
-// 		resources.KsvcLabels(lbl),
-// 		resources.KsvcLabelVisibilityClusterLocal,
-// 		resources.KsvcOwner(target),
-// 		resources.KsvcPodLabels(podLabels),
-// 		resources.KsvcPodEnvVars(envs),
-// 	)
-// }
+	if sasAuth := target.Spec.Auth.SASToken; sasAuth != nil {
+		envs = common.MaybeAppendValueFromEnvVar(envs, envHubKeyName, sasAuth.KeyName)
+		envs = common.MaybeAppendValueFromEnvVar(envs, envHubKeyValue, sasAuth.KeyValue)
+		envs = common.MaybeAppendValueFromEnvVar(envs, envHubConnStr, sasAuth.ConnectionString)
+	}
 
-// func makeAppEnv(o *v1alpha1.AzureEventHubsTarget) []corev1.EnvVar {
-// 	env := []corev1.EnvVar{
-// 		{
-// 			Name:  libreconciler.EnvBridgeID,
-// 			Value: libreconciler.GetStatefulBridgeID(o),
-// 		},
-// 	}
-
-// 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
-// 		env = append(env, corev1.EnvVar{
-// 			Name:  envEventsPayloadPolicy,
-// 			Value: string(*o.Spec.EventOptions.PayloadPolicy),
-// 		})
-// 	}
-
-// 	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
-// 		env = append(env, corev1.EnvVar{
-// 			Name:  envHubKeyName,
-// 			Value:  o.Spec.Auth.SASToken.s ,
-// 		})
-
-// 		env = append(env, corev1.EnvVar{
-// 			Name:  envHubKeyValue,
-// 			Value: sasAuth.KeyValue,
-// 		})
-
-// 		env = append(env, corev1.EnvVar{
-// 			Name:  envHubConnStr,
-// 			Value: sasAuth.ConnectionString,
-// 		})
-// 	}
-
-// 	return env
-
-// }
+	if spAuth := target.Spec.Auth.ServicePrincipal; spAuth != nil {
+		envs = common.MaybeAppendValueFromEnvVar(envs, envAADTenantID, spAuth.TenantID)
+		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientID, spAuth.ClientID)
+		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientSecret, spAuth.ClientSecret)
+	}
+	return resources.MakeKService(target.Namespace, name, cfg.Image,
+		resources.KsvcLabels(lbl),
+		resources.KsvcLabelVisibilityClusterLocal,
+		resources.KsvcOwner(target),
+		resources.KsvcPodLabels(podLabels),
+		resources.KsvcPodEnvVars(envs),
+	)
+}

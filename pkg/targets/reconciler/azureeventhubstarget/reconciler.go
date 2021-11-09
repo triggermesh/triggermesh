@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2021 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import (
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
-type Reconciler struct {
+type reconciler struct {
 	// adapter properties
 	adapterCfg *adapterConfig
 
@@ -36,18 +36,21 @@ type Reconciler struct {
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.AzureEventHubsTarget) pkgreconciler.Event {
+func (r *reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.AzureEventHubsTarget) pkgreconciler.Event {
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
 	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
 
-	trg.Status.PropagateKServiceAvailability(adapter)
+	if adapter != nil {
+		trg.Status.PropagateKServiceAvailability(adapter)
+	} else {
+		trg.Status.MarkNoKService("ServicePending", event.Error())
+	}
 
 	return event
 }
