@@ -386,6 +386,7 @@ rules:
   - ''
   resources:
   - serviceaccounts
+  - serviceaccounts/finalizers
   verbs:
   - list
   - watch
