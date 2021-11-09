@@ -27,7 +27,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub/eventhubapi"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/azure"
+	"github.com/triggermesh/triggermesh/pkg/sources/azure/auth"
 )
 
 // EventSubscriptionsClient is an alias for the EventSubscriptionsClientAPI interface.
@@ -62,7 +62,7 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureBlobStorageSource) (EventSubscriptionsClient, EventHubsClient, error) {
-	authorizer, err := azure.Authorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
+	authorizer, err := auth.Authorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
 	if err != nil {
 		return nil, nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
 	}

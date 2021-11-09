@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package azure
+package auth
 
 import (
 	"errors"
@@ -62,38 +62,8 @@ func Authorizer(cli coreclientv1.SecretInterface, spAuth *v1alpha1.AzureServiceP
 	if err != nil {
 		// GetAuthorizer returns an untyped error when it is unable to
 		// obtain a non-empty value for any of the required auth settings.
-		return nil, emptyCredentialsError{e: err}
+		return nil, NewFatalCredentialsError(err)
 	}
 
 	return authorizer, nil
 }
-
-// emptyCredentialsError is an opaque error type that wraps another error to
-// indicate that required Azure credentials could not be obtained.
-//
-// This allows callers to handle that special case if required, especially when
-// the original error can not be asserted any other way because it is untyped.
-// For example, Kubernetes finalizers are unlikely to be able to proceed when
-// credentials can not be determined.
-type emptyCredentialsError struct {
-	e error
-}
-
-// Error implements the error interface.
-func (e emptyCredentialsError) Error() string {
-	if e.e == nil {
-		return ""
-	}
-	return e.e.Error()
-}
-
-// Unwrap implements errors.Unwrap.
-func (e emptyCredentialsError) Unwrap() error {
-	return e.e
-}
-
-// IsEmptyCredentials allows callers to assert an error for behaviour.
-//
-// Example of assertion:
-//   _, ok := err.(interface { IsEmptyCredentials() })
-func (e emptyCredentialsError) IsEmptyCredentials() {}

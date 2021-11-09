@@ -30,7 +30,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/azureservicebustopicsource"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureservicebustopicsource"
-	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/servicebustopics"
+	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/servicebus"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 )
 
@@ -56,7 +56,7 @@ func NewController(
 	informer := informerv1alpha1.Get(ctx)
 
 	r := &Reconciler{
-		cg:         servicebustopics.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
+		cg:         servicebus.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
 		srcLister:  informer.Lister().AzureServiceBusTopicSources,
 		adapterCfg: adapterCfg,
 	}
