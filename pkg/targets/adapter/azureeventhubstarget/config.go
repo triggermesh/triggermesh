@@ -37,5 +37,5 @@ type envAccessor struct {
 	DiscardCEContext bool `envconfig:"DISCARD_CE_CONTEXT"`
 
 	// AzureEventHub connection parameters
-	ConnectionString string `envconfig:"AZURE_EVENTHUBS_CONNECTION_STRING"`
+	ConnectionString string `envconfig:"EVENTHUB_CONNECTION_STRING"`
 }

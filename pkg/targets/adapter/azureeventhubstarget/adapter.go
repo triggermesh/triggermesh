@@ -49,7 +49,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	hub, err := eventhub.NewHubFromEnvironment()
 	if err != nil {
-		logger.Panicw("Unable to create Event Hub client", zap.Error(err))
+		hub, err = eventhub.NewHubFromConnectionString(env.ConnectionString)
+		if err != nil {
+			logger.Panicf("Error creating EventHub connection: %v", err)
+		}
 	}
 
 	return &adapter{
