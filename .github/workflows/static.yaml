@@ -63,3 +63,6 @@ jobs:
         go install .
         popd
         rbac-check
+
+    - name: Validate CRD annotations
+      run: hack/crd-annotations-check.sh
