@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -30,27 +31,6 @@ type component struct {
 }
 
 func (a *component) replaceTemplates(filename, outputname string) {
-	// data, err := ioutil.ReadFile(filename)
-	// if err != nil {
-	// 	log.Panicf("failed reading data from file: %s", err)
-	// }
-
-	// filterUpper := bytes.ReplaceAll(data, []byte("$TARGETFULLCASE"), []byte(a.uppercaseName))
-	// filterLowercase := bytes.ReplaceAll(filterUpper, []byte("$TARGET"), []byte(a.name))
-
-	// file, err := os.Create(outputname)
-	// if err != nil {
-	// 	log.Fatalf("failed creating file: %s", err)
-	// }
-
-	// defer file.Close()
-	// _, err = file.Write(filterLowercase)
-	// if err != nil {
-	// 	log.Fatalf("failed writing to file: %s", err)
-	// }
-
-	// std1 := component{"vani", "Vani"}
-
 	tmp1, err := template.ParseFiles(filename)
 	if err != nil {
 		fmt.Println(err)
@@ -74,12 +54,13 @@ func main() {
 	temp := &component{}
 	// var capsName string
 
-	fmt.Print("Enter the LOWERCASE VERSION of the target name: ")
-	fmt.Scanf("%s", &temp.Name)
-	fmt.Print("Enter the UPPERCASE VERSION of the target name: ")
+	fmt.Print("Enter the target name: ")
 	fmt.Scanf("%s", &temp.UppercaseName)
+
+	temp.Name = strings.ToLower(temp.UppercaseName)
 	// fmt.Print("Enter the ALL CAPS VERISON of the target name: ")
 	// fmt.Scanf("%s", &capsName)
+
 	// TODO add naming validation here
 
 	// make cmd folder
