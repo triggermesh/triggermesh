@@ -26,48 +26,48 @@ import (
 
 // Managed event types
 const (
-	EventType$TARGETFULLCASEGenericResponse = "io.triggermesh.$TARGET.response"
+	EventType{{.UppercaseName}}GenericResponse = "io.triggermesh.{{.Name}}.response"
 )
 
 // AcceptedEventTypes implements IntegrationTarget.
-func (*$TARGETFULLCASE) AcceptedEventTypes() []string {
+func (*{{.UppercaseName}}) AcceptedEventTypes() []string {
 	return []string{
 		"*",
 	}
 }
 
 // GetEventTypes implements EventSource.
-func (*$TARGETFULLCASE) GetEventTypes() []string {
+func (*{{.UppercaseName}}) GetEventTypes() []string {
 	return []string{
-		EventType$TARGETFULLCASEGenericResponse,
+		EventType{{.UppercaseName}}GenericResponse,
 	}
 }
 
 // AsEventSource implements targets.EventSource.
-func (s *$TARGETFULLCASE) AsEventSource() string {
+func (s *{{.UppercaseName}}) AsEventSource() string {
 	return "https://" + "SOMETHINGUSEFULE"
 }
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *$TARGETFULLCASE) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("$TARGETFULLCASE Target")
+func (s *{{.UppercaseName}}) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("{{.UppercaseName}} Target")
 }
 
-// $TARGETFULLCASECondSet is the group of possible conditions
-var $TARGETFULLCASECondSet = apis.NewLivingConditionSet(
+// {{.UppercaseName}}CondSet is the group of possible conditions
+var {{.UppercaseName}}CondSet = apis.NewLivingConditionSet(
 	ConditionDeployed,
 )
 
 // InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *$TARGETFULLCASEStatus) InitializeConditions() {
-	$TARGETFULLCASECondSet.Manage(s).InitializeConditions()
+func (s *{{.UppercaseName}}Status) InitializeConditions() {
+	{{.UppercaseName}}CondSet.Manage(s).InitializeConditions()
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
 // ConditionDeployed should be marked as true or false.
-func (s *$TARGETFULLCASEStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
+func (s *{{.UppercaseName}}Status) PropagateKServiceAvailability(ksvc *servingv1.Service) {
 	if ksvc == nil {
-		$TARGETFULLCASECondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
+		{{.UppercaseName}}CondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
 			"The status of the adapter Service can not be determined")
 		return
 	}
@@ -78,7 +78,7 @@ func (s *$TARGETFULLCASEStatus) PropagateKServiceAvailability(ksvc *servingv1.Se
 	s.Address.URL = ksvc.Status.URL
 
 	if ksvc.IsReady() {
-		$TARGETFULLCASECondSet.Manage(s).MarkTrue(ConditionDeployed)
+		{{.UppercaseName}}CondSet.Manage(s).MarkTrue(ConditionDeployed)
 		return
 	}
 
@@ -88,26 +88,26 @@ func (s *$TARGETFULLCASEStatus) PropagateKServiceAvailability(ksvc *servingv1.Se
 		msg += ": " + readyCond.Message
 	}
 
-	$TARGETFULLCASECondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
+	{{.UppercaseName}}CondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
 
 }
 
 // MarkNoKService sets the condition that the service is not ready
-func (s *$TARGETFULLCASEStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	$TARGETFULLCASECondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
+func (s *{{.UppercaseName}}Status) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
+	{{.UppercaseName}}CondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
 }
 
 // IsReady returns true if the resource is ready overall.
-func (s *$TARGETFULLCASEStatus) IsReady() bool {
-	return $TARGETFULLCASECondSet.Manage(s).IsHappy()
+func (s *{{.UppercaseName}}Status) IsReady() bool {
+	return {{.UppercaseName}}CondSet.Manage(s).IsHappy()
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *$TARGETFULLCASE) GetConditionSet() apis.ConditionSet {
-	return $TARGETFULLCASECondSet
+func (s *{{.UppercaseName}}) GetConditionSet() apis.ConditionSet {
+	return {{.UppercaseName}}CondSet
 }
 
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *$TARGETFULLCASE) GetStatus() *duckv1.Status {
+func (s *{{.UppercaseName}}) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package $TARGET
+package {{.Name}}
 
 import (
 	"context"
@@ -49,13 +49,13 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		targetce.ReplierWithStaticResponseType("io.triggermesh.$TARGET.response"),
+		targetce.ReplierWithStaticResponseType("io.triggermesh.{{.Name}}.response"),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	return &$TARGETAdapter{
+	return &{{.Name}}Adapter{
 
 		replier:  replier,
 		ceClient: ceClient,
@@ -63,9 +63,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 }
 
-var _ pkgadapter.Adapter = (*$TARGETAdapter)(nil)
+var _ pkgadapter.Adapter = (*{{.Name}}Adapter)(nil)
 
-type $TARGETAdapter struct {
+type {{.Name}}Adapter struct {
 
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
@@ -73,12 +73,12 @@ type $TARGETAdapter struct {
 }
 
 // Returns if stopCh is closed or Send() returns an error.
-func (a *$TARGETAdapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting $TARGETFULLCASE Adapter")
+func (a *{{.Name}}Adapter) Start(ctx context.Context) error {
+	a.logger.Info("Starting {{.UppercaseName}} Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *$TARGETAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *{{.Name}}Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 
 
 	return a.replier.Ok(&event, "ok")

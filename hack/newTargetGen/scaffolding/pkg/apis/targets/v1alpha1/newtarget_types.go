@@ -29,33 +29,33 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// $TARGETFULLCASE is the Schema for an Alibaba Object Storage Service Target.
-type $TARGETFULLCASE struct {
+// {{.UppercaseName}} is the Schema for an Alibaba Object Storage Service Target.
+type {{.UppercaseName}} struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   $TARGETFULLCASESpec   `json:"spec"`
-	Status $TARGETFULLCASEStatus `json:"status,omitempty"`
+	Spec   {{.UppercaseName}}Spec   `json:"spec"`
+	Status {{.UppercaseName}}Status `json:"status,omitempty"`
 }
 
-// Check the interfaces $TARGETFULLCASE should be implementing.
+// Check the interfaces {{.UppercaseName}} should be implementing.
 var (
-	_ runtime.Object            = (*$TARGETFULLCASE)(nil)
-	_ kmeta.OwnerRefable        = (*$TARGETFULLCASE)(nil)
-	_ targets.IntegrationTarget = (*$TARGETFULLCASE)(nil)
-	_ targets.EventSource       = (*$TARGETFULLCASE)(nil)
-	_ duckv1.KRShaped           = (*$TARGETFULLCASE)(nil)
+	_ runtime.Object            = (*{{.UppercaseName}})(nil)
+	_ kmeta.OwnerRefable        = (*{{.UppercaseName}})(nil)
+	_ targets.IntegrationTarget = (*{{.UppercaseName}})(nil)
+	_ targets.EventSource       = (*{{.UppercaseName}})(nil)
+	_ duckv1.KRShaped           = (*{{.UppercaseName}})(nil)
 )
 
-// $TARGETFULLCASESpec holds the desired state of the $TARGETFULLCASE.
-type $TARGETFULLCASESpec struct {
+// {{.UppercaseName}}Spec holds the desired state of the {{.UppercaseName}}.
+type {{.UppercaseName}}Spec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
-// $TARGETFULLCASEStatus communicates the observed state of the $TARGETFULLCASE (from the controller).
-type $TARGETFULLCASEStatus struct {
+// {{.UppercaseName}}Status communicates the observed state of the {{.UppercaseName}} (from the controller).
+type {{.UppercaseName}}Status struct {
 	duckv1.Status        `json:",inline"`
 	duckv1.AddressStatus `json:",inline"`
 
@@ -65,9 +65,9 @@ type $TARGETFULLCASEStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// $TARGETFULLCASEList is a list of $TARGETFULLCASE resources
-type $TARGETFULLCASEList struct {
+// {{.UppercaseName}}List is a list of {{.UppercaseName}} resources
+type {{.UppercaseName}}List struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []$TARGETFULLCASE `json:"items"`
+	Items           []{{.UppercaseName}} `json:"items"`
 }

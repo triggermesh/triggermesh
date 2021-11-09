@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package $TARGET
+package {{.Name}}
 
 import (
 	"context"
@@ -41,7 +41,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/$TARGET"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/{{.Name}}"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
@@ -226,21 +226,21 @@ var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) c
 	}
 
 	return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
-		fakeinjectionclient.Get(ctx), ls.Get$TARGETFULLCASELister(),
+		fakeinjectionclient.Get(ctx), ls.Get{{.UppercaseName}}Lister(),
 		controller.GetEventRecorder(ctx), r)
 }
 
 /* Event targets */
 
-// newEventTarget returns a test $TARGETFULLCASE object with pre-filled attributes.
-func newEventTarget() *v1alpha1.$TARGETFULLCASE {
-	o := &v1alpha1.$TARGETFULLCASE{
+// newEventTarget returns a test {{.UppercaseName}} object with pre-filled attributes.
+func newEventTarget() *v1alpha1.{{.UppercaseName}} {
+	o := &v1alpha1.{{.UppercaseName}}{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
 			Name:      tName,
 			UID:       tUID,
 		},
-		Spec: v1alpha1.$TARGETFULLCASESpec{
+		Spec: v1alpha1.{{.UppercaseName}}Spec{
 			
 		},
 	}
@@ -266,7 +266,7 @@ func newSecret() *corev1.Secret {
 }
 
 // Deployed: Unknown
-func newEventTargetUnknownDeployed(adapterExists bool) *v1alpha1.$TARGETFULLCASE {
+func newEventTargetUnknownDeployed(adapterExists bool) *v1alpha1.{{.UppercaseName}} {
 	o := newEventTarget()
 	o.Status.PropagateKServiceAvailability(nil)
 
@@ -282,14 +282,14 @@ func newEventTargetUnknownDeployed(adapterExists bool) *v1alpha1.$TARGETFULLCASE
 }
 
 // Deployed: True
-func newEventTargetDeployed() *v1alpha1.$TARGETFULLCASE {
+func newEventTargetDeployed() *v1alpha1.{{.UppercaseName}} {
 	o := newEventTarget()
 	o.Status.PropagateKServiceAvailability(newAdapterServiceReady())
 	return o
 }
 
 // Deployed: False
-func newEventTargetNotDeployed() *v1alpha1.$TARGETFULLCASE {
+func newEventTargetNotDeployed() *v1alpha1.{{.UppercaseName}} {
 	o := newEventTarget()
 	o.Status.PropagateKServiceAvailability(newAdapterServiceNotReady())
 	return o
@@ -314,7 +314,7 @@ func newAdapterService() *servingv1.Service {
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(NewOwnerRefable(
 					tName,
-					(&v1alpha1.$TARGETFULLCASE{}).GetGroupVersionKind(),
+					(&v1alpha1.{{.UppercaseName}}{}).GetGroupVersionKind(),
 					tUID,
 				)),
 			},
@@ -342,7 +342,7 @@ func newAdapterService() *servingv1.Service {
 										Value: tNs,
 									}, {
 										Name:  resources.EnvName,
-										Value: "$TARGET-" + tName,
+										Value: "{{.Name}}-" + tName,
 									}, {
 										Name: libreconciler.EnvBridgeID,
 									}, {
