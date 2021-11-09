@@ -142,10 +142,6 @@ func main() {
 	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/controller.go", temp.Name)
 	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller.go", path)
 
-	// read reconciler_test.go
-	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/reconciler_test.go", temp.Name)
-	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler_test.go", path)
-
 	// read reconciler.go
 	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/reconciler.go", temp.Name)
 	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
