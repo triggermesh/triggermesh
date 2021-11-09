@@ -64,7 +64,7 @@ func main() {
 	// TODO add naming validation here
 
 	// make cmd folder
-	path := fmt.Sprintf("cmd/%s", temp.Name)
+	path := fmt.Sprintf("cmd/%s", temp.Name+"-adapter")
 	newpath := filepath.Join("../../", path)
 	err := os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
@@ -89,12 +89,12 @@ func main() {
 
 	// populate cmd folder
 	// read dockerfile and replace the template variables
-	path = fmt.Sprintf("cmd/%s/Dockerfile", temp.Name)
+	path = fmt.Sprintf("cmd/%s/Dockerfile", temp.Name+"-adapter")
 	newpath = filepath.Join("../../", path)
 	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/Dockerfile", newpath)
 
 	// read main.go and replace the template variables
-	path = fmt.Sprintf("../../cmd/%s/main.go", temp.Name)
+	path = fmt.Sprintf("../../cmd/%s/main.go", temp.Name+"-adapter")
 	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
 
 	// populate adapter folder
