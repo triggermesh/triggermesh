@@ -140,5 +140,6 @@ func main() {
 	fmt.Println("Update `config/500-controller.yaml`")
 	fmt.Println("Update `pkg/api/targets/v1alpha1/register.go`")
 	fmt.Printf("Create kodata symlinks in cmd/%s", temp.Name)
+	fmt.Println("")
 	fmt.Println("Run `make codegen`")
 }
