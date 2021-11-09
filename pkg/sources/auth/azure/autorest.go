@@ -24,15 +24,16 @@ import (
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
+	autorestauth "github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/auth"
 	"github.com/triggermesh/triggermesh/pkg/sources/secret"
 )
 
-// Authorizer returns a new Authorizer for autorest-based Azure clients using
-// the provided service principal authentication information.
-func Authorizer(cli coreclientv1.SecretInterface, spAuth *v1alpha1.AzureServicePrincipal) (autorest.Authorizer, error) {
+// NewAADAuthorizer returns a new Authorizer for autorest-based Azure clients
+// using the provided Service Principal authentication information.
+func NewAADAuthorizer(cli coreclientv1.SecretInterface, spAuth *v1alpha1.AzureServicePrincipal) (autorest.Authorizer, error) {
 	if spAuth == nil {
 		return nil, errors.New("servicePrincipal auth is undefined")
 	}
@@ -48,52 +49,24 @@ func Authorizer(cli coreclientv1.SecretInterface, spAuth *v1alpha1.AzureServiceP
 
 	tenantID, clientID, clientSecret := requestedSecrets[0], requestedSecrets[1], requestedSecrets[2]
 
-	authSettings := auth.EnvironmentSettings{
+	azureEnv := &azure.PublicCloud
+
+	authSettings := autorestauth.EnvironmentSettings{
 		Values: map[string]string{
-			auth.TenantID:     tenantID,
-			auth.ClientID:     clientID,
-			auth.ClientSecret: clientSecret,
-			auth.Resource:     azure.PublicCloud.ResourceManagerEndpoint,
+			autorestauth.TenantID:     tenantID,
+			autorestauth.ClientID:     clientID,
+			autorestauth.ClientSecret: clientSecret,
+			autorestauth.Resource:     azureEnv.ResourceManagerEndpoint,
 		},
-		Environment: azure.PublicCloud,
+		Environment: *azureEnv,
 	}
 
 	authorizer, err := authSettings.GetAuthorizer()
 	if err != nil {
 		// GetAuthorizer returns an untyped error when it is unable to
 		// obtain a non-empty value for any of the required auth settings.
-		return nil, emptyCredentialsError{e: err}
+		return nil, auth.NewPermanentCredentialsError(err)
 	}
 
 	return authorizer, nil
 }
-
-// emptyCredentialsError is an opaque error type that wraps another error to
-// indicate that required Azure credentials could not be obtained.
-//
-// This allows callers to handle that special case if required, especially when
-// the original error can not be asserted any other way because it is untyped.
-// For example, Kubernetes finalizers are unlikely to be able to proceed when
-// credentials can not be determined.
-type emptyCredentialsError struct {
-	e error
-}
-
-// Error implements the error interface.
-func (e emptyCredentialsError) Error() string {
-	if e.e == nil {
-		return ""
-	}
-	return e.e.Error()
-}
-
-// Unwrap implements errors.Unwrap.
-func (e emptyCredentialsError) Unwrap() error {
-	return e.e
-}
-
-// IsEmptyCredentials allows callers to assert an error for behaviour.
-//
-// Example of assertion:
-//   _, ok := err.(interface { IsEmptyCredentials() })
-func (e emptyCredentialsError) IsEmptyCredentials() {}

@@ -72,24 +72,24 @@ func (*AzureServiceBusTopicSource) GetEventTypes() []string {
 
 // Status conditions
 const (
-	// AzureServiceBusTopicSubscribed has status True when the source has subscribed to a topic.
-	AzureServiceBusTopicSubscribed apis.ConditionType = "Subscribed"
+	// AzureServiceBusTopicConditionSubscribed has status True when the source has subscribed to a topic.
+	AzureServiceBusTopicConditionSubscribed apis.ConditionType = "Subscribed"
 )
 
 // azureServiceBusTopicSourceConditionSet is a set of conditions for
 // AzureServiceBusTopicSource objects.
 var azureServiceBusTopicSourceConditionSet = NewEventSourceConditionSet(
-	AzureServiceBusTopicSubscribed,
+	AzureServiceBusTopicConditionSubscribed,
 )
 
 // MarkSubscribed sets the Subscribed condition to True.
 func (s *AzureServiceBusTopicSourceStatus) MarkSubscribed() {
-	azureServiceBusTopicSourceConditionSet.Manage(s).MarkTrue(AzureServiceBusTopicSubscribed)
+	azureServiceBusTopicSourceConditionSet.Manage(s).MarkTrue(AzureServiceBusTopicConditionSubscribed)
 }
 
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *AzureServiceBusTopicSourceStatus) MarkNotSubscribed(reason, msg string) {
 	s.SubscriptionID = nil
-	azureServiceBusTopicSourceConditionSet.Manage(s).MarkFalse(AzureServiceBusTopicSubscribed, reason, msg)
+	azureServiceBusTopicSourceConditionSet.Manage(s).MarkFalse(AzureServiceBusTopicConditionSubscribed, reason, msg)
 }

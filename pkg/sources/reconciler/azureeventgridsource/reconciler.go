@@ -31,6 +31,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureeventgridsource"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/auth"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/eventgrid"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
@@ -120,7 +121,7 @@ func isNoCredentials(err error) bool {
 	if k8sErr := apierrors.APIStatus(nil); errors.As(err, &k8sErr) {
 		return k8sErr.Status().Reason == metav1.StatusReasonNotFound
 	}
-	if ecErr := (interface{ IsEmptyCredentials() })(nil); errors.As(err, &ecErr) {
+	if permErr := (auth.PermanentCredentialsError)(nil); errors.As(err, &permErr) {
 		return true
 	}
 	return false

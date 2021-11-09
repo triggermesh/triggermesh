@@ -25,7 +25,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/monitor/mgmt/insights/insightsapi"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/azure"
+	"github.com/triggermesh/triggermesh/pkg/sources/auth/azure"
 )
 
 // EventCategoriesClient is an alias for the EventCategoriesClientAPI interface.
@@ -60,7 +60,7 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureActivityLogsSource) (EventCategoriesClient, DiagnosticSettingsClient, error) {
-	authorizer, err := azure.Authorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
+	authorizer, err := azure.NewAADAuthorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
 	if err != nil {
 		return nil, nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
 	}
