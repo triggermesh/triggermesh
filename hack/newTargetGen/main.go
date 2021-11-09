@@ -28,6 +28,7 @@ import (
 type component struct {
 	Name          string
 	UppercaseName string
+	FullCaps      string
 }
 
 func (a *component) replaceTemplates(filename, outputname string) {
@@ -58,6 +59,7 @@ func main() {
 	fmt.Scanf("%s", &temp.UppercaseName)
 
 	temp.Name = strings.ToLower(temp.UppercaseName)
+	temp.FullCaps = strings.ToUpper(temp.UppercaseName)
 	// fmt.Print("Enter the ALL CAPS VERISON of the target name: ")
 	// fmt.Scanf("%s", &capsName)
 
