@@ -29,7 +29,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// {{.UppercaseName}} is the Schema for an Alibaba Object Storage Service Target.
+// {{.UppercaseName}} is the Schema the event target.
 type {{.UppercaseName}} struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -47,14 +47,14 @@ var (
 	_ duckv1.KRShaped           = (*{{.UppercaseName}})(nil)
 )
 
-// {{.UppercaseName}}Spec holds the desired state of the {{.UppercaseName}}.
+// {{.UppercaseName}}Spec holds the desired state of the event target.
 type {{.UppercaseName}}Spec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
-// {{.UppercaseName}}Status communicates the observed state of the {{.UppercaseName}} (from the controller).
+// {{.UppercaseName}}Status communicates the observed state of the event target. (from the controller).
 type {{.UppercaseName}}Status struct {
 	duckv1.Status        `json:",inline"`
 	duckv1.AddressStatus `json:",inline"`
@@ -65,7 +65,7 @@ type {{.UppercaseName}}Status struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// {{.UppercaseName}}List is a list of {{.UppercaseName}} resources
+// {{.UppercaseName}}List is a list of event target instances.
 type {{.UppercaseName}}List struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
