@@ -59,73 +59,68 @@ func main() {
 	temp.Name = strings.ToLower(*kind)
 	temp.FullCaps = strings.ToUpper(*kind)
 
-	// make cmd folder
-	path := fmt.Sprintf("cmd/%s", temp.Name+"-adapter")
+	// make cmd directory
+	path := "cmd/" + temp.Name + "-adapter"
 	newpath := filepath.Join("../../", path)
 	err := os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// // make adapter folder
-	path = fmt.Sprintf("pkg/targets/adapter/%s", temp.Name)
+	// // make adapter directory
+	path = "pkg/targets/adapter/%s" + temp.Name
 	newpath = filepath.Join("../../", path)
 	err = os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// make reconciler folder
-	path = fmt.Sprintf("pkg/targets/reconciler/%s", temp.Name)
+	// make reconciler directory
+	path = "pkg/targets/reconciler/" + temp.Name
 	newpath = filepath.Join("../../", path)
 	err = os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// populate cmd folder
-	// read dockerfile and replace the template variables
-	path = fmt.Sprintf("cmd/%s/Dockerfile", temp.Name+"-adapter")
-	newpath = filepath.Join("../../", path)
-	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/Dockerfile", newpath)
-
+	// populate cmd directory
 	// read main.go and replace the template variables
-	path = fmt.Sprintf("../../cmd/%s/main.go", temp.Name+"-adapter")
+	path = ".../../cmd/" + temp.Name + "-adapter/main.go"
 	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
 
-	// populate adapter folder
+	// populate adapter directory
 	// read adapter.go
-	path = fmt.Sprintf("../../pkg/targets/adapter/%s/adapter.go", temp.Name)
+	path = ".../../pkg/targets/adapter/" + temp.Name + "/adapter.go"
 	temp.replaceTemplates("scaffolding/pkg/targets/adapter/newtarget/adapter.go", path)
 
-	// // read newtarget_lifecycle.go
-	path = fmt.Sprintf("../../pkg/apis/targets/v1alpha1/%s_lifecycle.go", temp.Name)
+	// read newtarget_lifecycle.go
+	path = "../../pkg/apis/targets/v1alpha1/" + temp.Name + "_lifecycle.go"
 	temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_lifecycle.go", path)
 
-	// // read newtarget_types.go
-	path = fmt.Sprintf("../../pkg/apis/targets/v1alpha1/%s_types.go", temp.Name)
+	// read newtarget_types.go
+	path = "../../pkg/apis/targets/v1alpha1/" + temp.Name + "_types.go"
 	temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_types.go", path)
 
-	// populate reconciler folder
+	// populate reconciler directory
 	// read adapter.go
-	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/adapter.go", temp.Name)
+	path = "../../pkg/targets/reconciler/" + temp.Name + "/adapter.go"
 	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/adapter.go", path)
 
 	// read controller_test.go
-	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/controller_test.go", temp.Name)
+	path = "../../pkg/targets/reconciler/" + temp.Name + "/controller_test.go"
 	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller_test.go", path)
 
 	// read controller.go
-	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/controller.go", temp.Name)
+	path = "../../pkg/targets/reconciler/" + temp.Name + "/controller.go"
 	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller.go", path)
 
 	// read reconciler.go
-	path = fmt.Sprintf("../../pkg/targets/reconciler/%s/reconciler.go", temp.Name)
+	path = "../../pkg/targets/reconciler/" + temp.Name + "/reconciler.go"
 	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
 
-	// populate the config folder
+	// populate the config directory
 	// read 301-newtarget.yaml.go
-	path = fmt.Sprintf("../../config/301-%s.yaml", temp.Name)
+	path = "../../config/301-" + temp.Name + ".yaml"
 	temp.replaceTemplates("scaffolding/config/301-newtarget.yaml", path)
 
 	fmt.Println("done")
