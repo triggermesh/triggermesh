@@ -68,7 +68,7 @@ func main() {
 	}
 
 	// // make adapter directory
-	path = "pkg/targets/adapter/%s" + temp.Name
+	path = "pkg/targets/adapter/" + temp.Name
 	newpath = filepath.Join("../../", path)
 	err = os.MkdirAll(newpath, os.ModePerm)
 	if err != nil {
@@ -85,12 +85,12 @@ func main() {
 
 	// populate cmd directory
 	// read main.go and replace the template variables
-	path = ".../../cmd/" + temp.Name + "-adapter/main.go"
+	path = "../../cmd/" + temp.Name + "-adapter/main.go"
 	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
 
 	// populate adapter directory
 	// read adapter.go
-	path = ".../../pkg/targets/adapter/" + temp.Name + "/adapter.go"
+	path = "../../pkg/targets/adapter/" + temp.Name + "/adapter.go"
 	temp.replaceTemplates("scaffolding/pkg/targets/adapter/newtarget/adapter.go", path)
 
 	// read newtarget_lifecycle.go
