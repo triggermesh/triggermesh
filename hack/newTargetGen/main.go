@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -52,18 +53,11 @@ func (a *component) replaceTemplates(filename, outputname string) {
 }
 
 func main() {
+	kind := flag.String("kind", "TestTarget", "specify the Target kind")
+	flag.Parse()
 	temp := &component{}
-	// var capsName string
-
-	fmt.Print("Enter the target name: ")
-	fmt.Scanf("%s", &temp.UppercaseName)
-
-	temp.Name = strings.ToLower(temp.UppercaseName)
-	temp.FullCaps = strings.ToUpper(temp.UppercaseName)
-	// fmt.Print("Enter the ALL CAPS VERISON of the target name: ")
-	// fmt.Scanf("%s", &capsName)
-
-	// TODO add naming validation here
+	temp.Name = strings.ToLower(*kind)
+	temp.FullCaps = strings.ToUpper(*kind)
 
 	// make cmd folder
 	path := fmt.Sprintf("cmd/%s", temp.Name+"-adapter")
