@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package azureservicebustopicsource
+package azureservicebussource
 
 import (
 	"encoding/json"
@@ -22,7 +22,9 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
+	"github.com/Azure/azure-amqp-common-go/v3/uuid"
 	servicebus "github.com/Azure/azure-service-bus-go"
+	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -57,7 +59,7 @@ func makeServiceBusEvent(msg *servicebus.Message, srcAttr string) (*cloudevents.
 	event := cloudevents.NewEvent()
 	event.SetID(msg.ID)
 	event.SetSource(srcAttr)
-	event.SetType(v1alpha1.AzureEventType(sources.AzureServiceServiceBus, v1alpha1.AzureServiceBusTopicGenericEventType))
+	event.SetType(v1alpha1.AzureEventType(sources.AzureServiceServiceBus, v1alpha1.AzureServiceBusGenericEventType))
 
 	if sysProps := msg.SystemProperties; sysProps != nil && sysProps.EnqueuedTime != nil {
 		event.SetTime(*sysProps.EnqueuedTime)
@@ -74,24 +76,46 @@ func makeServiceBusEvent(msg *servicebus.Message, srcAttr string) (*cloudevents.
 // JSON serialization inside some CloudEvent data.
 func toCloudEventData(msg *servicebus.Message) interface{} {
 	var data interface{}
-	data = msg
+
+	serialMsg := &Message{
+		LockToken: stringifyLockToken(msg.LockToken),
+		Message:   msg,
+	}
+
+	data = serialMsg
 
 	// if event.Data contains raw JSON data, type it as json.RawMessage so
 	// it doesn't get encoded to base64 during the serialization of the
 	// CloudEvent data.
 	var rawData json.RawMessage
 	if err := json.Unmarshal(msg.Data, &rawData); err == nil {
-		data = EventWithRawData{
+		data = &MessageWithRawJSONData{
 			Data:    rawData,
-			Message: msg,
+			Message: serialMsg,
 		}
 	}
 
 	return data
 }
 
-// EventWithRawData is an servicebus.Message with RawMessage-typed data.
-type EventWithRawData struct {
-	Data json.RawMessage
+// Message is a servicebus.Message with some selected fields shadowed for
+// improved serialization.
+type Message struct {
+	LockToken *string
 	*servicebus.Message
+}
+
+// MessageWithRawJSONData is an Message with RawMessage-typed JSON data.
+type MessageWithRawJSONData struct {
+	Data json.RawMessage
+	*Message
+}
+
+// stringifyLockToken converts a UUID byte-array into its string representation.
+func stringifyLockToken(id *uuid.UUID) *string {
+	if id == nil {
+		return nil
+	}
+
+	return to.StringPtr(id.String())
 }

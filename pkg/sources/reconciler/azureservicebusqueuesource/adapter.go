@@ -32,15 +32,12 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
-const (
-	envAzureConnString = "SERVICEBUS_CONNECTION_STRING"
-)
-
 // adapterConfig contains properties used to configure the adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
-	Image string `default:"gcr.io/triggermesh/azureservicebusqueuesource-adapter"`
+	// Uses a common adapter for both Azure Service Bus sources instead of a source-specific image.
+	Image string `envconfig:"AZURESERVICEBUSSOURCE_IMAGE" default:"gcr.io/triggermesh/azureservicebussource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
@@ -51,13 +48,24 @@ var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 // BuildAdapter implements common.AdapterDeploymentBuilder.
 func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.AzureServiceBusQueueSource)
-	serviceBusEnvs := []corev1.EnvVar{}
-	serviceBusEnvs = common.MaybeAppendValueFromEnvVar(serviceBusEnvs, envAzureConnString, typedSrc.Spec.Auth.SASToken.ConnectionString)
+
+	var authEnvs []corev1.EnvVar
+	if sasAuth := typedSrc.Spec.Auth.SASToken; sasAuth != nil {
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusKeyName, sasAuth.KeyName)
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusKeyValue, sasAuth.KeyValue)
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusConnStr, sasAuth.ConnectionString)
+	}
+	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientID, spAuth.ClientID)
+		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
+	}
+
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVars(serviceBusEnvs...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
+
+		resource.EnvVar(common.EnvServiceBusEntityResourceID, typedSrc.Spec.QueueID.String()),
+		resource.EnvVars(authEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }

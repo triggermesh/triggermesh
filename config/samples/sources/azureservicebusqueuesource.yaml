@@ -24,12 +24,15 @@ kind: AzureServiceBusQueueSource
 metadata:
   name: sample
 spec:
+  queueID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.ServiceBus/namespaces/MyNamespace/queues/MyQueue
+
   auth:
     sasToken:
       connectionString:
-        value: Endpoint=sb://foo.servicebus.windows.net/;SharedAccessKeyName=bar;SharedAccessKey=<key>;EntityPath=fobar
+        value: Endpoint=sb://mynamespace.servicebus.windows.net/;SharedAccessKeyName=ReadOnly;SharedAccessKey=aHpDel7ZCURMDyixudUeciLODz9SxImqqbEXAMPLEKEY;EntityPath=myqueue
+
   sink:
     ref:
       apiVersion: eventing.knative.dev/v1
-      kind: broker
+      kind: Broker
       name: default

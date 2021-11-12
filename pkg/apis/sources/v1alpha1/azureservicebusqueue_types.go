@@ -32,8 +32,8 @@ type AzureServiceBusQueueSource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AzureServiceBusQueueSourceSpec   `json:"spec,omitempty"`
-	Status AzureServiceBusQueueSourceStatus `json:"status,omitempty"`
+	Spec   AzureServiceBusQueueSourceSpec `json:"spec,omitempty"`
+	Status EventSourceStatus              `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
@@ -46,12 +46,14 @@ var (
 type AzureServiceBusQueueSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	Auth AzureAuth `json:"auth,omitempty"`
-}
+	// The resource ID the Service Bus Queue to subscribe to.
+	//
+	// Expected format:
+	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}
+	QueueID AzureResourceID `json:"queueID"`
 
-// AzureServiceBusQueueSourceStatus defines the observed state of the event source.
-type AzureServiceBusQueueSourceStatus struct {
-	EventSourceStatus `json:",inline"`
+	// Authentication method to interact with Azure Service Bus.
+	Auth AzureAuth `json:"auth"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

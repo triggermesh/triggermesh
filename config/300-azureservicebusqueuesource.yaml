@@ -52,19 +52,147 @@ spec:
             description: Desired state of the event source.
             type: object
             properties:
+              queueID:
+                description: |-
+                  The resource ID the Service Bus Queue to subscribe to.
+
+                  The expected format is
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}
+                type: string
+                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.ServiceBus\/namespaces\/[A-Za-z0-9-]{6,50}\/queues\/[A-Za-z0-9][\w.~/-]{0,258}[A-Za-z0-9]$
               auth:
                 description: Authentication method to interact with the Azure Service Bus Queue.
                 type: object
                 properties:
+                  servicePrincipal:
+                    description: Credentials of an Azure Service Principal. For more information about service
+                      principals, please refer to the Azure Active Directory documentation at
+                      https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals.
+                    type: object
+                    properties:
+                      tenantID:
+                        description: ID of the Azure Active Directory tenant.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the tenant ID.
+                            type: string
+                            format: guid
+                            pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the tenant ID.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientID:
+                        description: ID of the registered client/application.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the client ID.
+                            type: string
+                            format: guid
+                            pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the client ID.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientSecret:
+                        description: Secret associated with the registered client/application.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the client secret.
+                            type: string
+                            format: password
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the client secret.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                    required:
+                    - tenantID
+                    - clientID
+                    - clientSecret
                   sasToken:
                     description: An Azure shared access signature (SAS) token. For more information about SAS tokens,
                       please refer to the Azure Service Bus Queue documentation at
                       https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas.
                     type: object
                     properties:
+                      keyName:
+                        description: Name of the key used by the SAS token. Mutually exclusive with 'connectionString'.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal name of the key.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the key's name.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      keyValue:
+                        description: Value of the key used by the SAS token. Mutually exclusive with 'connectionString'.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the key.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the key's value.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
                       connectionString:
-                        description: Connection string containing both the resource URI of the Event Service Bus
-                          instance, and the SAS token.
+                        description: Connection string containing both the resource URI of the Service Bus Queue, and
+                          the SAS token. Mutually exclusive with 'keyName' and 'keyValue'.
                         type: object
                         properties:
                           value:
@@ -78,6 +206,21 @@ spec:
                                 type: string
                               key:
                                 type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                    oneOf:
+                    - required:
+                      - keyName
+                      - keyValue
+                    - required:
+                      - connectionString
+                oneOf:
+                - required: [sasToken]
+                - required: [servicePrincipal]
               sink:
                 description: The destination of events sourced from Azure Service Bus Queue.
                 type: object
@@ -106,6 +249,7 @@ spec:
                 - required: [ref]
                 - required: [uri]
             required:
+            - queueID
             - auth
             - sink
           status:

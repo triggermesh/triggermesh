@@ -54,6 +54,18 @@ type envConfig struct {
 	//
 	// Supported values: [ default eventgrid ]
 	MessageProcessor string `envconfig:"EVENTHUB_MESSAGE_PROCESSOR" default:"default"`
+
+	// The environment variables below aren't read from the envConfig struct
+	// by the Event Hubs SDK, but rather directly using os.Getenv().
+	// They are nevertheless listed here for documentation purposes.
+	_ string `envconfig:"EVENTHUB_NAMESPACE"`
+	_ string `envconfig:"EVENTHUB_NAME"`
+	_ string `envconfig:"AZURE_TENANT_ID"`
+	_ string `envconfig:"AZURE_CLIENT_ID"`
+	_ string `envconfig:"AZURE_CLIENT_SECRET"`
+	_ string `envconfig:"EVENTHUB_KEY_NAME"`
+	_ string `envconfig:"EVENTHUB_KEY_VALUE"`
+	_ string `envconfig:"EVENTHUB_CONNECTION_STRING"`
 }
 
 // adapter implements the source's adapter.

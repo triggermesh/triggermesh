@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package azureservicebustopicsource
+package azureservicebussource
 
 import (
 	"testing"
@@ -23,12 +23,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Azure/azure-amqp-common-go/v3/uuid"
 	servicebus "github.com/Azure/azure-service-bus-go"
 )
 
 func TestProcessMessage(t *testing.T) {
 	const ceType = "com.microsoft.azure.servicebus.message"
-	const ceSource = "/resource/id/of/a/servicebus/topic"
+	const ceSource = "/resource/id/of/a/servicebus/entity"
 	const ceID = "someMessageID"
 	var ceTime = time.Unix(0, 0)
 
@@ -37,6 +38,7 @@ func TestProcessMessage(t *testing.T) {
 		SystemProperties: &servicebus.SystemProperties{
 			EnqueuedTime: &ceTime,
 		},
+		LockToken: &uuid.Nil,
 
 		Data: sampleEvent,
 	}
@@ -54,6 +56,13 @@ func TestProcessMessage(t *testing.T) {
 	assert.Equal(t, ceType, event.Type())
 	assert.Equal(t, ceSource, event.Source())
 	assert.Equal(t, ceTime, event.Time())
+
+	eventData := make(map[string]interface{})
+	require.NoError(t, event.DataAs(&eventData))
+
+	lockToken := eventData["LockToken"]
+	require.NotNil(t, lockToken, "LockToken should be set")
+	assert.Equal(t, "00000000-0000-0000-0000-000000000000", lockToken, "LockToken should be stringified")
 }
 
 // Generated using https://www.json-generator.com

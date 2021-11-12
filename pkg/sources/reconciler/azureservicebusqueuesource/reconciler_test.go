@@ -64,6 +64,14 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newEventSource() *v1alpha1.AzureServiceBusQueueSource {
 	src := &v1alpha1.AzureServiceBusQueueSource{
 		Spec: v1alpha1.AzureServiceBusQueueSourceSpec{
+			QueueID: v1alpha1.AzureResourceID{
+				SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+				ResourceGroup:    "MyGroup",
+				ResourceProvider: "Microsoft.ServiceBus",
+				Namespace:        "MyNamespace",
+				ResourceType:     "queues",
+				ResourceName:     "MyQueue",
+			},
 			Auth: v1alpha1.AzureAuth{
 				SASToken: &v1alpha1.AzureSASToken{
 					ConnectionString: v1alpha1.ValueFromField{
@@ -73,7 +81,9 @@ func newEventSource() *v1alpha1.AzureServiceBusQueueSource {
 			},
 		},
 	}
+
 	Populate(src)
+
 	return src
 }
 

@@ -32,13 +32,12 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
-const envServiceBusSubscription = "SERVICEBUS_SUBSCRIPTION_RESOURCE_ID"
-
 // adapterConfig contains properties used to configure the source's adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
-	Image string `default:"gcr.io/triggermesh/azureservicebustopicsource-adapter"`
+	// Uses a common adapter for both Azure Service Bus sources instead of a source-specific image.
+	Image string `envconfig:"AZURESERVICEBUSSOURCE_IMAGE" default:"gcr.io/triggermesh/azureservicebussource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
@@ -65,7 +64,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(envServiceBusSubscription, subsID),
+		resource.EnvVar(common.EnvServiceBusEntityResourceID, subsID),
 		resource.EnvVars(authEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)

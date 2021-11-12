@@ -19,9 +19,9 @@ package main
 import (
 	"knative.dev/eventing/pkg/adapter/v2"
 
-	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureservicebustopicsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureservicebussource"
 )
 
 func main() {
-	adapter.Main("azureservicebustopicsource", azureservicebustopicsource.NewEnvConfig, azureservicebustopicsource.NewAdapter)
+	adapter.Main("azureservicebussource", azureservicebussource.NewEnvConfig, azureservicebussource.NewAdapter)
 }

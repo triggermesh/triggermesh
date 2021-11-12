@@ -83,10 +83,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/azureiothubsource-adapter
         - name: AZUREQUEUESTORAGESOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/azurequeuestoragesource-adapter
-        - name: AZURESERVICEBUSQUEUESOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/azureservicebusqueuesource-adapter
-        - name: AZURESERVICEBUSTOPICSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/azureservicebustopicsource-adapter
+        - name: AZURESERVICEBUSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azureservicebussource-adapter
         - name: GOOGLECLOUDPUBSUBSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudpubsubsource-adapter
         - name: HTTPPOLLERSOURCE_IMAGE

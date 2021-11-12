@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Message",
+  "definitions": {
+    "Message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ContentType",
+        "CorrelationID",
+        "Data",
+        "DeliveryCount",
+        "ID",
+        "Label",
+        "ReplyTo",
+        "ReplyToGroupID",
+        "To",
+        "Format"
+      ],
+      "properties": {
+        "ContentType": {
+          "type": "string"
+        },
+        "CorrelationID": {
+          "type": "string"
+        },
+        "Data": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "DeliveryCount": {
+          "type": "integer"
+        },
+        "SessionID": {
+          "type": "string"
+        },
+        "GroupSequence": {
+          "type": "integer"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Label": {
+          "type": "string"
+        },
+        "ReplyTo": {
+          "type": "string"
+        },
+        "ReplyToGroupID": {
+          "type": "string"
+        },
+        "To": {
+          "type": "string"
+        },
+        "TTL": {
+          "type": "integer"
+        },
+        "LockToken": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "SystemProperties": {
+          "type": "object",
+          "properties": {
+            "DeadLetterSource": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "EnqueuedSequenceNumber": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "EnqueuedTime": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "ScheduledEnqueueTime": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "LockedUntil": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            },
+            "SequenceNumber": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "PartitionID": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "PartitionKey": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "ViaPartitionKey": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "Annotations": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "UserProperties": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          }
+        },
+        "Format": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

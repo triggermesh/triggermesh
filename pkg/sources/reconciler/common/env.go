@@ -45,6 +45,12 @@ const (
 	EnvHubConnStr    = "EVENTHUB_CONNECTION_STRING"
 	EnvHubResourceID = "EVENTHUB_RESOURCE_ID"
 
+	// Azure Service Bus attributes
+	EnvServiceBusKeyName          = "SERVICEBUS_KEY_NAME"
+	EnvServiceBusKeyValue         = "SERVICEBUS_KEY_VALUE"
+	EnvServiceBusConnStr          = "SERVICEBUS_CONNECTION_STRING"
+	EnvServiceBusEntityResourceID = "SERVICEBUS_ENTITY_RESOURCE_ID"
+
 	// Google Cloud
 	EnvGCloudSAKey              = "GCLOUD_SERVICEACCOUNT_KEY"
 	EnvGCloudPubSubSubscription = "GCLOUD_PUBSUB_SUBSCRIPTION"
