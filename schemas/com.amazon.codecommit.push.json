@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/Commit",
+  "definitions": {
+    "Commit": {
+      "required": [
+        "AdditionalData",
+        "Author",
+        "CommitId",
+        "Committer",
+        "Message",
+        "Parents",
+        "TreeId"
+      ],
+      "properties": {
+        "AdditionalData": {
+          "type": "string"
+        },
+        "Author": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/UserInfo"
+        },
+        "CommitId": {
+          "type": "string"
+        },
+        "Committer": {
+          "$ref": "#/definitions/UserInfo"
+        },
+        "Message": {
+          "type": "string"
+        },
+        "Parents": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "TreeId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "UserInfo": {
+      "required": [
+        "Date",
+        "Email",
+        "Name"
+      ],
+      "properties": {
+        "Date": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

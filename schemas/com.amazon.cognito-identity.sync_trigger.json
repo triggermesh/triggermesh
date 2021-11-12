@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/CognitoIdentitySyncEvent",
+  "definitions": {
+    "CognitoIdentitySyncEvent": {
+      "required": [
+        "CreationDate",
+        "DataStorage",
+        "DatasetName",
+        "IdentityID",
+        "LastModifiedBy",
+        "LastModifiedDate",
+        "NumRecords",
+        "EventType",
+        "Region",
+        "IdentityPoolID",
+        "DatasetRecords"
+      ],
+      "properties": {
+        "CreationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "DataStorage": {
+          "type": "integer"
+        },
+        "DatasetName": {
+          "type": "string"
+        },
+        "DatasetRecords": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Record"
+          },
+          "type": "array"
+        },
+        "EventType": {
+          "type": "string"
+        },
+        "IdentityID": {
+          "type": "string"
+        },
+        "IdentityPoolID": {
+          "type": "string"
+        },
+        "LastModifiedBy": {
+          "type": "string"
+        },
+        "LastModifiedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "NumRecords": {
+          "type": "integer"
+        },
+        "Region": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Record": {
+      "required": [
+        "DeviceLastModifiedDate",
+        "Key",
+        "LastModifiedBy",
+        "LastModifiedDate",
+        "SyncCount",
+        "Value"
+      ],
+      "properties": {
+        "DeviceLastModifiedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Key": {
+          "type": "string"
+        },
+        "LastModifiedBy": {
+          "type": "string"
+        },
+        "LastModifiedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "SyncCount": {
+          "type": "integer"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

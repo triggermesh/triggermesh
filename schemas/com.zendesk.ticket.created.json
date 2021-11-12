@@ -1,0 +1,180 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ticket": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": {
+          "type": "string"
+        },
+        "via": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "ticket_type": {
+          "type": "string"
+        },
+        "group_name": {
+          "type": "string"
+        },
+        "brand_name": {
+          "type": "string"
+        },
+        "due_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "account": {
+          "type": "string"
+        },
+        "assignee": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "name": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          }
+        },
+        "requester": {
+          "name": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "external_id": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "organization": {
+          "name": {
+            "type": "string"
+          },
+          "external_id": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "ccs": {
+          "type": "string"
+        },
+        "cc_names": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "string"
+        },
+        "current_holiday_name": {
+          "type": "string"
+        },
+        "ticket_field_id": {
+          "type": "string"
+        },
+        "ticket_field_option_title_id": {
+          "type": "string"
+        }
+      }
+    },
+    "current_user": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "organization": {
+          "name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "external_id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        }
+      }
+    },
+    "satisfaction": {
+      "type": "object",
+      "properties": {
+        "current_rating": {
+          "type": "string"
+        },
+        "current_comment": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

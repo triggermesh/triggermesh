@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Standard event wrapper for the Events API",
+  "description": "Adapted from auto-generated content",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "token",
+    "team_id",
+    "api_app_id",
+    "event",
+    "type",
+    "event_id",
+    "event_time",
+    "authed_users"
+  ],
+  "properties": {
+    "token": {
+      "title": "A verification token to validate the event originated from Slack",
+      "type": "string"
+    },
+    "team_id": {
+      "title": "The unique identifier of the workspace where the event occurred",
+      "type": "string",
+      "examples": [
+        "T1H9RESGL"
+      ]
+    },
+    "api_app_id": {
+      "title": "The unique identifier your installed Slack application.",
+      "description": " Use this to distinguish which app the event belongs to if you use multiple apps with the same Request URL.",
+      "type": "string",
+      "examples": [
+        "A2H9RFS1A"
+      ]
+    },
+    "event": {
+      "title": "The actual event, an object, that happened. You'll find the most variance in properties beneath this node.",
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "type",
+        "event_ts"
+      ],
+      "properties": {
+        "type": {
+          "title": "The specific name of the event",
+          "type": "string"
+        },
+        "event_ts": {
+          "title": "When the event was dispatched",
+          "type": "string"
+        }
+      },
+      "examples": [
+        {
+          "type": "message",
+          "user": "U061F7AUR",
+          "text": "How many cats did we herd yesterday?",
+          "ts": "1525215129.000001",
+          "channel": "D0PNCRP9N",
+          "event_ts": "1525215129.000001",
+          "channel_type": "app_home"
+        }
+      ]
+    },
+    "type": {
+      "title": "Indicates which kind of event dispatch this is, usually `event_callback`",
+      "type": "string",
+      "examples": [
+        "event_callback"
+      ]
+    },
+    "event_id": {
+      "title": "A unique identifier for this specific event, globally unique across all workspaces.",
+      "type": "string",
+      "examples": [
+        "Ev0PV52K25"
+      ]
+    },
+    "event_time": {
+      "title": "The epoch timestamp in seconds indicating when this event was dispatched.",
+      "type": "integer",
+      "examples": [
+        1525215129
+      ]
+    },
+    "authed_users": {
+      "title": "An array of string-based User IDs. Each member of the collection represents a user that has installed your application/bot and indicates the described event would be visible to those users.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "examples": [
+    {
+      "token": "XXYYZZ",
+      "team_id": "TXXXXXXXX",
+      "api_app_id": "AXXXXXXXXX",
+      "event": {
+        "type": "resources_added",
+        "resources": [
+          {
+            "resource": {
+              "type": "im",
+              "grant": {
+                "type": "specific",
+                "resource_id": "DXXXXXXXX"
+              }
+            },
+            "scopes": [
+              "chat:write:user",
+              "im:read",
+              "im:history",
+              "commands"
+            ]
+          }
+        ]
+      },
+      "type": "event_callback",
+      "authed_teams": [],
+      "event_id": "EvXXXXXXXX",
+      "event_time": 1234567890
+    },
+    {
+      "token": "XXYYZZ",
+      "team_id": "TXXXXXXXX",
+      "api_app_id": "AXXXXXXXXX",
+      "event": {
+        "type": "reaction_added",
+        "user": "U024BE7LH",
+        "reaction": "thumbsup",
+        "item_user": "U0G9QF9C6",
+        "item": {
+          "type": "message",
+          "channel": "C0G9QF9GZ",
+          "ts": "1360782400.498405"
+        },
+        "event_ts": "1360782804.083113"
+      },
+      "type": "event_callback",
+      "authed_teams": [],
+      "event_id": "EvXXXXXXXX",
+      "event_time": 1234567890
+    }
+  ]
+}

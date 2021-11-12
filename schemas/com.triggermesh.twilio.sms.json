@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/Message",
+  "definitions": {
+    "Message": {
+      "required": [
+        "message_sid",
+        "sms_status",
+        "from_country",
+        "num_segments",
+        "to_zip",
+        "num_meda",
+        "account_sid",
+        "sms_message_sid",
+        "api_version",
+        "to_country",
+        "to_city",
+        "from_zip",
+        "sms_sid",
+        "from_state",
+        "body",
+        "from",
+        "from_city",
+        "to",
+        "to_state"
+      ],
+      "properties": {
+        "account_sid": {
+          "type": "string"
+        },
+        "api_version": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "from_city": {
+          "type": "string"
+        },
+        "from_country": {
+          "type": "string"
+        },
+        "from_state": {
+          "type": "string"
+        },
+        "from_zip": {
+          "type": "string"
+        },
+        "message_sid": {
+          "type": "string"
+        },
+        "num_meda": {
+          "type": "string"
+        },
+        "num_segments": {
+          "type": "string"
+        },
+        "sms_message_sid": {
+          "type": "string"
+        },
+        "sms_sid": {
+          "type": "string"
+        },
+        "sms_status": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "to_city": {
+          "type": "string"
+        },
+        "to_country": {
+          "type": "string"
+        },
+        "to_state": {
+          "type": "string"
+        },
+        "to_zip": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

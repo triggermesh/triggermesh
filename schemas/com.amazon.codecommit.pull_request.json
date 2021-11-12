@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/PullRequest",
+  "definitions": {
+    "ApprovalRule": {
+      "required": [
+        "ApprovalRuleContent",
+        "ApprovalRuleId",
+        "ApprovalRuleName",
+        "CreationDate",
+        "LastModifiedDate",
+        "LastModifiedUser",
+        "OriginApprovalRuleTemplate",
+        "RuleContentSha256"
+      ],
+      "properties": {
+        "ApprovalRuleContent": {
+          "type": "string"
+        },
+        "ApprovalRuleId": {
+          "type": "string"
+        },
+        "ApprovalRuleName": {
+          "type": "string"
+        },
+        "CreationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "LastModifiedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "LastModifiedUser": {
+          "type": "string"
+        },
+        "OriginApprovalRuleTemplate": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/OriginApprovalRuleTemplate"
+        },
+        "RuleContentSha256": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MergeMetadata": {
+      "required": [
+        "IsMerged",
+        "MergeCommitId",
+        "MergeOption",
+        "MergedBy"
+      ],
+      "properties": {
+        "IsMerged": {
+          "type": "boolean"
+        },
+        "MergeCommitId": {
+          "type": "string"
+        },
+        "MergeOption": {
+          "type": "string"
+        },
+        "MergedBy": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "OriginApprovalRuleTemplate": {
+      "required": [
+        "ApprovalRuleTemplateId",
+        "ApprovalRuleTemplateName"
+      ],
+      "properties": {
+        "ApprovalRuleTemplateId": {
+          "type": "string"
+        },
+        "ApprovalRuleTemplateName": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PullRequest": {
+      "required": [
+        "ApprovalRules",
+        "AuthorArn",
+        "ClientRequestToken",
+        "CreationDate",
+        "Description",
+        "LastActivityDate",
+        "PullRequestId",
+        "PullRequestStatus",
+        "PullRequestTargets",
+        "RevisionId",
+        "Title"
+      ],
+      "properties": {
+        "ApprovalRules": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ApprovalRule"
+          },
+          "type": "array"
+        },
+        "AuthorArn": {
+          "type": "string"
+        },
+        "ClientRequestToken": {
+          "type": "string"
+        },
+        "CreationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "LastActivityDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "PullRequestId": {
+          "type": "string"
+        },
+        "PullRequestStatus": {
+          "type": "string"
+        },
+        "PullRequestTargets": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/PullRequestTarget"
+          },
+          "type": "array"
+        },
+        "RevisionId": {
+          "type": "string"
+        },
+        "Title": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PullRequestTarget": {
+      "required": [
+        "DestinationCommit",
+        "DestinationReference",
+        "MergeBase",
+        "MergeMetadata",
+        "RepositoryName",
+        "SourceCommit",
+        "SourceReference"
+      ],
+      "properties": {
+        "DestinationCommit": {
+          "type": "string"
+        },
+        "DestinationReference": {
+          "type": "string"
+        },
+        "MergeBase": {
+          "type": "string"
+        },
+        "MergeMetadata": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/MergeMetadata"
+        },
+        "RepositoryName": {
+          "type": "string"
+        },
+        "SourceCommit": {
+          "type": "string"
+        },
+        "SourceReference": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "Reference: https://docs.microsoft.com/en-us/azure/event-grid/event-schema-blob-storage?tabs=cloud-event-schema#event-properties",
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "string"
+    },
+    "clientRequestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "requestId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eTag": {
+      "type": "string"
+    },
+    "contentType": {
+      "type": "string",
+      "format": "mimetype"
+    },
+    "contentLength": {
+      "type": "integer"
+    },
+    "blobType": {
+      "type": "string",
+      "enum": [
+        "BlockBlob",
+        "PageBlob"
+      ]
+    },
+    "contentOffset": {
+      "type": "number"
+    },
+    "destinationUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "sourceUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "recursive": {
+      "type": "string",
+      "enum": [
+        "true",
+        "false"
+      ]
+    },
+    "sequencer": {
+      "type": "string"
+    },
+    "storageDiagnostics": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "api",
+    "clientRequestId",
+    "requestId",
+    "url",
+    "sequencer"
+  ]
+}

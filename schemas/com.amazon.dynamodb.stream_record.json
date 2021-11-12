@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/Record",
+  "definitions": {
+    "AttributeValue": {
+      "required": [
+        "B",
+        "BOOL",
+        "BS",
+        "L",
+        "M",
+        "N",
+        "NS",
+        "NULL",
+        "S",
+        "SS"
+      ],
+      "properties": {
+        "B": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "BOOL": {
+          "type": "boolean"
+        },
+        "BS": {
+          "items": {
+            "type": "string",
+            "media": {
+              "binaryEncoding": "base64"
+            }
+          },
+          "type": "array"
+        },
+        "L": {
+          "items": {
+            "$ref": "#/definitions/AttributeValue"
+          },
+          "type": "array"
+        },
+        "M": {
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/AttributeValue"
+            }
+          },
+          "type": "object"
+        },
+        "N": {
+          "type": "string"
+        },
+        "NS": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "NULL": {
+          "type": "boolean"
+        },
+        "S": {
+          "type": "string"
+        },
+        "SS": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Identity": {
+      "required": [
+        "PrincipalId",
+        "Type"
+      ],
+      "properties": {
+        "PrincipalId": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Record": {
+      "required": [
+        "AwsRegion",
+        "Dynamodb",
+        "EventID",
+        "EventName",
+        "EventSource",
+        "EventVersion",
+        "UserIdentity"
+      ],
+      "properties": {
+        "AwsRegion": {
+          "type": "string"
+        },
+        "Dynamodb": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/StreamRecord"
+        },
+        "EventID": {
+          "type": "string"
+        },
+        "EventName": {
+          "type": "string"
+        },
+        "EventSource": {
+          "type": "string"
+        },
+        "EventVersion": {
+          "type": "string"
+        },
+        "UserIdentity": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Identity"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "StreamRecord": {
+      "required": [
+        "ApproximateCreationDateTime",
+        "Keys",
+        "NewImage",
+        "OldImage",
+        "SequenceNumber",
+        "SizeBytes",
+        "StreamViewType"
+      ],
+      "properties": {
+        "ApproximateCreationDateTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Keys": {
+          "patternProperties": {
+            ".*": {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "$ref": "#/definitions/AttributeValue"
+            }
+          },
+          "type": "object"
+        },
+        "NewImage": {
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/AttributeValue"
+            }
+          },
+          "type": "object"
+        },
+        "OldImage": {
+          "patternProperties": {
+            ".*": {
+              "$ref": "#/definitions/AttributeValue"
+            }
+          },
+          "type": "object"
+        },
+        "SequenceNumber": {
+          "type": "string"
+        },
+        "SizeBytes": {
+          "type": "integer"
+        },
+        "StreamViewType": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}
