@@ -54,9 +54,9 @@ require (
 	github.com/tidwall/gjson v1.11.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.25.0
-	go.opentelemetry.io/otel v1.1.0
-	go.opentelemetry.io/otel/metric v0.24.0
-	go.opentelemetry.io/otel/sdk/metric v0.24.0
+	go.opentelemetry.io/otel v1.2.0
+	go.opentelemetry.io/otel/metric v0.25.0
+	go.opentelemetry.io/otel/sdk/metric v0.25.0
 	go.uber.org/zap v1.19.1
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
@@ -176,10 +176,10 @@ require (
 	github.com/trivago/tgo v1.0.7 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	go.opentelemetry.io/otel/internal/metric v0.24.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.0.1 // indirect
-	go.opentelemetry.io/otel/sdk/export/metric v0.24.0 // indirect
-	go.opentelemetry.io/otel/trace v1.1.0 // indirect
+	go.opentelemetry.io/otel/internal/metric v0.25.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.2.0 // indirect
+	go.opentelemetry.io/otel/sdk/export/metric v0.25.0 // indirect
+	go.opentelemetry.io/otel/trace v1.2.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
