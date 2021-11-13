@@ -116,7 +116,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	case "default":
 		msgPrcsr = &defaultMessageProcessor{ceSource: arn.String()}
 	default:
-		panic("unsupported message processor " + strconv.Quote(env.MessageProcessor))
+		panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
 	var visibilityTimeoutSeconds *int64

@@ -44,12 +44,12 @@ func TestProcessMessageDefault(t *testing.T) {
 
 	eventExts := event.Extensions()
 
-	assert.Contains(t, eventExts, "something")
-	assert.Contains(t, eventExts, "mixedcase")
-	assert.Contains(t, eventExts, "invalidchars")
-	assert.Contains(t, eventExts, "xsubject")
+	assert.Contains(t, eventExts, "pubsubmsgsomething")
+	assert.Contains(t, eventExts, "pubsubmsgmixedcase")
+	assert.Contains(t, eventExts, "pubsubmsginvalidchars")
+	assert.Contains(t, eventExts, "pubsubmsgsubject")
 
-	assert.NotContains(t, eventExts, "something_else")
+	assert.NotContains(t, eventExts, "something")
 	assert.NotContains(t, eventExts, "mixedCase")
 	assert.NotContains(t, eventExts, "invalid-chars")
 	assert.NotContains(t, eventExts, "subject")

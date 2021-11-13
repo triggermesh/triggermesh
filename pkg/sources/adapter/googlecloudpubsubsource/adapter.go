@@ -89,7 +89,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	case "default":
 		msgPrcsr = &defaultMessageProcessor{ceSource: topicName}
 	default:
-		panic("unsupported message processor " + strconv.Quote(env.MessageProcessor))
+		logger.Panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
 	return &adapter{
@@ -102,32 +102,37 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
-	err := a.subs.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		events, err := a.msgPrcsr.Process(msg)
-		if err != nil {
-			a.logger.Errorw("Failed to process Pub/Sub message", zap.Error(err))
-			msg.Nack()
-		}
+	a.logger.Info("Starting message receiver")
 
-		var sendErrs errList
-
-		for _, event := range events {
-			if result := a.ceClient.Send(ctx, *event); !cloudevents.IsACK(result) {
-				sendErrs.errs = append(sendErrs.errs, err)
-				continue
-			}
-		}
-
-		if len(sendErrs.errs) != 0 {
-			a.logger.Errorw("Failed to send CloudEvents", zap.Error(sendErrs))
-			msg.Nack()
-		}
-
-		msg.Ack()
-	})
-	if err != nil {
+	if err := a.subs.Receive(ctx, a.handleMessage); err != nil {
 		return fmt.Errorf("during runtime of message receiver: %w", err)
 	}
 
 	return nil
+}
+
+// handleMessage is called by the receiver whenever a Message is pulled from
+// the Pub/Sub subscription.
+func (a *adapter) handleMessage(ctx context.Context, msg *pubsub.Message) {
+	events, err := a.msgPrcsr.Process(msg)
+	if err != nil {
+		a.logger.Errorw("Failed to process Pub/Sub message", zap.Error(err))
+		msg.Nack()
+	}
+
+	var sendErrs errList
+
+	for _, event := range events {
+		if result := a.ceClient.Send(ctx, *event); !cloudevents.IsACK(result) {
+			sendErrs.errs = append(sendErrs.errs, err)
+			continue
+		}
+	}
+
+	if len(sendErrs.errs) != 0 {
+		a.logger.Errorw("Failed to send CloudEvents", zap.Error(sendErrs))
+		msg.Nack()
+	}
+
+	msg.Ack()
 }

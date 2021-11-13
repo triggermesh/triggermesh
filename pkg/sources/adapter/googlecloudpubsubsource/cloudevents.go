@@ -14,50 +14,45 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awssqssource
+package googlecloudpubsubsource
 
 import (
 	"strings"
 
-	"github.com/aws/aws-sdk-go/service/sqs"
+	"cloud.google.com/go/pubsub"
 )
 
-const sqsMgsAttrDataTypeBinary = "Binary"
-const ceExtensionSQSMessagePrefix = "sqsmsg"
+const ceExtensionPubSubMessagePrefix = "pubsubmsg"
 
 // ceExtensionAttrsForMessage returns a collection of CloudEvents extension
-// attributes translated from the message attributes of the given SQS message.
+// attributes translated from the message attributes of the given Pub/Sub message.
 //
-// Attributes with a Binary data type are excluded.
-// The resulting extension attribute name is composed of the 'sqsmsg' prefix,
-// followed by the lowercase name of the SQS message attribute, from which all
-// non-alphanumeric characters have been removed (e.g. "sqsmsgmyattribute").
+// The resulting extension attribute name is composed of the 'pubsubmsg' prefix,
+// followed by the lowercase name of the Pub/Sub message attribute, from which all
+// non-alphanumeric characters have been removed (e.g. "pubsubmsgmyattribute").
 //
 // https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#extension-context-attributes
-func ceExtensionAttrsForMessage(msg *sqs.Message) map[string]interface{} {
-	if len(msg.MessageAttributes) == 0 {
+func ceExtensionAttrsForMessage(msg *pubsub.Message) map[string]interface{} {
+	if len(msg.Attributes) == 0 {
 		return nil
 	}
 
 	ceExtAttrs := make(map[string]interface{})
 
-	for name, attrVal := range msg.MessageAttributes {
-		if !strings.HasPrefix(*attrVal.DataType, sqsMgsAttrDataTypeBinary) {
-			ceExtAttrs[ceExtensionAttrForMessageAttr(name)] = *attrVal.StringValue
-		}
+	for name, attrVal := range msg.Attributes {
+		ceExtAttrs[ceExtensionAttrForMessageAttr(name)] = attrVal
 	}
 
 	return ceExtAttrs
 }
 
-// ceExtensionAttrForMessageAttr sanitizes the name of a SQS message attribute
-// so that it can be used as a CloudEvent context attribute.
+// ceExtensionAttrForMessageAttr sanitizes the name of a Pub/Sub message
+// attribute so that it can be used as a CloudEvent context attribute.
 //
-// The naming conventions for both formats are described at:
-//  - https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html#message-attribute-components
-//  - https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#context-attributes
+// The naming conventions for CloudEvent context attributes is described at
+// https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#context-attributes.
 func ceExtensionAttrForMessageAttr(attrName string) string {
-	return ceExtensionSQSMessagePrefix + stripNonAlphanumCharsAndMapToLower(attrName)
+	return ceExtensionPubSubMessagePrefix + stripNonAlphanumCharsAndMapToLower(attrName)
 }
 
 // stripNonAlphanumCharsAndMapToLower applies the following transformations to

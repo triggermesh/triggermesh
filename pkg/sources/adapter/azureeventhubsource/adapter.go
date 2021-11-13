@@ -93,7 +93,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	case "default":
 		msgPrcsr = &defaultMessageProcessor{ceSource: ceSource}
 	default:
-		panic("unsupported message processor " + strconv.Quote(env.MessageProcessor))
+		panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
 	// The Event Hubs client uses the default "NoOpTracer" tab.Tracer

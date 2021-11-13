@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Message",
+  "definitions": {
+    "Message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ID",
+        "Data",
+        "Attributes",
+        "PublishTime",
+        "OrderingKey"
+      ],
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "Data": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "Attributes": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          }
+        },
+        "PublishTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "DeliveryAttempt": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "OrderingKey": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
