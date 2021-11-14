@@ -65,17 +65,31 @@ type AWSS3SourceSpec struct {
 	// https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html
 	EventTypes []string `json:"eventTypes"`
 
-	// SQS Queue ARN
-	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies
+	// The destination of notifications originating from the Amazon S3 bucket.
 	//
-	// When not provided, a SQS queue for receiving event notifications
-	// from the S3 bucket is automatically created and configured.
+	// If omitted, an Amazon SQS queue is automatically created and
+	// associated with the bucket.
 	//
 	// +optional
-	QueueARN *apis.ARN `json:"queueARN,omitempty"`
+	Destination *AWSS3SourceDestination `json:"destination,omitempty"`
 
 	// Credentials to interact with the Amazon S3 and SQS APIs.
 	Credentials AWSSecurityCredentials `json:"credentials"`
+}
+
+// AWSS3SourceDestination contains possible destinations for bucket notifications.
+type AWSS3SourceDestination struct {
+	// Amazon SQS destination.
+	// +optional
+	SQS *AWSS3SourceDestinationSQS `json:"sqs,omitempty"`
+}
+
+// AWSS3SourceDestinationSQS contains properties of an Amazon SQS queue to use
+// as destination for bucket notifications.
+type AWSS3SourceDestinationSQS struct {
+	// SQS Queue ARN
+	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies
+	QueueARN apis.ARN `json:"queueARN"`
 }
 
 // AWSS3SourceStatus defines the observed state of the event source.

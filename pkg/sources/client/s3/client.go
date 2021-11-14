@@ -121,8 +121,10 @@ func determineS3Region(src *v1alpha1.AWSS3Source, creds *credentials.Value) (str
 		return src.Spec.ARN.Region, nil
 	}
 
-	if queueARN := src.Spec.QueueARN; queueARN != nil {
-		return src.Spec.QueueARN.Region, nil
+	if dest := src.Spec.Destination; dest != nil {
+		if sqsDest := dest.SQS; sqsDest != nil {
+			return sqsDest.QueueARN.Region, nil
+		}
 	}
 
 	region, err := getBucketRegion(src.Spec.ARN.Resource, creds)
@@ -164,8 +166,10 @@ func determineBucketOwnerAccount(src *v1alpha1.AWSS3Source, creds *credentials.V
 		return src.Spec.ARN.AccountID, nil
 	}
 
-	if queueARN := src.Spec.QueueARN; queueARN != nil {
-		return src.Spec.QueueARN.AccountID, nil
+	if dest := src.Spec.Destination; dest != nil {
+		if sqsDest := dest.SQS; sqsDest != nil {
+			return sqsDest.QueueARN.AccountID, nil
+		}
 	}
 
 	accID, err := getCallerAccountID(creds)
