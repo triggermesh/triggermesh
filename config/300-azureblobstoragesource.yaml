@@ -71,18 +71,6 @@ spec:
                   group name which all together uniquely identify the Storage Account within Azure.
                 type: string
                 pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.Storage\/storageAccounts\/[a-z0-9]{3,24}$
-              eventHubID:
-                description: |-
-                  Resource ID of either the Event Hubs instance or Event Hubs namespace to send events to.
-
-                  Accepted formats are
-                    - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
-                    - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
-
-                  If the resource ID represents an Event Hubs namespace, an Event Hubs instance is created on behalf of
-                  the user inside that namespace. Otherwise, the user-provided Event Hub is used.
-                type: string
-                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}(?:\/eventHubs\/[a-zA-Z0-9][\w.-]{0,49})?$
               eventTypes:
                 description: |-
                   Types of events to subscribe to.
@@ -110,6 +98,31 @@ spec:
                   # Allowed for completeness, but users should be aware that those events use a different schema from
                   # the other Storage event types.
                   - Microsoft.Storage.BlobInventoryPolicyCompleted
+              endpoint:
+                description: The destination of events subscribed via Event Grid.
+                type: object
+                properties:
+                  eventHubs:
+                    description: Properties of an Event Hubs namespace to use as destination of events.
+                    type: object
+                    properties:
+                      namespaceID:
+                        description: |-
+                          Resource ID of the Event Hubs namespace.
+
+                          The expected format is
+                            /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
+                        type: string
+                        pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}$
+                      eventHubName:
+                        description: Name of the Event Hubs instance within the selected namespace. If omitted, an Event
+                          Hubs instance is created on behalf of the user.
+                        type: string
+                        pattern: ^[A-Za-z0-9][\w.-]{0,49}$
+                    required:
+                    - namespaceID
+                required:
+                - eventHubs
               auth:
                 description: Authentication method to interact with the Azure Storage and Azure Event Hubs REST APIs.
                   This event source only supports the Service Principal authentication.

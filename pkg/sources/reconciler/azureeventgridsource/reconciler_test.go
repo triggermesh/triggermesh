@@ -102,7 +102,12 @@ func newEventSource() *v1alpha1.AzureEventGridSource {
 				"Microsoft.Storage.BlobCreated",
 				"Microsoft.Storage.BlobDeleted",
 			},
-			EventHubID: tEventHubID,
+			Endpoint: v1alpha1.AzureEventGridSourceEndpoint{
+				EventHubs: v1alpha1.AzureEventGridSourceDestinationEventHubs{
+					NamespaceID:  tEventHubNamespaceID,
+					EventHubName: &tEventHubID.ResourceName,
+				},
+			},
 			Auth: v1alpha1.AzureAuth{
 				ServicePrincipal: &v1alpha1.AzureServicePrincipal{
 					TenantID: v1alpha1.ValueFromField{
@@ -271,11 +276,21 @@ var (
 		ResourceName:     "mystorageaccount",
 	}
 
-	tEventHubID = v1alpha1.EventHubResourceID{
-		SubscriptionID: "00000000-0000-0000-0000-000000000000",
-		ResourceGroup:  "MyGroup",
-		Namespace:      "MyNamespace",
-		EventHub:       "MyEventHub",
+	tEventHubNamespaceID = v1alpha1.AzureResourceID{
+		SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+		ResourceGroup:    "MyGroup",
+		ResourceProvider: "Microsoft.EventHub",
+		ResourceType:     "namespaces",
+		ResourceName:     "MyNamespace",
+	}
+
+	tEventHubID = v1alpha1.AzureResourceID{
+		SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+		ResourceGroup:    "MyGroup",
+		ResourceProvider: "Microsoft.EventHub",
+		Namespace:        "MyNamespace",
+		ResourceType:     "eventhubs",
+		ResourceName:     "MyEventHub",
 	}
 
 	tEventSubscriptionID = v1alpha1.AzureResourceID{
@@ -359,7 +374,7 @@ func newReconciledAdapter() *appsv1.Deployment {
 	// set for the deployment to contain an AZURE_HUB_NAME env var with the
 	// expected value
 	src := newEventSource()
-	src.Status.EventHubID = &src.Spec.EventHubID
+	src.Status.EventHubID = &tEventHubID
 
 	adapter := adapterBuilder(adapterCfg).BuildAdapter(src, tSinkURI)
 

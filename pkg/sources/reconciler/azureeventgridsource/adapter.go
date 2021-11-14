@@ -58,7 +58,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	var hubName string
 	if ehID := typedSrc.Status.EventHubID; ehID != nil {
 		hubResID = ehID.String()
-		hubName = ehID.EventHub
+		hubName = ehID.ResourceName
 	}
 
 	var hubEnvs []corev1.EnvVar
@@ -72,7 +72,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvHubResourceID, hubResID),
-		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
+		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.Endpoint.EventHubs.NamespaceID.ResourceName),
 		resource.EnvVar(common.EnvHubName, hubName),
 		resource.EnvVars(hubEnvs...),
 		resource.EnvVar(envMessageProcessor, "eventgrid"),

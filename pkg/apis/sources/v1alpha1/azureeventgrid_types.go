@@ -68,21 +68,32 @@ type AzureEventGridSourceSpec struct {
 	// +optional
 	EventTypes []string `json:"eventTypes,omitempty"`
 
-	// Resource ID of either the Event Hubs instance or Event Hubs
-	// namespace to send events to.
-	//
-	// Accepted formats:
-	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
-	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
-	//
-	// If the resource ID represents an Event Hubs namespace, an Event Hubs
-	// instance is created on behalf of the user inside that namespace.
-	// Otherwise, the user-provided Event Hub is used.
-	EventHubID EventHubResourceID `json:"eventHubID"`
+	// The destination of events subscribed via Event Grid.
+	Endpoint AzureEventGridSourceEndpoint `json:"endpoint"`
 
 	// Authentication method to interact with the Azure REST API.
 	// This event source only supports the ServicePrincipal authentication.
 	Auth AzureAuth `json:"auth"`
+}
+
+// AzureEventGridSourceEndpoint contains possible destinations for events.
+type AzureEventGridSourceEndpoint struct {
+	EventHubs AzureEventGridSourceDestinationEventHubs `json:"eventHubs"`
+}
+
+// AzureEventGridSourceDestinationEventHubs contains properties of an Event
+// Hubs namespace to use as destination for events.
+type AzureEventGridSourceDestinationEventHubs struct {
+	// Resource ID of the Event Hubs namespace.
+	//
+	// The expected format is
+	//   /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
+	NamespaceID AzureResourceID `json:"namespaceID"`
+
+	// Name of the Event Hubs instance within the selected namespace. If
+	// omitted, an Event Hubs instance is created on behalf of the user.
+	// +optional
+	EventHubName *string `json:"eventHubName,omitempty"`
 }
 
 // AzureEventGridSourceStatus defines the observed state of the event source.
@@ -95,7 +106,7 @@ type AzureEventGridSourceStatus struct {
 
 	// Resource ID of the Event Hubs instance that is currently receiving
 	// events from the Azure Event Grid subscription.
-	EventHubID *EventHubResourceID `json:"eventHubID,omitempty"`
+	EventHubID *AzureResourceID `json:"eventHubID,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
