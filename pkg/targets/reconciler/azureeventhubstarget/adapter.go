@@ -59,7 +59,6 @@ func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapt
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	// envApp := makeAppEnv(&target.Spec)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := []corev1.EnvVar{}
 	envs = append(envs, envSvc...)
@@ -76,11 +75,15 @@ func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapt
 		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientID, spAuth.ClientID)
 		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientSecret, spAuth.ClientSecret)
 	}
+
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
 		resources.KsvcLabels(lbl),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcOwner(target),
 		resources.KsvcPodLabels(podLabels),
 		resources.KsvcPodEnvVars(envs),
+		resources.EnvVar(envHubResourceID, target.Spec.EventHubID.String()),
+		resources.EnvVar(envHubNamespace, target.Spec.EventHubID.Namespace),
+		resources.EnvVar(envHubName, target.Spec.EventHubID.EventHub),
 	)
 }
