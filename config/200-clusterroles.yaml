@@ -148,6 +148,7 @@ rules:
   - awss3targets
   - awssnstargets
   - awssqstargets
+  - azureeventhubstargets
   - confluenttargets
   - datadogtargets
   - elasticsearchtargets
@@ -186,6 +187,7 @@ rules:
   - awss3targets/status
   - awssnstargets/status
   - awssqstargets/status
+  - azureeventhubstargets/status
   - confluenttargets/status
   - datadogtargets/status
   - elasticsearchtargets/status
@@ -835,6 +837,7 @@ rules:
   - awssnstargets
   - awssqstargets
   - azureeventbridgetargets
+  - azureeventhubstargets
   - confluenttargets
   - datadogtargets
   - elasticsearchtargets
