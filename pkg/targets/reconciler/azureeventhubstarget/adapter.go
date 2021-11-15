@@ -41,7 +41,6 @@ const (
 	envAADClientID     = "AZURE_CLIENT_ID"
 	envAADClientSecret = "AZURE_CLIENT_SECRET"
 
-	envDiscardCEContext    = "DISCARD_CE_CONTEXT"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 

@@ -21,6 +21,7 @@ require (
 	cloud.google.com/go/pubsub v1.17.1
 	cloud.google.com/go/storage v1.18.2
 	cloud.google.com/go/workflows v1.0.0
+	github.com/Azure/azure-event-hubs-go v1.3.1
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
 	github.com/Azure/azure-sdk-for-go v58.3.0+incompatible
 	github.com/Azure/azure-service-bus-go v0.11.3
@@ -79,7 +80,6 @@ require (
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
 	github.com/Azure/azure-amqp-common-go v1.1.4 // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
-	github.com/Azure/azure-event-hubs-go v1.3.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.1.9 // indirect
 	github.com/Azure/go-amqp v0.16.1 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
