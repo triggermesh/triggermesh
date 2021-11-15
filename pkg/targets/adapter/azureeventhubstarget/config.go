@@ -34,6 +34,7 @@ type envAccessor struct {
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
 
+	// DiscardCEContext chooses to keep or discard the incoming cloudevent context
 	DiscardCEContext bool `envconfig:"DISCARD_CE_CONTEXT"`
 
 	// AzureEventHub connection parameters

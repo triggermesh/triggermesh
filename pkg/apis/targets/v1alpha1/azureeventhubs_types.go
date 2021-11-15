@@ -60,6 +60,8 @@ type AzureEventHubsTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	DiscardCEContext bool `json:"discardCEContext"`
 }
 
 // AzureEventHubsTargetStatus communicates the observed state of the AzureEventHubsTarget (from the controller).

@@ -26,6 +26,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -36,7 +37,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		targetce.ReplierWithStaticResponseType("io.triggermesh.azure.eventhub.put.response"),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeAzureEventHubsGenericResponse),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
@@ -44,10 +45,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	hub, err := eventhub.NewHubFromEnvironment()
 	if err != nil {
-		hub, err = eventhub.NewHubFromConnectionString(env.ConnectionString)
-		if err != nil {
-			logger.Panicf("Error creating EventHub connection: %v", err)
-		}
+		logger.Panicf("Error creating EventHub connection: %v", err)
 	}
 
 	return &adapter{

@@ -41,6 +41,7 @@ const (
 	envAADClientID     = "AZURE_CLIENT_ID"
 	envAADClientSecret = "AZURE_CLIENT_SECRET"
 
+	envDiscardCEContext    = "DISCARD_CE_CONTEXT"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -74,6 +75,13 @@ func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapt
 		envs = common.MaybeAppendValueFromEnvVar(envs, envAADTenantID, spAuth.TenantID)
 		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientID, spAuth.ClientID)
 		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientSecret, spAuth.ClientSecret)
+	}
+
+	if target.Spec.EventOptions != nil && target.Spec.EventOptions.PayloadPolicy != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envEventsPayloadPolicy,
+			Value: string(*target.Spec.EventOptions.PayloadPolicy),
+		})
 	}
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
