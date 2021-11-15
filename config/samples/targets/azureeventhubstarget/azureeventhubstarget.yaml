@@ -17,7 +17,7 @@
 # For a list and description of all available attributes, execute the following command against a cluster where this
 # Custom Resource Definition has been registered:
 #
-#   kubectl explain azureeventhubtargets.targets.triggermesh.io
+#   kubectl explain azureeventhubstargets.targets.triggermesh.io
 
 apiVersion: sources.triggermesh.io/v1alpha1
 kind: AzureEventHubsTarget
