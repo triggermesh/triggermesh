@@ -30,7 +30,9 @@ spec:
   - Microsoft.Storage.BlobCreated
   - Microsoft.Storage.BlobDeleted
 
-  eventHubID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace/eventHubs/MyEvents
+  endpoint:
+    eventHubs:
+      namespaceID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace
 
   auth:
     servicePrincipal:

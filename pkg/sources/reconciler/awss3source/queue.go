@@ -47,9 +47,11 @@ func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, erro
 
 	status := &typedSrc.Status
 
-	if userProvided := typedSrc.Spec.QueueARN; userProvided != nil {
-		status.QueueARN = userProvided
-		return userProvided.String(), nil
+	if dest := typedSrc.Spec.Destination; dest != nil {
+		if userProvidedQueue := dest.SQS; userProvidedQueue != nil {
+			status.QueueARN = &userProvidedQueue.QueueARN
+			return userProvidedQueue.QueueARN.String(), nil
+		}
 	}
 
 	queueName := queueName(typedSrc)
@@ -115,9 +117,11 @@ func ensureNoQueue(ctx context.Context, cli sqsiface.SQSAPI) error {
 	src := v1alpha1.SourceFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
-	if userProvided := typedSrc.Spec.QueueARN; userProvided != nil {
-		// do not delete queues managed by the user
-		return nil
+	if dest := typedSrc.Spec.Destination; dest != nil {
+		if userProvidedQueue := dest.SQS; userProvidedQueue != nil {
+			// do not delete queues managed by the user
+			return nil
+		}
 	}
 
 	queueURL, err := sqs.QueueURL(cli, queueName(typedSrc))

@@ -23,13 +23,12 @@ import "github.com/triggermesh/triggermesh/pkg/apis"
 // which matches the official format defined by AWS.
 // https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html#amazons3-resources-for-iam-policies
 //
-// This is necessary because our AWSS3Source API enforces that bucket ARNs
+// This is necessary because our AWSS3Source API accepts that bucket ARNs
 // include a region and an account ID, which are both absent from the public
 // ARN.
 func RealBucketARN(arn apis.ARN) string {
-	arnCpy := arn
-	arnCpy.Region = ""
-	arnCpy.AccountID = ""
+	arn.Region = ""
+	arn.AccountID = ""
 
-	return arnCpy.String()
+	return arn.String()
 }

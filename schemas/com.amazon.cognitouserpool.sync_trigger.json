@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/UserType",
+  "definitions": {
+    "AttributeType": {
+      "required": [
+        "Name",
+        "Value"
+      ],
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MFAOptionType": {
+      "required": [
+        "AttributeName",
+        "DeliveryMedium"
+      ],
+      "properties": {
+        "AttributeName": {
+          "type": "string"
+        },
+        "DeliveryMedium": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "UserType": {
+      "required": [
+        "Attributes",
+        "Enabled",
+        "MFAOptions",
+        "UserCreateDate",
+        "UserLastModifiedDate",
+        "UserStatus",
+        "Username"
+      ],
+      "properties": {
+        "Attributes": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/AttributeType"
+          },
+          "type": "array"
+        },
+        "Enabled": {
+          "type": "boolean"
+        },
+        "MFAOptions": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/MFAOptionType"
+          },
+          "type": "array"
+        },
+        "UserCreateDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "UserLastModifiedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "UserStatus": {
+          "type": "string"
+        },
+        "Username": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

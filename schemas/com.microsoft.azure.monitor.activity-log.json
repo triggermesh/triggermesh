@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/Event",
+  "definitions": {
+    "Event": {
+      "required": [
+        "Data",
+        "PartitionKey",
+        "Properties",
+        "ID",
+        "SystemProperties"
+      ],
+      "properties": {
+        "Data": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "PartitionKey": {
+          "type": "string"
+        },
+        "Properties": {
+          "patternProperties": {
+            ".*": {
+              "additionalProperties": true,
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "SystemProperties": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/SystemProperties"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "SystemProperties": {
+      "required": [
+        "SequenceNumber",
+        "EnqueuedTime",
+        "Offset",
+        "PartitionID",
+        "PartitionKey"
+      ],
+      "properties": {
+        "EnqueuedTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Offset": {
+          "type": "integer"
+        },
+        "PartitionID": {
+          "type": "integer"
+        },
+        "PartitionKey": {
+          "type": "string"
+        },
+        "SequenceNumber": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

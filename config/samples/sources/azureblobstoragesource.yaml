@@ -26,7 +26,9 @@ metadata:
 spec:
   storageAccountID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.Storage/storageAccounts/MyBlobStorage
 
-  eventHubID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace/eventHubs/MyEvents
+  endpoint:
+    eventHubs:
+      namespaceID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace
 
   # Available event types are documented at
   # https://docs.microsoft.com/en-us/azure/event-grid/event-schema-blob-storage

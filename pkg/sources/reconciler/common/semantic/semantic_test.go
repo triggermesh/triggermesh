@@ -24,14 +24,17 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"knative.dev/pkg/ptr"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 const (
-	fixtureDeploymentPath = "../../../../../test/fixtures/deployment.json"
-	fixtureKnServicePath  = "../../../../../test/fixtures/knService.json"
+	fixtureDeploymentPath     = "../../../../../test/fixtures/deployment.json"
+	fixtureKnServicePath      = "../../../../../test/fixtures/knService.json"
+	fixtureServiceAccountPath = "../../../../../test/fixtures/serviceAccount.json"
 )
 
 func TestDeploymentEqual(t *testing.T) {
@@ -179,6 +182,91 @@ func TestKnServiceEqual(t *testing.T) {
 				assert.True(t, knServiceEqual(desired, current))
 			case false:
 				assert.False(t, knServiceEqual(desired, current))
+			}
+		})
+	}
+}
+
+func TestServiceAccountEqual(t *testing.T) {
+	current := &corev1.ServiceAccount{}
+	loadFixture(t, fixtureServiceAccountPath, current)
+
+	assert.GreaterOrEqual(t, len(current.Labels), 2,
+		"Test suite requires a reference object with at least 2 labels to run properly")
+	assert.Nil(t, current.AutomountServiceAccountToken,
+		"Test suite requires a reference object with a nil automountServiceAccountTokent attribute to run properly")
+
+	assert.True(t, serviceAccountEqual(nil, nil), "Two nil elements should be equal")
+
+	testCases := map[string]struct {
+		prep   func() *corev1.ServiceAccount
+		expect bool
+	}{
+		"not equal when one element is nil": {
+			func() *corev1.ServiceAccount {
+				return nil
+			},
+			false,
+		},
+		// counter intuitive but expected result for deep derivative comparisons
+		"equal when all desired attributes are empty": {
+			func() *corev1.ServiceAccount {
+				return &corev1.ServiceAccount{}
+			},
+			true,
+		},
+		"not equal when some existing attribute differs": {
+			func() *corev1.ServiceAccount {
+				desired := current.DeepCopy()
+				for k := range desired.Labels {
+					desired.Labels[k] += "test"
+					break // changing one is enough
+				}
+				return desired
+			},
+			false,
+		},
+		"equal when some attribute is set in current but not in desired": {
+			func() *corev1.ServiceAccount {
+				desired := current.DeepCopy()
+				desired.AutomountServiceAccountToken = ptr.Bool(true)
+				return desired
+			},
+			false,
+		},
+		"equal when current has more attributes than desired": {
+			func() *corev1.ServiceAccount {
+				desired := current.DeepCopy()
+				for k := range desired.Labels {
+					delete(desired.Labels, k)
+					break // deleting one is enough
+				}
+				return desired
+			},
+			true,
+		},
+		"not equal when desired has more attributes than current": {
+			func() *corev1.ServiceAccount {
+				desired := current.DeepCopy()
+				for k := range desired.Labels {
+					desired.Labels[k+"test"] = "test"
+					break // adding one is enough
+				}
+				return desired
+			},
+			false,
+		},
+	}
+
+	for name, tc := range testCases {
+		// //nolint:scopelint
+		t.Run(name, func(t *testing.T) {
+			desired := tc.prep()
+			switch tc.expect {
+			case true:
+				assert.True(t, serviceAccountEqual(desired, current))
+			case false:
+				assert.False(t, serviceAccountEqual(desired, current))
 			}
 		})
 	}

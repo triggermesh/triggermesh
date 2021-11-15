@@ -24,6 +24,8 @@ import (
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
+
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
 // EventSource is implemented by all event source types.
@@ -56,6 +58,31 @@ type multiTenant interface {
 func IsMultiTenant(src EventSource) bool {
 	mt, ok := src.(multiTenant)
 	return ok && mt.IsMultiTenant()
+}
+
+// serviceAccountProvider is implemented by source types which are able to
+// influence the shape of the ServiceAccount used by their own receive adapter.
+type serviceAccountProvider interface {
+	WantsOwnServiceAccount() bool
+	ServiceAccountOptions() []resource.ServiceAccountOption
+}
+
+// WantsOwnServiceAccount returns whether the given source instance should have
+// a dedicated ServiceAccount associated with its receive adapter.
+func WantsOwnServiceAccount(src EventSource) bool {
+	saProvider, ok := src.(serviceAccountProvider)
+	return ok && saProvider.WantsOwnServiceAccount()
+}
+
+// ServiceAccountOptions returns functional options for mutating the
+// ServiceAccount associated with a given source instance.
+func ServiceAccountOptions(src EventSource) []resource.ServiceAccountOption {
+	saProvider, ok := src.(serviceAccountProvider)
+	if !ok {
+		return nil
+	}
+
+	return saProvider.ServiceAccountOptions()
 }
 
 type sourceKey struct{}

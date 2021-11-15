@@ -1,0 +1,84 @@
+{
+  "items": {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MetricData"
+  },
+  "type": "array",
+  "definitions": {
+    "AggregatedDatapoint": {
+      "required": [
+        "timestamp",
+        "value"
+      ],
+      "properties": {
+        "timestamp": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/SDKTime"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MetricData": {
+      "required": [
+        "namespace",
+        "compartmentId",
+        "name",
+        "dimensions",
+        "aggregatedDatapoints",
+        "resourceGroup",
+        "metadata",
+        "resolution"
+      ],
+      "properties": {
+        "aggregatedDatapoints": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/AggregatedDatapoint"
+          },
+          "type": "array"
+        },
+        "compartmentId": {
+          "type": "string"
+        },
+        "dimensions": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "metadata": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "resolution": {
+          "type": "string"
+        },
+        "resourceGroup": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "SDKTime": {
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

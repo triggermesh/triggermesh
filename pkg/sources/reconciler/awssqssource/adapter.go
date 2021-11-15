@@ -54,7 +54,8 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvARN, typedSrc.Spec.ARN.String()),
-		resource.EnvVars(common.MakeSecurityCredentialsEnvVars(typedSrc.Spec.Credentials)...),
+		resource.EnvVars(common.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
+		resource.EnvVars(common.MakeAWSEndpointEnvVars(typedSrc.Spec.Endpoint)...),
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
@@ -78,15 +79,21 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(namespace string) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.srcLister(namespace).List(labels.Everything())
+func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error) {
+	if v1alpha1.WantsOwnServiceAccount(src) {
+		return []kmeta.OwnerRefable{src}, nil
+	}
+
+	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}
 
-	ownerRefables := make([]kmeta.OwnerRefable, len(srcs))
-	for i := range srcs {
-		ownerRefables[i] = srcs[i]
+	ownerRefables := make([]kmeta.OwnerRefable, 0, len(srcs))
+	for _, src := range srcs {
+		if !v1alpha1.WantsOwnServiceAccount(src) {
+			ownerRefables = append(ownerRefables, src)
+		}
 	}
 
 	return ownerRefables, nil

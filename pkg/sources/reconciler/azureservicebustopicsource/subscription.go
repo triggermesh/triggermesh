@@ -26,23 +26,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
-
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
 	"knative.dev/pkg/reconciler"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/servicebus/mgmt/servicebus"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/servicebustopics"
@@ -66,8 +58,6 @@ func ensureSubscription(ctx context.Context, cli servicebustopics.SubscriptionsC
 
 	status := &typedSrc.Status
 
-	// read current Subscription
-
 	topic := typedSrc.Spec.TopicID.String()
 	subsName := subscriptionName(src)
 
@@ -87,40 +77,41 @@ func ensureSubscription(ctx context.Context, cli servicebustopics.SubscriptionsC
 		return fmt.Errorf("%w", failGetSubscriptionEvent(topic, err))
 	}
 
-	subsExists := currentSubs.ID != nil
+	if subsExists := currentSubs.ID != nil; !subsExists {
+		// use Azure's defaults
+		desiredSubs := servicebus.SBSubscription{}
 
-	// compare and create/update Subscription
+		restCtx, cancel = context.WithTimeout(ctx, crudTimeout)
+		defer cancel()
 
-	desiredSubs := newSubscription()
-
-	if equalSubscriptions(ctx, desiredSubs, currentSubs) {
-		subscriptionResID, err := parseSubscriptionResID(*currentSubs.ID)
-		if err != nil {
-			return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
+		currentSubs, err = cli.CreateOrUpdate(restCtx, typedSrc.Spec.TopicID.ResourceGroup, typedSrc.Spec.TopicID.Namespace,
+			typedSrc.Spec.TopicID.ResourceName, subsName, desiredSubs)
+		switch {
+		// This call responds with NotFound if the topic doesn't exist.
+		case isNotFound(err):
+			// We use a generic error message in the object's status instead of the original error, because
+			// these API errors tend to contain a confusing message ("incoming request is not recognized as
+			// a namespace policy put request") and unique elements (timestamp and correlation ID) which we
+			// don't want to cause inifinite loops of reconciliation.
+			status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Topic does not exist")
+			return controller.NewPermanentError(failSubscribeEvent(topic, err))
+		case isDenied(err):
+			status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Access denied to Subscription API: "+toErrMsg(err))
+			return controller.NewPermanentError(failSubscribeEvent(topic, err))
+		case err != nil:
+			status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Cannot subscribe to Topic: "+toErrMsg(err))
+			return fmt.Errorf("%w", failSubscribeEvent(topic, err))
 		}
-
-		status.SubscriptionID = subscriptionResID
-		status.MarkSubscribed()
-		return nil
 	}
 
-	restCtx, cancel = context.WithTimeout(ctx, crudTimeout)
-	defer cancel()
-
-	res, err := cli.CreateOrUpdate(restCtx, typedSrc.Spec.TopicID.ResourceGroup, typedSrc.Spec.TopicID.Namespace,
-		typedSrc.Spec.TopicID.ResourceName, subsName, desiredSubs)
-	switch {
-	case isDenied(err):
-		status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Access denied to Subscription API: "+toErrMsg(err))
-		return controller.NewPermanentError(failSubscribeEvent(topic, subsExists, err))
-	case err != nil:
-		status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Cannot subscribe to events: "+toErrMsg(err))
-		return fmt.Errorf("%w", failSubscribeEvent(topic, subsExists, err))
+	if !status.GetCondition(v1alpha1.AzureServiceBusTopicConditionSubscribed).IsTrue() {
+		event.Normal(ctx, ReasonSubscribed, "Created Subscription %q for Topic %q", subsName, topic)
 	}
 
-	recordSubscribedEvent(ctx, subsName, topic, subsExists)
-
-	subscriptionResID, err := parseSubscriptionResID(*res.ID)
+	// it is essential that we propagate the subscription's resource ID
+	// here, otherwise BuildAdapter() won't be able to configure the
+	// Service Bus adapter properly
+	subscriptionResID, err := parseSubscriptionResID(*currentSubs.ID)
 	if err != nil {
 		return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
 	}
@@ -170,60 +161,6 @@ func ensureNoSubscription(ctx context.Context, cli servicebustopics.Subscription
 	return nil
 }
 
-// newSubscription returns the desired state of the Subscription for the given source.
-// All values correspond to Azure's defaults.
-func newSubscription() servicebus.SBSubscription {
-	const maxDeliveryCount = 10
-
-	// 1 minute in ISO 8601 duration format.
-	// https://en.wikipedia.org/wiki/ISO_8601#Durations
-	const oneMinuteISO8601 = "PT1M"
-	// Max signed 64-bit integer in ISO 8601 duration format.
-	// https://docs.microsoft.com/en-us/azure/service-bus-messaging/message-expiration
-	const maxDurationISO8601 = "P10675199DT2H48M5.4775807S"
-
-	return servicebus.SBSubscription{
-		SBSubscriptionProperties: &servicebus.SBSubscriptionProperties{
-			MaxDeliveryCount:                          to.Int32Ptr(maxDeliveryCount),
-			LockDuration:                              to.StringPtr(oneMinuteISO8601),
-			DefaultMessageTimeToLive:                  to.StringPtr(maxDurationISO8601),
-			AutoDeleteOnIdle:                          to.StringPtr(maxDurationISO8601), // never
-			RequiresSession:                           to.BoolPtr(false),
-			EnableBatchedOperations:                   to.BoolPtr(true),
-			DeadLetteringOnFilterEvaluationExceptions: to.BoolPtr(true),
-			DeadLetteringOnMessageExpiration:          to.BoolPtr(false),
-		},
-	}
-}
-
-// equalSubscriptions asserts the equality of two SBSubscription instances.
-func equalSubscriptions(ctx context.Context, desired, current servicebus.SBSubscription) bool {
-	cmpFn := cmp.Equal
-	if logger := logging.FromContext(ctx); logger.Desugar().Core().Enabled(zapcore.DebugLevel) {
-		cmpFn = diffLoggingCmp(logger)
-	}
-	return cmpFn(desired.SBSubscriptionProperties, current.SBSubscriptionProperties,
-		cmpopts.IgnoreFields(servicebus.SBSubscriptionProperties{},
-			"MessageCount", "CreatedAt", "AccessedAt", "UpdatedAt", "CountDetails", "Status"),
-	)
-}
-
-// cmpFunc can compare the equality of two interfaces. The function signature
-// is the same as cmp.Equal.
-type cmpFunc func(x, y interface{}, opts ...cmp.Option) bool
-
-// diffLoggingCmp compares the equality of two interfaces and logs the diff at
-// the Debug level.
-func diffLoggingCmp(logger *zap.SugaredLogger) cmpFunc {
-	return func(desired, current interface{}, opts ...cmp.Option) bool {
-		if diff := cmp.Diff(desired, current, opts...); diff != "" {
-			logger.Debug("Subscriptions differ (-desired, +current)\n" + diff)
-			return false
-		}
-		return true
-	}
-}
-
 // parseSubscriptionResID parses the given Subscription resource ID string to a
 // structured resource ID.
 func parseSubscriptionResID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
@@ -271,7 +208,7 @@ func recursErrMsg(errMsg string, err error) string {
 		// the object's status conditions.
 		// Instead of resorting to over-engineered error parsing techniques to get around the verbosity of the
 		// message, we simply return a short and generic error description.
-		return errMsg + "Invalid client secret"
+		return errMsg + "failed to refresh token: the provided secret is either invalid or expired"
 	}
 
 	return errMsg + err.Error()
@@ -311,18 +248,6 @@ func subscriptionName(src v1alpha1.EventSource) string {
 	return "io.triggermesh.azureservicebussources-" + strconv.FormatUint(uint64(nsNameChecksum), 10)
 }
 
-// recordSubscribedEvent records a Kubernetes API event which indicates that a
-// Subscription was either created or updated.
-func recordSubscribedEvent(ctx context.Context, subsName, topicID string, isUpdate bool) {
-	verb := "Created"
-	if isUpdate {
-		verb = "Updated"
-	}
-
-	event.Normal(ctx, ReasonSubscribed, "%s Subscription %q for Topic %q",
-		verb, subsName, topicID)
-}
-
 // failGetSubscriptionEvent returns a reconciler event which indicates that a
 // Subscription for the given Topic could not be retrieved from the Azure API.
 func failGetSubscriptionEvent(topicID string, origErr error) reconciler.Event {
@@ -331,16 +256,10 @@ func failGetSubscriptionEvent(topicID string, origErr error) reconciler.Event {
 }
 
 // failSubscribeEvent returns a reconciler event which indicates that a
-// Subscription for the given Topic could not be created or updated via the
-// Azure API.
-func failSubscribeEvent(topicID string, isUpdate bool, origErr error) reconciler.Event {
-	verb := "creating"
-	if isUpdate {
-		verb = "updating"
-	}
-
+// Subscription for the given Topic could not be created via the Azure API.
+func failSubscribeEvent(topicID string, origErr error) reconciler.Event {
 	return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-		"Error %s Subscription for Topic %q: %s", verb, topicID, toErrMsg(origErr))
+		"Error creating Subscription for Topic %q: %s", topicID, toErrMsg(origErr))
 }
 
 // failUnsubscribeEvent returns a reconciler event which indicates that a

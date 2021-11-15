@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package azure
+package auth_test
 
 import (
 	"errors"
@@ -22,22 +22,24 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	. "github.com/triggermesh/triggermesh/pkg/sources/auth"
 )
 
-func TestEmptyCredentialsError(t *testing.T) {
+func TestPermanentCredentialsError(t *testing.T) {
 	genericErr := assert.AnError
-	ecErr := emptyCredentialsError{e: genericErr}
+	permErr := NewPermanentCredentialsError(genericErr)
 
-	assert.False(t, isEmptyCreds(genericErr))
-	assert.False(t, isEmptyCreds(fmt.Errorf("wrapped: %w", genericErr)))
+	assert.False(t, isPermanent(genericErr))
+	assert.False(t, isPermanent(fmt.Errorf("wrapped: %w", genericErr)))
 
-	assert.True(t, isEmptyCreds(ecErr))
-	assert.True(t, isEmptyCreds(fmt.Errorf("wrapped: %w", ecErr)))
+	assert.True(t, isPermanent(permErr))
+	assert.True(t, isPermanent(fmt.Errorf("wrapped: %w", permErr)))
 
 }
 
-// isEmptyCreds returns whether err implements the IsEmptyCredentials error behaviour.
-func isEmptyCreds(err error) bool {
-	ecErr := (interface{ IsEmptyCredentials() })(nil)
-	return errors.As(err, &ecErr)
+// isPermanent returns whether err implements PermanentCredentialsError.
+func isPermanent(err error) bool {
+	permErr := (PermanentCredentialsError)(nil)
+	return errors.As(err, &permErr)
 }

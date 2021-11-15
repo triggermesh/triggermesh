@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/MessageData",
+  "definitions": {
+    "MessageData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "Notification"
+          ]
+        },
+        "MessageId": {
+          "type": "string"
+        },
+        "TopicArn": {
+          "type": "string"
+        },
+        "Subject": {
+          "type": "string"
+        },
+        "Message": {
+          "type": "string"
+        },
+        "Timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "SignatureVersion": {
+          "type": "string"
+        },
+        "Signature": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "SigningCertURL": {
+          "type": "string",
+          "format": "uri"
+        },
+        "UnsubscribeURL": {
+          "type": "string",
+          "format": "uri"
+        },
+        "MessageAttributes": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/MessageAttribute"
+          }
+        }
+      },
+      "required": [
+        "Type",
+        "MessageId",
+        "TopicArn",
+        "Message",
+        "Timestamp",
+        "SignatureVersion",
+        "Signature",
+        "SigningCertURL",
+        "UnsubscribeURL"
+      ]
+    },
+    "MessageAttribute": {
+      "required": [
+        "Type",
+        "Value"
+      ],
+      "properties": {
+        "Type": {
+          "type": "string",
+          "enum": [
+            "String",
+            "String.Array",
+            "Number",
+            "Binary"
+          ]
+        },
+        "Value": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

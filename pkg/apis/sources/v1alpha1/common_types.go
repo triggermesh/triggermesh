@@ -27,13 +27,6 @@ type EventSourceStatus struct {
 	duckv1.AddressStatus `json:",inline"`
 }
 
-// AWSSecurityCredentials represents a set of AWS security credentials.
-// See https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
-type AWSSecurityCredentials struct {
-	AccessKeyID     ValueFromField `json:"accessKeyID"`
-	SecretAccessKey ValueFromField `json:"secretAccessKey"`
-}
-
 // ValueFromField is a struct field that can have its value either defined
 // explicitly or sourced from another entity.
 type ValueFromField struct {

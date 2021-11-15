@@ -130,7 +130,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	cfg := session.Must(session.NewSession(aws.NewConfig().
-		WithRegion(arn.Region),
+		WithRegion(arn.Region).
+		WithEndpointResolver(common.EndpointResolver(arn.Partition)),
 	))
 
 	// allocate generous buffer sizes to limit blocking on surges of new

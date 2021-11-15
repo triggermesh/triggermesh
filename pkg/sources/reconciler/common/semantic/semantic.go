@@ -37,6 +37,7 @@ import (
 var Semantic = conversion.EqualitiesOrDie(
 	deploymentEqual,
 	knServiceEqual,
+	serviceAccountEqual,
 )
 
 // eq is an instance of Equalities for internal deep derivative comparisons
@@ -124,6 +125,32 @@ func knServiceEqual(a, b *servingv1.Service) bool {
 	}
 
 	if !eq.DeepDerivative(&a.Spec.Template, &b.Spec.Template) {
+		return false
+	}
+
+	return true
+}
+
+// serviceAccountEqual returns whether two ServiceAccounts are semantically equivalent.
+func serviceAccountEqual(a, b *corev1.ServiceAccount) bool {
+	if a == b {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+
+	if !eq.DeepDerivative(&a.ObjectMeta, &b.ObjectMeta) {
+		return false
+	}
+
+	if !eq.DeepDerivative(&a.Secrets, &b.Secrets) {
+		return false
+	}
+	if !eq.DeepDerivative(&a.ImagePullSecrets, &b.ImagePullSecrets) {
+		return false
+	}
+	if !eq.DeepDerivative(&a.AutomountServiceAccountToken, &b.AutomountServiceAccountToken) {
 		return false
 	}
 

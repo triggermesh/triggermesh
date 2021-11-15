@@ -28,7 +28,6 @@ import (
 
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
-	"knative.dev/pkg/ptr"
 	"knative.dev/pkg/system"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
@@ -47,6 +46,23 @@ func ComponentName(src kmeta.OwnerRefable) string {
 // the given source's multi-tenant adapter (RBAC, Deployment/KnService, ...).
 func MTAdapterObjectName(src kmeta.OwnerRefable) string {
 	return ComponentName(src) + "-" + componentAdapter
+}
+
+// ServiceAccountName returns the name to set on the ServiceAccount associated
+// with the given source.
+func ServiceAccountName(src v1alpha1.EventSource) string {
+	if v1alpha1.WantsOwnServiceAccount(src) {
+		srcName := src.GetName()
+
+		// Edge case: we need to make sure some characters are inserted
+		// between the component name and the source name to avoid
+		// clashing with the shared "{kind}-adapter" ServiceAccount in
+		// case the source is named "adapter". We picked 'i' for
+		// "instance" to keep it short yet distinguishable.
+		return kmeta.ChildName(ComponentName(src)+"-i-", srcName)
+	}
+
+	return MTAdapterObjectName(src)
 }
 
 // NewAdapterDeployment is a wrapper around resource.NewDeployment which
@@ -104,7 +120,7 @@ func commonAdapterDeploymentOptions(src v1alpha1.EventSource) []resource.ObjectO
 		resource.PodLabel(appPartOfLabel, partOf),
 		resource.PodLabel(appManagedByLabel, managedBy),
 
-		resource.ServiceAccount(MTAdapterObjectName(src)),
+		resource.ServiceAccount(ServiceAccountName(src)),
 
 		resource.EnvVar(envComponent, app),
 	}
@@ -173,21 +189,10 @@ func commonAdapterKnServiceOptions(src v1alpha1.EventSource) []resource.ObjectOp
 // newServiceAccount returns a ServiceAccount object with its OwnerReferences
 // metadata attribute populated from the given owners.
 func newServiceAccount(src v1alpha1.EventSource, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
-	ownerRefs := make([]metav1.OwnerReference, len(owners))
-	for i, owner := range owners {
-		ownerRefs[i] = *kmeta.NewControllerRef(owner)
-		ownerRefs[i].Controller = ptr.Bool(false)
-	}
-
-	return &corev1.ServiceAccount{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace:       src.GetNamespace(),
-			Name:            MTAdapterObjectName(src),
-			OwnerReferences: ownerRefs,
-			Labels:          CommonObjectLabels(src),
-		},
-	}
-
+	return resource.NewServiceAccount(src.GetNamespace(), ServiceAccountName(src),
+		resource.Owners(owners...),
+		resource.Labels(CommonObjectLabels(src)),
+	)
 }
 
 // newRoleBinding returns a RoleBinding object that binds a ServiceAccount
@@ -267,6 +272,18 @@ func MaybeAppendValueFromEnvVar(envs []corev1.EnvVar, key string, valueFrom v1al
 	return envs
 }
 
+// MakeAWSAuthEnvVars returns environment variables for the given AWS
+// authentication method.
+func MakeAWSAuthEnvVars(auth v1alpha1.AWSAuth) []corev1.EnvVar {
+	var authEnvVars []corev1.EnvVar
+
+	if creds := auth.Credentials; creds != nil {
+		authEnvVars = append(authEnvVars, MakeSecurityCredentialsEnvVars(*creds)...)
+	}
+
+	return authEnvVars
+}
+
 // MakeSecurityCredentialsEnvVars returns environment variables for the given
 // AWS security credentials.
 func MakeSecurityCredentialsEnvVars(creds v1alpha1.AWSSecurityCredentials) []corev1.EnvVar {
@@ -306,4 +323,23 @@ func envVarValueFromSecret(secretName, secretKey string) *corev1.EnvVarSource {
 			Key: secretKey,
 		},
 	}
+}
+
+// MakeAWSEndpointEnvVars returns environment variables for the given AWS
+// endpoint parameters.
+func MakeAWSEndpointEnvVars(endpoint *v1alpha1.AWSEndpoint) []corev1.EnvVar {
+	if endpoint == nil {
+		return nil
+	}
+
+	var endpointEnvVars []corev1.EnvVar
+
+	if url := endpoint.URL; url != nil {
+		endpointEnvVars = append(endpointEnvVars, corev1.EnvVar{
+			Name:  EnvEndpointURL,
+			Value: url.String(),
+		})
+	}
+
+	return endpointEnvVars
 }

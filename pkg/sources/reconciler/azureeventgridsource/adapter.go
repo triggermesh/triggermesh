@@ -58,7 +58,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	var hubName string
 	if ehID := typedSrc.Status.EventHubID; ehID != nil {
 		hubResID = ehID.String()
-		hubName = ehID.EventHub
+		hubName = ehID.ResourceName
 	}
 
 	var hubEnvs []corev1.EnvVar
@@ -72,7 +72,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvHubResourceID, hubResID),
-		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
+		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.Endpoint.EventHubs.NamespaceID.ResourceName),
 		resource.EnvVar(common.EnvHubName, hubName),
 		resource.EnvVars(hubEnvs...),
 		resource.EnvVar(envMessageProcessor, "eventgrid"),
@@ -81,8 +81,8 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(namespace string) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.srcLister(namespace).List(labels.Everything())
+func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error) {
+	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}

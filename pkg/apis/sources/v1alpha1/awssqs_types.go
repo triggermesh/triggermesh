@@ -40,8 +40,9 @@ type AWSSQSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object = (*AWSSQSSource)(nil)
-	_ EventSource    = (*AWSSQSSource)(nil)
+	_ runtime.Object         = (*AWSSQSSource)(nil)
+	_ EventSource            = (*AWSSQSSource)(nil)
+	_ serviceAccountProvider = (*AWSSQSSource)(nil)
 )
 
 // AWSSQSSourceSpec defines the desired state of the event source.
@@ -56,8 +57,12 @@ type AWSSQSSourceSpec struct {
 	// +optional
 	ReceiveOptions *AWSSQSSourceReceiveOptions `json:"receiveOptions,omitempty"`
 
-	// Credentials to interact with the Amazon SQS API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon SQS API.
+	Auth AWSAuth `json:"auth"`
+
+	// Customizations of the AWS REST API endpoint.
+	// +optional
+	Endpoint *AWSEndpoint `json:"endpoint,omitempty"`
 }
 
 // AWSSQSSourceReceiveOptions defines options that control the behavior of

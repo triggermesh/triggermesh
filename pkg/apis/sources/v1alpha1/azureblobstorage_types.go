@@ -61,18 +61,6 @@ type AzureBlobStorageSourceSpec struct {
 	// uniquely identify the Storage Account within Azure.
 	StorageAccountID StorageAccountResourceID `json:"storageAccountID"`
 
-	// Resource ID of either the Event Hubs instance or Event Hubs
-	// namespace to send events to.
-	//
-	// Accepted formats:
-	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
-	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
-	//
-	// If the resource ID represents an Event Hubs namespace, an Event Hubs
-	// instance is created on behalf of the user inside that namespace.
-	// Otherwise, the user-provided Event Hub is used.
-	EventHubID EventHubResourceID `json:"eventHubID"`
-
 	// Types of events to subscribe to.
 	//
 	// The list of available event types can be found at
@@ -86,6 +74,9 @@ type AzureBlobStorageSourceSpec struct {
 	// +optional
 	EventTypes []string `json:"eventTypes,omitempty"`
 
+	// The destination of events subscribed via Event Grid.
+	Endpoint AzureEventGridSourceEndpoint `json:"endpoint"`
+
 	// Authentication method to interact with the Azure REST API.
 	// This event source only supports the ServicePrincipal authentication.
 	Auth AzureAuth `json:"auth"`
@@ -97,7 +88,7 @@ type AzureBlobStorageSourceStatus struct {
 
 	// Resource ID of the Event Hubs instance that is currently receiving
 	// events from the Azure Event Grid subscription.
-	EventHubID *EventHubResourceID `json:"eventHubID,omitempty"`
+	EventHubID *AzureResourceID `json:"eventHubID,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

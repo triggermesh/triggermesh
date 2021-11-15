@@ -45,6 +45,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/auth"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 )
@@ -360,7 +361,7 @@ func isNoCredentials(err error) bool {
 	if k8sErr := apierrors.APIStatus(nil); errors.As(err, &k8sErr) {
 		return k8sErr.Status().Reason == metav1.StatusReasonNotFound
 	}
-	if ecErr := (interface{ IsEmptyCredentials() })(nil); errors.As(err, &ecErr) {
+	if permErr := (auth.PermanentCredentialsError)(nil); errors.As(err, &permErr) {
 		return true
 	}
 	return false

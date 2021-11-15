@@ -36,6 +36,7 @@ resources:
 - config/300-azureiothubsource.yaml
 - config/300-azurequeuestoragesource.yaml
 - config/300-azureservicebusqueuesource.yaml
+- config/300-azureservicebustopicsource.yaml
 - config/300-googlecloudauditlogssource.yaml
 - config/300-googlecloudbillingsource.yaml
 - config/300-googlecloudiotsource.yaml

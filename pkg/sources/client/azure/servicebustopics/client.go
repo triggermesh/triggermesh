@@ -25,7 +25,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/servicebus/mgmt/servicebus/servicebusapi"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/azure"
+	"github.com/triggermesh/triggermesh/pkg/sources/auth/azure"
 )
 
 // SubscriptionsClient is an alias for the SubscriptionsClientAPI interface.
@@ -57,7 +57,7 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureServiceBusTopicSource) (SubscriptionsClient, error) {
-	authorizer, err := azure.Authorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
+	authorizer, err := azure.NewAADAuthorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
 	if err != nil {
 		return nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
 	}

@@ -240,7 +240,7 @@ func recursErrMsg(errMsg string, err error) string {
 		// the object's status conditions.
 		// Instead of resorting to over-engineered error parsing techniques to get around the verbosity of the
 		// message, we simply return a short and generic error description.
-		return errMsg + "Invalid client secret"
+		return errMsg + "failed to refresh token: the provided secret is either invalid or expired"
 	}
 
 	return errMsg + err.Error()

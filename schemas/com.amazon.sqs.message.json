@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Message",
+  "definitions": {
+    "Message": {
+      "required": [
+        "Attributes",
+        "Body",
+        "MD5OfBody",
+        "MD5OfMessageAttributes",
+        "MessageAttributes",
+        "MessageId",
+        "ReceiptHandle"
+      ],
+      "properties": {
+        "Attributes": {
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          }
+        },
+        "Body": {
+          "type": "string"
+        },
+        "MD5OfBody": {
+          "type": "string"
+        },
+        "MD5OfMessageAttributes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "MessageAttributes": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "patternProperties": {
+            ".*": {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "$ref": "#/definitions/MessageAttributeValue"
+            }
+          }
+        },
+        "MessageId": {
+          "type": "string"
+        },
+        "ReceiptHandle": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MessageAttributeValue": {
+      "required": [
+        "BinaryListValues",
+        "BinaryValue",
+        "DataType",
+        "StringListValues",
+        "StringValue"
+      ],
+      "properties": {
+        "BinaryListValues": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string",
+            "media": {
+              "binaryEncoding": "base64"
+            }
+          }
+        },
+        "BinaryValue": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "DataType": {
+          "type": "string"
+        },
+        "StringListValues": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "StringValue": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

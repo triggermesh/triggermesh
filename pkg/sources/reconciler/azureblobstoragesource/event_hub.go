@@ -43,6 +43,8 @@ const (
 	defaultPartitionCount       = 4
 )
 
+const resourceTypeEventHubs = "eventhubs"
+
 // ensureEventHub ensures the existence of an Event Hub for sending storage events.
 // Required permissions:
 //  - Microsoft.EventHub/namespaces/eventhubs/read
@@ -55,9 +57,10 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
 	status := &src.Status
 
-	if userProvided := src.Spec.EventHubID; userProvided.EventHub != "" {
-		status.EventHubID = &userProvided
-		return userProvided.String(), nil
+	if userProvidedHub := src.Spec.Endpoint.EventHubs.EventHubName; userProvidedHub != nil {
+		eventHubID := makeEventHubID(&src.Spec.Endpoint.EventHubs.NamespaceID, *userProvidedHub)
+		status.EventHubID = eventHubID
+		return eventHubID.String(), nil
 	}
 
 	stAccName := src.Spec.StorageAccountID.StorageAccount
@@ -66,8 +69,8 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 	// one for Event Hubs, so this should hopefully always be valid, on top
 	// of being deterministic
 	eventHubName := stAccName
-	resourceGroup := src.Spec.EventHubID.ResourceGroup
-	namespace := src.Spec.EventHubID.Namespace
+	resourceGroup := src.Spec.Endpoint.EventHubs.NamespaceID.ResourceGroup
+	namespace := src.Spec.Endpoint.EventHubs.NamespaceID.ResourceName
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
 	defer cancel()
@@ -120,6 +123,16 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 	return *res.ID, nil
 }
 
+// makeEventHubID returns the Resource ID of an Event Hubs instance based on
+// the given Event Hubs namespace and Hub name.
+func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) *v1alpha1.AzureResourceID {
+	hubID := *namespaceID
+	hubID.Namespace = namespaceID.ResourceName
+	hubID.ResourceType = resourceTypeEventHubs
+	hubID.ResourceName = hubName
+	return &hubID
+}
+
 // ensureNoEventHub ensures that the Event Hub created for sending storage
 // events is deleted.
 // Required permissions:
@@ -127,7 +140,7 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 func ensureNoEventHub(ctx context.Context, cli storage.EventHubsClient) error {
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
 
-	if userProvided := src.Spec.EventHubID; userProvided.EventHub != "" {
+	if userProvidedHub := src.Spec.Endpoint.EventHubs.EventHubName; userProvidedHub != nil {
 		// do not delete Event Hubs managed by the user
 		return nil
 	}
@@ -135,8 +148,8 @@ func ensureNoEventHub(ctx context.Context, cli storage.EventHubsClient) error {
 	stAccName := src.Spec.StorageAccountID.StorageAccount
 
 	eventHubName := stAccName
-	resourceGroup := src.Spec.EventHubID.ResourceGroup
-	namespace := src.Spec.EventHubID.Namespace
+	resourceGroup := src.Spec.Endpoint.EventHubs.NamespaceID.ResourceGroup
+	namespace := src.Spec.Endpoint.EventHubs.NamespaceID.ResourceName
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
 	defer cancel()
@@ -164,8 +177,8 @@ func ensureNoEventHub(ctx context.Context, cli storage.EventHubsClient) error {
 
 // parseEventHubResID parses the given Event Hub resource ID string to a
 // structured resource ID.
-func parseEventHubResID(resIDStr string) (*v1alpha1.EventHubResourceID, error) {
-	resID := &v1alpha1.EventHubResourceID{}
+func parseEventHubResID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
+	resID := &v1alpha1.AzureResourceID{}
 
 	err := json.Unmarshal([]byte(strconv.Quote(resIDStr)), resID)
 	if err != nil {

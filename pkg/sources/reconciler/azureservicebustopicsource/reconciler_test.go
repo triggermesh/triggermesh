@@ -153,9 +153,9 @@ func TestReconcileSubscription(t *testing.T) {
 			},
 		},
 		{
-			Name:          "Already subscribed and up-to-date",
+			Name:          "Already subscribed",
 			Key:           tKey,
-			OtherTestData: makeMockSubscriptions(true),
+			OtherTestData: makeMockSubscriptions(),
 			Objects: []runtime.Object{
 				newReconciledSource(subscribed),
 				newReconciledServiceAccount(),
@@ -167,31 +167,13 @@ func TestReconcileSubscription(t *testing.T) {
 				calledCreateUpdateSubscription(false),
 			},
 		},
-		{
-			Name:          "Already subscribed but outdated",
-			Key:           tKey,
-			OtherTestData: makeMockSubscriptions(false),
-			Objects: []runtime.Object{
-				newReconciledSource(subscribed),
-				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
-				newReconciledAdapter(),
-			},
-			WantEvents: []string{
-				updatedSubsEvent(),
-			},
-			PostConditions: []func(*testing.T, *rt.TableRow){
-				calledGetSubscription(true),
-				calledCreateUpdateSubscription(true),
-			},
-		},
 
 		// Finalization
 
 		{
 			Name:          "Deletion while subscribed",
 			Key:           tKey,
-			OtherTestData: makeMockSubscriptions(true),
+			OtherTestData: makeMockSubscriptions(),
 			Objects: []runtime.Object{
 				newReconciledSource(subscribed, deleted),
 				newReconciledServiceAccount(),
@@ -419,13 +401,9 @@ const mockSubscriptionsDataKey = "subs"
 
 // makeMockSubscriptions returns a mocked list of Subscriptions to be used as
 // TableRow data.
-func makeMockSubscriptions(inSync bool) map[string]interface{} {
-	sub := newSubscription()
-	sub.ID = to.StringPtr(tSubscriptionID.String())
-
-	if !inSync {
-		// inject arbitrary change to cause comparison to be false
-		*sub.SBSubscriptionProperties.MaxDeliveryCount++
+func makeMockSubscriptions() map[string]interface{} {
+	sub := servicebus.SBSubscription{
+		ID: to.StringPtr(tSubscriptionID.String()),
 	}
 
 	// key format expected by mocked client impl
@@ -505,10 +483,6 @@ func unsetFinalizerPatch() clientgotesting.PatchActionImpl {
 func createdSubsEvent() string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonSubscribed,
 		"Created Subscription %q for Topic %q", tSubscriptionID.SubResourceName, &tTopicID)
-}
-func updatedSubsEvent() string {
-	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonSubscribed,
-		"Updated Subscription %q for Topic %q", tSubscriptionID.SubResourceName, &tTopicID)
 }
 func deletedSubsEvent() string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonUnsubscribed,
