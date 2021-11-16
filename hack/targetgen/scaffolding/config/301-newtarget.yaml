@@ -15,7 +15,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: {{.Name}}s.targets.triggermesh.io
+  name: {{.Kind}}s.targets.triggermesh.io
   labels:
     duck.knative.dev/addressable: 'true'
     triggermesh.io/crd-install: 'true'
@@ -26,13 +26,13 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.{{.Name}}.response" }
+        { "type": "io.triggermesh.{{.Kind}}.response" }
       ]
 spec:
   group: targets.triggermesh.io
   names:
-    kind: {{.UppercaseName}}
-    plural: {{.Name}}s
+    kind: {{.TitleCase}}
+    plural: {{.Kind}}s
     categories:
     - all
     - knative
@@ -48,7 +48,7 @@ spec:
     schema:
       openAPIV3Schema:
         type: object
-        description: TriggerMesh event target for {{.Name}}.
+        description: TriggerMesh event target for {{.Kind}}.
         properties:
           spec:
             description: Desired state of the event target.

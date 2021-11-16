@@ -29,33 +29,33 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// {{.UppercaseName}} is the Schema the event target.
-type {{.UppercaseName}} struct {
+// {{.TitleCase}} is the Schema the event target.
+type {{.TitleCase}} struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   {{.UppercaseName}}Spec   `json:"spec"`
-	Status {{.UppercaseName}}Status `json:"status,omitempty"`
+	Spec   {{.TitleCase}}Spec   `json:"spec"`
+	Status {{.TitleCase}}Status `json:"status,omitempty"`
 }
 
-// Check the interfaces {{.UppercaseName}} should be implementing.
+// Check the interfaces {{.TitleCase}} should be implementing.
 var (
-	_ runtime.Object            = (*{{.UppercaseName}})(nil)
-	_ kmeta.OwnerRefable        = (*{{.UppercaseName}})(nil)
-	_ targets.IntegrationTarget = (*{{.UppercaseName}})(nil)
-	_ targets.EventSource       = (*{{.UppercaseName}})(nil)
-	_ duckv1.KRShaped           = (*{{.UppercaseName}})(nil)
+	_ runtime.Object            = (*{{.TitleCase}})(nil)
+	_ kmeta.OwnerRefable        = (*{{.TitleCase}})(nil)
+	_ targets.IntegrationTarget = (*{{.TitleCase}})(nil)
+	_ targets.EventSource       = (*{{.TitleCase}})(nil)
+	_ duckv1.KRShaped           = (*{{.TitleCase}})(nil)
 )
 
-// {{.UppercaseName}}Spec holds the desired state of the event target.
-type {{.UppercaseName}}Spec struct {
+// {{.TitleCase}}Spec holds the desired state of the event target.
+type {{.TitleCase}}Spec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
-// {{.UppercaseName}}Status communicates the observed state of the event target. (from the controller).
-type {{.UppercaseName}}Status struct {
+// {{.TitleCase}}Status communicates the observed state of the event target. (from the controller).
+type {{.TitleCase}}Status struct {
 	duckv1.Status        `json:",inline"`
 	duckv1.AddressStatus `json:",inline"`
 
@@ -65,9 +65,9 @@ type {{.UppercaseName}}Status struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// {{.UppercaseName}}List is a list of event target instances.
-type {{.UppercaseName}}List struct {
+// {{.TitleCase}}List is a list of event target instances.
+type {{.TitleCase}}List struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-	Items           []{{.UppercaseName}} `json:"items"`
+	Items           []{{.TitleCase}} `json:"items"`
 }

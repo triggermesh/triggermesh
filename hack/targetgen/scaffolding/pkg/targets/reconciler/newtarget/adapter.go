@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package {{.Name}}
+package {{.Kind}}
 
 import (
 	corev1 "k8s.io/api/core/v1"
@@ -29,7 +29,7 @@ import (
 )
 
 const (
-	adapterName = "{{.Name}}"
+	adapterName = "{{.Kind}}"
 
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
@@ -40,11 +40,11 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"{{.FullCaps}}_ADAPTER_IMAGE" default:"gcr.io/triggermesh-private/{{.Name}}-adapter"`
+	Image string `envconfig:"{{.FullCaps}}_ADAPTER_IMAGE" default:"gcr.io/triggermesh-private/{{.Kind}}-adapter"`
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.{{.UppercaseName}}, cfg *adapterConfig) *servingv1.Service {
+func makeTargetAdapterKService(target *v1alpha1.{{.TitleCase}}, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
@@ -63,7 +63,7 @@ func makeTargetAdapterKService(target *v1alpha1.{{.UppercaseName}}, cfg *adapter
 	)
 }
 
-func makeAppEnv(o *v1alpha1.{{.UppercaseName}}) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.{{.TitleCase}}) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  libreconciler.EnvBridgeID,

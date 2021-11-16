@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package {{.Name}}
+package {{.Kind}}
 
 import (
 	"context"
@@ -22,7 +22,7 @@ import (
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/{{.Name}}"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/{{.Kind}}"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
@@ -39,7 +39,7 @@ type Reconciler struct {
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.{{.UppercaseName}}) pkgreconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.{{.TitleCase}}) pkgreconciler.Event {
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
 	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()

@@ -42,7 +42,9 @@ func main() {
 	cmdPath := filepath.Join(*cfgDir, path)
 	err := os.MkdirAll(cmdPath, os.ModePerm)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("failed creating the cmd directories")
+		log.Fatal(err)
+		return
 	}
 
 	// // make adapter directory
@@ -50,51 +52,94 @@ func main() {
 	adapterPath := filepath.Join(*cfgDir, path)
 	err = os.MkdirAll(adapterPath, os.ModePerm)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("failed creating the adapter directories")
+		log.Fatal(err)
+		return
 	}
-
 	// make reconciler directory
 	path = "pkg/targets/reconciler/" + temp.Kind
 	reconcilerPath := filepath.Join(*cfgDir, path)
 	err = os.MkdirAll(reconcilerPath, os.ModePerm)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("failed creating the reconciler directories")
+		log.Fatal(err)
+		return
 	}
 
 	// populate cmd directory
 	// read main.go and replace the template variables
 	path = *cfgDir + "/cmd/" + temp.Kind + "-adapter/main.go"
-	temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
+	err = temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
+	if err != nil {
+		log.Fatal("failed creating the cmd templates")
+		log.Fatal(err)
+		return
+	}
 
 	// populate adapter directory
 	// read adapter.go
 	path = *cfgDir + "/pkg/targets/adapter/" + temp.Kind + "/adapter.go"
-	temp.replaceTemplates("scaffolding/pkg/targets/adapter/newtarget/adapter.go", path)
+	err = temp.replaceTemplates("scaffolding/pkg/targets/adapter/newtarget/adapter.go", path)
+	if err != nil {
+		log.Fatal("failed creating the adapter templates")
+		log.Fatal(err)
+		return
+	}
 
 	// read newtarget_lifecycle.go
 	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.Kind + "_lifecycle.go"
-	temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_lifecycle.go", path)
+	err = temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_lifecycle.go", path)
+	if err != nil {
+		log.Fatal("failed creating the newtarget_lifecycle.go template")
+		log.Fatal(err)
+		return
+	}
 
 	// read newtarget_types.go
 	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.Kind + "_types.go"
-	temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_types.go", path)
+	err = temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_types.go", path)
+	if err != nil {
+		log.Fatal("failed creating the newtarget_types.go template")
+		log.Fatal(err)
+		return
+	}
 
 	// populate reconciler directory
 	// read adapter.go
 	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/adapter.go"
-	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/adapter.go", path)
+	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/adapter.go", path)
+	if err != nil {
+		log.Fatal("failed creating the reconciler templates")
+		log.Fatal(err)
+		return
+	}
 
 	// read controller_test.go
 	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/controller_test.go"
-	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller_test.go", path)
+	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller_test.go", path)
+	if err != nil {
+		log.Fatal("failed creating the controller_test.go template")
+		log.Fatal(err)
+		return
+	}
 
 	// read controller.go
 	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/controller.go"
-	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller.go", path)
+	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller.go", path)
+	if err != nil {
+		log.Fatal("failed creating the controller.go template")
+		log.Fatal(err)
+		return
+	}
 
 	// read reconciler.go
 	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/reconciler.go"
-	temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
+	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
+	if err != nil {
+		log.Fatal("failed creating the reconciler.go template")
+		log.Fatal(err)
+		return
+	}
 
 	// populate the config directory
 	// read 301-newtarget.yaml.go
@@ -117,22 +162,22 @@ type component struct {
 	FullCaps  string
 }
 
-func (a *component) replaceTemplates(filename, outputname string) {
+func (a *component) replaceTemplates(filename, outputname string) error {
 	tmp, err := template.ParseFiles(filename)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	file, err := os.Create(outputname)
 	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
+		return err
 	}
 	defer file.Close()
 
 	err = tmp.Execute(file, a)
-
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
+	return nil
 }

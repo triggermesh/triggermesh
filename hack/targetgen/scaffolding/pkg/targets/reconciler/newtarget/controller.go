@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package {{.Name}}
+package {{.Kind}}
 
 import (
 	"context"
@@ -31,8 +31,8 @@ import (
 	serviceinformerv1 "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/{{.Name}}"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/{{.Name}}"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/{{.Kind}}"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/{{.Kind}}"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
@@ -62,7 +62,7 @@ func NewController(
 	targetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	serviceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGVK((&v1alpha1.{{.UppercaseName}}{}).GetGroupVersionKind()),
+		FilterFunc: controller.FilterControllerGVK((&v1alpha1.{{.TitleCase}}{}).GetGroupVersionKind()),
 		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
 	})
 
