@@ -174,10 +174,5 @@ func (a *component) replaceTemplates(filename, outputname string) error {
 	}
 	defer file.Close()
 
-	err = tmp.Execute(file, a)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return tmp.Execute(file, a)
 }
