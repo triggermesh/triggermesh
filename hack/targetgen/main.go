@@ -28,7 +28,7 @@ import (
 )
 
 func main() {
-	kind := flag.String("kind", "TestTarget", "specify the Target kind")
+	kind := flag.String("kind", "TestTarget", "Specify the Target kind")
 	cfgDir := flag.String("c", "../../",
 		"Path of the directory containing the TriggerMesh deployment manifests")
 	flag.Parse()
