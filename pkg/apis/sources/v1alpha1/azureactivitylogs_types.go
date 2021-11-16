@@ -46,29 +46,8 @@ var (
 type AzureActivityLogsSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	// Resource ID of either the Event Hubs instance or Event Hubs namespace to send activity logs to.
-	// This resource ID also conveniently contains the ID of the subscription which activity logs are to be
-	// subscribed to.
-	//
-	// If the resource ID represents an Event Hubs namespace, Azure automatically creates an Event Hub with the name
-	// 'insights-activity-logs' inside that namespace. Otherwise, the user-provided Event Hub is used.
-	//
-	// Accepted formats:
-	// * /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
-	// * /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
-	EventHubID EventHubResourceID `json:"eventHubID"`
-
-	// Name of a SAS policy with Manage permissions inside the Event Hubs namespace referenced in the EventHubID
-	// field.
-	//
-	// Defaults to "RootManageSharedAccessKey".
-	//
-	// References:
-	//  * https://docs.microsoft.com/en-us/rest/api/eventhub/2017-04-01/authorization%20rules%20-%20namespaces/getauthorizationrule
-	//  * https://docs.microsoft.com/en-us/azure/event-hubs/authorize-access-shared-access-signature
-	//
-	// +optional
-	EventHubsSASPolicy *string `json:"eventHubsSASPolicy,omitempty"`
+	// The destination of activity logs.
+	Destination AzureActivityLogsSourceDestination `json:"destination"`
 
 	// Categories of Activity Logs to collect.
 	//
@@ -81,6 +60,41 @@ type AzureActivityLogsSourceSpec struct {
 	// Authentication method to interact with the Azure Monitor REST API.
 	// This event source only supports the ServicePrincipal authentication.
 	Auth AzureAuth `json:"auth"`
+}
+
+// AzureActivityLogsSourceDestination contains possible destinations for
+// activity logs.
+type AzureActivityLogsSourceDestination struct {
+	EventHubs AzureActivityLogsSourceDestinationEventHubs `json:"eventHubs"`
+}
+
+// AzureActivityLogsSourceDestinationEventHubs contains properties of an Event
+// Hubs namespace to use as destination for events.
+type AzureActivityLogsSourceDestinationEventHubs struct {
+	// Resource ID of the Event Hubs namespace.
+	//
+	// The expected format is
+	//   /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
+	NamespaceID AzureResourceID `json:"namespaceID"`
+
+	// Name of the Event Hubs instance within the selected namespace. If
+	// omitted, Azure automatically creates an Event Hub with the name
+	// 'insights-activity-logs' inside the selected namespace.
+	//
+	// +optional
+	HubName *string `json:"hubName,omitempty"`
+
+	// Name of a SAS policy with Manage permissions inside the Event Hubs
+	// namespace referenced in the EventHubID field.
+	//
+	// Defaults to "RootManageSharedAccessKey".
+	//
+	// References:
+	//  * https://docs.microsoft.com/en-us/rest/api/eventhub/2017-04-01/authorization%20rules%20-%20namespaces/getauthorizationrule
+	//  * https://docs.microsoft.com/en-us/azure/event-hubs/authorize-access-shared-access-signature
+	//
+	// +optional
+	SASPolicy *string `json:"sasPolicy,omitempty"`
 }
 
 // AzureActivityLogsSourceStatus defines the observed state of the event source.

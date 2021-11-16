@@ -54,14 +54,11 @@ var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.AzureActivityLogsSource)
 
-	hubResID := typedSrc.Spec.EventHubID
+	hubNamespaceID := typedSrc.Spec.Destination.EventHubs.NamespaceID
 
-	var hubName string
-	if hubResID.EventHub != "" {
-		hubName = typedSrc.Spec.EventHubID.EventHub
-	} else {
-		hubName = defaultActivityLogsEventHubName
-		hubResID.EventHub = hubName
+	eventHubName := defaultActivityLogsEventHubName
+	if hubName := typedSrc.Spec.Destination.EventHubs.HubName; hubName != nil && *hubName != "" {
+		eventHubName = *hubName
 	}
 
 	var hubEnvs []corev1.EnvVar
@@ -80,9 +77,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvHubResourceID, hubResID.String()),
-		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
-		resource.EnvVar(common.EnvHubName, hubName),
+		resource.EnvVar(common.EnvHubResourceID, makeEventHubID(&hubNamespaceID, eventHubName)),
+		resource.EnvVar(common.EnvHubNamespace, hubNamespaceID.ResourceName),
+		resource.EnvVar(common.EnvHubName, eventHubName),
 		resource.EnvVars(hubEnvs...),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
@@ -102,4 +99,14 @@ func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable,
 	}
 
 	return ownerRefables, nil
+}
+
+// makeEventHubID returns the Resource ID of an Event Hubs instance based on
+// the given Event Hubs namespace and Hub name.
+func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) string {
+	hubID := *namespaceID
+	hubID.Namespace = namespaceID.ResourceName
+	hubID.ResourceType = resourceTypeEventHubs
+	hubID.ResourceName = hubName
+	return hubID.String()
 }

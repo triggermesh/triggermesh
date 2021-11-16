@@ -24,9 +24,3 @@ const (
 	AzureServiceServiceBus = "servicebus"
 	AzureIOTHub            = "iothub"
 )
-
-// SubscriptionResourceID returns the Azure resource ID for the given
-// subscription ID.
-func SubscriptionResourceID(subID string) string {
-	return "/subscriptions/" + subID
-}

@@ -53,26 +53,40 @@ spec:
             description: Desired state of the event source.
             type: object
             properties:
-              eventHubID:
-                description: |-
-                  Resource ID of either the Event Hubs instance or Event Hubs namespace to send activity logs to. This
-                  resource ID also conveniently contains the ID of the subscription which activity logs are to be
-                  subscribed to.
+              destination:
+                description: The destination of activity logs.
+                type: object
+                properties:
+                  eventHubs:
+                    description: Properties of an Event Hubs namespace to use as destination of activity logs.
+                    type: object
+                    properties:
+                      namespaceID:
+                        description: |-
+                          Resource ID of the Event Hubs namespace.
 
-                  If the resource ID represents an Event Hubs namespace, Azure automatically creates an Event Hub with
-                  the name 'insights-activity-logs' inside that namespace. Otherwise, the user-provided Event Hub is
-                  used.
+                          The expected format is
+                            /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
 
-                  Accepted formats are
-                    - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventHubs/{eventHubName}
-                    - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
-                type: string
-                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}(?:\/eventHubs\/[a-zA-Z0-9][\w.-]{0,49})?$
-              eventHubsSASPolicy:
-                description: Name of a SAS policy with Manage permissions inside the Event Hubs namespace referenced in
-                  the EventHubID field. Defaults to 'RootManageSharedAccessKey'.
-                type: string
-                pattern: ^[\w.-]+$'
+                          This resource ID also conveniently contains the ID of the subscription which activity logs are
+                          to be subscribed to.
+                        type: string
+                        pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}$
+                      hubName:
+                        description: Name of the Event Hubs instance within the selected namespace. If omitted, Azure
+                          automatically creates an Event Hub with the name 'insights-activity-logs' inside the selected
+                          namespace.
+                        type: string
+                        pattern: ^[A-Za-z0-9][\w.-]{0,49}$
+                      sasPolicy:
+                        description: Name of a SAS policy with Manage permissions inside the Event Hubs namespace
+                          referenced by the 'namespaceID' field. Defaults to 'RootManageSharedAccessKey'.
+                        type: string
+                        pattern: ^[\w.-]+$'
+                    required:
+                    - namespaceID
+                required:
+                - eventHubs
               categories:
                 description: Categories of Activity Logs to collect. All available categories are selected when this
                   attribute is empty. For a list of available Activity Logs category, please refer to
@@ -203,7 +217,7 @@ spec:
                 required:
                 - extensions
             required:
-            - eventHubID
+            - destination
             - auth
             - sink
           status:

@@ -65,10 +65,10 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureActivityLogsSource
 		return nil, nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
 	}
 
-	eventCatCli := insights.NewEventCategoriesClient(src.Spec.EventHubID.SubscriptionID)
+	eventCatCli := insights.NewEventCategoriesClient(src.Spec.Destination.EventHubs.NamespaceID.SubscriptionID)
 	eventCatCli.Authorizer = authorizer
 
-	diagSettingsCli := insights.NewDiagnosticSettingsClient(src.Spec.EventHubID.SubscriptionID)
+	diagSettingsCli := insights.NewDiagnosticSettingsClient(src.Spec.Destination.EventHubs.NamespaceID.SubscriptionID)
 	diagSettingsCli.Authorizer = authorizer
 
 	return eventCatCli, diagSettingsCli, nil

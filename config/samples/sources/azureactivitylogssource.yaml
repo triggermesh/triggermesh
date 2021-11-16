@@ -24,14 +24,16 @@ kind: AzureActivityLogsSource
 metadata:
   name: sample
 spec:
-  eventHubID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace
-
   # Available Activity Log categories are documented at
   # https://docs.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-schema#categories
   categories:
   - Administrative
   - Security
   - Policy
+
+  destination:
+    eventHubs:
+      namespaceID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace
 
   auth:
     servicePrincipal:

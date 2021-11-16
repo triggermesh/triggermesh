@@ -237,7 +237,7 @@ spec:
                 - required: [uri]
             required:
             - storageAccountID
-            - eventHubID
+            - endpoint
             - auth
             - sink
           status:

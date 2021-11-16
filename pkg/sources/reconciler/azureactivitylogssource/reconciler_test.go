@@ -65,11 +65,10 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newEventSource() *v1alpha1.AzureActivityLogsSource {
 	src := &v1alpha1.AzureActivityLogsSource{
 		Spec: v1alpha1.AzureActivityLogsSourceSpec{
-			EventHubID: v1alpha1.EventHubResourceID{
-				SubscriptionID: "00000000-0000-0000-0000-000000000000",
-				ResourceGroup:  "MyGroup",
-				Namespace:      "MyNamespace",
-				EventHub:       "MyEvents",
+			Destination: v1alpha1.AzureActivityLogsSourceDestination{
+				EventHubs: v1alpha1.AzureActivityLogsSourceDestinationEventHubs{
+					NamespaceID: tEventHubNamespaceID,
+				},
 			},
 			Categories: []string{"Administrative"},
 			Auth: v1alpha1.AzureAuth{

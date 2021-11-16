@@ -47,17 +47,29 @@ var fakeLogCategories = []string{
 	"FakeLogCategoryA",
 }
 
-var tEventHubID = v1alpha1.EventHubResourceID{
-	SubscriptionID: "00000000-0000-0000-0000-000000000000",
-	ResourceGroup:  "test",
-	Namespace:      "my-event-hubs",
-	EventHub:       "MyEvents",
-}
+var (
+	tEventHubNamespaceID = v1alpha1.AzureResourceID{
+		SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+		ResourceGroup:    "MyGroup",
+		ResourceProvider: "Microsoft.EventHub",
+		ResourceType:     "namespaces",
+		ResourceName:     "MyNamespace",
+	}
+
+	tEventHubID = v1alpha1.AzureResourceID{
+		SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+		ResourceGroup:    "MyGroup",
+		ResourceProvider: "Microsoft.EventHub",
+		Namespace:        "MyNamespace",
+		ResourceType:     "eventhubs",
+		ResourceName:     "MyEventHub",
+	}
+)
 
 const (
 	tEventHubsSASPolicy   = "MyPolicy"
-	tEventHubsSASPolicyID = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test" +
-		"/providers/Microsoft.EventHub/namespaces/my-event-hubs/authorizationRules/MyPolicy"
+	tEventHubsSASPolicyID = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup" +
+		"/providers/Microsoft.EventHub/namespaces/MyNamespace/authorizationRules/MyPolicy"
 )
 
 func TestEnsureDiagnosticSettings(t *testing.T) {
@@ -129,9 +141,14 @@ func TestEnsureDiagnosticSettings(t *testing.T) {
 
 			src := &v1alpha1.AzureActivityLogsSource{
 				Spec: v1alpha1.AzureActivityLogsSourceSpec{
-					EventHubID:         tEventHubID,
-					EventHubsSASPolicy: to.StringPtr(tEventHubsSASPolicy),
-					Categories:         tc.categories,
+					Destination: v1alpha1.AzureActivityLogsSourceDestination{
+						EventHubs: v1alpha1.AzureActivityLogsSourceDestinationEventHubs{
+							NamespaceID: tEventHubNamespaceID,
+							HubName:     &tEventHubID.ResourceName,
+							SASPolicy:   to.StringPtr(tEventHubsSASPolicy),
+						},
+					},
+					Categories: tc.categories,
 				},
 			}
 
@@ -183,7 +200,7 @@ func makePayload(cats ...logCategoryTuple) *insights.DiagnosticSettingsResource 
 	return &insights.DiagnosticSettingsResource{
 		DiagnosticSettings: &insights.DiagnosticSettings{
 			EventHubAuthorizationRuleID: to.StringPtr(tEventHubsSASPolicyID),
-			EventHubName:                &tEventHubID.EventHub,
+			EventHubName:                &tEventHubID.ResourceName,
 			Logs:                        &logs,
 		},
 	}
@@ -232,7 +249,7 @@ func existingDiagSettingsMockClients(rr requestRecorder) (clients.EventCategorie
 			getResp: &insights.DiagnosticSettingsResource{
 				DiagnosticSettings: &insights.DiagnosticSettings{
 					EventHubAuthorizationRuleID: to.StringPtr(tEventHubsSASPolicyID),
-					EventHubName:                &tEventHubID.EventHub,
+					EventHubName:                &tEventHubID.ResourceName,
 					// assume all categories are selected for simplicity
 					Logs: &[]insights.LogSettings{{
 						Category: to.StringPtr("FakeLogCategoryA"),

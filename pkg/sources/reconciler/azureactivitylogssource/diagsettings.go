@@ -40,14 +40,19 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/monitor/mgmt/insights"
 	"github.com/Azure/go-autorest/autorest"
+	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/auth"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+)
+
+const (
+	resourceTypeEventHubs  = "eventhubs"
+	resourceTypeAuthzRules = "authorizationRules"
 )
 
 const defaultSASPolicyName = "RootManageSharedAccessKey"
@@ -58,7 +63,6 @@ const crudTimeout = time.Second * 15
 // Required permissions:
 //  - Microsoft.Insights/DiagnosticSettings/Read
 //  - Microsoft.Insights/DiagnosticSettings/Write
-//  - Microsoft.Insights/DiagnosticSettings/Delete
 //  - Microsoft.EventHub/namespaces/authorizationRules/listkeys/action
 func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 	if skip.Skip(ctx) {
@@ -85,9 +89,8 @@ func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 
 	// read current diagnostics settings
 
-	eventHubID := src.Spec.EventHubID
-	subsID := eventHubID.SubscriptionID
-	subsResID := sources.SubscriptionResourceID(subsID)
+	subsID := src.Spec.Destination.EventHubs.NamespaceID.SubscriptionID
+	subsResID := subscriptionResourceID(subsID)
 	diagsName := diagnosticSettingsName(src)
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
@@ -145,18 +148,20 @@ func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 	logSettings := initLogSettings(desiredCats, availCats)
 
 	sasPolName := defaultSASPolicyName
-	if pn := src.Spec.EventHubsSASPolicy; pn != nil && *pn != "" {
+	if pn := src.Spec.Destination.EventHubs.SASPolicy; pn != nil && *pn != "" {
 		sasPolName = *pn
 	}
 
+	nsID := src.Spec.Destination.EventHubs.NamespaceID
+
 	var eventHubName *string
-	if eventHubID.EventHub != "" {
-		eventHubName = &eventHubID.EventHub
+	if hubName := src.Spec.Destination.EventHubs.HubName; hubName != nil && *hubName != "" {
+		eventHubName = hubName
 	}
 
 	desiredDiagSettings := insights.DiagnosticSettingsResource{
 		DiagnosticSettings: &insights.DiagnosticSettings{
-			EventHubAuthorizationRuleID: to.StringPtr(sasPolicyResourceID(sasPolName, eventHubID)),
+			EventHubAuthorizationRuleID: to.StringPtr(sasPolicyResourceID(&nsID, sasPolName)),
 			EventHubName:                eventHubName,
 			Logs:                        &logSettings,
 		},
@@ -191,19 +196,15 @@ func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 	return nil
 }
 
-// sasPolicyID returns the resource ID of a SAS policy identified by name,
-// relatively to the given Event Hub's namepace.
-func sasPolicyResourceID(polName string, eventHub v1alpha1.EventHubResourceID) string {
-	eventHubsNs := v1alpha1.EventHubResourceID{
-		SubscriptionID: eventHub.SubscriptionID,
-		ResourceGroup:  eventHub.ResourceGroup,
-		Namespace:      eventHub.Namespace,
-	}
-
-	return eventHubsNs.String() + "/authorizationRules/" + polName
+// sasPolicyResourceID returns the resource ID of a SAS policy identified by
+// name, relatively to the given Event Hub's namepace.
+func sasPolicyResourceID(namespaceID *v1alpha1.AzureResourceID, polName string) string {
+	return namespaceID.String() + "/" + resourceTypeAuthzRules + "/" + polName
 }
 
 // ensureNoDiagnosticSettings ensures diagnostic settings are removed.
+// Required permissions:
+//  - Microsoft.Insights/DiagnosticSettings/Delete
 func (r *Reconciler) ensureNoDiagnosticSettings(ctx context.Context) reconciler.Event {
 	if skip.Skip(ctx) {
 		return nil
@@ -224,8 +225,8 @@ func (r *Reconciler) ensureNoDiagnosticSettings(ctx context.Context) reconciler.
 			"Error creating Azure clients: %s", err)
 	}
 
-	subsID := src.Spec.EventHubID.SubscriptionID
-	subsResID := sources.SubscriptionResourceID(subsID)
+	subsID := src.Spec.Destination.EventHubs.NamespaceID.SubscriptionID
+	subsResID := subscriptionResourceID(subsID)
 	diagsName := diagnosticSettingsName(src)
 
 	ctx, cancel := context.WithTimeout(ctx, crudTimeout)
@@ -252,6 +253,15 @@ func (r *Reconciler) ensureNoDiagnosticSettings(ctx context.Context) reconciler.
 	return nil
 }
 
+// subscriptionResourceID returns the resource ID of an Azure subscription,
+// based on its ID.
+func subscriptionResourceID(subsID string) string {
+	subsResID := &v1alpha1.AzureResourceID{
+		SubscriptionID: subsID,
+	}
+	return subsResID.String()
+}
+
 // equalDiagnosticSettings asserts the equality of two DiagnosticSettingsResource.
 func (r *Reconciler) equalDiagnosticSettings(ctx context.Context,
 	desired, current insights.DiagnosticSettingsResource) bool {
@@ -263,7 +273,7 @@ func (r *Reconciler) equalDiagnosticSettings(ctx context.Context,
 	return cmpFn(desired.DiagnosticSettings, current.DiagnosticSettings, cmpopts.SortSlices(lessLogSettings))
 }
 
-// diagnosticSettingsName returns a predictable name for some Activity Logs
+// diagnosticSettingsName returns a deterministic name for some Activity Logs
 // diagnostic settings.
 func diagnosticSettingsName(o *v1alpha1.AzureActivityLogsSource) string {
 	return "io.triggermesh.azureactivitylogssource." + o.Namespace + "." + o.Name
@@ -340,6 +350,16 @@ func recursErrMsg(errMsg string, err error) string {
 		if tErr.ServiceError != nil {
 			return errMsg + tErr.ServiceError.Message
 		}
+	case adal.TokenRefreshError:
+		// This type of error is returned when the OAuth authentication with Azure Active Directory fails, often
+		// due to an invalid or expired secret.
+		//
+		// The associated message is typically opaque and contains elements that are unique to each request
+		// (trace/correlation IDs, timestamps), which causes an infinite loop of reconciliation if propagated to
+		// the object's status conditions.
+		// Instead of resorting to over-engineered error parsing techniques to get around the verbosity of the
+		// message, we simply return a short and generic error description.
+		return errMsg + "failed to refresh token: the provided secret is either invalid or expired"
 	}
 
 	return errMsg + err.Error()
