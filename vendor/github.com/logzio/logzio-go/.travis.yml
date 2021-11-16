@@ -1,0 +1,20 @@
+language: go
+sudo: false
+go:
+- 1.10.x
+before_install:
+- go get github.com/mattn/goveralls
+- go get golang.org/x/tools/cmd/cover
+os:
+- linux
+script:
+- go build -race
+- go test -v ./... -coverprofile=cover.out
+- go test -run=bench -cpuprofile=cpu.pprof -memprofile=mem.pprof -benchmem -bench
+  ^Benchmark
+- cd test; if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then go run test.go $LOGZ ; fi
+after_success:
+- bash <(curl -s https://codecov.io/bash)
+env:
+  global:
+    secure: VD2ePbT2Cf2yxwlrNf4C/3rjybHT6N1FCnOJEM7hj+xdJ1k3gB+GPSUf4kW9sHs9kgma+vjkVwfsmlyTMH+ehcfiemkFJyi778GcGQgWYTTwx9algMqCWeJKouwpJTW496L45s87IpwE7TuWhWQy/98e5HNmCOLf/p8wEM/4/1artZgBEgXSuM/CCNpx78VJ4PxKGN09bQa3HrbVFWMeaIbjFGvNOk79e9E0nlVgaxtO8QiHMQvrS4mECEWJWwXopiuVNBa0CQGYULK9837ORBD0w2qjDNRKp/gdC6bIAhxsy569n/z4H/XlVS7PysU7YfFW1XrIc4TVimu2JiymZjbHqp2niTeeEztEwsEvExMCvdtoyibjUzz+2OrxwnJXaCY4CHRR0NxYWCRlgMS8Kn9B/nFO5sz1Bem5WyzerTHe2o3iU0gNS7kcgTD1yK8TousOulRb9s4I1b/hM3sJjWcrS0QSCWA5rbUlXRfL9TnMK+7IN7XgVIL78YvmsV6L+qyWaaUXTkZSZJtM2jNkdTpeyK/wpk89rCpJ/xcT9uw8fBP3XWTi28yw8020gyhJHGUmO2uw1jZbPIxaOerD27769+RIGOWvr5ARBnboar4EwbRcV5ObAICe5gu+IO9RQ2mi5RagdYaKL4+VRgQsDqIy7GzS8Yy/M/aFdAysghs=
