@@ -29,7 +29,7 @@ import (
 
 func main() {
 	kind := flag.String("kind", "TestTarget", "Specify the Target kind")
-	cfgDir := flag.String("c", "../../",
+	cfgDir := flag.String("config", "../../",
 		"Path of the directory containing the TriggerMesh deployment manifests")
 	flag.Parse()
 	*cfgDir = path.Clean(*cfgDir)
@@ -40,36 +40,22 @@ func main() {
 	// make cmd directory
 	path := "cmd/" + temp.Kind + "-adapter"
 	cmdPath := filepath.Join(*cfgDir, path)
-	err := os.MkdirAll(cmdPath, os.ModePerm)
-	if err != nil {
-		log.Fatal("failed creating the cmd directories")
-		log.Fatal(err)
-		return
-	}
+	mustMkdirAll(cmdPath)
 
 	// // make adapter directory
 	path = "pkg/targets/adapter/" + temp.Kind
 	adapterPath := filepath.Join(*cfgDir, path)
-	err = os.MkdirAll(adapterPath, os.ModePerm)
-	if err != nil {
-		log.Fatal("failed creating the adapter directories")
-		log.Fatal(err)
-		return
-	}
+	mustMkdirAll(adapterPath)
+
 	// make reconciler directory
 	path = "pkg/targets/reconciler/" + temp.Kind
 	reconcilerPath := filepath.Join(*cfgDir, path)
-	err = os.MkdirAll(reconcilerPath, os.ModePerm)
-	if err != nil {
-		log.Fatal("failed creating the reconciler directories")
-		log.Fatal(err)
-		return
-	}
+	mustMkdirAll(reconcilerPath)
 
 	// populate cmd directory
 	// read main.go and replace the template variables
 	path = *cfgDir + "/cmd/" + temp.Kind + "-adapter/main.go"
-	err = temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
+	err := temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
 	if err != nil {
 		log.Fatal("failed creating the cmd templates")
 		log.Fatal(err)
@@ -175,4 +161,10 @@ func (a *component) replaceTemplates(filename, outputname string) error {
 	defer file.Close()
 
 	return tmp.Execute(file, a)
+}
+
+func mustMkdirAll(path string) {
+	if err := os.MkdirAll(path, os.ModePerm); err != nil {
+		log.Fatalf("failed creating directory: %v", err)
+	}
 }
