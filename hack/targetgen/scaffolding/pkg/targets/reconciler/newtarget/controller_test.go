@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package {{.Kind}}
+package {{.LowercaseKind}}
 
 import (
 	"testing"
@@ -22,7 +22,7 @@ import (
 	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
 
 	// Link fake informers accessed by our controller
-	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/{{.Kind}}/fake"
+	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/{{.LowercaseKind}}/fake"
 	_ "knative.dev/pkg/client/injection/kube/informers/apps/v1/deployment/fake"
 	_ "knative.dev/pkg/client/injection/kube/informers/core/v1/service/fake"
 	_ "knative.dev/serving/pkg/client/injection/informers/serving/v1/service/fake"

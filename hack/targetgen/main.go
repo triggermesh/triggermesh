@@ -143,9 +143,9 @@ func main() {
 }
 
 type component struct {
-	Kind      string
-	TitleCase string
-	FullCaps  string
+	Kind          string
+	LowercaseKind string
+	UppercaseKind string
 }
 
 func (a *component) replaceTemplates(filename, outputname string) error {

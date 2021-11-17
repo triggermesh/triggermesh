@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/{{.Kind}}"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/{{.LowercaseKind}}"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 func main() {
-	pkgadapter.Main("{{.Kind}}-adapter", {{.Kind}}.EnvAccessorCtor, {{.Kind}}.NewTarget)
+	pkgadapter.Main("{{.LowercaseKind}}-adapter", {{.LowercaseKind}}.EnvAccessorCtor, {{.LowercaseKind}}.NewTarget)
 }

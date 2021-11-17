@@ -26,48 +26,48 @@ import (
 
 // Managed event types
 const (
-	EventType{{.TitleCase}}GenericResponse = "io.triggermesh.{{.Kind}}.response"
+	EventType{{.Kind}}GenericResponse = "io.triggermesh.{{.LowercaseKind}}.response"
 )
 
 // AcceptedEventTypes implements IntegrationTarget.
-func (*{{.TitleCase}}) AcceptedEventTypes() []string {
+func (*{{.Kind}}) AcceptedEventTypes() []string {
 	return []string{
 		"*",
 	}
 }
 
 // GetEventTypes implements EventSource.
-func (*{{.TitleCase}}) GetEventTypes() []string {
+func (*{{.Kind}}) GetEventTypes() []string {
 	return []string{
-		EventType{{.TitleCase}}GenericResponse,
+		EventType{{.Kind}}GenericResponse,
 	}
 }
 
 // AsEventSource implements targets.EventSource.
-func (s *{{.TitleCase}}) AsEventSource() string {
+func (s *{{.Kind}}) AsEventSource() string {
 	return "https://" + "SOMETHINGUSEFULE"
 }
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *{{.TitleCase}}) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("{{.TitleCase}} Target")
+func (s *{{.Kind}}) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("{{.Kind}} Target")
 }
 
-// {{.TitleCase}}CondSet is the group of possible conditions
-var {{.TitleCase}}CondSet = apis.NewLivingConditionSet(
+// {{.Kind}}CondSet is the group of possible conditions
+var {{.Kind}}CondSet = apis.NewLivingConditionSet(
 	ConditionDeployed,
 )
 
 // InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *{{.TitleCase}}Status) InitializeConditions() {
-	{{.TitleCase}}CondSet.Manage(s).InitializeConditions()
+func (s *{{.Kind}}Status) InitializeConditions() {
+	{{.Kind}}CondSet.Manage(s).InitializeConditions()
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
 // ConditionDeployed should be marked as true or false.
-func (s *{{.TitleCase}}Status) PropagateKServiceAvailability(ksvc *servingv1.Service) {
+func (s *{{.Kind}}Status) PropagateKServiceAvailability(ksvc *servingv1.Service) {
 	if ksvc == nil {
-		{{.TitleCase}}CondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
+		{{.Kind}}CondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
 			"The status of the adapter Service can not be determined")
 		return
 	}
@@ -78,7 +78,7 @@ func (s *{{.TitleCase}}Status) PropagateKServiceAvailability(ksvc *servingv1.Ser
 	s.Address.URL = ksvc.Status.URL
 
 	if ksvc.IsReady() {
-		{{.TitleCase}}CondSet.Manage(s).MarkTrue(ConditionDeployed)
+		{{.Kind}}CondSet.Manage(s).MarkTrue(ConditionDeployed)
 		return
 	}
 
@@ -88,26 +88,26 @@ func (s *{{.TitleCase}}Status) PropagateKServiceAvailability(ksvc *servingv1.Ser
 		msg += ": " + readyCond.Message
 	}
 
-	{{.TitleCase}}CondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
+	{{.Kind}}CondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
 
 }
 
 // MarkNoKService sets the condition that the service is not ready
-func (s *{{.TitleCase}}Status) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	{{.TitleCase}}CondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
+func (s *{{.Kind}}Status) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
+	{{.Kind}}CondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
 }
 
 // IsReady returns true if the resource is ready overall.
-func (s *{{.TitleCase}}Status) IsReady() bool {
-	return {{.TitleCase}}CondSet.Manage(s).IsHappy()
+func (s *{{.Kind}}Status) IsReady() bool {
+	return {{.Kind}}CondSet.Manage(s).IsHappy()
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *{{.TitleCase}}) GetConditionSet() apis.ConditionSet {
-	return {{.TitleCase}}CondSet
+func (s *{{.Kind}}) GetConditionSet() apis.ConditionSet {
+	return {{.Kind}}CondSet
 }
 
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *{{.TitleCase}}) GetStatus() *duckv1.Status {
+func (s *{{.Kind}}) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
