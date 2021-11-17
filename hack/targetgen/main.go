@@ -34,27 +34,27 @@ func main() {
 	flag.Parse()
 	*cfgDir = path.Clean(*cfgDir)
 	temp := &component{}
-	temp.Kind = strings.ToLower(*kind)
-	temp.FullCaps = strings.ToUpper(*kind)
+	temp.LowercaseKind = strings.ToLower(*kind)
+	temp.UppercaseKind = strings.ToUpper(*kind)
 
 	// make cmd directory
-	path := "cmd/" + temp.Kind + "-adapter"
+	path := "cmd/" + temp.LowercaseKind + "-adapter"
 	cmdPath := filepath.Join(*cfgDir, path)
 	mustMkdirAll(cmdPath)
 
 	// // make adapter directory
-	path = "pkg/targets/adapter/" + temp.Kind
+	path = "pkg/targets/adapter/" + temp.LowercaseKind
 	adapterPath := filepath.Join(*cfgDir, path)
 	mustMkdirAll(adapterPath)
 
 	// make reconciler directory
-	path = "pkg/targets/reconciler/" + temp.Kind
+	path = "pkg/targets/reconciler/" + temp.LowercaseKind
 	reconcilerPath := filepath.Join(*cfgDir, path)
 	mustMkdirAll(reconcilerPath)
 
 	// populate cmd directory
 	// read main.go and replace the template variables
-	path = *cfgDir + "/cmd/" + temp.Kind + "-adapter/main.go"
+	path = *cfgDir + "/cmd/" + temp.LowercaseKind + "-adapter/main.go"
 	err := temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
 	if err != nil {
 		log.Fatal("failed creating the cmd templates")
@@ -64,7 +64,7 @@ func main() {
 
 	// populate adapter directory
 	// read adapter.go
-	path = *cfgDir + "/pkg/targets/adapter/" + temp.Kind + "/adapter.go"
+	path = *cfgDir + "/pkg/targets/adapter/" + temp.LowercaseKind + "/adapter.go"
 	err = temp.replaceTemplates("scaffolding/pkg/targets/adapter/newtarget/adapter.go", path)
 	if err != nil {
 		log.Fatal("failed creating the adapter templates")
@@ -73,7 +73,7 @@ func main() {
 	}
 
 	// read newtarget_lifecycle.go
-	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.Kind + "_lifecycle.go"
+	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.LowercaseKind + "_lifecycle.go"
 	err = temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_lifecycle.go", path)
 	if err != nil {
 		log.Fatal("failed creating the newtarget_lifecycle.go template")
@@ -82,7 +82,7 @@ func main() {
 	}
 
 	// read newtarget_types.go
-	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.Kind + "_types.go"
+	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.LowercaseKind + "_types.go"
 	err = temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_types.go", path)
 	if err != nil {
 		log.Fatal("failed creating the newtarget_types.go template")
@@ -92,7 +92,7 @@ func main() {
 
 	// populate reconciler directory
 	// read adapter.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/adapter.go"
+	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/adapter.go"
 	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/adapter.go", path)
 	if err != nil {
 		log.Fatal("failed creating the reconciler templates")
@@ -101,7 +101,7 @@ func main() {
 	}
 
 	// read controller_test.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/controller_test.go"
+	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/controller_test.go"
 	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller_test.go", path)
 	if err != nil {
 		log.Fatal("failed creating the controller_test.go template")
@@ -110,7 +110,7 @@ func main() {
 	}
 
 	// read controller.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/controller.go"
+	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/controller.go"
 	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller.go", path)
 	if err != nil {
 		log.Fatal("failed creating the controller.go template")
@@ -119,7 +119,7 @@ func main() {
 	}
 
 	// read reconciler.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.Kind + "/reconciler.go"
+	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/reconciler.go"
 	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
 	if err != nil {
 		log.Fatal("failed creating the reconciler.go template")
@@ -129,7 +129,7 @@ func main() {
 
 	// populate the config directory
 	// read 301-newtarget.yaml.go
-	path = *cfgDir + "/config/301-" + temp.Kind + ".yaml"
+	path = *cfgDir + "/config/301-" + temp.LowercaseKind + ".yaml"
 	temp.replaceTemplates("scaffolding/config/301-newtarget.yaml", path)
 
 	fmt.Println("done")
@@ -137,7 +137,7 @@ func main() {
 	fmt.Println("Update `cmd/triggermesh-controller/main.go`")
 	fmt.Println("Update `config/500-controller.yaml`")
 	fmt.Println("Update `pkg/api/targets/v1alpha1/register.go`")
-	fmt.Printf("Create kodata symlinks in cmd/%s", temp.Kind)
+	fmt.Printf("Create kodata symlinks in cmd/%s", temp.LowercaseKind)
 	fmt.Println("")
 	fmt.Println("Run `make codegen`")
 }
