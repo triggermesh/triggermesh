@@ -32,11 +32,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
-const (
-	envPubSubSubscription = "GCLOUD_PUBSUB_SUBSCRIPTION"
-	envCloudEventSource   = "CE_SOURCE"
-)
-
 // adapterConfig contains properties used to configure the source's adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
@@ -56,9 +51,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	// the user may or may not provide a Pub/Sub subscription ID in the
 	// source's spec, so the source's status is unfortunately our only
 	// source of truth here
-	var subsID string
+	var subsName string
 	if sn := typedSrc.Status.Subscription; sn != nil {
-		subsID = sn.Resource
+		subsName = sn.String()
 	}
 
 	var authEnvs []corev1.EnvVar
@@ -67,9 +62,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(envCloudEventSource, typedSrc.Spec.Topic.String()),
-		resource.EnvVar(common.EnvGCloudProject, typedSrc.Spec.Topic.Project),
-		resource.EnvVar(envPubSubSubscription, subsID),
+		resource.EnvVar(common.EnvGCloudPubSubSubscription, subsName),
 		resource.EnvVars(authEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)

@@ -46,6 +46,6 @@ const (
 	EnvHubResourceID = "EVENTHUB_RESOURCE_ID"
 
 	// Google Cloud
-	EnvGCloudProject = "GCLOUD_PROJECT"
-	EnvGCloudSAKey   = "GCLOUD_SERVICEACCOUNT_KEY"
+	EnvGCloudSAKey              = "GCLOUD_SERVICEACCOUNT_KEY"
+	EnvGCloudPubSubSubscription = "GCLOUD_PUBSUB_SUBSCRIPTION"
 )

@@ -17,7 +17,6 @@ limitations under the License.
 package googlecloudauditlogssource
 
 import (
-	"encoding/json"
 	"fmt"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -27,17 +26,12 @@ import (
 	"knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/cloudevents"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
-)
-
-const (
-	envAuditLogsSubscription = "GCLOUD_PUBSUB_SUBSCRIPTION"
-	envCloudEventSource      = "CE_SOURCE"
 )
 
 // adapterConfig contains properties used to configure the source's adapter.
@@ -58,30 +52,25 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	typedSrc := src.(*v1alpha1.GoogleCloudAuditLogsSource)
 
 	// we rely on the source's status to persist the ID of the Pub/Sub subscription
-	var pubsubProject string
-	var subsID string
+	var subsName string
 	if sn := typedSrc.Status.Subscription; sn != nil {
-		pubsubProject = sn.Project
-		subsID = sn.Resource
+		subsName = sn.String()
 	}
 
 	var authEnvs []corev1.EnvVar
 	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvGCloudSAKey, typedSrc.Spec.ServiceAccountKey)
 
-	ceOverridesStr := ceOverridesJSON(typedSrc.Spec.CloudEventOverrides)
+	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides,
+		cloudevents.SetExtension(cloudevents.AttributeSource, src.AsEventSource()),
+		cloudevents.SetExtension(cloudevents.AttributeType, v1alpha1.GoogleCloudAuditLogsGenericEventType),
+	)
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		// TODO(antoineco): remove usage of CE_SOURCE / CE overrides
-		// and configure a message handler for Cloud Audit Logs events in
-		// the adapter instead.
-		resource.EnvVar(envCloudEventSource, typedSrc.AsEventSource()),
-		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
-
-		resource.EnvVar(common.EnvGCloudProject, pubsubProject),
-		resource.EnvVar(envAuditLogsSubscription, subsID),
+		resource.EnvVar(common.EnvGCloudPubSubSubscription, subsName),
 		resource.EnvVars(authEnvs...),
+		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }
@@ -99,35 +88,4 @@ func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable,
 	}
 
 	return ownerRefables, nil
-}
-
-// ceOverridesJSON returns the source's CloudEvent overrides as a JSON object.
-func ceOverridesJSON(ceo *duckv1.CloudEventOverrides) string {
-	ceo = setCETypeOverride(ceo)
-
-	var ceoStr string
-	if b, err := json.Marshal(ceo); err == nil {
-		ceoStr = string(b)
-	}
-
-	return ceoStr
-}
-
-// setCETypeOverride sets an override on the CloudEvent "type" attribute that
-// matches event payloads sent by Google Cloud Audit Logs.
-func setCETypeOverride(ceo *duckv1.CloudEventOverrides) *duckv1.CloudEventOverrides {
-	if ceo == nil {
-		ceo = &duckv1.CloudEventOverrides{}
-	}
-
-	ext := &ceo.Extensions
-	if *ext == nil {
-		*ext = make(map[string]string, 1)
-	}
-
-	if _, isSet := (*ext)["type"]; !isSet {
-		(*ext)["type"] = v1alpha1.GoogleCloudAuditLogsGenericEventType
-	}
-
-	return ceo
 }

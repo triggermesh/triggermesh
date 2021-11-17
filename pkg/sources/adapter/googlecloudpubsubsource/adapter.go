@@ -36,12 +36,9 @@ import (
 type envConfig struct {
 	pkgadapter.EnvConfig
 
-	CESource string `envconfig:"CE_SOURCE" required:"true"`
+	SubscriptionResourceName GCloudResourceName `envconfig:"GCLOUD_PUBSUB_SUBSCRIPTION" required:"true"`
 
-	ProjectID         string `envconfig:"GCLOUD_PROJECT" required:"true"`
 	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
-
-	SubscriptionID string `envconfig:"GCLOUD_PUBSUB_SUBSCRIPTION" required:"true"`
 
 	// Name of a message processor which takes care of converting Pub/Sub
 	// messages to CloudEvents.
@@ -71,15 +68,26 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envConfig)
 
-	psCli, err := pubsub.NewClient(ctx, env.ProjectID, option.WithCredentialsJSON(env.ServiceAccountKey))
+	psCli, err := pubsub.NewClient(ctx, env.SubscriptionResourceName.Project,
+		option.WithCredentialsJSON(env.ServiceAccountKey),
+	)
 	if err != nil {
 		logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
 	}
 
+	subsCli := psCli.Subscription(env.SubscriptionResourceName.Resource)
+
+	sub, err := subsCli.Config(ctx)
+	if err != nil {
+		logger.Panicw("Failed to read configuration of Pub/Sub Subscription "+
+			strconv.Quote(env.SubscriptionResourceName.String()), zap.Error(err))
+	}
+	topicName := sub.Topic.String()
+
 	var msgPrcsr MessageProcessor
 	switch env.MessageProcessor {
 	case "default":
-		msgPrcsr = &defaultMessageProcessor{ceSource: env.CESource}
+		msgPrcsr = &defaultMessageProcessor{ceSource: topicName}
 	default:
 		panic("unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
@@ -87,7 +95,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	return &adapter{
 		logger:   logger,
 		ceClient: ceClient,
-		subs:     psCli.Subscription(env.SubscriptionID),
+		subs:     subsCli,
 		msgPrcsr: msgPrcsr,
 	}
 }
