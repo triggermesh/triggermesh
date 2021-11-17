@@ -19,7 +19,7 @@ package azureeventhubstarget
 import (
 	"context"
 
-	eventhub "github.com/Azure/azure-event-hubs-go"
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
