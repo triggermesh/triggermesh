@@ -21,7 +21,6 @@ require (
 	cloud.google.com/go/pubsub v1.17.1
 	cloud.google.com/go/storage v1.18.2
 	cloud.google.com/go/workflows v1.0.0
-	github.com/Azure/azure-event-hubs-go v1.3.1
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
 	github.com/Azure/azure-sdk-for-go v58.3.0+incompatible
 	github.com/Azure/azure-service-bus-go v0.11.3
@@ -78,7 +77,6 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
-	github.com/Azure/azure-amqp-common-go v1.1.4 // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.1.9 // indirect
 	github.com/Azure/go-amqp v0.16.1 // indirect
@@ -207,7 +205,6 @@ require (
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7 // indirect
 	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
-	pack.ag/amqp v0.11.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
