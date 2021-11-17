@@ -283,6 +283,7 @@ rules:
   - azureactivitylogssources/finalizers
   - azureblobstoragesources/finalizers
   - azureeventgridsources/finalizers
+  - azureeventhubsources/finalizers
   - azureiothubsources/finalizers
   - azurequeuestoragesources/finalizers
   - azureservicebusqueuesources/finalizers
