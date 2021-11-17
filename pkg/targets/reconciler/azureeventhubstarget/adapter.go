@@ -36,7 +36,6 @@ const (
 	envHubName         = "EVENTHUB_NAME"
 	envHubKeyValue     = "EVENTHUB_KEY_VALUE"
 	envHubConnStr      = "EVENTHUB_CONNECTION_STRING"
-	envHubResourceID   = "EVENTHUB_RESOURCE_ID"
 	envAADTenantID     = "AZURE_TENANT_ID"
 	envAADClientID     = "AZURE_CLIENT_ID"
 	envAADClientSecret = "AZURE_CLIENT_SECRET"
