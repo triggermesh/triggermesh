@@ -36,7 +36,4 @@ type envAccessor struct {
 
 	// DiscardCEContext chooses to keep or discard the incoming cloudevent context
 	DiscardCEContext bool `envconfig:"DISCARD_CE_CONTEXT"`
-
-	// AzureEventHub connection parameters
-	ConnectionString string `envconfig:"EVENTHUB_CONNECTION_STRING"`
 }

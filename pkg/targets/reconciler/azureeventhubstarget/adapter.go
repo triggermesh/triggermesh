@@ -89,7 +89,6 @@ func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapt
 		resources.KsvcOwner(target),
 		resources.KsvcPodLabels(podLabels),
 		resources.KsvcPodEnvVars(envs),
-		resources.EnvVar(envHubResourceID, target.Spec.EventHubID.String()),
 		resources.EnvVar(envHubNamespace, target.Spec.EventHubID.Namespace),
 		resources.EnvVar(envHubName, target.Spec.EventHubID.EventHub),
 	)
