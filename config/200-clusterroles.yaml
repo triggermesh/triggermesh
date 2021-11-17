@@ -767,7 +767,6 @@ rules:
   - awss3targets
   - awssnstargets
   - awssqstargets
-  - azureeventbridgetargets
   - azureeventhubstargets
   - confluenttargets
   - datadogtargets
