@@ -45,7 +45,7 @@ func (*{{.Kind}}) GetEventTypes() []string {
 
 // AsEventSource implements targets.EventSource.
 func (s *{{.Kind}}) AsEventSource() string {
-	return "https://" + "SOMETHINGUSEFULE"
+	return "https://" + "REPLACEME"
 }
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
