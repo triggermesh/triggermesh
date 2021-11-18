@@ -82,7 +82,7 @@ spec:
                         description: Name of a SAS policy with Manage permissions inside the Event Hubs namespace
                           referenced by the 'namespaceID' field. Defaults to 'RootManageSharedAccessKey'.
                         type: string
-                        pattern: ^[\w.-]+$'
+                        pattern: ^[\w.-]+$
                     required:
                     - namespaceID
                 required:
