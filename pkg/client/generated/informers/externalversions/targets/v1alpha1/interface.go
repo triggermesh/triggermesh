@@ -40,6 +40,8 @@ type Interface interface {
 	AWSSQSTargets() AWSSQSTargetInformer
 	// AlibabaOSSTargets returns a AlibabaOSSTargetInformer.
 	AlibabaOSSTargets() AlibabaOSSTargetInformer
+	// AzureEventHubsTargets returns a AzureEventHubsTargetInformer.
+	AzureEventHubsTargets() AzureEventHubsTargetInformer
 	// ConfluentTargets returns a ConfluentTargetInformer.
 	ConfluentTargets() ConfluentTargetInformer
 	// DatadogTargets returns a DatadogTargetInformer.
@@ -135,6 +137,11 @@ func (v *version) AWSSQSTargets() AWSSQSTargetInformer {
 // AlibabaOSSTargets returns a AlibabaOSSTargetInformer.
 func (v *version) AlibabaOSSTargets() AlibabaOSSTargetInformer {
 	return &alibabaOSSTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureEventHubsTargets returns a AzureEventHubsTargetInformer.
+func (v *version) AzureEventHubsTargets() AzureEventHubsTargetInformer {
+	return &azureEventHubsTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ConfluentTargets returns a ConfluentTargetInformer.

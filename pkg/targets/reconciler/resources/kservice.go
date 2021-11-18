@@ -17,6 +17,7 @@ limitations under the License.
 package resources
 
 import (
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -107,4 +108,49 @@ func KsvcPodEnvVars(env []corev1.EnvVar) KsvcOpts {
 		ksvc.Spec.Template.Spec.Containers[0].Env = env
 		return ksvc
 	}
+}
+
+// EnvVar sets the value of a Container's environment variable.
+func EnvVar(name, val string) KsvcOpts {
+	return func(object *servingv1.Service) *servingv1.Service {
+		setEnvVar(envVarsFrom(object), name, val, nil)
+		return object
+	}
+}
+
+func envVarsFrom(object interface{}) (envVars *[]corev1.EnvVar) {
+	switch o := object.(type) {
+	case *corev1.Container:
+		envVars = &o.Env
+	case *appsv1.Deployment, *servingv1.Service:
+		envVars = &firstContainer(o).Env
+	}
+
+	return
+}
+
+func setEnvVar(envVars *[]corev1.EnvVar, name, value string, valueFrom *corev1.EnvVarSource) {
+	*envVars = append(*envVars, corev1.EnvVar{
+		Name:      name,
+		Value:     value,
+		ValueFrom: valueFrom,
+	})
+}
+
+// firstContainer returns a PodSpecable's first Container definition.
+// A new empty Container is injected if the PodSpecable does not contain any.
+func firstContainer(object interface{}) *corev1.Container {
+	var containers *[]corev1.Container
+
+	switch o := object.(type) {
+	case *appsv1.Deployment:
+		containers = &o.Spec.Template.Spec.Containers
+	case *servingv1.Service:
+		containers = &o.Spec.Template.Spec.Containers
+	}
+
+	if len(*containers) == 0 {
+		*containers = make([]corev1.Container, 1)
+	}
+	return &(*containers)[0]
 }

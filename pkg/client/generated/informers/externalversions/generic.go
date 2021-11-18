@@ -153,6 +153,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AWSSQSTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("alibabaosstargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AlibabaOSSTargets().Informer()}, nil
+	case targetsv1alpha1.SchemeGroupVersion.WithResource("azureeventhubstargets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AzureEventHubsTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("confluenttargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().ConfluentTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("datadogtargets"):
