@@ -50,7 +50,7 @@ func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 }
 
 func withDynamicInformer(ctx context.Context) context.Context {
-	inf := &wrapper{client: client.Get(ctx)}
+	inf := &wrapper{client: client.Get(ctx), resourceVersion: injection.GetResourceVersion(ctx)}
 	return context.WithValue(ctx, Key{}, inf)
 }
 
@@ -68,6 +68,8 @@ type wrapper struct {
 	client internalclientset.Interface
 
 	namespace string
+
+	resourceVersion string
 }
 
 var _ v1alpha1.AzureBlobStorageSourceInformer = (*wrapper)(nil)
@@ -82,13 +84,21 @@ func (w *wrapper) Lister() sourcesv1alpha1.AzureBlobStorageSourceLister {
 }
 
 func (w *wrapper) AzureBlobStorageSources(namespace string) sourcesv1alpha1.AzureBlobStorageSourceNamespaceLister {
-	return &wrapper{client: w.client, namespace: namespace}
+	return &wrapper{client: w.client, namespace: namespace, resourceVersion: w.resourceVersion}
+}
+
+// SetResourceVersion allows consumers to adjust the minimum resourceVersion
+// used by the underlying client.  It is not accessible via the standard
+// lister interface, but can be accessed through a user-defined interface and
+// an implementation check e.g. rvs, ok := foo.(ResourceVersionSetter)
+func (w *wrapper) SetResourceVersion(resourceVersion string) {
+	w.resourceVersion = resourceVersion
 }
 
 func (w *wrapper) List(selector labels.Selector) (ret []*apissourcesv1alpha1.AzureBlobStorageSource, err error) {
 	lo, err := w.client.SourcesV1alpha1().AzureBlobStorageSources(w.namespace).List(context.TODO(), v1.ListOptions{
-		LabelSelector: selector.String(),
-		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+		LabelSelector:   selector.String(),
+		ResourceVersion: w.resourceVersion,
 	})
 	if err != nil {
 		return nil, err
@@ -101,6 +111,6 @@ func (w *wrapper) List(selector labels.Selector) (ret []*apissourcesv1alpha1.Azu
 
 func (w *wrapper) Get(name string) (*apissourcesv1alpha1.AzureBlobStorageSource, error) {
 	return w.client.SourcesV1alpha1().AzureBlobStorageSources(w.namespace).Get(context.TODO(), name, v1.GetOptions{
-		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+		ResourceVersion: w.resourceVersion,
 	})
 }

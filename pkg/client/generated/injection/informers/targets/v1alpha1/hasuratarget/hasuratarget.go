@@ -50,7 +50,7 @@ func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 }
 
 func withDynamicInformer(ctx context.Context) context.Context {
-	inf := &wrapper{client: client.Get(ctx)}
+	inf := &wrapper{client: client.Get(ctx), resourceVersion: injection.GetResourceVersion(ctx)}
 	return context.WithValue(ctx, Key{}, inf)
 }
 
@@ -68,6 +68,8 @@ type wrapper struct {
 	client internalclientset.Interface
 
 	namespace string
+
+	resourceVersion string
 }
 
 var _ v1alpha1.HasuraTargetInformer = (*wrapper)(nil)
@@ -82,13 +84,21 @@ func (w *wrapper) Lister() targetsv1alpha1.HasuraTargetLister {
 }
 
 func (w *wrapper) HasuraTargets(namespace string) targetsv1alpha1.HasuraTargetNamespaceLister {
-	return &wrapper{client: w.client, namespace: namespace}
+	return &wrapper{client: w.client, namespace: namespace, resourceVersion: w.resourceVersion}
+}
+
+// SetResourceVersion allows consumers to adjust the minimum resourceVersion
+// used by the underlying client.  It is not accessible via the standard
+// lister interface, but can be accessed through a user-defined interface and
+// an implementation check e.g. rvs, ok := foo.(ResourceVersionSetter)
+func (w *wrapper) SetResourceVersion(resourceVersion string) {
+	w.resourceVersion = resourceVersion
 }
 
 func (w *wrapper) List(selector labels.Selector) (ret []*apistargetsv1alpha1.HasuraTarget, err error) {
 	lo, err := w.client.TargetsV1alpha1().HasuraTargets(w.namespace).List(context.TODO(), v1.ListOptions{
-		LabelSelector: selector.String(),
-		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+		LabelSelector:   selector.String(),
+		ResourceVersion: w.resourceVersion,
 	})
 	if err != nil {
 		return nil, err
@@ -101,6 +111,6 @@ func (w *wrapper) List(selector labels.Selector) (ret []*apistargetsv1alpha1.Has
 
 func (w *wrapper) Get(name string) (*apistargetsv1alpha1.HasuraTarget, error) {
 	return w.client.TargetsV1alpha1().HasuraTargets(w.namespace).Get(context.TODO(), name, v1.GetOptions{
-		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
+		ResourceVersion: w.resourceVersion,
 	})
 }
