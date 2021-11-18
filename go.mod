@@ -51,7 +51,7 @@ require (
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sendgrid/sendgrid-go v3.10.3+incompatible
 	github.com/stretchr/testify v1.7.0
-	github.com/tektoncd/pipeline v0.29.0
+	github.com/tektoncd/pipeline v0.30.0
 	github.com/tidwall/gjson v1.11.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.25.0
@@ -75,6 +75,7 @@ require (
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
+	cloud.google.com/go/kms v1.1.0 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
