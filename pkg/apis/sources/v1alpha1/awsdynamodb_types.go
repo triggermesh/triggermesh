@@ -52,8 +52,8 @@ type AWSDynamoDBSourceSpec struct {
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazondynamodb.html#amazondynamodb-resources-for-iam-policies
 	ARN apis.ARN `json:"arn"`
 
-	// Credentials to interact with the Amazon DynamoDB API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon DynamoDB API.
+	Auth AWSAuth `json:"auth"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

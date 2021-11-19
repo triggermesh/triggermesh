@@ -26,15 +26,16 @@ metadata:
 spec:
   arn: arn:aws:cognito-idp:us-west-2:123456789012:userpool/us-west-2_abcdefghi
 
-  credentials:
-    accessKeyID:
-      valueFromSecret:
-        name: awscreds
-        key: aws_access_key_id
-    secretAccessKey:
-      valueFromSecret:
-        name: awscreds
-        key: aws_secret_access_key
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: awscreds
+          key: aws_access_key_id
+      secretAccessKey:
+        valueFromSecret:
+          name: awscreds
+          key: aws_secret_access_key
 
   sink:
     ref:

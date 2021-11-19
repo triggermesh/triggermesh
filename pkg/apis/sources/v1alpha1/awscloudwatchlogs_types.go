@@ -60,8 +60,8 @@ type AWSCloudWatchLogsSourceSpec struct {
 	// +optional
 	PollingInterval *apis.Duration `json:"pollingInterval,omitempty"`
 
-	// Credentials to interact with the Amazon CloudWatch Logs API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon CloudWatch Logs API.
+	Auth AWSAuth `json:"auth"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

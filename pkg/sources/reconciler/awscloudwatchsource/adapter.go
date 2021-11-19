@@ -74,7 +74,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVar(envRegion, typedSrc.Spec.Region),
 		resource.EnvVar(envQueries, queries),
 		resource.EnvVar(envPollingInterval, pollingInterval.String()),
-		resource.EnvVars(common.MakeSecurityCredentialsEnvVars(typedSrc.Spec.Credentials)...),
+		resource.EnvVars(common.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),

@@ -27,15 +27,16 @@ spec:
   arn: 'arn:aws:logs:us-west-2:123456789012:log-group:/aws/lambda/lambdadumper:*'
   pollingInterval: 5m
 
-  credentials:
-    accessKeyID:
-      valueFromSecret:
-        name: awscreds
-        key: aws_access_key_id
-    secretAccessKey:
-      valueFromSecret:
-        name: awscreds
-        key: aws_secret_access_key
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: awscreds
+          key: aws_access_key_id
+      secretAccessKey:
+        valueFromSecret:
+          name: awscreds
+          key: aws_secret_access_key
 
   sink:
     ref:

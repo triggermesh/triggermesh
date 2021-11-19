@@ -278,51 +278,11 @@ func MakeAWSAuthEnvVars(auth v1alpha1.AWSAuth) []corev1.EnvVar {
 	var authEnvVars []corev1.EnvVar
 
 	if creds := auth.Credentials; creds != nil {
-		authEnvVars = append(authEnvVars, MakeSecurityCredentialsEnvVars(*creds)...)
+		authEnvVars = MaybeAppendValueFromEnvVar(authEnvVars, EnvAccessKeyID, creds.AccessKeyID)
+		authEnvVars = MaybeAppendValueFromEnvVar(authEnvVars, EnvSecretAccessKey, creds.SecretAccessKey)
 	}
 
 	return authEnvVars
-}
-
-// MakeSecurityCredentialsEnvVars returns environment variables for the given
-// AWS security credentials.
-func MakeSecurityCredentialsEnvVars(creds v1alpha1.AWSSecurityCredentials) []corev1.EnvVar {
-	const (
-		envAccessKeyID = iota
-		envSecretAccessKey
-	)
-
-	credsEnvVars := []corev1.EnvVar{
-		{Name: EnvAccessKeyID},
-		{Name: EnvSecretAccessKey},
-	}
-
-	if vfs := creds.AccessKeyID.ValueFromSecret; vfs != nil {
-		credsEnvVars[envAccessKeyID].ValueFrom = envVarValueFromSecret(vfs.Name, vfs.Key)
-	} else {
-		credsEnvVars[envAccessKeyID].Value = creds.AccessKeyID.Value
-	}
-
-	if vfs := creds.SecretAccessKey.ValueFromSecret; vfs != nil {
-		credsEnvVars[envSecretAccessKey].ValueFrom = envVarValueFromSecret(vfs.Name, vfs.Key)
-	} else {
-		credsEnvVars[envSecretAccessKey].Value = creds.SecretAccessKey.Value
-	}
-
-	return credsEnvVars
-}
-
-// envVarValueFromSecret returns the value of an environment variable sourced
-// from a Kubernetes Secret.
-func envVarValueFromSecret(secretName, secretKey string) *corev1.EnvVarSource {
-	return &corev1.EnvVarSource{
-		SecretKeyRef: &corev1.SecretKeySelector{
-			LocalObjectReference: corev1.LocalObjectReference{
-				Name: secretName,
-			},
-			Key: secretKey,
-		},
-	}
 }
 
 // MakeAWSEndpointEnvVars returns environment variables for the given AWS

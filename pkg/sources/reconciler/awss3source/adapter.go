@@ -61,7 +61,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvARN, queueARN.String()),
-		resource.EnvVars(common.MakeSecurityCredentialsEnvVars(typedSrc.Spec.Credentials)...),
+		resource.EnvVars(common.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVar(envMessageProcessor, "s3"),

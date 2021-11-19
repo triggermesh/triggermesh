@@ -59,7 +59,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVar(common.EnvARN, typedSrc.Spec.ARN.String()),
 		resource.EnvVar(envBranch, typedSrc.Spec.Branch),
 		resource.EnvVar(envEventTypes, strings.Join(typedSrc.Spec.EventTypes, ",")),
-		resource.EnvVars(common.MakeSecurityCredentialsEnvVars(typedSrc.Spec.Credentials)...),
+		resource.EnvVars(common.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }

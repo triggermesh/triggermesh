@@ -65,8 +65,8 @@ type AWSCloudWatchSourceSpec struct {
 	// +optional
 	MetricQueries []AWSCloudWatchMetricQuery `json:"metricQueries,omitempty"`
 
-	// Credentials to interact with the Amazon CloudWatch API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon CloudWatch API.
+	Auth AWSAuth `json:"auth"`
 }
 
 // AWSCloudWatchMetricQuery represents a CloudWatch MetricDataQuery.

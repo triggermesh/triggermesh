@@ -22,8 +22,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/kinesis"
 
-	corev1 "k8s.io/api/core/v1"
-
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
@@ -69,24 +67,6 @@ func newEventSource(skipCEAtrributes ...interface{}) *v1alpha1.AWSKinesisSource 
 	src := &v1alpha1.AWSKinesisSource{
 		Spec: v1alpha1.AWSKinesisSourceSpec{
 			ARN: NewARN(kinesis.ServiceName, "stream/triggermeshtest"),
-			Credentials: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
-						},
-						Key: "keyId",
-					},
-				},
-				SecretAccessKey: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
-						},
-						Key: "secret",
-					},
-				},
-			},
 		},
 	}
 

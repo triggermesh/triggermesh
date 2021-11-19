@@ -26,15 +26,16 @@ metadata:
 spec:
   arn: arn:aws:kinesis:us-west-2:123456789012:stream/triggermeshtest
 
-  credentials:
-    accessKeyID:
-      valueFromSecret:
-        name: awscreds
-        key: aws_access_key_id
-    secretAccessKey:
-      valueFromSecret:
-        name: awscreds
-        key: aws_secret_access_key
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: awscreds
+          key: aws_access_key_id
+      secretAccessKey:
+        valueFromSecret:
+          name: awscreds
+          key: aws_secret_access_key
 
   sink:
     ref:

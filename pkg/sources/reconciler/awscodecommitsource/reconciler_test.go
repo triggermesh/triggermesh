@@ -22,8 +22,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/codecommit"
 
-	corev1 "k8s.io/api/core/v1"
-
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
@@ -71,24 +69,6 @@ func newEventSource() *v1alpha1.AWSCodeCommitSource {
 			ARN:        NewARN(codecommit.ServiceName, "triggermeshtest"),
 			Branch:     "test",
 			EventTypes: []string{"pull-request", "push"},
-			Credentials: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
-						},
-						Key: "keyId",
-					},
-				},
-				SecretAccessKey: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
-						},
-						Key: "secret",
-					},
-				},
-			},
 		},
 	}
 

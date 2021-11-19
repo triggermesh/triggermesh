@@ -17,6 +17,7 @@ limitations under the License.
 package s3
 
 import (
+	"errors"
 	"fmt"
 
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -71,7 +72,11 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, SQSClient, error) {
-	creds, err := aws.Credentials(g.sg(src.Namespace), &src.Spec.Credentials)
+	if src.Spec.Auth.Credentials == nil {
+		return nil, nil, errors.New("AWS security credentials were not specified")
+	}
+
+	creds, err := aws.Credentials(g.sg(src.Namespace), src.Spec.Auth.Credentials)
 	if err != nil {
 		return nil, nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
 	}

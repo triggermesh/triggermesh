@@ -125,7 +125,7 @@ func (in *AWSCloudWatchLogsSourceSpec) DeepCopyInto(out *AWSCloudWatchLogsSource
 		*out = new(apis.Duration)
 		**out = **in
 	}
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -296,7 +296,7 @@ func (in *AWSCloudWatchSourceSpec) DeepCopyInto(out *AWSCloudWatchSourceSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -381,7 +381,7 @@ func (in *AWSCodeCommitSourceSpec) DeepCopyInto(out *AWSCodeCommitSourceSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -461,7 +461,7 @@ func (in *AWSCognitoIdentitySourceSpec) DeepCopyInto(out *AWSCognitoIdentitySour
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -541,7 +541,7 @@ func (in *AWSCognitoUserPoolSourceSpec) DeepCopyInto(out *AWSCognitoUserPoolSour
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -621,7 +621,7 @@ func (in *AWSDynamoDBSourceSpec) DeepCopyInto(out *AWSDynamoDBSourceSpec) {
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -722,7 +722,7 @@ func (in *AWSKinesisSourceSpec) DeepCopyInto(out *AWSKinesisSourceSpec) {
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -807,7 +807,7 @@ func (in *AWSPerformanceInsightsSourceSpec) DeepCopyInto(out *AWSPerformanceInsi
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -935,7 +935,7 @@ func (in *AWSS3SourceSpec) DeepCopyInto(out *AWSS3SourceSpec) {
 		*out = new(AWSS3SourceDestination)
 		(*in).DeepCopyInto(*out)
 	}
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 
@@ -1052,7 +1052,7 @@ func (in *AWSSNSSourceSpec) DeepCopyInto(out *AWSSNSSourceSpec) {
 			(*out)[key] = outVal
 		}
 	}
-	in.Credentials.DeepCopyInto(&out.Credentials)
+	in.Auth.DeepCopyInto(&out.Auth)
 	return
 }
 

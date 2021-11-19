@@ -57,8 +57,8 @@ type AWSCodeCommitSourceSpec struct {
 	// Valid values: [push, pull_request]
 	EventTypes []string `json:"eventTypes"`
 
-	// Credentials to interact with the Amazon CodeCommit API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon CodeCommit API.
+	Auth AWSAuth `json:"auth"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

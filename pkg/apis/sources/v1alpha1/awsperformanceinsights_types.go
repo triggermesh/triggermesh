@@ -62,8 +62,8 @@ type AWSPerformanceInsightsSourceSpec struct {
 	// https://docs.aws.amazon.com/performance-insights/latest/APIReference/API_MetricQuery.html
 	Metrics []string `json:"metrics"`
 
-	// Credentials to interact with the Amazon RDS and Performance Insights APIs.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon RDS and Performance Insights APIs.
+	Auth AWSAuth `json:"auth"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

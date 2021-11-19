@@ -111,55 +111,59 @@ spec:
                         pattern: ^arn:aws(-cn|-us-gov)?:sqs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
                     required:
                     - queueARN
-              credentials:
-                description: Credentials to interact with the Amazon S3 and SQS APIs. For more information about AWS
-                  security credentials, please refer to the AWS General Reference at
-                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+              auth:
+                description: Authentication method to interact with the Amazon S3 and SQS APIs.
                 type: object
                 properties:
-                  accessKeyID:
-                    description: Access key ID.
+                  credentials:
+                    description: Security credentials authentication. For more information about AWS security
+                      credentials, please refer to the AWS General Reference at
+                      https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
                     type: object
                     properties:
-                      value:
-                        description: Literal value of the access key ID.
-                        type: string
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the access key ID.
+                      accessKeyID:
+                        description: Access key ID.
                         type: object
                         properties:
-                          name:
+                          value:
+                            description: Literal value of the access key ID.
                             type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
-                  secretAccessKey:
-                    description: Secret access key.
-                    type: object
-                    properties:
-                      value:
-                        description: Literal value of the secret access key.
-                        type: string
-                        format: password
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the secret access key.
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the access key ID.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      secretAccessKey:
+                        description: Secret access key.
                         type: object
                         properties:
-                          name:
+                          value:
+                            description: Literal value of the secret access key.
                             type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
+                            format: password
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the secret access key.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
               sink:
                 description: The destination of events sourced from Amazon S3.
                 type: object

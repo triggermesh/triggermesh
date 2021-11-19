@@ -98,24 +98,6 @@ func newEventSource() *v1alpha1.AWSSNSSource {
 			SubscriptionAttributes: map[string]*string{
 				"DeliveryPolicy": aws.String(`{"healthyRetryPolicy":{"numRetries":5}}`),
 			},
-			Credentials: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
-						},
-						Key: "keyId",
-					},
-				},
-				SecretAccessKey: v1alpha1.ValueFromField{
-					ValueFromSecret: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: "test-secret",
-						},
-						Key: "secret",
-					},
-				},
-			},
 		},
 	}
 

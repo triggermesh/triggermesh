@@ -52,8 +52,8 @@ type AWSCognitoUserPoolSourceSpec struct {
 	// https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncognitouserpools.html#amazoncognitouserpools-resources-for-iam-policies
 	ARN apis.ARN `json:"arn"`
 
-	// Credentials to interact with the Amazon Cognito API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon Cognito API.
+	Auth AWSAuth `json:"auth"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

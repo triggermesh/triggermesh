@@ -30,15 +30,16 @@ spec:
   - s3:ObjectCreated:*
   - s3:ObjectRemoved:*
 
-  credentials:
-    accessKeyID:
-      valueFromSecret:
-        name: awscreds
-        key: aws_access_key_id
-    secretAccessKey:
-      valueFromSecret:
-        name: awscreds
-        key: aws_secret_access_key
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: awscreds
+          key: aws_access_key_id
+      secretAccessKey:
+        valueFromSecret:
+          name: awscreds
+          key: aws_secret_access_key
 
   sink:
     ref:

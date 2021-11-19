@@ -40,15 +40,16 @@ spec:
         - name: FunctionName
           value: lambdadumper
 
-  credentials:
-    accessKeyID:
-      valueFromSecret:
-        name: awscreds
-        key: aws_access_key_id
-    secretAccessKey:
-      valueFromSecret:
-        name: awscreds
-        key: aws_secret_access_key
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: awscreds
+          key: aws_access_key_id
+      secretAccessKey:
+        valueFromSecret:
+          name: awscreds
+          key: aws_secret_access_key
 
   sink:
     ref:

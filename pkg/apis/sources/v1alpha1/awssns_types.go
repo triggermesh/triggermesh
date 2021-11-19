@@ -62,8 +62,8 @@ type AWSSNSSourceSpec struct {
 	// +optional
 	SubscriptionAttributes map[string]*string `json:"subscriptionAttributes,omitempty"`
 
-	// Credentials to interact with the Amazon SNS API.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon SNS API.
+	Auth AWSAuth `json:"auth"`
 }
 
 // AWSSNSSourceStatus defines the observed state of the event source.

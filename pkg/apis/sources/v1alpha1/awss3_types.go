@@ -73,8 +73,8 @@ type AWSS3SourceSpec struct {
 	// +optional
 	Destination *AWSS3SourceDestination `json:"destination,omitempty"`
 
-	// Credentials to interact with the Amazon S3 and SQS APIs.
-	Credentials AWSSecurityCredentials `json:"credentials"`
+	// Authentication method to interact with the Amazon S3 and SQS APIs.
+	Auth AWSAuth `json:"auth"`
 }
 
 // AWSS3SourceDestination contains possible destinations for bucket notifications.
