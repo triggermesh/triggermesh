@@ -27,125 +27,128 @@ import (
 	"text/template"
 )
 
+const (
+	apiVersion = "v1alpha1"
+
+	cmdPath        = "cmd"
+	configPath     = "config"
+	templatesPath  = "scaffolding"
+	apisPath       = "pkg/apis/targets"
+	adapterPath    = "pkg/targets/adapter"
+	reconcilerPath = "pkg/targets/reconciler"
+)
+
+type component struct {
+	Kind          string
+	LowercaseKind string
+	UppercaseKind string
+}
+
 func main() {
 	kind := flag.String("kind", "TestTarget", "Specify the Target kind")
 	cfgDir := flag.String("config", "../../",
 		"Path of the directory containing the TriggerMesh deployment manifests")
 	flag.Parse()
 	*cfgDir = path.Clean(*cfgDir)
-	temp := &component{}
-	temp.LowercaseKind = strings.ToLower(*kind)
-	temp.UppercaseKind = strings.ToUpper(*kind)
+	temp := &component{
+		Kind:          *kind,
+		LowercaseKind: strings.ToLower(*kind),
+		UppercaseKind: strings.ToUpper(*kind),
+	}
 
 	// make cmd directory
-	path := "cmd/" + temp.LowercaseKind + "-adapter"
-	cmdPath := filepath.Join(*cfgDir, path)
-	mustMkdirAll(cmdPath)
+	mustMkdirAll(filepath.Join(*cfgDir, cmdPath, temp.LowercaseKind+"-adapter"))
 
-	// // make adapter directory
-	path = "pkg/targets/adapter/" + temp.LowercaseKind
-	adapterPath := filepath.Join(*cfgDir, path)
-	mustMkdirAll(adapterPath)
+	// make adapter directory
+	mustMkdirAll(filepath.Join(*cfgDir, adapterPath, temp.LowercaseKind))
 
 	// make reconciler directory
-	path = "pkg/targets/reconciler/" + temp.LowercaseKind
-	reconcilerPath := filepath.Join(*cfgDir, path)
-	mustMkdirAll(reconcilerPath)
+	mustMkdirAll(filepath.Join(*cfgDir, reconcilerPath, temp.LowercaseKind))
 
 	// populate cmd directory
 	// read main.go and replace the template variables
-	path = *cfgDir + "/cmd/" + temp.LowercaseKind + "-adapter/main.go"
-	err := temp.replaceTemplates("scaffolding/cmd/newtarget-adapter/main.go", path)
-	if err != nil {
-		log.Fatal("failed creating the cmd templates")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, cmdPath, "newtarget-adapter", "main.go"),
+		filepath.Join(*cfgDir, cmdPath, temp.LowercaseKind+"-adapter/main.go"),
+	); err != nil {
+		log.Fatalf("failed creating the cmd templates: %v", err)
 	}
 
 	// populate adapter directory
 	// read adapter.go
-	path = *cfgDir + "/pkg/targets/adapter/" + temp.LowercaseKind + "/adapter.go"
-	err = temp.replaceTemplates("scaffolding/pkg/targets/adapter/newtarget/adapter.go", path)
-	if err != nil {
-		log.Fatal("failed creating the adapter templates")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, adapterPath, "newtarget", "adapter.go"),
+		filepath.Join(*cfgDir, adapterPath, temp.LowercaseKind, "/adapter.go"),
+	); err != nil {
+		log.Fatalf("failed creating the adapter templates: %v", err)
 	}
 
 	// read newtarget_lifecycle.go
-	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.LowercaseKind + "_lifecycle.go"
-	err = temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_lifecycle.go", path)
-	if err != nil {
-		log.Fatal("failed creating the newtarget_lifecycle.go template")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, apisPath, apiVersion, "newtarget_lifecycle.go"),
+		filepath.Join(*cfgDir, apisPath, apiVersion, temp.LowercaseKind+"_lifecycle.go"),
+	); err != nil {
+		log.Fatalf("failed creating the newtarget_lifecycle.go template: %v", err)
 	}
 
 	// read newtarget_types.go
-	path = *cfgDir + "/pkg/apis/targets/v1alpha1/" + temp.LowercaseKind + "_types.go"
-	err = temp.replaceTemplates("scaffolding/pkg/apis/targets/v1alpha1/newtarget_types.go", path)
-	if err != nil {
-		log.Fatal("failed creating the newtarget_types.go template")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, apisPath, apiVersion, "newtarget_types.go"),
+		filepath.Join(*cfgDir, apisPath, apiVersion, temp.LowercaseKind+"_types.go"),
+	); err != nil {
+		log.Fatalf("failed creating the newtarget_types.go template: %v", err)
 	}
 
 	// populate reconciler directory
 	// read adapter.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/adapter.go"
-	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/adapter.go", path)
-	if err != nil {
-		log.Fatal("failed creating the reconciler templates")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, reconcilerPath, "newtarget", "adapter.go"),
+		filepath.Join(*cfgDir, reconcilerPath, temp.LowercaseKind, "adapter.go"),
+	); err != nil {
+		log.Fatalf("failed creating the reconciler templates: %v", err)
 	}
 
 	// read controller_test.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/controller_test.go"
-	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller_test.go", path)
-	if err != nil {
-		log.Fatal("failed creating the controller_test.go template")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, reconcilerPath, "newtarget", "controller_test.go"),
+		filepath.Join(*cfgDir, reconcilerPath, temp.LowercaseKind, "controller_test.go"),
+	); err != nil {
+		log.Fatalf("failed creating the controller_test.go template: %v", err)
 	}
 
 	// read controller.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/controller.go"
-	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/controller.go", path)
-	if err != nil {
-		log.Fatal("failed creating the controller.go template")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, reconcilerPath, "newtarget", "controller.go"),
+		filepath.Join(*cfgDir, reconcilerPath, temp.LowercaseKind, "controller.go"),
+	); err != nil {
+		log.Fatalf("failed creating the controller.go template: %v", err)
 	}
 
 	// read reconciler.go
-	path = *cfgDir + "/pkg/targets/reconciler/" + temp.LowercaseKind + "/reconciler.go"
-	err = temp.replaceTemplates("scaffolding/pkg/targets/reconciler/newtarget/reconciler.go", path)
-	if err != nil {
-		log.Fatal("failed creating the reconciler.go template")
-		log.Fatal(err)
-		return
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, reconcilerPath, "newtarget", "reconciler.go"),
+		filepath.Join(*cfgDir, reconcilerPath, temp.LowercaseKind, "reconciler.go"),
+	); err != nil {
+		log.Fatalf("failed creating the reconciler.go template: %v", err)
 	}
 
 	// populate the config directory
 	// read 301-newtarget.yaml.go
-	path = *cfgDir + "/config/301-" + temp.LowercaseKind + ".yaml"
-	temp.replaceTemplates("scaffolding/config/301-newtarget.yaml", path)
+	if err := temp.replaceTemplates(
+		filepath.Join(templatesPath, configPath, "301-newtarget.yaml"),
+		filepath.Join(*cfgDir, configPath, "301-"+temp.LowercaseKind+".yaml"),
+	); err != nil {
+		log.Fatalf("failed creating the CRD from the template: %v", err)
+	}
 
 	fmt.Println("done")
 	fmt.Println("Next Steps:")
 	fmt.Println("Update `cmd/triggermesh-controller/main.go`")
 	fmt.Println("Update `config/500-controller.yaml`")
-	fmt.Println("Update `pkg/api/targets/v1alpha1/register.go`")
+	fmt.Println("Update `pkg/apis/targets/v1alpha1/register.go`")
 	fmt.Printf("Create kodata symlinks in cmd/%s", temp.LowercaseKind)
 	fmt.Println("")
 	fmt.Println("Run `make codegen`")
-}
-
-type component struct {
-	Kind          string
-	LowercaseKind string
-	UppercaseKind string
 }
 
 func (a *component) replaceTemplates(filename, outputname string) error {
