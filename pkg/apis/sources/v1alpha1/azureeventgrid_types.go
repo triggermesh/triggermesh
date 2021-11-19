@@ -93,7 +93,7 @@ type AzureEventGridSourceDestinationEventHubs struct {
 	// Name of the Event Hubs instance within the selected namespace. If
 	// omitted, an Event Hubs instance is created on behalf of the user.
 	// +optional
-	EventHubName *string `json:"eventHubName,omitempty"`
+	HubName *string `json:"hubName,omitempty"`
 }
 
 // AzureEventGridSourceStatus defines the observed state of the event source.

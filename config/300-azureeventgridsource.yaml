@@ -91,7 +91,7 @@ spec:
                             /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
                         type: string
                         pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}$
-                      eventHubName:
+                      hubName:
                         description: Name of the Event Hubs instance within the selected namespace. If omitted, an Event
                           Hubs instance is created on behalf of the user.
                         type: string

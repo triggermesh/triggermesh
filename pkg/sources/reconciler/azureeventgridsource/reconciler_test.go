@@ -104,8 +104,8 @@ func newEventSource() *v1alpha1.AzureEventGridSource {
 			},
 			Endpoint: v1alpha1.AzureEventGridSourceEndpoint{
 				EventHubs: v1alpha1.AzureEventGridSourceDestinationEventHubs{
-					NamespaceID:  tEventHubNamespaceID,
-					EventHubName: &tEventHubID.ResourceName,
+					NamespaceID: tEventHubNamespaceID,
+					HubName:     &tEventHubID.ResourceName,
 				},
 			},
 			Auth: v1alpha1.AzureAuth{

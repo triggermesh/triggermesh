@@ -1529,8 +1529,8 @@ func (in *AzureEventGridSource) DeepCopyObject() runtime.Object {
 func (in *AzureEventGridSourceDestinationEventHubs) DeepCopyInto(out *AzureEventGridSourceDestinationEventHubs) {
 	*out = *in
 	out.NamespaceID = in.NamespaceID
-	if in.EventHubName != nil {
-		in, out := &in.EventHubName, &out.EventHubName
+	if in.HubName != nil {
+		in, out := &in.HubName, &out.HubName
 		*out = new(string)
 		**out = **in
 	}
