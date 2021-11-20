@@ -89,7 +89,7 @@ func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 
 	// read current diagnostics settings
 
-	subsID := src.Spec.Destination.EventHubs.NamespaceID.SubscriptionID
+	subsID := src.Spec.SubscriptionID
 	subsResID := subscriptionResourceID(subsID)
 	diagsName := diagnosticSettingsName(src)
 
@@ -225,7 +225,7 @@ func (r *Reconciler) ensureNoDiagnosticSettings(ctx context.Context) reconciler.
 			"Error creating Azure clients: %s", err)
 	}
 
-	subsID := src.Spec.Destination.EventHubs.NamespaceID.SubscriptionID
+	subsID := src.Spec.SubscriptionID
 	subsResID := subscriptionResourceID(subsID)
 	diagsName := diagnosticSettingsName(src)
 

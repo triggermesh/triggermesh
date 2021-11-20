@@ -53,12 +53,18 @@ spec:
             description: Desired state of the event source.
             type: object
             properties:
+              subscriptionID:
+                description: The ID of the Azure subscription which activity logs to subscribe to.
+                type: string
+                format: guid
+                pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
               destination:
-                description: The destination of activity logs.
+                description: The intermediate destination of activity logs, before they are retrieved by TriggerMesh.
                 type: object
                 properties:
                   eventHubs:
-                    description: Properties of an Event Hubs namespace to use as destination of activity logs.
+                    description: Properties of an Event Hubs namespace to use as intermediate destination of activity
+                      logs.
                     type: object
                     properties:
                       namespaceID:
@@ -67,9 +73,6 @@ spec:
 
                           The expected format is
                             /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}
-
-                          This resource ID also conveniently contains the ID of the subscription which activity logs are
-                          to be subscribed to.
                         type: string
                         pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}$
                       hubName:
@@ -217,6 +220,7 @@ spec:
                 required:
                 - extensions
             required:
+            - subscriptionID
             - destination
             - auth
             - sink

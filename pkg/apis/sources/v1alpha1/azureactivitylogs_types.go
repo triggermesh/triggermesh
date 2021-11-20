@@ -46,7 +46,11 @@ var (
 type AzureActivityLogsSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	// The destination of activity logs.
+	// The ID of the Azure subscription which activity logs to subscribe to.
+	SubscriptionID string `json:"subscriptionID"`
+
+	// The intermediate destination of activity logs, before they are
+	// retrieved by TriggerMesh.
 	Destination AzureActivityLogsSourceDestination `json:"destination"`
 
 	// Categories of Activity Logs to collect.
@@ -62,14 +66,14 @@ type AzureActivityLogsSourceSpec struct {
 	Auth AzureAuth `json:"auth"`
 }
 
-// AzureActivityLogsSourceDestination contains possible destinations for
-// activity logs.
+// AzureActivityLogsSourceDestination contains possible intermediate
+// destinations for activity logs.
 type AzureActivityLogsSourceDestination struct {
 	EventHubs AzureActivityLogsSourceDestinationEventHubs `json:"eventHubs"`
 }
 
 // AzureActivityLogsSourceDestinationEventHubs contains properties of an Event
-// Hubs namespace to use as destination for events.
+// Hubs namespace to use as intermediate destination for events.
 type AzureActivityLogsSourceDestinationEventHubs struct {
 	// Resource ID of the Event Hubs namespace.
 	//

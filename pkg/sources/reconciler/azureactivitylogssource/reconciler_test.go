@@ -65,6 +65,7 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newEventSource() *v1alpha1.AzureActivityLogsSource {
 	src := &v1alpha1.AzureActivityLogsSource{
 		Spec: v1alpha1.AzureActivityLogsSourceSpec{
+			SubscriptionID: tSubscriptionID,
 			Destination: v1alpha1.AzureActivityLogsSourceDestination{
 				EventHubs: v1alpha1.AzureActivityLogsSourceDestinationEventHubs{
 					NamespaceID: tEventHubNamespaceID,

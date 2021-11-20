@@ -24,6 +24,8 @@ kind: AzureActivityLogsSource
 metadata:
   name: sample
 spec:
+  subscriptionID: 00000000-0000-0000-0000-000000000000
+
   # Available Activity Log categories are documented at
   # https://docs.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-schema#categories
   categories:

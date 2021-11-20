@@ -47,9 +47,11 @@ var fakeLogCategories = []string{
 	"FakeLogCategoryA",
 }
 
+const tSubscriptionID = "00000000-0000-0000-0000-000000000000"
+
 var (
 	tEventHubNamespaceID = v1alpha1.AzureResourceID{
-		SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+		SubscriptionID:   tSubscriptionID,
 		ResourceGroup:    "MyGroup",
 		ResourceProvider: "Microsoft.EventHub",
 		ResourceType:     "namespaces",
@@ -57,7 +59,7 @@ var (
 	}
 
 	tEventHubID = v1alpha1.AzureResourceID{
-		SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+		SubscriptionID:   tSubscriptionID,
 		ResourceGroup:    "MyGroup",
 		ResourceProvider: "Microsoft.EventHub",
 		Namespace:        "MyNamespace",
@@ -141,6 +143,7 @@ func TestEnsureDiagnosticSettings(t *testing.T) {
 
 			src := &v1alpha1.AzureActivityLogsSource{
 				Spec: v1alpha1.AzureActivityLogsSourceSpec{
+					SubscriptionID: tSubscriptionID,
 					Destination: v1alpha1.AzureActivityLogsSourceDestination{
 						EventHubs: v1alpha1.AzureActivityLogsSourceDestinationEventHubs{
 							NamespaceID: tEventHubNamespaceID,

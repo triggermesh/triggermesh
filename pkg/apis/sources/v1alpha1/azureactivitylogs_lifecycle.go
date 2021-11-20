@@ -56,7 +56,7 @@ func (s *AzureActivityLogsSource) GetStatusManager() *EventSourceStatusManager {
 // AsEventSource implements EventSource.
 func (s *AzureActivityLogsSource) AsEventSource() string {
 	subsID := &AzureResourceID{
-		SubscriptionID: s.Spec.Destination.EventHubs.NamespaceID.SubscriptionID,
+		SubscriptionID: s.Spec.SubscriptionID,
 	}
 	return subsID.String()
 }
