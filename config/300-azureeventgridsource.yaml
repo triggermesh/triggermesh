@@ -76,11 +76,12 @@ spec:
                 items:
                   type: string
               endpoint:
-                description: The destination of events subscribed via Event Grid.
+                description: The intermediate destination of events subscribed via Event Grid, before they are retrieved
+                  by TriggerMesh.
                 type: object
                 properties:
                   eventHubs:
-                    description: Properties of an Event Hubs namespace to use as destination of events.
+                    description: Properties of an Event Hubs namespace to use as intermediate destination of events.
                     type: object
                     properties:
                       namespaceID:

@@ -74,7 +74,8 @@ type AzureBlobStorageSourceSpec struct {
 	// +optional
 	EventTypes []string `json:"eventTypes,omitempty"`
 
-	// The destination of events subscribed via Event Grid.
+	// The intermediate destination of events subscribed via Event Grid,
+	// before they are retrieved by TriggerMesh.
 	Endpoint AzureEventGridSourceEndpoint `json:"endpoint"`
 
 	// Authentication method to interact with the Azure REST API.
