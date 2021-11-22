@@ -196,6 +196,11 @@ func (in *AWSDynamoDBTargetSpec) DeepCopyInto(out *AWSDynamoDBTargetSpec) {
 	*out = *in
 	in.AWSApiKey.DeepCopyInto(&out.AWSApiKey)
 	in.AWSApiSecret.DeepCopyInto(&out.AWSApiSecret)
+	if in.EventOptions != nil {
+		in, out := &in.EventOptions, &out.EventOptions
+		*out = new(EventOptions)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

@@ -61,6 +61,9 @@ type AWSDynamoDBTargetSpec struct {
 	// Table ARN
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazondynamodb.html#amazondynamodb-resources-for-iam-policies
 	ARN string `json:"arn"`
+
+	// EventOptions for targets
+	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 }
 
 // AWSDynamoDBTargetStatus communicates the observed state of the event target.

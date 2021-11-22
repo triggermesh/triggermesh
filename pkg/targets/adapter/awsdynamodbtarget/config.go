@@ -36,6 +36,10 @@ type envAccessor struct {
 	AwsTargetArn string `envconfig:"AWS_TARGET_ARN" required:"true"`
 
 	DiscardCEContext bool `envconfig:"AWS_DISCARD_CE_CONTEXT"`
+	// BridgeIdentifier is the name of the bridge workflow this target is part of
+	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
+	// CloudEvents responses parametrization
+	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
 }
 
 func (e *envAccessor) GetAwsConfig() *aws.Config {

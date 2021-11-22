@@ -19,7 +19,7 @@ package awsdynamodbtarget
 import (
 	"context"
 	"encoding/json"
-	"net/http"
+	"fmt"
 
 	"go.uber.org/zap"
 
@@ -34,6 +34,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget Adapter implementation
@@ -51,12 +52,21 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		dynamodbTable = MustParseDynamoDBResource(a.Resource)
 	}
 
+	replier, err := targetce.New(env.Component, logger.Named("replier"),
+		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeAWSDynamoDBResult),
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
+	if err != nil {
+		logger.Panicf("Error creating CloudEvents replier: %v", err)
+	}
+
 	return &adapter{
 		config:               config, // define configuration for the aws client
 		awsArnString:         env.AwsTargetArn,
 		awsArn:               a,
 		awsDynamoDBTableName: dynamodbTable,
 
+		replier:          replier,
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
 		logger:           logger,
@@ -73,6 +83,7 @@ type adapter struct {
 	session              *session.Session
 	dynamoDB             *dynamodb.DynamoDB
 
+	replier          *targetce.Replier
 	discardCEContext bool
 	ceClient         cloudevents.Client
 	logger           *zap.SugaredLogger
@@ -83,10 +94,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	s := session.Must(session.NewSession(a.config))
 	a.session = s
 
-	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
-		return err
-	}
-	return nil
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 // Parse and send the aws event
@@ -95,21 +103,21 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 
 	if a.discardCEContext {
 		if err := event.DataAs(&eventJSONMap); err != nil {
-			return a.reportError("Error deserializing event data to map", err)
+			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 	} else {
 		b, err := json.Marshal(event)
 		if err != nil {
-			return a.reportError("Error serializing event to JSON", err)
+			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 		if err := json.Unmarshal(b, &eventJSONMap); err != nil {
-			return a.reportError("Error deserializing JSON event to map", err)
+			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 	}
 
 	av, err := dynamodbattribute.MarshalMap(eventJSONMap)
 	if err != nil {
-		return a.reportError("Error marshalling attribute", err)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, fmt.Errorf("Error marshalling attribute"), nil)
 	}
 
 	input := &dynamodb.PutItemInput{
@@ -119,21 +127,8 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 
 	resp, err := a.dynamoDB.PutItem(input)
 	if err != nil {
-		return a.reportError("Error invoking DynamoDB", err)
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
-	responseEvent := cloudevents.NewEvent(cloudevents.VersionV1)
-	err = responseEvent.SetData(cloudevents.ApplicationJSON, resp)
-	if err != nil {
-		return a.reportError("error generating response event", err)
-	}
-
-	responseEvent.SetType(v1alpha1.EventTypeAWSDynamoDBResult)
-	responseEvent.SetSource(a.awsArnString)
-	return &responseEvent, cloudevents.ResultACK
-}
-
-func (a *adapter) reportError(msg string, err error) (*cloudevents.Event, cloudevents.Result) {
-	a.logger.Errorw(msg, zap.Error(err))
-	return nil, cloudevents.NewHTTPResult(http.StatusInternalServerError, msg)
+	return a.replier.Ok(&event, resp)
 }

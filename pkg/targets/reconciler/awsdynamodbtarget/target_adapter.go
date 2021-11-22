@@ -49,10 +49,17 @@ func makeTargetDynamoDBAdapterKService(target *v1alpha1.AWSDynamoDBTarget, cfg *
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeCommonAppEnv(&target.Spec.AWSApiKey, &target.Spec.AWSApiSecret, target.Spec.ARN, false)
+	envApp := makeCommonAppEnv(&target.Spec.AWSApiKey, &target.Spec.AWSApiSecret, target.Spec.ARN, false, target)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
+
+	if target.Spec.EventOptions != nil && target.Spec.EventOptions.PayloadPolicy != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  "EVENTS_PAYLOAD_POLICY",
+			Value: string(*target.Spec.EventOptions.PayloadPolicy),
+		})
+	}
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
 		resources.KsvcLabels(labels),
@@ -64,7 +71,7 @@ func makeTargetDynamoDBAdapterKService(target *v1alpha1.AWSDynamoDBTarget, cfg *
 }
 
 func makeCommonAppEnv(key, secret *v1alpha1.SecretValueFromSource, arnStr string,
-	discardCEContext bool) []corev1.EnvVar {
+	discardCEContext bool, o *v1alpha1.AWSDynamoDBTarget) []corev1.EnvVar {
 
 	var targetType string
 	if arn, err := arn.Parse(arnStr); err == nil {
@@ -93,6 +100,9 @@ func makeCommonAppEnv(key, secret *v1alpha1.SecretValueFromSource, arnStr string
 	}, {
 		Name:  "AWS_DISCARD_CE_CONTEXT",
 		Value: strconv.FormatBool(discardCEContext),
+	}, {
+		Name:  libreconciler.EnvBridgeID,
+		Value: libreconciler.GetStatefulBridgeID(o),
 	}}
 
 	return envs

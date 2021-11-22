@@ -88,6 +88,14 @@ spec:
                   https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondynamodb.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:dynamodb:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:table\/[a-zA-Z0-9-_.]{3,255}$
+              eventOptions:
+                type: object
+                description: 'When should this target generate a response event for processing: always, on error, or
+                  never.'
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
             required:
             - arn
             - awsApiSecret
