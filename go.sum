@@ -70,8 +70,9 @@ contrib.go.opencensus.io/exporter/prometheus v0.4.0/go.mod h1:o7cosnyfuPVK0tB8q0
 contrib.go.opencensus.io/exporter/zipkin v0.1.2 h1:YqE293IZrKtqPnpwDPH/lOqTWD/s3Iwabycam74JV3g=
 contrib.go.opencensus.io/exporter/zipkin v0.1.2/go.mod h1:mP5xM3rrgOjpn79MM8fZbj3gsxcuytSqtH0dxSWW1RE=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
-github.com/Azure/azure-amqp-common-go/v3 v3.2.1 h1:uQyDk81yn5hTP1pW4Za+zHzy97/f4vDz9o1d/exI4j4=
 github.com/Azure/azure-amqp-common-go/v3 v3.2.1/go.mod h1:O6X1iYHP7s2x7NjUKsXVhkwWrQhxrd+d8/3rRadj4CI=
+github.com/Azure/azure-amqp-common-go/v3 v3.2.2 h1:CJpxNAGxP7UBhDusRUoaOn0uOorQyAYhQYLnNgkRhlY=
+github.com/Azure/azure-amqp-common-go/v3 v3.2.2/go.mod h1:O6X1iYHP7s2x7NjUKsXVhkwWrQhxrd+d8/3rRadj4CI=
 github.com/Azure/azure-event-hubs-go/v3 v3.3.16 h1:e3iHaU6Tgq5A8F313uIUWwwXtXAn75iIC6ekgzW6TG8=
 github.com/Azure/azure-event-hubs-go/v3 v3.3.16/go.mod h1:xgDvUi1+8/bb11WTEaU7VwZREYufzKzjWE4YiPZixb0=
 github.com/Azure/azure-pipeline-go v0.1.8/go.mod h1:XA1kFWRVhSK+KNFiOhfv83Fv8L9achrP7OxIzeTn1Yg=
