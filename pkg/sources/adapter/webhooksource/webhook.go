@@ -125,6 +125,7 @@ func (h *webhookHandler) handleAll(w http.ResponseWriter, r *http.Request) {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetType(h.eventType)
 	event.SetSource(h.eventSource)
+	event.SetExtension("http.method", r.Method)
 
 	if err := event.SetData(r.Header.Get("Content-Type"), body); err != nil {
 		h.handleError(fmt.Errorf("failed to set event data: %w", err), http.StatusInternalServerError, w)
