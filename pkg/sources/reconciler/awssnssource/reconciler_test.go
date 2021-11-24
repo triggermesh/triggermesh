@@ -213,8 +213,8 @@ func TestReconcileSubscription(t *testing.T) {
 				unsetFinalizerPatch(),
 			},
 			WantEvents: []string{
+				notEnoughInformationUnsubscribeEvent(),
 				finalizedEvent(),
-				skippedUnsubscribeEvent(),
 			},
 			PostConditions: []func(*testing.T, *rt.TableRow){
 				calledUnsubscribe(false),
@@ -475,9 +475,11 @@ func subscribedEvent() string {
 func unsubscribedEvent() string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonUnsubscribed, "Unsubscribed from SNS topic %q", tTopicARN)
 }
-func skippedUnsubscribeEvent() string {
-	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonUnsubscribed, "Subscription already absent, skipping finalization")
+
+func notEnoughInformationUnsubscribeEvent() string {
+	return eventtesting.Eventf(corev1.EventTypeWarning, ReasonFailedUnsubscribe, "SNS status information incomplete, skipping finalization")
 }
+
 func finalizedEvent() string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, "FinalizerUpdate", "Updated %q finalizers", tName)
 }
