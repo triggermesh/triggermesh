@@ -52,10 +52,9 @@ func (r *Reconciler) ensureSubscribed(ctx context.Context) error {
 	status := &src.(*v1alpha1.AWSSNSSource).Status
 
 	isDeployed := status.GetCondition(v1alpha1.ConditionDeployed).IsTrue()
-	url := status.Address.URL
 
 	// skip this cycle if the URL couldn't yet be determined
-	if !isDeployed || url == nil {
+	if !isDeployed {
 		status.MarkNotSubscribed(v1alpha1.AWSSNSReasonNoURL, "The receive adapter isn't ready yet")
 		return nil
 	}
@@ -69,6 +68,7 @@ func (r *Reconciler) ensureSubscribed(ctx context.Context) error {
 			"Error creating SNS client: %s", err))
 	}
 
+	url := status.Address.URL
 	topicARN := typedSrc.Spec.ARN.String()
 
 	subsARN, err := findSubscription(ctx, snsClient, topicARN, url.String())
@@ -129,9 +129,13 @@ func (r *Reconciler) ensureUnsubscribed(ctx context.Context) error {
 
 	src := v1alpha1.SourceFromContext(ctx)
 
-	url := src.GetStatusManager().Address.URL
-	if url == nil {
-		event.Warn(ctx, ReasonFailedUnsubscribe, "Missing endpoint URL, skipping finalization")
+	sm := src.GetStatusManager()
+
+	// Note: requiring readiness to unsubscribe might leak subscriptions when the service
+	// is not ready. The reason for requiring IsReady is because we require the status address
+	// when looking for the SNS subscription and it is informed when the service is ready.
+	if !sm.IsReady() {
+		event.Warn(ctx, ReasonFailedUnsubscribe, "SNS status information incomplete, skipping finalization")
 		return nil
 	}
 
@@ -152,7 +156,7 @@ func (r *Reconciler) ensureUnsubscribed(ctx context.Context) error {
 
 	topicARN := typedSrc.Spec.ARN.String()
 
-	subsARN, err := findSubscription(ctx, snsClient, topicARN, url.String())
+	subsARN, err := findSubscription(ctx, snsClient, topicARN, sm.Address.URL.String())
 	switch {
 	case isPending(subsARN):
 		return reconciler.NewEvent(corev1.EventTypeNormal, ReasonFailedUnsubscribe,
