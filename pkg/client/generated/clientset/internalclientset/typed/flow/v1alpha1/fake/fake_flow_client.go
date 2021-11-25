@@ -32,6 +32,10 @@ func (c *FakeFlowV1alpha1) Transformations(namespace string) v1alpha1.Transforma
 	return &FakeTransformations{c, namespace}
 }
 
+func (c *FakeFlowV1alpha1) XsltTransforms(namespace string) v1alpha1.XsltTransformInterface {
+	return &FakeXsltTransforms{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeFlowV1alpha1) RESTClient() rest.Interface {

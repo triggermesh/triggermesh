@@ -3560,6 +3560,7 @@ func (in *ValueFromField) DeepCopyInto(out *ValueFromField) {
 		*out = new(v1.SecretKeySelector)
 		(*in).DeepCopyInto(*out)
 	}
+	in.ValueFromConfigMap.DeepCopyInto(&out.ValueFromConfigMap)
 	return
 }
 

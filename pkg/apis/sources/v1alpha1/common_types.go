@@ -38,4 +38,8 @@ type ValueFromField struct {
 	// Field value from a Kubernetes Secret.
 	// +optional
 	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
+
+	// Field value from a Kubernetes ConfigMap.
+	// +optional
+	ValueFromConfigMap corev1.ConfigMapKeySelector `json:"valueFromSecret,omitempty"`
 }

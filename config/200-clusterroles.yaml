@@ -217,6 +217,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations
+  - xslttransforms
   verbs:
   - list
   - watch
@@ -226,6 +227,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations/status
+  - xslttransforms/status
   verbs:
   - update
 # +rbac-check
@@ -345,6 +347,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations/finalizers
+  - xslttransforms/finalizers
   verbs:
   - update
 # +rbac-check:subresource=finalizers
@@ -415,6 +418,7 @@ rules:
   - tektontarget-adapter
   - filter-adapter
   - splitter-adapter
+  - xslttransform-adapter
   verbs:
   - update
 
@@ -691,6 +695,47 @@ rules:
 
 ---
 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: xslttransform-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - xslttransforms
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
 # This role provides readonly access to "Source" duck types.
 # All the rules it contains get aggregated into the "source-observer" ClusterRole provided by Knative Eventing.
 # see https://github.com/knative/eventing/blob/release-0.26/docs/spec/sources.md#source-rbac
@@ -800,6 +845,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations
+  - xslttransforms
   verbs:
   - get
   - list

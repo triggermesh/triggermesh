@@ -164,9 +164,11 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
         - name: ZENDESK_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
-        # Transformation adapter
+        # Flow adapters
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
+        - name: XSLTTRANSFORM_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/xslttransformflow-adapter
         # Routing adapters
         - name: FILTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter

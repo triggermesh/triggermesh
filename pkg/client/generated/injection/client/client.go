@@ -396,6 +396,137 @@ func (w *wrapFlowV1alpha1TransformationImpl) Watch(ctx context.Context, opts v1.
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapFlowV1alpha1) XsltTransforms(namespace string) typedflowv1alpha1.XsltTransformInterface {
+	return &wrapFlowV1alpha1XsltTransformImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "flow.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "xslttransforms",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapFlowV1alpha1XsltTransformImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedflowv1alpha1.XsltTransformInterface = (*wrapFlowV1alpha1XsltTransformImpl)(nil)
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) Create(ctx context.Context, in *flowv1alpha1.XsltTransform, opts v1.CreateOptions) (*flowv1alpha1.XsltTransform, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "XsltTransform",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XsltTransform{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*flowv1alpha1.XsltTransform, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XsltTransform{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) List(ctx context.Context, opts v1.ListOptions) (*flowv1alpha1.XsltTransformList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XsltTransformList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *flowv1alpha1.XsltTransform, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XsltTransform{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) Update(ctx context.Context, in *flowv1alpha1.XsltTransform, opts v1.UpdateOptions) (*flowv1alpha1.XsltTransform, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "XsltTransform",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XsltTransform{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) UpdateStatus(ctx context.Context, in *flowv1alpha1.XsltTransform, opts v1.UpdateOptions) (*flowv1alpha1.XsltTransform, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "XsltTransform",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XsltTransform{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XsltTransformImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 // RoutingV1alpha1 retrieves the RoutingV1alpha1Client
 func (w *wrapClient) RoutingV1alpha1() typedroutingv1alpha1.RoutingV1alpha1Interface {
 	return &wrapRoutingV1alpha1{

@@ -45,6 +45,22 @@ type ValueFromField struct {
 	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
 }
 
+// EventTargetStatus defines the observed state of an event target.
+type EventTargetStatus struct {
+	// inherits duck/v1beta1 Status, which currently provides:
+	// * ObservedGeneration - the 'Generation' of the Service that was last
+	//   processed by the controller.
+	// * Conditions - the latest available observations of a resource's current
+	//   state.
+	duckv1.Status `json:",inline"`
+
+	// AddressStatus fulfills the Addressable contract.
+	duckv1.AddressStatus `json:",inline"`
+
+	// Accepted/emitted CloudEvent attributes.
+	CloudEventStatus `json:",inline"`
+}
+
 // CloudEventStatus contains attributes that target types can embed to declare
 // the event types they accept and emit.
 type CloudEventStatus struct {

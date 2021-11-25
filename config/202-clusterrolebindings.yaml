@@ -110,6 +110,21 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: splitter-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: xslttransform-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: xslttransform-adapter
 
 ---
 
