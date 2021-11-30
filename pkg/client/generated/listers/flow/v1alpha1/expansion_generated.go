@@ -25,3 +25,11 @@ type TransformationListerExpansion interface{}
 // TransformationNamespaceListerExpansion allows custom methods to be added to
 // TransformationNamespaceLister.
 type TransformationNamespaceListerExpansion interface{}
+
+// XsltTransformListerExpansion allows custom methods to be added to
+// XsltTransformLister.
+type XsltTransformListerExpansion interface{}
+
+// XsltTransformNamespaceListerExpansion allows custom methods to be added to
+// XsltTransformNamespaceLister.
+type XsltTransformNamespaceListerExpansion interface{}

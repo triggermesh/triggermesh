@@ -43,6 +43,8 @@ require (
 	github.com/google/go-cmp v0.5.6
 	github.com/google/uuid v1.3.0
 	github.com/jarcoal/httpmock v1.0.8
+	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f
+	github.com/jbowtie/ratago v0.0.0-20200401224626-3140c0a9b186
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e

@@ -765,6 +765,10 @@ github.com/j-keck/arping v0.0.0-20160618110441-2cf9dc699c56/go.mod h1:ymszkNOg6t
 github.com/jarcoal/httpmock v1.0.8 h1:8kI16SoO6LQKgPE7PvQuV+YuD/inwHd7fOOe2zMbo4k=
 github.com/jarcoal/httpmock v1.0.8/go.mod h1:ATjnClrvW/3tijVmpL/va5Z3aAyGvqU3gCT8nX0Txik=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
+github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f h1:6UIvzqlGM38lOpKP380Wbl0kUyyjutcc7KJUaDM/U4o=
+github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f/go.mod h1:C3R3VzPq+DAwilxue7DiV6F2QL1rrQX0L56GyI+sBxM=
+github.com/jbowtie/ratago v0.0.0-20200401224626-3140c0a9b186 h1:8N1+ik35JbbQVslv63BvyO1yv0TC5Ol/ip26fOy+MP0=
+github.com/jbowtie/ratago v0.0.0-20200401224626-3140c0a9b186/go.mod h1:0ZLxKWdtG2yYN5kJTy71ALuAcl/gFhkxuGbKCMufBwI=
 github.com/jenkins-x/go-scm v1.10.10/go.mod h1:z7xTO9/VzqW3xEbEMH2z5cpOGrZ8+nOHOWfU1ngFGxs=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jmespath/go-jmespath v0.0.0-20160202185014-0b12d6b521d8/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=

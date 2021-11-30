@@ -30,11 +30,13 @@ import (
 	"knative.dev/pkg/webhook/resourcesemantics/defaulting"
 	"knative.dev/pkg/webhook/resourcesemantics/validation"
 
+	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 )
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
-	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"): &routingv1alpha1.Filter{},
+	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):        &routingv1alpha1.Filter{},
+	routingv1alpha1.SchemeGroupVersion.WithKind("XsltTransform"): &flowv1alpha1.XsltTransform{},
 }
 
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}

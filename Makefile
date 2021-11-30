@@ -67,11 +67,15 @@ help: ## Display this help
 
 build: $(COMMANDS)  ## Build all artifacts
 
-$(filter-out confluenttarget-adapter, $(COMMANDS)): ## Build artifact
+$(filter-out confluenttarget-adapter xslttransform-adapter, $(COMMANDS)): ## Build artifact
 	$(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 confluenttarget-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
+
+# Not statically linked
+xslttransform-adapter: ## Builds XML releated functionality
+	CGO_ENABLED=1 $(GO) build -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
 	$(KO) apply -f $(BASE_DIR)/config
