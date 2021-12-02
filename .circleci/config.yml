@@ -36,6 +36,7 @@ jobs:
               # should at least be up-to-date for the current dependencies' versions.
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
+          # XsltTransform needs libxml2.
           name: Install libxml2
           command: sudo apt-get update && sudo apt-get install -y libxml2-dev
       - run:

@@ -40,7 +40,8 @@ GOTOOL            ?= go tool
 GOTEST            ?= gotestsum --junitfile $(TEST_OUTPUT_DIR)/$(KREPO)-unit-tests.xml --format pkgname-and-test-fails --
 
 GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/function/... ./pkg/routing/... ./pkg/sources/... ./pkg/targets/... ./pkg/transformation/...
-LDFLAGS            = -extldflags=-static -w -s
+LDFLAGS            = -w -s
+LDFLAGS_STATIC     = $(LDFLAGS) -extldflags=-static
 
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)
 HAS_GOLANGCI_LINT := $(shell command -v golangci-lint;)
@@ -68,14 +69,14 @@ help: ## Display this help
 build: $(COMMANDS)  ## Build all artifacts
 
 $(filter-out confluenttarget-adapter xslttransform-adapter, $(COMMANDS)): ## Build artifact
-	$(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
+	$(GO) build -ldflags "$(LDFLAGS_STATIC)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 confluenttarget-adapter:
-	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
+	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS_STATIC)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 # Not statically linked
 xslttransform-adapter: ## Builds XML releated functionality
-	CGO_ENABLED=1 $(GO) build -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
+	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
 	$(KO) apply -f $(BASE_DIR)/config
