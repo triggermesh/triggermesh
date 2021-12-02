@@ -16,25 +16,28 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	"knative.dev/pkg/apis"
-)
+import "knative.dev/pkg/apis"
 
-// status conditions
+// Status conditions
 const (
-	// ConditionDeployed has status True when the target's adapter is up and running.
+	// ConditionReady has status True when the router is ready to send events.
+	ConditionReady = apis.ConditionReady
+	// ConditionSinkProvided has status True when the router has been configured with a sink target.
+	ConditionSinkProvided apis.ConditionType = "SinkProvided"
+	// ConditionDeployed has status True when the router's adapter is up and running.
 	ConditionDeployed apis.ConditionType = "Deployed"
 )
 
-// reasons for conditions
+// Reasons for status conditions
 const (
-	// ReasonUnavailable is set on a ServiceReady condition when an adapter in unavailable.
+	// ReasonSinkNotFound is set on a SinkProvided condition when a sink does not exist.
+	ReasonSinkNotFound = "SinkNotFound"
+	// ReasonSinkEmpty is set on a SinkProvided condition when a sink URI is empty.
+	ReasonSinkEmpty = "EmptySinkURI"
+
+	// ReasonRBACNotBound is set on a Deployed condition when an adapter's
+	// ServiceAccount cannot be bound.
+	ReasonRBACNotBound = "RBACNotBound"
+	// ReasonUnavailable is set on a Deployed condition when an adapter in unavailable.
 	ReasonUnavailable = "AdapterUnavailable"
-
-	// ReasonResourceUnavailable is set on any object whose condition is  unavailable.
-	ReasonResourceUnavailable = "ResourceUnavailable"
-
-	// ReasonNotFound is set on a SecretsProvided condition when secret
-	// credentials can't be found.
-	ReasonNotFound = "NotFound"
 )

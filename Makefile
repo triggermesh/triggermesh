@@ -45,7 +45,7 @@ GOTEST            ?= gotestsum --junitfile $(TEST_OUTPUT_DIR)/$(KREPO)-unit-test
 
 GOMODULE           = github.com/triggermesh/triggermesh
 
-GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/function/... ./pkg/routing/... ./pkg/flow/... ./pkg/sources/... ./pkg/targets/... ./pkg/transformation/...
+GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/function/... ./pkg/routing/... ./pkg/sources/... ./pkg/targets/... ./pkg/flow/...
 GOPKGS_SKIP_TESTS  = $(GOMODULE)/pkg/sources/reconciler/ibmmqsource \
                      $(GOMODULE)/pkg/targets/reconciler/ibmmqtarget \
                      $(GOMODULE)/pkg/sources/adapter/ibmmqsource/mq \
@@ -55,6 +55,7 @@ GOPKGS_SKIP_TESTS  = $(GOMODULE)/pkg/sources/reconciler/ibmmqsource \
                      $(GOMODULE)/cmd/ibmmqsource-adapter \
                      $(GOMODULE)/cmd/ibmmqtarget-adapter
 
+LDFLAGS            = -w -s
 LDFLAGS_STATIC     = $(LDFLAGS) -extldflags=-static
 
 HAS_GOTESTSUM     := $(shell command -v gotestsum;)

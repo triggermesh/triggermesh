@@ -24,7 +24,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation"
 )
 
 type envConfig struct {
@@ -55,7 +55,7 @@ func main() {
 		log.Fatalf("Cannot unmarshal Data Transformation variable: %v", err)
 	}
 
-	handler, err := pipeline.NewHandler(trnContext, trnData)
+	handler, err := transformation.NewHandler(trnContext, trnData)
 	if err != nil {
 		log.Fatalf("Cannot create transformation handler: %v", err)
 	}

@@ -24,6 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// Synchronizers returns a SynchronizerInformer.
+	Synchronizers() SynchronizerInformer
 	// Transformations returns a TransformationInformer.
 	Transformations() TransformationInformer
 	// XMLToJSONTransformations returns a XMLToJSONTransformationInformer.
@@ -41,6 +43,11 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
+}
+
+// Synchronizers returns a SynchronizerInformer.
+func (v *version) Synchronizers() SynchronizerInformer {
+	return &synchronizerInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Transformations returns a TransformationInformer.
