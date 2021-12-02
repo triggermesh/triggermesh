@@ -40,12 +40,12 @@ func reaperThread(ctx context.Context, r *reconciler) {
 
 	p, err := cloudevents.NewHTTP()
 	if err != nil {
-		log.Fatal("failed to create new HTTP based cloudevent: ", zap.Error(err))
+		log.Fatalw("failed to create new HTTP based cloudevent: ", zap.Error(err))
 	}
 
 	client, err := cloudevents.NewClient(p)
 	if err != nil {
-		log.Fatal("Unable to create cloudevent client: ", zap.Error(err))
+		log.Fatalw("Unable to create cloudevent client: ", zap.Error(err))
 	}
 
 	for {
@@ -53,14 +53,14 @@ func reaperThread(ctx context.Context, r *reconciler) {
 		log.Debug("executing reaping")
 		nsl, err := k8sclient.Get(ctx).CoreV1().Namespaces().List(ctx, v1.ListOptions{})
 		if err != nil {
-			log.Fatal("Unable to retrieve namespaces: ", zap.Error(err))
+			log.Fatalw("Unable to retrieve namespaces: ", zap.Error(err))
 		}
 
 		// search for tektontargets across all namespaces
 		for _, ns := range nsl.Items {
 			targets, err := r.targetLister(ns.Name).List(labels.Everything())
 			if err != nil {
-				log.Warn("unable to retrieve targets for #{ns.Name}: ", zap.Error(err))
+				log.Warnw("unable to retrieve targets for #{ns.Name}: ", zap.Error(err))
 				continue
 			}
 
@@ -71,7 +71,7 @@ func reaperThread(ctx context.Context, r *reconciler) {
 					continue
 				}
 
-				log.Info("Found target: " + t.Namespace + "." + t.Name)
+				log.Infow("Found target: " + t.Namespace + "." + t.Name)
 				// Send the reap cloudevent
 				cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
 
@@ -87,7 +87,7 @@ func reaperThread(ctx context.Context, r *reconciler) {
 				_ = newEvent.SetData(cloudevents.ApplicationJSON, nil)
 
 				result := client.Send(cloudCtx, newEvent)
-				log.Info("event sending results: ", zap.Error(result))
+				log.Infow("event sending results: ", zap.Error(result))
 			}
 		}
 	}
