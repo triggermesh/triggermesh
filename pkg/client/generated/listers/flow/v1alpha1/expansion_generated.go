@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1alpha1
 
+// SynchronizerListerExpansion allows custom methods to be added to
+// SynchronizerLister.
+type SynchronizerListerExpansion interface{}
+
+// SynchronizerNamespaceListerExpansion allows custom methods to be added to
+// SynchronizerNamespaceLister.
+type SynchronizerNamespaceListerExpansion interface{}
+
 // TransformationListerExpansion allows custom methods to be added to
 // TransformationLister.
 type TransformationListerExpansion interface{}
