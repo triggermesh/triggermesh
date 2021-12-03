@@ -37,11 +37,11 @@ func (v *ValueFromField) Validate(_ context.Context) *apis.FieldError {
 	}
 
 	if secret && (v.ValueFromSecret.Name == "" || v.ValueFromSecret.Key == "") {
-		return apis.ErrMultipleOneOf("Secret must provide name and key").ViaField("ValueFromSecret")
+		return apis.ErrMissingField("Secret must provide name and key").ViaField("ValueFromSecret")
 	}
 
 	if cm && (v.ValueFromConfigMap.Name == "" || v.ValueFromConfigMap.Key == "") {
-		return apis.ErrMultipleOneOf("ConfigMap must provide name and key").ViaField("ValueFromConfigMap")
+		return apis.ErrMissingField("ConfigMap must provide name and key").ViaField("ValueFromConfigMap")
 	}
 
 	return nil
