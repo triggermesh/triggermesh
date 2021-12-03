@@ -22,12 +22,14 @@ import (
 
 // SetDefaults implements apis.Defaultable
 func (o *XsltTransform) SetDefaults(ctx context.Context) {
-	o.Spec.SetDefaults(ctx)
+	if o != nil {
+		o.Spec.SetDefaults(ctx)
+	}
 }
 
 // SetDefaults implements apis.Defaultable
 func (s *XsltTransformSpec) SetDefaults(ctx context.Context) {
-	if s.AllowPerEventXSLT == nil {
+	if s != nil && s.AllowPerEventXSLT == nil {
 		f := false
 		s.AllowPerEventXSLT = &f
 	}
