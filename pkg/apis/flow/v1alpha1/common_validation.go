@@ -33,15 +33,15 @@ func (v *ValueFromField) Validate(_ context.Context) *apis.FieldError {
 	cm := v.ValueFromConfigMap != nil && (v.ValueFromConfigMap.Name != "" || v.ValueFromConfigMap.Key != "")
 
 	if val && secret || val && cm || secret && cm {
-		return apis.ErrMultipleOneOf("Only one of Value, Secret of ConfigMap choices should be used")
+		return apis.ErrMultipleOneOf("value", "valueFromSecret", "valueFromConfigMap")
 	}
 
 	if secret && (v.ValueFromSecret.Name == "" || v.ValueFromSecret.Key == "") {
-		return apis.ErrMissingField("Secret must provide name and key").ViaField("ValueFromSecret")
+		return apis.ErrMissingField("name", "key").ViaField("ValueFromSecret")
 	}
 
 	if cm && (v.ValueFromConfigMap.Name == "" || v.ValueFromConfigMap.Key == "") {
-		return apis.ErrMissingField("ConfigMap must provide name and key").ViaField("ValueFromConfigMap")
+		return apis.ErrMissingField("name", "key").ViaField("ValueFromConfigMap")
 	}
 
 	return nil

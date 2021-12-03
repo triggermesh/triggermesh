@@ -30,12 +30,13 @@ func (o *XsltTransform) Validate(ctx context.Context) *apis.FieldError {
 // Validate XSLT spec
 func (s *XsltTransformSpec) Validate(ctx context.Context) *apis.FieldError {
 	var errs *apis.FieldError
-	if s.AllowPerEventXSLT != nil && !*s.AllowPerEventXSLT && !s.XSLT.IsInformed() {
-		errs = errs.Also(apis.ErrMissingOneOf("when XSLT is empty, per event XSLT must be allowed"))
+
+	if (s.AllowPerEventXSLT == nil || !*s.AllowPerEventXSLT) && !s.XSLT.IsInformed() {
+		errs = errs.Also(apis.ErrGeneric("when XSLT is empty, per event XSLT must be allowed", "allowPerEventXslt", "xslt"))
 	}
 
 	if err := s.XSLT.Validate(ctx); err != nil {
-		errs = err.ViaField("XSLT")
+		errs = errs.Also(err.ViaField("XSLT"))
 	}
 
 	return errs

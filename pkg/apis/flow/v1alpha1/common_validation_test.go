@@ -25,9 +25,9 @@ import (
 )
 
 var (
-	errTooMany               = apis.ErrMultipleOneOf("Only one of Value, Secret of ConfigMap choices should be used")
-	errMissingSecretField    = apis.ErrMissingField("Secret must provide name and key").ViaField("ValueFromSecret")
-	errMissingConfigMapField = apis.ErrMissingField("ConfigMap must provide name and key").ViaField("ValueFromConfigMap")
+	errVffTooMany               = apis.ErrMultipleOneOf("value", "valueFromSecret", "valueFromConfigMap")
+	errVffMissingSecretField    = apis.ErrMissingField("name", "key").ViaField("ValueFromSecret")
+	errVffMissingConfigMapField = apis.ErrMissingField("name", "key").ViaField("ValueFromConfigMap")
 )
 
 func TestValueFromFieldValidate(t *testing.T) {
@@ -57,35 +57,35 @@ func TestValueFromFieldValidate(t *testing.T) {
 		},
 		"value and secret, fail": {
 			vff:         valueFromField(vffWithValue(tValue), vffWithSecret(tName, tKey)),
-			expectError: errTooMany,
+			expectError: errVffTooMany,
 		},
 		"value and configmap, fail": {
 			vff:         valueFromField(vffWithValue(tValue), vffWithConfigMap(tName, tKey)),
-			expectError: errTooMany,
+			expectError: errVffTooMany,
 		},
 		"secret and configmap, fail": {
 			vff:         valueFromField(vffWithConfigMap(tName, tKey), vffWithSecret(tName, tKey)),
-			expectError: errTooMany,
+			expectError: errVffTooMany,
 		},
 		"value, secret and configmap, fail": {
 			vff:         valueFromField(vffWithValue(tValue), vffWithConfigMap(tName, tKey), vffWithSecret(tName, tKey)),
-			expectError: errTooMany,
+			expectError: errVffTooMany,
 		},
 		"secret lacks name, fail": {
 			vff:         valueFromField(vffWithSecret("", tKey)),
-			expectError: errMissingSecretField,
+			expectError: errVffMissingSecretField,
 		},
 		"secret lacks key, fail": {
 			vff:         valueFromField(vffWithSecret(tName, "")),
-			expectError: errMissingSecretField,
+			expectError: errVffMissingSecretField,
 		},
 		"configmap lacks name, fail": {
 			vff:         valueFromField(vffWithConfigMap("", tKey)),
-			expectError: errMissingConfigMapField,
+			expectError: errVffMissingConfigMapField,
 		},
 		"configmap lacks key, fail": {
 			vff:         valueFromField(vffWithConfigMap(tName, "")),
-			expectError: errMissingConfigMapField,
+			expectError: errVffMissingConfigMapField,
 		},
 	}
 
