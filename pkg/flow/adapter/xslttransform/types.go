@@ -20,5 +20,5 @@ package xslttransform
 // that informs both the XML and XSLT to transform.
 type XsltTransformStructuredRequest struct {
 	XML  string `json:"xml"`
-	XSLT string `json:"path"`
+	XSLT string `json:"xslt,omitempty"`
 }

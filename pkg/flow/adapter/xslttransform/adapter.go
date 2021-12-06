@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 	"github.com/jbowtie/ratago/xslt"
 
@@ -56,6 +55,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+		targetce.ReplierWithStaticDataContentType(cloudevents.ApplicationXML),
+		targetce.ReplierWithStaticErrorDataContentType(*cloudevents.StringOfApplicationJSON()),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
@@ -95,7 +96,7 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 			errors.New("it is not allowed to override XSLT per CloudEvent"), nil)
 	}
 
-	isXML := event.DataMediaType() == "application/xml" || event.DataMediaType() == "text/xml"
+	isXML := event.DataMediaType() == cloudevents.ApplicationXML
 
 	style := a.defaultXslt
 	var xmlin *xml.XmlDocument
@@ -113,13 +114,13 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 
-		xmlin, err = gokogiri.ParseXml([]byte(req.XML))
+		xmlin, err = parseXML(req.XML)
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 
 	case isXML:
-		xmlin, err = gokogiri.ParseXml([]byte(event.DataEncoded))
+		xmlin, err = parseXML(string(event.DataEncoded))
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
@@ -138,11 +139,15 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 			fmt.Errorf("eror processing XML with XSLT: %v", err), nil)
 	}
 
-	return a.replier.Ok(&event, []byte(output))
+	return a.replier.Ok(&event, []byte(output), targetce.ResponseWithDataContentType(cloudevents.ApplicationXML))
+}
+
+func parseXML(in string) (*xml.XmlDocument, error) {
+	return xml.Parse([]byte(in), xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
 }
 
 func parseXSLT(in string) (*xslt.Stylesheet, error) {
-	doc, err := xml.Parse([]byte(in), xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
+	doc, err := parseXML(in)
 	if err != nil {
 		return nil, err
 	}

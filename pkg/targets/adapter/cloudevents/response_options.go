@@ -95,3 +95,10 @@ func ResponseWithProcessedHeaders() EventResponseOption {
 		return nil
 	}
 }
+
+// ResponseWithDataContentType is an option for modifying returned event content type.
+func ResponseWithDataContentType(dct string) EventResponseOption {
+	return func(in, out *cloudevents.Event) error {
+		return out.Context.SetDataContentType(dct)
+	}
+}
