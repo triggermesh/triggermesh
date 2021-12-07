@@ -20,4 +20,4 @@ package v1alpha1
 
 type TransformationExpansion interface{}
 
-type XsltTransformExpansion interface{}
+type XSLTTransformExpansion interface{}

@@ -16,9 +16,9 @@ limitations under the License.
 
 package xslttransform
 
-// XsltTransformStructuredRequest contains an opinionated structure
+// XSLTTransformStructuredRequest contains an opinionated structure
 // that informs both the XML and XSLT to transform.
-type XsltTransformStructuredRequest struct {
+type XSLTTransformStructuredRequest struct {
 	XML  string `json:"xml"`
 	XSLT string `json:"xslt,omitempty"`
 }

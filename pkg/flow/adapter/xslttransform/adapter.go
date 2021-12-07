@@ -36,7 +36,7 @@ import (
 var _ pkgadapter.Adapter = (*xsltTransformAdapter)(nil)
 
 type xsltTransformAdapter struct {
-	defaultXslt  *xslt.Stylesheet
+	defaultXSLT  *xslt.Stylesheet
 	xsltOverride bool
 
 	replier  *targetce.Replier
@@ -76,7 +76,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 			logger.Panicf("Non valid XSLT document: %v", err)
 		}
 
-		adapter.defaultXslt = style
+		adapter.defaultXSLT = style
 	}
 
 	return adapter
@@ -90,7 +90,7 @@ func (a *xsltTransformAdapter) Start(ctx context.Context) error {
 }
 
 func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	isStructuredTransform := event.Type() == v1alpha1.EventTypeXsltTransform
+	isStructuredTransform := event.Type() == v1alpha1.EventTypeXSLTTransform
 	if isStructuredTransform && !a.xsltOverride {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("it is not allowed to override XSLT per CloudEvent"), nil)
@@ -98,13 +98,13 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 
 	isXML := event.DataMediaType() == cloudevents.ApplicationXML
 
-	style := a.defaultXslt
+	style := a.defaultXSLT
 	var xmlin *xml.XmlDocument
 	var err error
 
 	switch {
 	case isStructuredTransform:
-		req := &XsltTransformStructuredRequest{}
+		req := &XSLTTransformStructuredRequest{}
 		if err := event.DataAs(req); err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}

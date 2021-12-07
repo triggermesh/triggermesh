@@ -26,24 +26,24 @@ import (
 
 // Reasons for status conditions
 const (
-	// XsltTransformReasonWrongSpec is set when an adapter cannot be built from the spec.
-	XsltTransformReasonWrongSpec = "WrongSpec"
+	// XSLTTransformReasonWrongSpec is set when an adapter cannot be built from the spec.
+	XSLTTransformReasonWrongSpec = "WrongSpec"
 )
 
 const (
 	// ConditionReady is set when the runtime resources for the component
 	// are ready to be used.
-	XsltTransformConditionReady = apis.ConditionReady
+	XSLTTransformConditionReady = apis.ConditionReady
 )
 
 // Managed event types
 const (
-	EventTypeXsltTransform = "io.triggermesh.xslt.transform"
+	EventTypeXSLTTransform = "io.triggermesh.xslt.transform"
 )
 
 // GetGroupVersionKind returns the GroupVersionKind.
-func (*XsltTransform) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("XsltTransform")
+func (*XSLTTransform) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("XSLTTransform")
 }
 
 var xsltTransformrCondSet = apis.NewLivingConditionSet(
@@ -51,23 +51,23 @@ var xsltTransformrCondSet = apis.NewLivingConditionSet(
 )
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (*XsltTransform) GetConditionSet() apis.ConditionSet {
+func (*XSLTTransform) GetConditionSet() apis.ConditionSet {
 	return xsltTransformrCondSet
 }
 
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (o *XsltTransform) GetStatus() *duckv1.Status {
+func (o *XSLTTransform) GetStatus() *duckv1.Status {
 	return &o.Status.Status
 }
 
 // InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *XsltTransformStatus) InitializeConditions() {
+func (s *XSLTTransformStatus) InitializeConditions() {
 	xsltTransformrCondSet.Manage(s).InitializeConditions()
 }
 
 // PropagateAvailability uses the readiness of the provided Knative Service to
 // determine whether the Deployed condition should be marked as true or false.
-func (s *XsltTransformStatus) PropagateAvailability(ksvc *servingv1.Service) {
+func (s *XSLTTransformStatus) PropagateAvailability(ksvc *servingv1.Service) {
 	if ksvc == nil {
 		xsltTransformrCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
 			"The status of the adapter Service can not be determined")
@@ -94,6 +94,6 @@ func (s *XsltTransformStatus) PropagateAvailability(ksvc *servingv1.Service) {
 }
 
 // MarkNotDeployed sets the condition that the service has not been deployed.
-func (s *XsltTransformStatus) MarkNotDeployed(reason, messageFormat string, messageA ...interface{}) {
+func (s *XSLTTransformStatus) MarkNotDeployed(reason, messageFormat string, messageA ...interface{}) {
 	xsltTransformrCondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
 }

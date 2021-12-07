@@ -47,7 +47,7 @@ type adapterConfig struct {
 }
 
 // makeAdapterKService generates the adapter knative service structure.
-func makeAdapterKService(o *v1alpha1.XsltTransform, cfg *adapterConfig) (*servingv1.Service, error) {
+func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig) (*servingv1.Service, error) {
 	envApp, err := makeAppEnv(o)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func makeAdapterKService(o *v1alpha1.XsltTransform, cfg *adapterConfig) (*servin
 		resources.KsvcPodEnvVars(envs)), nil
 }
 
-func makeAppEnv(o *v1alpha1.XsltTransform) ([]corev1.EnvVar, error) {
+func makeAppEnv(o *v1alpha1.XSLTTransform) ([]corev1.EnvVar, error) {
 	env := []corev1.EnvVar{
 		*o.Spec.XSLT.ToEnvironmentVariable(envXslt),
 		{

@@ -22,7 +22,7 @@ spec:
   group: flow.triggermesh.io
   scope: Namespaced
   names:
-    kind: XsltTransform
+    kind: XSLTTransform
     plural: xslttransforms
     categories:
     - all
@@ -81,12 +81,12 @@ spec:
                 - required: [valueFromSecret]
                 - required: [valueFromConfigMap]
 
-              allowPerEventXslt:
+              allowPerEventXSLT:
                 description: Whether the XSLT informed at the spec can be overriden at each CloudEvent.
                 type: boolean
             anyOf:
             - required: [xslt]
-            - required: [allowPerEventXslt]
+            - required: [allowPerEventXSLT]
 
           status:
             description: Reported status.

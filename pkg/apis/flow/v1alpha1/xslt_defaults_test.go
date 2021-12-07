@@ -23,36 +23,36 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestXsltTransformSetDefaults(t *testing.T) {
+func TestXSLTTransformSetDefaults(t *testing.T) {
 	testCases := map[string]struct {
-		xslt      *XsltTransform
-		defaulted *XsltTransform
+		xslt      *XSLTTransform
+		defaulted *XSLTTransform
 	}{
 		"XSLT with allow event xslt value set to false, needs no defaulting": {
 			xslt: xsltTransform(
 				xsltWithXSLT(valueFromField(vffWithValue(tValue))),
-				xsltWithAllowEventXslt(false),
+				xsltWithAllowEventXSLT(false),
 			),
 			defaulted: xsltTransform(
 				xsltWithXSLT(valueFromField(vffWithValue(tValue))),
-				xsltWithAllowEventXslt(false),
+				xsltWithAllowEventXSLT(false),
 			),
 		},
 		"XSLT with allow event xslt value set to true, needs no defaulting": {
 			xslt: xsltTransform(
 				xsltWithXSLT(valueFromField(vffWithValue(tValue))),
-				xsltWithAllowEventXslt(true),
+				xsltWithAllowEventXSLT(true),
 			),
 			defaulted: xsltTransform(
 				xsltWithXSLT(valueFromField(vffWithValue(tValue))),
-				xsltWithAllowEventXslt(true),
+				xsltWithAllowEventXSLT(true),
 			),
 		},
 		"XSLT without allow event xslt value, needs defaulting": {
 			xslt: xsltTransform(xsltWithXSLT(valueFromField(vffWithValue(tValue)))),
 			defaulted: xsltTransform(
 				xsltWithXSLT(valueFromField(vffWithValue(tValue))),
-				xsltWithAllowEventXslt(false),
+				xsltWithAllowEventXSLT(false),
 			),
 		},
 		"XSLT nil does not defaulting": {

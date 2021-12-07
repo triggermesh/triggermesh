@@ -26,13 +26,13 @@ import (
 
 var (
 	errs                      = &apis.FieldError{}
-	errXsltAndOrAllowOverride = errs.Also(apis.ErrGeneric("when XSLT is empty, per event XSLT must be allowed", "allowPerEventXslt", "xslt").ViaField("spec"))
+	errXsltAndOrAllowOverride = errs.Also(apis.ErrGeneric("when XSLT is empty, per event XSLT must be allowed", "allowPerEventXSLT", "xslt").ViaField("spec"))
 	errXsltTooMany            = errs.Also(apis.ErrMultipleOneOf("value", "valueFromSecret", "valueFromConfigMap").ViaField("XSLT").ViaField("spec"))
 )
 
-func TestXsltTransformValidate(t *testing.T) {
+func TestXSLTTransformValidate(t *testing.T) {
 	testCases := map[string]struct {
-		xslt        *XsltTransform
+		xslt        *XSLTTransform
 		expectError *apis.FieldError
 	}{
 		"XSLT informed": {
@@ -40,23 +40,23 @@ func TestXsltTransformValidate(t *testing.T) {
 			expectError: nil,
 		},
 		"AllowOverride true": {
-			xslt:        xsltTransform(xsltWithAllowEventXslt(true)),
+			xslt:        xsltTransform(xsltWithAllowEventXSLT(true)),
 			expectError: nil,
 		},
 		"XSLT and AllowOverride true": {
 			xslt: xsltTransform(
 				xsltWithXSLT(valueFromField(vffWithValue(tValue))),
-				xsltWithAllowEventXslt(true)),
+				xsltWithAllowEventXSLT(true)),
 			expectError: nil,
 		},
 		"XSL nil and AllowOverride false": {
-			xslt:        xsltTransform(xsltWithAllowEventXslt(false)),
+			xslt:        xsltTransform(xsltWithAllowEventXSLT(false)),
 			expectError: errXsltAndOrAllowOverride,
 		},
 		"XSLT empty and AllowOverride false": {
 			xslt: xsltTransform(
 				xsltWithXSLT(valueFromField()),
-				xsltWithAllowEventXslt(false),
+				xsltWithAllowEventXSLT(false),
 			),
 			expectError: errXsltAndOrAllowOverride,
 		},
@@ -83,10 +83,10 @@ func TestXsltTransformValidate(t *testing.T) {
 	}
 }
 
-type xsltTransformOption func(*XsltTransform)
+type xsltTransformOption func(*XSLTTransform)
 
-func xsltTransform(opts ...xsltTransformOption) *XsltTransform {
-	xslt := &XsltTransform{}
+func xsltTransform(opts ...xsltTransformOption) *XSLTTransform {
+	xslt := &XSLTTransform{}
 
 	for _, o := range opts {
 		o(xslt)
@@ -96,13 +96,13 @@ func xsltTransform(opts ...xsltTransformOption) *XsltTransform {
 }
 
 func xsltWithXSLT(vff *ValueFromField) xsltTransformOption {
-	return func(xslt *XsltTransform) {
+	return func(xslt *XSLTTransform) {
 		xslt.Spec.XSLT = vff
 	}
 }
 
-func xsltWithAllowEventXslt(allowEventXslt bool) xsltTransformOption {
-	return func(xslt *XsltTransform) {
-		xslt.Spec.AllowPerEventXSLT = &allowEventXslt
+func xsltWithAllowEventXSLT(allowEventXSLT bool) xsltTransformOption {
+	return func(xslt *XSLTTransform) {
+		xslt.Spec.AllowPerEventXSLT = &allowEventXSLT
 	}
 }

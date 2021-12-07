@@ -32,59 +32,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// XsltTransformInformer provides access to a shared informer and lister for
-// XsltTransforms.
-type XsltTransformInformer interface {
+// XSLTTransformInformer provides access to a shared informer and lister for
+// XSLTTransforms.
+type XSLTTransformInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.XsltTransformLister
+	Lister() v1alpha1.XSLTTransformLister
 }
 
-type xsltTransformInformer struct {
+type xSLTTransformInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewXsltTransformInformer constructs a new informer for XsltTransform type.
+// NewXSLTTransformInformer constructs a new informer for XSLTTransform type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewXsltTransformInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredXsltTransformInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewXSLTTransformInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredXSLTTransformInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredXsltTransformInformer constructs a new informer for XsltTransform type.
+// NewFilteredXSLTTransformInformer constructs a new informer for XSLTTransform type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredXsltTransformInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredXSLTTransformInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FlowV1alpha1().XsltTransforms(namespace).List(context.TODO(), options)
+				return client.FlowV1alpha1().XSLTTransforms(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FlowV1alpha1().XsltTransforms(namespace).Watch(context.TODO(), options)
+				return client.FlowV1alpha1().XSLTTransforms(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&flowv1alpha1.XsltTransform{},
+		&flowv1alpha1.XSLTTransform{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *xsltTransformInformer) defaultInformer(client internalclientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredXsltTransformInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *xSLTTransformInformer) defaultInformer(client internalclientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredXSLTTransformInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *xsltTransformInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&flowv1alpha1.XsltTransform{}, f.defaultInformer)
+func (f *xSLTTransformInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&flowv1alpha1.XSLTTransform{}, f.defaultInformer)
 }
 
-func (f *xsltTransformInformer) Lister() v1alpha1.XsltTransformLister {
-	return v1alpha1.NewXsltTransformLister(f.Informer().GetIndexer())
+func (f *xSLTTransformInformer) Lister() v1alpha1.XSLTTransformLister {
+	return v1alpha1.NewXSLTTransformLister(f.Informer().GetIndexer())
 }

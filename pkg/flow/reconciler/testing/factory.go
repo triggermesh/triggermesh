@@ -54,7 +54,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 
 		// the controller.Reconciler uses an internal client to handle
 		// component objects
-		ctx, xsltclient := faketminjectionclient.With(ctx, ls.GetXsltTransformObjects()...)
+		ctx, xsltclient := faketminjectionclient.With(ctx, ls.GetXSLTTransformObjects()...)
 
 		// all clients used inside reconciler implementations should be
 		// injected as well

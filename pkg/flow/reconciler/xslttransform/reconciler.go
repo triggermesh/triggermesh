@@ -41,13 +41,13 @@ type reconciler struct {
 var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XsltTransform) pkgreconciler.Event {
+func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransform) pkgreconciler.Event {
 	o.Status.InitializeConditions()
 	o.Status.ObservedGeneration = o.Generation
 
 	ksvc, err := makeAdapterKService(o, r.adapterCfg)
 	if err != nil {
-		o.Status.MarkNotDeployed(v1alpha1.XsltTransformReasonWrongSpec, "Cannot create adapter from spec")
+		o.Status.MarkNotDeployed(v1alpha1.XSLTTransformReasonWrongSpec, "Cannot create adapter from spec")
 		return controller.NewPermanentError(fmt.Errorf("could not make the desired knative service adapter based on the spec: %w", err))
 	}
 

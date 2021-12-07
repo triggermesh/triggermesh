@@ -83,7 +83,7 @@ func (s *state) isNotLeaderNorObserver() bool {
 	return false
 }
 
-func (s *state) reconcileMethodFor(o *v1alpha1.XsltTransform) (string, doReconcile) {
+func (s *state) reconcileMethodFor(o *v1alpha1.XSLTTransform) (string, doReconcile) {
 	if o.GetDeletionTimestamp().IsZero() {
 		if s.isLeader {
 			return reconciler.DoReconcileKind, s.reconciler.ReconcileKind

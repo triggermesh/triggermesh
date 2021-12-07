@@ -27,7 +27,7 @@ import (
 type FlowV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	TransformationsGetter
-	XsltTransformsGetter
+	XSLTTransformsGetter
 }
 
 // FlowV1alpha1Client is used to interact with features provided by the flow.triggermesh.io group.
@@ -39,8 +39,8 @@ func (c *FlowV1alpha1Client) Transformations(namespace string) TransformationInt
 	return newTransformations(c, namespace)
 }
 
-func (c *FlowV1alpha1Client) XsltTransforms(namespace string) XsltTransformInterface {
-	return newXsltTransforms(c, namespace)
+func (c *FlowV1alpha1Client) XSLTTransforms(namespace string) XSLTTransformInterface {
+	return newXSLTTransforms(c, namespace)
 }
 
 // NewForConfig creates a new FlowV1alpha1Client for the given config.

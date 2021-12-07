@@ -64,7 +64,7 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	case flowv1alpha1.SchemeGroupVersion.WithResource("transformations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().Transformations().Informer()}, nil
 	case flowv1alpha1.SchemeGroupVersion.WithResource("xslttransforms"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().XsltTransforms().Informer()}, nil
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().XSLTTransforms().Informer()}, nil
 
 		// Group=routing.triggermesh.io, Version=v1alpha1
 	case routingv1alpha1.SchemeGroupVersion.WithResource("filters"):

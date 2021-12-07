@@ -25,69 +25,69 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// XsltTransformLister helps list XsltTransforms.
+// XSLTTransformLister helps list XSLTTransforms.
 // All objects returned here must be treated as read-only.
-type XsltTransformLister interface {
-	// List lists all XsltTransforms in the indexer.
+type XSLTTransformLister interface {
+	// List lists all XSLTTransforms in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.XsltTransform, err error)
-	// XsltTransforms returns an object that can list and get XsltTransforms.
-	XsltTransforms(namespace string) XsltTransformNamespaceLister
-	XsltTransformListerExpansion
+	List(selector labels.Selector) (ret []*v1alpha1.XSLTTransform, err error)
+	// XSLTTransforms returns an object that can list and get XSLTTransforms.
+	XSLTTransforms(namespace string) XSLTTransformNamespaceLister
+	XSLTTransformListerExpansion
 }
 
-// xsltTransformLister implements the XsltTransformLister interface.
-type xsltTransformLister struct {
+// xSLTTransformLister implements the XSLTTransformLister interface.
+type xSLTTransformLister struct {
 	indexer cache.Indexer
 }
 
-// NewXsltTransformLister returns a new XsltTransformLister.
-func NewXsltTransformLister(indexer cache.Indexer) XsltTransformLister {
-	return &xsltTransformLister{indexer: indexer}
+// NewXSLTTransformLister returns a new XSLTTransformLister.
+func NewXSLTTransformLister(indexer cache.Indexer) XSLTTransformLister {
+	return &xSLTTransformLister{indexer: indexer}
 }
 
-// List lists all XsltTransforms in the indexer.
-func (s *xsltTransformLister) List(selector labels.Selector) (ret []*v1alpha1.XsltTransform, err error) {
+// List lists all XSLTTransforms in the indexer.
+func (s *xSLTTransformLister) List(selector labels.Selector) (ret []*v1alpha1.XSLTTransform, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.XsltTransform))
+		ret = append(ret, m.(*v1alpha1.XSLTTransform))
 	})
 	return ret, err
 }
 
-// XsltTransforms returns an object that can list and get XsltTransforms.
-func (s *xsltTransformLister) XsltTransforms(namespace string) XsltTransformNamespaceLister {
-	return xsltTransformNamespaceLister{indexer: s.indexer, namespace: namespace}
+// XSLTTransforms returns an object that can list and get XSLTTransforms.
+func (s *xSLTTransformLister) XSLTTransforms(namespace string) XSLTTransformNamespaceLister {
+	return xSLTTransformNamespaceLister{indexer: s.indexer, namespace: namespace}
 }
 
-// XsltTransformNamespaceLister helps list and get XsltTransforms.
+// XSLTTransformNamespaceLister helps list and get XSLTTransforms.
 // All objects returned here must be treated as read-only.
-type XsltTransformNamespaceLister interface {
-	// List lists all XsltTransforms in the indexer for a given namespace.
+type XSLTTransformNamespaceLister interface {
+	// List lists all XSLTTransforms in the indexer for a given namespace.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.XsltTransform, err error)
-	// Get retrieves the XsltTransform from the indexer for a given namespace and name.
+	List(selector labels.Selector) (ret []*v1alpha1.XSLTTransform, err error)
+	// Get retrieves the XSLTTransform from the indexer for a given namespace and name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.XsltTransform, error)
-	XsltTransformNamespaceListerExpansion
+	Get(name string) (*v1alpha1.XSLTTransform, error)
+	XSLTTransformNamespaceListerExpansion
 }
 
-// xsltTransformNamespaceLister implements the XsltTransformNamespaceLister
+// xSLTTransformNamespaceLister implements the XSLTTransformNamespaceLister
 // interface.
-type xsltTransformNamespaceLister struct {
+type xSLTTransformNamespaceLister struct {
 	indexer   cache.Indexer
 	namespace string
 }
 
-// List lists all XsltTransforms in the indexer for a given namespace.
-func (s xsltTransformNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.XsltTransform, err error) {
+// List lists all XSLTTransforms in the indexer for a given namespace.
+func (s xSLTTransformNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.XSLTTransform, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.XsltTransform))
+		ret = append(ret, m.(*v1alpha1.XSLTTransform))
 	})
 	return ret, err
 }
 
-// Get retrieves the XsltTransform from the indexer for a given namespace and name.
-func (s xsltTransformNamespaceLister) Get(name string) (*v1alpha1.XsltTransform, error) {
+// Get retrieves the XSLTTransform from the indexer for a given namespace and name.
+func (s xSLTTransformNamespaceLister) Get(name string) (*v1alpha1.XSLTTransform, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
@@ -95,5 +95,5 @@ func (s xsltTransformNamespaceLister) Get(name string) (*v1alpha1.XsltTransform,
 	if !exists {
 		return nil, errors.NewNotFound(v1alpha1.Resource("xslttransform"), name)
 	}
-	return obj.(*v1alpha1.XsltTransform), nil
+	return obj.(*v1alpha1.XSLTTransform), nil
 }

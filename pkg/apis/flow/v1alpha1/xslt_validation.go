@@ -23,16 +23,16 @@ import (
 )
 
 // Validate implements apis.Validatable
-func (o *XsltTransform) Validate(ctx context.Context) *apis.FieldError {
+func (o *XSLTTransform) Validate(ctx context.Context) *apis.FieldError {
 	return o.Spec.Validate(ctx).ViaField("spec")
 }
 
 // Validate XSLT spec
-func (s *XsltTransformSpec) Validate(ctx context.Context) *apis.FieldError {
+func (s *XSLTTransformSpec) Validate(ctx context.Context) *apis.FieldError {
 	var errs *apis.FieldError
 
 	if (s.AllowPerEventXSLT == nil || !*s.AllowPerEventXSLT) && !s.XSLT.IsInformed() {
-		errs = errs.Also(apis.ErrGeneric("when XSLT is empty, per event XSLT must be allowed", "allowPerEventXslt", "xslt"))
+		errs = errs.Also(apis.ErrGeneric("when XSLT is empty, per event XSLT must be allowed", "allowPerEventXSLT", "xslt"))
 	}
 
 	if err := s.XSLT.Validate(ctx); err != nil {

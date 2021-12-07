@@ -13,11 +13,11 @@
 # limitations under the License.
 
 apiVersion: flow.triggermesh.io/v1alpha1
-kind: XsltTransform
+kind: XSLTTransform
 metadata:
   name: demo
 spec:
-  allowPerEventXslt: true
+  allowPerEventXSLT: true
   xslt:
     value: |
       <xsl:stylesheet version="1.0"	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">

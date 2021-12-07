@@ -124,7 +124,7 @@ const (
 `
 )
 
-func TestXsltTransformEvents(t *testing.T) {
+func TestXSLTTransformEvents(t *testing.T) {
 	testCases := map[string]struct {
 		allowXsltOverride bool
 		xslt              string
@@ -156,7 +156,7 @@ func TestXsltTransformEvents(t *testing.T) {
 			inEvent: newCloudEvent(
 				createStructuredRequest(tXML, tXSLT),
 				cloudevents.ApplicationJSON,
-				cloudEventWithEventType(v1alpha1.EventTypeXsltTransform)),
+				cloudEventWithEventType(v1alpha1.EventTypeXSLTTransform)),
 
 			expectEvent:    newCloudEvent(tOutXML, cloudevents.ApplicationXML),
 			expectCategory: tSuccessAttribute,
@@ -168,7 +168,7 @@ func TestXsltTransformEvents(t *testing.T) {
 			inEvent: newCloudEvent(
 				createStructuredRequest(tXML, tAlternativeXSLT),
 				cloudevents.ApplicationJSON,
-				cloudEventWithEventType(v1alpha1.EventTypeXsltTransform)),
+				cloudEventWithEventType(v1alpha1.EventTypeXSLTTransform)),
 
 			expectEvent:    newCloudEvent(tAlternativeOutXML, cloudevents.ApplicationXML),
 			expectCategory: tSuccessAttribute,
@@ -284,7 +284,7 @@ func cloudEventWithEventType(t string) cloudEventOptions {
 }
 
 func createStructuredRequest(xml, xslt string) string {
-	sr := XsltTransformStructuredRequest{
+	sr := XSLTTransformStructuredRequest{
 		XML:  xml,
 		XSLT: xslt,
 	}

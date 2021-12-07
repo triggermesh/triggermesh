@@ -62,7 +62,7 @@ func NewController(
 	componentInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	serviceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGVK((&v1alpha1.XsltTransform{}).GetGroupVersionKind()),
+		FilterFunc: controller.FilterControllerGVK((&v1alpha1.XSLTTransform{}).GetGroupVersionKind()),
 		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
 	})
 

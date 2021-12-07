@@ -30,31 +30,31 @@ import (
 	testing "k8s.io/client-go/testing"
 )
 
-// FakeXsltTransforms implements XsltTransformInterface
-type FakeXsltTransforms struct {
+// FakeXSLTTransforms implements XSLTTransformInterface
+type FakeXSLTTransforms struct {
 	Fake *FakeFlowV1alpha1
 	ns   string
 }
 
 var xslttransformsResource = schema.GroupVersionResource{Group: "flow.triggermesh.io", Version: "v1alpha1", Resource: "xslttransforms"}
 
-var xslttransformsKind = schema.GroupVersionKind{Group: "flow.triggermesh.io", Version: "v1alpha1", Kind: "XsltTransform"}
+var xslttransformsKind = schema.GroupVersionKind{Group: "flow.triggermesh.io", Version: "v1alpha1", Kind: "XSLTTransform"}
 
-// Get takes name of the xsltTransform, and returns the corresponding xsltTransform object, and an error if there is any.
-func (c *FakeXsltTransforms) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.XsltTransform, err error) {
+// Get takes name of the xSLTTransform, and returns the corresponding xSLTTransform object, and an error if there is any.
+func (c *FakeXSLTTransforms) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.XSLTTransform, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(xslttransformsResource, c.ns, name), &v1alpha1.XsltTransform{})
+		Invokes(testing.NewGetAction(xslttransformsResource, c.ns, name), &v1alpha1.XSLTTransform{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.XsltTransform), err
+	return obj.(*v1alpha1.XSLTTransform), err
 }
 
-// List takes label and field selectors, and returns the list of XsltTransforms that match those selectors.
-func (c *FakeXsltTransforms) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.XsltTransformList, err error) {
+// List takes label and field selectors, and returns the list of XSLTTransforms that match those selectors.
+func (c *FakeXSLTTransforms) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.XSLTTransformList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(xslttransformsResource, xslttransformsKind, c.ns, opts), &v1alpha1.XsltTransformList{})
+		Invokes(testing.NewListAction(xslttransformsResource, xslttransformsKind, c.ns, opts), &v1alpha1.XSLTTransformList{})
 
 	if obj == nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (c *FakeXsltTransforms) List(ctx context.Context, opts v1.ListOptions) (res
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha1.XsltTransformList{ListMeta: obj.(*v1alpha1.XsltTransformList).ListMeta}
-	for _, item := range obj.(*v1alpha1.XsltTransformList).Items {
+	list := &v1alpha1.XSLTTransformList{ListMeta: obj.(*v1alpha1.XSLTTransformList).ListMeta}
+	for _, item := range obj.(*v1alpha1.XSLTTransformList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -73,70 +73,70 @@ func (c *FakeXsltTransforms) List(ctx context.Context, opts v1.ListOptions) (res
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested xsltTransforms.
-func (c *FakeXsltTransforms) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested xSLTTransforms.
+func (c *FakeXSLTTransforms) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(xslttransformsResource, c.ns, opts))
 
 }
 
-// Create takes the representation of a xsltTransform and creates it.  Returns the server's representation of the xsltTransform, and an error, if there is any.
-func (c *FakeXsltTransforms) Create(ctx context.Context, xsltTransform *v1alpha1.XsltTransform, opts v1.CreateOptions) (result *v1alpha1.XsltTransform, err error) {
+// Create takes the representation of a xSLTTransform and creates it.  Returns the server's representation of the xSLTTransform, and an error, if there is any.
+func (c *FakeXSLTTransforms) Create(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransform, opts v1.CreateOptions) (result *v1alpha1.XSLTTransform, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(xslttransformsResource, c.ns, xsltTransform), &v1alpha1.XsltTransform{})
+		Invokes(testing.NewCreateAction(xslttransformsResource, c.ns, xSLTTransform), &v1alpha1.XSLTTransform{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.XsltTransform), err
+	return obj.(*v1alpha1.XSLTTransform), err
 }
 
-// Update takes the representation of a xsltTransform and updates it. Returns the server's representation of the xsltTransform, and an error, if there is any.
-func (c *FakeXsltTransforms) Update(ctx context.Context, xsltTransform *v1alpha1.XsltTransform, opts v1.UpdateOptions) (result *v1alpha1.XsltTransform, err error) {
+// Update takes the representation of a xSLTTransform and updates it. Returns the server's representation of the xSLTTransform, and an error, if there is any.
+func (c *FakeXSLTTransforms) Update(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransform, opts v1.UpdateOptions) (result *v1alpha1.XSLTTransform, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(xslttransformsResource, c.ns, xsltTransform), &v1alpha1.XsltTransform{})
+		Invokes(testing.NewUpdateAction(xslttransformsResource, c.ns, xSLTTransform), &v1alpha1.XSLTTransform{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.XsltTransform), err
+	return obj.(*v1alpha1.XSLTTransform), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeXsltTransforms) UpdateStatus(ctx context.Context, xsltTransform *v1alpha1.XsltTransform, opts v1.UpdateOptions) (*v1alpha1.XsltTransform, error) {
+func (c *FakeXSLTTransforms) UpdateStatus(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransform, opts v1.UpdateOptions) (*v1alpha1.XSLTTransform, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(xslttransformsResource, "status", c.ns, xsltTransform), &v1alpha1.XsltTransform{})
+		Invokes(testing.NewUpdateSubresourceAction(xslttransformsResource, "status", c.ns, xSLTTransform), &v1alpha1.XSLTTransform{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.XsltTransform), err
+	return obj.(*v1alpha1.XSLTTransform), err
 }
 
-// Delete takes name of the xsltTransform and deletes it. Returns an error if one occurs.
-func (c *FakeXsltTransforms) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+// Delete takes name of the xSLTTransform and deletes it. Returns an error if one occurs.
+func (c *FakeXSLTTransforms) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(xslttransformsResource, c.ns, name), &v1alpha1.XsltTransform{})
+		Invokes(testing.NewDeleteAction(xslttransformsResource, c.ns, name), &v1alpha1.XSLTTransform{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeXsltTransforms) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+func (c *FakeXSLTTransforms) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(xslttransformsResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1alpha1.XsltTransformList{})
+	_, err := c.Fake.Invokes(action, &v1alpha1.XSLTTransformList{})
 	return err
 }
 
-// Patch applies the patch and returns the patched xsltTransform.
-func (c *FakeXsltTransforms) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XsltTransform, err error) {
+// Patch applies the patch and returns the patched xSLTTransform.
+func (c *FakeXSLTTransforms) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XSLTTransform, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(xslttransformsResource, c.ns, name, pt, data, subresources...), &v1alpha1.XsltTransform{})
+		Invokes(testing.NewPatchSubresourceAction(xslttransformsResource, c.ns, name, pt, data, subresources...), &v1alpha1.XSLTTransform{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.XsltTransform), err
+	return obj.(*v1alpha1.XSLTTransform), err
 }

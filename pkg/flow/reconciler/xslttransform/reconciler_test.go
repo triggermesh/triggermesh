@@ -58,7 +58,7 @@ const (
 )
 
 var (
-	tXslt = `
+	tXSLT = `
 <xsl:stylesheet version="1.0"	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="tests">
 		<output>
@@ -168,7 +168,7 @@ func TestReconcile(t *testing.T) {
 	testCases.Test(t, MakeFactory(reconcilerCtor))
 }
 
-// reconcilerCtor returns a Ctor for a XsltTransform Reconciler.
+// reconcilerCtor returns a Ctor for a XSLTTransform Reconciler.
 var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) controller.Reconciler {
 	adapterCfg := &adapterConfig{
 		Image:   tImg,
@@ -184,13 +184,13 @@ var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) c
 	}
 
 	return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
-		fakeinjectionclient.Get(ctx), ls.GetXsltTransformLister(),
+		fakeinjectionclient.Get(ctx), ls.GetXSLTTransformLister(),
 		controller.GetEventRecorder(ctx), r)
 }
 
-// newComponent returns a test XsltTransform object with pre-filled attributes.
-func newComponent() *v1alpha1.XsltTransform {
-	o := &v1alpha1.XsltTransform{
+// newComponent returns a test XSLTTransform object with pre-filled attributes.
+func newComponent() *v1alpha1.XSLTTransform {
+	o := &v1alpha1.XSLTTransform{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
 			Name:      tName,
@@ -199,9 +199,9 @@ func newComponent() *v1alpha1.XsltTransform {
 				libreconciler.LabelBridgeUsedByPrefix + tBridge: libreconciler.LabelValueBridgeDominant,
 			},
 		},
-		Spec: v1alpha1.XsltTransformSpec{
+		Spec: v1alpha1.XSLTTransformSpec{
 			XSLT: &v1alpha1.ValueFromField{
-				Value: &tXslt,
+				Value: &tXSLT,
 			},
 		},
 	}
@@ -211,14 +211,14 @@ func newComponent() *v1alpha1.XsltTransform {
 }
 
 // Deployed: True
-func newComponentDeployed() *v1alpha1.XsltTransform {
+func newComponentDeployed() *v1alpha1.XSLTTransform {
 	o := newComponent()
 	o.Status.PropagateAvailability(newAdapterServiceReady())
 	return o
 }
 
 // Deployed: False
-func newComponentNotDeployed() *v1alpha1.XsltTransform {
+func newComponentNotDeployed() *v1alpha1.XSLTTransform {
 	o := newComponent()
 	o.Status.PropagateAvailability(newAdapterServiceNotReady())
 	return o
@@ -243,7 +243,7 @@ func newAdapterService() *servingv1.Service {
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(NewOwnerRefable(
 					tName,
-					(&v1alpha1.XsltTransform{}).GetGroupVersionKind(),
+					(&v1alpha1.XSLTTransform{}).GetGroupVersionKind(),
 					tUID,
 				)),
 			},
@@ -274,7 +274,7 @@ func newAdapterService() *servingv1.Service {
 										Value: tName,
 									}, {
 										Name:  envXslt,
-										Value: tXslt,
+										Value: tXSLT,
 									}, {
 										Name:  libreconciler.EnvBridgeID,
 										Value: tBridge,
@@ -302,7 +302,7 @@ func newAdapterService() *servingv1.Service {
 func newAdapterServiceReady() *servingv1.Service {
 	svc := newAdapterService()
 	svc.Status.SetConditions(apis.Conditions{{
-		Type:   v1alpha1.XsltTransformConditionReady,
+		Type:   v1alpha1.XSLTTransformConditionReady,
 		Status: corev1.ConditionTrue,
 	}})
 	svc.Status.URL = &tAdapterURL
@@ -313,7 +313,7 @@ func newAdapterServiceReady() *servingv1.Service {
 func newAdapterServiceNotReady() *servingv1.Service {
 	svc := newAdapterService()
 	svc.Status.SetConditions(apis.Conditions{{
-		Type:   v1alpha1.XsltTransformConditionReady,
+		Type:   v1alpha1.XSLTTransformConditionReady,
 		Status: corev1.ConditionFalse,
 	}})
 	return svc

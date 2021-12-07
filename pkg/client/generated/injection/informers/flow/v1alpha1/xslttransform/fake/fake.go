@@ -35,6 +35,6 @@ func init() {
 
 func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 	f := fake.Get(ctx)
-	inf := f.Flow().V1alpha1().XsltTransforms()
+	inf := f.Flow().V1alpha1().XSLTTransforms()
 	return context.WithValue(ctx, xslttransform.Key{}, inf), inf.Informer()
 }

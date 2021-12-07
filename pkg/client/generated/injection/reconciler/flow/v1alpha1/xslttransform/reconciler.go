@@ -42,40 +42,40 @@ import (
 )
 
 // Interface defines the strongly typed interfaces to be implemented by a
-// controller reconciling v1alpha1.XsltTransform.
+// controller reconciling v1alpha1.XSLTTransform.
 type Interface interface {
-	// ReconcileKind implements custom logic to reconcile v1alpha1.XsltTransform. Any changes
+	// ReconcileKind implements custom logic to reconcile v1alpha1.XSLTTransform. Any changes
 	// to the objects .Status or .Finalizers will be propagated to the stored
 	// object. It is recommended that implementors do not call any update calls
 	// for the Kind inside of ReconcileKind, it is the responsibility of the calling
 	// controller to propagate those properties. The resource passed to ReconcileKind
 	// will always have an empty deletion timestamp.
-	ReconcileKind(ctx context.Context, o *v1alpha1.XsltTransform) reconciler.Event
+	ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransform) reconciler.Event
 }
 
 // Finalizer defines the strongly typed interfaces to be implemented by a
-// controller finalizing v1alpha1.XsltTransform.
+// controller finalizing v1alpha1.XSLTTransform.
 type Finalizer interface {
-	// FinalizeKind implements custom logic to finalize v1alpha1.XsltTransform. Any changes
+	// FinalizeKind implements custom logic to finalize v1alpha1.XSLTTransform. Any changes
 	// to the objects .Status or .Finalizers will be ignored. Returning a nil or
 	// Normal type reconciler.Event will allow the finalizer to be deleted on
 	// the resource. The resource passed to FinalizeKind will always have a set
 	// deletion timestamp.
-	FinalizeKind(ctx context.Context, o *v1alpha1.XsltTransform) reconciler.Event
+	FinalizeKind(ctx context.Context, o *v1alpha1.XSLTTransform) reconciler.Event
 }
 
 // ReadOnlyInterface defines the strongly typed interfaces to be implemented by a
-// controller reconciling v1alpha1.XsltTransform if they want to process resources for which
+// controller reconciling v1alpha1.XSLTTransform if they want to process resources for which
 // they are not the leader.
 type ReadOnlyInterface interface {
-	// ObserveKind implements logic to observe v1alpha1.XsltTransform.
+	// ObserveKind implements logic to observe v1alpha1.XSLTTransform.
 	// This method should not write to the API.
-	ObserveKind(ctx context.Context, o *v1alpha1.XsltTransform) reconciler.Event
+	ObserveKind(ctx context.Context, o *v1alpha1.XSLTTransform) reconciler.Event
 }
 
-type doReconcile func(ctx context.Context, o *v1alpha1.XsltTransform) reconciler.Event
+type doReconcile func(ctx context.Context, o *v1alpha1.XSLTTransform) reconciler.Event
 
-// reconcilerImpl implements controller.Reconciler for v1alpha1.XsltTransform resources.
+// reconcilerImpl implements controller.Reconciler for v1alpha1.XSLTTransform resources.
 type reconcilerImpl struct {
 	// LeaderAwareFuncs is inlined to help us implement reconciler.LeaderAware.
 	reconciler.LeaderAwareFuncs
@@ -84,7 +84,7 @@ type reconcilerImpl struct {
 	Client internalclientset.Interface
 
 	// Listers index properties about resources.
-	Lister flowv1alpha1.XsltTransformLister
+	Lister flowv1alpha1.XSLTTransformLister
 
 	// Recorder is an event recorder for recording Event resources to the
 	// Kubernetes API.
@@ -111,7 +111,7 @@ var _ controller.Reconciler = (*reconcilerImpl)(nil)
 // Check that our generated Reconciler is always LeaderAware.
 var _ reconciler.LeaderAware = (*reconcilerImpl)(nil)
 
-func NewReconciler(ctx context.Context, logger *zap.SugaredLogger, client internalclientset.Interface, lister flowv1alpha1.XsltTransformLister, recorder record.EventRecorder, r Interface, options ...controller.Options) controller.Reconciler {
+func NewReconciler(ctx context.Context, logger *zap.SugaredLogger, client internalclientset.Interface, lister flowv1alpha1.XSLTTransformLister, recorder record.EventRecorder, r Interface, options ...controller.Options) controller.Reconciler {
 	// Check the options function input. It should be 0 or 1.
 	if len(options) > 1 {
 		logger.Fatal("Up to one options struct is supported, found: ", len(options))
@@ -195,7 +195,7 @@ func (r *reconcilerImpl) Reconcile(ctx context.Context, key string) error {
 
 	// Get the resource with this namespace/name.
 
-	getter := r.Lister.XsltTransforms(s.namespace)
+	getter := r.Lister.XSLTTransforms(s.namespace)
 
 	original, err := getter.Get(s.name)
 
@@ -308,13 +308,13 @@ func (r *reconcilerImpl) Reconcile(ctx context.Context, key string) error {
 	return nil
 }
 
-func (r *reconcilerImpl) updateStatus(ctx context.Context, existing *v1alpha1.XsltTransform, desired *v1alpha1.XsltTransform) error {
+func (r *reconcilerImpl) updateStatus(ctx context.Context, existing *v1alpha1.XSLTTransform, desired *v1alpha1.XSLTTransform) error {
 	existing = existing.DeepCopy()
 	return reconciler.RetryUpdateConflicts(func(attempts int) (err error) {
 		// The first iteration tries to use the injectionInformer's state, subsequent attempts fetch the latest state via API.
 		if attempts > 0 {
 
-			getter := r.Client.FlowV1alpha1().XsltTransforms(desired.Namespace)
+			getter := r.Client.FlowV1alpha1().XSLTTransforms(desired.Namespace)
 
 			existing, err = getter.Get(ctx, desired.Name, metav1.GetOptions{})
 			if err != nil {
@@ -333,7 +333,7 @@ func (r *reconcilerImpl) updateStatus(ctx context.Context, existing *v1alpha1.Xs
 
 		existing.Status = desired.Status
 
-		updater := r.Client.FlowV1alpha1().XsltTransforms(existing.Namespace)
+		updater := r.Client.FlowV1alpha1().XSLTTransforms(existing.Namespace)
 
 		_, err = updater.UpdateStatus(ctx, existing, metav1.UpdateOptions{})
 		return err
@@ -343,9 +343,9 @@ func (r *reconcilerImpl) updateStatus(ctx context.Context, existing *v1alpha1.Xs
 // updateFinalizersFiltered will update the Finalizers of the resource.
 // TODO: this method could be generic and sync all finalizers. For now it only
 // updates defaultFinalizerName or its override.
-func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource *v1alpha1.XsltTransform) (*v1alpha1.XsltTransform, error) {
+func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource *v1alpha1.XSLTTransform) (*v1alpha1.XSLTTransform, error) {
 
-	getter := r.Lister.XsltTransforms(resource.Namespace)
+	getter := r.Lister.XSLTTransforms(resource.Namespace)
 
 	actual, err := getter.Get(resource.Name)
 	if err != nil {
@@ -390,7 +390,7 @@ func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource 
 		return resource, err
 	}
 
-	patcher := r.Client.FlowV1alpha1().XsltTransforms(resource.Namespace)
+	patcher := r.Client.FlowV1alpha1().XSLTTransforms(resource.Namespace)
 
 	resourceName := resource.Name
 	updated, err := patcher.Patch(ctx, resourceName, types.MergePatchType, patch, metav1.PatchOptions{})
@@ -404,7 +404,7 @@ func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource 
 	return updated, err
 }
 
-func (r *reconcilerImpl) setFinalizerIfFinalizer(ctx context.Context, resource *v1alpha1.XsltTransform) (*v1alpha1.XsltTransform, error) {
+func (r *reconcilerImpl) setFinalizerIfFinalizer(ctx context.Context, resource *v1alpha1.XSLTTransform) (*v1alpha1.XSLTTransform, error) {
 	if _, ok := r.reconciler.(Finalizer); !ok {
 		return resource, nil
 	}
@@ -422,7 +422,7 @@ func (r *reconcilerImpl) setFinalizerIfFinalizer(ctx context.Context, resource *
 	return r.updateFinalizersFiltered(ctx, resource)
 }
 
-func (r *reconcilerImpl) clearFinalizer(ctx context.Context, resource *v1alpha1.XsltTransform, reconcileEvent reconciler.Event) (*v1alpha1.XsltTransform, error) {
+func (r *reconcilerImpl) clearFinalizer(ctx context.Context, resource *v1alpha1.XSLTTransform, reconcileEvent reconciler.Event) (*v1alpha1.XSLTTransform, error) {
 	if _, ok := r.reconciler.(Finalizer); !ok {
 		return resource, nil
 	}

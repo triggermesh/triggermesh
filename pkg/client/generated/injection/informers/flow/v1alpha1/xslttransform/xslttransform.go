@@ -45,7 +45,7 @@ type Key struct{}
 
 func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 	f := factory.Get(ctx)
-	inf := f.Flow().V1alpha1().XsltTransforms()
+	inf := f.Flow().V1alpha1().XSLTTransforms()
 	return context.WithValue(ctx, Key{}, inf), inf.Informer()
 }
 
@@ -55,13 +55,13 @@ func withDynamicInformer(ctx context.Context) context.Context {
 }
 
 // Get extracts the typed informer from the context.
-func Get(ctx context.Context) v1alpha1.XsltTransformInformer {
+func Get(ctx context.Context) v1alpha1.XSLTTransformInformer {
 	untyped := ctx.Value(Key{})
 	if untyped == nil {
 		logging.FromContext(ctx).Panic(
-			"Unable to fetch github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/flow/v1alpha1.XsltTransformInformer from context.")
+			"Unable to fetch github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/flow/v1alpha1.XSLTTransformInformer from context.")
 	}
-	return untyped.(v1alpha1.XsltTransformInformer)
+	return untyped.(v1alpha1.XSLTTransformInformer)
 }
 
 type wrapper struct {
@@ -72,18 +72,18 @@ type wrapper struct {
 	resourceVersion string
 }
 
-var _ v1alpha1.XsltTransformInformer = (*wrapper)(nil)
-var _ flowv1alpha1.XsltTransformLister = (*wrapper)(nil)
+var _ v1alpha1.XSLTTransformInformer = (*wrapper)(nil)
+var _ flowv1alpha1.XSLTTransformLister = (*wrapper)(nil)
 
 func (w *wrapper) Informer() cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(nil, &apisflowv1alpha1.XsltTransform{}, 0, nil)
+	return cache.NewSharedIndexInformer(nil, &apisflowv1alpha1.XSLTTransform{}, 0, nil)
 }
 
-func (w *wrapper) Lister() flowv1alpha1.XsltTransformLister {
+func (w *wrapper) Lister() flowv1alpha1.XSLTTransformLister {
 	return w
 }
 
-func (w *wrapper) XsltTransforms(namespace string) flowv1alpha1.XsltTransformNamespaceLister {
+func (w *wrapper) XSLTTransforms(namespace string) flowv1alpha1.XSLTTransformNamespaceLister {
 	return &wrapper{client: w.client, namespace: namespace, resourceVersion: w.resourceVersion}
 }
 
@@ -95,8 +95,8 @@ func (w *wrapper) SetResourceVersion(resourceVersion string) {
 	w.resourceVersion = resourceVersion
 }
 
-func (w *wrapper) List(selector labels.Selector) (ret []*apisflowv1alpha1.XsltTransform, err error) {
-	lo, err := w.client.FlowV1alpha1().XsltTransforms(w.namespace).List(context.TODO(), v1.ListOptions{
+func (w *wrapper) List(selector labels.Selector) (ret []*apisflowv1alpha1.XSLTTransform, err error) {
+	lo, err := w.client.FlowV1alpha1().XSLTTransforms(w.namespace).List(context.TODO(), v1.ListOptions{
 		LabelSelector:   selector.String(),
 		ResourceVersion: w.resourceVersion,
 	})
@@ -109,8 +109,8 @@ func (w *wrapper) List(selector labels.Selector) (ret []*apisflowv1alpha1.XsltTr
 	return ret, nil
 }
 
-func (w *wrapper) Get(name string) (*apisflowv1alpha1.XsltTransform, error) {
-	return w.client.FlowV1alpha1().XsltTransforms(w.namespace).Get(context.TODO(), name, v1.GetOptions{
+func (w *wrapper) Get(name string) (*apisflowv1alpha1.XSLTTransform, error) {
+	return w.client.FlowV1alpha1().XSLTTransforms(w.namespace).Get(context.TODO(), name, v1.GetOptions{
 		ResourceVersion: w.resourceVersion,
 	})
 }

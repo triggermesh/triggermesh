@@ -85,7 +85,7 @@ The API can be inspected using `kubectl explain` for each field level:
 
 ```console
 kubectl explain  xslttransform.spec
-KIND:     XsltTransform
+KIND:     XSLTTransform
 VERSION:  flow.triggermesh.io/v1alpha1
 
 RESOURCE: spec <Object>
@@ -94,7 +94,7 @@ DESCRIPTION:
      Desired state of the TriggerMesh component.
 
 FIELDS:
-   allowPerEventXslt    <boolean>
+   allowPerEventXSLT    <boolean>
      Whether the XSLT informed at the spec can be overriden at each CloudEvent.
 
    xslt <Object>
@@ -105,7 +105,7 @@ FIELDS:
 
 - The transformation accepts any CloudEvent whose media type is `application/xml`.
 - On success the output event will contain the transformed XML keeping the `application/xml` media type, and appending a `.response` suffix to the incoming CloudEvent type.
-- When the `allowPerEventXslt` flag is set it also accepts an `io.triggermesh.xslt.transform` event type that must include an `xml` and `xslt` element for the transformation.
+- When the `allowPerEventXSLT` flag is set it also accepts an `io.triggermesh.xslt.transform` event type that must include an `xml` and `xslt` element for the transformation.
 
 ```json
 {
@@ -236,4 +236,4 @@ Data,
 
 ## Developing
 
-When building XsltTransform container image, make sure that [library depencencies are satisfied](../../hack/images/xslttransform).
+When building XSLTTransform container image, make sure that [library depencencies are satisfied](../../hack/images/xslttransform).
