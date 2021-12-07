@@ -24,10 +24,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/aws/aws-sdk-go/service/kinesis/kinesisiface"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
@@ -36,16 +36,21 @@ import (
 
 // NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
-	config := env.GetAwsConfig()
 	logger := logging.FromContext(ctx)
+
+	env := envAcc.(*envAccessor)
+
 	a := MustParseARN(env.AwsTargetArn)
-	config = config.WithRegion(a.Region)
+	session := session.Must(session.NewSession(
+		env.GetAwsConfig().
+			WithRegion(a.Region).
+			WithMaxRetries(5)))
+
 	return &adapter{
-		config:              config, // define configuration for the aws client
 		awsArnString:        env.AwsTargetArn,
 		awsArn:              a,
 		awsKinesisPartition: env.AwsKinesisPartition,
+		knsClient:           kinesis.New(session),
 
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
@@ -59,9 +64,7 @@ type adapter struct {
 	awsArnString        string
 	awsArn              arn.ARN
 	awsKinesisPartition string
-	config              *aws.Config
-	session             *session.Session
-	kinesis             *kinesis.Kinesis
+	knsClient           kinesisiface.KinesisAPI
 
 	discardCEContext bool
 
@@ -71,13 +74,7 @@ type adapter struct {
 
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS Kinesis Target adapter")
-	s := session.Must(session.NewSession(a.config))
-	a.session = s
-
-	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
-		return err
-	}
-	return nil
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 // Parse and send the aws event
@@ -100,7 +97,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 		return a.reportError("unable to extract kinesis stream name from ARN", nil)
 	}
 
-	result, err := a.kinesis.PutRecord(&kinesis.PutRecordInput{
+	result, err := a.knsClient.PutRecord(&kinesis.PutRecordInput{
 		Data:         data,
 		PartitionKey: &a.awsKinesisPartition,
 		StreamName:   &streamName[1],
