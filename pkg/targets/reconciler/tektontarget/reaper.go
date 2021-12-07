@@ -71,7 +71,7 @@ func reaperThread(ctx context.Context, r *reconciler) {
 					continue
 				}
 
-				log.Infow("Found target: " + t.Namespace + "." + t.Name)
+				log.Info("Found target: " + t.Namespace + "." + t.Name)
 				// Send the reap cloudevent
 				cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
 
