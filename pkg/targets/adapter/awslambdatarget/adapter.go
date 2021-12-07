@@ -23,7 +23,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -40,7 +39,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	session := session.Must(session.NewSession(
+	lambdaSession := session.Must(session.NewSession(
 		env.GetAwsConfig().
 			WithRegion(a.Region).
 			WithMaxRetries(5)))
@@ -49,7 +48,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		awsArnString:     env.AwsTargetArn,
 		awsArn:           a,
 		discardCEContext: env.DiscardCEContext,
-		lambdaClient:     lambda.New(session),
+		lambdaClient:     lambda.New(lambdaSession),
 		ceClient:         ceClient,
 
 		logger: logger,
@@ -61,7 +60,6 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 type adapter struct {
 	awsArnString string
 	awsArn       arn.ARN
-	config       *aws.Config
 	lambdaClient *lambda.Lambda
 
 	discardCEContext bool

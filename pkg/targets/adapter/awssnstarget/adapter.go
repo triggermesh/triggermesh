@@ -61,8 +61,6 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 type adapter struct {
 	awsArnString string
 	awsArn       arn.ARN
-	config       *aws.Config
-	session      *session.Session
 	snsClient    *sns.SNS
 
 	discardCEContext bool
