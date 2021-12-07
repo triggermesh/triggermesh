@@ -23,7 +23,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -39,12 +38,14 @@ import (
 // NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
-	config := env.GetAwsConfig()
 	logger := logging.FromContext(ctx)
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	config = config.WithRegion(a.Region)
+	session := session.Must(session.NewSession(
+		env.GetAwsConfig().
+			WithRegion(a.Region).
+			WithMaxRetries(5)))
 
 	var dynamodbTable string
 	if a.Service == dynamodb.ServiceName {
@@ -52,10 +53,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	return &adapter{
-		config:               config, // define configuration for the aws client
 		awsArnString:         env.AwsTargetArn,
 		awsArn:               a,
 		awsDynamoDBTableName: dynamodbTable,
+		dynamoDBClient:       dynamodb.New(session),
 
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
@@ -69,9 +70,7 @@ type adapter struct {
 	awsArnString         string
 	awsArn               arn.ARN
 	awsDynamoDBTableName string
-	config               *aws.Config
-	session              *session.Session
-	dynamoDB             *dynamodb.DynamoDB
+	dynamoDBClient       *dynamodb.DynamoDB
 
 	discardCEContext bool
 	ceClient         cloudevents.Client
@@ -80,13 +79,7 @@ type adapter struct {
 
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS DynamoDB Target adapter")
-	s := session.Must(session.NewSession(a.config))
-	a.session = s
-
-	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
-		return err
-	}
-	return nil
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 // Parse and send the aws event
@@ -117,7 +110,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 		TableName: &a.awsDynamoDBTableName,
 	}
 
-	resp, err := a.dynamoDB.PutItem(input)
+	resp, err := a.dynamoDBClient.PutItem(input)
 	if err != nil {
 		return a.reportError("Error invoking DynamoDB", err)
 	}

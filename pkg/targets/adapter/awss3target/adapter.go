@@ -25,7 +25,6 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -40,17 +39,19 @@ import (
 // NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
-	config := env.GetAwsConfig()
 	logger := logging.FromContext(ctx)
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	config = config.WithRegion(a.Region)
+	s3Session := session.Must(session.NewSession(
+		env.GetAwsConfig().
+			WithRegion(a.Region).
+			WithMaxRetries(5)))
 
 	return &adapter{
-		config:       config, // define configuration for the aws client
 		awsArnString: env.AwsTargetArn,
 		awsArn:       a,
+		s3Client:     s3.New(s3Session),
 
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
@@ -63,9 +64,7 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 type adapter struct {
 	awsArnString string
 	awsArn       arn.ARN
-	config       *aws.Config
-	session      *session.Session
-	s3           *s3.S3
+	s3Client     *s3.S3
 
 	discardCEContext bool
 	ceClient         cloudevents.Client
@@ -74,13 +73,7 @@ type adapter struct {
 
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS S3 Target adapter")
-	s := session.Must(session.NewSession(a.config))
-	a.session = s
-	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
-		return err
-	}
-
-	return nil
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 // Parse and send the aws event
@@ -108,7 +101,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 		Body:   dataReader,
 	}
 
-	result, err := a.s3.PutObject(&putInput)
+	result, err := a.s3Client.PutObject(&putInput)
 	if err != nil {
 		return a.reportError("error publishing object to s3 bucket", err)
 	}

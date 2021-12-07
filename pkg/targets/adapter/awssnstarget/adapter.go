@@ -36,15 +36,19 @@ import (
 // NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
-	config := env.GetAwsConfig()
 	logger := logging.FromContext(ctx)
+
 	a := MustParseARN(env.AwsTargetArn)
-	config = config.WithRegion(a.Region)
+
+	snsSession := session.Must(session.NewSession(
+		env.GetAwsConfig().
+			WithRegion(a.Region).
+			WithMaxRetries(5)))
 
 	return &adapter{
-		config:       config, // define configuration for the aws client
 		awsArnString: env.AwsTargetArn,
 		awsArn:       a,
+		snsClient:    sns.New(snsSession),
 
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
@@ -59,7 +63,7 @@ type adapter struct {
 	awsArn       arn.ARN
 	config       *aws.Config
 	session      *session.Session
-	sns          *sns.SNS
+	snsClient    *sns.SNS
 
 	discardCEContext bool
 	ceClient         cloudevents.Client
@@ -68,13 +72,7 @@ type adapter struct {
 
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS SNS adapter")
-	s := session.Must(session.NewSession(a.config))
-	a.session = s
-
-	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
-		return err
-	}
-	return nil
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 // Parse and send the aws event
@@ -91,7 +89,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 		msg = jsonEvent
 	}
 
-	result, err := a.sns.Publish(&sns.PublishInput{
+	result, err := a.snsClient.Publish(&sns.PublishInput{
 		Message:  aws.String(string(msg)),
 		TopicArn: &a.awsArnString,
 	})

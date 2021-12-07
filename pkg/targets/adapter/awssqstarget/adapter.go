@@ -36,16 +36,19 @@ import (
 // NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
-	config := env.GetAwsConfig()
 	logger := logging.FromContext(ctx)
 	a := MustParseARN(env.AwsTargetArn)
-	config = config.WithRegion(a.Region)
+
+	sqsSession := session.Must(session.NewSession(
+		env.GetAwsConfig().
+			WithRegion(a.Region).
+			WithMaxRetries(5)))
 
 	return &adapter{
-		config:           config, // define configuration for the aws client
 		awsArnString:     env.AwsTargetArn,
 		awsArn:           a,
 		discardCEContext: env.DiscardCEContext,
+		sqsClient:        sqs.New(sqsSession),
 
 		ceClient: ceClient,
 		logger:   logger,
@@ -57,9 +60,7 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 type adapter struct {
 	awsArnString string
 	awsArn       arn.ARN
-	config       *aws.Config
-	session      *session.Session
-	sqs          *sqs.SQS
+	sqsClient    *sqs.SQS
 
 	discardCEContext bool
 	ceClient         cloudevents.Client
@@ -68,13 +69,7 @@ type adapter struct {
 
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS SQS Target adapter")
-	s := session.Must(session.NewSession(a.config))
-	a.session = s
-
-	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
-		return err
-	}
-	return nil
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 // Parse and send the aws event
@@ -94,7 +89,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 	// The SendMessageInput only accepts a URL for publishing messages. This can be extracted from the ARN
 	url := "https://" + a.awsArn.Service + "." + a.awsArn.Region + ".amazonaws.com/" + a.awsArn.AccountID + "/" + a.awsArn.Resource
 
-	result, err := a.sqs.SendMessage(&sqs.SendMessageInput{
+	result, err := a.sqsClient.SendMessage(&sqs.SendMessageInput{
 		MessageBody: aws.String(string(msg)),
 		QueueUrl:    &url,
 	})

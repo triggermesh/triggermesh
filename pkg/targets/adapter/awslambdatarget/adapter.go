@@ -36,18 +36,20 @@ import (
 // NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
-	config := env.GetAwsConfig()
 	logger := logging.FromContext(ctx)
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	config = config.WithRegion(a.Region)
+	session := session.Must(session.NewSession(
+		env.GetAwsConfig().
+			WithRegion(a.Region).
+			WithMaxRetries(5)))
 
 	return &adapter{
-		config:           config, // define configuration for the aws client
 		awsArnString:     env.AwsTargetArn,
 		awsArn:           a,
 		discardCEContext: env.DiscardCEContext,
+		lambdaClient:     lambda.New(session),
 		ceClient:         ceClient,
 
 		logger: logger,
@@ -60,8 +62,7 @@ type adapter struct {
 	awsArnString string
 	awsArn       arn.ARN
 	config       *aws.Config
-	session      *session.Session
-	lda          *lambda.Lambda
+	lambdaClient *lambda.Lambda
 
 	discardCEContext bool
 
@@ -71,15 +72,7 @@ type adapter struct {
 
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AWS Lambda adapter")
-	s := session.Must(session.NewSession(a.config))
-	a.session = s
-
-	a.lda = lambda.New(s)
-
-	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
-		return err
-	}
-	return nil
+	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 // Parse and send the aws event
@@ -100,7 +93,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 		Payload:      fnPayload,
 		FunctionName: &a.awsArnString,
 	}
-	out, err := a.lda.Invoke(input)
+	out, err := a.lambdaClient.Invoke(input)
 	if err != nil {
 		return a.reportError("error invoking lambda", err)
 	}
