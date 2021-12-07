@@ -15,14 +15,33 @@
 kind: Trigger
 apiVersion: eventing.knative.dev/v1
 metadata:
-  name: xslttransform
+  name: xslttransform-xmldoc
 spec:
   broker: demo
   filter:
     attributes:
-      # setting a filter to avoid processing already
-      # transformed CloudEvents.
+      # setting a filter to process only xsml.document
+      # typed  already CloudEvents
       type: xml.document
+  subscriber:
+    ref:
+      apiVersion: flow.triggermesh.io/v1alpha1
+      kind: XsltTransform
+      name: demo
+
+---
+
+kind: Trigger
+apiVersion: eventing.knative.dev/v1
+metadata:
+  name: xslttransform-xslt-per-event
+spec:
+  broker: demo
+  filter:
+    attributes:
+      # setting a filter to process only structured
+      # typed  already CloudEvents
+      type: io.triggermesh.xslt.transform
   subscriber:
     ref:
       apiVersion: flow.triggermesh.io/v1alpha1

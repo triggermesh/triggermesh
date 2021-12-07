@@ -291,6 +291,7 @@ func createStructuredRequest(xml, xslt string) string {
 
 	b, err := json.Marshal(sr)
 	if err != nil {
+		// not expected
 		panic(err)
 	}
 
@@ -305,6 +306,7 @@ func createErrorResponse(code, description string) string {
 
 	b, err := json.Marshal(ee)
 	if err != nil {
+		// not expected
 		panic(err)
 	}
 
