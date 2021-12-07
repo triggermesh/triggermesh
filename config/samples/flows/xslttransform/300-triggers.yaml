@@ -20,7 +20,7 @@ spec:
   broker: demo
   filter:
     attributes:
-      # setting a filter to process only xsml.document
+      # setting a filter to process only xml.document
       # typed  already CloudEvents
       type: xml.document
   subscriber:

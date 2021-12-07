@@ -142,7 +142,7 @@ kubectl exec -ti curl -- curl -v "http://broker-ingress.knative-eventing.svc.clu
   -H "Ce-Type: xml.document" \
   -H "Ce-Source: curl.shell" \
   -H "Content-Type: application/xml" \
-  -H "Ce-Id: conformance-test-nack" \
+  -H "Ce-Id: 1234-abcd" \
   -d "<tests>
   <test>
     <data>
@@ -200,7 +200,7 @@ kubectl exec -ti curl -- curl -v 'http://broker-ingress.knative-eventing.svc.clu
   -H 'Ce-Type: io.triggermesh.xslt.transform' \
   -H 'Ce-Source: curl.shell' \
   -H 'Content-Type: application/json' \
-  -H 'Ce-Id: conformance-test-nack' \
+  -H 'Ce-Id: 1234-abcd' \
   -d '{
   "xml": "<guitars><guitar><brand>Framus</brand><model>AK 1974</model><year>2012</year></guitar><guitar><brand>Fender</brand><model>Jaguar</model><year>2010</year></guitar><guitar><brand>Haar</brand><model>Telecaster</model><year>2019</year></guitar><guitar><brand>Hohner</brand><model>L75</model><year>1992</year></guitar></guitars>",
   "xslt": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"><xsl:template match=\"/\"><output><xsl:for-each select=\"guitars/guitar\"><xsl:sort select=\"year\"/><item><xsl:value-of select=\"year\"/><xsl:text> </xsl:text><xsl:value-of select=\"brand\"/><xsl:text> </xsl:text><xsl:value-of select=\"model\"/></item></xsl:for-each></output></xsl:template></xsl:stylesheet>"
