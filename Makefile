@@ -75,7 +75,7 @@ confluenttarget-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS_STATIC)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 # Not statically linked
-xslttransform-adapter: ## Builds XML releated functionality
+xslttransform-adapter: ## Builds XML related functionality
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster using ko
