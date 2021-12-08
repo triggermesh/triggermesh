@@ -125,6 +125,10 @@ jobs:
           name: Installing ko
           command: go install github.com/google/ko@v0.9.3
       - run:
+          # XSLTTransform needs libxml2.
+          name: Install libxml2
+          command: sudo apt-get update && sudo apt-get install -y libxml2-dev
+      - run:
           name: Publishing container images
           command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
           environment:
