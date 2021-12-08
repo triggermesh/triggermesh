@@ -126,7 +126,7 @@ const (
 
 func TestXSLTTransformEvents(t *testing.T) {
 	testCases := map[string]struct {
-		allowXsltOverride bool
+		allowXSLTOverride bool
 		xslt              string
 
 		inEvent cloudevents.Event
@@ -136,7 +136,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 		expectCategory string
 	}{
 		"transform ok": {
-			allowXsltOverride: false,
+			allowXSLTOverride: false,
 			xslt:              tXSLT,
 			inEvent:           newCloudEvent(tXML, cloudevents.ApplicationXML),
 
@@ -144,7 +144,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 			expectCategory: tSuccessAttribute,
 		},
 		"transform setting override to true but not providing an extra XSLT, ok": {
-			allowXsltOverride: true,
+			allowXSLTOverride: true,
 			xslt:              tXSLT,
 			inEvent:           newCloudEvent(tXML, cloudevents.ApplicationXML),
 
@@ -152,7 +152,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 			expectCategory: tSuccessAttribute,
 		},
 		"transform xslt at event, ok": {
-			allowXsltOverride: true,
+			allowXSLTOverride: true,
 			inEvent: newCloudEvent(
 				createStructuredRequest(tXML, tXSLT),
 				cloudevents.ApplicationJSON,
@@ -163,7 +163,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 		},
 
 		"transform xslt at event overrides default, ok": {
-			allowXsltOverride: true,
+			allowXSLTOverride: true,
 			xslt:              tXSLT,
 			inEvent: newCloudEvent(
 				createStructuredRequest(tXML, tAlternativeXSLT),
@@ -175,21 +175,21 @@ func TestXSLTTransformEvents(t *testing.T) {
 		},
 
 		"wrong XSLT": {
-			allowXsltOverride: false,
+			allowXSLTOverride: false,
 			xslt:              tFaultyXML,
 
 			expectPanic: "Non valid XSLT document",
 		},
 
 		"wrong configuration not providing XSLT": {
-			allowXsltOverride: false,
+			allowXSLTOverride: false,
 			xslt:              "",
 
 			expectPanic: "if XSLT cannot be overriden by CloudEvent payloads, configured XSLT cannot be empty",
 		},
 
 		"malformed incoming event": {
-			allowXsltOverride: false,
+			allowXSLTOverride: false,
 			xslt:              tXSLT,
 			inEvent:           newCloudEvent(tFaultyXML, cloudevents.ApplicationXML),
 
@@ -222,8 +222,8 @@ func TestXSLTTransformEvents(t *testing.T) {
 				EnvConfig: adapter.EnvConfig{
 					Component: tComponent,
 				},
-				Xslt:              tc.xslt,
-				AllowXsltOverride: tc.allowXsltOverride,
+				XSLT:              tc.xslt,
+				AllowXSLTOverride: tc.allowXSLTOverride,
 				BridgeIdentifier:  tBridgeID,
 			}
 

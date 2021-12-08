@@ -26,8 +26,8 @@ import (
 
 var (
 	errs                      = &apis.FieldError{}
-	errXsltAndOrAllowOverride = errs.Also(apis.ErrGeneric("when XSLT is empty, per event XSLT must be allowed", "allowPerEventXSLT", "xslt").ViaField("spec"))
-	errXsltTooMany            = errs.Also(apis.ErrMultipleOneOf("value", "valueFromSecret", "valueFromConfigMap").ViaField("XSLT").ViaField("spec"))
+	errXSLTAndOrAllowOverride = errs.Also(apis.ErrGeneric("when XSLT is empty, per event XSLT must be allowed", "allowPerEventXSLT", "xslt").ViaField("spec"))
+	errXSLTTooMany            = errs.Also(apis.ErrMultipleOneOf("value", "valueFromSecret", "valueFromConfigMap").ViaField("XSLT").ViaField("spec"))
 )
 
 func TestXSLTTransformValidate(t *testing.T) {
@@ -51,18 +51,18 @@ func TestXSLTTransformValidate(t *testing.T) {
 		},
 		"XSL nil and AllowOverride false": {
 			xslt:        xsltTransform(xsltWithAllowEventXSLT(false)),
-			expectError: errXsltAndOrAllowOverride,
+			expectError: errXSLTAndOrAllowOverride,
 		},
 		"XSLT empty and AllowOverride false": {
 			xslt: xsltTransform(
 				xsltWithXSLT(valueFromField()),
 				xsltWithAllowEventXSLT(false),
 			),
-			expectError: errXsltAndOrAllowOverride,
+			expectError: errXSLTAndOrAllowOverride,
 		},
 		"XSLT nil and missing AllowOverride": {
 			xslt:        xsltTransform(xsltWithXSLT(valueFromField())),
-			expectError: errXsltAndOrAllowOverride,
+			expectError: errXSLTAndOrAllowOverride,
 		},
 
 		"XSLT informed wrong": {
@@ -71,7 +71,7 @@ func TestXSLTTransformValidate(t *testing.T) {
 					vffWithValue(tValue),
 					vffWithSecret(tName, tKey),
 				))),
-			expectError: errXsltTooMany,
+			expectError: errXSLTTooMany,
 		},
 	}
 

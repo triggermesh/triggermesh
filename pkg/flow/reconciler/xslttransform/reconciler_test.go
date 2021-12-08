@@ -273,13 +273,13 @@ func newAdapterService() *servingv1.Service {
 										Name:  resources.EnvName,
 										Value: tName,
 									}, {
-										Name:  envXslt,
+										Name:  envXSLT,
 										Value: tXSLT,
 									}, {
 										Name:  libreconciler.EnvBridgeID,
 										Value: tBridge,
 									}, {
-										Name:  envAllowXsltOverride,
+										Name:  envAllowXSLTOverride,
 										Value: "false",
 									}, {
 										Name: source.EnvLoggingCfg,

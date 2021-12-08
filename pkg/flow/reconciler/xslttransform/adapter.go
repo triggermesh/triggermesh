@@ -33,8 +33,8 @@ import (
 const (
 	adapterName = "xslttransform"
 
-	envXslt              = "XSLTTRANSFORM_XSLT"
-	envAllowXsltOverride = "XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE"
+	envXSLT              = "XSLTTRANSFORM_XSLT"
+	envAllowXSLTOverride = "XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE"
 )
 
 // adapterConfig contains properties used to configure the component's adapter.
@@ -70,7 +70,7 @@ func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig) (*servin
 
 func makeAppEnv(o *v1alpha1.XSLTTransform) ([]corev1.EnvVar, error) {
 	env := []corev1.EnvVar{
-		*o.Spec.XSLT.ToEnvironmentVariable(envXslt),
+		*o.Spec.XSLT.ToEnvironmentVariable(envXSLT),
 		{
 			Name:  pkgreconciler.EnvBridgeID,
 			Value: pkgreconciler.GetStatefulBridgeID(o),
@@ -79,7 +79,7 @@ func makeAppEnv(o *v1alpha1.XSLTTransform) ([]corev1.EnvVar, error) {
 
 	if o.Spec.AllowPerEventXSLT != nil {
 		env = append(env, corev1.EnvVar{
-			Name:  envAllowXsltOverride,
+			Name:  envAllowXSLTOverride,
 			Value: strconv.FormatBool(*o.Spec.AllowPerEventXSLT),
 		})
 	}

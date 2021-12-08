@@ -63,15 +63,15 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	adapter := &xsltTransformAdapter{
-		xsltOverride: env.AllowXsltOverride,
+		xsltOverride: env.AllowXSLTOverride,
 
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
 	}
 
-	if env.Xslt != "" {
-		style, err := parseXSLT(env.Xslt)
+	if env.XSLT != "" {
+		style, err := parseXSLT(env.XSLT)
 		if err != nil {
 			logger.Panicf("Non valid XSLT document: %v", err)
 		}

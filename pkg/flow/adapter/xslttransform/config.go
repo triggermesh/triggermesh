@@ -30,17 +30,17 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	Xslt string `envconfig:"XSLTTRANSFORM_XSLT"`
+	XSLT string `envconfig:"XSLTTRANSFORM_XSLT"`
 	// If set to true, enables consuming structured CloudEvents that include
 	// fields for the XML and XSLT field.
-	AllowXsltOverride bool `envconfig:"XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE" required:"true"`
+	AllowXSLTOverride bool `envconfig:"XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE" required:"true"`
 
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 }
 
 func (e *envAccessor) validate() error {
-	if !e.AllowXsltOverride && e.Xslt == "" {
+	if !e.AllowXSLTOverride && e.XSLT == "" {
 		return errors.New("if XSLT cannot be overriden by CloudEvent payloads, configured XSLT cannot be empty")
 	}
 	return nil

@@ -21,7 +21,7 @@ spec:
   filter:
     attributes:
       # setting a filter to process only xml.document
-      # typed  already CloudEvents
+      # typed CloudEvents
       type: xml.document
   subscriber:
     ref:
