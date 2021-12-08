@@ -62,9 +62,9 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.24.0
 	go.uber.org/zap v1.19.1
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309
-	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
-	google.golang.org/api v0.60.0
-	google.golang.org/genproto v0.0.0-20211028162531-8db9c33dc351
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	google.golang.org/api v0.61.0
+	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.7.0
@@ -190,7 +190,7 @@ require (
 	golang.org/x/crypto v0.0.0-20211115234514-b4de73f9ece8 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211116061358-0a5406a5449c // indirect
+	golang.org/x/sys v0.0.0-20211124211545-fe61309f8881 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
