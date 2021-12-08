@@ -167,6 +167,8 @@ spec:
         # Transformation adapter
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
+        - name: XSLTTRANSFORM_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/xslttransform-adapter
         # Routing adapters
         - name: FILTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter

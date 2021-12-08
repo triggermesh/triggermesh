@@ -26,6 +26,8 @@ import (
 type Interface interface {
 	// Transformations returns a TransformationInformer.
 	Transformations() TransformationInformer
+	// XSLTTransforms returns a XSLTTransformInformer.
+	XSLTTransforms() XSLTTransformInformer
 }
 
 type version struct {
@@ -42,4 +44,9 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // Transformations returns a TransformationInformer.
 func (v *version) Transformations() TransformationInformer {
 	return &transformationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// XSLTTransforms returns a XSLTTransformInformer.
+func (v *version) XSLTTransforms() XSLTTransformInformer {
+	return &xSLTTransformInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

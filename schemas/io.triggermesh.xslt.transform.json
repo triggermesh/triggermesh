@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://triggermesh.io/schemas/xslt.transform.json",
+  "type": "object",
+  "title": "XSLT transform",
+  "description": "XSLT transformation of XML documents.",
+  "default": {},
+  "examples": [
+      {
+          "xml": "<guitars><guitar><brand>Framus</brand><model>AK 1974</model><year>2012</year></guitar><guitar><brand>Fender</brand><model>Jaguar</model><year>2010</year></guitar><guitar><brand>Haar</brand><model>Telecaster</model><year>2019</year></guitar><guitar><brand>Hohner</brand><model>L75</model><year>1992</year></guitar></guitars>",
+          "xslt": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"><xsl:template match=\"/\"><output><xsl:for-each select=\"guitars/guitar\"><xsl:sort select=\"year\"/><item><xsl:value-of select=\"year\"/><xsl:text> </xsl:text><xsl:value-of select=\"brand\"/><xsl:text> </xsl:text><xsl:value-of select=\"model\"/></item></xsl:for-each></output></xsl:template></xsl:stylesheet>"
+      }
+  ],
+  "required": [
+      "xml",
+      "xslt"
+  ],
+  "properties": {
+      "xml": {
+          "$id": "#/properties/xml",
+          "type": "string",
+          "title": "XML document",
+          "description": "XML document to be transformed.",
+          "examples": [
+              "<guitars><guitar><brand>Framus</brand><model>AK 1974</model><year>2012</year></guitar><guitar><brand>Fender</brand><model>Jaguar</model><year>2010</year></guitar><guitar><brand>Haar</brand><model>Telecaster</model><year>2019</year></guitar><guitar><brand>Hohner</brand><model>L75</model><year>1992</year></guitar></guitars>"
+          ]
+      },
+      "xslt": {
+          "$id": "#/properties/xslt",
+          "type": "string",
+          "title": "XSLT document schema",
+          "description": "XSLT document that contains instructions to transform an XML.",
+          "default": "",
+          "examples": [
+              "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"><xsl:template match=\"/\"><output><xsl:for-each select=\"guitars/guitar\"><xsl:sort select=\"year\"/><item><xsl:value-of select=\"year\"/><xsl:text> </xsl:text><xsl:value-of select=\"brand\"/><xsl:text> </xsl:text><xsl:value-of select=\"model\"/></item></xsl:for-each></output></xsl:template></xsl:stylesheet>"
+          ]
+      }
+  },
+  "additionalProperties": false
+}

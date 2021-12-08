@@ -19,6 +19,7 @@ package main
 import (
 	"knative.dev/pkg/injection/sharedmain"
 
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xslttransform"
 	"github.com/triggermesh/triggermesh/pkg/function"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/filter"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/splitter"
@@ -157,6 +158,7 @@ func main() {
 		zendesktarget.NewController,
 		// transformation
 		transformation.NewController,
+		xslttransform.NewController,
 		// functions
 		function.NewController,
 		// routing

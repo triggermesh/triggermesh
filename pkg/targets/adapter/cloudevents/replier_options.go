@@ -76,3 +76,19 @@ func ReplierWithProcessedHeaders() ReplierOption {
 		return nil
 	}
 }
+
+// ReplierWithStaticDataContentType sets the response content type for all replies.
+func ReplierWithStaticDataContentType(contentType string) ReplierOption {
+	return func(c *Replier) error {
+		c.responseContentType = StaticResponse(contentType)
+		return nil
+	}
+}
+
+// ReplierWithStaticErrorDataContentType sets the response content type for error replies.
+func ReplierWithStaticErrorDataContentType(contentType string) ReplierOption {
+	return func(c *Replier) error {
+		c.responseErrorContentType = StaticResponse(contentType)
+		return nil
+	}
+}

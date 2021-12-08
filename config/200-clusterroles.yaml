@@ -217,6 +217,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations
+  - xslttransforms
   verbs:
   - list
   - watch
@@ -226,6 +227,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations/status
+  - xslttransforms/status
   verbs:
   - update
 # +rbac-check
@@ -345,6 +347,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations/finalizers
+  - xslttransforms/finalizers
   verbs:
   - update
 # +rbac-check:subresource=finalizers
@@ -800,6 +803,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations
+  - xslttransforms
   verbs:
   - get
   - list
