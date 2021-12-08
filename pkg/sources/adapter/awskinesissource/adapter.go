@@ -18,6 +18,7 @@ package awskinesissource
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"go.uber.org/zap"
@@ -193,7 +194,7 @@ func (a *adapter) sendKinesisRecord(record *kinesis.Record) error {
 	event.SetSubject(*record.PartitionKey)
 	event.SetSource(a.arn.String())
 	event.SetID(*record.SequenceNumber)
-	if err := event.SetData(cloudevents.ApplicationJSON, record); err != nil {
+	if err := event.SetData(cloudevents.ApplicationJSON, toCloudEventData(record)); err != nil {
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
@@ -201,4 +202,29 @@ func (a *adapter) sendKinesisRecord(record *kinesis.Record) error {
 		return result
 	}
 	return nil
+}
+
+// toCloudEventData returns a Kinesis record in a shape that is suitable for
+// JSON serialization inside some CloudEvent data.
+func toCloudEventData(record *kinesis.Record) interface{} {
+	var data interface{}
+	data = record
+
+	// if record.Data contains raw JSON data, type it as json.RawMessage so
+	// it doesn't get encoded to base64 during the serialization of the
+	// CloudEvent data.
+	if json.Valid(record.Data) {
+		data = &RecordWithRawJSONData{
+			Data:   json.RawMessage(record.Data),
+			Record: record,
+		}
+	}
+
+	return data
+}
+
+// RecordWithRawJSONData is an Message with RawMessage-typed JSON data.
+type RecordWithRawJSONData struct {
+	Data json.RawMessage
+	*kinesis.Record
 }
