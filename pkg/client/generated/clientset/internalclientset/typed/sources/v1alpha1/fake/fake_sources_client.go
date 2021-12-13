@@ -132,6 +132,10 @@ func (c *FakeSourcesV1alpha1) HTTPPollerSources(namespace string) v1alpha1.HTTPP
 	return &FakeHTTPPollerSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) IBMMQSources(namespace string) v1alpha1.IBMMQSourceInterface {
+	return &FakeIBMMQSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) OCIMetricsSources(namespace string) v1alpha1.OCIMetricsSourceInterface {
 	return &FakeOCIMetricsSources{c, namespace}
 }

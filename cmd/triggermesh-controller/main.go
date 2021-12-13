@@ -49,6 +49,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudrepositoriessource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudstoragesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/httppollersource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ibmmqsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ocimetricssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/salesforcesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/slacksource"
@@ -73,6 +74,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlesheettarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/hasuratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/httptarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/ibmmqtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/infratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/jiratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/logzmetricstarget"
@@ -118,6 +120,7 @@ func main() {
 		googlecloudrepositoriessource.NewController,
 		googlecloudstoragesource.NewController,
 		httppollersource.NewController,
+		ibmmqsource.NewController,
 		ocimetricssource.NewController,
 		salesforcesource.NewController,
 		slacksource.NewController,
@@ -142,6 +145,7 @@ func main() {
 		googlesheettarget.NewController,
 		hasuratarget.NewController,
 		httptarget.NewController,
+		ibmmqtarget.NewController,
 		datadogtarget.NewController,
 		infratarget.NewController,
 		jiratarget.NewController,

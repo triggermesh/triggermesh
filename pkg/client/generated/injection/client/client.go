@@ -4225,6 +4225,137 @@ func (w *wrapSourcesV1alpha1HTTPPollerSourceImpl) Watch(ctx context.Context, opt
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapSourcesV1alpha1) IBMMQSources(namespace string) typedsourcesv1alpha1.IBMMQSourceInterface {
+	return &wrapSourcesV1alpha1IBMMQSourceImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "sources.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "ibmmqsources",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapSourcesV1alpha1IBMMQSourceImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedsourcesv1alpha1.IBMMQSourceInterface = (*wrapSourcesV1alpha1IBMMQSourceImpl)(nil)
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.IBMMQSource, opts v1.CreateOptions) (*sourcesv1alpha1.IBMMQSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "IBMMQSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.IBMMQSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.IBMMQSource, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.IBMMQSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.IBMMQSourceList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.IBMMQSourceList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.IBMMQSource, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.IBMMQSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.IBMMQSource, opts v1.UpdateOptions) (*sourcesv1alpha1.IBMMQSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "IBMMQSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.IBMMQSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.IBMMQSource, opts v1.UpdateOptions) (*sourcesv1alpha1.IBMMQSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "IBMMQSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.IBMMQSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1IBMMQSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapSourcesV1alpha1) OCIMetricsSources(namespace string) typedsourcesv1alpha1.OCIMetricsSourceInterface {
 	return &wrapSourcesV1alpha1OCIMetricsSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
@@ -7381,6 +7512,137 @@ func (w *wrapTargetsV1alpha1HasuraTargetImpl) UpdateStatus(ctx context.Context, 
 }
 
 func (w *wrapTargetsV1alpha1HasuraTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
+func (w *wrapTargetsV1alpha1) IBMMQTargets(namespace string) typedtargetsv1alpha1.IBMMQTargetInterface {
+	return &wrapTargetsV1alpha1IBMMQTargetImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "targets.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "ibmmqtargets",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapTargetsV1alpha1IBMMQTargetImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedtargetsv1alpha1.IBMMQTargetInterface = (*wrapTargetsV1alpha1IBMMQTargetImpl)(nil)
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.IBMMQTarget, opts v1.CreateOptions) (*targetsv1alpha1.IBMMQTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "IBMMQTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.IBMMQTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.IBMMQTarget, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.IBMMQTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.IBMMQTargetList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.IBMMQTargetList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.IBMMQTarget, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.IBMMQTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.IBMMQTarget, opts v1.UpdateOptions) (*targetsv1alpha1.IBMMQTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "IBMMQTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.IBMMQTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.IBMMQTarget, opts v1.UpdateOptions) (*targetsv1alpha1.IBMMQTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "IBMMQTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.IBMMQTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1IBMMQTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return nil, errors.New("NYI: Watch")
 }
 

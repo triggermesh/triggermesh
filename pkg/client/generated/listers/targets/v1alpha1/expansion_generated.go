@@ -162,6 +162,14 @@ type HasuraTargetListerExpansion interface{}
 // HasuraTargetNamespaceLister.
 type HasuraTargetNamespaceListerExpansion interface{}
 
+// IBMMQTargetListerExpansion allows custom methods to be added to
+// IBMMQTargetLister.
+type IBMMQTargetListerExpansion interface{}
+
+// IBMMQTargetNamespaceListerExpansion allows custom methods to be added to
+// IBMMQTargetNamespaceLister.
+type IBMMQTargetNamespaceListerExpansion interface{}
+
 // InfraTargetListerExpansion allows custom methods to be added to
 // InfraTargetLister.
 type InfraTargetListerExpansion interface{}
