@@ -40,12 +40,12 @@ func reaperThread(ctx context.Context, r *reconciler) {
 
 	p, err := cloudevents.NewHTTP()
 	if err != nil {
-		log.Fatalw("failed to create new HTTP based cloudevent: ", zap.Error(err))
+		log.Fatalw("Failed to create new HTTP based Cloudevent: ", zap.Error(err))
 	}
 
 	client, err := cloudevents.NewClient(p)
 	if err != nil {
-		log.Fatalw("Unable to create cloudevent client: ", zap.Error(err))
+		log.Fatalw("Unable to create Cloudevent client: ", zap.Error(err))
 	}
 
 	for {
