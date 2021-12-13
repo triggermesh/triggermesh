@@ -35,6 +35,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 const serviceType = "RDS"
@@ -130,7 +131,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Enabling AWS Performance Insights Source")
-
+	go health.Start(ctx)
 	// Setup polling to retrieve metrics
 	poll := time.NewTicker(a.pollingInterval)
 	defer poll.Stop()
