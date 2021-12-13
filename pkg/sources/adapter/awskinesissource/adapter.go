@@ -38,6 +38,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -90,6 +91,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
+	go health.Start(ctx)
 	// Get info about a particular stream
 	myStream, err := a.knsClient.DescribeStream(&kinesis.DescribeStreamInput{
 		StreamName: &a.stream,
