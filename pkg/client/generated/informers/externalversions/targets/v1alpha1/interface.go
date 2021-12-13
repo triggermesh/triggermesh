@@ -60,6 +60,8 @@ type Interface interface {
 	HTTPTargets() HTTPTargetInformer
 	// HasuraTargets returns a HasuraTargetInformer.
 	HasuraTargets() HasuraTargetInformer
+	// IBMMQTargets returns a IBMMQTargetInformer.
+	IBMMQTargets() IBMMQTargetInformer
 	// InfraTargets returns a InfraTargetInformer.
 	InfraTargets() InfraTargetInformer
 	// JiraTargets returns a JiraTargetInformer.
@@ -187,6 +189,11 @@ func (v *version) HTTPTargets() HTTPTargetInformer {
 // HasuraTargets returns a HasuraTargetInformer.
 func (v *version) HasuraTargets() HasuraTargetInformer {
 	return &hasuraTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// IBMMQTargets returns a IBMMQTargetInformer.
+func (v *version) IBMMQTargets() IBMMQTargetInformer {
+	return &iBMMQTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // InfraTargets returns a InfraTargetInformer.

@@ -137,6 +137,7 @@ jobs:
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
             DIST_DIR: /tmp/dist/
+            DOCKER_BUILDKIT: 1
       - persist_to_workspace:
           root: /tmp/
           paths:

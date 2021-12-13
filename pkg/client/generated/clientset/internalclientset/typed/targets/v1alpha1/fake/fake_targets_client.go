@@ -100,6 +100,10 @@ func (c *FakeTargetsV1alpha1) HasuraTargets(namespace string) v1alpha1.HasuraTar
 	return &FakeHasuraTargets{c, namespace}
 }
 
+func (c *FakeTargetsV1alpha1) IBMMQTargets(namespace string) v1alpha1.IBMMQTargetInterface {
+	return &FakeIBMMQTargets{c, namespace}
+}
+
 func (c *FakeTargetsV1alpha1) InfraTargets(namespace string) v1alpha1.InfraTargetInterface {
 	return &FakeInfraTargets{c, namespace}
 }
