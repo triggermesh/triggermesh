@@ -36,6 +36,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -123,7 +124,7 @@ func ExtractLogDetails(details string) (string, string) {
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Enabling CloudWatchLog")
-
+	go health.Start(ctx)
 	// Setup polling to retrieve metrics
 	poll := time.NewTicker(a.pollingInterval)
 	defer poll.Stop()
