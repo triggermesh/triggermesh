@@ -35,7 +35,6 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -160,7 +159,6 @@ func transformQuery(q *v1alpha1.AWSCloudWatchMetricStat) *cloudwatch.MetricStat 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Enabling CloudWatch")
-	go health.Start(ctx)
 
 	// Setup polling to retrieve metrics
 	poll := time.NewTicker(a.pollingInterval)
