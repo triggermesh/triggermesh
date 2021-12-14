@@ -166,16 +166,46 @@ func (b *bayeux) Start(ctx context.Context) error {
 	b.ctx = ctx
 	b.mutex.Unlock()
 
-	bom := wait.NewExponentialBackoffManager(time.Second, time.Minute*5, time.Minute*30, 2, 0, &clock.RealClock{})
+	bom := wait.NewExponentialBackoffManager(time.Second, time.Second*60, time.Second*100, 2, 0, &clock.RealClock{})
 
 	// Connect loop will run until context is done
 	go func() {
+		// helper variable for signaling channels
+		empty := struct{}{}
+
+		// poll channel receives a signal when it is ok to
+		// receive data from Salesforce. We won't send signals
+		// to this channel when an error occurs at connection and
+		// we need to temporarily retry using backoffs, or when
+		// the context is done.
+		// All other cases at the processing loop MUST put the signal
+		// in the poll channel.
+		poll := make(chan struct{}, 1)
+
+		// errc channel receives a signal when a connection error occurs.
+		errc := make(chan struct{}, 1)
+
+		// we signal the poll channel at the beginning to start the processing.
+		poll <- empty
+
 		for {
 			select {
 			case <-b.ctx.Done():
 				close(b.stopCh)
 				return
-			default:
+
+			case <-errc:
+				// return control to the loop to make sure we exit when the
+				// context is done. The go routine will send a signal to
+				// the poll channel when the backoff timer has ended.
+				go func() {
+					<-bom.Backoff().C()
+					poll <- empty
+				}()
+
+			case <-poll:
+
+				// default:
 				if b.needsHandshake {
 					if err := b.init(); err != nil {
 						b.errCh <- err
@@ -183,8 +213,8 @@ func (b *bayeux) Start(ctx context.Context) error {
 						// failed, we need to continue with the next loop iteration which will
 						// retry the operation.
 
-						// backing off to avoid locking the Salesforce account
-						<-bom.Backoff().C()
+						// backing off to avoid locking the Salesforce account.
+						errc <- empty
 						continue
 					}
 
@@ -198,8 +228,8 @@ func (b *bayeux) Start(ctx context.Context) error {
 				if err != nil {
 					b.errCh <- err
 
-					// backing off to avoid locking the Salesforce account
-					<-bom.Backoff().C()
+					// backing off to avoid locking the Salesforce account.
+					errc <- empty
 					continue
 				}
 
@@ -213,6 +243,9 @@ func (b *bayeux) Start(ctx context.Context) error {
 					}
 					b.msgCh <- &crs[i]
 				}
+
+				// process next item.
+				poll <- empty
 			}
 		}
 	}()
