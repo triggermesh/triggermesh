@@ -29,9 +29,13 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"go.uber.org/zap"
 	"golang.org/x/net/publicsuffix"
+
+	"k8s.io/apimachinery/pkg/util/clock"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/salesforcesource/auth"
 )
@@ -162,6 +166,8 @@ func (b *bayeux) Start(ctx context.Context) error {
 	b.ctx = ctx
 	b.mutex.Unlock()
 
+	bom := wait.NewExponentialBackoffManager(time.Second, time.Minute*5, time.Minute*30, 2, 0, &clock.RealClock{})
+
 	// Connect loop will run until context is done
 	go func() {
 		for {
@@ -176,6 +182,9 @@ func (b *bayeux) Start(ctx context.Context) error {
 						// init was not successful, either the handshake or the subscription
 						// failed, we need to continue with the next loop iteration which will
 						// retry the operation.
+
+						// backing off to avoid locking the Salesforce account
+						<-bom.Backoff().C()
 						continue
 					}
 
@@ -188,6 +197,9 @@ func (b *bayeux) Start(ctx context.Context) error {
 				crs, err := b.Connect()
 				if err != nil {
 					b.errCh <- err
+
+					// backing off to avoid locking the Salesforce account
+					<-bom.Backoff().C()
 					continue
 				}
 

@@ -58,6 +58,11 @@ type claims struct {
 
 // NewJWTAuthenticator creates an OAuth JWT authenticator for Salesforce.
 func NewJWTAuthenticator(certKey, clientID, user, server string, client *http.Client, logger *zap.SugaredLogger) (Authenticator, error) {
+	// JWT package marshals Audience as array even if there is only one element in it. This does not
+	// seem to be supported by Salesforce. By setting the following option to false we tell the imported
+	// library to marshal single item Audience array as a string.
+	jwt.MarshalSingleStringAsArray = false
+
 	audience := strings.TrimSuffix(server, "/")
 
 	signKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(certKey))
