@@ -107,7 +107,7 @@ jobs:
     executor:
       name: go/default
       tag: '1.17'
-    resource_class: large
+    resource_class: xlarge
     steps:
       - checkout
       - gcp-cli/install
