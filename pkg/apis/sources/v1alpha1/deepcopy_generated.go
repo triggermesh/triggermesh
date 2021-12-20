@@ -3637,6 +3637,11 @@ func (in *WebhookSourceSpec) DeepCopyInto(out *WebhookSourceSpec) {
 		*out = new(ValueFromField)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.CORSOrigin != nil {
+		in, out := &in.CORSOrigin, &out.CORSOrigin
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 
