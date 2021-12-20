@@ -9,6 +9,12 @@ jobs:
   codeql:
     name: Code Analysis
     runs-on: ubuntu-latest
+    env:
+      # Force CodeQL to run the extraction on the files compiled by our custom
+      # build command, as opposed to letting the autobuilder figure it out.
+      # This approach is more efficient because TriggerMesh is composed of
+      # multiple small programs.
+      CODEQL_EXTRACTOR_GO_BUILD_TRACING: 'on'
 
     permissions:
       security-events: write
@@ -36,8 +42,11 @@ jobs:
       with:
         languages: go
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+    # The code compiled in this step is also the one being analyzed in the next
+    # step, due to build tracing being enabled via the CODEQL_EXTRACTOR_GO_BUILD_TRACING
+    # environment variable.
+    - name: Build Go code
+      run: go build ./cmd/...
 
     # This step follows the three-step extraction process described at
     # https://lgtm.com/help/lgtm/go-extraction
