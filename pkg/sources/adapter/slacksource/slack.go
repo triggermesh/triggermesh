@@ -24,11 +24,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"go.uber.org/zap"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
 const apiAppIDCeExtension = "comslackapiappid"
@@ -122,7 +124,7 @@ func (h *slackEventAPIHandler) handleAll(w http.ResponseWriter, r *http.Request)
 	// There are only 2 documented types to be received from the Events API
 	// - `event_callback`, See: https://api.slack.com/events-api#receiving_events
 	// - `event_callback`, See: https://api.slack.com/events-api#subscriptions
-	switch event.Type {
+	switch eventType := sanitizeUserInput(event.Type); eventType {
 	case "event_callback":
 		// All paths that are not managed by this integration and are
 		// not errors need to return 2xx withing 3 seconds to Slack API.
@@ -141,7 +143,7 @@ func (h *slackEventAPIHandler) handleAll(w http.ResponseWriter, r *http.Request)
 		h.handleChallenge(body, w)
 
 	default:
-		h.logger.Warnf("not supported content %q", event.Type)
+		h.logger.Warn("Content not supported: ", strconv.Quote(eventType))
 	}
 }
 
@@ -160,7 +162,7 @@ func (h *slackEventAPIHandler) gracefulShutdown(stopCh <-chan struct{}, done cha
 }
 
 func (h *slackEventAPIHandler) handleError(err error, code int, w http.ResponseWriter) {
-	h.logger.Error("An error ocurred", zap.Error(err))
+	h.logger.Errorw("An error ocurred", zap.Error(err))
 	http.Error(w, err.Error(), code)
 }
 
@@ -217,4 +219,14 @@ func cloudEventFromEventWrapper(wrapper *SlackEventWrapper) (*cloudevents.Event,
 	}
 
 	return &event, nil
+}
+
+// sanitizeUserInput removes unwanted characters from the given string.
+// It also guarantees the safe logging of data that potentially originates from
+// user input (CWE-117, https://cwe.mitre.org/data/definitions/117.html).
+func sanitizeUserInput(s string) string {
+	return strings.Replace(
+		strings.Replace(s, "\n", "", -1),
+		"\r", "", -1,
+	)
 }

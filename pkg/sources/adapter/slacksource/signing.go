@@ -49,7 +49,7 @@ var _ timeWrap = (*standardTime)(nil)
 // verifySigning using signature headers and request body hash.
 // see: https://api.slack.com/authentication/verifying-requests-from-slack
 func (h *slackEventAPIHandler) verifySigning(header http.Header, body []byte) error {
-	signature := header.Get(signatureHeader)
+	signature := sanitizeUserInput(header.Get(signatureHeader))
 	if signature == "" {
 		return errors.New("empty signature header")
 	}

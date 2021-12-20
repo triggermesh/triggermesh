@@ -100,7 +100,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		h.logger.Debug("Request body: ", string(body))
+		h.logger.Debugw("Received Notification request", zap.String("body", string(body)))
 
 		notif := &notification{}
 		if err := json.Unmarshal(body, notif); err != nil {
@@ -135,7 +135,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		h.logger.Debug("Request body: ", string(body))
+		h.logger.Debugw("Received SubscriptionConfirmation request", zap.String("body", string(body)))
 
 		subsConfirm := &subscriptionConfirmation{}
 		if err := json.Unmarshal(body, subsConfirm); err != nil {
