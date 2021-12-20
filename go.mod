@@ -32,7 +32,7 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.0+incompatible
-	github.com/amenzhinsky/iothub v0.8.0
+	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.14.0
 	github.com/aws/aws-sdk-go v1.42.20
 	github.com/clbanning/mxj v1.8.4
@@ -82,7 +82,7 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
 	github.com/Azure/azure-pipeline-go v0.1.9 // indirect
-	github.com/Azure/go-amqp v0.16.4 // indirect
+	github.com/Azure/go-amqp v0.17.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.2 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
