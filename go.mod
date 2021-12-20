@@ -67,7 +67,7 @@ require (
 	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
-	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.7.0
+	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
 	k8s.io/api v0.21.4
 	k8s.io/apimachinery v0.21.4
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
