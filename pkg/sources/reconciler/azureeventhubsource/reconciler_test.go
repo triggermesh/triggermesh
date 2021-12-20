@@ -64,11 +64,13 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newEventSource() *v1alpha1.AzureEventHubSource {
 	src := &v1alpha1.AzureEventHubSource{
 		Spec: v1alpha1.AzureEventHubSourceSpec{
-			EventHubID: v1alpha1.EventHubResourceID{
-				SubscriptionID: "00000000-0000-0000-0000-000000000000",
-				ResourceGroup:  "MyGroup",
-				Namespace:      "MyNamespace",
-				EventHub:       "MyEventHub",
+			EventHubID: v1alpha1.AzureResourceID{
+				SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+				ResourceGroup:    "MyGroup",
+				ResourceProvider: "Microsoft.EventHub",
+				Namespace:        "MyNamespace",
+				ResourceType:     "eventhubs",
+				ResourceName:     "MyEventHub",
 			},
 			Auth: v1alpha1.AzureAuth{
 				SASToken: &v1alpha1.AzureSASToken{

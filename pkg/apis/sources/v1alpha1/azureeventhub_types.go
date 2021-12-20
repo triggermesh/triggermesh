@@ -50,7 +50,7 @@ type AzureEventHubSourceSpec struct {
 	//
 	// Expected format:
 	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
-	EventHubID EventHubResourceID `json:"eventHubID"`
+	EventHubID AzureResourceID `json:"eventHubID"`
 
 	// Authentication method to interact with the Azure Event Hubs API.
 	Auth AzureAuth `json:"auth"`

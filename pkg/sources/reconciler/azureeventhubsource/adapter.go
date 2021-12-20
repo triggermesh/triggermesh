@@ -65,7 +65,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 
 		resource.EnvVar(common.EnvHubResourceID, typedSrc.Spec.EventHubID.String()),
 		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
-		resource.EnvVar(common.EnvHubName, typedSrc.Spec.EventHubID.EventHub),
+		resource.EnvVar(common.EnvHubName, typedSrc.Spec.EventHubID.ResourceName),
 		resource.EnvVars(hubEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
