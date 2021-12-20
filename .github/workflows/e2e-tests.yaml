@@ -1,0 +1,69 @@
+name: End-to-End Testing
+
+on:
+  push:
+    # NOTE(antoineco): To avoid exposing repository secrets to user supplied
+    # code in pull requests, we only allow this workflow to run on the 'main'
+    # branch, where all code changes are expected to have been reviewed by
+    # maintainers.
+    #
+    # We may want to relax this in the future, on condition that safeguards are
+    # added to prevent the workflow from running automatically when an external
+    # contributor submits code changes inside the .github/workflows/ or
+    # test/e2e/ directories.
+    #
+    # Ref. https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+    branches: [ main ]
+
+jobs:
+
+  e2e-triggermesh:
+    name: Test TriggerMesh components
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'
+
+    - name: Go caches
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ github.job }}-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ github.job }}-${{ runner.os }}-go-
+
+    - name: KinD Cluster
+      uses: container-tools/kind-action@v1
+      with:
+        knative_serving: v1.0.0
+        knative_kourier: v1.0.0
+        # ko loads images directly into KinD's container runtime when
+        # KO_DOCKER_REPO is set to the rogue value "kind.local", so we have no
+        # use for a container registry.
+        registry: 'false'
+
+    - name: Apply Knative Eventing ClusterRoles for addressable-resolver
+      run: kubectl apply -f https://raw.githubusercontent.com/knative/eventing/knative-v1.1.0/config/core/roles/addressable-resolvers-clusterrole.yaml
+
+    - name: Install ko
+      run: go install github.com/google/ko@v0.9.3
+
+    - name: Deploy TriggerMesh
+      env:
+        KO_DOCKER_REPO: kind.local
+      run: |
+        ko apply -f ./config/namespace/
+        ko apply -f ./config/
+        kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-controller
+        kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-webhook
+
+    - name: Run e2e tests
+      run: |
+        true
