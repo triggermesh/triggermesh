@@ -87,10 +87,14 @@ func makeWebhookEnvs(src *v1alpha1.WebhookSource) []corev1.EnvVar {
 	}, {
 		Name:  envWebhookEventSource,
 		Value: src.AsEventSource(),
-	}, {
-		Name:  envCorsOrigin,
-		Value: *src.Spec.CORSOrigin,
 	}}
+
+	if origin := src.Spec.CORSOrigin; origin != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envCorsOrigin,
+			Value: *origin,
+		})
+	}
 
 	if user := src.Spec.BasicAuthUsername; user != nil {
 		envs = append(envs, corev1.EnvVar{
