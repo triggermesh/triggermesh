@@ -38,29 +38,25 @@ func reaperThread(ctx context.Context, r *reconciler) {
 	poll := time.NewTicker(interval)
 	log := logging.FromContext(ctx)
 
-	p, err := cloudevents.NewHTTP()
+	client, err := cloudevents.NewClientHTTP()
 	if err != nil {
-		log.Fatalw("Failed to create new HTTP based Cloudevent ", zap.Error(err))
-	}
-
-	client, err := cloudevents.NewClient(p)
-	if err != nil {
-		log.Fatalw("Unable to create Cloudevent client ", zap.Error(err))
+		log.Fatalw("Unable to create CloudEvent client", zap.Error(err))
 	}
 
 	for {
 		<-poll.C // Used to wait for the poll timer
-		log.Debug("executing reaping")
+		log.Debug("Executing reaping")
 		nsl, err := k8sclient.Get(ctx).CoreV1().Namespaces().List(ctx, v1.ListOptions{})
 		if err != nil {
-			log.Fatalw("Unable to retrieve namespaces ", zap.Error(err))
+			log.Errorw("Unable to list Kubernetes namespaces", zap.Error(err))
+			continue
 		}
 
 		// search for tektontargets across all namespaces
 		for _, ns := range nsl.Items {
 			targets, err := r.targetLister(ns.Name).List(labels.Everything())
 			if err != nil {
-				log.Warnw("unable to retrieve target adapters", zap.Error(err), zap.String("namespace", ns.Name))
+				log.Errorw("Unable to list TektonTarget objects", zap.Error(err), zap.String("namespace", ns.Name))
 				continue
 			}
 
@@ -71,23 +67,25 @@ func reaperThread(ctx context.Context, r *reconciler) {
 					continue
 				}
 
-				log.Info("Found target " + t.Namespace + "." + t.Name)
-				// Send the reap cloudevent
-				cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
+				log.Info("Found target: ", t.Namespace+"."+t.Name)
 
-				id := uuid.NewString()
+				// Send the reap CloudEvent
+				cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
 
 				newEvent := cloudevents.NewEvent(cloudevents.VersionV1)
 				newEvent.SetType(v1alpha1.EventTypeTektonReap)
 				newEvent.SetSource("CronJob")
 				newEvent.SetTime(time.Now())
-				newEvent.SetID(id)
+				newEvent.SetID(uuid.NewString())
 
-				// This should always pass
-				_ = newEvent.SetData(cloudevents.ApplicationJSON, nil)
+				if err := newEvent.SetData(cloudevents.ApplicationJSON, nil); err != nil {
+					log.Errorw("Failed to set event data", zap.Error(err))
+					continue
+				}
 
-				result := client.Send(cloudCtx, newEvent)
-				log.Infow("event sending results ", zap.Error(result))
+				if result := client.Send(cloudCtx, newEvent); !cloudevents.IsACK(result) {
+					log.Errorw("Event wasn't acknowledged", zap.Error(result))
+				}
 			}
 		}
 	}
