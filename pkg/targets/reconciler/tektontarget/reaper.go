@@ -60,7 +60,7 @@ func reaperThread(ctx context.Context, r *reconciler) {
 		for _, ns := range nsl.Items {
 			targets, err := r.targetLister(ns.Name).List(labels.Everything())
 			if err != nil {
-				log.Warnw("unable to retrieve target adapters", zap.Error(err), zap.String("namespace",ns.Name))
+				log.Warnw("unable to retrieve target adapters", zap.Error(err), zap.String("namespace", ns.Name))
 				continue
 			}
 
