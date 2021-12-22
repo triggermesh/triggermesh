@@ -169,6 +169,7 @@ func TestBayeux(t *testing.T) {
 				InstanceURL: sf.URL,
 			})
 			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
 
 			b := NewBayeux(tAPIVersion, tSubscription, authenticator, dispatcher, sf.Client(), logger)
 
@@ -187,7 +188,6 @@ func TestBayeux(t *testing.T) {
 			require.Equal(t, tc.expectedConnectResponses, len(dispatcher.dispatchedEvents), "Unexpected number of responses from connect")
 			require.Equal(t, tc.expectedConnectErrors, len(dispatcher.dispatchedErrors), "Unexpected number of errors from dispatcher")
 
-			cancel()
 		})
 	}
 }
