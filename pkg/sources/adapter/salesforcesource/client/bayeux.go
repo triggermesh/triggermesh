@@ -235,8 +235,8 @@ func (b *bayeux) Start(ctx context.Context) error {
 
 				for i := range crs {
 					// if the message comes from meta channel it is processed immediately and
-					// not sent to a channel. That way we avoid launching new connects when
-					// some action (handshake) needs to be taken
+					// not sent to a processing channel. That way we avoid launching new connects
+					//  when some action (handshake) needs to be taken.
 					if strings.HasPrefix(crs[i].Channel, "/meta") {
 						b.manageMeta(&crs[i])
 						continue
