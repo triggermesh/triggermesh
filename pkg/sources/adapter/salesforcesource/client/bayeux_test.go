@@ -168,10 +168,10 @@ func TestBayeux(t *testing.T) {
 			authenticator := fake.NewFakeAuthenticator(auth.Credentials{
 				InstanceURL: sf.URL,
 			})
-			ctx, cancel := context.WithCancel(context.Background())
-			t.Cleanup(cancel)
 
 			b := NewBayeux(tAPIVersion, tSubscription, authenticator, dispatcher, sf.Client(), logger)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
 
 			go func() {
 				clientErr := b.Start(ctx)
