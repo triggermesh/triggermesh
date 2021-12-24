@@ -1,8 +1,5 @@
-//go:build tools
-// +build tools
-
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2020 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package hack
+// Package apps contains helpers to interact with various Kubernetes workloads.
+package apps
 
-// These imports ensure build tools are included in Go modules.
-// See https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module
-import (
-	_ "github.com/onsi/ginkgo/ginkgo"
-	_ "k8s.io/code-generator"
+const (
+	labelAppName   = "app.kubernetes.io/name"
+	labelManagedBy = "app.kubernetes.io/managed-by"
+
+	labelManagedByVal = "e2e-test-suite"
 )

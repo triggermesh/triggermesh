@@ -1,0 +1,39 @@
+/* AWS IAM policy for e2e tests.
+
+   Policy ARN:  arn:aws:iam::043455440429:policy/EndToEndTestSuite
+   Description: Set of permissions required by the TriggerMesh end-to-end test suite to run tests that manipulate AWS resources.
+*/
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "E2EFrameworkSQS",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:SendMessage",
+                "sqs:ReceiveMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:CreateQueue",
+                "sqs:DeleteQueue",
+                "sqs:SetQueueAttributes",
+                "sqs:TagQueue"
+            ],
+            "Resource": [
+                "arn:aws:sqs:*:043455440429:e2e-*"
+            ]
+        },
+        {
+            "Sid": "AWSSQSSourceReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:GetQueueUrl",
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage",
+                "sqs:DeleteMessageBatch"
+            ],
+            "Resource": [
+                "arn:aws:sqs:*:043455440429:e2e-*"
+            ]
+        }
+    ]
+}

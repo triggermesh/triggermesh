@@ -1,8 +1,5 @@
-//go:build tools
-// +build tools
-
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2020 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,11 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package hack
+package e2e
 
-// These imports ensure build tools are included in Go modules.
-// See https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module
 import (
-	_ "github.com/onsi/ginkgo/ginkgo"
-	_ "k8s.io/code-generator"
+	"testing"
+
+	. "github.com/onsi/ginkgo" //nolint:stylecheck
+	. "github.com/onsi/gomega" //nolint:stylecheck
+
+	// support client-go's auth providers
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+
+	_ "github.com/triggermesh/triggermesh/test/e2e/framework"
+
+	// test suites
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources"
 )
+
+func TestE2e(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "E2E Suite")
+}

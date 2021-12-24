@@ -1,6 +1,3 @@
-//go:build tools
-// +build tools
-
 /*
 Copyright 2021 TriggerMesh Inc.
 
@@ -17,11 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package hack
+package sources
 
-// These imports ensure build tools are included in Go modules.
-// See https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module
 import (
-	_ "github.com/onsi/ginkgo/ginkgo"
-	_ "k8s.io/code-generator"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awssqs"
 )
