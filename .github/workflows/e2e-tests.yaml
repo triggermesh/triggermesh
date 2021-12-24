@@ -55,6 +55,11 @@ jobs:
         kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-controller
         kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-webhook
 
+    - name: Install Ginkgo
+      run: go install github.com/onsi/ginkgo/ginkgo
+
+    - name: Export KUBECONFIG path
+      run: echo "KUBECONFIG=${HOME}/.kube/config" >> $GITHUB_ENV
+
     - name: Run e2e tests
-      run: |
-        true
+      run: ginkgo -nodes=4 -slowSpecThreshold=60 -randomizeAllSpecs ./test/e2e/
