@@ -70,7 +70,7 @@ type WebhookSourceSpec struct {
 
 	// Specifies the CORS Origin to use in pre-flight headers.
 	// +optional
-	CORSOrigin *string `json:"corsOrigin,omitempty"`
+	CORSAllowOrigin *string `json:"corsAllowOrigin,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

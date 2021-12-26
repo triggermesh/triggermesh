@@ -32,5 +32,5 @@ type envAccessor struct {
 	EventSource       string `envconfig:"WEBHOOK_EVENT_SOURCE" required:"true"`
 	BasicAuthUsername string `envconfig:"WEBHOOK_BASICAUTH_USERNAME"`
 	BasicAuthPassword string `envconfig:"WEBHOOK_BASICAUTH_PASSWORD"`
-	CORSOrigin        string `envconfig:"WEBHOOK_CORS_ORIGIN"`
+	CORSAllowOrigin   string `envconfig:"WEBHOOK_CORS_ORIGIN"`
 }

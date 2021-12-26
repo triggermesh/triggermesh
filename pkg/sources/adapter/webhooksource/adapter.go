@@ -30,11 +30,11 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 	env := aEnv.(*envAccessor)
 
 	return &webhookHandler{
-		eventType:   env.EventType,
-		eventSource: env.EventSource,
-		username:    env.BasicAuthUsername,
-		password:    env.BasicAuthPassword,
-		corsOrigin:  env.CORSOrigin,
+		eventType:       env.EventType,
+		eventSource:     env.EventSource,
+		username:        env.BasicAuthUsername,
+		password:        env.BasicAuthPassword,
+		corsAllowOrigin: env.CORSAllowOrigin,
 
 		ceClient: ceClient,
 		logger:   logging.FromContext(ctx),
