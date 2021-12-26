@@ -49,9 +49,6 @@ jobs:
         # use for a container registry.
         registry: 'false'
 
-    - name: Apply Knative Eventing ClusterRoles for addressable-resolver
-      run: kubectl apply -f https://raw.githubusercontent.com/knative/eventing/knative-v1.1.0/config/core/roles/addressable-resolvers-clusterrole.yaml
-
     - name: Install ko
       run: go install github.com/google/ko@v0.9.3
 
