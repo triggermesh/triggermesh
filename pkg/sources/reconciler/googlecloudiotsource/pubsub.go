@@ -249,6 +249,7 @@ func ensureNoPubSubTopic(ctx context.Context, cli *pubsub.Client) error {
 // Required permissions:
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.create
+// - pubsub.topics.attachSubscription
 func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
 	status := &src.Status
@@ -312,6 +313,7 @@ func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResN
 // Required permissions:
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.delete
+// - pubsub.topics.detachSubscription
 func ensureNoPubSubSubscription(ctx context.Context, cli *pubsub.Client) error {
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
 	status := src.Status

@@ -34,6 +34,7 @@ import (
 // Ensures that the Repo has the topic associated.
 // Required permissions:
 // - source.repos.updateRepoConfig
+// - iam.serviceAccounts.actAs
 func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicResName *v1alpha1.GCloudResourceName) error {
 	if skip.Skip(ctx) {
 		return nil
@@ -82,6 +83,7 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicR
 // ensureNoTopicAssociated looks at status.Repositories and if non-empty will delete it
 // Required permissions:
 // - source.repos.updateRepoConfig
+// - iam.serviceAccounts.actAs
 func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcerepo.Service) error {
 	if skip.Skip(ctx) {
 		return nil

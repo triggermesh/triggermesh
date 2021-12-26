@@ -39,7 +39,7 @@ parallelism of test specs, the format and verbosity of the reporter's output, et
 # Using the Ginkgo version pinned inside `go.mod`
 go run github.com/onsi/ginkgo/ginkgo
 
-# Or using an executable installed via `go get`
+# Or using an executable installed via `go install`
 ginkgo
 ```
 
@@ -50,12 +50,12 @@ interact with a Kubernetes cluster, unless tests run in a Kubernetes pod, in whi
 used as a fallback. The path to this file can be set using the `-e2e.kubeconfig` flag, which defaults to the value of
 the `KUBECONFIG` environment variable.
 
-Some tests require more specific input, such as access tokens to interact with third-party APIs (AWS, GitHub, etc.). The
+Some tests require more specific input, such as access tokens to interact with third-party APIs (AWS, Azure, etc.). The
 input method for those tests varies depending on the client that is used. For example, the Go client for AWS reads
 security credentials from the environment and falls back to the standard location of a local file containing shared
-credentials ([ref.][aws-go-session]), while the GitHub client expects an OAuth2 access token to be exported in the
-environment ([ref.][gh-client]). Please refer to documentation of each test for a description of the required inputs.
-Below is an example of such documentation:
+credentials ([ref.][aws-go-session]), while the Azure client expects Service Account credentials to be exported in the
+environment. Please refer to documentation of each test for a description of the required inputs. Below is an example of
+such documentation:
 
 ```go
 /* This test suite requires:
@@ -367,10 +367,9 @@ The benefits of this approach become more obvious when the complexity of test sc
 [ginkgo-docs]: https://onsi.github.io/ginkgo/
 [ginkgo-issue222]: https://github.com/onsi/ginkgo/issues/222
 [ginkgo-struct]: https://onsi.github.io/ginkgo/#structuring-your-specs
-[optimized-test]: https://github.com/triggermesh/test-infra/blob/956c8ce257/test/e2e/sources/awscodecommit/main.go#L172-L188
+[optimized-test]: https://github.com/triggermesh/triggermesh/blob/main/test/e2e/sources/awscodecommit/main.go#L171-L187
 
 [k8s-e2e]: https://godoc.org/k8s.io/kubernetes/test/e2e
 [sigtesting-howto]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-testing/writing-good-e2e-tests.md
 
 [aws-go-session]: https://docs.aws.amazon.com/sdk-for-go/api/aws/session/
-[gh-client]: https://github.com/triggermesh/test-infra/blob/9f19ed28a9/test/e2e/framework/github/github.go#L39-L53

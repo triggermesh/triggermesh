@@ -72,4 +72,6 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        GCLOUD_PROJECT: ${{ secrets.GCLOUD_PROJECT }}
+        GCLOUD_SERVICEACCOUNT_KEY: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
       run: ginkgo -nodes=4 -slowSpecThreshold=60 -randomizeAllSpecs ./test/e2e/

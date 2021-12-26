@@ -18,15 +18,12 @@ limitations under the License.
 package sqs
 
 import (
-	"encoding/json"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 	e2eaws "github.com/triggermesh/triggermesh/test/e2e/framework/aws"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/aws/iam"
 )
 
 // CreateQueue creates a queue named after the given framework.Framework.
@@ -42,25 +39,6 @@ func CreateQueue(sqsClient sqsiface.SQSAPI, f *framework.Framework) string /*url
 	}
 
 	return *resp.QueueUrl
-}
-
-// SetQueuePolicy sets the Policy attribute of the queue with the given URL.
-func SetQueuePolicy(sqsClient sqsiface.SQSAPI, url string, pol iam.Policy) {
-	polJSON, err := json.Marshal(pol)
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to serialize queue policy: %s", err)
-	}
-
-	attrs := &sqs.SetQueueAttributesInput{
-		QueueUrl: &url,
-		Attributes: aws.StringMap(map[string]string{
-			sqs.QueueAttributeNamePolicy: string(polJSON),
-		}),
-	}
-
-	if _, err := sqsClient.SetQueueAttributes(attrs); err != nil {
-		framework.FailfWithOffset(2, "Failed to set attributes of queue %q: %s", *attrs.QueueUrl, err)
-	}
 }
 
 // DeleteQueue deletes the queue with the given URL.
@@ -105,26 +83,4 @@ func SendMessage(sqsClient sqsiface.SQSAPI, url string) string /*msgId*/ {
 		framework.FailfWithOffset(2, "Failed to send message to queue %q: %s", *params.QueueUrl, err)
 	}
 	return *msgOutput.MessageId
-}
-
-// ReceiveMessages retrieves messages from the queue with the given URL.
-func ReceiveMessages(sqsClient sqsiface.SQSAPI, url string) []*sqs.Message {
-	const maxRcvMsg int64 = 10
-	const maxLongPollingWaitTimeSeconds int64 = 20
-
-	params := &sqs.ReceiveMessageInput{
-		QueueUrl:            &url,
-		MaxNumberOfMessages: aws.Int64(maxRcvMsg),
-		WaitTimeSeconds:     aws.Int64(maxLongPollingWaitTimeSeconds),
-		MessageAttributeNames: aws.StringSlice([]string{
-			sqs.QueueAttributeNameAll,
-		}),
-	}
-
-	msgs, err := sqsClient.ReceiveMessage(params)
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to receive message from queue %q: %s", *params.QueueUrl, err)
-	}
-
-	return msgs.Messages
 }

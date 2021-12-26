@@ -101,6 +101,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 }
 
 // Start implements adapter.Adapter.
+// Required permissions:
+// - pubsub.subscriptions.consume
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting message receiver")
 
@@ -124,7 +126,9 @@ func (a *adapter) handleMessage(ctx context.Context, msg *pubsub.Message) {
 
 	for _, event := range events {
 		if result := a.ceClient.Send(ctx, *event); !cloudevents.IsACK(result) {
-			sendErrs.errs = append(sendErrs.errs, err)
+			sendErrs.errs = append(sendErrs.errs,
+				fmt.Errorf("failed to send event with ID %s: %w", event.ID(), result),
+			)
 			continue
 		}
 	}
