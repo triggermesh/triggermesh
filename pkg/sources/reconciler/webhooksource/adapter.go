@@ -37,7 +37,7 @@ const (
 	envWebhookEventSource       = "WEBHOOK_EVENT_SOURCE"
 	envWebhookBasicAuthUsername = "WEBHOOK_BASICAUTH_USERNAME"
 	envWebhookBasicAuthPassword = "WEBHOOK_BASICAUTH_PASSWORD"
-	envCorsAllowOrigin          = "WEBHOOK_CORS_ORIGIN"
+	envCorsAllowOrigin          = "WEBHOOK_CORS_ALLOW_ORIGIN"
 )
 
 // adapterConfig contains properties used to configure the adapter.
