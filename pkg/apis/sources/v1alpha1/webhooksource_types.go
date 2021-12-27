@@ -67,6 +67,10 @@ type WebhookSourceSpec struct {
 	// Password HTTP clients must set to authenticate with the webhook using HTTP Basic authentication.
 	// +optional
 	BasicAuthPassword *ValueFromField `json:"basicAuthPassword,omitempty"`
+
+	// Specifies the CORS Origin to use in pre-flight headers.
+	// +optional
+	CORSAllowOrigin *string `json:"corsAllowOrigin,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

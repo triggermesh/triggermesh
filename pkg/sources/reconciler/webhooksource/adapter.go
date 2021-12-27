@@ -37,6 +37,7 @@ const (
 	envWebhookEventSource       = "WEBHOOK_EVENT_SOURCE"
 	envWebhookBasicAuthUsername = "WEBHOOK_BASICAUTH_USERNAME"
 	envWebhookBasicAuthPassword = "WEBHOOK_BASICAUTH_PASSWORD"
+	envCorsAllowOrigin          = "WEBHOOK_CORS_ALLOW_ORIGIN"
 )
 
 // adapterConfig contains properties used to configure the adapter.
@@ -87,6 +88,13 @@ func makeWebhookEnvs(src *v1alpha1.WebhookSource) []corev1.EnvVar {
 		Name:  envWebhookEventSource,
 		Value: src.AsEventSource(),
 	}}
+
+	if origin := src.Spec.CORSAllowOrigin; origin != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envCorsAllowOrigin,
+			Value: *origin,
+		})
+	}
 
 	if user := src.Spec.BasicAuthUsername; user != nil {
 		envs = append(envs, corev1.EnvVar{

@@ -35,15 +35,14 @@ const (
 )
 
 type webhookHandler struct {
-	eventType   string
-	eventSource string
-
-	username string
-	password string
+	eventType       string
+	eventSource     string
+	username        string
+	password        string
+	corsAllowOrigin string
 
 	ceClient cloudevents.Client
-
-	logger *zap.SugaredLogger
+	logger   *zap.SugaredLogger
 }
 
 // Start implements adapter.Adapter.
@@ -98,6 +97,10 @@ func runHandler(ctx context.Context, s *http.Server) error {
 // handleAll receives all webhook events at a single resource, it
 // is up to this function to parse event wrapper and dispatch.
 func (h *webhookHandler) handleAll(w http.ResponseWriter, r *http.Request) {
+	if h.corsAllowOrigin != "" {
+		w.Header().Set("Access-Control-Allow-Origin", h.corsAllowOrigin)
+	}
+
 	if r.Body == nil {
 		h.handleError(errors.New("request without body not supported"), http.StatusBadRequest, w)
 		return
