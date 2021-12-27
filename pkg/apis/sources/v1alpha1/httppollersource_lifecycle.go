@@ -25,7 +25,7 @@ import (
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
 func (*HTTPPollerSource) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("HttpPollerSource")
+	return SchemeGroupVersion.WithKind("HTTPPollerSource")
 }
 
 // GetConditionSet implements duckv1.KRShaped.
