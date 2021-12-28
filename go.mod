@@ -34,7 +34,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.0+incompatible
 	github.com/amenzhinsky/iothub v0.8.0
 	github.com/andygrunwald/go-jira v1.14.0
-	github.com/aws/aws-sdk-go v1.42.20
+	github.com/aws/aws-sdk-go v1.42.25
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
@@ -63,7 +63,7 @@ require (
 	go.opentelemetry.io/otel/metric v0.24.0
 	go.opentelemetry.io/otel/sdk/metric v0.24.0
 	go.uber.org/zap v1.19.1
-	golang.org/x/net v0.0.0-20211020060615-d418f374d309
+	golang.org/x/net v0.0.0-20211209124913-491a49abca63
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/api v0.63.0
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
@@ -110,7 +110,6 @@ require (
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/emicklei/go-restful v2.15.0+incompatible // indirect
 	github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021 // indirect
-	github.com/envoyproxy/protoc-gen-validate v0.1.0 // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
