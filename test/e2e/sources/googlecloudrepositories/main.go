@@ -58,9 +58,6 @@ var sourceAPIVersion = schema.GroupVersion{
 const (
 	sourceKind     = "GoogleCloudRepositoriesSource"
 	sourceResource = "googlecloudrepositoriessources"
-
-	credsEnvVar   = "GCLOUD_SERVICEACCOUNT_KEY"
-	projectEnvVar = "GCLOUD_PROJECT"
 )
 
 var _ = Describe("Google Cloud Repositories source", func() {
@@ -89,8 +86,8 @@ var _ = Describe("Google Cloud Repositories source", func() {
 		var err error
 
 		BeforeEach(func() {
-			saKey = e2egcloud.GetCreds(credsEnvVar)
-			project = "projects/" + e2egcloud.GetProject(projectEnvVar)
+			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			project = "projects/" + e2egcloud.ProjectNameFromEnv()
 			repoClient, err = sourcerepo.NewService(context.Background(), option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 

@@ -58,9 +58,6 @@ var sourceAPIVersion = schema.GroupVersion{
 const (
 	sourceKind     = "GoogleCloudPubSubSource"
 	sourceResource = "googlecloudpubsubsources"
-
-	credsEnvVar   = "GCLOUD_SERVICEACCOUNT_KEY"
-	projectEnvVar = "GCLOUD_PROJECT"
 )
 
 var _ = Describe("Google Cloud Pub/Sub source", func() {
@@ -89,8 +86,8 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 		var err error
 
 		BeforeEach(func() {
-			saKey = e2egcloud.GetCreds(credsEnvVar)
-			project = e2egcloud.GetProject(projectEnvVar)
+			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			project = e2egcloud.ProjectNameFromEnv()
 			pubsubClient, err = pubsub.NewClient(context.Background(), project, option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 
@@ -150,8 +147,8 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 		var err error
 
 		BeforeEach(func() {
-			saKey = e2egcloud.GetCreds(credsEnvVar)
-			project = e2egcloud.GetProject(projectEnvVar)
+			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			project = e2egcloud.ProjectNameFromEnv()
 			pubsubClient, err = pubsub.NewClient(context.Background(), project, option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 
