@@ -123,7 +123,7 @@ var _ = Describe("Google Cloud AuditLogs source", func() {
 			})
 			AfterEach(func() {
 				By("deleting Pub/Sub topic "+topic.String(), func() {
-					e2epubsub.DeleteTopic(pubsubClient, topic)
+					e2epubsub.DeleteTopic(pubsubClient, topic.ID())
 				})
 			})
 			Specify("the source generates an event", func() {

@@ -24,8 +24,12 @@ name: projects/cebuk-01/roles/TriggerMeshE2E
 title: TriggerMesh E2E test suite
 description: Grants permissions required by the TriggerMesh E2E test suite.
 includedPermissions:
+- pubsub.subscriptions.create
+- pubsub.subscriptions.delete
+- pubsub.topics.attachSubscription
 - pubsub.topics.create
 - pubsub.topics.delete
+- pubsub.topics.detachSubscription
 - pubsub.topics.publish
 - source.repos.create
 - source.repos.delete

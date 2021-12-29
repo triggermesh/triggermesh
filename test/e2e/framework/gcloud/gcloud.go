@@ -28,17 +28,12 @@ const (
 	envProjectName       = "GCLOUD_PROJECT"
 )
 
-const pubsubLabelOwnerResource = "io-triggermesh_owner-resource"
-
-// PubSubResourceID returns a deterministic Pub/Sub resource ID matching the given framework.Framework.
-func PubSubResourceID(f *framework.Framework) string {
-	return f.UniqueName
-}
+const e2eInstanceTagKey = "e2e_instance"
 
 // TagsFor returns a set of resource tags matching the given framework.Framework.
 func TagsFor(f *framework.Framework) map[string]string {
 	return map[string]string{
-		pubsubLabelOwnerResource: f.UniqueName,
+		e2eInstanceTagKey: f.UniqueName,
 	}
 }
 
