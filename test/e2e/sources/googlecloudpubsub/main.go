@@ -117,6 +117,7 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 		BeforeEach(func() {
 			saKey = e2egcloud.ServiceAccountKeyFromEnv()
 			gcloudProject = e2egcloud.ProjectNameFromEnv()
+
 			pubsubClient, err = pubsub.NewClient(context.Background(), gcloudProject, option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 
@@ -183,8 +184,9 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 	})
 
 	When("a client creates a source object with invalid specs", func() {
+		const topicName = "projects/fake-project/topics/fake-topic"
 
-		// Those tests do not require a real repository or sink
+		// Those tests do not require a real topic or sink
 		BeforeEach(func() {
 			saKey = "fake-creds"
 
@@ -213,6 +215,36 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.topic: Invalid value: "))
+			})
+
+			By("setting an invalid subscription ID", func() {
+				invalidSubscriptionID := "000invalid"
+
+				_, err := createSource(srcClient, ns, "test-invalid-subscr-", sink,
+					withTopic(topicName),
+					withSubscriptionID(invalidSubscriptionID),
+					withServiceAccountKey(saKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.subscriptionID: Invalid value: "))
+			})
+
+			By("omitting the topic", func() {
+				_, err := createSource(srcClient, ns, "test-topic-", sink,
+					withServiceAccountKey(saKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.topic: Required value"))
+			})
+
+			By("setting empty credentials", func() {
+				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
+					withTopic(topicName),
+					withServiceAccountKey(""),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(
+					`"spec.serviceAccountKey" must validate one and only one schema (oneOf).`))
 			})
 
 		})
@@ -259,9 +291,14 @@ func withSubscriptionID(subscriptionID string) sourceOption {
 }
 
 func withServiceAccountKey(key string) sourceOption {
+	svcAccKeyMap := make(map[string]interface{})
+	if key != "" {
+		svcAccKeyMap = map[string]interface{}{"value": key}
+	}
+
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedField(src.Object, key, "spec", "serviceAccountKey", "value"); err != nil {
-			framework.FailfWithOffset(3, "Failed to set spec.serviceAccountKey.value field: %s", err)
+		if err := unstructured.SetNestedMap(src.Object, svcAccKeyMap, "spec", "serviceAccountKey"); err != nil {
+			framework.FailfWithOffset(3, "Failed to set spec.serviceAccountKey field: %s", err)
 		}
 	}
 }
