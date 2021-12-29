@@ -202,13 +202,13 @@ type GoogleCloudPubSubSourceListerExpansion interface{}
 // GoogleCloudPubSubSourceNamespaceLister.
 type GoogleCloudPubSubSourceNamespaceListerExpansion interface{}
 
-// GoogleCloudRepositoriesSourceListerExpansion allows custom methods to be added to
-// GoogleCloudRepositoriesSourceLister.
-type GoogleCloudRepositoriesSourceListerExpansion interface{}
+// GoogleCloudSourceRepositoriesSourceListerExpansion allows custom methods to be added to
+// GoogleCloudSourceRepositoriesSourceLister.
+type GoogleCloudSourceRepositoriesSourceListerExpansion interface{}
 
-// GoogleCloudRepositoriesSourceNamespaceListerExpansion allows custom methods to be added to
-// GoogleCloudRepositoriesSourceNamespaceLister.
-type GoogleCloudRepositoriesSourceNamespaceListerExpansion interface{}
+// GoogleCloudSourceRepositoriesSourceNamespaceListerExpansion allows custom methods to be added to
+// GoogleCloudSourceRepositoriesSourceNamespaceLister.
+type GoogleCloudSourceRepositoriesSourceNamespaceListerExpansion interface{}
 
 // GoogleCloudStorageSourceListerExpansion allows custom methods to be added to
 // GoogleCloudStorageSourceLister.

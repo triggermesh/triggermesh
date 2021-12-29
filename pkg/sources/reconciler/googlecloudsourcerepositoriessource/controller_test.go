@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositoriessource
+package googlecloudsourcerepositoriessource
 
 import (
 	"testing"
@@ -22,7 +22,7 @@ import (
 	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
 
 	// Link fake informers accessed by our controller
-	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudrepositoriessource/fake"
+	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudsourcerepositoriessource/fake"
 	_ "knative.dev/pkg/client/injection/ducks/duck/v1/addressable/fake"
 	_ "knative.dev/pkg/client/injection/kube/informers/apps/v1/deployment/fake"
 	_ "knative.dev/pkg/client/injection/kube/informers/core/v1/serviceaccount/fake"

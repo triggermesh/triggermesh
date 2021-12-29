@@ -85,7 +85,7 @@ rules:
   - googlecloudbillingsources
   - googlecloudiotsources
   - googlecloudpubsubsources
-  - googlecloudrepositoriessources
+  - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
   - httppollersources
   - ocimetricssources
@@ -125,7 +125,7 @@ rules:
   - googlecloudbillingsources/status
   - googlecloudiotsources/status
   - googlecloudpubsubsources/status
-  - googlecloudrepositoriessources/status
+  - googlecloudsourcerepositoriessources/status
   - googlecloudstoragesources/status
   - httppollersources/status
   - ocimetricssources/status
@@ -294,7 +294,7 @@ rules:
   - googlecloudbillingsources/finalizers
   - googlecloudiotsources/finalizers
   - googlecloudpubsubsources/finalizers
-  - googlecloudrepositoriessources/finalizers
+  - googlecloudsourcerepositoriessources/finalizers
   - googlecloudstoragesources/finalizers
   - httppollersources/finalizers
   - ocimetricssources/finalizers
@@ -381,7 +381,7 @@ rules:
   - googlecloudbillingsources
   - googlecloudiotsources
   - googlecloudpubsubsources
-  - googlecloudrepositoriessources
+  - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
   - zendesksources
   verbs:
@@ -732,7 +732,7 @@ rules:
   - googlecloudbillingsources
   - googlecloudiotsources
   - googlecloudpubsubsources
-  - googlecloudrepositoriessources
+  - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
   - httppollersources
   - ocimetricssources

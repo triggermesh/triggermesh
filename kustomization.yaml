@@ -41,7 +41,7 @@ resources:
 - config/300-googlecloudbillingsource.yaml
 - config/300-googlecloudiotsource.yaml
 - config/300-googlecloudpubsubsource.yaml
-- config/300-googlecloudrepositoriessource.yaml
+- config/300-googlecloudsourcerepositoriessource.yaml
 - config/300-googlecloudstoragesource.yaml
 - config/300-httppollersource.yaml
 - config/300-ocimetricssource.yaml

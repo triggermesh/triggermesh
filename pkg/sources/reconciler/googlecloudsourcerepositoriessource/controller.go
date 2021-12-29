@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositoriessource
+package googlecloudsourcerepositoriessource
 
 import (
 	"context"
@@ -28,8 +28,8 @@ import (
 	"knative.dev/pkg/controller"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudrepositoriessource"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudrepositoriessource"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudsourcerepositoriessource"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudsourcerepositoriessource"
 	repositories "github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/repositories"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 )
@@ -43,7 +43,7 @@ func NewController(
 	cmw configmap.Watcher,
 ) *controller.Impl {
 
-	typ := (*v1alpha1.GoogleCloudRepositoriesSource)(nil)
+	typ := (*v1alpha1.GoogleCloudSourceRepositoriesSource)(nil)
 	app := common.ComponentName(typ)
 
 	// Calling envconfig.Process() with a prefix appends that prefix
@@ -57,7 +57,7 @@ func NewController(
 
 	r := &Reconciler{
 		cg:         repositories.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
-		srcLister:  informer.Lister().GoogleCloudRepositoriesSources,
+		srcLister:  informer.Lister().GoogleCloudSourceRepositoriesSources,
 		adapterCfg: adapterCfg,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)

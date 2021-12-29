@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositoriessource
+package googlecloudsourcerepositoriessource
 
 import (
 	"fmt"
@@ -49,7 +49,7 @@ var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
 func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
-	typedSrc := src.(*v1alpha1.GoogleCloudRepositoriesSource)
+	typedSrc := src.(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 
 	// we rely on the source's status to persist the ID of the Pub/Sub subscription
 	var subsName string

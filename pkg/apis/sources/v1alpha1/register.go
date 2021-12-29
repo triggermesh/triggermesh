@@ -59,7 +59,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&GoogleCloudBillingSource{}, &GoogleCloudBillingSourceList{},
 		&GoogleCloudIoTSource{}, &GoogleCloudIoTSourceList{},
 		&GoogleCloudPubSubSource{}, &GoogleCloudPubSubSourceList{},
-		&GoogleCloudRepositoriesSource{}, &GoogleCloudRepositoriesSourceList{},
+		&GoogleCloudSourceRepositoriesSource{}, &GoogleCloudSourceRepositoriesSourceList{},
 		&GoogleCloudStorageSource{}, &GoogleCloudStorageSourceList{},
 		&HTTPPollerSource{}, &HTTPPollerSourceList{},
 		&OCIMetricsSource{}, &OCIMetricsSourceList{},

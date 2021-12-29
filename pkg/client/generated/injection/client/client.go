@@ -3832,31 +3832,31 @@ func (w *wrapSourcesV1alpha1GoogleCloudPubSubSourceImpl) Watch(ctx context.Conte
 	return nil, errors.New("NYI: Watch")
 }
 
-func (w *wrapSourcesV1alpha1) GoogleCloudRepositoriesSources(namespace string) typedsourcesv1alpha1.GoogleCloudRepositoriesSourceInterface {
-	return &wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl{
+func (w *wrapSourcesV1alpha1) GoogleCloudSourceRepositoriesSources(namespace string) typedsourcesv1alpha1.GoogleCloudSourceRepositoriesSourceInterface {
+	return &wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
 			Group:    "sources.triggermesh.io",
 			Version:  "v1alpha1",
-			Resource: "googlecloudrepositoriessources",
+			Resource: "googlecloudsourcerepositoriessources",
 		}),
 
 		namespace: namespace,
 	}
 }
 
-type wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl struct {
+type wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl struct {
 	dyn dynamic.NamespaceableResourceInterface
 
 	namespace string
 }
 
-var _ typedsourcesv1alpha1.GoogleCloudRepositoriesSourceInterface = (*wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl)(nil)
+var _ typedsourcesv1alpha1.GoogleCloudSourceRepositoriesSourceInterface = (*wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl)(nil)
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.GoogleCloudRepositoriesSource, opts v1.CreateOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, opts v1.CreateOptions) (*sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "GoogleCloudRepositoriesSource",
+		Kind:    "GoogleCloudSourceRepositoriesSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3866,62 +3866,62 @@ func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Create(ctx contex
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	out := &sourcesv1alpha1.GoogleCloudSourceRepositoriesSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, error) {
 	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	out := &sourcesv1alpha1.GoogleCloudSourceRepositoriesSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSourceList, error) {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.GoogleCloudSourceRepositoriesSourceList, error) {
 	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.GoogleCloudRepositoriesSourceList{}
+	out := &sourcesv1alpha1.GoogleCloudSourceRepositoriesSourceList{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.GoogleCloudRepositoriesSource, err error) {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, err error) {
 	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	out := &sourcesv1alpha1.GoogleCloudSourceRepositoriesSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.GoogleCloudRepositoriesSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "GoogleCloudRepositoriesSource",
+		Kind:    "GoogleCloudSourceRepositoriesSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3931,18 +3931,18 @@ func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Update(ctx contex
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	out := &sourcesv1alpha1.GoogleCloudSourceRepositoriesSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.GoogleCloudRepositoriesSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudSourceRepositoriesSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "GoogleCloudRepositoriesSource",
+		Kind:    "GoogleCloudSourceRepositoriesSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3952,14 +3952,14 @@ func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) UpdateStatus(ctx 
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.GoogleCloudRepositoriesSource{}
+	out := &sourcesv1alpha1.GoogleCloudSourceRepositoriesSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1GoogleCloudRepositoriesSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+func (w *wrapSourcesV1alpha1GoogleCloudSourceRepositoriesSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return nil, errors.New("NYI: Watch")
 }
 

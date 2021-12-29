@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositoriessource
+package googlecloudsourcerepositoriessource
 
 import (
 	"context"
@@ -88,7 +88,7 @@ func ensureNoPubSub(ctx context.Context, cli *pubsub.Client) error {
 // - pubsub.topic.get
 // - pubsub.topics.create
 func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudResourceName, error) {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudRepositoriesSource)
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 	status := &src.Status
 
 	if userProvided := src.Spec.PubSub.Topic; userProvided != nil {
@@ -186,7 +186,7 @@ func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GClou
 // - pubsub.topics.get
 // - pubsub.topics.delete
 func ensureNoPubSubTopic(ctx context.Context, cli *pubsub.Client) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudRepositoriesSource)
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 	status := src.Status
 
 	if src.Spec.PubSub.Topic != nil {
@@ -250,7 +250,7 @@ func ensureNoPubSubTopic(ctx context.Context, cli *pubsub.Client) error {
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.create
 func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudRepositoriesSource)
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 	status := &src.Status
 
 	// safeguard, in case the function is called with a bad resource name
@@ -313,7 +313,7 @@ func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResN
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.delete
 func ensureNoPubSubSubscription(ctx context.Context, cli *pubsub.Client) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudRepositoriesSource)
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 	status := src.Status
 
 	subsResName := status.Topic
@@ -386,12 +386,12 @@ func makeSubscriptionResourceName(proj, subsID string) *v1alpha1.GCloudResourceN
 // Resource IDs aren't allowed to start with "goog" and can only contain a
 // limited set of characters.
 func pubsubResourceID(src v1alpha1.EventSource) string {
-	return src.GetNamespace() + "." + src.GetName() + "~" + sources.GoogleCloudRepositoriesSourceResource.String()
+	return src.GetNamespace() + "." + src.GetName() + "~" + sources.GoogleCloudSourceRepositoriesSourceResource.String()
 }
 
 // assertPubSubTopicOwnership returns whether a Pub/Sub topic is owned by the
 // given source.
-func assertPubSubTopicOwnership(src *v1alpha1.GoogleCloudRepositoriesSource, topicCfg pubsub.TopicConfig) bool {
+func assertPubSubTopicOwnership(src *v1alpha1.GoogleCloudSourceRepositoriesSource, topicCfg pubsub.TopicConfig) bool {
 	for k, v := range pubsubResourceLabels(src) {
 		if topicCfg.Labels[k] != v {
 			return false
@@ -403,7 +403,7 @@ func assertPubSubTopicOwnership(src *v1alpha1.GoogleCloudRepositoriesSource, top
 
 // assertPubSubSubscriptionOwnership returns whether a Pub/Sub subscription is
 // owned by the given source.
-func assertPubSubSubscriptionOwnership(src *v1alpha1.GoogleCloudRepositoriesSource, subsCfg pubsub.SubscriptionConfig) bool {
+func assertPubSubSubscriptionOwnership(src *v1alpha1.GoogleCloudSourceRepositoriesSource, subsCfg pubsub.SubscriptionConfig) bool {
 	for k, v := range pubsubResourceLabels(src) {
 		if subsCfg.Labels[k] != v {
 			return false
@@ -418,9 +418,9 @@ func assertPubSubSubscriptionOwnership(src *v1alpha1.GoogleCloudRepositoriesSour
 //
 // Labels accept lowercase characters, numbers, hyphens and underscores exclusively.
 // Neither the key nor the value can exceed 63 characters.
-func pubsubResourceLabels(src *v1alpha1.GoogleCloudRepositoriesSource) map[string]string {
+func pubsubResourceLabels(src *v1alpha1.GoogleCloudSourceRepositoriesSource) map[string]string {
 	return map[string]string{
-		pubsubLabelOwnerResource:  strings.ReplaceAll(sources.GoogleCloudRepositoriesSourceResource.String(), ".", "-"),
+		pubsubLabelOwnerResource:  strings.ReplaceAll(sources.GoogleCloudSourceRepositoriesSourceResource.String(), ".", "-"),
 		pubsubLabelOwnerNamespace: src.Namespace,
 		pubsubLabelOwnerName:      strings.ReplaceAll(src.Name, ".", "_"),
 	}

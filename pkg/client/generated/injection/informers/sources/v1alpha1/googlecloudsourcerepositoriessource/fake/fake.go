@@ -22,12 +22,12 @@ import (
 	context "context"
 
 	fake "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/factory/fake"
-	googlecloudrepositoriessource "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudrepositoriessource"
+	googlecloudsourcerepositoriessource "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudsourcerepositoriessource"
 	controller "knative.dev/pkg/controller"
 	injection "knative.dev/pkg/injection"
 )
 
-var Get = googlecloudrepositoriessource.Get
+var Get = googlecloudsourcerepositoriessource.Get
 
 func init() {
 	injection.Fake.RegisterInformer(withInformer)
@@ -35,6 +35,6 @@ func init() {
 
 func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 	f := fake.Get(ctx)
-	inf := f.Sources().V1alpha1().GoogleCloudRepositoriesSources()
-	return context.WithValue(ctx, googlecloudrepositoriessource.Key{}, inf), inf.Informer()
+	inf := f.Sources().V1alpha1().GoogleCloudSourceRepositoriesSources()
+	return context.WithValue(ctx, googlecloudsourcerepositoriessource.Key{}, inf), inf.Informer()
 }

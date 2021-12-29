@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositoriessource
+package googlecloudsourcerepositoriessource
 
 import (
 	"context"
@@ -39,7 +39,7 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicR
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudRepositoriesSource)
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 	status := &src.Status
 
 	repoName := src.Spec.Repository.String()
@@ -87,7 +87,7 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcere
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudRepositoriesSource)
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 
 	repoName := src.Spec.Repository.String()
 

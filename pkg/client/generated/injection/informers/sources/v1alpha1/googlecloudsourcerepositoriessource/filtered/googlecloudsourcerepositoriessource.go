@@ -55,7 +55,7 @@ func withInformer(ctx context.Context) (context.Context, []controller.Informer) 
 	infs := []controller.Informer{}
 	for _, selector := range labelSelectors {
 		f := filtered.Get(ctx, selector)
-		inf := f.Sources().V1alpha1().GoogleCloudRepositoriesSources()
+		inf := f.Sources().V1alpha1().GoogleCloudSourceRepositoriesSources()
 		ctx = context.WithValue(ctx, Key{Selector: selector}, inf)
 		infs = append(infs, inf.Informer())
 	}
@@ -77,13 +77,13 @@ func withDynamicInformer(ctx context.Context) context.Context {
 }
 
 // Get extracts the typed informer from the context.
-func Get(ctx context.Context, selector string) v1alpha1.GoogleCloudRepositoriesSourceInformer {
+func Get(ctx context.Context, selector string) v1alpha1.GoogleCloudSourceRepositoriesSourceInformer {
 	untyped := ctx.Value(Key{Selector: selector})
 	if untyped == nil {
 		logging.FromContext(ctx).Panicf(
-			"Unable to fetch github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/sources/v1alpha1.GoogleCloudRepositoriesSourceInformer with selector %s from context.", selector)
+			"Unable to fetch github.com/triggermesh/triggermesh/pkg/client/generated/informers/externalversions/sources/v1alpha1.GoogleCloudSourceRepositoriesSourceInformer with selector %s from context.", selector)
 	}
-	return untyped.(v1alpha1.GoogleCloudRepositoriesSourceInformer)
+	return untyped.(v1alpha1.GoogleCloudSourceRepositoriesSourceInformer)
 }
 
 type wrapper struct {
@@ -94,28 +94,28 @@ type wrapper struct {
 	selector string
 }
 
-var _ v1alpha1.GoogleCloudRepositoriesSourceInformer = (*wrapper)(nil)
-var _ sourcesv1alpha1.GoogleCloudRepositoriesSourceLister = (*wrapper)(nil)
+var _ v1alpha1.GoogleCloudSourceRepositoriesSourceInformer = (*wrapper)(nil)
+var _ sourcesv1alpha1.GoogleCloudSourceRepositoriesSourceLister = (*wrapper)(nil)
 
 func (w *wrapper) Informer() cache.SharedIndexInformer {
-	return cache.NewSharedIndexInformer(nil, &apissourcesv1alpha1.GoogleCloudRepositoriesSource{}, 0, nil)
+	return cache.NewSharedIndexInformer(nil, &apissourcesv1alpha1.GoogleCloudSourceRepositoriesSource{}, 0, nil)
 }
 
-func (w *wrapper) Lister() sourcesv1alpha1.GoogleCloudRepositoriesSourceLister {
+func (w *wrapper) Lister() sourcesv1alpha1.GoogleCloudSourceRepositoriesSourceLister {
 	return w
 }
 
-func (w *wrapper) GoogleCloudRepositoriesSources(namespace string) sourcesv1alpha1.GoogleCloudRepositoriesSourceNamespaceLister {
+func (w *wrapper) GoogleCloudSourceRepositoriesSources(namespace string) sourcesv1alpha1.GoogleCloudSourceRepositoriesSourceNamespaceLister {
 	return &wrapper{client: w.client, namespace: namespace, selector: w.selector}
 }
 
-func (w *wrapper) List(selector labels.Selector) (ret []*apissourcesv1alpha1.GoogleCloudRepositoriesSource, err error) {
+func (w *wrapper) List(selector labels.Selector) (ret []*apissourcesv1alpha1.GoogleCloudSourceRepositoriesSource, err error) {
 	reqs, err := labels.ParseToRequirements(w.selector)
 	if err != nil {
 		return nil, err
 	}
 	selector = selector.Add(reqs...)
-	lo, err := w.client.SourcesV1alpha1().GoogleCloudRepositoriesSources(w.namespace).List(context.TODO(), v1.ListOptions{
+	lo, err := w.client.SourcesV1alpha1().GoogleCloudSourceRepositoriesSources(w.namespace).List(context.TODO(), v1.ListOptions{
 		LabelSelector: selector.String(),
 		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
 	})
@@ -128,9 +128,9 @@ func (w *wrapper) List(selector labels.Selector) (ret []*apissourcesv1alpha1.Goo
 	return ret, nil
 }
 
-func (w *wrapper) Get(name string) (*apissourcesv1alpha1.GoogleCloudRepositoriesSource, error) {
+func (w *wrapper) Get(name string) (*apissourcesv1alpha1.GoogleCloudSourceRepositoriesSource, error) {
 	// TODO(mattmoor): Check that the fetched object matches the selector.
-	return w.client.SourcesV1alpha1().GoogleCloudRepositoriesSources(w.namespace).Get(context.TODO(), name, v1.GetOptions{
+	return w.client.SourcesV1alpha1().GoogleCloudSourceRepositoriesSources(w.namespace).Get(context.TODO(), name, v1.GetOptions{
 		// TODO(mattmoor): Incorporate resourceVersion bounds based on staleness criteria.
 	})
 }
