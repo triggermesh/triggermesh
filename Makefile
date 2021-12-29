@@ -67,7 +67,7 @@ ifeq ($(OS),$(filter $(OS),Darwin FreeBSD NetBSD))
     SED           += ''
 endif
 
-.PHONY: sss help all build release vm-images test lint fmt fmt-test images clean install-gotestsum install-golangci-lint deploy undeploy
+.PHONY: help all build release vm-images test lint fmt fmt-test images clean install-gotestsum install-golangci-lint deploy undeploy
 
 .DEFAULT_GOAL := build
 
