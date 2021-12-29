@@ -61,16 +61,15 @@ const (
 )
 
 var _ = Describe("Google Cloud Storage source", func() {
-	// Storage buckets aren't allowed to contain "google"
-	f := framework.New("cloudstoragesource")
+	// NOTE: bucket names aren't allowed to contain "goog"
+	f := framework.New("gcloudstoragesource")
 
 	var ns string
 
 	var srcClient dynamic.ResourceInterface
 
-	var bucket string
-	var object string
-	var project string
+	var bucketID string
+	var gcloudProject string
 	var saKey string
 
 	var sink *duckv1.Destination
@@ -82,14 +81,15 @@ var _ = Describe("Google Cloud Storage source", func() {
 		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	Context("a source watches a bucket", func() {
+	Context("a source subscribes to a bucket's change notifications", func() {
 		var storageClient *storage.Client
-		var src *unstructured.Unstructured
-		var err error
 
 		BeforeEach(func() {
 			saKey = e2egcloud.ServiceAccountKeyFromEnv()
-			project = e2egcloud.ProjectNameFromEnv()
+			gcloudProject = e2egcloud.ProjectNameFromEnv()
+
+			var err error
+
 			storageClient, err = storage.NewClient(context.Background(), option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 
@@ -98,37 +98,39 @@ var _ = Describe("Google Cloud Storage source", func() {
 			})
 
 			By("creating a bucket", func() {
-				bucket = e2estorage.CreateBucket(storageClient, project, f)
+				bucketID = e2estorage.CreateBucket(storageClient, gcloudProject, f)
 			})
 
-			By("creating a GoogleCloudStorage object", func() {
-				src, err = createSource(srcClient, ns, "test-", sink,
-					withBucket(bucket),
-					withProject(project),
-					withEventTypes("OBJECT_FINALIZE"),
-					withCredentials(saKey),
+			By("creating a GoogleCloudStorageSource object", func() {
+				src, err := createSource(srcClient, ns, "test-", sink,
+					withBucket(bucketID),
+					withProject(gcloudProject),
+					withEventType("OBJECT_FINALIZE"),
+					withServiceAccountKey(saKey),
 				)
 				Expect(err).ToNot(HaveOccurred())
+
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
 			})
 		})
 
 		AfterEach(func() {
-			By("deleting storage object "+object, func() {
-				e2estorage.DeleteObject(storageClient, bucket, object)
-			})
-			By("deleting storage bucket "+bucket, func() {
-				e2estorage.DeleteBucket(storageClient, bucket)
-			})
-			By("deleting a GoogleCloudStorage object", func() {
-				err := srcClient.Delete(context.Background(), src.GetName(), metav1.DeleteOptions{})
-				Expect(err).ToNot(HaveOccurred())
+			By("deleting storage bucket "+bucketID, func() {
+				e2estorage.DeleteBucket(storageClient, bucketID)
 			})
 		})
 
 		When("a new object is created", func() {
+			var objectName string
+
 			BeforeEach(func() {
-				object = e2estorage.CreateObject(storageClient, project, bucket, f)
+				objectName = e2estorage.CreateObject(storageClient, bucketID, f)
+			})
+
+			AfterEach(func() {
+				By("deleting object "+objectName+" from storage bucket "+bucketID, func() {
+					e2estorage.DeleteObject(storageClient, bucketID, objectName)
+				})
 			})
 
 			Specify("the source generates an event", func() {
@@ -145,15 +147,22 @@ var _ = Describe("Google Cloud Storage source", func() {
 				e := receivedEvents[0]
 
 				Expect(e.Type()).To(Equal("com.google.cloud.storage.notification"))
-				Expect(e.Source()).To(Equal("gs://" + bucket))
+				Expect(e.Source()).To(Equal("gs://" + bucketID))
+
+				Expect(e.Extensions()["pubsubmsgbucketid"]).To(Equal(bucketID))
+				Expect(e.Extensions()["pubsubmsgeventtype"]).To(Equal("OBJECT_FINALIZE"))
+				Expect(e.Extensions()["pubsubmsgobjectid"]).To(Equal(objectName))
 			})
 		})
 	})
 
-	When("a client creates a source object with invalid event Types", func() {
+	When("a client creates a source object with invalid specs", func() {
 
-		// Those tests do not require a real repository or sink
+		// Those tests do not require a real bucket or sink
 		BeforeEach(func() {
+			bucketID = "fake-bucket"
+			gcloudProject = "fake-project"
+
 			saKey = "fake-creds"
 
 			sink = &duckv1.Destination{
@@ -173,22 +182,41 @@ var _ = Describe("Google Cloud Storage source", func() {
 		Specify("the API server rejects the creation of that object", func() {
 
 			By("setting an invalid bucket", func() {
-				bucket := "fake-bucket"
-
-				_, err := createSource(srcClient, ns, "test-invalid-eventTypes-", sink,
-					withBucket(bucket),
-					withProject(project),
-					withEventTypes("invalidType"),
-					withCredentials(saKey),
+				_, err := createSource(srcClient, ns, "test-invalid-bucket-", sink,
+					withBucket("Invalid_Bucket_Name"),
+					withProject(gcloudProject),
+					withServiceAccountKey(saKey),
 				)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(`spec.eventTypes: Unsupported value: "invalidType"`))
+				Expect(err.Error()).To(ContainSubstring("spec.bucket: Invalid value: "))
 			})
+
+			By("setting an invalid event type", func() {
+				_, err := createSource(srcClient, ns, "test-invalid-eventtype-", sink,
+					withBucket(bucketID),
+					withProject(gcloudProject),
+					withEventType("invalid_type"),
+					withServiceAccountKey(saKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(`spec.eventTypes: Unsupported value: "invalid_type"`))
+			})
+
+			By("setting an invalid project", func() {
+				_, err := createSource(srcClient, ns, "test-invalid-project-", sink,
+					withBucket(bucketID),
+					withProject("invalid_project"),
+					withServiceAccountKey(saKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.pubsub.project: Invalid value: "))
+			})
+
 		})
 	})
 })
 
-// createSource creates a GoogleCloudStorage object initialized with the given options.
+// createSource creates a GoogleCloudStorageSource object initialized with the given options.
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
 
@@ -227,7 +255,7 @@ func withProject(project string) sourceOption {
 	}
 }
 
-func withEventTypes(eventType string) sourceOption {
+func withEventType(eventType string) sourceOption {
 	return func(src *unstructured.Unstructured) {
 		eventTypes, _, err := unstructured.NestedStringSlice(src.Object, "spec", "eventTypes")
 		if err != nil {
@@ -242,11 +270,14 @@ func withEventTypes(eventType string) sourceOption {
 	}
 }
 
-func withCredentials(creds string) sourceOption {
-	c := map[string]interface{}{"value": creds}
+func withServiceAccountKey(key string) sourceOption {
+	svcAccKeyMap := make(map[string]interface{})
+	if key != "" {
+		svcAccKeyMap = map[string]interface{}{"value": key}
+	}
 
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedField(src.Object, c, "spec", "serviceAccountKey"); err != nil {
+		if err := unstructured.SetNestedMap(src.Object, svcAccKeyMap, "spec", "serviceAccountKey"); err != nil {
 			framework.FailfWithOffset(3, "Failed to set spec.serviceAccountKey field: %s", err)
 		}
 	}

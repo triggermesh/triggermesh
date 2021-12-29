@@ -35,7 +35,7 @@ import (
 type Framework struct {
 	// Test identifiers
 	baseName   string // e.g. "mytest"
-	UniqueName string // e.g. "mytest-1234"
+	UniqueName string // e.g. "e2e-mytest-1234"
 
 	// Test context
 	namespacesToDelete []*corev1.Namespace
