@@ -367,7 +367,7 @@ The benefits of this approach become more obvious when the complexity of test sc
 [ginkgo-docs]: https://onsi.github.io/ginkgo/
 [ginkgo-issue222]: https://github.com/onsi/ginkgo/issues/222
 [ginkgo-struct]: https://onsi.github.io/ginkgo/#structuring-your-specs
-[optimized-test]: https://github.com/triggermesh/triggermesh/blob/main/test/e2e/sources/awscodecommit/main.go#L171-L187
+[optimized-test]: https://github.com/triggermesh/triggermesh/blob/1d8390e2/test/e2e/sources/awscodecommit/main.go#L171-L187
 
 [k8s-e2e]: https://godoc.org/k8s.io/kubernetes/test/e2e
 [sigtesting-howto]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-testing/writing-good-e2e-tests.md
