@@ -1,0 +1,110 @@
+# Copyright 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Google Cloud IAM roles for E2E tests.
+#
+# Set of permissions required by the TriggerMesh end-to-end test suite to run
+# tests that manipulate Google Cloud resources.
+
+---
+
+# Permissions required by the test binary.
+name: projects/cebuk-01/roles/TriggerMeshE2E
+title: TriggerMesh E2E test suite
+description: Grants permissions required by the TriggerMesh E2E test suite.
+includedPermissions:
+- pubsub.topics.create
+- pubsub.topics.delete
+- pubsub.topics.publish
+- source.repos.create
+- source.repos.delete
+- storage.buckets.create
+- storage.buckets.delete
+- storage.objects.create
+- storage.objects.delete
+
+---
+
+# Permissions required by the reconciler and receive adapter of the Audit Logs event source.
+name: projects/cebuk-01/roles/CloudAuditLogsEventSource
+title: Cloud Audit Logs event source
+description: Role suitable for use with the TriggerMesh event source for Cloud Audit Logs.
+includedPermissions:
+- logging.sinks.create
+- logging.sinks.delete
+- logging.sinks.get
+- pubsub.subscriptions.consume
+- pubsub.subscriptions.create
+- pubsub.subscriptions.delete
+- pubsub.subscriptions.get
+- pubsub.topics.attachSubscription
+- pubsub.topics.create
+- pubsub.topics.delete
+- pubsub.topics.detachSubscription
+- pubsub.topics.get
+- pubsub.topics.getIamPolicy
+- pubsub.topics.publish
+- pubsub.topics.setIamPolicy
+
+---
+
+# Permissions required by the reconciler and receive adapter of the Pub/Sub event source.
+name: projects/cebuk-01/roles/CloudPubSubEventSource
+title: Cloud Pub/Sub event source
+description: Role suitable for use with the TriggerMesh event source for Cloud Pub/Sub.
+includedPermissions:
+- pubsub.subscriptions.consume
+- pubsub.subscriptions.create
+- pubsub.subscriptions.delete
+- pubsub.subscriptions.get
+- pubsub.topics.attachSubscription
+- pubsub.topics.detachSubscription
+
+---
+
+# Permissions required by the reconciler and receive adapter of the Source Repositories event source.
+name: projects/cebuk-01/roles/CloudRepositoriesEventSource
+title: Cloud Repositories event source
+description: Role suitable for use with the TriggerMesh event source for Cloud Source Repositories.
+includedPermissions:
+- iam.serviceAccounts.actAs
+- pubsub.subscriptions.consume
+- pubsub.subscriptions.create
+- pubsub.subscriptions.delete
+- pubsub.subscriptions.get
+- pubsub.topics.attachSubscription
+- pubsub.topics.create
+- pubsub.topics.delete
+- pubsub.topics.detachSubscription
+- pubsub.topics.get
+- source.repos.updateRepoConfig
+
+---
+
+# Permissions required by the reconciler and receive adapter of the Storage event source.
+name: projects/cebuk-01/roles/CloudStorageEventSource
+title: Cloud Storage event source
+description: Role suitable for use with the TriggerMesh event source for Cloud Storage.
+includedPermissions:
+- pubsub.subscriptions.consume
+- pubsub.subscriptions.create
+- pubsub.subscriptions.delete
+- pubsub.subscriptions.get
+- pubsub.topics.attachSubscription
+- pubsub.topics.create
+- pubsub.topics.delete
+- pubsub.topics.detachSubscription
+- pubsub.topics.get
+- storage.buckets.get
+- storage.buckets.update

@@ -1,4 +1,4 @@
-/* AWS IAM policy for e2e tests.
+/* AWS IAM policy for E2E tests.
 
    Policy ARN:  arn:aws:iam::043455440429:policy/EndToEndTestSuite
    Description: Set of permissions required by the TriggerMesh end-to-end test suite to run tests that manipulate AWS resources.
@@ -6,6 +6,20 @@
 {
     "Version": "2012-10-17",
     "Statement": [
+        {
+            "Sid": "E2EFrameworkSNS",
+            "Effect": "Allow",
+            "Action": [
+                "sns:Publish",
+                "sns:CreateTopic",
+                "sns:DeleteTopic",
+                "sns:GetTopicAttributes",
+                "sns:SetTopicAttributes"
+            ],
+            "Resource": [
+                "arn:aws:sns:*:043455440429:e2e-*"
+            ]
+        },
         {
             "Sid": "E2EFrameworkSQS",
             "Effect": "Allow",
@@ -23,6 +37,93 @@
             ]
         },
         {
+            "Sid": "E2EFrameworkCodeCommit",
+            "Effect": "Allow",
+            "Action": [
+                "codecommit:CreateRepository",
+                "codecommit:DeleteRepository",
+                "codecommit:GetBranch",
+                "codecommit:CreateCommit",
+                "codecommit:TagResource"
+            ],
+            "Resource": [
+                "arn:aws:codecommit:*:043455440429:e2e-*"
+            ]
+        },
+        {
+            "Sid": "E2EFrameworkKinesis",
+            "Effect": "Allow",
+            "Action": [
+                "kinesis:PutRecord",
+                "kinesis:DeleteStream",
+                "kinesis:CreateStream",
+                "kinesis:DescribeStream"
+            ],
+            "Resource": [
+                "arn:aws:kinesis:*:043455440429:stream/e2e-*"
+            ]
+        },
+        {
+            "Sid": "E2EFrameworkCognitoUserPools",
+            "Effect": "Allow",
+            "Action": [
+                "cognito-idp:CreateUserPool",
+                "cognito-idp:AdminCreateUser",
+                "cognito-idp:DeleteUserPool"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "E2EFrameworkDynamoDB",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:CreateTable",
+                "dynamodb:DescribeTable",
+                "dynamodb:DeleteTable",
+                "dynamodb:PutItem"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:*:043455440429:table/e2e-*"
+            ]
+        },
+        {
+            "Sid": "AWSCodeCommitSourceReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "codecommit:GetBranch",
+                "codecommit:GetCommit",
+                "codecommit:ListPullRequests",
+                "codecommit:GetPullRequest"
+            ],
+            "Resource": [
+                "arn:aws:codecommit:*:043455440429:e2e-*"
+            ]
+        },
+        {
+            "Sid": "AWSSNSSourceReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "sns:ConfirmSubscription"
+            ],
+            "Resource": [
+                "arn:aws:sns:*:043455440429:e2e-*"
+            ]
+        },
+        {
+            "Sid": "AWSSNSSourceReconciler",
+            "Effect": "Allow",
+            "Action": [
+                "sns:ListSubscriptionsByTopic",
+                "sns:Subscribe",
+                "sns:Unsubscribe"
+            ],
+            "Resource": [
+                "arn:aws:sns:*:043455440429:e2e-*"
+            ]
+        },
+        {
             "Sid": "AWSSQSSourceReceiveAdapter",
             "Effect": "Allow",
             "Action": [
@@ -34,6 +135,45 @@
             "Resource": [
                 "arn:aws:sqs:*:043455440429:e2e-*"
             ]
+        },
+        {
+            "Sid": "AWSKinesisSourceReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "kinesis:DescribeStream",
+                "kinesis:GetShardIterator",
+                "kinesis:GetRecords"
+            ],
+            "Resource": [
+                "arn:aws:kinesis:*:043455440429:stream/e2e-*"
+            ]
+        },
+        {
+            "Sid": "AWSCognitoUserPoolSourceReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "cognito-idp:DescribeUserPool",
+                "cognito-idp:ListUsers"
+            ],
+            "Resource": "arn:aws:cognito-idp:*:043455440429:userpool/*"
+        },
+        {
+            "Sid": "AWSDynamoDBTableSourceReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:DescribeTable"
+            ],
+            "Resource": "arn:aws:dynamodb:*:043455440429:table/e2e-*"
+        },
+        {
+            "Sid": "AWSDynamoDBStreamSourceReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:GetShardIterator",
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords"
+            ],
+            "Resource": "arn:aws:dynamodb:*:043455440429:table/e2e-*/stream/*"
         }
     ]
 }

@@ -17,5 +17,15 @@ limitations under the License.
 package sources
 
 import (
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awscodecommit"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awscognitouserpool"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awsdynamodb"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awskinesis"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awssns"
 	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awssqs"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/googlecloudauditlogs"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/googlecloudpubsub"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/googlecloudrepositories"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/googlecloudstorage"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/webhook"
 )

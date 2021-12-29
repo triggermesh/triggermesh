@@ -20,3 +20,6 @@
 
 # Build artifacts
 /_output/
+
+# Test artifacts
+*.test
