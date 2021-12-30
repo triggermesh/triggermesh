@@ -76,8 +76,6 @@ type Interface interface {
 	GoogleCloudStorageSources() GoogleCloudStorageSourceInformer
 	// HTTPPollerSources returns a HTTPPollerSourceInformer.
 	HTTPPollerSources() HTTPPollerSourceInformer
-	// IBMMQSources returns a IBMMQSourceInformer.
-	IBMMQSources() IBMMQSourceInformer
 	// OCIMetricsSources returns a OCIMetricsSourceInformer.
 	OCIMetricsSources() OCIMetricsSourceInformer
 	// SalesforceSources returns a SalesforceSourceInformer.
@@ -231,11 +229,6 @@ func (v *version) GoogleCloudStorageSources() GoogleCloudStorageSourceInformer {
 // HTTPPollerSources returns a HTTPPollerSourceInformer.
 func (v *version) HTTPPollerSources() HTTPPollerSourceInformer {
 	return &hTTPPollerSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// IBMMQSources returns a IBMMQSourceInformer.
-func (v *version) IBMMQSources() IBMMQSourceInformer {
-	return &iBMMQSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // OCIMetricsSources returns a OCIMetricsSourceInformer.

@@ -184,11 +184,6 @@ spec:
         # Type-specific options
         - name: TEKTON_REAPING_INTERVAL
           value: 2m
-        # Custom build adapters
-        - name: IBMMQSOURCE_ADAPTER_IMAGE
-          value: gcr.io/triggermesh/ibmmqsource-adapter:latest
-        - name: IBMMQTARGET_ADAPTER_IMAGE
-          value: gcr.io/triggermesh/ibmmqtarget-adapter:latest
 
         securityContext:
           allowPrivilegeEscalation: false

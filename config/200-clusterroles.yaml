@@ -88,7 +88,6 @@ rules:
   - googlecloudrepositoriessources
   - googlecloudstoragesources
   - httppollersources
-  - ibmmqsources
   - ocimetricssources
   - salesforcesources
   - slacksources
@@ -129,7 +128,6 @@ rules:
   - googlecloudrepositoriessources/status
   - googlecloudstoragesources/status
   - httppollersources/status
-  - ibmmqsources/status
   - ocimetricssources/status
   - salesforcesources/status
   - slacksources/status
@@ -160,7 +158,6 @@ rules:
   - googlesheettargets
   - hasuratargets
   - httptargets
-  - ibmmqtargets
   - infratargets
   - jiratargets
   - logzmetricstargets
@@ -200,7 +197,6 @@ rules:
   - googlesheettargets/status
   - hasuratargets/status
   - httptargets/status
-  - ibmmqtargets/status
   - infratargets/status
   - jiratargets/status
   - logzmetricstargets/status
@@ -301,7 +297,6 @@ rules:
   - googlecloudrepositoriessources/finalizers
   - googlecloudstoragesources/finalizers
   - httppollersources/finalizers
-  - ibmmqsources/finalizers
   - ocimetricssources/finalizers
   - salesforcesources/finalizers
   - slacksources/finalizers
@@ -332,7 +327,6 @@ rules:
   - googlesheettargets/finalizers
   - hasuratargets/finalizers
   - httptargets/finalizers
-  - ibmmqtargets/finalizers
   - infratargets/finalizers
   - jiratargets/finalizers
   - logzmetricstargets/finalizers
@@ -741,7 +735,6 @@ rules:
   - googlecloudrepositoriessources
   - googlecloudstoragesources
   - httppollersources
-  - ibmmqsources
   - ocimetricssources
   - salesforcesources
   - slacksources
@@ -810,7 +803,6 @@ rules:
   - googlesheettargets
   - hasuratargets
   - httptargets
-  - ibmmqtargets
   - infratargets
   - jiratargets
   - logzmetricstargets

@@ -44,7 +44,6 @@ type TargetsV1alpha1Interface interface {
 	GoogleSheetTargetsGetter
 	HTTPTargetsGetter
 	HasuraTargetsGetter
-	IBMMQTargetsGetter
 	InfraTargetsGetter
 	JiraTargetsGetter
 	LogzMetricsTargetsGetter
@@ -135,10 +134,6 @@ func (c *TargetsV1alpha1Client) HTTPTargets(namespace string) HTTPTargetInterfac
 
 func (c *TargetsV1alpha1Client) HasuraTargets(namespace string) HasuraTargetInterface {
 	return newHasuraTargets(c, namespace)
-}
-
-func (c *TargetsV1alpha1Client) IBMMQTargets(namespace string) IBMMQTargetInterface {
-	return newIBMMQTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) InfraTargets(namespace string) InfraTargetInterface {
