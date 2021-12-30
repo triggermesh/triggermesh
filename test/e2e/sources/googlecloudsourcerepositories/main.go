@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositories
+package googlecloudsourcerepositoriessource
 
 import (
 	"context"
@@ -56,15 +56,15 @@ var sourceAPIVersion = schema.GroupVersion{
 }
 
 const (
-	sourceKind     = "GoogleCloudRepositoriesSource"
-	sourceResource = "googlecloudrepositoriessources"
+	sourceKind     = "GoogleCloudSourceRepositoriesSource"
+	sourceResource = "googlecloudsourcerepositoriessources"
 
 	credsEnvVar   = "GCLOUD_SERVICEACCOUNT_KEY"
 	projectEnvVar = "GCLOUD_PROJECT"
 )
 
 var _ = Describe("Google Cloud Repositories source", func() {
-	f := framework.New("googlecloudrepositoriessource")
+	f := framework.New("googlecloudsourcerepositoriessource")
 
 	var ns string
 
