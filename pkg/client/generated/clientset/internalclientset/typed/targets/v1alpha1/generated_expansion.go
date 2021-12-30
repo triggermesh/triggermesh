@@ -54,8 +54,6 @@ type HTTPTargetExpansion interface{}
 
 type HasuraTargetExpansion interface{}
 
-type IBMMQTargetExpansion interface{}
-
 type InfraTargetExpansion interface{}
 
 type JiraTargetExpansion interface{}
