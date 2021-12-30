@@ -1,0 +1,64 @@
+# Copyright 2021 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ibm-mq-server
+spec:
+  selector:
+    matchLabels:
+      app: ibm-mq-server
+  template:
+    metadata:
+      labels:
+        app: ibm-mq-server
+    spec:
+      containers:
+      - name: user-container
+        env:
+        - name: LICENSE
+          value: accept
+        - name: MQ_QMGR_NAME
+          value: QM1
+        - name: MQ_APP_PASSWORD
+          value: mq-app-password
+        image: ibmcom/mq@sha256:ac44cdf670864fbff36d9a8a416df1cadda2930b01f6904123cf14e6067ed11b
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ibm-mq-secret
+data:
+  username: YXBw
+  password: bXEtYXBwLXBhc3N3b3Jk
+type: Opaque
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ibm-mq
+spec:
+  selector:
+    app: ibm-mq-server
+  type: ClusterIP
+  ports:
+  - name: mq
+    port: 1414
+    protocol: TCP
+    targetPort: 1414

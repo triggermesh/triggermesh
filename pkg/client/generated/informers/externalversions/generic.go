@@ -125,6 +125,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudStorageSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("httppollersources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().HTTPPollerSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("ibmmqsources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().IBMMQSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("ocimetricssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().OCIMetricsSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("salesforcesources"):
@@ -175,6 +177,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().HTTPTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("hasuratargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().HasuraTargets().Informer()}, nil
+	case targetsv1alpha1.SchemeGroupVersion.WithResource("ibmmqtargets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().IBMMQTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("infratargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().InfraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("jiratargets"):
