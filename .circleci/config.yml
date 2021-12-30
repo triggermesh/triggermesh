@@ -128,6 +128,9 @@ jobs:
           # XSLTTransform needs libxml2.
           name: Install libxml2
           command: sudo apt-get update && sudo apt-get install -y libxml2-dev
+      - setup_remote_docker:
+          version: 20.10.11
+          docker_layer_caching: true
       - run:
           name: Publishing container images
           command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
