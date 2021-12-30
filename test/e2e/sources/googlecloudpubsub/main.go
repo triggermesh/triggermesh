@@ -58,9 +58,6 @@ var sourceAPIVersion = schema.GroupVersion{
 const (
 	sourceKind     = "GoogleCloudPubSubSource"
 	sourceResource = "googlecloudpubsubsources"
-
-	credsEnvVar   = "GCLOUD_SERVICEACCOUNT_KEY"
-	projectEnvVar = "GCLOUD_PROJECT"
 )
 
 var _ = Describe("Google Cloud Pub/Sub source", func() {
@@ -70,9 +67,6 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 
 	var srcClient dynamic.ResourceInterface
 
-	var topic *pubsub.Topic
-	var subscription string
-	var project string
 	var saKey string
 
 	var sink *duckv1.Destination
@@ -84,136 +78,115 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	Context("a source watches an non-existing subscription", func() {
+	Context("a source subscribes to a topic", func() {
 		var pubsubClient *pubsub.Client
+		var gcloudProject string
+
+		var topic *pubsub.Topic
+
 		var err error
 
+		SendMessageAndAssertReceivedEvent := func() func() {
+			return func() {
+				var msgID string
+
+				BeforeEach(func() {
+					msgID = e2epubsub.SendMessage(pubsubClient, topic.ID())
+				})
+
+				Specify("the source generates an event", func() {
+					const receiveTimeout = 15 * time.Second
+					const pollInterval = 500 * time.Millisecond
+
+					var receivedEvents []cloudevents.Event
+
+					readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
+
+					Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
+					Expect(receivedEvents).To(HaveLen(1))
+
+					e := receivedEvents[0]
+
+					Expect(e.Type()).To(Equal("com.google.cloud.pubsub.message"))
+					Expect(e.ID()).To(Equal(msgID))
+					Expect(e.Source()).To(Equal(topic.String()))
+				})
+			}
+		}
+
 		BeforeEach(func() {
-			saKey = e2egcloud.GetCreds(credsEnvVar)
-			project = e2egcloud.GetProject(projectEnvVar)
-			pubsubClient, err = pubsub.NewClient(context.Background(), project, option.WithCredentialsJSON([]byte(saKey)))
+			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			gcloudProject = e2egcloud.ProjectNameFromEnv()
+
+			pubsubClient, err = pubsub.NewClient(context.Background(), gcloudProject, option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 
 			By("creating an event sink", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 			})
 
-			By("creating a pubsub topic", func() {
+			By("creating a Pub/Sub topic", func() {
 				topic = e2epubsub.CreateTopic(pubsubClient, f)
-			})
-
-			By("creating a GoogleCloudPubSub object", func() {
-				src, err := createSource(srcClient, ns, "test-", sink,
-					withTopic(topic.String()),
-					withCredentials(saKey),
-				)
-				Expect(err).ToNot(HaveOccurred())
-				ducktypes.WaitUntilReady(f.DynamicClient, src)
 			})
 		})
 
 		AfterEach(func() {
-			By("deleting pubsub topic "+topic.String(), func() {
-				e2epubsub.DeleteTopic(pubsubClient, topic)
+			By("deleting the Pub/Sub topic "+topic.ID(), func() {
+				e2epubsub.DeleteTopic(pubsubClient, topic.ID())
 			})
 		})
 
-		When("a message is sent to the topic", func() {
-			var msgID string
+		Context("the subscription is managed by the source", func() {
 
 			BeforeEach(func() {
-				msgID = e2epubsub.SendMessage(pubsubClient, topic, f)
+				By("creating a GoogleCloudPubSubSource object", func() {
+					src, err := createSource(srcClient, ns, "test-", sink,
+						withTopic(topic.String()),
+						withServiceAccountKey(saKey),
+					)
+					Expect(err).ToNot(HaveOccurred())
+
+					ducktypes.WaitUntilReady(f.DynamicClient, src)
+				})
 			})
 
-			Specify("the source generates an event", func() {
-				const receiveTimeout = 15 * time.Second
-				const pollInterval = 500 * time.Millisecond
-
-				var receivedEvents []cloudevents.Event
-
-				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
-
-				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
-				Expect(receivedEvents).To(HaveLen(1))
-
-				e := receivedEvents[0]
-
-				Expect(e.Type()).To(Equal("com.google.cloud.pubsub.message"))
-				Expect(e.ID()).To(Equal(msgID))
-				Expect(e.Source()).To(Equal(topic.String()))
-			})
-		})
-	})
-
-	Context("a source watches an existing subscription", func() {
-		var pubsubClient *pubsub.Client
-		var err error
-
-		BeforeEach(func() {
-			saKey = e2egcloud.GetCreds(credsEnvVar)
-			project = e2egcloud.GetProject(projectEnvVar)
-			pubsubClient, err = pubsub.NewClient(context.Background(), project, option.WithCredentialsJSON([]byte(saKey)))
-			Expect(err).ToNot(HaveOccurred())
-
-			By("creating an event sink", func() {
-				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
-			})
-
-			By("creating a pubsub topic", func() {
-				topic = e2epubsub.CreateTopic(pubsubClient, f)
-			})
-
-			By("creating a pubsub subscription", func() {
-				subscription = e2epubsub.CreateSubscription(pubsubClient, topic, f)
-			})
-
-			By("creating a GoogleCloudPubSub object", func() {
-				src, err := createSource(srcClient, ns, "test-", sink,
-					withTopic(topic.String()),
-					withSubscription(subscription),
-					withCredentials(saKey),
-				)
-				Expect(err).ToNot(HaveOccurred())
-				ducktypes.WaitUntilReady(f.DynamicClient, src)
-			})
+			When("a message is sent to the topic", SendMessageAndAssertReceivedEvent())
 		})
 
-		AfterEach(func() {
-			By("deleting pubsub topic "+topic.String(), func() {
-				e2epubsub.DeleteTopic(pubsubClient, topic)
-			})
-		})
-
-		When("a message is sent to the topic", func() {
-			var msgID string
+		Context("the subscription is managed by the user", func() {
+			var subscriptionID string
 
 			BeforeEach(func() {
-				msgID = e2epubsub.SendMessage(pubsubClient, topic, f)
+				By("creating a Pub/Sub subscription", func() {
+					subscriptionID = e2epubsub.CreateSubscription(pubsubClient, topic, f).ID()
+				})
+
+				By("creating a GoogleCloudPubSubSource object", func() {
+					src, err := createSource(srcClient, ns, "test-", sink,
+						withTopic(topic.String()),
+						withSubscriptionID(subscriptionID),
+						withServiceAccountKey(saKey),
+					)
+					Expect(err).ToNot(HaveOccurred())
+
+					ducktypes.WaitUntilReady(f.DynamicClient, src)
+				})
 			})
 
-			Specify("the source generates an event", func() {
-				const receiveTimeout = 15 * time.Second
-				const pollInterval = 500 * time.Millisecond
-
-				var receivedEvents []cloudevents.Event
-
-				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
-
-				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
-				Expect(receivedEvents).To(HaveLen(1))
-
-				e := receivedEvents[0]
-
-				Expect(e.Type()).To(Equal("com.google.cloud.pubsub.message"))
-				Expect(e.ID()).To(Equal(msgID))
-				Expect(e.Source()).To(Equal(topic.String()))
+			AfterEach(func() {
+				By("deleting the Pub/Sub subscription "+subscriptionID, func() {
+					e2epubsub.DeleteSubscription(pubsubClient, subscriptionID)
+				})
 			})
+
+			When("a message is sent to the topic", SendMessageAndAssertReceivedEvent())
 		})
 	})
 
 	When("a client creates a source object with invalid specs", func() {
+		const topicName = "projects/fake-project/topics/fake-topic"
 
-		// Those tests do not require a real repository or sink
+		// Those tests do not require a real topic or sink
 		BeforeEach(func() {
 			saKey = "fake-creds"
 
@@ -238,17 +211,47 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 
 				_, err := createSource(srcClient, ns, "test-invalid-topic-", sink,
 					withTopic(invalidTopic),
-					withCredentials(saKey),
+					withServiceAccountKey(saKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.topic: Invalid value: "))
+			})
+
+			By("setting an invalid subscription ID", func() {
+				invalidSubscriptionID := "000invalid"
+
+				_, err := createSource(srcClient, ns, "test-invalid-subscr-", sink,
+					withTopic(topicName),
+					withSubscriptionID(invalidSubscriptionID),
+					withServiceAccountKey(saKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.subscriptionID: Invalid value: "))
+			})
+
+			By("omitting the topic", func() {
+				_, err := createSource(srcClient, ns, "test-topic-", sink,
+					withServiceAccountKey(saKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.topic: Required value"))
+			})
+
+			By("setting empty credentials", func() {
+				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
+					withTopic(topicName),
+					withServiceAccountKey(""),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(
+					`"spec.serviceAccountKey" must validate one and only one schema (oneOf).`))
 			})
 
 		})
 	})
 })
 
-// createSource creates an GoogleCloudPubSub object initialized with the given options.
+// createSource creates a GoogleCloudPubSubSource object initialized with the given options.
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
 
@@ -279,19 +282,22 @@ func withTopic(topic string) sourceOption {
 	}
 }
 
-func withSubscription(subscription string) sourceOption {
+func withSubscriptionID(subscriptionID string) sourceOption {
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedField(src.Object, subscription, "spec", "subscription"); err != nil {
-			framework.FailfWithOffset(3, "Failed to set spec.subscription field: %s", err)
+		if err := unstructured.SetNestedField(src.Object, subscriptionID, "spec", "subscriptionID"); err != nil {
+			framework.FailfWithOffset(3, "Failed to set spec.subscriptionID field: %s", err)
 		}
 	}
 }
 
-func withCredentials(creds string) sourceOption {
-	c := map[string]interface{}{"value": creds}
+func withServiceAccountKey(key string) sourceOption {
+	svcAccKeyMap := make(map[string]interface{})
+	if key != "" {
+		svcAccKeyMap = map[string]interface{}{"value": key}
+	}
 
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedField(src.Object, c, "spec", "serviceAccountKey"); err != nil {
+		if err := unstructured.SetNestedMap(src.Object, svcAccKeyMap, "spec", "serviceAccountKey"); err != nil {
 			framework.FailfWithOffset(3, "Failed to set spec.serviceAccountKey field: %s", err)
 		}
 	}

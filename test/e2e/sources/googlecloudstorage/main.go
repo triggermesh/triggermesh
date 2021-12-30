@@ -58,9 +58,6 @@ var sourceAPIVersion = schema.GroupVersion{
 const (
 	sourceKind     = "GoogleCloudStorageSource"
 	sourceResource = "googlecloudstoragesources"
-
-	credsEnvVar   = "GCLOUD_SERVICEACCOUNT_KEY"
-	projectEnvVar = "GCLOUD_PROJECT"
 )
 
 var _ = Describe("Google Cloud Storage source", func() {
@@ -91,8 +88,8 @@ var _ = Describe("Google Cloud Storage source", func() {
 		var err error
 
 		BeforeEach(func() {
-			saKey = e2egcloud.GetCreds(credsEnvVar)
-			project = e2egcloud.GetProject(projectEnvVar)
+			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			project = e2egcloud.ProjectNameFromEnv()
 			storageClient, err = storage.NewClient(context.Background(), option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 

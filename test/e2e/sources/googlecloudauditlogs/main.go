@@ -58,9 +58,6 @@ var sourceAPIVersion = schema.GroupVersion{
 const (
 	sourceKind     = "GoogleCloudAuditLogsSource"
 	sourceResource = "googlecloudauditlogssources"
-
-	credsEnvVar   = "GCLOUD_SERVICEACCOUNT_KEY"
-	projectEnvVar = "GCLOUD_PROJECT"
 )
 
 var _ = Describe("Google Cloud AuditLogs source", func() {
@@ -91,8 +88,8 @@ var _ = Describe("Google Cloud AuditLogs source", func() {
 		BeforeEach(func() {
 			serviceName = "pubsub.googleapis.com"
 			methodName = "google.pubsub.v1.Publisher.CreateTopic"
-			saKey = e2egcloud.GetCreds(credsEnvVar)
-			project = e2egcloud.GetProject(projectEnvVar)
+			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			project = e2egcloud.ProjectNameFromEnv()
 			pubsubClient, err = pubsub.NewClient(context.Background(), project, option.WithCredentialsJSON([]byte(saKey)))
 			Expect(err).ToNot(HaveOccurred())
 
@@ -126,7 +123,7 @@ var _ = Describe("Google Cloud AuditLogs source", func() {
 			})
 			AfterEach(func() {
 				By("deleting Pub/Sub topic "+topic.String(), func() {
-					e2epubsub.DeleteTopic(pubsubClient, topic)
+					e2epubsub.DeleteTopic(pubsubClient, topic.ID())
 				})
 			})
 			Specify("the source generates an event", func() {

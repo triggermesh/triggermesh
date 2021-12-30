@@ -23,26 +23,28 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
 
-const pubsubLabelOwnerResource = "io-triggermesh_owner-resource"
+const (
+	envServiceAccountKey = "GCLOUD_SERVICEACCOUNT_KEY"
+	envProjectName       = "GCLOUD_PROJECT"
+)
 
-// PubSubResourceID returns a deterministic Pub/Sub resource ID matching the given framework.Framework.
-func PubSubResourceID(f *framework.Framework) string {
-	return f.UniqueName
-}
+const e2eInstanceTagKey = "e2e_instance"
 
 // TagsFor returns a set of resource tags matching the given framework.Framework.
 func TagsFor(f *framework.Framework) map[string]string {
 	return map[string]string{
-		pubsubLabelOwnerResource: f.UniqueName,
+		e2eInstanceTagKey: f.UniqueName,
 	}
 }
 
-// GetCreds returns the Google Cloud creds read from the environment.
-func GetCreds(credsEnvVar string) string {
-	return os.Getenv(credsEnvVar)
+// ServiceAccountKeyFromEnv returns the Service Account key read from the
+// environment.
+func ServiceAccountKeyFromEnv() string {
+	return os.Getenv(envServiceAccountKey)
 }
 
-// GetProject returns the Google Cloud project read from the environment.
-func GetProject(projectEnvVar string) string {
-	return os.Getenv(projectEnvVar)
+// ProjectNameFromEnv returns the name of the Google Cloud project read from
+// the environment.
+func ProjectNameFromEnv() string {
+	return os.Getenv(envProjectName)
 }
