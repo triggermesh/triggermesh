@@ -60,17 +60,15 @@ const (
 	sourceResource = "googlecloudauditlogssources"
 )
 
-var _ = Describe("Google Cloud AuditLogs source", func() {
+var _ = Describe("Google Cloud Audit Logs source", func() {
 	f := framework.New("googlecloudauditlogssource")
 
 	var ns string
 
 	var srcClient dynamic.ResourceInterface
 
-	var serviceName string
-	var methodName string
-	var project string
-	var saKey string
+	var gcloudProject string
+	var serviceaccountKey string
 
 	var sink *duckv1.Destination
 
@@ -81,51 +79,58 @@ var _ = Describe("Google Cloud AuditLogs source", func() {
 		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	Context("a source watches a Google Cloud AuditLogs Sink configured with Pub/Sub", func() {
+	Context("a source subscribes to audit logs for the Cloud Pub/Sub service", func() {
 		var pubsubClient *pubsub.Client
 		var err error
 
+		const serviceNamePubSub = "pubsub.googleapis.com"
+		const methodNamePubSubCreateTopic = "google.pubsub.v1.Publisher.CreateTopic"
+
 		BeforeEach(func() {
-			serviceName = "pubsub.googleapis.com"
-			methodName = "google.pubsub.v1.Publisher.CreateTopic"
-			saKey = e2egcloud.ServiceAccountKeyFromEnv()
-			project = e2egcloud.ProjectNameFromEnv()
-			pubsubClient, err = pubsub.NewClient(context.Background(), project, option.WithCredentialsJSON([]byte(saKey)))
+			serviceaccountKey = e2egcloud.ServiceAccountKeyFromEnv()
+			gcloudProject = e2egcloud.ProjectNameFromEnv()
+
+			pubsubClient, err = pubsub.NewClient(context.Background(), gcloudProject, option.WithCredentialsJSON([]byte(serviceaccountKey)))
 			Expect(err).ToNot(HaveOccurred())
 
 			By("creating an event sink", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 			})
 
-			By("creating a GoogleCloudAuditLogs object", func() {
-				src, err := createSource(srcClient, ns, "test", sink,
-					withServiceName(serviceName),
-					withMethodName(methodName),
-					withProject(project),
-					withCredentials(saKey),
+			By("creating a GoogleCloudAuditLogsSource object", func() {
+				src, err := createSource(srcClient, ns, "test-", sink,
+					withServiceName(serviceNamePubSub),
+					withMethodName(methodNamePubSubCreateTopic),
+					withProject(gcloudProject),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).ToNot(HaveOccurred())
+
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
 
-				// Audit logs source misses the topic which gets created shortly after the source becomes ready.
-				// Need to wait for a few seconds.
+				// FIXME: We observed that audit logs generated shortly after the source reports "Ready"
+				// weren't sent to the Pub/Sub topic observed by the receive adapter. It is likely that
+				// the Audit Logs Router Sink reconciled by the source starts routing audit logs after a
+				// delay (10-30s), so we virtually delay the next test steps here as well.
 				time.Sleep(30 * time.Second)
 			})
 		})
 
-		When("a new Pub/Sub topic is created", func() {
-			var topic *pubsub.Topic
+		When("a Pub/Sub topic is created", func() {
+			var topicID string
 
 			BeforeEach(func() {
-				By("creating Pub/Sub topic", func() {
-					topic = e2epubsub.CreateTopic(pubsubClient, f)
+				By("creating a Pub/Sub topic", func() {
+					topicID = e2epubsub.CreateTopic(pubsubClient, f).ID()
 				})
 			})
+
 			AfterEach(func() {
-				By("deleting Pub/Sub topic "+topic.String(), func() {
-					e2epubsub.DeleteTopic(pubsubClient, topic.ID())
+				By("deleting the Pub/Sub topic "+topicID, func() {
+					e2epubsub.DeleteTopic(pubsubClient, topicID)
 				})
 			})
+
 			Specify("the source generates an event", func() {
 				const receiveTimeout = 15 * time.Second
 				const pollInterval = 500 * time.Millisecond
@@ -135,7 +140,6 @@ var _ = Describe("Google Cloud AuditLogs source", func() {
 				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
 
 				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
-				Expect(receivedEvents).To(HaveLen(1))
 
 				e := receivedEvents[0]
 
@@ -146,10 +150,14 @@ var _ = Describe("Google Cloud AuditLogs source", func() {
 	})
 
 	When("a client creates a source object with invalid specs", func() {
+		const serviceName = "foo.example.com"
+		const methodName = "foo.v0.DoSomething"
 
-		// Those tests do not require a real creds or sink
+		// Those tests do not require a real project or sink
 		BeforeEach(func() {
-			saKey = "fake-creds"
+			gcloudProject = "fake-project"
+
+			serviceaccountKey = "fake-creds"
 
 			sink = &duckv1.Destination{
 				Ref: &duckv1.KReference{
@@ -166,33 +174,70 @@ var _ = Describe("Google Cloud AuditLogs source", func() {
 		//   "When: it sets an invalid ..., Specify: the API server rejects ..."
 		// to avoid creating a namespace for each spec, due to their simplicity.
 		Specify("the API server rejects the creation of that object", func() {
-			invalidServiceName := "Pubsub.googleapis.com"
 
 			By("setting an invalid service name", func() {
-				_, err := createSource(srcClient, ns, "test-invalid-service-name-", sink,
+				const invalidServiceName = "Foo.example.com"
+
+				_, err := createSource(srcClient, ns, "test-invalid-servicename-", sink,
 					withServiceName(invalidServiceName),
 					withMethodName(methodName),
-					withCredentials(saKey),
+					withProject(gcloudProject),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.serviceName: Invalid value: "))
 			})
 
-			invalidMethodName := "google.pubsub.v1.Publisher.CreateTopic."
 			By("setting an invalid method name", func() {
-				_, err := createSource(srcClient, ns, "test-invalid-service-name-", sink,
+				const invalidMethodName = "foo.v0."
+
+				_, err := createSource(srcClient, ns, "test-invalid-methodname-", sink,
 					withServiceName(serviceName),
 					withMethodName(invalidMethodName),
-					withCredentials(saKey),
+					withProject(gcloudProject),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.methodName: Invalid value: "))
+			})
+
+			By("setting an invalid project", func() {
+				_, err := createSource(srcClient, ns, "test-invalid-project-", sink,
+					withServiceName(serviceName),
+					withMethodName(methodName),
+					withProject("invalid_project"),
+					withServiceAccountKey(serviceaccountKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.pubsub.project: Invalid value: "))
+			})
+
+			By("omitting the project", func() {
+				_, err := createSource(srcClient, ns, "test-noproject-", sink,
+					withServiceName(serviceName),
+					withMethodName(methodName),
+					withServiceAccountKey(serviceaccountKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.pubsub: Required value"))
+			})
+
+			By("setting empty credentials", func() {
+				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
+					withServiceName(serviceName),
+					withMethodName(methodName),
+					withProject(gcloudProject),
+					withServiceAccountKey(""),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(
+					`"spec.serviceAccountKey" must validate one and only one schema (oneOf).`))
 			})
 		})
 	})
 })
 
-// createSource creates an GoogleCloudAuditLogs object initialized with the given options.
+// createSource creates an GoogleCloudAuditLogsSource object initialized with the given options.
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
 
@@ -234,16 +279,19 @@ func withMethodName(methodName string) sourceOption {
 func withProject(project string) sourceOption {
 	return func(src *unstructured.Unstructured) {
 		if err := unstructured.SetNestedField(src.Object, project, "spec", "pubsub", "project"); err != nil {
-			framework.FailfWithOffset(3, "Failed to set spec.methodName field: %s", err)
+			framework.FailfWithOffset(3, "Failed to set spec.pubsub.project field: %s", err)
 		}
 	}
 }
 
-func withCredentials(creds string) sourceOption {
-	c := map[string]interface{}{"value": creds}
+func withServiceAccountKey(key string) sourceOption {
+	svcAccKeyMap := make(map[string]interface{})
+	if key != "" {
+		svcAccKeyMap = map[string]interface{}{"value": key}
+	}
 
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedField(src.Object, c, "spec", "serviceAccountKey"); err != nil {
+		if err := unstructured.SetNestedMap(src.Object, svcAccKeyMap, "spec", "serviceAccountKey"); err != nil {
 			framework.FailfWithOffset(3, "Failed to set spec.serviceAccountKey field: %s", err)
 		}
 	}
