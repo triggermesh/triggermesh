@@ -134,7 +134,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 
 				e := receivedEvents[0]
 
-				Expect(e.Type()).To(Equal("com.google.cloud.repositories.notification"))
+				Expect(e.Type()).To(Equal("com.google.cloud.sourcerepo.notification"))
 				Expect(e.Source()).To(Equal(repo.Name))
 			})
 		})
