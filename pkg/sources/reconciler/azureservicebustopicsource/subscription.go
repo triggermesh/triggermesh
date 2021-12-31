@@ -241,7 +241,7 @@ func isDenied(err error) bool {
 //
 // The generated name must match the regexp /[A-Za-z0-9][\w.-]{0,49}/, which
 // doesn't give us a lot of characters for indicating what component owns the
-// Subscription. Thereforce, we compute the CRC32 checksum of the source's
+// Subscription. Therefore, we compute the CRC32 checksum of the source's
 // name/namespace (8 characters) and make it part of the name.
 func subscriptionName(src v1alpha1.EventSource) string {
 	nsNameChecksum := crc32.ChecksumIEEE([]byte(src.GetNamespace() + "/" + src.GetName()))

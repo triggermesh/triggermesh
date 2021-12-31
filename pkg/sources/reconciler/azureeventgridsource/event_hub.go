@@ -176,7 +176,7 @@ func ensureNoEventHub(ctx context.Context, cli eventgrid.EventHubsClient) error 
 // makeEventHubName returns a deterministic name for an Event Hubs instance.
 //
 // The generated name must match the regexp /[a-zA-Z0-9][\w.-]{0,49}/, which doesn't give us a lot of characters for
-// indicating what component owns the Event Hub. Thereforce, we compute the CRC32 checksum of the source's
+// indicating what component owns the Event Hub. Therefore, we compute the CRC32 checksum of the source's
 // name/namespace (8 characters) and make it part of the name.
 func makeEventHubName(src *v1alpha1.AzureEventGridSource) string {
 	nsNameChecksum := crc32.ChecksumIEEE([]byte(src.Namespace + "/" + src.Name))

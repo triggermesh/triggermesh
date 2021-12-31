@@ -19,6 +19,8 @@ package googlecloudauditlogssource
 import (
 	"context"
 	"fmt"
+	"hash/crc32"
+	"strconv"
 
 	"cloud.google.com/go/logging/logadmin"
 	"cloud.google.com/go/pubsub"
@@ -26,7 +28,6 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
@@ -60,7 +61,7 @@ func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *
 	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
-	sinkID := generateSinkName(src)
+	sinkID := generateSinkID(src)
 
 	sink, err := cli.Sink(ctx, sinkID)
 	switch {
@@ -188,8 +189,14 @@ func generateTopicResourceName(s *v1alpha1.GoogleCloudAuditLogsSource, topicID s
 	return fmt.Sprintf("pubsub.googleapis.com/projects/%s/topics/%s", *s.Spec.PubSub.Project, topicID)
 }
 
-// generateSinkName generates a AuditLogSink sink resource name for an
-// CloudAuditLogsSource.
-func generateSinkName(s *v1alpha1.GoogleCloudAuditLogsSource) string {
-	return fmt.Sprintf("sink-%s-%s", s.Namespace, s.Name) + sources.GoogleCloudAuditLogsSourceResource.String()
+// generateSinkID returns a deterministic resource ID for an Audit Logs router sink.
+//
+// The generated ID can contain up to 100 characters (lower-case alphanumeric
+// characters, underscores, hyphens, and periods), which doesn't give us a lot
+// of characters for indicating what component owns the logs router sink.
+// Therefore, we compute the CRC32 checksum of the source's name/namespace (8
+// characters) and make it part of the name.
+func generateSinkID(s *v1alpha1.GoogleCloudAuditLogsSource) string {
+	nsNameChecksum := crc32.ChecksumIEEE([]byte(s.Namespace + "/" + s.Name))
+	return "io.triggermesh.googlecloudauditlogssources-" + strconv.FormatUint(uint64(nsNameChecksum), 10)
 }
