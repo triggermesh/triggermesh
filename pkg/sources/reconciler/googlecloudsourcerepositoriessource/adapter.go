@@ -62,7 +62,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 
 	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides,
 		cloudevents.SetExtension(cloudevents.AttributeSource, src.AsEventSource()),
-		cloudevents.SetExtension(cloudevents.AttributeType, v1alpha1.GoogleCloudRepositoriesGenericEventType),
+		cloudevents.SetExtension(cloudevents.AttributeType, v1alpha1.GoogleCloudSourceRepoGenericEventType),
 	)
 
 	return common.NewAdapterDeployment(src, sinkURI,

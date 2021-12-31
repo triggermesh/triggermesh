@@ -24,7 +24,7 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.google.cloud.repositories.notification" }
+        { "type": "com.google.cloud.sourcerepo.notification" }
       ]
 spec:
   group: sources.triggermesh.io

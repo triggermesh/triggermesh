@@ -19,72 +19,60 @@ package storage
 
 import (
 	"context"
-	"io"
-	"os"
 
 	"cloud.google.com/go/storage"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
-)
-
-const (
-	defaultStorageClass = "STANDARD"
-	defaultLocation     = "EU"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/gcloud"
 )
 
 // CreateBucket creates a bucket named after the given framework.Framework.
-func CreateBucket(storageCli *storage.Client, project string, f *framework.Framework) string {
-	storageClassAndLocation := &storage.BucketAttrs{
-		StorageClass: defaultStorageClass,
-		Location:     defaultLocation,
+func CreateBucket(storageCli *storage.Client, project string, f *framework.Framework) string /*bucket ID*/ {
+	bucketID := f.UniqueName
+
+	bucketAttrs := &storage.BucketAttrs{
+		// Force single-region by setting an explicit region.
+		Location: "us-east1",
+		Labels:   gcloud.TagsFor(f),
 	}
 
-	bucketName := f.UniqueName
-
-	createBucket := storageCli.Bucket(bucketName)
-	if err := createBucket.Create(context.Background(), project, storageClassAndLocation); err != nil {
-		framework.FailfWithOffset(2, "Failed to create bucket %q: %s", bucketName, err)
+	if err := storageCli.Bucket(bucketID).Create(context.Background(), project, bucketAttrs); err != nil {
+		framework.FailfWithOffset(2, "Failed to create bucket %q: %s", bucketID, err)
 	}
 
-	return bucketName
+	return bucketID
 }
 
-// CreateObject creates an object named after the given framework.Framework.
-func CreateObject(storageCli *storage.Client, project string, bucket string, f *framework.Framework) string {
-	object := f.UniqueName
-	file, err := os.Create("/tmp/" + object)
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to create file %q: %s", object, err)
+// CreateObject creates an object in the given bucket.
+func CreateObject(storageCli *storage.Client, bucket string, f *framework.Framework) string /*obj name*/ {
+	const objectName = "hello.txt"
+
+	objWriter := storageCli.Bucket(bucket).Object(objectName).NewWriter(context.Background())
+	defer func() {
+		if err := objWriter.Close(); err != nil {
+			framework.FailfWithOffset(2, "Failed to close writer for object %q: %s", objectName, err)
+		}
+	}()
+
+	if _, err := objWriter.Write([]byte("Hello, World!")); err != nil {
+		framework.FailfWithOffset(2, "Failed to create object %q: %s", objectName, err)
 	}
 
-	wc := storageCli.Bucket(bucket).Object(object).NewWriter(context.Background())
-	if _, err = io.Copy(wc, file); err != nil {
-		framework.FailfWithOffset(2, "Failed to create object %q: %s", object, err)
-	}
-	if err := wc.Close(); err != nil {
-		framework.FailfWithOffset(2, "Failed to create object %q: %s", object, err)
-	}
-
-	return object
+	return objectName
 }
 
-// DeleteBucket deletes a bucket.
-func DeleteBucket(storageCli *storage.Client, bucketName string) {
-	bucket := storageCli.Bucket(bucketName)
-
-	if err := bucket.Delete(context.Background()); err != nil {
-		framework.FailfWithOffset(2, "Failed to delete bucket %q: %s", bucketName, err)
+// DeleteBucket deletes a bucket by ID.
+// Buckets need to be emptied before they can be deleted.
+func DeleteBucket(storageCli *storage.Client, bucketID string) {
+	if err := storageCli.Bucket(bucketID).Delete(context.Background()); err != nil {
+		framework.FailfWithOffset(2, "Failed to delete bucket %q: %s", bucketID, err)
 	}
 }
 
-// DeleteObject deletes an object.
-func DeleteObject(storageCli *storage.Client, bucketName string, objectName string) {
-	if err := os.Remove("/tmp/" + objectName); err != nil {
-		framework.FailfWithOffset(2, "Failed to delete file %q: %s", objectName, err)
-	}
-
-	object := storageCli.Bucket(bucketName).Object(objectName)
-	if err := object.Delete(context.Background()); err != nil {
-		framework.FailfWithOffset(2, "Failed to delete object %q: %s", objectName, err)
+// DeleteObject deletes an object by name from the given bucket.
+func DeleteObject(storageCli *storage.Client, bucketID, objectName string) {
+	if err := storageCli.Bucket(bucketID).Object(objectName).Delete(context.Background()); err != nil {
+		framework.FailfWithOffset(2, "Failed to delete object %q from bucket %q: %s",
+			objectName, bucketID, err)
 	}
 }

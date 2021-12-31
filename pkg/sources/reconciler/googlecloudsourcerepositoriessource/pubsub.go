@@ -301,7 +301,7 @@ func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResN
 	// the Pub/Sub adapter properly
 	status.Subscription = makeSubscriptionResourceName(topicResName.Project, subsID)
 
-	if !status.GetCondition(v1alpha1.GoogleCloudRepositoriesConditionSubscribed).IsTrue() {
+	if !status.GetCondition(v1alpha1.GoogleCloudSourceRepoConditionSubscribed).IsTrue() {
 		event.Normal(ctx, ReasonSubscribed, "Subscribed to topic %q", topicResName)
 	}
 

@@ -99,6 +99,7 @@ func ensureSubscription(ctx context.Context, cli *pubsub.Client) error {
 		// here, otherwise BuildAdapter() won't be able to configure
 		// the Pub/Sub adapter properly
 		status.Subscription = makeSubscriptionResourceName(topicResName.Project, *userProvided)
+		status.MarkSubscribed()
 
 		return nil
 	}
