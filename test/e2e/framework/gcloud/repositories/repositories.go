@@ -18,6 +18,10 @@ limitations under the License.
 package repositories
 
 import (
+	"errors"
+	"net/http"
+
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sourcerepo/v1"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
@@ -26,10 +30,10 @@ import (
 // CreateRepository creates a repository named after the given framework.Framework.
 func CreateRepository(repoCli *sourcerepo.Service, project string, f *framework.Framework) *sourcerepo.Repo {
 	repoRequest := &sourcerepo.Repo{
-		Name: project + "/repos/" + f.UniqueName,
+		Name: "projects/" + project + "/repos/" + f.UniqueName,
 	}
 
-	createRepo := repoCli.Projects.Repos.Create(project, repoRequest)
+	createRepo := repoCli.Projects.Repos.Create("projects/"+project, repoRequest)
 
 	repo, err := createRepo.Do()
 	if err != nil {
@@ -39,11 +43,32 @@ func CreateRepository(repoCli *sourcerepo.Service, project string, f *framework.
 	return repo
 }
 
-// DeleteRepository deletes a repository.
+// DeleteRepository deletes a repository by resource name.
+// It doesn't fail if the repository doesn't exist.
 func DeleteRepository(repoCli *sourcerepo.Service, name string) {
-	deleteRepo := repoCli.Projects.Repos.Delete(name)
+	deleteRepository(repoCli, name, true)
+}
 
-	if _, err := deleteRepo.Do(); err != nil {
-		framework.FailfWithOffset(2, "Failed to delete repo %q: %s", name, err)
+// MustDeleteRepository deletes a repository by resource name.
+// Unlike DeleteRepository, the delete call fails if the repository isn't found.
+func MustDeleteRepository(repoCli *sourcerepo.Service, name string) {
+	deleteRepository(repoCli, name, false)
+}
+
+func deleteRepository(repoCli *sourcerepo.Service, name string, tolerateNotFound bool) {
+	_, err := repoCli.Projects.Repos.Delete(name).Do()
+	switch {
+	case isNotFound(err) && tolerateNotFound:
+		return
+	case err != nil:
+		framework.FailfWithOffset(3, "Failed to delete repo %q: %s", name, err)
 	}
+}
+
+func isNotFound(err error) bool {
+	if gapiErr := (*googleapi.Error)(nil); errors.As(err, &gapiErr) {
+		return gapiErr.Code == http.StatusNotFound
+	}
+
+	return false
 }

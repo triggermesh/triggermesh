@@ -67,9 +67,8 @@ var _ = Describe("Google Cloud Repositories source", func() {
 
 	var srcClient dynamic.ResourceInterface
 
-	var repo *sourcerepo.Repo
-	var project string
-	var saKey string
+	var repoName string
+	var serviceaccountKey string
 
 	var sink *duckv1.Destination
 
@@ -80,47 +79,59 @@ var _ = Describe("Google Cloud Repositories source", func() {
 		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	Context("a source watches a repository", func() {
+	Context("a source subscribes to notifications from a repository", func() {
 		var repoClient *sourcerepo.Service
+
 		var src *unstructured.Unstructured
 		var err error
 
 		BeforeEach(func() {
-			saKey = e2egcloud.ServiceAccountKeyFromEnv()
-			project = "projects/" + e2egcloud.ProjectNameFromEnv()
-			repoClient, err = sourcerepo.NewService(context.Background(), option.WithCredentialsJSON([]byte(saKey)))
+			serviceaccountKey = e2egcloud.ServiceAccountKeyFromEnv()
+			gcloudProject := e2egcloud.ProjectNameFromEnv()
+
+			repoClient, err = sourcerepo.NewService(context.Background(), option.WithCredentialsJSON([]byte(serviceaccountKey)))
 			Expect(err).ToNot(HaveOccurred())
 
 			By("creating an event sink", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 			})
 
-			By("creating a repository", func() {
-				repo = e2erepo.CreateRepository(repoClient, project, f)
+			By("creating a source repository", func() {
+				repoName = e2erepo.CreateRepository(repoClient, gcloudProject, f).Name
 			})
 
-			By("creating a GoogleCloudSourceRepositories object", func() {
+			By("creating a GoogleCloudSourceRepositoriesSource object", func() {
 				src, err = createSource(srcClient, ns, "test-", sink,
-					withRepository(repo.Name),
-					withCredentials(saKey),
+					withRepository(repoName),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).ToNot(HaveOccurred())
+
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
-				// without this short pause, the receive adapter throws an
-				// error when deleting the topic.
-				time.Sleep(5 * time.Second)
 			})
 		})
 
-		When("the repository is deleted", func() {
-			AfterEach(func() {
-				By("deleting a GoogleCloudSourceRepositories object", func() {
-					err := srcClient.Delete(context.Background(), src.GetName(), metav1.DeleteOptions{})
-					Expect(err).ToNot(HaveOccurred())
-				})
+		AfterEach(func() {
+			By("deleting the source repository "+repoName, func() {
+				e2erepo.DeleteRepository(repoClient, repoName)
 			})
+		})
+
+		When("an event occurs in the repository", func() {
+
+			BeforeEach(func() {
+				// There are 2 ways to produce a notification to Pub/Sub:
+				//  - perform a Git push to the source repository
+				//  - delete the source repository
+				//
+				// The latter is simpler to execute inside a test suite since it doesn't require a
+				// configured Git client.
+				//
+				// https://cloud.google.com/source-repositories/docs/pubsub-notifications#event_types
+				e2erepo.MustDeleteRepository(repoClient, repoName)
+			})
+
 			Specify("the source generates an event", func() {
-				e2erepo.DeleteRepository(repoClient, repo.Name)
 
 				const receiveTimeout = 15 * time.Second
 				const pollInterval = 500 * time.Millisecond
@@ -135,12 +146,27 @@ var _ = Describe("Google Cloud Repositories source", func() {
 				e := receivedEvents[0]
 
 				Expect(e.Type()).To(Equal("com.google.cloud.sourcerepo.notification"))
-				Expect(e.Source()).To(Equal(repo.Name))
+				Expect(e.Source()).To(Equal(repoName))
 			})
 		})
 	})
 
-	When("a client creates a source object with invalid repository", func() {
+	When("a client creates a source object with invalid specs", func() {
+
+		// Those tests do not require a real repository or sink
+		BeforeEach(func() {
+			repoName = "projects/fake-project/repos/fake-repo"
+
+			serviceaccountKey = "fake-creds"
+
+			sink = &duckv1.Destination{
+				Ref: &duckv1.KReference{
+					APIVersion: "fake/v1",
+					Kind:       "Fake",
+					Name:       "fake",
+				},
+			}
+		})
 
 		// Here we use
 		//   "Specify: the API server rejects ..., By: setting an invalid ..."
@@ -150,30 +176,38 @@ var _ = Describe("Google Cloud Repositories source", func() {
 		Specify("the API server rejects the creation of that object", func() {
 
 			By("setting an invalid repository", func() {
-				saKey = "fake-creds"
-
-				sink = &duckv1.Destination{
-					Ref: &duckv1.KReference{
-						APIVersion: "fake/v1",
-						Kind:       "Fake",
-						Name:       "fake",
-					},
-				}
-
-				repo := "projects/fake-project/repos//"
+				invalidRepoName := "projects/fake-project/repos//"
 
 				_, err := createSource(srcClient, ns, "test-invalid-repository-", sink,
-					withRepository(repo),
-					withCredentials(saKey),
+					withRepository(invalidRepoName),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.repository: Invalid value: "))
+			})
+
+			By("omitting the repository", func() {
+				_, err := createSource(srcClient, ns, "test-norepo-", sink,
+					withServiceAccountKey(serviceaccountKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.repository: Required value"))
+			})
+
+			By("setting empty credentials", func() {
+				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
+					withRepository(repoName),
+					withServiceAccountKey(""),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(
+					`"spec.serviceAccountKey" must validate one and only one schema (oneOf).`))
 			})
 		})
 	})
 })
 
-// createSource creates a GoogleCloudSourceRepositories object initialized with the given options.
+// createSource creates a GoogleCloudSourceRepositoriesSource object initialized with the given options.
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
 
@@ -204,11 +238,14 @@ func withRepository(repo string) sourceOption {
 	}
 }
 
-func withCredentials(creds string) sourceOption {
-	c := map[string]interface{}{"value": creds}
+func withServiceAccountKey(key string) sourceOption {
+	svcAccKeyMap := make(map[string]interface{})
+	if key != "" {
+		svcAccKeyMap = map[string]interface{}{"value": key}
+	}
 
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedField(src.Object, c, "spec", "serviceAccountKey"); err != nil {
+		if err := unstructured.SetNestedMap(src.Object, svcAccKeyMap, "spec", "serviceAccountKey"); err != nil {
 			framework.FailfWithOffset(3, "Failed to set spec.serviceAccountKey field: %s", err)
 		}
 	}
