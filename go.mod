@@ -23,7 +23,7 @@ require (
 	cloud.google.com/go/workflows v1.0.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.2
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
-	github.com/Azure/azure-sdk-for-go v60.3.0+incompatible
+	github.com/Azure/azure-sdk-for-go v61.0.0+incompatible
 	github.com/Azure/azure-service-bus-go v0.11.5
 	github.com/Azure/azure-storage-queue-go v0.0.0-20191125232315-636801874cdd
 	github.com/Azure/go-autorest/autorest v0.11.23
@@ -110,8 +110,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/emicklei/go-restful v2.15.0+incompatible // indirect
-	github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021 // indirect
-	github.com/envoyproxy/protoc-gen-validate v0.1.0 // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
