@@ -226,6 +226,14 @@ type HTTPPollerSourceListerExpansion interface{}
 // HTTPPollerSourceNamespaceLister.
 type HTTPPollerSourceNamespaceListerExpansion interface{}
 
+// IBMMQSourceListerExpansion allows custom methods to be added to
+// IBMMQSourceLister.
+type IBMMQSourceListerExpansion interface{}
+
+// IBMMQSourceNamespaceListerExpansion allows custom methods to be added to
+// IBMMQSourceNamespaceLister.
+type IBMMQSourceNamespaceListerExpansion interface{}
+
 // OCIMetricsSourceListerExpansion allows custom methods to be added to
 // OCIMetricsSourceLister.
 type OCIMetricsSourceListerExpansion interface{}

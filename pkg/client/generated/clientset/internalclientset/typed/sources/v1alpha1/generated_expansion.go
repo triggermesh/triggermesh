@@ -70,6 +70,8 @@ type GoogleCloudStorageSourceExpansion interface{}
 
 type HTTPPollerSourceExpansion interface{}
 
+type IBMMQSourceExpansion interface{}
+
 type OCIMetricsSourceExpansion interface{}
 
 type SalesforceSourceExpansion interface{}
