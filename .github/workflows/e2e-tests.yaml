@@ -62,7 +62,7 @@ jobs:
         kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-webhook
 
     - name: Install Ginkgo
-      run: go install github.com/onsi/ginkgo/ginkgo
+      run: go install github.com/onsi/ginkgo/v2/ginkgo
 
     - name: Export KUBECONFIG path
       run: echo "KUBECONFIG=${HOME}/.kube/config" >> $GITHUB_ENV
@@ -74,4 +74,4 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         GCLOUD_PROJECT: ${{ secrets.GCLOUD_PROJECT }}
         GCLOUD_SERVICEACCOUNT_KEY: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
-      run: ginkgo -nodes=4 -slowSpecThreshold=60 -randomizeAllSpecs ./test/e2e/
+      run: ginkgo -p -slow-spec-threshold=1m -randomize-all ./test/e2e/

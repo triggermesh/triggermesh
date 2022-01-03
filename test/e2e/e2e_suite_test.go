@@ -19,8 +19,8 @@ package e2e
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo" //nolint:stylecheck
-	. "github.com/onsi/gomega" //nolint:stylecheck
+	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
+	. "github.com/onsi/gomega"    //nolint:stylecheck
 
 	// support client-go's auth providers
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
