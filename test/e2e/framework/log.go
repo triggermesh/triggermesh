@@ -19,7 +19,7 @@ package framework
 import (
 	"fmt"
 
-	"github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/v2"
 )
 
 // Logf logs the given message.

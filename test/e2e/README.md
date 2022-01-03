@@ -28,16 +28,13 @@ tasks executed automatically before and after each of these specs.
 
 ### Execution
 
-| :warning: Do not ever interrupt running tests with `Ctrl-C`. When interrupted, Ginkgo only triggers the global `AfterSuite` logic and skips all the individual `AfterEach` blocks declared in running tests. This can leave dangling resources behind that are tedious to clean up manually and can become costly if not terminated quickly. Ref. [onsi/ginkgo#222][ginkgo-issue222].
-| :--- |
-
 While it is possible to run tests using `go test` like standard unit tests, it is recommended to use the `ginkgo` CLI
 tool for running Ginkgo test suites, which offers better control over Gingko-specific parameters, such as the
 parallelism of test specs, the format and verbosity of the reporter's output, etc.
 
 ```sh
 # Using the Ginkgo version pinned inside `go.mod`
-go run github.com/onsi/ginkgo/ginkgo
+go run github.com/onsi/ginkgo/v2/ginkgo
 
 # Or using an executable installed via `go install`
 ginkgo
@@ -112,7 +109,7 @@ move those helpers to a suitable sub-package of `framework`.
 
 ### Structure
 
-The Ginkgo documentation contains good examples for [Structuring Your Specs][ginkgo-struct] in an expressive manner.
+The Ginkgo documentation contains good examples for [Writing Specs][ginkgo-specs] in an expressive manner.
 
 Ginkgo spec blocks can be nested in many different ways and developers are free to organize them however they please.
 One golden rule is that **the hierarchy of spec blocks should read as naturally as possible**.
@@ -365,8 +362,7 @@ The benefits of this approach become more obvious when the complexity of test sc
 
 
 [ginkgo-docs]: https://onsi.github.io/ginkgo/
-[ginkgo-issue222]: https://github.com/onsi/ginkgo/issues/222
-[ginkgo-struct]: https://onsi.github.io/ginkgo/#structuring-your-specs
+[ginkgo-specs]: https://onsi.github.io/ginkgo/#writing-specs
 [optimized-test]: https://github.com/triggermesh/triggermesh/blob/1d8390e2/test/e2e/sources/awscodecommit/main.go#L171-L187
 
 [k8s-e2e]: https://godoc.org/k8s.io/kubernetes/test/e2e

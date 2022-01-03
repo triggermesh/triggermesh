@@ -19,9 +19,10 @@ limitations under the License.
 
 package hack
 
-// These imports ensure build tools are included in Go modules.
+// These imports ensure build tools are included in Go modules so that we can
+// `go install` them in module-aware mode.
 // See https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module
 import (
-	_ "github.com/onsi/ginkgo/ginkgo"
+	_ "github.com/onsi/ginkgo/v2/ginkgo"
 	_ "k8s.io/code-generator"
 )

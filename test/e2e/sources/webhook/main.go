@@ -21,8 +21,8 @@ import (
 	"net/url"
 	"time"
 
-	. "github.com/onsi/ginkgo" //nolint:stylecheck
-	. "github.com/onsi/gomega" //nolint:stylecheck
+	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
+	. "github.com/onsi/gomega"    //nolint:stylecheck
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
