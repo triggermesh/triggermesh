@@ -22,7 +22,7 @@ import (
 	context "context"
 
 	factoryfiltered "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/factory/filtered"
-	filtered "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudrepositoriessource/filtered"
+	filtered "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudsourcerepositoriessource/filtered"
 	controller "knative.dev/pkg/controller"
 	injection "knative.dev/pkg/injection"
 	logging "knative.dev/pkg/logging"
@@ -44,7 +44,7 @@ func withInformer(ctx context.Context) (context.Context, []controller.Informer) 
 	infs := []controller.Informer{}
 	for _, selector := range labelSelectors {
 		f := factoryfiltered.Get(ctx, selector)
-		inf := f.Sources().V1alpha1().GoogleCloudRepositoriesSources()
+		inf := f.Sources().V1alpha1().GoogleCloudSourceRepositoriesSources()
 		ctx = context.WithValue(ctx, filtered.Key{Selector: selector}, inf)
 		infs = append(infs, inf.Informer())
 	}

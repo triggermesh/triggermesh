@@ -70,8 +70,8 @@ type Interface interface {
 	GoogleCloudIoTSources() GoogleCloudIoTSourceInformer
 	// GoogleCloudPubSubSources returns a GoogleCloudPubSubSourceInformer.
 	GoogleCloudPubSubSources() GoogleCloudPubSubSourceInformer
-	// GoogleCloudRepositoriesSources returns a GoogleCloudRepositoriesSourceInformer.
-	GoogleCloudRepositoriesSources() GoogleCloudRepositoriesSourceInformer
+	// GoogleCloudSourceRepositoriesSources returns a GoogleCloudSourceRepositoriesSourceInformer.
+	GoogleCloudSourceRepositoriesSources() GoogleCloudSourceRepositoriesSourceInformer
 	// GoogleCloudStorageSources returns a GoogleCloudStorageSourceInformer.
 	GoogleCloudStorageSources() GoogleCloudStorageSourceInformer
 	// HTTPPollerSources returns a HTTPPollerSourceInformer.
@@ -216,9 +216,9 @@ func (v *version) GoogleCloudPubSubSources() GoogleCloudPubSubSourceInformer {
 	return &googleCloudPubSubSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// GoogleCloudRepositoriesSources returns a GoogleCloudRepositoriesSourceInformer.
-func (v *version) GoogleCloudRepositoriesSources() GoogleCloudRepositoriesSourceInformer {
-	return &googleCloudRepositoriesSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// GoogleCloudSourceRepositoriesSources returns a GoogleCloudSourceRepositoriesSourceInformer.
+func (v *version) GoogleCloudSourceRepositoriesSources() GoogleCloudSourceRepositoriesSourceInformer {
+	return &googleCloudSourceRepositoriesSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GoogleCloudStorageSources returns a GoogleCloudStorageSourceInformer.

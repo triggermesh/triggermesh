@@ -27,39 +27,39 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudRepositoriesSource is the Schema for the event source.
-type GoogleCloudRepositoriesSource struct {
+// GoogleCloudSourceRepositoriesSource is the Schema for the event source.
+type GoogleCloudSourceRepositoriesSource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GoogleCloudRepositoriesSourceSpec   `json:"spec,omitempty"`
-	Status GoogleCloudRepositoriesSourceStatus `json:"status,omitempty"`
+	Spec   GoogleCloudSourceRepositoriesSourceSpec   `json:"spec,omitempty"`
+	Status GoogleCloudSourceRepositoriesSourceStatus `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object = (*GoogleCloudRepositoriesSource)(nil)
-	_ EventSource    = (*GoogleCloudRepositoriesSource)(nil)
+	_ runtime.Object = (*GoogleCloudSourceRepositoriesSource)(nil)
+	_ EventSource    = (*GoogleCloudSourceRepositoriesSource)(nil)
 )
 
-// GoogleCloudRepositoriesSourceSpec defines the desired state of the event source.
-type GoogleCloudRepositoriesSourceSpec struct {
+// GoogleCloudSourceRepositoriesSourceSpec defines the desired state of the event source.
+type GoogleCloudSourceRepositoriesSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
 	// Name of the Cloud repo to receive notifications from.
 	Repository GCloudResourceName `json:"repository"`
 
 	// Settings related to the Pub/Sub resources associated with the repo events.
-	PubSub GoogleCloudRepositoriesSourcePubSubSpec `json:"pubsub"`
+	PubSub GoogleCloudSourceRepositoriesSourcePubSubSpec `json:"pubsub"`
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	ServiceAccountKey ValueFromField `json:"serviceAccountKey"`
 }
 
-// GoogleCloudRepositoriesSourcePubSubSpec defines the attributes related to the
+// GoogleCloudSourceRepositoriesSourcePubSubSpec defines the attributes related to the
 // configuration of Pub/Sub resources.
-type GoogleCloudRepositoriesSourcePubSubSpec struct {
+type GoogleCloudSourceRepositoriesSourcePubSubSpec struct {
 	// Optional: no more than one of the following may be specified.
 
 	// Full resource name of the Pub/Sub topic where change notifications
@@ -83,8 +83,8 @@ type GoogleCloudRepositoriesSourcePubSubSpec struct {
 	Project *string `json:"project,omitempty"`
 }
 
-// GoogleCloudRepositoriesSourceStatus defines the observed state of the event source.
-type GoogleCloudRepositoriesSourceStatus struct {
+// GoogleCloudSourceRepositoriesSourceStatus defines the observed state of the event source.
+type GoogleCloudSourceRepositoriesSourceStatus struct {
 	EventSourceStatus `json:",inline"`
 
 	// Resource name of the target Pub/Sub topic.
@@ -97,9 +97,9 @@ type GoogleCloudRepositoriesSourceStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudRepositoriesSourceList contains a list of event sources.
-type GoogleCloudRepositoriesSourceList struct {
+// GoogleCloudSourceRepositoriesSourceList contains a list of event sources.
+type GoogleCloudSourceRepositoriesSourceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []GoogleCloudRepositoriesSource `json:"items"`
+	Items           []GoogleCloudSourceRepositoriesSource `json:"items"`
 }

@@ -64,7 +64,7 @@ type GoogleCloudIoTSourceExpansion interface{}
 
 type GoogleCloudPubSubSourceExpansion interface{}
 
-type GoogleCloudRepositoriesSourceExpansion interface{}
+type GoogleCloudSourceRepositoriesSourceExpansion interface{}
 
 type GoogleCloudStorageSourceExpansion interface{}
 

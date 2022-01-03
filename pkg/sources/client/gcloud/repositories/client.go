@@ -32,7 +32,7 @@ import (
 
 // ClientGetter can obtain Google Cloud API clients.
 type ClientGetter interface {
-	Get(*v1alpha1.GoogleCloudRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error)
+	Get(*v1alpha1.GoogleCloudSourceRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error)
 }
 
 // NewClientGetter returns a ClientGetter for the given secrets getter.
@@ -55,7 +55,7 @@ type ClientGetterWithSecretGetter struct {
 var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
-func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error) {
+func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudSourceRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error) {
 	requestedSecrets, err := secret.NewGetter(g.sg(src.Namespace)).Get(src.Spec.ServiceAccountKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("retrieving Google Cloud service account key: %w", err)
@@ -85,12 +85,12 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudRepositories
 }
 
 // ClientGetterFunc allows the use of ordinary functions as ClientGetter.
-type ClientGetterFunc func(*v1alpha1.GoogleCloudRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error)
+type ClientGetterFunc func(*v1alpha1.GoogleCloudSourceRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error)
 
 // ClientGetterFunc implements ClientGetter.
 var _ ClientGetter = (ClientGetterFunc)(nil)
 
 // Get implements ClientGetter.
-func (f ClientGetterFunc) Get(src *v1alpha1.GoogleCloudRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error) {
+func (f ClientGetterFunc) Get(src *v1alpha1.GoogleCloudSourceRepositoriesSource) (*pubsub.Client, *sourcerepo.Service, error) {
 	return f(src)
 }

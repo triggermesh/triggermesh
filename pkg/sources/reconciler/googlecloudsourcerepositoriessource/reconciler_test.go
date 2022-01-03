@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositoriessource
+package googlecloudsourcerepositoriessource
 
 import (
 	"context"
@@ -32,7 +32,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudrepositoriessource"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudsourcerepositoriessource"
 	repositories "github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/repositories"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
@@ -56,27 +56,27 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
 			cg:         staticClientGetter((*gpubsub.Client)(nil), (*gsourcerepo.Service)(nil)),
-			srcLister:  ls.GetGoogleCloudRepositoriesSourceLister().GoogleCloudRepositoriesSources,
+			srcLister:  ls.GetGoogleCloudSourceRepositoriesSourceLister().GoogleCloudSourceRepositoriesSources,
 			base:       NewTestDeploymentReconciler(ctx, ls),
 			adapterCfg: cfg,
 		}
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
-			fakeinjectionclient.Get(ctx), ls.GetGoogleCloudRepositoriesSourceLister(),
+			fakeinjectionclient.Get(ctx), ls.GetGoogleCloudSourceRepositoriesSourceLister(),
 			controller.GetEventRecorder(ctx), r)
 	}
 }
 
 // newEventSource returns a test source object with a minimal set of pre-filled attributes.
-func newEventSource() *v1alpha1.GoogleCloudRepositoriesSource {
-	src := &v1alpha1.GoogleCloudRepositoriesSource{
-		Spec: v1alpha1.GoogleCloudRepositoriesSourceSpec{
+func newEventSource() *v1alpha1.GoogleCloudSourceRepositoriesSource {
+	src := &v1alpha1.GoogleCloudSourceRepositoriesSource{
+		Spec: v1alpha1.GoogleCloudSourceRepositoriesSourceSpec{
 			Repository: v1alpha1.GCloudResourceName{
 				Project:    "my-project",
 				Collection: "repos",
 				Resource:   "my-repo",
 			},
-			PubSub: v1alpha1.GoogleCloudRepositoriesSourcePubSubSpec{
+			PubSub: v1alpha1.GoogleCloudSourceRepositoriesSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
 			ServiceAccountKey: v1alpha1.ValueFromField{
@@ -87,7 +87,7 @@ func newEventSource() *v1alpha1.GoogleCloudRepositoriesSource {
 
 	// assume finalizer is already set to prevent the generated reconciler
 	// from generating an extra Patch action
-	src.Finalizers = []string{sources.GoogleCloudRepositoriesSourceResource.String()}
+	src.Finalizers = []string{sources.GoogleCloudSourceRepositoriesSourceResource.String()}
 
 	Populate(src)
 
@@ -106,7 +106,7 @@ func adapterBuilder(cfg *adapterConfig) common.AdapterDeploymentBuilder {
 
 // staticClientGetter transforms the given client into a ClientGetter.
 func staticClientGetter(psCli *gpubsub.Client, stCli *gsourcerepo.Service) repositories.ClientGetterFunc {
-	return func(*v1alpha1.GoogleCloudRepositoriesSource) (*gpubsub.Client, *gsourcerepo.Service, error) {
+	return func(*v1alpha1.GoogleCloudSourceRepositoriesSource) (*gpubsub.Client, *gsourcerepo.Service, error) {
 		return psCli, stCli, nil
 	}
 }

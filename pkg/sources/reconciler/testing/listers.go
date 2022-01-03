@@ -198,9 +198,9 @@ func (l *Listers) GetGoogleCloudPubSubSourceLister() listersv1alpha1.GoogleCloud
 	return listersv1alpha1.NewGoogleCloudPubSubSourceLister(l.IndexerFor(&v1alpha1.GoogleCloudPubSubSource{}))
 }
 
-// GetGoogleCloudRepositoriesSourceLister returns a Lister for GoogleCloudRepositoriesSource objects.
-func (l *Listers) GetGoogleCloudRepositoriesSourceLister() listersv1alpha1.GoogleCloudRepositoriesSourceLister {
-	return listersv1alpha1.NewGoogleCloudRepositoriesSourceLister(l.IndexerFor(&v1alpha1.GoogleCloudRepositoriesSource{}))
+// GetGoogleCloudSourceRepositoriesSourceLister returns a Lister for GoogleCloudSourceRepositoriesSource objects.
+func (l *Listers) GetGoogleCloudSourceRepositoriesSourceLister() listersv1alpha1.GoogleCloudSourceRepositoriesSourceLister {
+	return listersv1alpha1.NewGoogleCloudSourceRepositoriesSourceLister(l.IndexerFor(&v1alpha1.GoogleCloudSourceRepositoriesSource{}))
 }
 
 // GetGoogleCloudStorageSourceLister returns a Lister for GoogleCloudStorageSource objects.

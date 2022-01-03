@@ -32,59 +32,59 @@ import (
 	cache "k8s.io/client-go/tools/cache"
 )
 
-// GoogleCloudRepositoriesSourceInformer provides access to a shared informer and lister for
-// GoogleCloudRepositoriesSources.
-type GoogleCloudRepositoriesSourceInformer interface {
+// GoogleCloudSourceRepositoriesSourceInformer provides access to a shared informer and lister for
+// GoogleCloudSourceRepositoriesSources.
+type GoogleCloudSourceRepositoriesSourceInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.GoogleCloudRepositoriesSourceLister
+	Lister() v1alpha1.GoogleCloudSourceRepositoriesSourceLister
 }
 
-type googleCloudRepositoriesSourceInformer struct {
+type googleCloudSourceRepositoriesSourceInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewGoogleCloudRepositoriesSourceInformer constructs a new informer for GoogleCloudRepositoriesSource type.
+// NewGoogleCloudSourceRepositoriesSourceInformer constructs a new informer for GoogleCloudSourceRepositoriesSource type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewGoogleCloudRepositoriesSourceInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredGoogleCloudRepositoriesSourceInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewGoogleCloudSourceRepositoriesSourceInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredGoogleCloudSourceRepositoriesSourceInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredGoogleCloudRepositoriesSourceInformer constructs a new informer for GoogleCloudRepositoriesSource type.
+// NewFilteredGoogleCloudSourceRepositoriesSourceInformer constructs a new informer for GoogleCloudSourceRepositoriesSource type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredGoogleCloudRepositoriesSourceInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredGoogleCloudSourceRepositoriesSourceInformer(client internalclientset.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.SourcesV1alpha1().GoogleCloudRepositoriesSources(namespace).List(context.TODO(), options)
+				return client.SourcesV1alpha1().GoogleCloudSourceRepositoriesSources(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.SourcesV1alpha1().GoogleCloudRepositoriesSources(namespace).Watch(context.TODO(), options)
+				return client.SourcesV1alpha1().GoogleCloudSourceRepositoriesSources(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&sourcesv1alpha1.GoogleCloudRepositoriesSource{},
+		&sourcesv1alpha1.GoogleCloudSourceRepositoriesSource{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *googleCloudRepositoriesSourceInformer) defaultInformer(client internalclientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredGoogleCloudRepositoriesSourceInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *googleCloudSourceRepositoriesSourceInformer) defaultInformer(client internalclientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredGoogleCloudSourceRepositoriesSourceInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *googleCloudRepositoriesSourceInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&sourcesv1alpha1.GoogleCloudRepositoriesSource{}, f.defaultInformer)
+func (f *googleCloudSourceRepositoriesSourceInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&sourcesv1alpha1.GoogleCloudSourceRepositoriesSource{}, f.defaultInformer)
 }
 
-func (f *googleCloudRepositoriesSourceInformer) Lister() v1alpha1.GoogleCloudRepositoriesSourceLister {
-	return v1alpha1.NewGoogleCloudRepositoriesSourceLister(f.Informer().GetIndexer())
+func (f *googleCloudSourceRepositoriesSourceInformer) Lister() v1alpha1.GoogleCloudSourceRepositoriesSourceLister {
+	return v1alpha1.NewGoogleCloudSourceRepositoriesSourceLister(f.Informer().GetIndexer())
 }

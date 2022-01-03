@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositoriessource
+package googlecloudsourcerepositoriessource
 
 import (
 	"context"
@@ -34,7 +34,7 @@ import (
 	grpcstatus "google.golang.org/grpc/status"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudrepositoriessource"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudsourcerepositoriessource"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/repositories"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
@@ -46,7 +46,7 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Google Cloud APIs
 	cg repositories.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.GoogleCloudRepositoriesSourceNamespaceLister
+	srcLister func(namespace string) listersv1alpha1.GoogleCloudSourceRepositoriesSourceNamespaceLister
 
 	// Event Hubs adapter
 	base       common.GenericDeploymentReconciler
@@ -60,7 +60,7 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 var _ reconcilerv1alpha1.Finalizer = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudRepositoriesSource) reconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudSourceRepositoriesSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
 	ctx = v1alpha1.WithSource(ctx, o)
 
@@ -90,7 +90,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudR
 }
 
 // FinalizeKind is called when the resource is deleted.
-func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudRepositoriesSource) reconciler.Event {
+func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudSourceRepositoriesSource) reconciler.Event {
 	// inject source into context for usage in finalization logic
 	ctx = v1alpha1.WithSource(ctx, o)
 

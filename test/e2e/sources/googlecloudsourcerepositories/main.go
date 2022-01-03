@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package googlecloudrepositories
+package googlecloudsourcerepositories
 
 import (
 	"context"
@@ -56,12 +56,12 @@ var sourceAPIVersion = schema.GroupVersion{
 }
 
 const (
-	sourceKind     = "GoogleCloudRepositoriesSource"
-	sourceResource = "googlecloudrepositoriessources"
+	sourceKind     = "GoogleCloudSourceRepositoriesSource"
+	sourceResource = "googlecloudsourcerepositoriessources"
 )
 
 var _ = Describe("Google Cloud Repositories source", func() {
-	f := framework.New("googlecloudrepositoriessource")
+	f := framework.New("googlecloudsourcerepositoriessource")
 
 	var ns string
 
@@ -99,7 +99,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 				repo = e2erepo.CreateRepository(repoClient, project, f)
 			})
 
-			By("creating a GoogleCloudRepositories object", func() {
+			By("creating a GoogleCloudSourceRepositories object", func() {
 				src, err = createSource(srcClient, ns, "test-", sink,
 					withRepository(repo.Name),
 					withCredentials(saKey),
@@ -114,7 +114,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 
 		When("the repository is deleted", func() {
 			AfterEach(func() {
-				By("deleting a GoogleCloudRepositories object", func() {
+				By("deleting a GoogleCloudSourceRepositories object", func() {
 					err := srcClient.Delete(context.Background(), src.GetName(), metav1.DeleteOptions{})
 					Expect(err).ToNot(HaveOccurred())
 				})
@@ -134,7 +134,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 
 				e := receivedEvents[0]
 
-				Expect(e.Type()).To(Equal("com.google.cloud.repositories.notification"))
+				Expect(e.Type()).To(Equal("com.google.cloud.sourcerepo.notification"))
 				Expect(e.Source()).To(Equal(repo.Name))
 			})
 		})
@@ -173,7 +173,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 	})
 })
 
-// createSource creates a GoogleCloudRepositories object initialized with the given options.
+// createSource creates a GoogleCloudSourceRepositories object initialized with the given options.
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
 
