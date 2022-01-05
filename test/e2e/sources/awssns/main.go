@@ -95,6 +95,12 @@ var _ = Describe("AWS SNS source", func() {
 
 			By("creating a SNS topic", func() {
 				topicARN = e2esns.CreateTopic(snsClient, f)
+
+				DeferCleanup(func() {
+					By("deleting SNS topic "+topicARN, func() {
+						e2esns.DeleteTopic(snsClient, topicARN)
+					})
+				})
 			})
 
 			By("creating an AWSSNSSource object", func() {
@@ -113,12 +119,6 @@ var _ = Describe("AWS SNS source", func() {
 				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
 				//
 				time.Sleep(5 * time.Second)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting SNS topic "+topicARN, func() {
-				e2esns.DeleteTopic(snsClient, topicARN)
 			})
 		})
 

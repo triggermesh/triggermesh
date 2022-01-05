@@ -119,6 +119,12 @@ var _ = Describe("Azure Blob Storage source", func() {
 			By("creating a resource group", func() {
 				rg := azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
 				rgName = *rg.Name
+
+				DeferCleanup(func() {
+					By("deleting the resource group "+rgName, func() {
+						_ = azure.DeleteResourceGroup(ctx, subscriptionID, rgName)
+					})
+				})
 			})
 
 			By("creating a storage account and Blob container", func() {
@@ -158,12 +164,6 @@ var _ = Describe("Azure Blob Storage source", func() {
 				// events are routed over Event Grid). The source shouldn't report Ready before this
 				// system topic is available, because events occuring prior to that are dropped.
 				time.Sleep(1 * time.Minute)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting the resource group "+rgName, func() {
-				_ = azure.DeleteResourceGroup(ctx, subscriptionID, rgName)
 			})
 		})
 

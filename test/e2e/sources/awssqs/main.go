@@ -94,6 +94,12 @@ var _ = Describe("AWS SQS source", func() {
 
 			By("creating a SQS queue", func() {
 				queueURL = e2esqs.CreateQueue(sqsClient, f)
+
+				DeferCleanup(func() {
+					By("deleting SQS queue "+queueURL, func() {
+						e2esqs.DeleteQueue(sqsClient, queueURL)
+					})
+				})
 			})
 
 			By("creating an AWSSQSSource object", func() {
@@ -113,12 +119,6 @@ var _ = Describe("AWS SQS source", func() {
 				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
 				//
 				time.Sleep(5 * time.Second)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting SQS queue "+queueURL, func() {
-				e2esqs.DeleteQueue(sqsClient, queueURL)
 			})
 		})
 

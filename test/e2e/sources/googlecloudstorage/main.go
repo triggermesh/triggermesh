@@ -99,6 +99,12 @@ var _ = Describe("Google Cloud Storage source", func() {
 
 			By("creating a bucket", func() {
 				bucketID = e2estorage.CreateBucket(storageClient, gcloudProject, f)
+
+				DeferCleanup(func() {
+					By("deleting storage bucket "+bucketID, func() {
+						e2estorage.DeleteBucket(storageClient, bucketID)
+					})
+				})
 			})
 
 			By("creating a GoogleCloudStorageSource object", func() {
@@ -114,22 +120,16 @@ var _ = Describe("Google Cloud Storage source", func() {
 			})
 		})
 
-		AfterEach(func() {
-			By("deleting storage bucket "+bucketID, func() {
-				e2estorage.DeleteBucket(storageClient, bucketID)
-			})
-		})
-
 		When("a new object is created", func() {
 			var objectName string
 
 			BeforeEach(func() {
 				objectName = e2estorage.CreateObject(storageClient, bucketID, f)
-			})
 
-			AfterEach(func() {
-				By("deleting object "+objectName+" from storage bucket "+bucketID, func() {
-					e2estorage.DeleteObject(storageClient, bucketID, objectName)
+				DeferCleanup(func() {
+					By("deleting object "+objectName+" from storage bucket "+bucketID, func() {
+						e2estorage.DeleteObject(storageClient, bucketID, objectName)
+					})
 				})
 			})
 

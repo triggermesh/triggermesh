@@ -107,6 +107,10 @@ var _ = Describe("Azure ServiceBusTopic", func() {
 
 		BeforeEach(func() {
 			rg = e2eazure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+			DeferCleanup(func() {
+				_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
+			})
+
 			nsClient := e2eazure.CreateServiceBusNamespaceClient(ctx, subscriptionID, ns)
 			err := e2eazure.CreateServiceBusNamespace(ctx, *nsClient, *rg.Name, ns, region)
 			Expect(err).ToNot(HaveOccurred())
@@ -156,10 +160,6 @@ var _ = Describe("Azure ServiceBusTopic", func() {
 					Expect(data["ID"]).To(Equal(testID))
 				})
 			})
-		})
-
-		AfterEach(func() {
-			_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
 		})
 	})
 

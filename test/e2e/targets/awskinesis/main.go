@@ -75,7 +75,6 @@ var _ = Describe("AWS Kinesis target", func() {
 
 	var streamARN string
 	var streamName string
-	var awsCreds credentials.Value
 	var awsSecret *corev1.Secret
 
 	BeforeEach(func() {
@@ -92,18 +91,19 @@ var _ = Describe("AWS Kinesis target", func() {
 		BeforeEach(func() {
 			sess := session.Must(session.NewSession())
 			kc = kinesis.New(sess)
-			awsCreds = readAWSCredentials(sess)
+
+			awsCreds := readAWSCredentials(sess)
+			awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
 
 			By("creating a Kinesis data stream", func() {
 				streamARN = e2ekinesis.CreateDatastream(kc, f)
 				streamName = path.Base(aws.ParseARN(streamARN).Resource)
-				awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
-			})
-		})
 
-		AfterEach(func() {
-			By("deleting Kinesis data stream "+streamName, func() {
-				e2ekinesis.DeleteStream(kc, streamName)
+				DeferCleanup(func() {
+					By("deleting Kinesis data stream "+streamName, func() {
+						e2ekinesis.DeleteStream(kc, streamName)
+					})
+				})
 			})
 		})
 
@@ -222,7 +222,7 @@ var _ = Describe("AWS Kinesis target", func() {
 		// Those tests do not require a real streamARN or awsSecret
 		BeforeEach(func() {
 			streamARN = "arn:aws:kinesis:eu-central-1:000000000000/test"
-			awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
+			awsSecret = &corev1.Secret{}
 		})
 
 		// Here we use

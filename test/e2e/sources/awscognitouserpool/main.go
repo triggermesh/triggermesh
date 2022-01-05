@@ -101,6 +101,12 @@ var _ = Describe("AWS Cognito UserPool source", func() {
 
 				// TODO: remove after https://github.com/triggermesh/triggermesh/issues/35 is resolved
 				e2ecognitouserpool.CreateUser(cc, poolID, "alice")
+
+				DeferCleanup(func() {
+					By("deleting Cognito userpool "+poolID, func() {
+						e2ecognitouserpool.DeleteUserPool(cc, poolID)
+					})
+				})
 			})
 
 			By("creating an AWSCognitoUserPoolSource object", func() {
@@ -119,12 +125,6 @@ var _ = Describe("AWS Cognito UserPool source", func() {
 				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
 				//
 				time.Sleep(2 * time.Second)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting Cognito userpool "+poolID, func() {
-				e2ecognitouserpool.DeleteUserPool(cc, poolID)
 			})
 		})
 

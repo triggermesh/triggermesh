@@ -109,6 +109,10 @@ var _ = Describe("Azure ServiceBusQueue", func() {
 		When("an event flows", func() {
 			BeforeEach(func() {
 				rg = e2eazure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+				DeferCleanup(func() {
+					_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
+				})
+
 				nsClient := e2eazure.CreateServiceBusNamespaceClient(ctx, subscriptionID, ns)
 				err := e2eazure.CreateServiceBusNamespace(ctx, *nsClient, *rg.Name, ns, region)
 				Expect(err).ToNot(HaveOccurred())
@@ -156,10 +160,6 @@ var _ = Describe("Azure ServiceBusQueue", func() {
 					testID := fmt.Sprintf("%v", data["ID"])
 					Expect(data["ID"]).To(Equal(testID))
 				})
-			})
-
-			AfterEach(func() {
-				_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
 			})
 		})
 	})

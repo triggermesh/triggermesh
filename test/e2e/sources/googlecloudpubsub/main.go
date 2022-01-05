@@ -127,12 +127,12 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 
 			By("creating a Pub/Sub topic", func() {
 				topic = e2epubsub.CreateTopic(pubsubClient, f)
-			})
-		})
 
-		AfterEach(func() {
-			By("deleting the Pub/Sub topic "+topic.ID(), func() {
-				e2epubsub.DeleteTopic(pubsubClient, topic.ID())
+				DeferCleanup(func() {
+					By("deleting the Pub/Sub topic "+topic.ID(), func() {
+						e2epubsub.DeleteTopic(pubsubClient, topic.ID())
+					})
+				})
 			})
 		})
 
@@ -154,11 +154,18 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 		})
 
 		Context("the subscription is managed by the user", func() {
-			var subscriptionID string
 
 			BeforeEach(func() {
+				var subscriptionID string
+
 				By("creating a Pub/Sub subscription", func() {
 					subscriptionID = e2epubsub.CreateSubscription(pubsubClient, topic, f).ID()
+
+					DeferCleanup(func() {
+						By("deleting the Pub/Sub subscription "+subscriptionID, func() {
+							e2epubsub.DeleteSubscription(pubsubClient, subscriptionID)
+						})
+					})
 				})
 
 				By("creating a GoogleCloudPubSubSource object", func() {
@@ -170,12 +177,6 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					ducktypes.WaitUntilReady(f.DynamicClient, src)
-				})
-			})
-
-			AfterEach(func() {
-				By("deleting the Pub/Sub subscription "+subscriptionID, func() {
-					e2epubsub.DeleteSubscription(pubsubClient, subscriptionID)
 				})
 			})
 

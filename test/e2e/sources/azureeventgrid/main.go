@@ -118,6 +118,12 @@ var _ = Describe("Azure Event Grid source", func() {
 				rgName = *rg.Name
 
 				eventScope = "/subscriptions/" + subscriptionID + "/resourceGroups/" + *rg.Name
+
+				DeferCleanup(func() {
+					By("deleting the resource group "+rgName, func() {
+						_ = azure.DeleteResourceGroup(ctx, subscriptionID, rgName)
+					})
+				})
 			})
 
 			By("creating an Event Hubs namespace", func() {
@@ -141,12 +147,6 @@ var _ = Describe("Azure Event Grid source", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting the resource group "+rgName, func() {
-				_ = azure.DeleteResourceGroup(ctx, subscriptionID, rgName)
 			})
 		})
 

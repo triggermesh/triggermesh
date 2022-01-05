@@ -73,7 +73,6 @@ var _ = Describe("AWS SQS target", func() {
 
 	var queueURL string
 	var queueARN string
-	var awsCreds credentials.Value
 	var awsSecret *corev1.Secret
 
 	BeforeEach(func() {
@@ -90,18 +89,19 @@ var _ = Describe("AWS SQS target", func() {
 		BeforeEach(func() {
 			sess := session.Must(session.NewSession())
 			sqsClient = sqs.New(sess)
-			awsCreds = readAWSCredentials(sess)
+
+			awsCreds := readAWSCredentials(sess)
+			awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
 
 			By("creating a SQS queue", func() {
 				queueURL = e2esqs.CreateQueue(sqsClient, f)
-				awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
 				queueARN = e2esqs.QueueARN(sqsClient, queueURL)
-			})
-		})
 
-		AfterEach(func() {
-			By("deleting SQS queue "+queueURL, func() {
-				e2esqs.DeleteQueue(sqsClient, queueURL)
+				DeferCleanup(func() {
+					By("deleting SQS queue "+queueURL, func() {
+						e2esqs.DeleteQueue(sqsClient, queueURL)
+					})
+				})
 			})
 		})
 
@@ -218,7 +218,7 @@ var _ = Describe("AWS SQS target", func() {
 		// Those tests do not require a real queueARN or awsSecret
 		BeforeEach(func() {
 			queueARN = "arn:aws:sqs:eu-central-1:000000000000:test"
-			awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
+			awsSecret = &corev1.Secret{}
 		})
 
 		// Here we use

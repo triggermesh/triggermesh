@@ -90,23 +90,23 @@ var _ = Describe("AWS S3 target", func() {
 		var sentEvent *cloudevents.Event
 
 		var bucketName string
-		var awsCreds credentials.Value
 
 		BeforeEach(func() {
 			sess := session.Must(session.NewSession())
 			s3Client = s3.New(sess)
-			awsCreds = readAWSCredentials(sess)
+
+			awsCreds := readAWSCredentials(sess)
+			awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
 
 			By("creating a S3 bucket", func() {
 				bucketName = e2es3.CreateBucket(s3Client, f, region)
 				bucketARN = createBucketARN(bucketName, region)
-				awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
-			})
-		})
 
-		AfterEach(func() {
-			By("deleting S3 bucket "+bucketName, func() {
-				e2es3.DeleteBucket(s3Client, bucketName)
+				DeferCleanup(func() {
+					By("deleting S3 bucket "+bucketName, func() {
+						e2es3.DeleteBucket(s3Client, bucketName)
+					})
+				})
 			})
 		})
 
