@@ -88,7 +88,5 @@ func (s *GoogleCloudIoTSourceStatus) MarkSubscribed() {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *GoogleCloudIoTSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.Topic = nil
-	s.Subscription = nil
 	googleCloudIoTSourceConditionSet.Manage(s).MarkFalse(GoogleCloudIoTConditionSubscribed, reason, msg)
 }

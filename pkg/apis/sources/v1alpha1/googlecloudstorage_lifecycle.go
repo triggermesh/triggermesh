@@ -88,8 +88,5 @@ func (s *GoogleCloudStorageSourceStatus) MarkSubscribed() {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *GoogleCloudStorageSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.NotificationID = nil
-	s.Topic = nil
-	s.Subscription = nil
 	googleCloudStorageSourceConditionSet.Manage(s).MarkFalse(GoogleCloudStorageConditionSubscribed, reason, msg)
 }
