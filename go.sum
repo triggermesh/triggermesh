@@ -60,8 +60,8 @@ cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RX
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
 cloud.google.com/go/storage v1.18.2 h1:5NQw6tOn3eMm0oE8vTkfjau18kjL79FlMjy/CHTpmoY=
 cloud.google.com/go/storage v1.18.2/go.mod h1:AiIj7BWXyhO5gGVmYJ+S8tbkCx3yb0IMjua8Aw4naVM=
-cloud.google.com/go/workflows v1.0.0 h1:UBXMqcFMWlfv7cYNvrG4jPlMvKtybbJ/uwCSWeie9mc=
-cloud.google.com/go/workflows v1.0.0/go.mod h1:RVBAJadnt7KCrOVMqkVfncGKRiUmCuoRcBBOG43gAIU=
+cloud.google.com/go/workflows v1.1.0 h1:MFaJ4aKSmtA9DkD9WLHZmPijIJp2LwOqhRC5nk0ZQ4g=
+cloud.google.com/go/workflows v1.1.0/go.mod h1:0RZDZIiQQrEjJdJAn9p/Jk8hbGpLUC4PIWAui+XB4s4=
 code.gitea.io/sdk/gitea v0.14.0/go.mod h1:89WiyOX1KEcvjP66sRHdu0RafojGo60bT9UqW17VbWs=
 contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d h1:LblfooH1lKOpp1hIhukktmSAxFkqMPFk9KR6iZ0MJNI=
 contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d/go.mod h1:IshRmMJBhDfFj5Y67nVhMYTTIze91RUeT73ipWKs/GY=
