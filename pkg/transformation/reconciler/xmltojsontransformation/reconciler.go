@@ -21,8 +21,8 @@ import (
 
 	pkgreconciler "knative.dev/pkg/reconciler"
 
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/xmltojsontransformation"
+	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
@@ -39,11 +39,9 @@ type Reconciler struct {
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XMLtoJSONTransformation) pkgreconciler.Event {
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XMLToJSONTransformation) pkgreconciler.Event {
 	trg.Status.InitializeConditions()
 	trg.Status.ObservedGeneration = trg.Generation
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
 

@@ -20,4 +20,6 @@ package v1alpha1
 
 type TransformationExpansion interface{}
 
+type XMLToJSONTransformationExpansion interface{}
+
 type XSLTTransformExpansion interface{}

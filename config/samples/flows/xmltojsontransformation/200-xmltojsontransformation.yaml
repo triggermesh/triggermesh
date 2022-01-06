@@ -1,0 +1,10 @@
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: XMLToJSONTransformation
+metadata:
+  name: demo
+spec:
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: default

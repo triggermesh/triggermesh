@@ -27,6 +27,7 @@ import (
 type FlowV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	TransformationsGetter
+	XMLToJSONTransformationsGetter
 	XSLTTransformsGetter
 }
 
@@ -37,6 +38,10 @@ type FlowV1alpha1Client struct {
 
 func (c *FlowV1alpha1Client) Transformations(namespace string) TransformationInterface {
 	return newTransformations(c, namespace)
+}
+
+func (c *FlowV1alpha1Client) XMLToJSONTransformations(namespace string) XMLToJSONTransformationInterface {
+	return newXMLToJSONTransformations(c, namespace)
 }
 
 func (c *FlowV1alpha1Client) XSLTTransforms(namespace string) XSLTTransformInterface {

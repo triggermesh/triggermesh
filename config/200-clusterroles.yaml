@@ -221,6 +221,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations
+  - xmltojsontransformations
   - xslttransforms
   verbs:
   - list
@@ -231,6 +232,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations/status
+  - xmltojsontransformations/status
   - xslttransforms/status
   verbs:
   - update
@@ -353,6 +355,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations/finalizers
+  - xmltojsontransformations/finalizers
   - xslttransforms/finalizers
   verbs:
   - update
@@ -833,6 +836,7 @@ rules:
   - flow.triggermesh.io
   resources:
   - transformations
+  - xmltojsontransformations
   - xslttransforms
   verbs:
   - get

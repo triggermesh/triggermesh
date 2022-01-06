@@ -26,6 +26,8 @@ import (
 type Interface interface {
 	// Transformations returns a TransformationInformer.
 	Transformations() TransformationInformer
+	// XMLToJSONTransformations returns a XMLToJSONTransformationInformer.
+	XMLToJSONTransformations() XMLToJSONTransformationInformer
 	// XSLTTransforms returns a XSLTTransformInformer.
 	XSLTTransforms() XSLTTransformInformer
 }
@@ -44,6 +46,11 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // Transformations returns a TransformationInformer.
 func (v *version) Transformations() TransformationInformer {
 	return &transformationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// XMLToJSONTransformations returns a XMLToJSONTransformationInformer.
+func (v *version) XMLToJSONTransformations() XMLToJSONTransformationInformer {
+	return &xMLToJSONTransformationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // XSLTTransforms returns a XSLTTransformInformer.

@@ -40,11 +40,11 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"XMLTOJSONTRANSFORMATION_ADAPTER_IMAGE" default:"gcr.io/triggermesh/xmltojsontransformation-adapter"`
+	Image string `envconfig:"XMLTOJSONTRANSFORMATION_IMAGE" default:"gcr.io/triggermesh/xmltojsontransformation-adapter"`
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.XMLtoJSONTransformation, cfg *adapterConfig) *servingv1.Service {
+func makeTargetAdapterKService(target *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
@@ -63,19 +63,12 @@ func makeTargetAdapterKService(target *v1alpha1.XMLtoJSONTransformation, cfg *ad
 	)
 }
 
-func makeAppEnv(o *v1alpha1.XMLtoJSONTransformation) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  libreconciler.EnvBridgeID,
 			Value: libreconciler.GetStatefulBridgeID(o),
 		},
-	}
-
-	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
-		env = append(env, corev1.EnvVar{
-			Name:  envEventsPayloadPolicy,
-			Value: string(*o.Spec.EventOptions.PayloadPolicy),
-		})
 	}
 
 	return env

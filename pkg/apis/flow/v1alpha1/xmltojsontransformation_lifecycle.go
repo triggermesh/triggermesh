@@ -19,6 +19,9 @@ package v1alpha1
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 var xmlToJSONCondSet = apis.NewLivingConditionSet(
@@ -51,4 +54,33 @@ func (ts *XMLToJSONTransformationStatus) MarkServiceUnavailable(name string) {
 // MarkServiceAvailable sets XMLToJSONTransformation condition to ready.
 func (ts *XMLToJSONTransformationStatus) MarkServiceAvailable() {
 	xmlToJSONCondSet.Manage(ts).MarkTrue(XMLToJSONTransformationConditionReady)
+}
+
+// PropagateKServiceAvailability uses the availability of the provided KService to determine if
+// ConditionDeployed should be marked as true or false.
+func (s *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
+	if ksvc == nil {
+		xmlToJSONCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
+			"The status of the adapter Service can not be determined")
+		return
+	}
+
+	if s.Address == nil {
+		s.Address = &duckv1.Addressable{}
+	}
+	s.Address.URL = ksvc.Status.URL
+
+	if ksvc.IsReady() {
+		xmlToJSONCondSet.Manage(s).MarkTrue(ConditionDeployed)
+		return
+	}
+
+	msg := "The adapter Service is unavailable"
+	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
+	if readyCond != nil && readyCond.Message != "" {
+		msg += ": " + readyCond.Message
+	}
+
+	xmlToJSONCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
+
 }

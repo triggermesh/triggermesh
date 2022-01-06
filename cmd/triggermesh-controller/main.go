@@ -89,6 +89,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/uipathtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
 	transformation "github.com/triggermesh/triggermesh/pkg/transformation/reconciler/controller"
+	"github.com/triggermesh/triggermesh/pkg/transformation/reconciler/xmltojsontransformation"
 )
 
 func main() {
@@ -162,6 +163,7 @@ func main() {
 		zendesktarget.NewController,
 		// transformation
 		transformation.NewController,
+		xmltojsontransformation.NewController,
 		xslttransform.NewController,
 		// functions
 		function.NewController,

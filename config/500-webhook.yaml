@@ -1,91 +1,91 @@
-# Copyright 2021 TriggerMesh Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# # Copyright 2021 TriggerMesh Inc.
+# #
+# # Licensed under the Apache License, Version 2.0 (the "License");
+# # you may not use this file except in compliance with the License.
+# # You may obtain a copy of the License at
+# #
+# #     http://www.apache.org/licenses/LICENSE-2.0
+# #
+# # Unless required by applicable law or agreed to in writing, software
+# # distributed under the License is distributed on an "AS IS" BASIS,
+# # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# # See the License for the specific language governing permissions and
+# # limitations under the License.
 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: triggermesh-webhook
-  namespace: triggermesh
-  labels:
-    app.kubernetes.io/part-of: triggermesh
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: triggermesh-webhook
+#   namespace: triggermesh
+#   labels:
+#     app.kubernetes.io/part-of: triggermesh
 
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: triggermesh-webhook
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: triggermesh-webhook
 
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/inject: 'false'
-      labels:
-        app: triggermesh-webhook
+#   template:
+#     metadata:
+#       annotations:
+#         sidecar.istio.io/inject: 'false'
+#       labels:
+#         app: triggermesh-webhook
 
-    spec:
-      serviceAccountName: triggermesh-webhook
-      containers:
-      - name: webhook
-        terminationMessagePolicy: FallbackToLogsOnError
-        image: ko://github.com/triggermesh/triggermesh/cmd/triggermesh-webhook
-        env:
-        - name: SYSTEM_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: CONFIG_LOGGING_NAME
-          value: config-logging
-        - name: METRICS_DOMAIN
-          value: triggermesh.io/sources
-        - name: WEBHOOK_NAME
-          value: triggermesh-webhook
-        ports:
-        - containerPort: 9090
-          name: metrics
+#     spec:
+#       serviceAccountName: triggermesh-webhook
+#       containers:
+#       - name: webhook
+#         terminationMessagePolicy: FallbackToLogsOnError
+#         image: ko://github.com/triggermesh/triggermesh/cmd/triggermesh-webhook
+#         env:
+#         - name: SYSTEM_NAMESPACE
+#           valueFrom:
+#             fieldRef:
+#               fieldPath: metadata.namespace
+#         - name: CONFIG_LOGGING_NAME
+#           value: config-logging
+#         - name: METRICS_DOMAIN
+#           value: triggermesh.io/sources
+#         - name: WEBHOOK_NAME
+#           value: triggermesh-webhook
+#         ports:
+#         - containerPort: 9090
+#           name: metrics
 
-        # TODO set proper resource limits.
+#         # TODO set proper resource limits.
 
-        readinessProbe:
-          periodSeconds: 1
-          httpGet:
-            scheme: HTTPS
-            port: 8443
-            httpHeaders:
-            - name: k-kubelet-probe
-              value: webhook
-        livenessProbe:
-          periodSeconds: 1
-          httpGet:
-            scheme: HTTPS
-            port: 8443
-            httpHeaders:
-            - name: k-kubelet-probe
-              value: webhook
+#         readinessProbe:
+#           periodSeconds: 1
+#           httpGet:
+#             scheme: HTTPS
+#             port: 8443
+#             httpHeaders:
+#             - name: k-kubelet-probe
+#               value: webhook
+#         livenessProbe:
+#           periodSeconds: 1
+#           httpGet:
+#             scheme: HTTPS
+#             port: 8443
+#             httpHeaders:
+#             - name: k-kubelet-probe
+#               value: webhook
 
----
+# ---
 
-apiVersion: v1
-kind: Service
-metadata:
-  name: triggermesh-webhook
-  namespace: triggermesh
-  labels:
-    app.kubernetes.io/part-of: triggermesh
-spec:
-  ports:
-  - name: https-webhook
-    port: 443
-    targetPort: 8443
-  selector:
-    app: triggermesh-webhook
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: triggermesh-webhook
+#   namespace: triggermesh
+#   labels:
+#     app.kubernetes.io/part-of: triggermesh
+# spec:
+#   ports:
+#   - name: https-webhook
+#     port: 443
+#     targetPort: 8443
+#   selector:
+#     app: triggermesh-webhook

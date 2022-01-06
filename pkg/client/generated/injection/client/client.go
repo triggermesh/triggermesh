@@ -396,6 +396,137 @@ func (w *wrapFlowV1alpha1TransformationImpl) Watch(ctx context.Context, opts v1.
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapFlowV1alpha1) XMLToJSONTransformations(namespace string) typedflowv1alpha1.XMLToJSONTransformationInterface {
+	return &wrapFlowV1alpha1XMLToJSONTransformationImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "flow.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "xmltojsontransformations",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapFlowV1alpha1XMLToJSONTransformationImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedflowv1alpha1.XMLToJSONTransformationInterface = (*wrapFlowV1alpha1XMLToJSONTransformationImpl)(nil)
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) Create(ctx context.Context, in *flowv1alpha1.XMLToJSONTransformation, opts v1.CreateOptions) (*flowv1alpha1.XMLToJSONTransformation, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "XMLToJSONTransformation",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XMLToJSONTransformation{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*flowv1alpha1.XMLToJSONTransformation, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XMLToJSONTransformation{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) List(ctx context.Context, opts v1.ListOptions) (*flowv1alpha1.XMLToJSONTransformationList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XMLToJSONTransformationList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *flowv1alpha1.XMLToJSONTransformation, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XMLToJSONTransformation{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) Update(ctx context.Context, in *flowv1alpha1.XMLToJSONTransformation, opts v1.UpdateOptions) (*flowv1alpha1.XMLToJSONTransformation, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "XMLToJSONTransformation",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XMLToJSONTransformation{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) UpdateStatus(ctx context.Context, in *flowv1alpha1.XMLToJSONTransformation, opts v1.UpdateOptions) (*flowv1alpha1.XMLToJSONTransformation, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "XMLToJSONTransformation",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.XMLToJSONTransformation{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1XMLToJSONTransformationImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapFlowV1alpha1) XSLTTransforms(namespace string) typedflowv1alpha1.XSLTTransformInterface {
 	return &wrapFlowV1alpha1XSLTTransformImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
