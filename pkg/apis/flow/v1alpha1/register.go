@@ -51,6 +51,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&TransformationList{},
 		&XSLTTransform{},
 		&XSLTTransformList{},
+		&XMLToJSONTransformation{},
+		&XMLToJSONTransformationList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
