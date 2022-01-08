@@ -67,7 +67,7 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 
 	var srcClient dynamic.ResourceInterface
 
-	var saKey string
+	var serviceaccountKey string
 
 	var sink *duckv1.Destination
 
@@ -115,10 +115,10 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 		}
 
 		BeforeEach(func() {
-			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			serviceaccountKey = e2egcloud.ServiceAccountKeyFromEnv()
 			gcloudProject = e2egcloud.ProjectNameFromEnv()
 
-			pubsubClient, err = pubsub.NewClient(context.Background(), gcloudProject, option.WithCredentialsJSON([]byte(saKey)))
+			pubsubClient, err = pubsub.NewClient(context.Background(), gcloudProject, option.WithCredentialsJSON([]byte(serviceaccountKey)))
 			Expect(err).ToNot(HaveOccurred())
 
 			By("creating an event sink", func() {
@@ -142,7 +142,7 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 				By("creating a GoogleCloudPubSubSource object", func() {
 					src, err := createSource(srcClient, ns, "test-", sink,
 						withTopic(topic.String()),
-						withServiceAccountKey(saKey),
+						withServiceAccountKey(serviceaccountKey),
 					)
 					Expect(err).ToNot(HaveOccurred())
 
@@ -165,7 +165,7 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 					src, err := createSource(srcClient, ns, "test-", sink,
 						withTopic(topic.String()),
 						withSubscriptionID(subscriptionID),
-						withServiceAccountKey(saKey),
+						withServiceAccountKey(serviceaccountKey),
 					)
 					Expect(err).ToNot(HaveOccurred())
 
@@ -188,7 +188,7 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 
 		// Those tests do not require a real topic or sink
 		BeforeEach(func() {
-			saKey = "fake-creds"
+			serviceaccountKey = "fake-creds"
 
 			sink = &duckv1.Destination{
 				Ref: &duckv1.KReference{
@@ -211,7 +211,7 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 
 				_, err := createSource(srcClient, ns, "test-invalid-topic-", sink,
 					withTopic(invalidTopic),
-					withServiceAccountKey(saKey),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.topic: Invalid value: "))
@@ -223,15 +223,15 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 				_, err := createSource(srcClient, ns, "test-invalid-subscr-", sink,
 					withTopic(topicName),
 					withSubscriptionID(invalidSubscriptionID),
-					withServiceAccountKey(saKey),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.subscriptionID: Invalid value: "))
 			})
 
 			By("omitting the topic", func() {
-				_, err := createSource(srcClient, ns, "test-topic-", sink,
-					withServiceAccountKey(saKey),
+				_, err := createSource(srcClient, ns, "test-notopic-", sink,
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.topic: Required value"))
@@ -246,7 +246,6 @@ var _ = Describe("Google Cloud Pub/Sub source", func() {
 				Expect(err.Error()).To(ContainSubstring(
 					`"spec.serviceAccountKey" must validate one and only one schema (oneOf).`))
 			})
-
 		})
 	})
 })

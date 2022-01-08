@@ -70,7 +70,7 @@ var _ = Describe("Google Cloud Storage source", func() {
 
 	var bucketID string
 	var gcloudProject string
-	var saKey string
+	var serviceaccountKey string
 
 	var sink *duckv1.Destination
 
@@ -85,12 +85,12 @@ var _ = Describe("Google Cloud Storage source", func() {
 		var storageClient *storage.Client
 
 		BeforeEach(func() {
-			saKey = e2egcloud.ServiceAccountKeyFromEnv()
+			serviceaccountKey = e2egcloud.ServiceAccountKeyFromEnv()
 			gcloudProject = e2egcloud.ProjectNameFromEnv()
 
 			var err error
 
-			storageClient, err = storage.NewClient(context.Background(), option.WithCredentialsJSON([]byte(saKey)))
+			storageClient, err = storage.NewClient(context.Background(), option.WithCredentialsJSON([]byte(serviceaccountKey)))
 			Expect(err).ToNot(HaveOccurred())
 
 			By("creating an event sink", func() {
@@ -106,7 +106,7 @@ var _ = Describe("Google Cloud Storage source", func() {
 					withBucket(bucketID),
 					withProject(gcloudProject),
 					withEventType("OBJECT_FINALIZE"),
-					withServiceAccountKey(saKey),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -163,7 +163,7 @@ var _ = Describe("Google Cloud Storage source", func() {
 			bucketID = "fake-bucket"
 			gcloudProject = "fake-project"
 
-			saKey = "fake-creds"
+			serviceaccountKey = "fake-creds"
 
 			sink = &duckv1.Destination{
 				Ref: &duckv1.KReference{
@@ -185,7 +185,7 @@ var _ = Describe("Google Cloud Storage source", func() {
 				_, err := createSource(srcClient, ns, "test-invalid-bucket-", sink,
 					withBucket("Invalid_Bucket_Name"),
 					withProject(gcloudProject),
-					withServiceAccountKey(saKey),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.bucket: Invalid value: "))
@@ -196,7 +196,7 @@ var _ = Describe("Google Cloud Storage source", func() {
 					withBucket(bucketID),
 					withProject(gcloudProject),
 					withEventType("invalid_type"),
-					withServiceAccountKey(saKey),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(`spec.eventTypes: Unsupported value: "invalid_type"`))
@@ -206,12 +206,31 @@ var _ = Describe("Google Cloud Storage source", func() {
 				_, err := createSource(srcClient, ns, "test-invalid-project-", sink,
 					withBucket(bucketID),
 					withProject("invalid_project"),
-					withServiceAccountKey(saKey),
+					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.pubsub.project: Invalid value: "))
 			})
 
+			By("omitting the project", func() {
+				_, err := createSource(srcClient, ns, "test-noproject-", sink,
+					withBucket(bucketID),
+					withServiceAccountKey(serviceaccountKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.pubsub: Required value"))
+			})
+
+			By("setting empty credentials", func() {
+				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
+					withBucket(bucketID),
+					withProject(gcloudProject),
+					withServiceAccountKey(""),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(
+					`"spec.serviceAccountKey" must validate one and only one schema (oneOf).`))
+			})
 		})
 	})
 })
