@@ -44,9 +44,8 @@ import (
 )
 
 const (
-	eventDisplayName = "event-display"
-	// using a nightly image because versions prior to v0.25 (unreleased) don't expose "/healthz"
-	eventDisplayContainerImage = "gcr.io/knative-nightly/knative.dev/eventing/cmd/event_display@sha256:e1a70eabf59345a4b160f007cbfd121ef2aca6e0921fa81c79495c236a9f2d7b"
+	eventDisplayName           = "event-display"
+	eventDisplayContainerImage = "gcr.io/knative-releases/knative.dev/eventing/cmd/event_display"
 )
 
 // CreateEventDisplaySink creates an event-display event sink and returns it as
