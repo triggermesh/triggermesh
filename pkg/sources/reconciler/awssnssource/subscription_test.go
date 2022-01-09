@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
@@ -48,9 +49,13 @@ func TestErrors(t *testing.T) {
 			return awserr.NewRequestFailure(genericAWSErr, httpCode, "00000000-0000-...")
 		}
 
+		emptyStaticCredsErr := credentials.ErrStaticCredentialsEmpty
+
 		assert.True(t, isDenied(deniedErr))
 		assert.True(t, isDenied(fmt.Errorf("wrapped: %w", deniedErr)))
 		assert.True(t, isDenied(reqFailErr(http.StatusUnauthorized)))
+		assert.True(t, isDenied(emptyStaticCredsErr))
+		assert.True(t, isDenied(fmt.Errorf("wrapped: %w", emptyStaticCredsErr)))
 		assert.False(t, isDenied(genericAWSErr))
 		assert.False(t, isDenied(genericErr))
 		assert.False(t, isDenied(reqFailErr(http.StatusBadRequest)))

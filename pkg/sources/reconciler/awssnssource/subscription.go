@@ -33,6 +33,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 
@@ -334,6 +335,10 @@ func isNotFound(err error) bool {
 // API could not be authorized.
 func isDenied(err error) bool {
 	if awsErr := awserr.Error(nil); errors.As(err, &awsErr) {
+		if awsErr == credentials.ErrStaticCredentialsEmpty {
+			return true
+		}
+
 		if awsReqFail := awserr.RequestFailure(nil); errors.As(err, &awsReqFail) {
 			code := awsReqFail.StatusCode()
 			return code == http.StatusUnauthorized || code == http.StatusForbidden
