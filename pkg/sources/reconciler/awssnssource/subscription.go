@@ -33,6 +33,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 
@@ -48,8 +49,8 @@ func (r *Reconciler) ensureSubscribed(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
-	status := &src.(*v1alpha1.AWSSNSSource).Status
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AWSSNSSource)
+	status := &src.Status
 
 	isDeployed := status.GetCondition(v1alpha1.ConditionDeployed).IsTrue()
 
@@ -59,9 +60,7 @@ func (r *Reconciler) ensureSubscribed(ctx context.Context) error {
 		return nil
 	}
 
-	typedSrc := src.(*v1alpha1.AWSSNSSource)
-
-	snsClient, err := r.snsCg.Get(typedSrc)
+	snsClient, err := r.snsCg.Get(src)
 	if err != nil {
 		status.MarkNotSubscribed(v1alpha1.AWSSNSReasonNoClient, "Cannot obtain SNS client")
 		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
@@ -69,16 +68,37 @@ func (r *Reconciler) ensureSubscribed(ctx context.Context) error {
 	}
 
 	url := status.Address.URL
-	topicARN := typedSrc.Spec.ARN.String()
+	topicARN := src.Spec.ARN.String()
+
+	// We need to check the existence of the topic prior to attempting to
+	// list its subscriptions, because AWS returns the same NotFound error
+	// whether the topic or the subscription is missing, and we want to
+	// handle both cases differently.
+	topicExists, err := checkTopicExists(ctx, snsClient, topicARN)
+	switch {
+	case isDenied(err):
+		msg := fmt.Sprintf("Authorization error checking existence of topic %q: %s", topicARN, toErrMsg(err))
+		status.MarkNotSubscribed(v1alpha1.AWSSNSReasonAPIError, msg)
+		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe, msg))
+	case err != nil:
+		msg := fmt.Sprintf("Error checking existence of topic %q: %s", topicARN, toErrMsg(err))
+		status.MarkNotSubscribed(v1alpha1.AWSSNSReasonAPIError, msg)
+		// wrap any other error to fail the reconciliation
+		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe, msg))
+	case !topicExists:
+		msg := fmt.Sprintf("The provided topic %q does not exist", topicARN)
+		status.MarkNotSubscribed(v1alpha1.AWSSNSReasonFailedSync, msg)
+		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe, msg))
+	}
 
 	subsARN, err := findSubscription(ctx, snsClient, topicARN, url.String())
 	switch {
 	case isPending(subsARN), isNotFound(err):
-		subsARN, err = subscribe(ctx, snsClient, topicARN, url, typedSrc.Spec.SubscriptionAttributes)
+		subsARN, err = subscribe(ctx, snsClient, topicARN, url, src.Spec.SubscriptionAttributes)
 		switch {
 		case isPending(subsARN):
 			status.MarkNotSubscribed(v1alpha1.AWSSNSReasonPending, "Subscription is pending confirmation")
-			// wrap to fail the finalization
+			// wrap to fail the reconciliation
 			return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
 				"Subscription is pending confirmation, will retry"))
 		case isAWSError(err):
@@ -127,21 +147,10 @@ func (r *Reconciler) ensureUnsubscribed(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AWSSNSSource)
+	status := src.Status
 
-	sm := src.GetStatusManager()
-
-	// Note: requiring readiness to unsubscribe might leak subscriptions when the service
-	// is not ready. The reason for requiring IsReady is because we require the status address
-	// when looking for the SNS subscription and it is informed when the service is ready.
-	if !sm.IsReady() {
-		event.Warn(ctx, ReasonFailedUnsubscribe, "SNS status information incomplete, skipping finalization")
-		return nil
-	}
-
-	typedSrc := src.(*v1alpha1.AWSSNSSource)
-
-	snsClient, err := r.snsCg.Get(typedSrc)
+	snsClient, err := r.snsCg.Get(src)
 	switch {
 	case isNotFound(err):
 		// the finalizer is unlikely to recover from a missing Secret,
@@ -150,43 +159,73 @@ func (r *Reconciler) ensureUnsubscribed(ctx context.Context) error {
 			"Secret missing while finalizing event source. Ignoring: %s", err)
 		return nil
 	case err != nil:
-		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
-			"Error creating SNS client: %s", err))
+		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
+			"Error creating SNS client: %s", err)
 	}
 
-	topicARN := typedSrc.Spec.ARN.String()
+	topicARN := src.Spec.ARN.String()
 
-	subsARN, err := findSubscription(ctx, snsClient, topicARN, sm.Address.URL.String())
+	// We need to check the existence of the topic prior to attempting to
+	// list its subscriptions, because AWS returns the same NotFound error
+	// whether the topic or the subscription is missing, and we want to
+	// handle both cases differently.
+	topicExists, err := checkTopicExists(ctx, snsClient, topicARN)
 	switch {
-	case isPending(subsARN):
-		return reconciler.NewEvent(corev1.EventTypeNormal, ReasonFailedUnsubscribe,
-			"Subscription wasn't confirmed, skipping finalization")
-	case isNotFound(err):
-		return reconciler.NewEvent(corev1.EventTypeNormal, ReasonUnsubscribed,
-			"Subscription already absent, skipping finalization")
 	case isDenied(err):
-		// it is unlikely that we recover from validation errors in the
+		// it is unlikely that we recover from auth errors in the
 		// finalizer, so we simply record a warning event and return
 		event.Warn(ctx, ReasonFailedUnsubscribe,
-			"Authorization error finding subscription. Ignoring: %s", toErrMsg(err))
+			"Authorization error checking the existence of the topic. Ignoring: %s", toErrMsg(err))
 		return nil
 	case err != nil:
-		// wrap any other error to fail the finalization
-		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
-			"Error finding subscription: %s", toErrMsg(err)))
+		return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
+			"Error checking the existence of topic: %s", toErrMsg(err))
+	}
+
+	var subsARN string
+	if sa := src.Status.SubscriptionARN; sa != nil {
+		subsARN = *sa
+	}
+
+	// Prefer getting the subscription's ARN from AWS directly if the topic
+	// exists, as it is more reliable than what may be stored in the source's status.
+	if topicExists && status.Address != nil && status.Address.URL != nil {
+		subsARN, err = findSubscription(ctx, snsClient, topicARN, status.Address.URL.String())
+		switch {
+		case isPending(subsARN):
+			return reconciler.NewEvent(corev1.EventTypeNormal, ReasonFailedUnsubscribe,
+				"Subscription wasn't confirmed, skipping finalization")
+		case isNotFound(err):
+			return reconciler.NewEvent(corev1.EventTypeNormal, ReasonUnsubscribed,
+				"Subscription already absent, skipping finalization")
+		case isDenied(err):
+			// it is unlikely that we recover from auth errors in the
+			// finalizer, so we simply record a warning event and return
+			event.Warn(ctx, ReasonFailedUnsubscribe,
+				"Authorization error finding subscription. Ignoring: %s", toErrMsg(err))
+			return nil
+		case err != nil:
+			return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
+				"Error finding subscription: %s", toErrMsg(err))
+		}
+	}
+
+	// It is possible that the source never successfully subscribed to the
+	// topic at all, in which case there is nothing to unsubscribe.
+	if subsARN == "" {
+		return nil
 	}
 
 	err = unsubscribe(ctx, snsClient, subsARN)
 	switch {
 	case isDenied(err):
-		// it is unlikely that we recover from validation errors in the
+		// it is unlikely that we recover from auth errors in the
 		// finalizer, so we simply record a warning event and return
 		event.Warn(ctx, ReasonFailedUnsubscribe,
 			"Authorization error unsubscribing from SNS topic %q. Ignoring: %s", topicARN, toErrMsg(err))
 		return nil
 	case err != nil:
-		// wrap any other error to fail the finalization
-		return fmt.Errorf("%w", unsubscribeErrorEvent(topicARN, err))
+		return unsubscribeErrorEvent(topicARN, err)
 	}
 
 	return reconciler.NewEvent(corev1.EventTypeNormal, ReasonUnsubscribed,
@@ -211,7 +250,7 @@ func findSubscription(ctx context.Context, cli snsiface.SNSAPI, topicARN, endpoi
 
 		out, err = cli.ListSubscriptionsByTopicWithContext(ctx, in)
 		if err != nil {
-			return "", fmt.Errorf("listing subscriptions for topic: %w", err)
+			return "", fmt.Errorf("listing subscriptions for topic %q: %w", topicARN, err)
 		}
 
 		if initialRequest {
@@ -226,6 +265,23 @@ func findSubscription(ctx context.Context, cli snsiface.SNSAPI, topicARN, endpoi
 	}
 
 	return "", awserr.New(sns.ErrCodeNotFoundException, "", nil)
+}
+
+// checkTopicExists returns whether the topic with the given ARN exists.
+func checkTopicExists(ctx context.Context, cli snsiface.SNSAPI, topicARN string) (bool, error) {
+	in := &sns.GetTopicAttributesInput{
+		TopicArn: &topicARN,
+	}
+
+	_, err := cli.GetTopicAttributesWithContext(ctx, in)
+	switch {
+	case isNotFound(err):
+		return false, nil
+	case err != nil:
+		return false, fmt.Errorf("getting topic attributes: %w", err)
+	}
+
+	return true, nil
 }
 
 // subscribe subscribes to a SNS topic.
@@ -249,6 +305,8 @@ func subscribe(ctx context.Context, cli snsiface.SNSAPI, topicARN string,
 
 // unsubscribe unsubscribes from a SNS topic.
 func unsubscribe(ctx context.Context, cli snsiface.SNSAPI, subsARN string) error {
+	// NOTE(antoineco): this API call does not seem to return any error if
+	// the given SubscriptionArn can't be found
 	resp, err := cli.UnsubscribeWithContext(ctx, &sns.UnsubscribeInput{
 		SubscriptionArn: &subsARN,
 	})
@@ -277,6 +335,10 @@ func isNotFound(err error) bool {
 // API could not be authorized.
 func isDenied(err error) bool {
 	if awsErr := awserr.Error(nil); errors.As(err, &awsErr) {
+		if awsErr == credentials.ErrStaticCredentialsEmpty {
+			return true
+		}
+
 		if awsReqFail := awserr.RequestFailure(nil); errors.As(err, &awsReqFail) {
 			code := awsReqFail.StatusCode()
 			return code == http.StatusUnauthorized || code == http.StatusForbidden

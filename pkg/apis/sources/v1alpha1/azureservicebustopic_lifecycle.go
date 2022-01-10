@@ -85,6 +85,5 @@ func (s *AzureServiceBusTopicSourceStatus) MarkSubscribed() {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *AzureServiceBusTopicSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.SubscriptionID = nil
 	azureServiceBusTopicSourceConditionSet.Manage(s).MarkFalse(AzureServiceBusTopicConditionSubscribed, reason, msg)
 }

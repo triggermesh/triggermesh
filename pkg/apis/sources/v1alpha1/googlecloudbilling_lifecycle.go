@@ -88,7 +88,5 @@ func (s *GoogleCloudBillingSourceStatus) MarkSubscribed() {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *GoogleCloudBillingSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.Topic = nil
-	s.Subscription = nil
 	GoogleCloudBillingSourceConditionSet.Manage(s).MarkFalse(GoogleCloudBillingConditionSubscribed, reason, msg)
 }
