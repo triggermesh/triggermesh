@@ -28,9 +28,10 @@ spec:
     - all
     - knative
     - eventing
-    - xmltojsontransformations
+    - triggermesh
+    - transformations
     shortNames:
-    - trn
+    - xmltojsontrn
   versions:
   - name: v1alpha1
     served: true

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ type adapter struct {
 
 // Returns if stopCh is closed or Send() returns an error.
 func (a *adapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting XMLtoJSONTransformation Adapter")
+	a.logger.Info("Starting XMLToJSONTransformation Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
