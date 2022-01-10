@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package main
 import (
 	"knative.dev/pkg/injection/sharedmain"
 
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xmltojsontransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xslttransform"
 	"github.com/triggermesh/triggermesh/pkg/function"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/filter"
@@ -89,7 +90,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/uipathtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
 	transformation "github.com/triggermesh/triggermesh/pkg/transformation/reconciler/controller"
-	"github.com/triggermesh/triggermesh/pkg/transformation/reconciler/xmltojsontransformation"
 )
 
 func main() {

@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
@@ -54,8 +55,24 @@ var (
 
 // XMLToJSONTransformationSpec holds the desired state of the XMLToJSONTransformation (from the client).
 type XMLToJSONTransformationSpec struct {
+	// EventOptions for targets
+	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
 	// Sink is a reference to an object that will resolve to a uri to use as the sink.
 	Sink duckv1.Destination `json:"sink,omitempty"`
+}
+
+// EventOptions modifies CloudEvents management at Targets.
+type EventOptions struct {
+	// PayloadPolicy indicates if replies from the target should include
+	// a payload if available. Possible values are:
+	//
+	// - always: will return a with the reply payload if avaliable.
+	// - errors: will only reply with payload in case of an error.
+	// - never: will not reply with payload.
+	//
+	// +optional
+	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
 }
 
 const (

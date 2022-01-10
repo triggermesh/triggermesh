@@ -29,7 +29,8 @@ import (
 )
 
 const (
-	adapterName = "xmltojsontransformation"
+	adapterName            = "xmltojsontransformation"
+	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -67,6 +68,13 @@ func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
 			Name:  libreconciler.EnvBridgeID,
 			Value: libreconciler.GetStatefulBridgeID(o),
 		},
+	}
+
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envEventsPayloadPolicy,
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
+		})
 	}
 
 	return env

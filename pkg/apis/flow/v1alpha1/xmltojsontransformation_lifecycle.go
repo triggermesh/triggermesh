@@ -24,6 +24,11 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
+// Managed event types
+const (
+	EventTypeXMLToJSONGenericResponse = "io.triggermesh.xmltojsontransformation.error"
+)
+
 var xmlToJSONCondSet = apis.NewLivingConditionSet(
 	XMLToJSONTransformationConditionReady,
 )
