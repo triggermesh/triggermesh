@@ -18,6 +18,10 @@ package xmltojsontransformation
 
 import (
 	"context"
+	"encoding/xml"
+	"errors"
+	"fmt"
+	"io/ioutil"
 	"strings"
 
 	"go.uber.org/zap"
@@ -58,34 +62,52 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	return &adapter{
-
+	return &Adapter{
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
 	}
 }
 
-var _ pkgadapter.Adapter = (*adapter)(nil)
+var _ pkgadapter.Adapter = (*Adapter)(nil)
 
-type adapter struct {
+type Adapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 }
 
 // Returns if stopCh is closed or Send() returns an error.
-func (a *adapter) Start(ctx context.Context) error {
+func (a *Adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting XMLToJSONTransformation Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+	if !IsValidXML(event.Data()) {
+		fmt.Println("fail")
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			errors.New("invalid XML"), nil)
+	}
+
 	xml := strings.NewReader(string(event.Data()))
-	json, err := xj.Convert(xml)
+	jsn, err := xj.Convert(xml)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
-	event.SetData("appllication/json", json)
+
+	readBuf, err := ioutil.ReadAll(jsn)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+	}
+
+	if err := event.SetData("application/json", readBuf); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+	}
+
 	return &event, cloudevents.ResultACK
+}
+
+func IsValidXML(data []byte) bool {
+	return xml.Unmarshal(data, new(interface{})) == nil
 }
