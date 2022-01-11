@@ -72,7 +72,7 @@ func ensureEventSubscription(ctx context.Context, cli storage.EventSubscriptions
 	// read current event subscription
 
 	stAccID := typedSrc.Spec.StorageAccountID.String()
-	stAccName := typedSrc.Spec.StorageAccountID.StorageAccount
+	stAccName := typedSrc.Spec.StorageAccountID.ResourceName
 	subsName := subscriptionName(typedSrc)
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
@@ -163,7 +163,7 @@ func ensureNoEventSubscription(ctx context.Context, cli storage.EventSubscriptio
 	typedSrc := src.(*v1alpha1.AzureBlobStorageSource)
 
 	stAccID := typedSrc.Spec.StorageAccountID.String()
-	stAccName := typedSrc.Spec.StorageAccountID.StorageAccount
+	stAccName := typedSrc.Spec.StorageAccountID.ResourceName
 	subsName := subscriptionName(typedSrc)
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
