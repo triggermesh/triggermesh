@@ -1,3 +1,5 @@
+//go:build !codeanalysis
+
 /*
 Copyright 2021 TriggerMesh Inc.
 

@@ -42,6 +42,7 @@ jobs:
       with:
         languages: go
 
+    # Install IBM MQ redis client required by IBM MQ source and target adapters
     - name: Install IBM MQ client
       run: |
         curl https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/9.2.3.0-IBM-MQC-Redist-LinuxX64.tar.gz -o mq.tar.gz
