@@ -12,7 +12,7 @@ linters:
 run:
   timeout: 10m
   build-tags:
-    - codeanalysis
+  - noclibs
 
 linters-settings:
   stylecheck:
