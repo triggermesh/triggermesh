@@ -25,6 +25,10 @@ const (
 	envComponent             = "K_COMPONENT"
 	envMetricsPrometheusPort = "METRICS_PROMETHEUS_PORT"
 
+	// Overrides for CloudEvents context attributes (only supported by a subset of components)
+	EnvCESource = "CE_SOURCE"
+	EnvCEType   = "CE_TYPE"
+
 	// Common AWS attributes
 	EnvARN             = "ARN"
 	EnvAccessKeyID     = "AWS_ACCESS_KEY_ID"

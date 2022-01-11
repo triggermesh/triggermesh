@@ -23,8 +23,6 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	"cloud.google.com/go/pubsub"
-
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
 // MessageProcessor converts a Pub/Sub message to a CloudEvent.
@@ -39,11 +37,12 @@ var (
 // defaultMessageProcessor is the default processor for Pub/Sub messages.
 type defaultMessageProcessor struct {
 	ceSource string
+	ceType   string
 }
 
 // Process implements MessageProcessor.
 func (p *defaultMessageProcessor) Process(msg *pubsub.Message) ([]*cloudevents.Event, error) {
-	event, err := makePubSubEvent(msg, p.ceSource)
+	event, err := makePubSubEvent(msg, p.ceSource, p.ceType)
 	if err != nil {
 		return nil, fmt.Errorf("creating CloudEvent from Pub/Sub message: %w", err)
 	}
@@ -52,12 +51,12 @@ func (p *defaultMessageProcessor) Process(msg *pubsub.Message) ([]*cloudevents.E
 }
 
 // makePubSubEvent returns a CloudEvent for a generic Pub/Sub message.
-func makePubSubEvent(msg *pubsub.Message, srcAttr string) (*cloudevents.Event, error) {
+func makePubSubEvent(msg *pubsub.Message, srcAttr, typeAttr string) (*cloudevents.Event, error) {
 	event := cloudevents.NewEvent()
 	event.SetID(msg.ID)
 	event.SetTime(msg.PublishTime)
-	event.SetType(v1alpha1.GoogleCloudPubSubGenericEventType)
 	event.SetSource(srcAttr)
+	event.SetType(typeAttr)
 
 	for name, val := range ceExtensionAttrsForMessage(msg) {
 		event.SetExtension(name, val)
