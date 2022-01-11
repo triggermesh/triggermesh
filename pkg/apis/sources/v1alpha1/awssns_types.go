@@ -18,9 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	pkgapis "knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
@@ -41,10 +38,8 @@ type AWSSNSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object  = (*AWSSNSSource)(nil)
-	_ pkgapis.HasSpec = (*AWSSNSSource)(nil)
-	_ EventSource     = (*AWSSNSSource)(nil)
-	_ multiTenant     = (*AWSSNSSource)(nil)
+	_ EventSource = (*AWSSNSSource)(nil)
+	_ multiTenant = (*AWSSNSSource)(nil)
 )
 
 // AWSSNSSourceSpec defines the desired state of the event source.

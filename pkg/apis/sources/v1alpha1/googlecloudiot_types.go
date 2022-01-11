@@ -24,8 +24,6 @@ import (
 	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
@@ -44,8 +42,7 @@ type GoogleCloudIoTSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object = (*GoogleCloudIoTSource)(nil)
-	_ EventSource    = (*GoogleCloudIoTSource)(nil)
+	_ EventSource = (*GoogleCloudIoTSource)(nil)
 )
 
 // GoogleCloudIoTSourceSpec defines the desired state of the event source.

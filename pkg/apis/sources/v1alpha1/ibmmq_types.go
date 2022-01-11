@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
@@ -37,8 +36,7 @@ type IBMMQSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object = (*IBMMQSource)(nil)
-	_ EventSource    = (*IBMMQSource)(nil)
+	_ EventSource = (*IBMMQSource)(nil)
 )
 
 // IBMMQSourceSpec holds the desired state of the event source.

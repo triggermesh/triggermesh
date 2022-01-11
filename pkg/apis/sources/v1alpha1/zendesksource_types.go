@@ -18,9 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	pkgapis "knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
@@ -39,10 +36,8 @@ type ZendeskSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object  = (*ZendeskSource)(nil)
-	_ pkgapis.HasSpec = (*ZendeskSource)(nil)
-	_ EventSource     = (*ZendeskSource)(nil)
-	_ multiTenant     = (*ZendeskSource)(nil)
+	_ EventSource = (*ZendeskSource)(nil)
+	_ multiTenant = (*ZendeskSource)(nil)
 )
 
 // ZendeskSourceSpec defines the desired state of the event source.
