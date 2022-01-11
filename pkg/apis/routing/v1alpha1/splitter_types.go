@@ -18,9 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -45,14 +45,11 @@ type Splitter struct {
 
 var (
 	// Check that Splitter can be validated and defaulted.
-	_ apis.Validatable   = (*Splitter)(nil)
-	_ apis.Defaultable   = (*Splitter)(nil)
-	_ kmeta.OwnerRefable = (*Splitter)(nil)
-	// Check that the type conforms to the duck Knative Resource shape.
-	_ duckv1.KRShaped = (*Splitter)(nil)
-	_ multiTenant     = (*Splitter)(nil)
+	_ apis.Validatable = (*Splitter)(nil)
+	_ apis.Defaultable = (*Splitter)(nil)
 
-	_ Router = (*Splitter)(nil)
+	_ Router      = (*Splitter)(nil)
+	_ multiTenant = (*Splitter)(nil)
 )
 
 // SplitterSpec holds the desired state of the Splitter.
