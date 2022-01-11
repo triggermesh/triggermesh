@@ -102,7 +102,5 @@ func (s *AzureEventGridSourceStatus) MarkSubscribed() {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *AzureEventGridSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.EventSubscriptionID = nil
-	s.EventHubID = nil
 	azureEventGridSourceConditionSet.Manage(s).MarkFalse(AzureEventGridConditionSubscribed, reason, msg)
 }

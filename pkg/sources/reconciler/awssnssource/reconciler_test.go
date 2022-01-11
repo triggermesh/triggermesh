@@ -18,6 +18,7 @@ package awssnssource
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -35,6 +36,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/sns"
 
@@ -67,6 +69,7 @@ func TestReconcileSource(t *testing.T) {
 func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, tr *rt.TableRow, ls *Listers) controller.Reconciler {
 		snsCli := &mockedSNSClient{
+			topics:        getMockTopics(tr),
 			subscriptions: getMockSubscriptionsPages(tr),
 		}
 
@@ -94,7 +97,7 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newEventSource() *v1alpha1.AWSSNSSource {
 	src := &v1alpha1.AWSSNSSource{
 		Spec: v1alpha1.AWSSNSSourceSpec{
-			ARN: NewARN(sns.ServiceName, "triggermeshtest"),
+			ARN: tTopicARN,
 			SubscriptionAttributes: map[string]*string{
 				"DeliveryPolicy": aws.String(`{"healthyRetryPolicy":{"numRetries":5}}`),
 			},
@@ -124,9 +127,12 @@ func TestReconcileSubscription(t *testing.T) {
 		// Regular lifecycle
 
 		{
-			Name:          "Not yet subscribed",
-			Key:           tKey,
-			OtherTestData: makeMockSubscriptionsPages(false),
+			Name: "Not yet subscribed",
+			Key:  tKey,
+			OtherTestData: mergeTableRowData(
+				makeMockTopics(true),
+				makeMockSubscriptionsPages(false),
+			),
 			Objects: []runtime.Object{
 				newReconciledSource(),
 				newReconciledServiceAccount(),
@@ -144,9 +150,12 @@ func TestReconcileSubscription(t *testing.T) {
 			},
 		},
 		{
-			Name:          "Already subscribed",
-			Key:           tKey,
-			OtherTestData: makeMockSubscriptionsPages(true),
+			Name: "Already subscribed",
+			Key:  tKey,
+			OtherTestData: mergeTableRowData(
+				makeMockTopics(true),
+				makeMockSubscriptionsPages(true),
+			),
 			Objects: []runtime.Object{
 				newReconciledSource(subscribed),
 				newReconciledServiceAccount(),
@@ -161,9 +170,12 @@ func TestReconcileSubscription(t *testing.T) {
 		// Finalization
 
 		{
-			Name:          "Deletion while subscribed",
-			Key:           tKey,
-			OtherTestData: makeMockSubscriptionsPages(true),
+			Name: "Deletion while subscribed",
+			Key:  tKey,
+			OtherTestData: mergeTableRowData(
+				makeMockTopics(true),
+				makeMockSubscriptionsPages(true),
+			),
 			Objects: []runtime.Object{
 				newReconciledSource(subscribed, deleted),
 				newReconciledServiceAccount(),
@@ -182,9 +194,36 @@ func TestReconcileSubscription(t *testing.T) {
 			},
 		},
 		{
-			Name:          "Deletion while not subscribed",
-			Key:           tKey,
-			OtherTestData: makeMockSubscriptionsPages(false),
+			Name: "Deletion while subscribed and topic is gone",
+			Key:  tKey,
+			OtherTestData: mergeTableRowData(
+				makeMockTopics(false),
+				makeMockSubscriptionsPages(true),
+			),
+			Objects: []runtime.Object{
+				newReconciledSource(subscribed, deleted),
+				newReconciledServiceAccount(),
+				newReconciledRoleBinding(),
+				newReconciledAdapter(),
+			},
+			WantPatches: []clientgotesting.PatchActionImpl{
+				unsetFinalizerPatch(),
+			},
+			WantEvents: []string{
+				finalizedEvent(),
+				unsubscribedEvent(),
+			},
+			PostConditions: []func(*testing.T, *rt.TableRow){
+				calledUnsubscribe(true),
+			},
+		},
+		{
+			Name: "Deletion while not subscribed",
+			Key:  tKey,
+			OtherTestData: mergeTableRowData(
+				makeMockTopics(true),
+				makeMockSubscriptionsPages(false),
+			),
 			Objects: []runtime.Object{
 				newReconciledSource(deleted),
 				newReconciledServiceAccount(),
@@ -195,11 +234,61 @@ func TestReconcileSubscription(t *testing.T) {
 				unsetFinalizerPatch(),
 			},
 			WantEvents: []string{
-				notEnoughInformationUnsubscribeEvent(),
+				finalizedEvent(),
+				noopUnsubscribeEvent(),
+			},
+			PostConditions: []func(*testing.T, *rt.TableRow){
+				calledUnsubscribe(false),
+			},
+		},
+		{
+			Name: "Deletion while not subscribed and topic is gone",
+			Key:  tKey,
+			OtherTestData: mergeTableRowData(
+				makeMockTopics(false),
+				makeMockSubscriptionsPages(false),
+			),
+			Objects: []runtime.Object{
+				newReconciledSource(deleted),
+				newReconciledServiceAccount(),
+				newReconciledRoleBinding(),
+				newReconciledAdapter(),
+			},
+			WantPatches: []clientgotesting.PatchActionImpl{
+				unsetFinalizerPatch(),
+			},
+			WantEvents: []string{
 				finalizedEvent(),
 			},
 			PostConditions: []func(*testing.T, *rt.TableRow){
 				calledUnsubscribe(false),
+			},
+		},
+
+		// Error cases
+
+		{
+			Name:    "Topic not found while subscribing",
+			Key:     tKey,
+			WantErr: true,
+			OtherTestData: mergeTableRowData(
+				makeMockTopics(false),
+				makeMockSubscriptionsPages(false),
+			),
+			Objects: []runtime.Object{
+				newReconciledSource(),
+				newReconciledServiceAccount(),
+				newReconciledRoleBinding(),
+				newReconciledAdapter(),
+			},
+			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
+				Object: newReconciledSource(notSubscribedTopicNotFound),
+			}},
+			WantEvents: []string{
+				topicNotFoundSubscribeEvent(),
+			},
+			PostConditions: []func(*testing.T, *rt.TableRow){
+				calledSubscribe(false),
 			},
 		},
 	}
@@ -269,6 +358,14 @@ func subscribed(src *v1alpha1.AWSSNSSource) {
 	src.Status.MarkSubscribed(tSubARN.String())
 }
 
+// notSubscribedTopicNotFound sets the Subscribed status condition to False,
+// with a reason and message indicating that the user-provided topic was not found.
+func notSubscribedTopicNotFound(src *v1alpha1.AWSSNSSource) {
+	src.Status.MarkNotSubscribed(v1alpha1.AWSSNSReasonFailedSync,
+		fmt.Sprintf("The provided topic %q does not exist", tTopicARN),
+	)
+}
+
 // deleted marks the source as deleted.
 func deleted(src *v1alpha1.AWSSNSSource) {
 	t := metav1.Unix(0, 0)
@@ -315,15 +412,29 @@ func staticClientGetter(cli snsclient.Client) snsclient.ClientGetterFunc {
 
 const testClientDataKey = "client"
 
+type mockTopics map[ /*arn*/ string]*sns.GetTopicAttributesOutput
 type mockSubscriptionsPages map[ /*token*/ *string][]*sns.Subscription
 
 type mockedSNSClient struct {
 	snsclient.Client
 
+	topics        mockTopics
 	subscriptions mockSubscriptionsPages
 
 	calledSubscribe   bool
 	calledUnsubscribe bool
+}
+
+func (c *mockedSNSClient) GetTopicAttributesWithContext(_ aws.Context, in *sns.GetTopicAttributesInput,
+	_ ...request.Option) (*sns.GetTopicAttributesOutput, error) {
+
+	topicAttrs, found := c.topics[*in.TopicArn]
+
+	if !found {
+		return nil, awserr.New(sns.ErrCodeNotFoundException, "", nil)
+	}
+
+	return topicAttrs, nil
 }
 
 func (c *mockedSNSClient) SubscribeWithContext(aws.Context, *sns.SubscribeInput,
@@ -364,7 +475,44 @@ func (c *mockedSNSClient) ListSubscriptionsByTopicWithContext(_ aws.Context, in 
 	}, nil
 }
 
-const mockSubscriptionsPagesDataKey = "subpages"
+const mockTopicsDataKey = "topics"
+
+// makeMockTopics returns mocked SNS Topics to be used as TableRow data.
+func makeMockTopics(topicExists bool) map[string]interface{} {
+	topics := make(mockTopics, 2)
+
+	var wrongTopicARN = "aws:sns:not:my:topic"
+	var okTopicARN = tTopicARN.String()
+
+	topics[wrongTopicARN] = &sns.GetTopicAttributesOutput{
+		Attributes: map[string]*string{
+			"TopicArn": &wrongTopicARN,
+		},
+	}
+
+	if topicExists {
+		topics[okTopicARN] = &sns.GetTopicAttributesOutput{
+			Attributes: map[string]*string{
+				"TopicArn": &okTopicARN,
+			},
+		}
+	}
+
+	return map[string]interface{}{
+		mockTopicsDataKey: topics,
+	}
+}
+
+// getMockTopics gets mocked SNS topics from the TableRow's data.
+func getMockTopics(tr *rt.TableRow) mockTopics {
+	topics, ok := tr.OtherTestData[mockTopicsDataKey]
+	if !ok {
+		return nil
+	}
+	return topics.(mockTopics)
+}
+
+const mockSubscriptionsPagesDataKey = "subcriptionpages"
 
 // makeMockSubscriptionsPages returns mocked pages of SNS Subscriptions to be
 // used as TableRow data.
@@ -413,6 +561,19 @@ func getMockSubscriptionsPages(tr *rt.TableRow) mockSubscriptionsPages {
 	return pages.(mockSubscriptionsPages)
 }
 
+// mergeTableRowData flattens multiple maps of TableRow data.
+func mergeTableRowData(data ...map[string]interface{}) map[string]interface{} {
+	trData := make(map[string]interface{})
+
+	for _, d := range data {
+		for k, v := range d {
+			trData[k] = v
+		}
+	}
+
+	return trData
+}
+
 func calledSubscribe(expectCall bool) func(*testing.T, *rt.TableRow) {
 	return func(t *testing.T, tr *rt.TableRow) {
 		cli := tr.OtherTestData[testClientDataKey].(*mockedSNSClient)
@@ -451,15 +612,20 @@ func unsetFinalizerPatch() clientgotesting.PatchActionImpl {
 
 /* Events */
 
+func topicNotFoundSubscribeEvent() string {
+	return eventtesting.Eventf(corev1.EventTypeWarning, ReasonFailedSubscribe,
+		fmt.Sprintf("The provided topic %q does not exist", tTopicARN),
+	)
+}
+
 func subscribedEvent() string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonSubscribed, "Subscribed to SNS topic %q", tTopicARN)
 }
 func unsubscribedEvent() string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonUnsubscribed, "Unsubscribed from SNS topic %q", tTopicARN)
 }
-
-func notEnoughInformationUnsubscribeEvent() string {
-	return eventtesting.Eventf(corev1.EventTypeWarning, ReasonFailedUnsubscribe, "SNS status information incomplete, skipping finalization")
+func noopUnsubscribeEvent() string {
+	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonUnsubscribed, "Subscription already absent, skipping finalization")
 }
 
 func finalizedEvent() string {

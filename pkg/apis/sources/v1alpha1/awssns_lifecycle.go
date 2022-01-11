@@ -122,7 +122,6 @@ func (s *AWSSNSSourceStatus) MarkSubscribed(subARN string) {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and associated message.
 func (s *AWSSNSSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.SubscriptionARN = nil
 	awsSNSSourceConditionSet.Manage(s).MarkFalse(AWSSNSConditionSubscribed,
 		reason, msg)
 }

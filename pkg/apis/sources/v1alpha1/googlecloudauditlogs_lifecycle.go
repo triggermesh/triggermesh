@@ -88,8 +88,5 @@ func (s *GoogleCloudAuditLogsSourceStatus) MarkSubscribed() {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *GoogleCloudAuditLogsSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.AuditLogsSink = nil
-	s.Topic = nil
-	s.Subscription = nil
 	GoogleCloudAuditLogsSourceConditionSet.Manage(s).MarkFalse(GoogleCloudAuditLogsConditionSubscribed, reason, msg)
 }

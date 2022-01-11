@@ -118,6 +118,5 @@ func (s *AzureBlobStorageSourceStatus) MarkSubscribed() {
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *AzureBlobStorageSourceStatus) MarkNotSubscribed(reason, msg string) {
-	s.EventHubID = nil
 	azureBlobStorageSourceConditionSet.Manage(s).MarkFalse(AzureBlobStorageConditionSubscribed, reason, msg)
 }
