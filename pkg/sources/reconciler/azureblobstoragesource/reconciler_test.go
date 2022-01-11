@@ -266,10 +266,12 @@ var (
 		Path:   "/",
 	}
 
-	tStorageAccID = v1alpha1.StorageAccountResourceID{
-		SubscriptionID: "00000000-0000-0000-0000-000000000000",
-		ResourceGroup:  "MyGroup",
-		StorageAccount: "mystorageaccount",
+	tStorageAccID = v1alpha1.AzureResourceID{
+		SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+		ResourceGroup:    "MyGroup",
+		ResourceProvider: "Microsoft.Storage",
+		ResourceType:     "storageAccounts",
+		ResourceName:     "mystorageaccount",
 	}
 
 	tEventHubNamespaceID = v1alpha1.AzureResourceID{
@@ -530,17 +532,17 @@ func unsetFinalizerPatch() clientgotesting.PatchActionImpl {
 /* Events */
 
 func createdEventSubsEvent() string {
-	tStorageAccount := tStorageAccID.StorageAccount
+	tStorageAccount := tStorageAccID.ResourceName
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonSubscribed,
 		"Created event subscription %q for storage account %q", tEventSubs, tStorageAccount)
 }
 func updatedEventSubsEvent() string {
-	tStorageAccount := tStorageAccID.StorageAccount
+	tStorageAccount := tStorageAccID.ResourceName
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonSubscribed,
 		"Updated event subscription %q for storage account %q", tEventSubs, tStorageAccount)
 }
 func deletedEventSubsEvent() string {
-	tStorageAccount := tStorageAccID.StorageAccount
+	tStorageAccount := tStorageAccID.ResourceName
 	return eventtesting.Eventf(corev1.EventTypeNormal, ReasonUnsubscribed,
 		"Deleted event subscription %q for storage account %q", tEventSubs, tStorageAccount)
 }
