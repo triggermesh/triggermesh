@@ -22,11 +22,6 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
-const (
-	AttributeSource = "source"
-	AttributeType   = "type"
-)
-
 // OverridesJSON returns the JSON representation of a duckv1.CloudEventOverrides,
 // after applying some optional transformations to it.
 func OverridesJSON(ceo *duckv1.CloudEventOverrides, overrides ...ceOverrideOption) string {

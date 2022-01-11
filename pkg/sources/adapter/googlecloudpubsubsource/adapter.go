@@ -29,6 +29,8 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/option"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -39,6 +41,10 @@ type envConfig struct {
 	SubscriptionResourceName GCloudResourceName `envconfig:"GCLOUD_PUBSUB_SUBSCRIPTION" required:"true"`
 
 	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
+
+	// Allows overriding common CloudEvents attributes.
+	CEOverrideSource string `envconfig:"CE_SOURCE"`
+	CEOverrideType   string `envconfig:"CE_TYPE"`
 
 	// Name of a message processor which takes care of converting Pub/Sub
 	// messages to CloudEvents.
@@ -84,10 +90,23 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 	topicName := sub.Topic.String()
 
+	ceSource := topicName
+	if ceOverrideSource := env.CEOverrideSource; ceOverrideSource != "" {
+		ceSource = ceOverrideSource
+	}
+
+	ceType := v1alpha1.GoogleCloudPubSubGenericEventType
+	if ceOverrideType := env.CEOverrideType; ceOverrideType != "" {
+		ceType = ceOverrideType
+	}
+
 	var msgPrcsr MessageProcessor
 	switch env.MessageProcessor {
 	case "default":
-		msgPrcsr = &defaultMessageProcessor{ceSource: topicName}
+		msgPrcsr = &defaultMessageProcessor{
+			ceSource: ceSource,
+			ceType:   ceType,
+		}
 	default:
 		logger.Panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}

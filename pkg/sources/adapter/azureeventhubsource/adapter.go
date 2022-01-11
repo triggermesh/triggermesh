@@ -34,6 +34,8 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureeventhubsource/trace"
 )
 
@@ -54,6 +56,10 @@ type envConfig struct {
 	//
 	// Supported values: [ default eventgrid ]
 	MessageProcessor string `envconfig:"EVENTHUB_MESSAGE_PROCESSOR" default:"default"`
+
+	// Allows overriding common CloudEvents attributes.
+	CEOverrideSource string `envconfig:"CE_SOURCE"`
+	CEOverrideType   string `envconfig:"CE_TYPE"`
 
 	// The environment variables below aren't read from the envConfig struct
 	// by the Event Hubs SDK, but rather directly using os.Getenv().
@@ -97,13 +103,27 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	ceSource := env.HubResourceID
+	if ceOverrideSource := env.CEOverrideSource; ceOverrideSource != "" {
+		ceSource = ceOverrideSource
+	}
+
+	ceType := v1alpha1.AzureEventType(sources.AzureServiceEventHub, v1alpha1.AzureEventHubGenericEventType)
+	if ceOverrideType := env.CEOverrideType; ceOverrideType != "" {
+		ceType = ceOverrideType
+	}
 
 	var msgPrcsr MessageProcessor
 	switch env.MessageProcessor {
 	case "eventgrid":
-		msgPrcsr = &eventGridMessageProcessor{ceSourceFallback: ceSource}
+		msgPrcsr = &eventGridMessageProcessor{
+			ceSourceFallback: ceSource,
+			ceTypeFallback:   ceType,
+		}
 	case "default":
-		msgPrcsr = &defaultMessageProcessor{ceSource: ceSource}
+		msgPrcsr = &defaultMessageProcessor{
+			ceSource: ceSource,
+			ceType:   ceType,
+		}
 	default:
 		panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}

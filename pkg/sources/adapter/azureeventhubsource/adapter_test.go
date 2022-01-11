@@ -32,6 +32,9 @@ import (
 )
 
 func TestHandleMessage(t *testing.T) {
+	const ceSource = "fake.source"
+	const ceType = "fake.type"
+
 	testCases := []struct {
 		name            string
 		eventData       []byte
@@ -68,7 +71,10 @@ func TestHandleMessage(t *testing.T) {
 				},
 				logger:   loggingtesting.TestLogger(t),
 				ceClient: ceClient,
-				msgPrcsr: &defaultMessageProcessor{},
+				msgPrcsr: &defaultMessageProcessor{
+					ceSource: ceSource,
+					ceType:   ceType,
+				},
 			}
 
 			err := a.handleMessage(context.Background(), &event)
@@ -80,6 +86,9 @@ func TestHandleMessage(t *testing.T) {
 			// ensure the sent event has the expected encoding (base64 / raw JSON)
 			eventDataStr := extractDataFromEvent(t, events[0].Data())
 			assert.Equal(t, tc.expectEventData, eventDataStr)
+
+			assert.Equal(t, ceSource, events[0].Source())
+			assert.Equal(t, ceType, events[0].Type())
 		})
 	}
 }
