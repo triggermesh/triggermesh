@@ -91,7 +91,9 @@ spec:
                 description: A Kinesis partition name is required for the target to know where to stream the events to.
                 type: string
               discardCloudEventContext:
-                description: Produce a new cloud event based on the response from the Kinesis invocation.
+                description: Whether to omit CloudEvent context attributes in records created in Kinesis.
+                  When this property is false (default), the entire CloudEvent payload is included.
+                  When this property is true, only the CloudEvent data is included.
                 type: boolean
             required:
             - arn

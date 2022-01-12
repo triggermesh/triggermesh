@@ -60,7 +60,7 @@ type AWSSNSTargetSpec struct {
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsns.html#amazonsns-resources-for-iam-policies
 	ARN string `json:"arn"`
 
-	// Whether to omit CloudEvent context attributes in created SNS notifications.
+	// Whether to omit CloudEvent context attributes in notifications sent to SNS.
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`

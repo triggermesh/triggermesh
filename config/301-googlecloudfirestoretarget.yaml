@@ -67,7 +67,9 @@ spec:
                 description: Google Cloud Project ID associated with the firestore database.
                 type: string
               discardCloudEventContext:
-                description: Indicate whether the full cloud event payload should be sent to the target, or the data
+                description: Whether to omit CloudEvent context attributes in documents created in Firestore.
+                  When this property is false (default), the entire CloudEvent payload is included.
+                  When this property is true, only the CloudEvent data is included.
                   component only.
                 type: boolean
               credentialsJson:

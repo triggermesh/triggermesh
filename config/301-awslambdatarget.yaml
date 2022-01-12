@@ -89,7 +89,9 @@ spec:
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:lambda:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:(function|layer|event-source-mapping):.+$
               discardCloudEventContext:
-                description: Produce a new cloud event based on the response from the lambda function.
+                description: Whether to omit CloudEvent context attributes in Lambda function calls.
+                  When this property is false (default), the entire CloudEvent payload is included.
+                  When this property is true, only the CloudEvent data is included.
                 type: boolean
             required:
             - arn

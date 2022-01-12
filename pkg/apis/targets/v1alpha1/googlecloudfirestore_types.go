@@ -59,7 +59,7 @@ type GoogleCloudFirestoreTargetSpec struct {
 	// ProjectID specifies the Google project ID
 	ProjectID string `json:"projectID"`
 
-	// Whether to omit CloudEvent context attributes in created SNS notifications.
+	// Whether to omit CloudEvent context attributes in documents created in Firestore.
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`

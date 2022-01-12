@@ -110,7 +110,9 @@ spec:
                     type: string
                     enum: [always, error, never]
               discardCloudEventContext:
-                description: Discard cloud event metadata from payload being sent to Elasticsearch.
+                description: Whether to omit CloudEvent context attributes in documents created in Elasticsearch.
+                  When this property is false (default), the entire CloudEvent payload is included.
+                  When this property is true, only the CloudEvent data is included.
                 type: boolean
             required:
             - connection

@@ -60,7 +60,7 @@ type ElasticsearchTargetSpec struct {
 	// IndexName to write to.
 	IndexName string `json:"indexName"`
 
-	// Whether to omit CloudEvent context attributes in created documents.
+	// Whether to omit CloudEvent context attributes in documents created in Elasticsearch.
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`

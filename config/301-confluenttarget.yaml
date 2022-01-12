@@ -87,7 +87,9 @@ spec:
                   mechanism to use. This can be "Gssapi", "OAuthBearer", "Plain", "ScramSha256", and "ScramSha512".
                 type: string
               discardCloudEventContext:
-                description: Produce a new cloud event based on the response from calling Kafka.
+                description: Whether to omit CloudEvent context attributes in messages sent to Kafka.
+                  When this property is false (default), the entire CloudEvent payload is included.
+                  When this property is true, only the CloudEvent data is included.
                 type: boolean
             required:
             - username
