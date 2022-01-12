@@ -49,7 +49,7 @@ func CreateQueueStorageAccount(ctx context.Context, cli *armstorage.StorageAccou
 func CreateQueueStorage(ctx context.Context, name, accountName string, accountKey string) *azqueue.MessagesURL {
 	credential, err := azqueue.NewSharedKeyCredential(accountName, accountKey)
 	if err != nil {
-		framework.FailfWithOffset(3, "azqueue.NewSharedKeyCredential failed: ", err)
+		framework.FailfWithOffset(2, "Failed to obtain azqueue.NewSharedKeyCredential: %s", err)
 	}
 
 	p := azqueue.NewPipeline(credential, azqueue.PipelineOptions{})
@@ -57,7 +57,7 @@ func CreateQueueStorage(ctx context.Context, name, accountName string, accountKe
 	urlRef, err := url.Parse(fmt.Sprintf("https://%s.queue.core.windows.net", accountName))
 
 	if err != nil {
-		framework.FailfWithOffset(3, "url.Parse failed: ", err)
+		framework.FailfWithOffset(2, "Failed to parse url: %s", err)
 	}
 
 	serviceURL := azqueue.NewServiceURL(*urlRef, p)
@@ -65,7 +65,7 @@ func CreateQueueStorage(ctx context.Context, name, accountName string, accountKe
 	// Create a Queue
 	_, err = serviceURL.NewQueueURL(name).Create(ctx, azqueue.Metadata{})
 	if err != nil {
-		framework.FailfWithOffset(3, "error creating queue: ", err)
+		framework.FailfWithOffset(2, "Error creating queue: %s", err)
 	}
 
 	queueURL := serviceURL.NewQueueURL(name)
