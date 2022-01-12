@@ -60,16 +60,15 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	var authEnvs []corev1.EnvVar
 	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvGCloudSAKey, typedSrc.Spec.ServiceAccountKey)
 
-	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides,
-		cloudevents.SetExtension(cloudevents.AttributeSource, src.AsEventSource()),
-		cloudevents.SetExtension(cloudevents.AttributeType, v1alpha1.GoogleCloudIoTGenericEventType),
-	)
+	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvGCloudPubSubSubscription, subsName),
 		resource.EnvVars(authEnvs...),
+		resource.EnvVar(common.EnvCESource, src.AsEventSource()),
+		resource.EnvVar(common.EnvCEType, v1alpha1.GoogleCloudIoTGenericEventType),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)

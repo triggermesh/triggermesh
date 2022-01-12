@@ -27,9 +27,16 @@ import (
 )
 
 func TestProcessMessageDefault(t *testing.T) {
+	const ceSource = "fake.source"
+	const ceType = "fake.type"
+
 	testData := fakePubSubMessage()
 
-	msgPrcsr := &defaultMessageProcessor{ceSource: "fake.source"}
+	msgPrcsr := &defaultMessageProcessor{
+		ceSource: ceSource,
+		ceType:   ceType,
+	}
+
 	events, err := msgPrcsr.Process(testData)
 
 	require.NoError(t, err)
@@ -39,8 +46,8 @@ func TestProcessMessageDefault(t *testing.T) {
 
 	assert.Equal(t, "000", event.ID())
 	assert.Equal(t, time.Unix(0, 0), event.Time())
-	assert.Equal(t, "com.google.cloud.pubsub.message", event.Type())
-	assert.Equal(t, "fake.source", event.Source())
+	assert.Equal(t, ceSource, event.Source())
+	assert.Equal(t, ceType, event.Type())
 
 	eventExts := event.Extensions()
 

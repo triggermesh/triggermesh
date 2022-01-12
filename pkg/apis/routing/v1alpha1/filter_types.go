@@ -18,9 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -45,14 +45,11 @@ type Filter struct {
 
 var (
 	// Check that Filter can be validated and defaulted.
-	_ apis.Validatable   = (*Filter)(nil)
-	_ apis.Defaultable   = (*Filter)(nil)
-	_ kmeta.OwnerRefable = (*Filter)(nil)
-	// Check that the type conforms to the duck Knative Resource shape.
-	_ duckv1.KRShaped = (*Filter)(nil)
-	_ multiTenant     = (*Filter)(nil)
+	_ apis.Validatable = (*Filter)(nil)
+	_ apis.Defaultable = (*Filter)(nil)
 
-	_ Router = (*Filter)(nil)
+	_ Router      = (*Filter)(nil)
+	_ multiTenant = (*Filter)(nil)
 )
 
 // FilterSpec contains CEL expression string and the destination sink

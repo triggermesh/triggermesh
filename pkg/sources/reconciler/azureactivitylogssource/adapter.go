@@ -68,11 +68,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
-	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides,
-		cloudevents.SetExtension(cloudevents.AttributeSource, src.AsEventSource()),
-		cloudevents.SetExtension(cloudevents.AttributeType, v1alpha1.AzureEventType(sources.AzureServiceMonitor,
-			v1alpha1.AzureActivityLogsActivityLogEventType)),
-	)
+	ceType := v1alpha1.AzureEventType(sources.AzureServiceMonitor, v1alpha1.AzureActivityLogsActivityLogEventType)
+
+	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
@@ -81,6 +79,8 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVar(common.EnvHubNamespace, hubNamespaceID.ResourceName),
 		resource.EnvVar(common.EnvHubName, eventHubName),
 		resource.EnvVars(hubEnvs...),
+		resource.EnvVar(common.EnvCESource, src.AsEventSource()),
+		resource.EnvVar(common.EnvCEType, ceType),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)

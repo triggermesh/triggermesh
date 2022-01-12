@@ -21,8 +21,6 @@ import (
 	"fmt"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/triggermesh/triggermesh/pkg/apis/sources"
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 )
@@ -40,11 +38,12 @@ var (
 // defaultMessageProcessor is the default processor for Event Hubs messages.
 type defaultMessageProcessor struct {
 	ceSource string
+	ceType   string
 }
 
 // Process implements MessageProcessor.
 func (p *defaultMessageProcessor) Process(msg *eventhub.Event) ([]*cloudevents.Event, error) {
-	event, err := makeEventHubsEvent(msg, p.ceSource)
+	event, err := makeEventHubsEvent(msg, p.ceSource, p.ceType)
 	if err != nil {
 		return nil, fmt.Errorf("creating CloudEvent from Event Hubs message: %w", err)
 	}
@@ -53,12 +52,12 @@ func (p *defaultMessageProcessor) Process(msg *eventhub.Event) ([]*cloudevents.E
 }
 
 // makeEventHubsEvent returns a CloudEvent for a generic Event Hubs message.
-func makeEventHubsEvent(msg *eventhub.Event, srcAttr string) (*cloudevents.Event, error) {
+func makeEventHubsEvent(msg *eventhub.Event, srcAttr, typeAttr string) (*cloudevents.Event, error) {
 	ceData := toCloudEventData(msg)
 
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetSource(srcAttr)
-	event.SetType(v1alpha1.AzureEventType(sources.AzureServiceEventHub, v1alpha1.AzureEventHubGenericEventType))
+	event.SetType(typeAttr)
 	if err := event.SetData(cloudevents.ApplicationJSON, ceData); err != nil {
 		return nil, fmt.Errorf("setting CloudEvent data: %w", err)
 	}
@@ -94,9 +93,11 @@ type EventWithRawData struct {
 
 // eventGridMessageProcessor processes events originating from Azure Event Grid.
 type eventGridMessageProcessor struct {
-	// This value is set as the "source" CE context attribute when the
-	// message processor handles data which didn't originate from Event Grid.
+	// These values are set respectively as the "source" and "type" CE
+	// context attributes when the message processor handles data which
+	// didn't originate from Event Grid.
 	ceSourceFallback string
+	ceTypeFallback   string
 }
 
 // Process implements MessageProcessor.
@@ -112,7 +113,7 @@ func (p *eventGridMessageProcessor) Process(msg *eventhub.Event) ([]*cloudevents
 	if err := json.Unmarshal(msg.Data, &events); err != nil {
 		// the message didn't originate from Event Grid, fall back to
 		// the default processor's behaviour
-		event, err := makeEventHubsEvent(msg, p.ceSourceFallback)
+		event, err := makeEventHubsEvent(msg, p.ceSourceFallback, p.ceTypeFallback)
 		if err != nil {
 			return nil, fmt.Errorf("creating CloudEvent from Event Hubs message: %w", err)
 		}
@@ -126,7 +127,7 @@ func (p *eventGridMessageProcessor) Process(msg *eventhub.Event) ([]*cloudevents
 	// Although this attribute is optional, we set it here manually for
 	// event consumers.
 	for _, event := range events {
-		if event.Context.GetDataContentType() == "" {
+		if event.DataContentType() == "" {
 			event.SetDataContentType(cloudevents.ApplicationJSON)
 		}
 	}

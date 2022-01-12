@@ -49,6 +49,12 @@ type envConfig struct {
 	PollingInterval string `envconfig:"POLLING_INTERVAL" required:"true"`
 
 	Metrics []string `envconfig:"PI_METRICS" required:"true"`
+
+	// The environment variables below aren't read from the envConfig struct
+	// by the AWS SDK, but rather directly using os.Getenv().
+	// They are nevertheless listed here for documentation purposes.
+	_ string `envconfig:"AWS_ACCESS_KEY_ID"`
+	_ string `envconfig:"AWS_SECRET_ACCESS_KEY"`
 }
 
 // adapter implements the source's adapter.

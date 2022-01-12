@@ -64,6 +64,12 @@ type envConfig struct {
 	// Visibility timeout to set on all messages received by this event source.
 	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 	VisibilityTimeout *time.Duration `envconfig:"SQS_VISIBILITY_TIMEOUT"`
+
+	// The environment variables below aren't read from the envConfig struct
+	// by the AWS SDK, but rather directly using os.Getenv().
+	// They are nevertheless listed here for documentation purposes.
+	_ string `envconfig:"AWS_ACCESS_KEY_ID"`
+	_ string `envconfig:"AWS_SECRET_ACCESS_KEY"`
 }
 
 // adapter implements the source's adapter.
