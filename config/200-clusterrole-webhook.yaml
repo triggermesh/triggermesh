@@ -48,7 +48,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - xmltojsontransformations
   - xslttransforms
   verbs:
   - get

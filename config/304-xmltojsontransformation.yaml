@@ -44,11 +44,11 @@ spec:
         type: object
         properties:
           spec:
-            description: Desired state of the xmltojsontransformation object.
+            description: Desired state of the transformer.
             type: object
             properties:
               sink:
-                description: The destination of events sourced from the xmltojsontransformation object.
+                description: The destination of events transformed by this component.
                 type: object
                 properties:
                   ref:
@@ -75,7 +75,7 @@ spec:
                 - required: ['ref']
                 - required: ['uri']
           status:
-            description: Reported status of Transformation.
+            description: Reported status of the transformer.
             type: object
             properties:
               sinkUri:
@@ -119,7 +119,7 @@ spec:
                   - type
                   - status
               address:
-                description: Address of the HTTP/S endpoint where Transformation is serving incoming CloudEvents.
+                description: Address of the HTTP/S endpoint where the transformer is serving incoming CloudEvents.
                 type: object
                 properties:
                   url:

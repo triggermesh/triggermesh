@@ -17,12 +17,11 @@ limitations under the License.
 package xmltojsontransformation
 
 import (
+	"bytes"
 	"context"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io/ioutil"
-	"strings"
 
 	"go.uber.org/zap"
 
@@ -49,8 +48,8 @@ type envAccessor struct {
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
 }
 
-// NewTarget adapter implementation
-func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+// NewAdapter adapter implementation
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
@@ -77,20 +76,20 @@ type Adapter struct {
 	logger   *zap.SugaredLogger
 }
 
-// Returns if stopCh is closed or Send() returns an error.
+// Start is a blocking function and will return if an error occurs
+// or the context is cancelled.
 func (a *Adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting XMLToJSONTransformation Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	if !IsValidXML(event.Data()) {
-		fmt.Println("fail")
+	if !isValidXML(event.Data()) {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("invalid XML"), nil)
 	}
 
-	xml := strings.NewReader(string(event.Data()))
+	xml := bytes.NewReader(event.Data())
 	jsn, err := xj.Convert(xml)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
@@ -101,13 +100,13 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
-	if err := event.SetData("application/json", readBuf); err != nil {
+	if err := event.SetData(cloudevents.ApplicationJSON, readBuf); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	return &event, cloudevents.ResultACK
 }
 
-func IsValidXML(data []byte) bool {
+func isValidXML(data []byte) bool {
 	return xml.Unmarshal(data, new(interface{})) == nil
 }

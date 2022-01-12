@@ -24,9 +24,9 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
-	logtesting "knative.dev/pkg/logging/testing"
 )
 
 const (
@@ -46,9 +46,7 @@ const (
 
 func TestXSLTTransformEvents(t *testing.T) {
 	testCases := map[string]struct {
-		inEvent cloudevents.Event
-
-		expectPanic string
+		inEvent     cloudevents.Event
 		expectEvent cloudevents.Event
 	}{
 		"transform ok": {
@@ -65,21 +63,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-
-			defer func() {
-				r := recover()
-				switch {
-				case r == nil:
-					assert.Empty(t, tc.expectPanic, "Expected panic did not occur")
-				case tc.expectPanic == "":
-					assert.Fail(t, "Unexpected panic", r)
-				default:
-					assert.Contains(t, r, tc.expectPanic)
-				}
-			}()
-
 			ctx := context.Background()
-			logtesting.TestContextWithLogger(t)
 
 			env := &envAccessor{
 				EnvConfig: adapter.EnvConfig{
@@ -93,9 +77,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 			a := NewTarget(ctx, env, ceClient)
 
 			go func() {
-				if err := a.Start(ctx); err != nil {
-					assert.FailNow(t, "could not start test adapter")
-				}
+				require.NoError(t, a.Start(ctx))
 			}()
 
 			send <- tc.inEvent
@@ -105,7 +87,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 				assert.Equal(t, tCloudEventSource, event.Event.Source())
 				assert.Equal(t, string(tc.expectEvent.DataEncoded), string(event.Event.DataEncoded))
 
-			case <-time.After(15 * time.Second):
+			case <-time.After(2 * time.Second):
 				assert.Fail(t, "expected cloud event response was not received")
 			}
 
@@ -126,11 +108,6 @@ func newCloudEvent(data, contentType string, opts ...cloudEventOptions) cloudeve
 	event.SetID(tCloudEventID)
 	event.SetType(tCloudEventType)
 	event.SetSource(tCloudEventSource)
-	event.SetSpecVersion("1.0")
-
-	for _, o := range opts {
-		o(&event)
-	}
 
 	return event
 }

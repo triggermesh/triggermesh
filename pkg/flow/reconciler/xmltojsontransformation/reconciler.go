@@ -40,9 +40,6 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XMLToJSONTransformation) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-
 	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
 
 	trg.Status.PropagateKServiceAvailability(adapter)

@@ -28,8 +28,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// XMLToJSONTransformation is a Knative abstraction that encapsulates the interface by which Knative
-// components express a desire to have a particular image cached.
+// XMLToJSONTransformation is the schema for the event transformer.
 type XMLToJSONTransformation struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional

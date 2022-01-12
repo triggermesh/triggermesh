@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("xmltojsontransformation-adapter", xmltojsontransformation.EnvAccessorCtor, xmltojsontransformation.NewTarget)
+	pkgadapter.Main("xmltojsontransformation-adapter", xmltojsontransformation.EnvAccessorCtor, xmltojsontransformation.NewAdapter)
 }
