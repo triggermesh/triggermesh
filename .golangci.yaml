@@ -11,6 +11,8 @@ linters:
 
 run:
   timeout: 10m
+  build-tags:
+  - noclibs
 
 linters-settings:
   stylecheck:

@@ -21,8 +21,6 @@ import (
 	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
@@ -41,8 +39,7 @@ type OCIMetricsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object = (*OCIMetricsSource)(nil)
-	_ EventSource    = (*OCIMetricsSource)(nil)
+	_ EventSource = (*OCIMetricsSource)(nil)
 )
 
 // OCIMetricsSourceSpec defines the desired state of the event source.

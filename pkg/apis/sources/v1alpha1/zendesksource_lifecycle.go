@@ -28,11 +28,6 @@ func (*ZendeskSource) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("ZendeskSource")
 }
 
-// GetUntypedSpec implements apis.HasSpec.
-func (s *ZendeskSource) GetUntypedSpec() interface{} {
-	return s.Spec
-}
-
 // GetConditionSet implements duckv1.KRShaped.
 func (*ZendeskSource) GetConditionSet() apis.ConditionSet {
 	return zendeskSourceConditionSet

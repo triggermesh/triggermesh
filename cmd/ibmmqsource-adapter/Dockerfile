@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.3
-
 FROM golang:bullseye as builder
 
 RUN apt-get update && \
@@ -21,8 +19,7 @@ RUN go mod download
 
 COPY . .
 
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    GOOS=linux GOARCH=amd64 go build -v -o ibmmqsource-adapter ./cmd/ibmmqsource-adapter 
+RUN GOOS=linux GOARCH=amd64 go build -v -o ibmmqsource-adapter ./cmd/ibmmqsource-adapter 
 
 
 FROM debian:stable-slim

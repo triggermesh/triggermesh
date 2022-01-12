@@ -63,7 +63,7 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 		return eventHubID.String(), nil
 	}
 
-	stAccName := src.Spec.StorageAccountID.StorageAccount
+	stAccName := src.Spec.StorageAccountID.ResourceName
 
 	// the naming rule for Storage Accounts is more restrictive than the
 	// one for Event Hubs, so this should hopefully always be valid, on top
@@ -145,7 +145,7 @@ func ensureNoEventHub(ctx context.Context, cli storage.EventHubsClient) error {
 		return nil
 	}
 
-	stAccName := src.Spec.StorageAccountID.StorageAccount
+	stAccName := src.Spec.StorageAccountID.ResourceName
 
 	eventHubName := stAccName
 	resourceGroup := src.Spec.Endpoint.EventHubs.NamespaceID.ResourceGroup

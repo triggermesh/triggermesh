@@ -18,8 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
@@ -40,7 +38,6 @@ type AWSSQSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ runtime.Object         = (*AWSSQSSource)(nil)
 	_ EventSource            = (*AWSSQSSource)(nil)
 	_ serviceAccountProvider = (*AWSSQSSource)(nil)
 )

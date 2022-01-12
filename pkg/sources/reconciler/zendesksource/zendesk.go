@@ -31,7 +31,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	pkgapis "knative.dev/pkg/apis"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
 
@@ -60,7 +59,7 @@ func (r *Reconciler) ensureZendeskTargetAndTrigger(ctx context.Context) error {
 		return nil
 	}
 
-	spec := src.(pkgapis.HasSpec).GetUntypedSpec().(v1alpha1.ZendeskSourceSpec)
+	spec := src.(*v1alpha1.ZendeskSource).Spec
 
 	sg := secret.NewGetter(r.secretClient(src.GetNamespace()))
 
@@ -255,7 +254,7 @@ func (r *Reconciler) ensureNoZendeskTargetAndTrigger(ctx context.Context) error 
 
 	title := targetTitle(src)
 
-	spec := src.(pkgapis.HasSpec).GetUntypedSpec().(v1alpha1.ZendeskSourceSpec)
+	spec := src.(*v1alpha1.ZendeskSource).Spec
 
 	sg := secret.NewGetter(r.secretClient(src.GetNamespace()))
 
