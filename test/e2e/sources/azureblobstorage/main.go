@@ -25,12 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
-	"github.com/Azure/go-autorest/autorest/to"
-
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
 
@@ -76,9 +72,8 @@ var sourceAPIVersion = schema.GroupVersion{
 }
 
 const (
-	sourceKind          = "AzureBlobStorageSource"
-	sourceResource      = "azureblobstoragesource"
-	azureBlobStorageURL = ".blob.core.windows.net/"
+	sourceKind     = "AzureBlobStorageSource"
+	sourceResource = "azureblobstoragesource"
 )
 
 /*
@@ -91,7 +86,7 @@ const (
  * Delete the blob and verify the event
 */
 
-var _ = Describe("Azure Blob Storage", func() {
+var _ = FDescribe("Azure Blob Storage", func() {
 	ctx := context.Background()
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 	region := os.Getenv("AZURE_REGION")
@@ -132,12 +127,14 @@ var _ = Describe("Azure Blob Storage", func() {
 			BeforeEach(func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 
+				saClient := azure.CreateStorageAccountsClient(subscriptionID)
+
 				// storageaccount name must be alphanumeric characters only and 3-24 characters long
 				saName = strings.Replace(ns, "-", "", -1)
 				saName = strings.Replace(saName, "e2eazureblobstoragesource", "tme2etest", -1)
-				sa = createStorageAccount(ctx, subscriptionID, *rg.Name, saName, region)
+				sa = azure.CreateBlobStorageAccount(ctx, saClient, saName, *rg.Name, region)
 
-				container = createBlobContainer(ctx, *rg.Name, sa, subscriptionID, ns)
+				container = azure.CreateBlobContainer(ctx, *rg.Name, sa, subscriptionID, ns)
 
 				src, err = createSource(srcClient, ns, "test-", sink,
 					withServicePrincipal(),
@@ -154,7 +151,7 @@ var _ = Describe("Azure Blob Storage", func() {
 
 			It("should verify an Azure storage event is sent", func() {
 				By("uploading a blob", func() {
-					uploadBlob(ctx, container, sa, ns, generatePayload(4096))
+					azure.UploadBlob(ctx, container, sa, ns, generatePayload(4096))
 					time.Sleep(30 * time.Second) // wait for the blob to be created
 
 					const receiveTimeout = 60 * time.Second // it takes events a little longer to flow in from azure
@@ -178,11 +175,11 @@ var _ = Describe("Azure Blob Storage", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(data["api"]).To(Equal("PutBlob"))
-					Expect(data["url"]).To(Equal("https://" + *sa.Name + azureBlobStorageURL + *container.Name + "/" + ns))
+					Expect(data["url"]).To(Equal("https://" + *sa.Name + azure.AzureBlobStorageURL + *container.Name + "/" + ns))
 				})
 
 				By("deleting a blob", func() {
-					deleteBlob(ctx, container, sa, ns)
+					azure.DeleteBlob(ctx, container, sa, ns)
 					time.Sleep(60 * time.Second) // wait for the blob to be deleted
 
 					const receiveTimeout = 60 * time.Second // it takes events a little longer to flow in from azure
@@ -206,7 +203,7 @@ var _ = Describe("Azure Blob Storage", func() {
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(data["api"]).To(Equal("DeleteBlob"))
-					Expect(data["url"]).To(Equal("https://" + *sa.Name + azureBlobStorageURL + *container.Name + "/" + ns))
+					Expect(data["url"]).To(Equal("https://" + *sa.Name + azure.AzureBlobStorageURL + *container.Name + "/" + ns))
 				})
 			})
 
@@ -397,99 +394,6 @@ func createStorageAccountID(subscriptionID, rgName, saName string) string {
 	return "/subscriptions/" + subscriptionID + "/resourceGroups/" + rgName + "/providers/Microsoft.Storage/storageAccounts/" + saName
 }
 
-// createStorageBlobAccount creates a new storage account and blob container to
-// user for the test.
-func createStorageAccount(ctx context.Context, subscriptionID, resourceGroup, name, region string) armstorage.StorageAccount {
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	if err != nil {
-		framework.FailfWithOffset(3, "unable to authenticate: %s", err)
-	}
-
-	saClient := armstorage.NewStorageAccountsClient(subscriptionID, cred, nil)
-
-	resp, err := saClient.BeginCreate(ctx, resourceGroup, name, armstorage.StorageAccountCreateParameters{
-		Kind:     armstorage.KindBlobStorage.ToPtr(),
-		Location: &region,
-		SKU: &armstorage.SKU{
-			Name: armstorage.SKUNameStandardRAGRS.ToPtr(),
-			Tier: armstorage.SKUTierStandard.ToPtr(),
-		},
-		Identity: &armstorage.Identity{
-			Type: armstorage.IdentityTypeNone.ToPtr(),
-		},
-		Properties: &armstorage.StorageAccountPropertiesCreateParameters{
-			AccessTier:            armstorage.AccessTierHot.ToPtr(),
-			AllowBlobPublicAccess: to.BoolPtr(true),
-		},
-	}, nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to create storage account: %s", err)
-	}
-
-	finalResp, err := resp.PollUntilDone(ctx, time.Second*30)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to create storage account: %s", err)
-	}
-
-	return finalResp.StorageAccount
-}
-
-func createBlobContainer(ctx context.Context, rg string, sa armstorage.StorageAccount, subscriptionID, name string) armstorage.BlobContainer {
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
-	}
-
-	client := armstorage.NewBlobContainersClient(subscriptionID, cred, nil)
-
-	resp, err := client.Create(ctx, rg, *sa.Name, name, armstorage.BlobContainer{}, nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to create blob container: %s", err)
-	}
-
-	return resp.BlobContainer
-}
-
-func uploadBlob(ctx context.Context, container armstorage.BlobContainer, sa armstorage.StorageAccount, name string, data string) {
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
-	}
-
-	url := "https://" + *sa.Name + azureBlobStorageURL + *container.Name
-	containerClient, err := azblob.NewContainerClient(url, cred, nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to obtain blob client: %s", err)
-	}
-
-	blobClient := containerClient.NewBlockBlobClient(name)
-	rs := ReadSeekCloser(strings.NewReader(data))
-
-	_, err = blobClient.Upload(ctx, rs, nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to upload payload: %s", err)
-	}
-}
-
-func deleteBlob(ctx context.Context, container armstorage.BlobContainer, sa armstorage.StorageAccount, name string) {
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
-	}
-
-	url := "https://" + *sa.Name + azureBlobStorageURL + *container.Name
-	containerClient, err := azblob.NewContainerClient(url, cred, nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to obtain blob client: %s", err)
-	}
-
-	blobClient := containerClient.NewBlockBlobClient(name)
-	_, err = blobClient.Delete(ctx, nil)
-	if err != nil {
-		framework.FailfWithOffset(2, "Unable to delete blob: %s", err)
-	}
-}
-
 func generatePayload(size int) string {
 	var sb strings.Builder
 
@@ -500,14 +404,3 @@ func generatePayload(size int) string {
 
 	return sb.String()
 }
-
-// ReadSeekCloser implements a closer with Seek, Read, and Close
-func ReadSeekCloser(r *strings.Reader) readSeekCloser {
-	return readSeekCloser{r}
-}
-
-type readSeekCloser struct {
-	*strings.Reader
-}
-
-func (readSeekCloser) Close() error { return nil }

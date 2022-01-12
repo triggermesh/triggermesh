@@ -154,7 +154,7 @@ var _ = FDescribe("Azure Queue Storage", func() {
 			rg = e2eazure.CreateResourceGroup(ctx, subscriptionID, ns, region)
 			storageClient := e2eazure.CreateStorageAccountsClient(subscriptionID)
 
-			err := e2eazure.CreateStorageAccount(ctx, storageClient, accountName, *rg.Name, region)
+			_ = e2eazure.CreateQueueStorageAccount(ctx, storageClient, accountName, *rg.Name, region)
 			Expect(err).ToNot(HaveOccurred())
 
 			keys, err := e2eazure.GetStorageAccountKey(ctx, storageClient, accountName, *rg.Name)

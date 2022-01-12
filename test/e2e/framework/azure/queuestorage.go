@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
@@ -41,33 +40,9 @@ func CreateStorageAccountsClient(subscriptionID string) *armstorage.StorageAccou
 	return saClient
 }
 
-// CreateStorageAccount will create the storage account
-func CreateStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName, region string) error {
-	resp, err := cli.BeginCreate(ctx, rgName, name, armstorage.StorageAccountCreateParameters{
-		Kind:     armstorage.KindStorage.ToPtr(),
-		Location: &region,
-		SKU: &armstorage.SKU{
-			Name: armstorage.SKUNameStandardRAGRS.ToPtr(),
-			Tier: armstorage.SKUTierStandard.ToPtr(),
-		},
-		Identity: &armstorage.Identity{
-			Type: armstorage.IdentityTypeNone.ToPtr(),
-		},
-		Properties: &armstorage.StorageAccountPropertiesCreateParameters{},
-	}, nil)
-
-	if err != nil {
-		framework.FailfWithOffset(3, "unable to create storage account: %s", err)
-		return err
-	}
-
-	_, err = resp.PollUntilDone(ctx, time.Second*30)
-	if err != nil {
-		framework.FailfWithOffset(3, "unable to complete storage account creation: %s", err)
-		return err
-	}
-
-	return nil
+// CreateQueueStorageAccount provides a wrapper to support Queue storage test
+func CreateQueueStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName, region string) armstorage.StorageAccount {
+	return CreateStorageAccountCommon(ctx, cli, name, rgName, region, false)
 }
 
 // CreateQueueStorage will create a queue storage message url
@@ -103,5 +78,4 @@ func CreateQueueStorage(ctx context.Context, name, accountName string, accountKe
 // GetStorageAccountKey will return the storage account keys
 func GetStorageAccountKey(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName string) (armstorage.StorageAccountsListKeysResponse, error) {
 	return cli.ListKeys(ctx, rgName, name, &armstorage.StorageAccountsListKeysOptions{})
-
 }
