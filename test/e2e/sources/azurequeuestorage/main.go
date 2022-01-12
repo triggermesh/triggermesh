@@ -24,8 +24,8 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
+	. "github.com/onsi/gomega"    //nolint:stylecheck
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -134,7 +134,7 @@ var _ = Describe("Azure Queue Storage", func() {
 					e := receivedEvents[0]
 
 					Expect(e.Type()).To(Equal("com.microsoft.azure.queuestorage"))
-					Expect(e.Source()).To(Equal(createQueueStorageId(accountName, ns)))
+					Expect(e.Source()).To(Equal(createQueueStorageID(accountName, ns)))
 
 					data := make(map[string]interface{})
 					err = json.Unmarshal(e.Data(), &data)
@@ -261,7 +261,7 @@ func readReceivedEvents(c clientset.Interface, namespace, eventDisplayName strin
 	}
 }
 
-// createQueueStorageId will create the Queue Storage ID
-func createQueueStorageId(accountName, name string) string {
+// createQueueStorageID will create the Queue Storage ID
+func createQueueStorageID(accountName, name string) string {
 	return "https://" + accountName + ".queue.core.windows.net/" + name
 }
