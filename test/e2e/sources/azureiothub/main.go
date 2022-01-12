@@ -30,19 +30,21 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
+
 	"github.com/triggermesh/triggermesh/test/e2e/framework/azure"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/triggermesh/triggermesh/test/e2e/framework"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	clientset "k8s.io/client-go/kubernetes"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/test/e2e/framework"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 )
 
 /*
@@ -73,7 +75,7 @@ const (
 	sourceResource = "azureiothubsource"
 )
 
-var _ = FDescribe("Azure IOT Hub Source", func() {
+var _ = Describe("Azure IOT Hub Source", func() {
 	ctx := context.Background()
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 	region := os.Getenv("AZURE_REGION")

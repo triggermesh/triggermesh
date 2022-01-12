@@ -37,16 +37,17 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework/azure"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/triggermesh/triggermesh/test/e2e/framework"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	clientset "k8s.io/client-go/kubernetes"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/test/e2e/framework"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 )
 
 /*

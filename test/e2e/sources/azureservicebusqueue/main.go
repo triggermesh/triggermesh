@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2021 TriggerMesh Inc.
+Copyright (c) 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,17 +30,18 @@ import (
 	. "github.com/onsi/gomega"    //nolint:stylecheck
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/triggermesh/triggermesh/test/e2e/framework"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
-	e2eazure "github.com/triggermesh/triggermesh/test/e2e/framework/azure"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
-	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	clientset "k8s.io/client-go/kubernetes"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/test/e2e/framework"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
+	e2eazure "github.com/triggermesh/triggermesh/test/e2e/framework/azure"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 )
 
 /*
