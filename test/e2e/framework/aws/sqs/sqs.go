@@ -84,3 +84,25 @@ func SendMessage(sqsClient sqsiface.SQSAPI, url string) string /*msgId*/ {
 	}
 	return *msgOutput.MessageId
 }
+
+// ReceiveMessages retrieves messages from the queue with the given URL.
+func ReceiveMessages(sqsClient sqsiface.SQSAPI, url string) []*sqs.Message {
+	const maxRcvMsg int64 = 10
+	const maxLongPollingWaitTimeSeconds int64 = 20
+
+	params := &sqs.ReceiveMessageInput{
+		QueueUrl:            &url,
+		MaxNumberOfMessages: aws.Int64(maxRcvMsg),
+		WaitTimeSeconds:     aws.Int64(maxLongPollingWaitTimeSeconds),
+		MessageAttributeNames: aws.StringSlice([]string{
+			sqs.QueueAttributeNameAll,
+		}),
+	}
+
+	msgs, err := sqsClient.ReceiveMessage(params)
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to receive message from queue %q: %s", *params.QueueUrl, err)
+	}
+
+	return msgs.Messages
+}

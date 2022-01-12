@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,25 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package e2e
+package targets
 
 import (
-	"testing"
-
-	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
-	. "github.com/onsi/gomega"    //nolint:stylecheck
-
-	// support client-go's auth providers
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-
-	_ "github.com/triggermesh/triggermesh/test/e2e/framework"
-
-	// test suites
-	_ "github.com/triggermesh/triggermesh/test/e2e/sources"
-	_ "github.com/triggermesh/triggermesh/test/e2e/targets"
+	_ "github.com/triggermesh/triggermesh/test/e2e/targets/awssqs"
 )
-
-func TestE2e(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "E2E Suite")
-}
