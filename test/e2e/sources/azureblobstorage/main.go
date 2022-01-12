@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2022 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ const (
  * Delete the blob and verify the event
 */
 
-var _ = FDescribe("Azure Blob Storage", func() {
+var _ = Describe("Azure Blob Storage", func() {
 	ctx := context.Background()
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 	region := os.Getenv("AZURE_REGION")

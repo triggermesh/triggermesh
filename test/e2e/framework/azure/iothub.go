@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2022 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub"
 	"github.com/Azure/go-autorest/autorest/to"
+
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
 

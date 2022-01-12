@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2022 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ const (
  * Send a message to the azure queue storage and look for a response
 */
 
-var _ = FDescribe("Azure Queue Storage", func() {
+var _ = Describe("Azure Queue Storage", func() {
 	ctx := context.Background()
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 	region := os.Getenv("AZURE_REGION")
