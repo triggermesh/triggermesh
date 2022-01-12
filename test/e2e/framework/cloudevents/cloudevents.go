@@ -32,7 +32,7 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
 
-// E2EInstanceCeExtension is a CloudEvent extension that is used to propagate
+// E2ECeExtension is a CloudEvent extension that is used to propagate
 // the name of the test that generated the event.
 const E2ECeExtension = "iotriggermeshe2e"
 
