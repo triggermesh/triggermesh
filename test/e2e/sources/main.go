@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,14 @@ import (
 	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awskinesis"
 	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awssns"
 	_ "github.com/triggermesh/triggermesh/test/e2e/sources/awssqs"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azureactivitylogs"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azureblobstorage"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azureeventgrid"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azureeventhubs"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azureiothub"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azurequeuestorage"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azureservicebusqueue"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources/azureservicebustopic"
 	_ "github.com/triggermesh/triggermesh/test/e2e/sources/googlecloudauditlogs"
 	_ "github.com/triggermesh/triggermesh/test/e2e/sources/googlecloudpubsub"
 	_ "github.com/triggermesh/triggermesh/test/e2e/sources/googlecloudsourcerepositories"

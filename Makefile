@@ -1,4 +1,4 @@
-# Copyright 2021 TriggerMesh Inc.
+# Copyright 2022 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ cover: test ## Generate code coverage
 	$(GOTOOL) cover -html=$(TEST_OUTPUT_DIR)/$(KREPO)-c.out -o $(COVER_OUTPUT_DIR)/$(KREPO)-coverage.html
 
 lint: install-golangci-lint ## Lint source files
-	$(GOLINT) $(GOPKGS)
+	$(GOLINT) $(GOPKGS) ./test/...
 
 fmt: ## Format source files
 	$(GOFMT) -s -w $(shell $(GO) list -f '{{$$d := .Dir}}{{range .GoFiles}}{{$$d}}/{{.}} {{end}} {{$$d := .Dir}}{{range .TestGoFiles}}{{$$d}}/{{.}} {{end}}' $(GOPKGS))

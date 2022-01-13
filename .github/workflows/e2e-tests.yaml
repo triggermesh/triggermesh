@@ -74,4 +74,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         GCLOUD_PROJECT: ${{ secrets.GCLOUD_PROJECT }}
         GCLOUD_SERVICEACCOUNT_KEY: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       run: ginkgo -p -slow-spec-threshold=1m -randomize-all ./test/e2e/
