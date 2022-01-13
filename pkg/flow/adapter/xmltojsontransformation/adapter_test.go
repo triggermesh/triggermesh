@@ -74,7 +74,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 
 			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
 
-			a := NewTarget(ctx, env, ceClient)
+			a := NewAdapter(ctx, env, ceClient)
 
 			go func() {
 				require.NoError(t, a.Start(ctx))
