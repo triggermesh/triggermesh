@@ -24,13 +24,8 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2/event"
 )
 
-// Correlation Key parameters.
-const (
-	defaultCorrelationKeyLen = 24
-	maxCorrelationKeyLen     = 64
-
-	correlationKeycharset = "abcdefghijklmnopqrstuvwxyz0123456789"
-)
+// Correlation Key charset.
+const correlationKeycharset = "abcdefghijklmnopqrstuvwxyz0123456789"
 
 var (
 	// CloudEvent attributes cannot be used as a correltaion key.
@@ -50,47 +45,38 @@ var (
 	seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-// CloudEventKey is the Correlation Key for the CloudEvents context.
-type CloudEventKey struct {
-	Attribute string
-	Length    int
+// correlationKey is the correlation attribute for the CloudEvents.
+type correlationKey struct {
+	attribute string
+	length    int
 }
 
 // NewCorrelationKey returns an instance of the CloudEvent Correlation key.
-func NewCorrelationKey(attribute string, length int) (*CloudEventKey, error) {
-	if length < 0 || length > maxCorrelationKeyLen {
-		return nil, fmt.Errorf("correlation ID length must be in the range between 0 and %d, got %d", maxCorrelationKeyLen, length)
-	}
-
+func newCorrelationKey(attribute string, length int) (*correlationKey, error) {
 	for _, rk := range restrictedKeys {
 		if attribute == rk {
 			return nil, fmt.Errorf("%q cannot be used as a correlation key", attribute)
 		}
 	}
 
-	return &CloudEventKey{
-		Attribute: attribute,
-		Length:    length,
+	return &correlationKey{
+		attribute: attribute,
+		length:    length,
 	}, nil
 }
 
 // Get returns the value of Correlation Key.
-func (k *CloudEventKey) Get(event cloudevents.Event) (string, bool) {
-	if val, exists := event.Extensions()[k.Attribute]; exists {
+func (k *correlationKey) get(event cloudevents.Event) (string, bool) {
+	if val, exists := event.Extensions()[k.attribute]; exists {
 		return val.(string), true
 	}
 	return "", false
 }
 
 // Set updates the CloudEvent's context with the random Correlation Key value.
-func (k *CloudEventKey) Set(event *cloudevents.Event) string {
-	var correlationID string
-	if k.Length == 0 {
-		correlationID = randString(defaultCorrelationKeyLen)
-	} else {
-		correlationID = randString(k.Length)
-	}
-	event.SetExtension(k.Attribute, correlationID)
+func (k *correlationKey) set(event *cloudevents.Event) string {
+	correlationID := randString(k.length)
+	event.SetExtension(k.attribute, correlationID)
 	return correlationID
 }
 

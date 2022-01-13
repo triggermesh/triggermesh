@@ -22,6 +22,8 @@ import (
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
+
+	"github.com/triggermesh/triggermesh/pkg/apis"
 )
 
 // +genclient
@@ -59,7 +61,7 @@ type Correlation struct {
 
 // Response defines the response handling configuration.
 type Response struct {
-	Timeout string `json:"timeout,omitempty"`
+	Timeout *apis.Duration `json:"timeout,omitempty"`
 }
 
 // SynchronizerStatus communicates the observed state of the Synchronizer.
