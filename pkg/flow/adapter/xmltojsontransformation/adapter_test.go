@@ -34,8 +34,6 @@ const (
 	tCloudEventID     = "ce-abcd-0123"
 	tCloudEventType   = "ce.test.type"
 	tCloudEventSource = "ce.test.source"
-	tSuccessAttribute = "success"
-	tErrorAttribute   = "error"
 
 	tXML1        = `<note><to>Tove</to></note>`
 	tJSONOutput1 = "{\"note\": {\"to\": \"Tove\"}}\n"

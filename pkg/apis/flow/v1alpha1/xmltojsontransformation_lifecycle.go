@@ -63,20 +63,20 @@ func (ts *XMLToJSONTransformationStatus) MarkServiceAvailable() {
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
 // ConditionDeployed should be marked as true or false.
-func (s *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
+func (ts *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
 	if ksvc == nil {
-		xmlToJSONCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
+		xmlToJSONCondSet.Manage(ts).MarkUnknown(ConditionDeployed, ReasonUnavailable,
 			"The status of the adapter Service can not be determined")
 		return
 	}
 
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
+	if ts.Address == nil {
+		ts.Address = &duckv1.Addressable{}
 	}
-	s.Address.URL = ksvc.Status.URL
+	ts.Address.URL = ksvc.Status.URL
 
 	if ksvc.IsReady() {
-		xmlToJSONCondSet.Manage(s).MarkTrue(ConditionDeployed)
+		xmlToJSONCondSet.Manage(ts).MarkTrue(ConditionDeployed)
 		return
 	}
 
@@ -86,6 +86,6 @@ func (s *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *serv
 		msg += ": " + readyCond.Message
 	}
 
-	xmlToJSONCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
+	xmlToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
 
 }
