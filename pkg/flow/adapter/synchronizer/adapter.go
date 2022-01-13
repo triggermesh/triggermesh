@@ -112,7 +112,7 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 	select {
 	case err := <-sendErr:
 		a.logger.Errorf("Unable to forward the request: %v", err)
-		return nil, cloudevents.NewHTTPResult(http.StatusBadGateway, "unable to forward the request: %v", err)
+		return nil, cloudevents.NewHTTPResult(http.StatusBadRequest, "unable to forward the request: %v", err)
 	case result := <-respChan:
 		if result == nil {
 			a.logger.Errorf("No response from %q", correlationID)
@@ -149,6 +149,7 @@ func (a *adapter) serveResponse(ctx context.Context, correlationID string, event
 	}
 }
 
+// withBridgeIdentifier adds Bridge ID to the event context.
 func (a *adapter) withBridgeIdentifier(event *cloudevents.Event) cloudevents.Event {
 	if a.bridgeID == "" {
 		return *event
