@@ -42,8 +42,8 @@ const (
 	eventSenderNamePrefix = "eventsender-"
 )
 
-// NewEvent generates a CloudEvent with dummy values.
-func NewEvent(f *framework.Framework) *cloudevents.Event {
+// NewHelloEvent generates a CloudEvent with dummy values.
+func NewHelloEvent(f *framework.Framework) *cloudevents.Event {
 	event := cloudevents.NewEvent()
 	event.SetID("0000")
 	event.SetType("e2e.test")

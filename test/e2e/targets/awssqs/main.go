@@ -83,7 +83,7 @@ var _ = Describe("AWS SQS target", func() {
 		trgtClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	Context("a target watches an existing queue", func() {
+	Context("a target is deployed", func() {
 		var trgtURL *url.URL
 		var sqsClient sqsiface.SQSAPI
 
@@ -97,7 +97,7 @@ var _ = Describe("AWS SQS target", func() {
 			})
 
 			By("creating an AWSSQSTarget object", func() {
-				awsSecret := createAWSCredsSecret(f.KubeClient, ns, awsCreds)
+				awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
 				queueARN = e2esqs.QueueARN(sqsClient, queueURL)
 
 				trgt, err := createTarget(trgtClient, ns, "test-",
@@ -124,14 +124,14 @@ var _ = Describe("AWS SQS target", func() {
 
 			BeforeEach(func() {
 				By("sending an event", func() {
-					sentEvent = e2ece.NewEvent(f)
+					sentEvent = e2ece.NewHelloEvent(f)
 
 					job := e2ece.RunEventSender(f.KubeClient, ns, trgtURL.String(), sentEvent)
 					apps.WaitForCompletion(f.KubeClient, job)
 				})
 			})
 
-			It("forwards the event", func() {
+			It("puts a message onto the queue", func() {
 				var receivedMsg []byte
 
 				By("polling the SQS queue", func() {
@@ -160,6 +160,51 @@ var _ = Describe("AWS SQS target", func() {
 					Expect(gotEvent.Data()).To(Equal(sentEvent.Data()))
 					Expect(gotEvent.Extensions()[e2ece.E2ECeExtension]).
 						To(Equal(sentEvent.Extensions()[e2ece.E2ECeExtension]))
+				})
+			})
+		})
+
+		When("the CloudEvent context is discarded", func() {
+			BeforeEach(func() {
+				By("creating an AWSSQSTarget object with discardCEContext enabled", func() {
+					trgt, err := createTarget(trgtClient, ns, "test-",
+						withARN(queueARN),
+						withCredentials(awsSecret.Name),
+						withDiscardCEContext(),
+					)
+					Expect(err).ToNot(HaveOccurred())
+
+					trgt = ducktypes.WaitUntilReady(f.DynamicClient, trgt)
+
+					trgtURL = ducktypes.Address(trgt)
+					Expect(trgtURL).ToNot(BeNil())
+				})
+			})
+			When("an event is sent to the target", func() {
+				var sentEvent *cloudevents.Event
+
+				BeforeEach(func() {
+					By("sending an event", func() {
+						sentEvent = e2ece.NewHelloEvent(f)
+
+						job := e2ece.RunEventSender(f.KubeClient, ns, trgtURL.String(), sentEvent)
+						apps.WaitForCompletion(f.KubeClient, job)
+					})
+				})
+
+				It("only puts the event's data onto the queue", func() {
+					var receivedMsg []byte
+
+					By("polling the SQS queue", func() {
+						receivedMsgs := e2esqs.ReceiveMessages(sqsClient, queueURL)
+						Expect(receivedMsgs).To(HaveLen(1),
+							"Received %d messages instead of 1", len(receivedMsgs))
+
+						receivedMsg = []byte(*receivedMsgs[0].Body)
+					})
+					By("inspecting the message payload", func() {
+						Expect(receivedMsg).To(Equal(sentEvent.Data()))
+					})
 				})
 			})
 		})
@@ -233,6 +278,14 @@ func withARN(arn string) targetOption {
 	return func(trgt *unstructured.Unstructured) {
 		if err := unstructured.SetNestedField(trgt.Object, arn, "spec", "arn"); err != nil {
 			framework.FailfWithOffset(2, "Failed to set spec.arn field: %s", err)
+		}
+	}
+}
+
+func withDiscardCEContext() targetOption {
+	return func(trgt *unstructured.Unstructured) {
+		if err := unstructured.SetNestedField(trgt.Object, true, "spec", "discardCloudEventContext"); err != nil {
+			framework.FailfWithOffset(2, "Failed to set spec.discardCloudEventContext field: %s", err)
 		}
 	}
 }
