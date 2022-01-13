@@ -29,7 +29,7 @@ spec:
   queueName: DEV.QUEUE.2
   channelName: DEV.APP.SVRCONN
   delivery:
-    deadLetterQueue: DEAD.LETTER.QUEUE
+    deadLetterQueue: DEV.DEAD.LETTER.QUEUE
     backoffDelay: 10
     retry: 3
   credentials:

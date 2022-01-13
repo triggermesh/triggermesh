@@ -50,9 +50,13 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 
 // Delivery returns the MQ delivery parameters.
 func (e *SourceEnvAccessor) Delivery() *mq.Delivery {
+	if e.DeadLetterQManager == "" {
+		e.DeadLetterQManager = e.QueueManager
+	}
 	return &mq.Delivery{
-		DeadLetterQueue: e.DeadLetterQueue,
-		BackoffDelay:    e.BackoffDelay,
-		Retry:           e.Retry,
+		DeadLetterQManager: e.DeadLetterQManager,
+		DeadLetterQueue:    e.DeadLetterQueue,
+		BackoffDelay:       e.BackoffDelay,
+		Retry:              e.Retry,
 	}
 }

@@ -20,7 +20,6 @@ package mq
 
 import (
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/ibm-messaging/mq-golang/v5/ibmmq"
@@ -33,6 +32,7 @@ const CECorrelIDAttr = "correlationid"
 // Object is a local wrapper for IBM MQ objects required to communicate with the queue.
 type Object struct {
 	queue *ibmmq.MQObject
+	dlq   *ibmmq.MQObject
 	mqmd  *ibmmq.MQMD
 	mqpmo *ibmmq.MQPMO
 	mqgmo *ibmmq.MQGMO
@@ -46,13 +46,6 @@ type ConnConfig struct {
 	User           string
 	Password       string
 	QueueManager   string
-	QueueName      string
-}
-
-// ReplyTo holds the data used in MQ's Reply-to header.
-type ReplyTo struct {
-	Manager string
-	Queue   string
 }
 
 // Delivery describes the message delivery details.
@@ -90,7 +83,7 @@ func NewConnection(cfg *ConnConfig) (ibmmq.MQQueueManager, error) {
 }
 
 // OpenQueue opens IBM MQ queue.
-func OpenQueue(queueName string, conn ibmmq.MQQueueManager) (Object, error) {
+func OpenQueue(queueName string, dlqName string, conn ibmmq.MQQueueManager) (Object, error) {
 	mh, err := conn.CrtMH(ibmmq.NewMQCMHO())
 	if err != nil {
 		return Object{}, err
@@ -98,16 +91,10 @@ func OpenQueue(queueName string, conn ibmmq.MQQueueManager) (Object, error) {
 
 	// Create the Object Descriptor that allows us to give the queue name
 	mqod := ibmmq.NewMQOD()
-
-	// We have to say how we are going to use this queue. In this case, to GET and PUT
-	// messages. That is done in the openOptions parameter.
-	openOptions := ibmmq.MQOO_OUTPUT
-
-	// Opening a QUEUE (rather than a Topic or other object type) and give the name
 	mqod.ObjectType = ibmmq.MQOT_Q
 	mqod.ObjectName = queueName
 
-	qObject, err := conn.Open(mqod, openOptions)
+	qObject, err := conn.Open(mqod, ibmmq.MQOO_OUTPUT|ibmmq.MQOO_INPUT_SHARED)
 	if err != nil {
 		return Object{}, err
 	}
@@ -124,11 +111,29 @@ func OpenQueue(queueName string, conn ibmmq.MQQueueManager) (Object, error) {
 	gmo.Options |= ibmmq.MQGMO_PROPERTIES_IN_HANDLE
 	gmo.MsgHandle = mh
 
-	return Object{
+	pmo := ibmmq.NewMQPMO()
+	pmo.Options = ibmmq.MQPMO_NO_SYNCPOINT
+
+	putmqmd := ibmmq.NewMQMD()
+	putmqmd.Format = ibmmq.MQFMT_STRING
+
+	res := Object{
 		queue: &qObject,
-		mqmd:  ibmmq.NewMQMD(),
+		mqmd:  putmqmd,
 		mqgmo: gmo,
-	}, nil
+		mqpmo: pmo,
+	}
+
+	if dlqName != "" {
+		mqod.ObjectName = dlqName
+		dlqObject, err := conn.Open(mqod, ibmmq.MQOO_OUTPUT)
+		if err != nil {
+			return Object{}, err
+		}
+		res.dlq = &dlqObject
+	}
+
+	return res, nil
 }
 
 // RegisterCallback registers the callback function for the incoming messages in the target queue.
@@ -157,8 +162,10 @@ func (q *Object) RegisterCallback(f Handler, delivery *Delivery, log *zap.Sugare
 		if err != nil {
 			log.Errorf("Callback execution error: %v", err)
 			if mqMD.BackoutCount >= int32(delivery.Retry) {
-				if err := q.sendToDLQ(data, delivery); err != nil {
-					log.Errorf("Failed to forward the message to DLQ: %v", err)
+				if delivery.DeadLetterQueue == "" {
+					log.Infof("Dead-letter queue is not set, discarding poisoned message %q", string(mqMD.MsgId))
+				} else if err := q.sendToDLQ(data, mqMD); err != nil {
+					log.Errorf("Failed to forward the message to DLQ, discarding: %v", err)
 				}
 				mqConn.Cmit()
 				return
@@ -193,16 +200,15 @@ func (q *Object) StartListen(conn ibmmq.MQQueueManager) error {
 }
 
 // Put puts the message to the queue.
-func (q *Object) Put(data []byte, ceCorrelID string) error {
-	correlID := [ibmmq.MQ_CORREL_ID_LENGTH]byte{}
-	copy(correlID[:], ceCorrelID)
-	mqmd := q.mqmd
-	mqmd.CorrelId = correlID[:]
-	return q.queue.Put(mqmd, q.mqpmo, data)
+func (q *Object) PutToDLQ(mqmd *ibmmq.MQMD, data []byte) error {
+	return q.dlq.Put(mqmd, q.mqpmo, data)
 }
 
 // Close closes the queue.
 func (q *Object) Close() error {
+	if q.dlq != nil {
+		q.dlq.Close(0)
+	}
 	return q.queue.Close(0)
 }
 
@@ -222,23 +228,18 @@ func (q *Object) StopCallback(conn ibmmq.MQQueueManager) error {
 	return conn.Ctl(ibmmq.MQOP_STOP, ibmmq.NewMQCTLO())
 }
 
-func (q *Object) sendToDLQ(data []byte, delivery *Delivery) error {
+func (q *Object) sendToDLQ(data []byte, mqmd *ibmmq.MQMD) error {
 	// TODO: store handler error in dead letter header
-	dlh := q.deadLetterHeader(ibmmq.MQRC_OPERATION_ERROR, delivery)
-	data = append(dlh.Bytes(), data...)
-	return q.Put(data, "")
+	dlh := q.deadLetterHeader(*mqmd)
+	return q.PutToDLQ(mqmd, append(dlh.Bytes(), data...))
 }
 
 // deadLetterHeader returns meta data for the poisoned message descriptor
-func (q *Object) deadLetterHeader(reason int32, delivery *Delivery) *ibmmq.MQDLH {
-	timestamp := time.Now()
-
-	dlh := ibmmq.NewMQDLH(q.mqmd)
-	dlh.Reason = reason
-	dlh.DestQName = delivery.DeadLetterQueue
-	dlh.DestQMgrName = delivery.DeadLetterQManager
-	dlh.PutTime = timestamp.Format("030405")
-	dlh.PutDate = timestamp.Format("20060102")
-
+func (q *Object) deadLetterHeader(mqmd ibmmq.MQMD) *ibmmq.MQDLH {
+	dlh := ibmmq.NewMQDLH(&mqmd)
+	dlh.Reason = ibmmq.MQRC_UNEXPECTED_ERROR
+	dlh.DestQName = q.queue.Name
+	dlh.PutApplType = ibmmq.MQAT_DEFAULT
+	dlh.PutApplName = "TriggerMesh IBM MQ source adapter"
 	return dlh
 }
