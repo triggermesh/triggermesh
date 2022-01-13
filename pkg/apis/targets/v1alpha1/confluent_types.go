@@ -74,7 +74,7 @@ type ConfluentTargetSpec struct {
 	// SASLMechanisms all the assignment of specific SASL mechanisms.
 	SASLMechanisms string `json:"saslMechanism"`
 
-	// Whether to omit CloudEvent context attributes in created messages.
+	// Whether to omit CloudEvent context attributes in messages sent to Kafka.
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`

@@ -60,6 +60,9 @@ type IBMMQTargetSpec struct {
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
+	// Whether to omit CloudEvent context attributes in messages sent to MQ.
+	// When this property is false (default), the entire CloudEvent payload is included.
+	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
 }
 

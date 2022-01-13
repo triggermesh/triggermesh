@@ -63,7 +63,7 @@ type AWSKinesisTargetSpec struct {
 	// Kinesis Partition to publish the events to
 	Partition string `json:"partition"`
 
-	// Whether to omit CloudEvent context attributes in created Kinesis records.
+	// Whether to omit CloudEvent context attributes in records created in Kinesis.
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`

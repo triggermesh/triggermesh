@@ -90,7 +90,9 @@ spec:
                   https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
                 pattern: ^arn:aws(-cn|-us-gov)?:s3:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               discardCloudEventContext:
-                description: Produce a new cloud event based on the response from the Kinesis invocation.
+                description: Whether to omit CloudEvent context attributes in objects created in S3.
+                  When this property is false (default), the entire CloudEvent payload is included.
+                  When this property is true, only the CloudEvent data is included.
                 type: boolean
             required:
             - arn

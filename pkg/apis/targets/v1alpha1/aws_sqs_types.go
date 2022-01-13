@@ -59,7 +59,7 @@ type AWSSQSTargetSpec struct {
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies
 	ARN string `json:"arn"`
 
-	// Whether to omit CloudEvent context attributes in created SQS messages.
+	// Whether to omit CloudEvent context attributes in messages sent to SQS.
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
