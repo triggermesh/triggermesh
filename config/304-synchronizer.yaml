@@ -63,8 +63,9 @@ spec:
                   length:
                     description: The length of the correlation key to generate. The default value is 24.
                     type: integer
-                    minimum: 0
+                    minimum: 1
                     maximum: 64
+                    default: 24
                 required:
                 - attribute
               response:

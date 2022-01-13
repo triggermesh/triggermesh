@@ -84,10 +84,10 @@ func makeAppEnv(o *v1alpha1.Synchronizer) []corev1.EnvVar {
 		})
 	}
 
-	if o.Spec.Response.Timeout != "" {
+	if o.Spec.Response.Timeout != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  "RESPONSE_WAIT_TIMEOUT",
-			Value: o.Spec.Response.Timeout,
+			Value: o.Spec.Response.Timeout.String(),
 		})
 	}
 

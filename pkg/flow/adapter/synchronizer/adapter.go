@@ -26,6 +26,8 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 var _ pkgadapter.Adapter = (*adapter)(nil)
@@ -34,11 +36,12 @@ type adapter struct {
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 
-	correlationKey  *CloudEventKey
+	correlationKey  *correlationKey
 	responseTimeout time.Duration
 
 	sessions *storage
 	sinkURL  string
+	bridgeID string
 }
 
 // NewAdapter returns adapter implementation.
@@ -46,12 +49,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
-	timeout, err := time.ParseDuration(env.ResponseWaitTimeout)
-	if err != nil {
-		logger.Panic("Failed to parse timeout value: %v", err)
-	}
-
-	key, err := NewCorrelationKey(env.CorrelationKey, env.CorrelationKeyLength)
+	key, err := newCorrelationKey(env.CorrelationKey, env.CorrelationKeyLength)
 	if err != nil {
 		logger.Panic("Cannot create an instance of Correlation Key: %v", err)
 	}
@@ -61,9 +59,10 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger:         logger,
 		correlationKey: key,
 
-		responseTimeout: timeout,
+		responseTimeout: env.ResponseWaitTimeout,
 		sessions:        newStorage(),
 		sinkURL:         env.Sink,
+		bridgeID:        env.BridgeIdentifier,
 	}
 }
 
@@ -76,11 +75,11 @@ func (a *adapter) Start(ctx context.Context) error {
 func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	a.logger.Debugf("Received the event: %s", event.String())
 
-	if correlationID, exists := a.correlationKey.Get(event); exists {
+	if correlationID, exists := a.correlationKey.get(event); exists {
 		return a.serveResponse(ctx, correlationID, event)
 	}
 
-	correlationID := a.correlationKey.Set(&event)
+	correlationID := a.correlationKey.set(&event)
 	return a.serveRequest(ctx, correlationID, event)
 }
 
@@ -88,21 +87,24 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 func (a *adapter) serveRequest(ctx context.Context, correlationID string, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	a.logger.Debugf("Handling request %q", correlationID)
 
-	respChan := a.sessions.add(correlationID)
+	respChan, err := a.sessions.add(correlationID)
+	if err != nil {
+		return nil, cloudevents.NewHTTPResult(http.StatusInternalServerError, "cannot add session %q: %w", correlationID, err)
+	}
 	defer a.sessions.delete(correlationID)
 
 	sendErr := make(chan error)
 	defer close(sendErr)
 
 	go func(errChan chan error) {
-		if res := a.ceClient.Send(cloudevents.ContextWithTarget(ctx, a.sinkURL), event); cloudevents.IsUndelivered(res) {
+		if res := a.ceClient.Send(cloudevents.ContextWithTarget(ctx, a.sinkURL), a.withBridgeIdentifier(&event)); cloudevents.IsUndelivered(res) {
 			errChan <- res
 		}
 	}(sendErr)
 
 	a.logger.Debugf("Request forwarded to %q", a.sinkURL)
 
-	t := time.NewTimer(time.Duration(a.responseTimeout))
+	t := time.NewTimer(a.responseTimeout)
 	defer t.Stop()
 
 	a.logger.Debugf("Waiting response for %q", correlationID)
@@ -117,7 +119,8 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 			return nil, cloudevents.NewHTTPResult(http.StatusInternalServerError, "failed to communicate the response")
 		}
 		a.logger.Debugf("Received response for %q", correlationID)
-		return result, cloudevents.ResultACK
+		res := a.withBridgeIdentifier(result)
+		return &res, cloudevents.ResultACK
 	case <-t.C:
 		a.logger.Errorf("Request %q timed out", correlationID)
 		return nil, cloudevents.NewHTTPResult(http.StatusGatewayTimeout, "backend did not respond in time")
@@ -128,7 +131,7 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 func (a *adapter) serveResponse(ctx context.Context, correlationID string, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	a.logger.Debugf("Handling response %q", correlationID)
 
-	responseChan, exists := a.sessions.open(correlationID)
+	responseChan, exists := a.sessions.get(correlationID)
 	if !exists {
 		a.logger.Errorf("Session for %q does not exist", correlationID)
 		return nil, cloudevents.NewHTTPResult(http.StatusBadGateway, "client session does not exist")
@@ -144,4 +147,15 @@ func (a *adapter) serveResponse(ctx context.Context, correlationID string, event
 		a.logger.Errorf("Unable to forward the response %q", correlationID)
 		return nil, cloudevents.NewHTTPResult(http.StatusBadGateway, "client connection is closed")
 	}
+}
+
+func (a *adapter) withBridgeIdentifier(event *cloudevents.Event) cloudevents.Event {
+	if a.bridgeID == "" {
+		return *event
+	}
+	if bid, err := event.Context.GetExtension(targetce.StatefulWorkflowHeader); err != nil && bid != "" {
+		return *event
+	}
+	event.SetExtension(targetce.StatefulWorkflowHeader, a.bridgeID)
+	return *event
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package synchronizer
 
 import (
+	"fmt"
 	"sync"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -36,13 +37,17 @@ func newStorage() *storage {
 }
 
 // add creates the new communication channel and adds it to the session storage.
-func (s *storage) add(id string) <-chan *cloudevents.Event {
+func (s *storage) add(id string) (<-chan *cloudevents.Event, error) {
 	s.Lock()
 	defer s.Unlock()
 
+	if _, exists := s.sessions[id]; exists {
+		return nil, fmt.Errorf("session already exists")
+	}
+
 	c := make(chan *cloudevents.Event)
 	s.sessions[id] = c
-	return c
+	return c, nil
 }
 
 // delete closes the communication channel and removes it from the storage.
@@ -55,7 +60,7 @@ func (s *storage) delete(id string) {
 }
 
 // open returns the communication channel for the session id.
-func (s *storage) open(id string) (chan<- *cloudevents.Event, bool) {
+func (s *storage) get(id string) (chan<- *cloudevents.Event, bool) {
 	s.Lock()
 	defer s.Unlock()
 
