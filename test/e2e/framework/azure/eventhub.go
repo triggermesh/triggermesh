@@ -84,15 +84,7 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 			return nil
 		}
 
-		keys, err := nsClient.ListKeys(ctx, rg, *ehResp.Name, "RootManageSharedAccessKey", nil)
-		if err != nil {
-			framework.FailfWithOffset(1, "Unable to obtain the connection string: %s", err)
-			return nil
-		}
-
-		// Take the namespace connection string, and add the specific eventhub
-		connectionString := *keys.PrimaryConnectionString + ";EntityPath=" + name
-		hub, err := eventhubs.NewHubFromConnectionString(connectionString)
+		hub, err := eventhubs.NewHubWithNamespaceNameAndEnvironment(*ehResp.Name, name)
 		if err != nil {
 			framework.FailfWithOffset(1, "Unable to create eventhub client: %s", err)
 			return nil
