@@ -59,6 +59,25 @@ write_files:
     #!/bin/bash
     set -e
 
+    # workaround: https://github.com/rancher/k3os/pull/833
+
+    PART=\$(blkid -L K3OS_STATE)
+    DEV=\$(echo "\$PART" | sed -r 's/((\d+)p)?\d+\$/\2/')
+    NUM=\$(echo "\$PART" | sed 's!.*[^0-9]!!')
+
+    echo -e "Yes\n100%" | sudo parted \$DEV resizepart \$NUM ---pretend-input-tty unit %
+    partprobe \$DEV
+    sleep 2
+    resize2fs \$PART
+
+  owner: root
+  path: /etc/local.d/growpart-live.start
+  permissions: '0755'
+- encoding: ""
+  content: |-
+    #!/bin/bash
+    set -e
+
     timeout 180s bash -c 'until kubectl get cm/config-domain -n knative-serving; do sleep 5; done'
 
     export EC2_INSTANCE_IP=\$(curl -sSL http://checkip.amazonaws.com)
