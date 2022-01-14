@@ -67,7 +67,6 @@ func TestXSLTTransformEvents(t *testing.T) {
 				EnvConfig: adapter.EnvConfig{
 					Component: tCloudEventSource,
 				},
-				BridgeIdentifier: tBridgeID,
 			}
 
 			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
