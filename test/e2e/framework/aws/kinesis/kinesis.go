@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -63,6 +63,37 @@ func PutRecord(kc kinesisiface.KinesisAPI, name string) string /*seqNumber*/ {
 	}
 
 	return *putOutput.SequenceNumber
+}
+
+// GetRecords get records from a kinesis data stream.
+func GetRecords(kc kinesisiface.KinesisAPI, name string) []*kinesis.Record {
+	shards, err := kc.ListShards(&kinesis.ListShardsInput{
+		StreamName: &name,
+	})
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to get shards from stream: %s", err)
+	}
+	if len(shards.Shards) == 0 {
+		framework.FailfWithOffset(2, "Shards not found from stream: %s", err)
+	}
+
+	shardIterator, err := kc.GetShardIterator(&kinesis.GetShardIteratorInput{
+		ShardId:           shards.Shards[0].ShardId,
+		ShardIteratorType: aws.String("TRIM_HORIZON"),
+		StreamName:        &name,
+	})
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to get shard iterator from stream: %s", err)
+	}
+
+	records, err := kc.GetRecords(&kinesis.GetRecordsInput{
+		ShardIterator: shardIterator.ShardIterator,
+	})
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to get records from stream: %s", err)
+	}
+
+	return records.Records
 }
 
 // DeleteStream deletes a Kinesis stream by name.
