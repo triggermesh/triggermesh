@@ -21,6 +21,6 @@ import (
 )
 
 // SetDefaults implements apis.Defaultable
-func (t *XMLToJSONTransformation) SetDefaults(ctx context.Context) {
+func (t *Transformation) SetDefaults(ctx context.Context) {
 	// Nothing to default.
 }

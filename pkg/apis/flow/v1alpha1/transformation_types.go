@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
 )
@@ -44,6 +45,8 @@ type Transformation struct {
 
 var (
 	// Check that Transformation can be validated and defaulted.
+	_ apis.Validatable   = (*Transformation)(nil)
+	_ apis.Defaultable   = (*Transformation)(nil)
 	_ kmeta.OwnerRefable = (*Transformation)(nil)
 	// Check that the type conforms to the duck Knative Resource shape.
 	_ duckv1.KRShaped = (*Transformation)(nil)
@@ -70,6 +73,12 @@ type Path struct {
 	Key   string `json:"key,omitempty"`
 	Value string `json:"value,omitempty"`
 }
+
+const (
+	// TransformationConditionReady is set when the revision is starting to materialize
+	// runtime resources, and becomes true when those resources are ready.
+	TransformationConditionReady = apis.ConditionReady
+)
 
 // TransformationStatus communicates the observed state of the Transformation (from the controller).
 type TransformationStatus struct {
