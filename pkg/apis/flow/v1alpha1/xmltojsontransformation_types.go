@@ -19,7 +19,6 @@ package v1alpha1
 import (
 	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
 )
@@ -45,8 +44,6 @@ type XMLToJSONTransformation struct {
 
 var (
 	// Check that XMLToJSONTransformation can be validated and defaulted.
-	_ apis.Validatable   = (*XMLToJSONTransformation)(nil)
-	_ apis.Defaultable   = (*XMLToJSONTransformation)(nil)
 	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
 	// Check that the type conforms to the duck Knative Resource shape.
 	_ duckv1.KRShaped = (*XMLToJSONTransformation)(nil)
@@ -74,12 +71,6 @@ type EventOptions struct {
 	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
 }
 
-const (
-	// XMLToJSONTransformationConditionReady is set when the revision is starting to materialize
-	// runtime resources, and becomes true when those resources are ready.
-	XMLToJSONTransformationConditionReady = apis.ConditionReady
-)
-
 // XMLToJSONTransformationStatus communicates the observed state of the XMLToJSONTransformation (from the controller).
 type XMLToJSONTransformationStatus struct {
 	duckv1.SourceStatus `json:",inline"`
@@ -97,9 +88,4 @@ type XMLToJSONTransformationList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []XMLToJSONTransformation `json:"items"`
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (t *XMLToJSONTransformation) GetStatus() *duckv1.Status {
-	return &t.Status.Status
 }
