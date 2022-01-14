@@ -21,7 +21,9 @@ import (
 	"knative.dev/pkg/apis"
 )
 
-var condSet = apis.NewLivingConditionSet()
+var condSet = apis.NewLivingConditionSet(
+	TransformationConditionReady,
+)
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
 func (t *Transformation) GetGroupVersionKind() schema.GroupVersionKind {
@@ -41,12 +43,12 @@ func (ts *TransformationStatus) InitializeConditions() {
 // MarkServiceUnavailable marks Transformation as not ready with ServiceUnavailable reason.
 func (ts *TransformationStatus) MarkServiceUnavailable(name string) {
 	condSet.Manage(ts).MarkFalse(
-		apis.ConditionReady,
+		TransformationConditionReady,
 		"ServiceUnavailable",
 		"Service %q is not ready.", name)
 }
 
 // MarkServiceAvailable sets Transformation condition to ready.
 func (ts *TransformationStatus) MarkServiceAvailable() {
-	condSet.Manage(ts).MarkTrue(apis.ConditionReady)
+	condSet.Manage(ts).MarkTrue(TransformationConditionReady)
 }
