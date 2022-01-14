@@ -30,7 +30,6 @@ import (
 )
 
 const (
-	tBridgeID         = "bride-abdc-0123"
 	tCloudEventID     = "ce-abcd-0123"
 	tCloudEventType   = "ce.test.type"
 	tCloudEventSource = "ce.test.source"
