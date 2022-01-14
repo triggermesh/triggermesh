@@ -43,7 +43,6 @@ type XMLToJSONTransformation struct {
 }
 
 var (
-	// Check that XMLToJSONTransformation can be validated and defaulted.
 	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
 	// Check that the type conforms to the duck Knative Resource shape.
 	_ duckv1.KRShaped = (*XMLToJSONTransformation)(nil)
