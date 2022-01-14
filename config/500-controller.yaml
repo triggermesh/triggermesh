@@ -1,4 +1,4 @@
-# Copyright 2021 TriggerMesh Inc.
+# Copyright 2022 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -167,6 +167,8 @@ spec:
         # Transformation adapter
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
+        - name: XMLTOJSONTRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
         - name: XSLTTRANSFORM_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xslttransform-adapter
         # Routing adapters

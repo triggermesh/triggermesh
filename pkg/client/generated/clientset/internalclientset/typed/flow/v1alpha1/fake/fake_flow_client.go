@@ -32,6 +32,10 @@ func (c *FakeFlowV1alpha1) Transformations(namespace string) v1alpha1.Transforma
 	return &FakeTransformations{c, namespace}
 }
 
+func (c *FakeFlowV1alpha1) XMLToJSONTransformations(namespace string) v1alpha1.XMLToJSONTransformationInterface {
+	return &FakeXMLToJSONTransformations{c, namespace}
+}
+
 func (c *FakeFlowV1alpha1) XSLTTransforms(namespace string) v1alpha1.XSLTTransformInterface {
 	return &FakeXSLTTransforms{c, namespace}
 }
