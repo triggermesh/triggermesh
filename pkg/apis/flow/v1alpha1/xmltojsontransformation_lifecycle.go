@@ -29,9 +29,7 @@ const (
 	EventTypeXMLToJSONGenericResponse = "io.triggermesh.xmltojsontransformation.error"
 )
 
-var xmlToJSONCondSet = apis.NewLivingConditionSet(
-	XMLToJSONTransformationConditionReady,
-)
+var xmlToJSONCondSet = apis.NewLivingConditionSet()
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
 func (t *XMLToJSONTransformation) GetGroupVersionKind() schema.GroupVersionKind {
@@ -51,14 +49,14 @@ func (ts *XMLToJSONTransformationStatus) InitializeConditions() {
 // MarkServiceUnavailable marks XMLToJSONTransformation as not ready with ServiceUnavailable reason.
 func (ts *XMLToJSONTransformationStatus) MarkServiceUnavailable(name string) {
 	xmlToJSONCondSet.Manage(ts).MarkFalse(
-		XMLToJSONTransformationConditionReady,
+		apis.ConditionReady,
 		"ServiceUnavailable",
 		"Service %q is not ready.", name)
 }
 
 // MarkServiceAvailable sets XMLToJSONTransformation condition to ready.
 func (ts *XMLToJSONTransformationStatus) MarkServiceAvailable() {
-	xmlToJSONCondSet.Manage(ts).MarkTrue(XMLToJSONTransformationConditionReady)
+	xmlToJSONCondSet.Manage(ts).MarkTrue(apis.ConditionReady)
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
@@ -88,4 +86,9 @@ func (ts *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *ser
 
 	xmlToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
 
+}
+
+// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
+func (t *XMLToJSONTransformation) GetStatus() *duckv1.Status {
+	return &t.Status.Status
 }
