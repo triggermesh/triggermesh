@@ -120,6 +120,12 @@ var _ = Describe("Azure IOT Hub Source", func() {
 
 				Expect(err).ToNot(HaveOccurred())
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
+
+				// FIXME(antoineco): because it doesn't have any startup probe, the adapter becomes
+				// Ready before it has established a connection with the IoT Hub. For this reason,
+				// sending a message immediately after observing the Ready condition occasionally causes
+				// a race.
+				time.Sleep(10 * time.Second)
 			})
 			It("should create an azure iothub source", func() {
 				By("creating a message sent from a device", func() {
