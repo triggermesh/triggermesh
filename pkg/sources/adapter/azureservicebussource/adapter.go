@@ -223,10 +223,12 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 //
 // Required permissions:
 //  Service Bus Queues:
-//    - Microsoft.ServiceBus/namespaces/queues/read (Queue)
+//    - Microsoft.ServiceBus/namespaces/queues/read
 //  Service Bus Topics:
 //    - Microsoft.ServiceBus/namespaces/topics/read
 //    - Microsoft.ServiceBus/namespaces/topics/subscriptions/read
+//  Both (DataAction):
+//  - Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
 	logging.FromContext(ctx).Info("Listening for messages")
 

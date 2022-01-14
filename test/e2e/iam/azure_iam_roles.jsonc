@@ -1,0 +1,177 @@
+/* Azure role definitions for E2E tests.
+
+   Set of permissions required by the TriggerMesh end-to-end test suite to run
+   tests that manipulate Azure resources.
+*/
+[
+  {
+    "roleName": "TriggerMesh E2E test suite",
+    "description": "Grants permissions required by the TriggerMesh E2E test suite.",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.EventHub/namespaces/read",
+          "Microsoft.EventHub/namespaces/write",
+          "Microsoft.Devices/iothubs/iothubkeys/listkeys/action",
+          "Microsoft.Devices/iothubs/read",
+          "Microsoft.Devices/iothubs/write",
+          "Microsoft.Resources/subscriptions/resourceGroups/delete",
+          "Microsoft.Resources/subscriptions/resourceGroups/write",
+          "Microsoft.ServiceBus/namespaces/authorizationrules/listKeys/action",
+          "Microsoft.ServiceBus/namespaces/read",
+          "Microsoft.ServiceBus/namespaces/write",
+          "Microsoft.Storage/storageAccounts/blobServices/containers/write",
+          "Microsoft.Storage/storageAccounts/blobServices/write",
+          "Microsoft.Storage/storageAccounts/listKeys/action",
+          "Microsoft.Storage/storageAccounts/write"
+        ],
+        "dataActions": [
+          "Microsoft.EventHub/namespaces/messages/send/action",
+          "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete",
+          "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  },
+  {
+    "roleName": "Activity Logs event source",
+    "description": "Role suitable for use with the TriggerMesh event source for Activity Logs.",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.EventHub/namespaces/authorizationRules/listkeys/action",
+          "Microsoft.EventHub/namespaces/eventhubs/delete",
+          "Microsoft.EventHub/namespaces/eventhubs/read",
+          "Microsoft.EventHub/namespaces/eventhubs/write",
+          "Microsoft.EventHub/namespaces/eventhubs/consumergroups/read",
+          "Microsoft.Insights/diagnosticsettings/delete",
+          "Microsoft.Insights/diagnosticsettings/read",
+          "Microsoft.Insights/diagnosticsettings/write"
+        ],
+        "dataActions": [
+          "Microsoft.EventHub/namespaces/messages/receive/action"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  },
+  {
+    "roleName": "Blob Storage event source",
+    "description": "Role suitable for use with the TriggerMesh event source for Blob Storage.",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.EventGrid/eventSubscriptions/delete",
+          "Microsoft.EventGrid/eventSubscriptions/read",
+          "Microsoft.EventGrid/eventSubscriptions/write",
+          "Microsoft.EventHub/namespaces/eventhubs/delete",
+          "Microsoft.EventHub/namespaces/eventhubs/read",
+          "Microsoft.EventHub/namespaces/eventhubs/write",
+          "Microsoft.EventHub/namespaces/eventhubs/consumergroups/read"
+        ],
+        "dataActions": [
+          "Microsoft.EventHub/namespaces/messages/receive/action"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  },
+  {
+    "roleName": "Event Grid event source",
+    "description": "Role suitable for use with the TriggerMesh event source for Event Grid.",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.EventGrid/eventSubscriptions/delete",
+          "Microsoft.EventGrid/eventSubscriptions/read",
+          "Microsoft.EventGrid/eventSubscriptions/write",
+          "Microsoft.EventHub/namespaces/eventhubs/delete",
+          "Microsoft.EventHub/namespaces/eventhubs/write",
+          "Microsoft.EventHub/namespaces/eventhubs/read",
+          "Microsoft.EventHub/namespaces/eventhubs/consumergroups/read"
+        ],
+        "dataActions": [
+          "Microsoft.EventHub/namespaces/messages/receive/action"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  },
+  {
+    "roleName": "Event Hubs event source",
+    "description": "Role suitable for use with the TriggerMesh event source for Event Hubs.",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.EventHub/namespaces/eventhubs/consumergroups/read"
+        ],
+        "dataActions": [
+          "Microsoft.EventHub/namespaces/messages/receive/action"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  },
+  {
+    "roleName": "Service Bus Queues event source",
+    "description": "Role suitable for use with the TriggerMesh event source for Service Bus Queues.",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.ServiceBus/namespaces/queues/read"
+        ],
+        "dataActions": [
+          "Microsoft.ServiceBus/namespaces/messages/receive/action"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  },
+  {
+    "roleName": "Service Bus Topics event source",
+    "description": "Role suitable for use with the TriggerMesh event source for Service Bus Topics.",
+    "permissions": [
+      {
+        "actions": [
+          "Microsoft.ServiceBus/namespaces/topics/read",
+          "Microsoft.ServiceBus/namespaces/topics/subscriptions/delete",
+          "Microsoft.ServiceBus/namespaces/topics/subscriptions/read",
+          "Microsoft.ServiceBus/namespaces/topics/subscriptions/write"
+        ],
+        "dataActions": [
+          "Microsoft.ServiceBus/namespaces/messages/receive/action"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  }
+]
