@@ -28,7 +28,9 @@ spec:
   queueName: testqueue
 
   accountKey:
-    value: VYCuibcTtULcZbMEZ7rIZxieb+A9rAHJTx/CAD4+l6qJ08/pkcBUzYHrCMBu6lmdDoPndm/oiNuYiA7qibrwoA==
+    valueFromSecret:
+      name: azure-queue-storage
+      key: account_key
 
   sink:
     ref:
