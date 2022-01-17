@@ -18,5 +18,5 @@ package targets
 
 import (
 	_ "github.com/triggermesh/triggermesh/test/e2e/targets/awskinesis"
-	// _ "github.com/triggermesh/triggermesh/test/e2e/targets/awssqs"
+	_ "github.com/triggermesh/triggermesh/test/e2e/targets/awssqs"
 )

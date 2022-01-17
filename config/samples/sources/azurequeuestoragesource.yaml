@@ -24,14 +24,14 @@ kind: AzureQueueStorageSource
 metadata:
   name: sample
 spec:
-  accountName: frantmtest
-  queueName: frantest
+  accountName: demoaccount
+  queueName: testqueue
 
   accountKey:
     value: VYCuibcTtULcZbMEZ7rIZxieb+A9rAHJTx/CAD4+l6qJ08/pkcBUzYHrCMBu6lmdDoPndm/oiNuYiA7qibrwoA==
 
   sink:
     ref:
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: sockeye
+      apiVersion: eventing.knative.dev/v1
+      kind: broker
+      name: default
