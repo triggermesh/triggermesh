@@ -57,7 +57,10 @@
                 "kinesis:PutRecord",
                 "kinesis:DeleteStream",
                 "kinesis:CreateStream",
-                "kinesis:DescribeStream"
+                "kinesis:DescribeStream",
+                "kinesis:ListShards",
+                "kinesis:GetShardIterator",
+                "kinesis:GetRecords"
             ],
             "Resource": [
                 "arn:aws:kinesis:*:043455440429:stream/e2e-*"
@@ -129,8 +132,7 @@
             "Action": [
                 "sqs:GetQueueUrl",
                 "sqs:ReceiveMessage",
-                "sqs:DeleteMessage",
-                "sqs:DeleteMessageBatch"
+                "sqs:DeleteMessage"
             ],
             "Resource": [
                 "arn:aws:sqs:*:043455440429:e2e-*"
