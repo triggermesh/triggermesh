@@ -61,7 +61,7 @@ require (
 	github.com/onsi/gomega v1.17.0
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
-	github.com/sendgrid/sendgrid-go v3.10.4+incompatible
+	github.com/sendgrid/sendgrid-go v3.10.5+incompatible
 	github.com/stretchr/testify v1.7.0
 	github.com/tektoncd/pipeline v0.31.0
 	github.com/tidwall/gjson v1.12.1
