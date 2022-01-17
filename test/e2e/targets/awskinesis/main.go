@@ -233,10 +233,10 @@ var _ = Describe("AWS Kinesis target", func() {
 		Specify("the API server rejects the creation of that object", func() {
 
 			By("setting an invalid stream ARN", func() {
-				invalidQueueARN := "arn:aws:kinesis:eu-central-1::"
+				invalidStreamARN := "arn:aws:kinesis:eu-central-1::"
 
 				_, err := createTarget(trgtClient, ns, "test-invalid-arn",
-					withARN(invalidQueueARN),
+					withARN(invalidStreamARN),
 					withPartition("test"),
 					withCredentials(awsSecret.Name),
 				)
