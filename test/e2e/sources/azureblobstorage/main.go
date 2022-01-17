@@ -129,10 +129,8 @@ var _ = Describe("Azure Blob Storage", func() {
 
 				saClient := azure.CreateStorageAccountsClient(subscriptionID)
 
-				// storageaccount name must be alphanumeric characters only and 3-24 characters long
-				saName = strings.Replace(ns, "-", "", -1)
-				saName = strings.Replace(saName, "e2eazureblobstoragesource", "tme2etest", -1)
-				sa = azure.CreateBlobStorageAccount(ctx, saClient, saName, *rg.Name, region)
+				sa = azure.CreateBlobStorageAccount(ctx, saClient, *rg.Name, region)
+				saName = *sa.Name
 
 				container = azure.CreateBlobContainer(ctx, *rg.Name, sa, subscriptionID, ns)
 

@@ -156,7 +156,7 @@ var _ = Describe("Azure Event Grid source", func() {
 			BeforeEach(func() {
 				By("creating a storage account to generate an event", func() {
 					storCli := azure.CreateStorageAccountsClient(subscriptionID)
-					storageAccount := azure.CreateBlobStorageAccount(ctx, storCli, "e2eo3by9w5zh4f92p5fxlmg", rgName, region)
+					storageAccount := azure.CreateBlobStorageAccount(ctx, storCli, rgName, region)
 
 					sampleStorageAccountID = *storageAccount.ID
 				})

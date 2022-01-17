@@ -31,8 +31,16 @@ const (
 	AzureBlobStorageURL = ".blob.core.windows.net/"
 )
 
-// CreateBlobStorageAccount provides a wrapper to support blob storage test
-func CreateBlobStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName, region string) armstorage.StorageAccount {
+// CreateBlobStorageAccount creates an Azure storage account in the given
+// resource group and region.
+// Because storage account names are globally unique, this helper generates a
+// random name to reduce the risk of running into naming conflicts.
+func CreateBlobStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, rgName, region string) armstorage.StorageAccount {
+	const maxStorAccNameLen = 24
+	const stoAccNamePrefix = "tme2e"
+
+	name := stoAccNamePrefix + randAlphanumString(maxStorAccNameLen-len(stoAccNamePrefix))
+
 	return CreateStorageAccountCommon(ctx, cli, name, rgName, region, true)
 }
 
