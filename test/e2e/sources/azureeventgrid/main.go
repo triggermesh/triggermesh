@@ -17,16 +17,15 @@ limitations under the License.
 package azureeventgrid
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
-
-	"github.com/triggermesh/triggermesh/test/e2e/framework/azure"
+	"github.com/onsi/gomega/types"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,6 +37,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/azure"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 )
@@ -54,12 +54,12 @@ import (
   - AZURE_TENANT_ID - Azure tenant to create the resources against
   - AZURE_CLIENT_ID - The Azure ServicePrincipal Client ID
   - AZURE_CLIENT_SECRET - The Azure ServicePrincipal Client Secret
-  - AZURE_REGION - Define the Azure region to run the test (default uswest2)
+  - AZURE_REGION - Define the Azure region to run the test (default "westus2")
 
   These will be done by the e2e test:
-  - Create an Azure Resource Group, EventHubs Namespace, and EventHub
-  - Register an EventGrid watcher on the resource group
-  - Create a storage account and watch for the event
+  - Create an Azure Resource Group, Event Hubs Namespace, and Event Hubs instance
+  - Create an AzureEventGridSource instance that subscribes to events from the resource group
+  - Create an Azure Storage Account to generate an event inside the resource group
 
 */
 
@@ -70,7 +70,7 @@ var sourceAPIVersion = schema.GroupVersion{
 
 const (
 	sourceKind     = "AzureEventGridSource"
-	sourceResource = "azureeventgridsource"
+	sourceResource = "azureeventgridsources"
 )
 
 /*
@@ -81,83 +81,124 @@ const (
  * Instantiate the Azure Storage Account and verify an event is produced
 */
 
-var _ = Describe("Azure Event Grid", func() {
-	ctx := context.Background()
-	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
-	region := os.Getenv("AZURE_REGION")
-
-	if region == "" {
-		region = "westus2"
-	}
-
-	f := framework.New(sourceResource)
+var _ = Describe("Azure Event Grid source", func() {
+	f := framework.New("azureeventgridsource")
 
 	var ns string
-	var srcClient dynamic.ResourceInterface
-	var sink *duckv1.Destination
 
-	var rg armresources.ResourceGroup
+	var srcClient dynamic.ResourceInterface
+
+	var sink *duckv1.Destination
+	var eventScope string
+	var eventHubsNamespaceID string
 
 	BeforeEach(func() {
 		ns = f.UniqueName
-		gvr := sourceAPIVersion.WithResource(sourceResource + "s")
-		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 
+		gvr := sourceAPIVersion.WithResource(sourceResource)
+		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	Context("an Azure Event Grid source is created", func() {
-		var err error // stubbed
+	Context("a source subscribes to events from a resource group", func() {
+		var rgName string
+
+		subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
+
+		region := os.Getenv("AZURE_REGION")
+		if region == "" {
+			region = "westus2"
+		}
+
+		ctx := context.Background()
 
 		BeforeEach(func() {
-			rg = azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
-			_ = azure.CreateEventHubNamespaceOnly(ctx, subscriptionID, ns, region, *rg.Name)
-		})
 
-		When("an event is produced", func() {
-			var src *unstructured.Unstructured
+			By("creating a resource group", func() {
+				rg := azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+				rgName = *rg.Name
 
-			BeforeEach(func() {
+				eventScope = "/subscriptions/" + subscriptionID + "/resourceGroups/" + *rg.Name
+			})
+
+			By("creating an Event Hubs namespace", func() {
+				nsName := f.UniqueName
+				_ = azure.CreateEventHubNamespaceOnly(ctx, subscriptionID, nsName, region, rgName)
+
+				eventHubsNamespaceID = eventHubsNamespaceResourceID(subscriptionID, rgName, nsName)
+			})
+
+			By("creating an event sink", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
+			})
 
-				src, err = createSource(srcClient, ns, "test-", sink,
+			By("creating an AzureEventGridSource object", func() {
+				src, err := createSource(srcClient, ns, "test-", sink,
 					withServicePrincipal(),
-					withEventScope("/subscriptions/"+subscriptionID+"/resourceGroups/"+*rg.Name),
+					withEventScope(eventScope),
 					withEventTypes([]string{"Microsoft.Resources.ResourceWriteSuccess"}),
-					withEventHubNamespace(createEventhubID(subscriptionID, ns)),
+					withEventHubsNamespaceID(eventHubsNamespaceID),
 				)
-
 				Expect(err).ToNot(HaveOccurred())
 
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
-				time.Sleep(30 * time.Second) // Will take some extra time to bring up the Azure Eventgrid
+			})
+		})
+
+		AfterEach(func() {
+			By("deleting the resource group "+rgName, func() {
+				_ = azure.DeleteResourceGroup(ctx, subscriptionID, rgName)
+			})
+		})
+
+		When("an event is generated inside the resource group", func() {
+			var sampleStorageAccountID string
+
+			BeforeEach(func() {
+				By("creating a storage account to generate an event", func() {
+					storCli := azure.CreateStorageAccountsClient(subscriptionID)
+					storageAccount := azure.CreateBlobStorageAccount(ctx, storCli, "e2eo3by9w5zh4f92p5fxlmg", rgName, region)
+
+					sampleStorageAccountID = *storageAccount.ID
+				})
 			})
 
-			It("should verify an eventgrid event was sent", func() {
-				const receiveTimeout = 60 * time.Second
+			Specify("the source generates an event", func() {
+				// Azure needs some extra time for setting up Event Grid's system topic upon creation of
+				// the Event Grid subscription by our reconciler.
+				const receiveTimeout = 3 * time.Minute
 				const pollInterval = 500 * time.Millisecond
 
 				var receivedEvents []cloudevents.Event
 
-				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
-
+				// NOTE(antoineco): Although we only create one resource inside our resource group, it
+				// is very likely that we receive unrelated events generated by Azure itself while
+				// setting up the Event Grid subscription.
+				// For this reason, we perform some extra filtering below to ensure that subsequent
+				// assertions are performed on the expected event only.
+				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents,
+					cloudEventDataContains([]byte(`"operationName":"Microsoft.Storage/storageAccounts/write"`)),
+				)
 				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
 				Expect(receivedEvents).To(HaveLen(1))
 
 				e := receivedEvents[0]
 
 				Expect(e.Type()).To(Equal("Microsoft.Resources.ResourceWriteSuccess"))
-				Expect(strings.ToLower(e.Source())).To(Equal(strings.ToLower("/subscriptions/" + subscriptionID + "/resourceGroups/" + *rg.Name)))
+				Expect(e.Source()).To(equalResourceID(eventScope))
+				Expect(e.Subject()).To(equalResourceID(sampleStorageAccountID))
 			})
-		})
 
-		AfterEach(func() {
-			_ = azure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
 		})
 	})
 
 	When("a client creates a source object with invalid specs", func() {
-		// Those tests do not require a real sink
+
+		// Those tests do not require a real sink, scope, or Event Hubs namespace
 		BeforeEach(func() {
+			const subscriptionID = "00000000-0000-0000-0000-000000000000"
+			eventScope = "/subscriptions/" + subscriptionID
+			eventHubsNamespaceID = eventHubsNamespaceResourceID(subscriptionID, "testRg", "testNs")
+
 			sink = &duckv1.Destination{
 				Ref: &duckv1.KReference{
 					APIVersion: "fake/v1",
@@ -168,50 +209,61 @@ var _ = Describe("Azure Event Grid", func() {
 		})
 
 		Specify("the API server rejects the creation of that object", func() {
-			fakeResourceGroupName := "fakegroup"
+
+			By("setting an invalid scope", func() {
+				invalidScopeResourceID := "I'm an invalid resource ID"
+
+				_, err := createSource(srcClient, ns, "test-invalid-scope", sink,
+					withServicePrincipal(),
+					withEventScope(invalidScopeResourceID),
+					withEventHubsNamespaceID(eventHubsNamespaceID),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.scope: Invalid value: "))
+			})
 
 			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-empty-credentials", sink,
-					withEventScope("/subscriptions/"+subscriptionID+"/resourceGroups/"+fakeResourceGroupName),
-					withEventTypes([]string{"Microsoft.Resources.ResourceWriteSuccess"}),
-					withEventHubNamespace(createEventhubID(subscriptionID, ns)),
+				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
+					withEventScope(eventScope),
+					withEventHubsNamespaceID(eventHubsNamespaceID),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(
 					`spec.auth: Required value`))
 			})
 
-			By("omitting the scope", func() {
-				_, err := createSource(srcClient, ns, "test-empty-scope", sink,
+			By("omitting the Event Hubs endpoint", func() {
+				_, err := createSource(srcClient, ns, "test-no-eventhubs-", sink,
 					withServicePrincipal(),
-					withEventTypes([]string{"Microsoft.Resources.ResourceWriteSuccess"}),
-					withEventHubNamespace(createEventhubID(subscriptionID, ns)),
+					withEventScope(eventScope),
 				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.scope: Required value`))
-			})
-
-			By("omitting the eventhub endpoint", func() {
-				_, err := createSource(srcClient, ns, "test-missing-endpoint", sink,
-					withServicePrincipal(),
-					withEventScope("/subscriptions/"+subscriptionID+"/resourceGroups/"+fakeResourceGroupName),
-					withEventTypes([]string{"Microsoft.Resources.ResourceWriteSuccess"}),
-				)
-
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(`spec.endpoint: Required value`))
 			})
 
-			By("setting an invalid eventhub endpoint", func() {
-				fakeEventHubNamespace := "I'm a fake eventhub namespace"
-				_, err := createSource(srcClient, ns, "test-invalid-eventhub-ns", sink,
+			By("setting an invalid Event Hubs namespace", func() {
+				invalidEventHubsNamespace := "I'm an invalid Event Hubs namespace"
+
+				_, err := createSource(srcClient, ns, "test-invalid-eventhubs-ns-", sink,
 					withServicePrincipal(),
-					withEventTypes([]string{"Microsoft.Resources.ResourceWriteSuccess"}),
-					withEventHubNamespace(fakeEventHubNamespace),
+					withEventScope(eventScope),
+					withEventHubsNamespaceID(invalidEventHubsNamespace),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(`spec.endpoint.eventHubs.namespaceID: Invalid value: "`))
+			})
+
+			By("setting an invalid Event Hubs instance name", func() {
+				invalidName := "I'm an invalid Event Hubs instance name"
+
+				_, err := createSource(srcClient, ns, "test-invalid-eventhubs-name-", sink,
+					withServicePrincipal(),
+					withEventScope(eventScope),
+					withEventHubsNamespaceID(eventHubsNamespaceID),
+					withEventHubsInstanceName(invalidName),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(`spec.endpoint.eventHubs.hubName: Invalid value: "`))
 			})
 		})
 	})
@@ -219,9 +271,10 @@ var _ = Describe("Azure Event Grid", func() {
 
 type sourceOption func(*unstructured.Unstructured)
 
-// createSource creates an AzureEventGridSource object initialized with the test parameters
+// createSource creates an AzureEventGridSource object initialized with the given options.
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
+
 	src := &unstructured.Unstructured{}
 	src.SetAPIVersion(sourceAPIVersion.String())
 	src.SetKind(sourceKind)
@@ -243,10 +296,18 @@ func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix str
 
 // Define the creation parameters to pass along
 
-func withEventHubNamespace(namespaceID string) sourceOption {
+func withEventHubsNamespaceID(ns string) sourceOption {
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedField(src.Object, namespaceID, "spec", "endpoint", "eventHubs", "namespaceID"); err != nil {
+		if err := unstructured.SetNestedField(src.Object, ns, "spec", "endpoint", "eventHubs", "namespaceID"); err != nil {
 			framework.FailfWithOffset(2, "Failed to set spec.endpoint.eventHubs.namespaceID: %s", err)
+		}
+	}
+}
+
+func withEventHubsInstanceName(name string) sourceOption {
+	return func(src *unstructured.Unstructured) {
+		if err := unstructured.SetNestedField(src.Object, name, "spec", "endpoint", "eventHubs", "hubName"); err != nil {
+			framework.FailfWithOffset(2, "Failed to set spec.endpoint.eventHubs.hubName: %s", err)
 		}
 	}
 }
@@ -267,7 +328,7 @@ func withEventScope(eventScope string) sourceOption {
 	}
 }
 
-// withServicePrincipal will create the service principal component based on the azure environment variables
+// withServicePrincipal will create the secret and service principal based on the azure environment variables
 func withServicePrincipal() sourceOption {
 	credsMap := map[string]interface{}{
 		"tenantID":     map[string]interface{}{"value": os.Getenv("AZURE_TENANT_ID")},
@@ -288,18 +349,58 @@ func withServicePrincipal() sourceOption {
 // The returned function signature satisfies the contract expected by
 // gomega.Eventually: no argument and one or more return values.
 func readReceivedEvents(c clientset.Interface, namespace, eventDisplayName string,
-	receivedEvents *[]cloudevents.Event) func() []cloudevents.Event {
+	receivedEvents *[]cloudevents.Event, filterFn cloudEventPredicate) func() []cloudevents.Event {
 
 	return func() []cloudevents.Event {
 		ev := bridges.ReceivedEventDisplayEvents(
 			apps.GetLogs(c, namespace, eventDisplayName),
 		)
+
+		if filterFn != nil {
+			filteredEv := ev[:0]
+
+			for _, e := range ev {
+				if filterFn(e) {
+					filteredEv = append(filteredEv, e)
+				}
+			}
+
+			ev = filteredEv
+		}
+
 		*receivedEvents = ev
+
 		return ev
 	}
 }
 
-// createEventhubID will create the EventHub path used by the k8s given the subscriptionID and the test unique name
-func createEventhubID(subscriptionID, testName string) string {
-	return "/subscriptions/" + subscriptionID + "/resourceGroups/" + testName + "/providers/Microsoft.EventHub/namespaces/" + testName
+// cloudEventPredicate is a predicate function that can be used as a filter to
+// verify different aspects of a CloudEvent.
+type cloudEventPredicate func(cloudevents.Event) bool
+
+// cloudEventDataContains returns a predicate function which asserts that a
+// CloudEvent's data contains the given bytes.
+func cloudEventDataContains(subslice []byte) cloudEventPredicate {
+	return func(e cloudevents.Event) bool {
+		return bytes.Contains(e.Data(), subslice)
+	}
+}
+
+// eventHubsNamespaceResourceID returns a fully qualified Azure resource ID for
+// an Event Hubs namespace.
+func eventHubsNamespaceResourceID(subscriptionID, rgName, nsName string) string {
+	return "/subscriptions/" + subscriptionID + "/resourceGroups/" + rgName +
+		"/providers/Microsoft.EventHub/namespaces/" + nsName
+}
+
+// equalResourceID returns a Gomega matcher which asserts the equality of two
+// Azure resource IDs.
+// Unlike gomega.Equal, this function accounts for Event Grid generating
+// CloudEvent attributes with an inconsistent casing of the "resourceGroups"
+// segment of resource IDs.
+func equalResourceID(expectID string) types.GomegaMatcher {
+	return SatisfyAny(
+		Equal(expectID),
+		Equal(strings.Replace(expectID, "/resourceGroups/", "/resourcegroups/", 1)),
+	)
 }

@@ -76,7 +76,7 @@ var activityCategories = []string{"Administrative", "Policy", "Security"}
  * Create a resource group and watch the event flow in
 */
 
-var _ = Describe("Azure Activity Logs", func() {
+var _ = Describe("Azure Activity Logs source", func() {
 	f := framework.New("azureactivitylogssource")
 
 	var ns string
@@ -98,8 +98,6 @@ var _ = Describe("Azure Activity Logs", func() {
 		var rgName string
 		var eventHubsInstanceName string
 
-		subscriptionID = os.Getenv("AZURE_SUBSCRIPTION_ID")
-
 		region := os.Getenv("AZURE_REGION")
 		if region == "" {
 			region = "westus2"
@@ -108,6 +106,7 @@ var _ = Describe("Azure Activity Logs", func() {
 		ctx := context.Background()
 
 		BeforeEach(func() {
+			subscriptionID = os.Getenv("AZURE_SUBSCRIPTION_ID")
 
 			By("creating a resource group", func() {
 				rg := azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
@@ -228,7 +227,6 @@ var _ = Describe("Azure Activity Logs", func() {
 					withSubscriptionID(subscriptionID),
 					withActivityCategories(activityCategories),
 					withEventHubsNamespaceID(eventHubsNamespaceID),
-					withEventHubsInstanceName(ns),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(
@@ -245,7 +243,7 @@ var _ = Describe("Azure Activity Logs", func() {
 				Expect(err.Error()).To(ContainSubstring(`spec.destination: Required value`))
 			})
 
-			By("setting invalid eventhub namespace", func() {
+			By("setting invalid Event Hubs namespace", func() {
 				invalidEventHubsNamespace := "I'm an invalid Event Hubs namespace"
 
 				_, err := createSource(srcClient, ns, "test-invalid-eventhubs-ns-", sink,
@@ -253,7 +251,6 @@ var _ = Describe("Azure Activity Logs", func() {
 					withSubscriptionID(subscriptionID),
 					withActivityCategories(activityCategories),
 					withEventHubsNamespaceID(invalidEventHubsNamespace),
-					withEventHubsInstanceName(ns),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(`spec.destination.eventHubs.namespaceID: Invalid value: "`))
@@ -277,9 +274,10 @@ var _ = Describe("Azure Activity Logs", func() {
 
 type sourceOption func(*unstructured.Unstructured)
 
-// createSource creates an AzureEventHubSource object initialized with the test parameters
+// createSource creates an AzureActivityLogsSource object initialized with the given options.
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
+
 	src := &unstructured.Unstructured{}
 	src.SetAPIVersion(sourceAPIVersion.String())
 	src.SetKind(sourceKind)
