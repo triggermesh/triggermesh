@@ -28,6 +28,7 @@ package xmltmtojson
 
 import (
 	"context"
+	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
@@ -45,6 +46,7 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 )
 
 var transAPIVersion = schema.GroupVersion{
@@ -63,19 +65,18 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	var ns string
 	var sink *duckv1.Destination
 
-	// var trnsClient dynamic.ResourceInterface
-	// var trans *unstructured.Unstructured
-	// var err error
+	var trnsClient dynamic.ResourceInterface
+	var trans *unstructured.Unstructured
+	var err error
 	// var transURL *url.URL
 
-	// It("test", func() {
-	// 	Expect(1).To(Equal(1))
-	// })
+	// 	Context("a Transformation is deployed" ...
+	//   When("a XML payload is sent" ...
+	//     It("converts the payload to JSON")
+	//   When("a non XML payload is sent" ...
+	//     It("responds with an error event" ...
 
-	// BeforeEach(func() {
-	// 	ns = f.UniqueName
-
-	Context("a source watches an existing repository branch", func() {
+	Context("a Transformation is deployed", func() {
 		BeforeEach(func() {
 			ns = f.UniqueName
 			By("creating an event sink", func() {
@@ -83,25 +84,32 @@ var _ = Describe("XMLToJSON Transformation", func() {
 				Expect(sink).NotTo(BeNil())
 			})
 
-			// By("creating an transformation object", func() {
-			// 	gvr := transAPIVersion.WithResource(transformationResource)
-			// 	trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-			// 	trans, err = createTransformation(trnsClient, ns, "test-xmltojson-")
+			By("creating an transformation object", func() {
+				gvr := transAPIVersion.WithResource(transformationResource)
+				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
+				trans, err = createTransformation(trnsClient, ns, "test-xmltojson-")
 
-			// 	Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
 
-			// 	ducktypes.WaitUntilReady(f.DynamicClient, trans)
+				ducktypes.WaitUntilReady(f.DynamicClient, trans)
 
-			// 	// FIXME(antoineco): without this short pause, the receive adapter throws the following
-			// 	// error when sending the event:
-			// 	//
-			// 	//   Sending CodeCommit event
-			// 	//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
-			// 	//
-			// 	time.Sleep(2 * time.Second)
-			// })
+				// FIXME(antoineco): without this short pause, the receive adapter throws the following
+				// error when sending the event:
+				//
+				//   Sending CodeCommit event
+				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
+				//
+				time.Sleep(2 * time.Second)
+			})
 
 		})
+		When("a XML payload is sent", func() {
+			It("should be created", func() {
+				Expect(1).To(Equal(1))
+			})
+		})
+		//   When("a non XML payload is sent" ...
+		//     It("responds with an error event" ...
 
 	})
 
