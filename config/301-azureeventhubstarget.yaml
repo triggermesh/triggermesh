@@ -22,6 +22,14 @@ metadata:
     knative.dev/crd-install: 'true'
     triggermesh.io/crd-install: 'true'
   annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "io.triggermesh.azure.eventhubs.put.response" }
+      ]
 
 spec:
   group: targets.triggermesh.io

@@ -21,6 +21,10 @@ metadata:
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
   annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
     registry.knative.dev/eventTypes: |
       [
         { "type": "io.triggermesh.targets.aws.comprehend.result" }

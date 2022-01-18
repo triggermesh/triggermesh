@@ -20,6 +20,15 @@ metadata:
     knative.dev/crd-install: 'true'
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "*" }
+      ]
 spec:
   group: targets.triggermesh.io
   names:
