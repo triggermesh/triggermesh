@@ -21,12 +21,12 @@ import (
 	"log"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/common/storage"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/transformer"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/transformer/add"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/transformer/delete"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/transformer/shift"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/transformer/store"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/common/storage"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/transformer"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/transformer/add"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/transformer/delete"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/transformer/shift"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/transformer/store"
 )
 
 // Pipeline is a set of Transformations that are

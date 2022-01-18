@@ -40,7 +40,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
-	"github.com/triggermesh/triggermesh/pkg/transformation/reconciler/controller/resources"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/pipeline/controller/resources"
 )
 
 const (

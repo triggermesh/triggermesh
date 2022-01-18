@@ -26,7 +26,7 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/common/storage"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/common/storage"
 )
 
 // Handler contains Pipelines for CE transformations and CloudEvents client.
