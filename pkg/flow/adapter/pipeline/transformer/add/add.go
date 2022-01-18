@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/common/convert"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/common/storage"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/transformer"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/common/convert"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/common/storage"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/transformer"
 )
 
 var _ transformer.Transformer = (*Add)(nil)

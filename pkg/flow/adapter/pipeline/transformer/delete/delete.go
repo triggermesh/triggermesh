@@ -22,8 +22,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/common/storage"
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/transformer"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/common/storage"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/transformer"
 )
 
 var _ transformer.Transformer = (*Delete)(nil)

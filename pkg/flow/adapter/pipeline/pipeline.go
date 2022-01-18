@@ -42,7 +42,7 @@ func register() map[string]transformer.Transformer {
 	add.Register(transformations)
 	delete.Register(transformations)
 	shift.Register(transformations)
-	store.Register(transformatins)
+	store.Register(transformations)
 
 	return transformations
 }

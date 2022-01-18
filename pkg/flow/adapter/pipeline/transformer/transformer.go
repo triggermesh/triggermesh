@@ -17,7 +17,7 @@ limitations under the License.
 package transformer
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/transformation/pipeline/common/storage"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/pipeline/common/storage"
 )
 
 // Transformer is an interface that contains common methods
