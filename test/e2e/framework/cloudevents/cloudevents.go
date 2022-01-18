@@ -56,6 +56,20 @@ func NewHelloEvent(f *framework.Framework) *cloudevents.Event {
 	return &event
 }
 
+// NewXMLHelloEvent generates a CloudEvent with dummy values and an XML data payload.
+func NewXMLHelloEvent(f *framework.Framework) *cloudevents.Event {
+	event := cloudevents.NewEvent()
+	event.SetID("0000")
+	event.SetType("e2e.test")
+	event.SetSource("e2e.triggermesh")
+	event.SetExtension(E2ECeExtension, f.UniqueName)
+	if err := event.SetData(cloudevents.ApplicationXML, `<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Dont forget me this weekend</body></note>`); err != nil {
+		framework.FailfWithOffset(2, "Error setting event data: %s", err)
+	}
+
+	return &event
+}
+
 // RunEventSender runs a job which sends a CloudEvent payload to the given URL.
 // The function doesn't wait for the job to complete, but the job gets retried
 // in case of failure.
@@ -79,6 +93,31 @@ func RunEventSender(c clientset.Interface, namespace, url string, payload *cloud
 	})
 
 	job, err = c.BatchV1().Jobs(namespace).Create(context.Background(), job, metav1.CreateOptions{})
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to create Job: %s", err)
+	}
+
+	return job
+}
+
+// RunXMLEventSender runs a job which sends a CloudEvent payload to the given URL.
+// The function doesn't wait for the job to complete, but the job gets retried
+// in case of failure.
+func RunXMLEventSender(c clientset.Interface, namespace, url string, payload *cloudevents.Event) *batchv1.Job {
+	job := makeCurlJob(namespace, []string{
+		"-s",  // hide progress meter
+		"-S",  // show errors
+		"-D-", // dump headers to stdout
+
+		// In Structured Content Mode, the entire payload is sent in the request body.
+		// https://github.com/cloudevents/spec/blob/v1.0/http-protocol-binding.md#32-structured-content-mode
+		"-H", http.ContentType + ": " + cloudevents.ApplicationCloudEventsJSON,
+		"--data-raw", string(payload.Data()),
+
+		url,
+	})
+
+	job, err := c.BatchV1().Jobs(namespace).Create(context.Background(), job, metav1.CreateOptions{})
 	if err != nil {
 		framework.FailfWithOffset(2, "Failed to create Job: %s", err)
 	}

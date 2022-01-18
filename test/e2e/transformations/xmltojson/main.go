@@ -14,11 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package awskinesis
+package xmltojson
 
 import (
 	"context"
+	"net/url"
+	"time"
 
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
 
@@ -26,8 +29,13 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+	clientset "k8s.io/client-go/kubernetes"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
+	e2ece "github.com/triggermesh/triggermesh/test/e2e/framework/cloudevents"
+	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 )
 
 var targetAPIVersion = schema.GroupVersion{
@@ -40,44 +48,83 @@ const (
 	transformationResource = "xmltojsontransformations"
 )
 
-var _ = Describe("AWS Kinesis target", func() {
-	f := framework.New("xmltojsontransformation")
+var _ = Describe("XMLToJSON Transformation", func() {
 
-	var ns string
+	Context("test", func() {
+		f := framework.New("xmltojsontransformation")
 
-	var trgtClient dynamic.ResourceInterface
+		var ns string
+		var trnsClient dynamic.ResourceInterface
 
-	BeforeEach(func() {
-		ns = f.UniqueName
+		BeforeEach(func() {
+			ns = f.UniqueName
+			var transURL *url.URL
 
-		gvr := targetAPIVersion.WithResource(transformationResource)
-		trgtClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-	})
+			gvr := targetAPIVersion.WithResource(transformationResource)
+			trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 
-	Specify("the API server rejects the creation of that object", func() {
+			sink := bridges.CreateEventDisplaySink(f.KubeClient, ns)
 
-		By("setting an invalid stream ARN", func() {
-			_, err := createTransformation(trgtClient, ns, "test-invalid-arn")
-			Expect(err).ToNot(HaveOccurred())
+			trans, err := createTransformation(trnsClient, ns, "test-xmltojson-", sink.URI.String())
+			Expect(err).To(nil)
+
+			By("receving an XML cloudevent", func() {
+				sentEvent := e2ece.NewXMLHelloEvent(f)
+
+				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
+
+				transURL = ducktypes.Address(trans)
+				Expect(transURL).ToNot(BeNil())
+
+				job := e2ece.RunXMLEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
+				apps.WaitForCompletion(f.KubeClient, job)
+
+			})
+
+			// malnamed
+			By("sink reciving events", func() {
+				const receiveTimeout = 15 * time.Second
+				const pollInterval = 500 * time.Millisecond
+
+				var receivedEvents []cloudevents.Event
+
+				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
+
+				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
+				Expect(receivedEvents).To(HaveLen(1))
+			})
+
 		})
-	})
 
+	})
 })
 
 // createTransformation creates an AWSKinesis object initialized with the given options.
-func createTransformation(trgtClient dynamic.ResourceInterface, namespace, namePrefix string, opts ...targetOption) (*unstructured.Unstructured, error) {
+func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix, sink string) (*unstructured.Unstructured, error) {
 
-	trgt := &unstructured.Unstructured{}
-	trgt.SetAPIVersion(targetAPIVersion.String())
-	trgt.SetKind(transformationKind)
-	trgt.SetNamespace(namespace)
-	trgt.SetGenerateName(namePrefix)
+	trns := &unstructured.Unstructured{}
+	trns.SetAPIVersion(targetAPIVersion.String())
+	trns.SetKind(transformationKind)
+	trns.SetNamespace(namespace)
+	trns.SetGenerateName(namePrefix)
+	trns.Object["spec"] = map[string]interface{}{"K_SINK": sink}
 
-	for _, opt := range opts {
-		opt(trgt)
-	}
-
-	return trgtClient.Create(context.Background(), trgt, metav1.CreateOptions{})
+	return trnsClient.Create(context.Background(), trns, metav1.CreateOptions{})
 }
 
-type targetOption func(*unstructured.Unstructured)
+// readReceivedEvents returns a function that reads CloudEvents received by the
+// event-display application and stores the result as the value of the given
+// `receivedEvents` variable.
+// The returned function signature satisfies the contract expected by
+// gomega.Eventually: no argument and one or more return values.
+func readReceivedEvents(c clientset.Interface, namespace, eventDisplayDeplName string,
+	receivedEvents *[]cloudevents.Event) func() []cloudevents.Event {
+
+	return func() []cloudevents.Event {
+		ev := bridges.ReceivedEventDisplayEvents(
+			apps.GetLogs(c, namespace, eventDisplayDeplName),
+		)
+		*receivedEvents = ev
+		return ev
+	}
+}
