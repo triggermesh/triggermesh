@@ -18,6 +18,17 @@ metadata:
   name: xmltojsontransformations.flow.triggermesh.io
   labels:
     triggermesh.io/crd-install: 'true'
+    duck.knative.dev/addressable: 'true'
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "io.triggermesh.xmltojsontransformation.error" },
+        { "type": "*" }
+      ]
 spec:
   group: flow.triggermesh.io
   scope: Namespaced
