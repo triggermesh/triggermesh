@@ -45,7 +45,7 @@ GOTEST            ?= gotestsum --junitfile $(TEST_OUTPUT_DIR)/$(KREPO)-unit-test
 
 GOMODULE           = github.com/triggermesh/triggermesh
 
-GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/function/... ./pkg/routing/... ./pkg/flow/... ./pkg/sources/... ./pkg/targets/... ./pkg/transformation/...
+GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/function/... ./pkg/routing/... ./pkg/flow/... ./pkg/sources/... ./pkg/targets/...
 GOPKGS_SKIP_TESTS  = $(GOMODULE)/pkg/sources/reconciler/ibmmqsource \
                      $(GOMODULE)/pkg/targets/reconciler/ibmmqtarget \
                      $(GOMODULE)/pkg/sources/adapter/ibmmqsource/mq \
