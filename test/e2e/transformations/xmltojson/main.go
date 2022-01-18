@@ -87,7 +87,7 @@ var _ = Describe("XMLToJSON Transformation", func() {
 			By("creating an transformation object", func() {
 				gvr := transAPIVersion.WithResource(transformationResource)
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-				trans, err = createTransformation(trnsClient, ns, "test-xmltojson-")
+				trans, err = createTransformation(trnsClient, ns, "test-xmltojson")
 
 				Expect(err).ToNot(HaveOccurred())
 
@@ -203,7 +203,6 @@ var _ = Describe("XMLToJSON Transformation", func() {
 
 // createTransformation creates an AWSKinesis object initialized with the given options.
 func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string) (*unstructured.Unstructured, error) {
-
 	trns := &unstructured.Unstructured{}
 	trns.SetAPIVersion(transAPIVersion.String())
 	trns.SetKind(transformationKind)
