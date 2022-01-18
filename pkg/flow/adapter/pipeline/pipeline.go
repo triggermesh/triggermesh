@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ func register() map[string]transformer.Transformer {
 	add.Register(transformations)
 	delete.Register(transformations)
 	shift.Register(transformations)
-	store.Register(transformations)
+	store.Register(transformatins)
 
 	return transformations
 }
