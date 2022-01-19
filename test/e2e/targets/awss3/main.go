@@ -200,7 +200,7 @@ var _ = Describe("AWS S3 target", func() {
 					})
 				})
 
-				It("only puts the event's data onto the record", func() {
+				It("only puts the event's data onto the bucket object", func() {
 					var receivedObj []byte
 					var err error
 
@@ -213,7 +213,7 @@ var _ = Describe("AWS S3 target", func() {
 						receivedObj, err = ioutil.ReadAll(object.Body)
 						Expect(err).ToNot(HaveOccurred())
 					})
-					By("inspecting the record payload", func() {
+					By("inspecting the object payload", func() {
 						Expect(receivedObj).To(Equal(sentEvent.Data()))
 					})
 				})
