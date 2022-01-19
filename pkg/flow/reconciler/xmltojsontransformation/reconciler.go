@@ -19,15 +19,20 @@ package xmltojsontransformation
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
+
 	pkgreconciler "knative.dev/pkg/reconciler"
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
+	base common.GenericDeploymentReconciler
+
 	// adapter properties
 	adapterCfg *adapterConfig
 
@@ -40,7 +45,13 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XMLToJSONTransformation) pkgreconciler.Event {
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
+	sink, err := r.base.SinkResolver.URIFromDestinationV1(ctx, trg.Spec.Sink, trg)
+
+	if err != nil {
+		return pkgreconciler.NewEvent(corev1.EventTypeWarning, "SinkResolver", err.Error())
+	}
+
+	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTransformationAdapterKService(trg, r.adapterCfg, sink))
 
 	trg.Status.PropagateKServiceAvailability(adapter)
 
