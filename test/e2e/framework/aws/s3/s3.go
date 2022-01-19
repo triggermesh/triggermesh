@@ -47,11 +47,11 @@ func CreateBucket(s3Client *s3.S3, f *framework.Framework, region string) string
 }
 
 // GetObjects get objects from a s3 bucket.
-func GetObjects(s3Client *s3.S3, bucket string) []*s3.GetObjectOutput {
+func GetObjects(s3Client *s3.S3, bucketName string) []*s3.GetObjectOutput {
 	var objectList []*s3.GetObjectOutput
 
 	objects, err := s3Client.ListObjects(&s3.ListObjectsInput{
-		Bucket: &bucket,
+		Bucket: &bucketName,
 	})
 	if err != nil {
 		framework.FailfWithOffset(2, "Failed to get objects from bucket: %s", err)
@@ -59,7 +59,7 @@ func GetObjects(s3Client *s3.S3, bucket string) []*s3.GetObjectOutput {
 
 	for _, o := range objects.Contents {
 		object, err := s3Client.GetObject(&s3.GetObjectInput{
-			Bucket: &bucket,
+			Bucket: &bucketName,
 			Key:    o.Key,
 		})
 		if err != nil {
@@ -73,20 +73,20 @@ func GetObjects(s3Client *s3.S3, bucket string) []*s3.GetObjectOutput {
 }
 
 // DeleteBucket deletes a s3 bucket by name.
-func DeleteBucket(s3Client *s3.S3, name string) {
+func DeleteBucket(s3Client *s3.S3, bucketName string) {
 	bucket := &s3.DeleteBucketInput{
-		Bucket: aws.String(name),
+		Bucket: aws.String(bucketName),
 	}
 
 	iter := s3manager.NewDeleteListIterator(s3Client, &s3.ListObjectsInput{
-		Bucket: aws.String(name),
+		Bucket: aws.String(bucketName),
 	})
 
 	if err := s3manager.NewBatchDeleteWithClient(s3Client).Delete(aws.BackgroundContext(), iter); err != nil {
-		framework.FailfWithOffset(2, "Unable to delete objects from bucket %q: %s", name, err)
+		framework.FailfWithOffset(2, "Unable to delete objects from bucket %q: %s", bucketName, err)
 	}
 
 	if _, err := s3Client.DeleteBucket(bucket); err != nil {
-		framework.FailfWithOffset(2, "Failed to delete bucket %q: %s", *bucket.Bucket, err)
+		framework.FailfWithOffset(2, "Failed to delete bucket %q: %s", bucketName, err)
 	}
 }
