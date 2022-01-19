@@ -28,6 +28,10 @@ type FakeFlowV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeFlowV1alpha1) Synchronizers(namespace string) v1alpha1.SynchronizerInterface {
+	return &FakeSynchronizers{c, namespace}
+}
+
 func (c *FakeFlowV1alpha1) Transformations(namespace string) v1alpha1.TransformationInterface {
 	return &FakeTransformations{c, namespace}
 }
