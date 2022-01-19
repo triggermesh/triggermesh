@@ -75,6 +75,8 @@ func (f *Framework) BeforeEach() {
 	ginkgo.By("creating test namespace with base name "+f.baseName, func() {
 		f.UniqueName = createTestNamespace(f).Name
 	})
+
+	ginkgo.GinkgoWriter.Println("Unique name:", f.UniqueName)
 }
 
 // AfterEach performs common cleanup tasks.
