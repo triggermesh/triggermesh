@@ -26,10 +26,13 @@ import (
 
 // Managed event types
 const (
-	EventTypeXMLToJSONGenericResponse = "io.triggermesh.xmltojsontransformation.error"
+	EventTypeXMLToJSONGenericResponse                    = "io.triggermesh.xmltojsontransformation.error"
+	ConditionSinkProvided             apis.ConditionType = "SinkProvided"
 )
 
-var xmlToJSONCondSet = apis.NewLivingConditionSet()
+var xmlToJSONCondSet = apis.NewLivingConditionSet(
+	ConditionSinkProvided,
+)
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
 func (t *XMLToJSONTransformation) GetGroupVersionKind() schema.GroupVersionKind {
