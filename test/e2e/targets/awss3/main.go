@@ -65,7 +65,7 @@ const (
 const awsAccessKeyIDSecretKey = "awsApiKey"
 const awsSecretAccessKeySecretKey = "awsApiSecret"
 
-var _ = FDescribe("AWS S3 target", func() {
+var _ = Describe("AWS S3 target", func() {
 	f := framework.New("awss3target")
 	region := os.Getenv("AWS_REGION")
 
