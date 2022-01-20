@@ -35,6 +35,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -164,6 +165,14 @@ func transformQuery(q *v1alpha1.AWSCloudWatchMetricStat) *cloudwatch.MetricStat 
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
+	go health.Start(ctx)
+
+	if err := peekMetrics(ctx, a.cwClient); err != nil {
+		return fmt.Errorf("unable to read metrics: %w", err)
+	}
+
+	health.MarkReady()
+
 	a.logger.Info("Enabling CloudWatch")
 
 	// Setup polling to retrieve metrics
@@ -249,4 +258,30 @@ func (a *adapter) SendMetricEvent(metricOutput *cloudwatch.GetMetricDataOutput) 
 	}
 
 	return nil
+}
+
+// peekMetrics verifies that the provided client can read metrics from CloudWatch.
+func peekMetrics(ctx context.Context, cli cloudwatchiface.CloudWatchAPI) error {
+	const oneHourInSeconds = 3600
+
+	_, err := cli.GetMetricDataWithContext(ctx, &cloudwatch.GetMetricDataInput{
+		StartTime: aws.Time(time.Unix(0, 0)),
+		EndTime:   aws.Time(time.Unix(1, 0)),
+		MetricDataQueries: []*cloudwatch.MetricDataQuery{
+			// This query is technically valid but we don't need it
+			// to return any result.
+			{
+				Id: aws.String("peek"),
+				MetricStat: &cloudwatch.MetricStat{
+					Metric: &cloudwatch.Metric{
+						MetricName: aws.String("Peak"),
+						Namespace:  aws.String("TriggerMesh"),
+					},
+					Period: aws.Int64(oneHourInSeconds),
+					Stat:   aws.String(cloudwatch.StatisticSum),
+				},
+			},
+		},
+	})
+	return err
 }

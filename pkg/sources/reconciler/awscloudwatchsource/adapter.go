@@ -41,6 +41,8 @@ const (
 
 const defaultPollingInterval = 5 * time.Minute
 
+const healthPortName = "health"
+
 // adapterConfig contains properties used to configure the source's adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
@@ -78,6 +80,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+
+		resource.Port(healthPortName, 8080),
+		resource.StartupProbe("/health", healthPortName),
 	)
 }
 

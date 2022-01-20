@@ -18,6 +18,7 @@ package awscloudwatchlogssource
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -36,6 +37,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -75,7 +77,6 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	var err error
 	logger := logging.FromContext(ctx)
 
 	env := envAcc.(*envConfig)
@@ -128,6 +129,14 @@ func ExtractLogDetails(details string) (string, string) {
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
+	go health.Start(ctx)
+
+	if err := peekLogGroup(ctx, a.cwLogsClient, a.logGroup); err != nil {
+		return fmt.Errorf("unable to access log group %q: %w", a.logGroup, err)
+	}
+
+	health.MarkReady()
+
 	a.logger.Info("Enabling CloudWatchLog")
 
 	// Setup polling to retrieve metrics
@@ -229,4 +238,13 @@ func (a *adapter) CollectLogs(priorTime *time.Time, currentTime time.Time) {
 	if err != nil {
 		a.logger.Errorf("error retrieving log streams: %v", zap.Error(err))
 	}
+}
+
+// peekLogGroup verifies that a log group exists.
+func peekLogGroup(ctx context.Context, cli cloudwatchlogsiface.CloudWatchLogsAPI, logGroup string) error {
+	_, err := cli.DescribeLogStreamsWithContext(ctx, &cloudwatchlogs.DescribeLogStreamsInput{
+		LogGroupName: &logGroup,
+		Limit:        aws.Int64(1),
+	})
+	return err
 }

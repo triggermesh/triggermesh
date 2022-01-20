@@ -63,7 +63,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.Port(healthPortName, 8080),
 		resource.Port("metrics", 9090),
 
-		resource.Probe("/health", healthPortName),
+		resource.StartupProbe("/health", healthPortName),
 
 		// CPU throttling can be observed below a limit of 1,
 		// although the CPU usage under load remains below 400m.
