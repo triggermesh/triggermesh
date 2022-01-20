@@ -104,16 +104,18 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
-	a.emitToSink(ctx, event)
+	if err := a.emitToSink(ctx, event); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+	}
 
 	return &event, cloudevents.ResultACK
 }
 
 func (a *Adapter) emitToSink(ctx context.Context, event cloudevents.Event) error {
-
-	a.ceClient.Send(ctx, event)
+	if err := a.ceClient.Send(ctx, event); err != nil {
+		return err
+	}
 	return nil
-
 }
 
 func isValidXML(data []byte) bool {

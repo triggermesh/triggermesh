@@ -37,4 +37,6 @@ const (
 	ReasonRBACNotBound = "RBACNotBound"
 	// ReasonUnavailable is set on a Deployed condition when an adapter in unavailable.
 	ReasonUnavailable = "AdapterUnavailable"
+	// credentials can't be found.
+	ReasonNotFound = "NotFound"
 )
