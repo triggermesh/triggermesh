@@ -28,6 +28,7 @@ package xmltmtojson
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -68,7 +69,7 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	var trnsClient dynamic.ResourceInterface
 	var trans *unstructured.Unstructured
 	var err error
-	// var transURL *url.URL
+	var transURL *url.URL
 
 	// 	Context("a Transformation is deployed" ...
 	//   When("a XML payload is sent" ...
@@ -87,26 +88,29 @@ var _ = Describe("XMLToJSON Transformation", func() {
 			By("creating an transformation object", func() {
 				gvr := transAPIVersion.WithResource(transformationResource)
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-				trans, err = createTransformation(trnsClient, ns, "test-xmltojson")
+				trans, err = createTransformation(trnsClient, ns, "test-xmltojson", sink)
 
 				Expect(err).ToNot(HaveOccurred())
 
 				ducktypes.WaitUntilReady(f.DynamicClient, trans)
-
-				// FIXME(antoineco): without this short pause, the receive adapter throws the following
-				// error when sending the event:
-				//
-				//   Sending CodeCommit event
-				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
-				//
 				time.Sleep(2 * time.Second)
+				transURL = ducktypes.Address(trans)
+				Expect(transURL).ToNot(BeNil())
+
 			})
 
 		})
 		When("a XML payload is sent", func() {
 			It("should be created", func() {
 				Expect(1).To(Equal(1))
+				// sentEvent := e2ece.NewXMLHelloEvent(f)
+				// job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
+				// apps.WaitForCompletion(f.KubeClient, job)
 			})
+			// sentEvent := e2ece.NewXMLHelloEvent(f)
+			// job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
+			// apps.WaitForCompletion(f.KubeClient, job)
+
 		})
 		//   When("a non XML payload is sent" ...
 		//     It("responds with an error event" ...
@@ -202,13 +206,16 @@ var _ = Describe("XMLToJSON Transformation", func() {
 })
 
 // createTransformation creates an AWSKinesis object initialized with the given options.
-func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string) (*unstructured.Unstructured, error) {
+func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string, sink *duckv1.Destination) (*unstructured.Unstructured, error) {
 	trns := &unstructured.Unstructured{}
 	trns.SetAPIVersion(transAPIVersion.String())
 	trns.SetKind(transformationKind)
 	trns.SetNamespace(namespace)
 	trns.SetGenerateName(namePrefix)
-	// trns.Object["spec"] = map[string]interface{}{"K_SINK": sink}
+
+	if err := unstructured.SetNestedMap(trns.Object, ducktypes.DestinationToMap(sink), "spec", "sink"); err != nil {
+		framework.FailfWithOffset(2, "Failed to set spec.sink field: %s", err)
+	}
 
 	return trnsClient.Create(context.Background(), trns, metav1.CreateOptions{})
 }
