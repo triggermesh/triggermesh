@@ -53,7 +53,8 @@ type XMLToJSONTransformationSpec struct {
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
-	duckv1.SourceSpec `json:"sink,omitempty"`
+	// Sink is a reference to an object that will resolve to a uri to use as the sink.
+	Sink duckv1.Destination `json:"sink,omitempty"`
 }
 
 // EventOptions modifies CloudEvents management at Targets.
