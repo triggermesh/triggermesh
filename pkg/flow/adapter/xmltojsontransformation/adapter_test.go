@@ -86,9 +86,7 @@ func TestSink(t *testing.T) {
 					assert.FailNow(t, "could not start test adapter")
 				}
 			}()
-
 			sendCE(&tc.inEvent, c, svr.URL)
-
 		})
 	}
 }

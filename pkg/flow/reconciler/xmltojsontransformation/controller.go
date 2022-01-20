@@ -26,7 +26,6 @@ import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
 	"knative.dev/pkg/resolver"
 	servingclient "knative.dev/serving/pkg/client/injection/client"
 	serviceinformerv1 "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
@@ -58,7 +57,6 @@ func NewController(
 	}
 
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	r.sinkResolver = resolver.NewURIResolverFromTracker(ctx, impl.Tracker)
 	syncInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
