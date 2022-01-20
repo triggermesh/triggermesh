@@ -74,8 +74,6 @@ var _ = Describe("AWS S3 target", func() {
 	var trgtClient dynamic.ResourceInterface
 
 	var bucketARN string
-	var bucketName string
-	var awsCreds credentials.Value
 	var awsSecret *corev1.Secret
 
 	BeforeEach(func() {
@@ -88,6 +86,11 @@ var _ = Describe("AWS S3 target", func() {
 	Context("a target is deployed", func() {
 		var trgtURL *url.URL
 		var s3Client *s3.S3
+
+		var sentEvent *cloudevents.Event
+
+		var bucketName string
+		var awsCreds credentials.Value
 
 		BeforeEach(func() {
 			sess := session.Must(session.NewSession())
@@ -124,7 +127,6 @@ var _ = Describe("AWS S3 target", func() {
 			})
 
 			When("an event is sent to the target", func() {
-				var sentEvent *cloudevents.Event
 
 				BeforeEach(func() {
 					By("sending an event", func() {
@@ -139,7 +141,7 @@ var _ = Describe("AWS S3 target", func() {
 					var receivedObj []byte
 					var err error
 
-					By("polling the bucket objects", func() {
+					By("listing the bucket objects", func() {
 						receivedObjs := e2es3.GetObjects(s3Client, bucketName)
 						Expect(receivedObjs).To(HaveLen(1),
 							"Received %d objects instead of 1", len(receivedObjs))
@@ -189,8 +191,6 @@ var _ = Describe("AWS S3 target", func() {
 				})
 			})
 			When("an event is sent to the target", func() {
-				var sentEvent *cloudevents.Event
-
 				BeforeEach(func() {
 					By("sending an event", func() {
 						sentEvent = e2ece.NewHelloEvent(f)
@@ -204,7 +204,7 @@ var _ = Describe("AWS S3 target", func() {
 					var receivedObj []byte
 					var err error
 
-					By("polling the bucket objects", func() {
+					By("listing the bucket objects", func() {
 						receivedObjs := e2es3.GetObjects(s3Client, bucketName)
 						Expect(receivedObjs).To(HaveLen(1),
 							"Received %d objects instead of 1", len(receivedObjs))
@@ -226,7 +226,7 @@ var _ = Describe("AWS S3 target", func() {
 		// Those tests do not require a real bucketARN or awsSecret
 		BeforeEach(func() {
 			bucketARN = "arn:aws:s3:eu-central-1:000000000000:test"
-			awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
+			awsSecret = &corev1.Secret{}
 		})
 
 		// Here we use
@@ -267,7 +267,7 @@ var _ = Describe("AWS S3 target", func() {
 	})
 })
 
-// createTarget creates an AWSS3 object initialized with the given options.
+// createTarget creates an AWSS3Target object initialized with the given options.
 func createTarget(trgtClient dynamic.ResourceInterface, namespace, namePrefix string, opts ...targetOption) (*unstructured.Unstructured, error) {
 
 	trgt := &unstructured.Unstructured{}
