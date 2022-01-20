@@ -454,11 +454,7 @@ func (in *XMLToJSONTransformationSpec) DeepCopy() *XMLToJSONTransformationSpec {
 func (in *XMLToJSONTransformationStatus) DeepCopyInto(out *XMLToJSONTransformationStatus) {
 	*out = *in
 	in.SourceStatus.DeepCopyInto(&out.SourceStatus)
-	if in.Address != nil {
-		in, out := &in.Address, &out.Address
-		*out = new(v1.Addressable)
-		(*in).DeepCopyInto(*out)
-	}
+	in.AddressStatus.DeepCopyInto(&out.AddressStatus)
 	return
 }
 
