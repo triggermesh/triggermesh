@@ -31,13 +31,21 @@ const (
 	AzureBlobStorageURL = ".blob.core.windows.net/"
 )
 
-// CreateBlobStorageAccount provides a wrapper to support blob storage test
-func CreateBlobStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName, region string) armstorage.StorageAccount {
+// CreateBlobStorageAccount creates an Azure storage account in the given
+// resource group and region.
+// Because storage account names are globally unique, this helper generates a
+// random name to reduce the risk of running into naming conflicts.
+func CreateBlobStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, rgName, region string) armstorage.StorageAccount {
+	const maxStorAccNameLen = 24
+	const stoAccNamePrefix = "tme2e"
+
+	name := stoAccNamePrefix + randAlphanumString(maxStorAccNameLen-len(stoAccNamePrefix))
+
 	return CreateStorageAccountCommon(ctx, cli, name, rgName, region, true)
 }
 
 // CreateBlobContainer will create a new blob storage container
-func CreateBlobContainer(ctx context.Context, rg string, sa armstorage.StorageAccount, subscriptionID, name string) armstorage.BlobContainer {
+func CreateBlobContainer(ctx context.Context, rg, saName, subscriptionID, name string) armstorage.BlobContainer {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
@@ -45,7 +53,7 @@ func CreateBlobContainer(ctx context.Context, rg string, sa armstorage.StorageAc
 
 	client := armstorage.NewBlobContainersClient(subscriptionID, cred, nil)
 
-	resp, err := client.Create(ctx, rg, *sa.Name, name, armstorage.BlobContainer{}, nil)
+	resp, err := client.Create(ctx, rg, saName, name, armstorage.BlobContainer{}, nil)
 	if err != nil {
 		framework.FailfWithOffset(2, "Unable to create blob container: %s", err)
 	}
@@ -54,13 +62,13 @@ func CreateBlobContainer(ctx context.Context, rg string, sa armstorage.StorageAc
 }
 
 // UploadBlob will upload a new chunk of data to the blob storage
-func UploadBlob(ctx context.Context, container armstorage.BlobContainer, sa armstorage.StorageAccount, name string, data string) {
+func UploadBlob(ctx context.Context, containerName, saName, name, data string) {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
 	}
 
-	url := "https://" + *sa.Name + AzureBlobStorageURL + *container.Name
+	url := "https://" + saName + AzureBlobStorageURL + containerName
 	containerClient, err := azblob.NewContainerClient(url, cred, nil)
 	if err != nil {
 		framework.FailfWithOffset(2, "Unable to obtain blob client: %s", err)
@@ -76,13 +84,13 @@ func UploadBlob(ctx context.Context, container armstorage.BlobContainer, sa arms
 }
 
 // DeleteBlob will delete the blob located at the name location
-func DeleteBlob(ctx context.Context, container armstorage.BlobContainer, sa armstorage.StorageAccount, name string) {
+func DeleteBlob(ctx context.Context, containerName, saName, name string) {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
 	}
 
-	url := "https://" + *sa.Name + AzureBlobStorageURL + *container.Name
+	url := "https://" + saName + AzureBlobStorageURL + containerName
 	containerClient, err := azblob.NewContainerClient(url, cred, nil)
 	if err != nil {
 		framework.FailfWithOffset(2, "Unable to obtain blob client: %s", err)
