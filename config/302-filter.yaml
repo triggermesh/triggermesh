@@ -18,6 +18,15 @@ metadata:
   name: filters.routing.triggermesh.io
   labels:
     triggermesh.io/crd-install: "true"
+  annotations:
+    registry.triggermesh.io/acceptedEventTypes: |
+      [
+        { "type": "*" }
+      ]
+    registry.knative.dev/eventTypes: |
+      [
+        { "type": "*" }
+      ]
 spec:
   group: routing.triggermesh.io
   scope: Namespaced

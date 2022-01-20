@@ -111,8 +111,9 @@ var _ = Describe("Google Cloud Audit Logs source", func() {
 				// FIXME: We observed that audit logs generated shortly after the source reports "Ready"
 				// weren't sent to the Pub/Sub topic observed by the receive adapter. It is likely that
 				// the Audit Logs Router Sink reconciled by the source starts routing audit logs after a
-				// delay (10-30s), so we virtually delay the next test steps here as well.
-				time.Sleep(30 * time.Second)
+				// delay (10-150s), so we virtually delay the next test steps here as well.
+				// https://github.com/triggermesh/triggermesh/issues/469
+				time.Sleep(150 * time.Second)
 			})
 		})
 

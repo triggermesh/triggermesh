@@ -42,21 +42,21 @@ type adapterConfig struct {
 	Image string `envconfig:"XMLTOJSONTRANSFORMATION_IMAGE" default:"gcr.io/triggermesh/xmltojsontransformation-adapter"`
 }
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(target)
+// makeAdapterKService generates (but does not insert into K8s) the Synchronizer Adapter KService.
+func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig) *servingv1.Service {
+	name := kmeta.ChildName(adapterName+"-", o.Name)
+	lbl := libreconciler.MakeAdapterLabels(adapterName, o.Name)
+	podLabels := libreconciler.MakeAdapterLabels(adapterName, o.Name)
+	envSvc := libreconciler.MakeServiceEnv(name, o.Namespace)
+	envApp := makeAppEnv(o)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
+	return resources.MakeKService(o.Namespace, name, cfg.Image,
 		resources.KsvcLabels(lbl),
 		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
+		resources.KsvcOwner(o),
 		resources.KsvcPodLabels(podLabels),
 		resources.KsvcPodEnvVars(envs),
 	)
@@ -67,6 +67,10 @@ func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
 		{
 			Name:  libreconciler.EnvBridgeID,
 			Value: libreconciler.GetStatefulBridgeID(o),
+		},
+		{
+			Name:  "K_SINK",
+			Value: o.Status.SinkURI.String(),
 		},
 	}
 
