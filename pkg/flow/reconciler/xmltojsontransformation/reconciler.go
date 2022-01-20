@@ -23,13 +23,11 @@ import (
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	base common.GenericDeploymentReconciler
 	// adapter properties
 	adapterCfg *adapterConfig
 
@@ -42,9 +40,7 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XMLToJSONTransformation) pkgreconciler.Event {
-	sink, _ := r.base.SinkResolver.URIFromDestinationV1(ctx, trg.Spec.Sink, trg)
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg, sink))
+	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
 
 	trg.Status.PropagateKServiceAvailability(adapter)
 

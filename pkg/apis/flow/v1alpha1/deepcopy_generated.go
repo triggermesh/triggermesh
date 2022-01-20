@@ -300,7 +300,7 @@ func (in *XMLToJSONTransformationSpec) DeepCopyInto(out *XMLToJSONTransformation
 		*out = new(EventOptions)
 		(*in).DeepCopyInto(*out)
 	}
-	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	in.Sink.DeepCopyInto(&out.Sink)
 	return
 }
 

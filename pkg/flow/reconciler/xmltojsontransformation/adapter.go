@@ -20,7 +20,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
-	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
@@ -44,21 +43,16 @@ type adapterConfig struct {
 }
 
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig, sinkURI *apis.URL) *servingv1.Service {
+func makeTargetAdapterKService(target *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
+	envApp := makeAppEnv(target)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-
-	var sinkURIStr string
-	if sinkURI != nil {
-		sinkURIStr = sinkURI.String()
-	}
-
-	envApp := makeAppEnv(target, sinkURIStr)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
+
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
 		resources.KsvcLabels(lbl),
 		resources.KsvcLabelVisibilityClusterLocal,
@@ -68,8 +62,7 @@ func makeTargetAdapterKService(target *v1alpha1.XMLToJSONTransformation, cfg *ad
 	)
 }
 
-func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink string) []corev1.EnvVar {
-
+func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  libreconciler.EnvBridgeID,
@@ -77,7 +70,7 @@ func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink string) []corev1.EnvVa
 		},
 		{
 			Name:  "K_SINK",
-			Value: sink,
+			Value: o.Spec.Sink.URI.String(),
 		},
 	}
 
