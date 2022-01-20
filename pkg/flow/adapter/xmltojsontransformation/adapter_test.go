@@ -18,13 +18,18 @@ package xmltojsontransformation
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
+	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 )
@@ -41,14 +46,60 @@ const (
 	tFalseXMLResponse = `{"Code":"request-validation","Description":"invalid XML","Details":null}`
 )
 
-func TestXSLTTransformEvents(t *testing.T) {
+func TestSink(t *testing.T) {
+	testCases := map[string]struct {
+		inEvent     cloudevents.Event
+		expectEvent cloudevents.Event
+	}{
+		"sink ok": {
+			inEvent:     newCloudEvent(tXML1, cloudevents.ApplicationXML),
+			expectEvent: newCloudEvent(tJSONOutput1, cloudevents.ApplicationJSON),
+		},
+	}
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			ctx := context.Background()
+			c, err := cloudevents.NewClientHTTP()
+			if err != nil {
+				log.Fatalf("failed to create client, %v", err)
+			}
+
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				body, err := ioutil.ReadAll(r.Body)
+				assert.NoError(t, err)
+				assert.Equal(t, tXML1, string(body))
+				fmt.Fprintf(w, "OK")
+			}))
+			defer svr.Close()
+
+			env := &envAccessor{
+				EnvConfig: adapter.EnvConfig{
+					Component: tCloudEventSource,
+					Sink:      svr.URL,
+				},
+			}
+
+			a := NewAdapter(ctx, env, c)
+
+			go func() {
+				if err := a.Start(ctx); err != nil {
+					assert.FailNow(t, "could not start test adapter")
+				}
+			}()
+
+			sendCE(&tc.inEvent, c, svr.URL)
+
+		})
+	}
+}
+
+func TestXMLTransformEvents(t *testing.T) {
 	testCases := map[string]struct {
 		inEvent     cloudevents.Event
 		expectEvent cloudevents.Event
 	}{
 		"transform ok": {
-			inEvent: newCloudEvent(tXML1, cloudevents.ApplicationXML),
-
+			inEvent:     newCloudEvent(tXML1, cloudevents.ApplicationXML),
 			expectEvent: newCloudEvent(tJSONOutput1, cloudevents.ApplicationJSON),
 		},
 		"transform error": {
@@ -73,7 +124,9 @@ func TestXSLTTransformEvents(t *testing.T) {
 			a := NewAdapter(ctx, env, ceClient)
 
 			go func() {
-				require.NoError(t, a.Start(ctx))
+				if err := a.Start(ctx); err != nil {
+					assert.FailNow(t, "could not start test adapter")
+				}
 			}()
 
 			send <- tc.inEvent
@@ -95,15 +148,33 @@ type cloudEventOptions func(*cloudevents.Event)
 
 func newCloudEvent(data, contentType string, opts ...cloudEventOptions) cloudevents.Event {
 	event := cloudevents.NewEvent()
+	event.SetID(tCloudEventID)
+	event.SetType(tCloudEventType)
+	event.SetSource(tCloudEventSource)
 
 	if err := event.SetData(contentType, []byte(data)); err != nil {
 		// not expected
 		panic(err)
 	}
 
-	event.SetID(tCloudEventID)
-	event.SetType(tCloudEventType)
-	event.SetSource(tCloudEventSource)
-
 	return event
+}
+
+func sendCE(event *cloudevents.Event, cs cloudevents.Client, sink string) protocol.Result {
+
+	// event :=  cloudevents.NewEvent()
+	// event.SetSource("example/uri")
+	// event.SetType("example.type")
+	// event.SetData(cloudevents.ApplicationJSON, map[string]string{"hello": "world"})
+
+	// Set a target.
+	ctx := cloudevents.ContextWithTarget(context.Background(), sink)
+	c, err := cloudevents.NewClientHTTP()
+	if err != nil {
+		log.Fatalf("failed to create client, %v", err)
+	}
+	// Send that Event.
+	result := c.Send(ctx, *event)
+
+	return result
 }

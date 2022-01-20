@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io/ioutil"
 
 	"go.uber.org/zap"
@@ -46,6 +47,10 @@ type envAccessor struct {
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
+	// Sink defines the target sink for the events. If no Sink is defined the
+	// events are replied back to the sender.
+	// +optional
+	Sink *string `envconfig:"K_SINK"`
 }
 
 // NewAdapter adapter implementation
@@ -60,8 +65,10 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
+	fmt.Println(env.Sink)
 
 	return &Adapter{
+		sink:     env.Sink,
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
@@ -71,6 +78,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 var _ pkgadapter.Adapter = (*Adapter)(nil)
 
 type Adapter struct {
+	sink     *string
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
@@ -104,18 +112,16 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
-	if err := a.emitToSink(ctx, event); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+	fmt.Println(a.sink)
+
+	if a.sink != nil {
+		if err := a.ceClient.Send(ctx, event); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+		return nil, cloudevents.ResultACK
 	}
 
 	return &event, cloudevents.ResultACK
-}
-
-func (a *Adapter) emitToSink(ctx context.Context, event cloudevents.Event) error {
-	if err := a.ceClient.Send(ctx, event); err != nil {
-		return err
-	}
-	return nil
 }
 
 func isValidXML(data []byte) bool {
