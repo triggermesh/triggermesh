@@ -19,7 +19,7 @@ package alibabaosstarget
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"io"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"go.uber.org/zap"
@@ -53,6 +53,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	return &ossAdapter{
 		oClient: client,
 		bucket:  env.Bucket,
+		pof:     PutObject,
 
 		replier:  replier,
 		ceClient: ceClient,
@@ -65,10 +66,28 @@ var _ pkgadapter.Adapter = (*ossAdapter)(nil)
 type ossAdapter struct {
 	oClient *oss.Client
 	bucket  string
+	pof     func(oclient *oss.Client, objectKey string, reader io.Reader, event cloudevents.Event, bucketName string) error
 
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+}
+
+func PutObject(oclient *oss.Client, objectKey string, reader io.Reader, event cloudevents.Event, bucketName string) error {
+	bucket, err := oclient.Bucket(bucketName)
+	if err != nil {
+		return err
+	}
+
+	if bucket == nil {
+		return err
+	}
+
+	if err = bucket.PutObject(event.ID(), bytes.NewReader(event.Data())); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Returns if stopCh is closed or Send() returns an error.
@@ -78,19 +97,8 @@ func (a *ossAdapter) Start(ctx context.Context) error {
 }
 
 func (a *ossAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-
-	bucket, err := a.oClient.Bucket(a.bucket)
-	if err != nil {
+	if err := a.pof(a.oClient, event.ID(), bytes.NewReader(event.Data()), event, a.bucket); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
-
-	if bucket == nil {
-		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, fmt.Errorf("no bucket returned"), nil)
-	}
-
-	if err = bucket.PutObject(event.ID(), bytes.NewReader(event.Data())); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
-	}
-
 	return a.replier.Ok(&event, "ok")
 }
