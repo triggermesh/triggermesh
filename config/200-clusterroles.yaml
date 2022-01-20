@@ -220,7 +220,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - synchronizers
   - transformations
   - xmltojsontransformations
   - xslttransforms
@@ -232,7 +231,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - synchronizers/status
   - transformations/status
   - xmltojsontransformations/status
   - xslttransforms/status
@@ -356,7 +354,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - synchronizers/finalizers
   - transformations/finalizers
   - xmltojsontransformations/finalizers
   - xslttransforms/finalizers
@@ -838,7 +835,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - synchronizers
   - transformations
   - xmltojsontransformations
   - xslttransforms
