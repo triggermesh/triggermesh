@@ -57,7 +57,6 @@ func NewController(
 	}
 
 	impl := confluenttarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	confluentTargetInformer := confluenttargetinformer.Get(ctx)
 	confluentTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

@@ -60,7 +60,6 @@ func NewController(
 	}
 
 	impl := twiliotarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	twilioTargetInformer := twiliotargetinformer.Get(ctx)
 	twilioTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

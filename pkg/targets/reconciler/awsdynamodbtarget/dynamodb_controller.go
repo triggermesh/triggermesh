@@ -25,7 +25,6 @@ import (
 	kubeclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	awsdynamodbtargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/awsdynamodbtarget"
@@ -56,7 +55,6 @@ func NewController(
 		vg:         libreconciler.NewValueGetter(kubeclient.Get(ctx)),
 		adapterCfg: adapterCfg,
 	})
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	awsTargetInformer := awsdynamodbtargetinformer.Get(ctx)
 	awsTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

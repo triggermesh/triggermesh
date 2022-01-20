@@ -24,7 +24,6 @@ import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
 	kserviceclient "knative.dev/serving/pkg/client/injection/client"
 	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
@@ -52,7 +51,6 @@ func NewController(
 	envconfig.MustProcess("", r)
 
 	impl := slacktarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	slackTargetInformer := slacktargetinformer.Get(ctx)
 	slackTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
