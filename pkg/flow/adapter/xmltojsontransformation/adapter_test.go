@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -52,18 +51,12 @@ func TestSink(t *testing.T) {
 		expectEvent cloudevents.Event
 	}{
 		"sink ok": {
-			inEvent:     newCloudEvent(tXML1, cloudevents.ApplicationXML),
-			expectEvent: newCloudEvent(tJSONOutput1, cloudevents.ApplicationJSON),
+			inEvent:     newCloudEvent(t, tXML1, cloudevents.ApplicationXML),
+			expectEvent: newCloudEvent(t, tJSONOutput1, cloudevents.ApplicationJSON),
 		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			ctx := context.Background()
-			c, err := cloudevents.NewClientHTTP()
-			if err != nil {
-				log.Fatalf("failed to create client, %v", err)
-			}
-
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				body, err := ioutil.ReadAll(r.Body)
 				assert.NoError(t, err)
@@ -78,6 +71,9 @@ func TestSink(t *testing.T) {
 					Sink:      svr.URL,
 				},
 			}
+			ctx := context.Background()
+			c, err := cloudevents.NewClientHTTP()
+			assert.NoError(t, err)
 
 			a := NewAdapter(ctx, env, c)
 
@@ -87,7 +83,7 @@ func TestSink(t *testing.T) {
 				}
 			}()
 
-			response := sendCE(&tc.inEvent, c, svr.URL)
+			response := sendCE(t, &tc.inEvent, c, svr.URL)
 			assert.NotEqual(t, cloudevents.IsUndelivered(response), response)
 		})
 	}
@@ -99,13 +95,13 @@ func TestXMLTransformEvents(t *testing.T) {
 		expectEvent cloudevents.Event
 	}{
 		"transform ok": {
-			inEvent:     newCloudEvent(tXML1, cloudevents.ApplicationXML),
-			expectEvent: newCloudEvent(tJSONOutput1, cloudevents.ApplicationJSON),
+			inEvent:     newCloudEvent(t, tXML1, cloudevents.ApplicationXML),
+			expectEvent: newCloudEvent(t, tJSONOutput1, cloudevents.ApplicationJSON),
 		},
 		"transform error": {
-			inEvent: newCloudEvent(tFalseXML, cloudevents.ApplicationXML),
+			inEvent: newCloudEvent(t, tFalseXML, cloudevents.ApplicationXML),
 
-			expectEvent: newCloudEvent(tFalseXMLResponse, cloudevents.ApplicationXML),
+			expectEvent: newCloudEvent(t, tFalseXMLResponse, cloudevents.ApplicationXML),
 		},
 	}
 
@@ -146,35 +142,21 @@ func TestXMLTransformEvents(t *testing.T) {
 
 type cloudEventOptions func(*cloudevents.Event)
 
-func newCloudEvent(data, contentType string, opts ...cloudEventOptions) cloudevents.Event {
+func newCloudEvent(t *testing.T, data, contentType string, opts ...cloudEventOptions) cloudevents.Event {
 	event := cloudevents.NewEvent()
 	event.SetID(tCloudEventID)
 	event.SetType(tCloudEventType)
 	event.SetSource(tCloudEventSource)
-
-	if err := event.SetData(contentType, []byte(data)); err != nil {
-		// not expected
-		panic(err)
-	}
-
+	err := event.SetData(contentType, []byte(data))
+	assert.NoError(t, err)
 	return event
 }
 
-func sendCE(event *cloudevents.Event, cs cloudevents.Client, sink string) protocol.Result {
-
-	// event :=  cloudevents.NewEvent()
-	// event.SetSource("example/uri")
-	// event.SetType("example.type")
-	// event.SetData(cloudevents.ApplicationJSON, map[string]string{"hello": "world"})
-
-	// Set a target.
+func sendCE(t *testing.T, event *cloudevents.Event, cs cloudevents.Client, sink string) protocol.Result {
 	ctx := cloudevents.ContextWithTarget(context.Background(), sink)
 	c, err := cloudevents.NewClientHTTP()
-	if err != nil {
-		log.Fatalf("failed to create client, %v", err)
-	}
-	// Send that Event.
-	result := c.Send(ctx, *event)
+	assert.NoError(t, err)
 
+	result := c.Send(ctx, *event)
 	return result
 }
