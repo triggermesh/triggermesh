@@ -29,7 +29,6 @@ package xmltmtojson
 import (
 	"context"
 	"net/url"
-	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
@@ -47,6 +46,7 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/apps"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/bridges"
+	e2ece "github.com/triggermesh/triggermesh/test/e2e/framework/cloudevents"
 	"github.com/triggermesh/triggermesh/test/e2e/framework/ducktypes"
 )
 
@@ -85,18 +85,15 @@ var _ = Describe("XMLToJSON Transformation", func() {
 				Expect(sink).NotTo(BeNil())
 			})
 
-			By("creating an transformation object", func() {
+			By("creating a transformation object", func() {
 				gvr := transAPIVersion.WithResource(transformationResource)
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-				trans, err = createTransformation(trnsClient, ns, "test-xmltojson", sink)
-
+				trans, err = createTransformation(trnsClient, ns, "test-xmltojson-", sink)
 				Expect(err).ToNot(HaveOccurred())
 
-				ducktypes.WaitUntilReady(f.DynamicClient, trans)
-				time.Sleep(2 * time.Second)
+				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
 				transURL = ducktypes.Address(trans)
 				Expect(transURL).ToNot(BeNil())
-
 			})
 
 		})
@@ -104,104 +101,30 @@ var _ = Describe("XMLToJSON Transformation", func() {
 			It("should be created", func() {
 				Expect(1).To(Equal(1))
 				// sentEvent := e2ece.NewXMLHelloEvent(f)
-				// job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
-				// apps.WaitForCompletion(f.KubeClient, job)
+				// job := e2ece.RunXMLEventSender(f.KubeClient, ns, transURL.String()+":8080", sentEvent)
+				sentEvent := e2ece.NewHelloEvent(f)
+				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
+				apps.WaitForCompletion(f.KubeClient, job)
 			})
-			// sentEvent := e2ece.NewXMLHelloEvent(f)
-			// job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
-			// apps.WaitForCompletion(f.KubeClient, job)
+
+			// It("should generate an event at the sink", func() {
+
+			// 	var receivedEvents []cloudevents.Event
+
+			// 	readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
+
+			// 	Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
+			// 	Expect(receivedEvents).To(HaveLen(1))
+
+			// 	e := receivedEvents[0]
+			// 	Expect(e.Type()).To(Equal("com.amazon.codecommit.push"))
+			// 	Expect(e.Source()).To(Equal(repoARN))
+			// 	Expect(e.Subject()).To(Equal(e2ecodecommit.DefaultBranch))
+			// })
 
 		})
-		//   When("a non XML payload is sent" ...
-		//     It("responds with an error event" ...
 
 	})
-
-	// BeforeEach(func() {
-	// 	ns = f.UniqueName
-
-	// 	By("creating an event sink", func() {
-	// 		sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
-	// 		fmt.Println(sink)
-	// 	})
-
-	// By("creating an transformation object", func() {
-	// 	gvr := transAPIVersion.WithResource(transformationResource)
-	// 	trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-	// 	trans, err = createTransformation(trnsClient, ns, "test-xmltojson-")
-
-	// 	Expect(err).ToNot(HaveOccurred())
-
-	// 	ducktypes.WaitUntilReady(f.DynamicClient, trans)
-
-	// 	// FIXME(antoineco): without this short pause, the receive adapter throws the following
-	// 	// error when sending the event:
-	// 	//
-	// 	//   Sending CodeCommit event
-	// 	//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
-	// 	//
-	// 	time.Sleep(2 * time.Second)
-	// })
-
-	// 	// By("recieves an XML cloudevent", func() {
-	// 	// 	sentEvent := e2ece.NewXMLHelloEvent(f)
-
-	// 	// 	trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
-
-	// 	// 	transURL = ducktypes.Address(trans)
-	// 	// 	Expect(transURL).ToNot(BeNil())
-	// 	// 	transURL = ducktypes.Address(trans)
-	// 	// 	Expect(transURL).ToNot(BeNil())
-
-	// 	// 	job := e2ece.RunXMLEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
-	// 	// 	apps.WaitForCompletion(f.KubeClient, job)
-
-	// 	// })
-	// })
-
-	// When("test client", func() {
-	// 	Expect(1).To(Equal(1))
-	// })
-
-	// BeforeEach(func() {
-
-	// var transURL *url.URL
-	// var trans *unstructured.Unstructured
-
-	// Expect(sink).NotTo(BeNil())
-
-	// It("creates sink", func() {
-
-	// 	createTransformation(trnsClient, ns, "test-xmltojson-")
-	// })
-
-	// Expect(err).To(nil)
-
-	// It("recieves an XML cloudevent", func() {
-	// 	sentEvent := e2ece.NewXMLHelloEvent(f)
-
-	// 	trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
-
-	// 	transURL = ducktypes.Address(trans)
-	// 	Expect(transURL).ToNot(BeNil())
-
-	// 	job := e2ece.RunXMLEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
-	// 	apps.WaitForCompletion(f.KubeClient, job)
-
-	// })
-
-	// // malnamed
-	// By("sink reciving events", func() {
-	// 	const receiveTimeout = 15 * time.Second
-	// 	const pollInterval = 500 * time.Millisecond
-
-	// 	var receivedEvents []cloudevents.Event
-
-	// 	readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
-
-	// 	Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
-	// 	Expect(receivedEvents).To(HaveLen(1))
-	// })
 
 })
 

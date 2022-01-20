@@ -111,7 +111,7 @@ func RunXMLEventSender(c clientset.Interface, namespace, url string, payload *cl
 
 		// In Structured Content Mode, the entire payload is sent in the request body.
 		// https://github.com/cloudevents/spec/blob/v1.0/http-protocol-binding.md#32-structured-content-mode
-		"-H", http.ContentType + ": " + cloudevents.ApplicationCloudEventsJSON,
+		"-H", http.ContentType + ": " + cloudevents.ApplicationXML,
 		"--data-raw", string(payload.Data()),
 
 		url,
