@@ -172,6 +172,37 @@ var _ = Describe("AWS S3 target", func() {
 					})
 				})
 			})
+			When("an event with specific type is sent to the target", func() {
+
+				BeforeEach(func() {
+					By("sending an event with type io.triggermesh.awss3.object.put", func() {
+						sentEvent = e2ece.NewHelloEvent(f)
+						sentEvent.SetType("io.triggermesh.awss3.object.put")
+
+						job := e2ece.RunEventSender(f.KubeClient, ns, trgtURL.String(), sentEvent)
+						apps.WaitForCompletion(f.KubeClient, job)
+					})
+				})
+
+				It("only puts the event's data onto the bucket object", func() {
+					var receivedObj []byte
+					var err error
+
+					By("listing the bucket objects", func() {
+						receivedObjs := e2es3.GetObjects(s3Client, bucketName)
+						Expect(receivedObjs).To(HaveLen(1),
+							"Received %d objects instead of 1", len(receivedObjs))
+
+						object := *receivedObjs[0]
+						receivedObj, err = ioutil.ReadAll(object.Body)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					By("inspecting the object payload", func() {
+						Expect(receivedObj).To(Equal(sentEvent.Data()))
+					})
+				})
+			})
 		})
 
 		When("the CloudEvent context is discarded", func() {
