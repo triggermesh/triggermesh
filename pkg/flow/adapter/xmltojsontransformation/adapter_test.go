@@ -74,7 +74,6 @@ func TestSink(t *testing.T) {
 			ctx := context.Background()
 			c, err := cloudevents.NewClientHTTP()
 			assert.NoError(t, err)
-
 			a := NewAdapter(ctx, env, c)
 
 			go func() {
@@ -89,7 +88,7 @@ func TestSink(t *testing.T) {
 	}
 }
 
-func TestXMLTransformEvents(t *testing.T) {
+func TestReplier(t *testing.T) {
 	testCases := map[string]struct {
 		inEvent     cloudevents.Event
 		expectEvent cloudevents.Event

@@ -65,7 +65,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
-	fmt.Println(env.Sink)
 
 	return &Adapter{
 		sink:     env.Sink,
