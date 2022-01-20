@@ -104,7 +104,16 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
+	a.emitToSink(ctx, event)
+
 	return &event, cloudevents.ResultACK
+}
+
+func (a *Adapter) emitToSink(ctx context.Context, event cloudevents.Event) error {
+
+	a.ceClient.Send(ctx, event)
+	return nil
+
 }
 
 func isValidXML(data []byte) bool {

@@ -26,15 +26,15 @@ const (
 	ConditionDeployed apis.ConditionType = "Deployed"
 )
 
-// reasons for conditions
+// Reasons for status conditions
 const (
-	// ReasonUnavailable is set on a ServiceReady condition when an adapter in unavailable.
+	// ReasonSinkNotFound is set on a SinkProvided condition when a sink does not exist.
+	ReasonSinkNotFound = "SinkNotFound"
+	// ReasonSinkEmpty is set on a SinkProvided condition when a sink URI is empty.
+	ReasonSinkEmpty = "EmptySinkURI"
+	// ReasonRBACNotBound is set on a Deployed condition when an adapter's
+	// ServiceAccount cannot be bound.
+	ReasonRBACNotBound = "RBACNotBound"
+	// ReasonUnavailable is set on a Deployed condition when an adapter in unavailable.
 	ReasonUnavailable = "AdapterUnavailable"
-
-	// ReasonResourceUnavailable is set on any object whose condition is  unavailable.
-	ReasonResourceUnavailable = "ResourceUnavailable"
-
-	// ReasonNotFound is set on a SecretsProvided condition when secret
-	// credentials can't be found.
-	ReasonNotFound = "NotFound"
 )
