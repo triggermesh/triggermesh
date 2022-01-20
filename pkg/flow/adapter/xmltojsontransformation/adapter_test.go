@@ -86,7 +86,9 @@ func TestSink(t *testing.T) {
 					assert.FailNow(t, "could not start test adapter")
 				}
 			}()
-			sendCE(&tc.inEvent, c, svr.URL)
+
+			response := sendCE(&tc.inEvent, c, svr.URL)
+			assert.NotEqual(t, cloudevents.IsUndelivered(response), response)
 		})
 	}
 }
