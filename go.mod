@@ -43,7 +43,6 @@ require (
 	github.com/aws/aws-sdk-go v1.42.35
 	github.com/basgys/goxml2json v1.1.0
 	github.com/clbanning/mxj v1.8.4
-	github.com/cloudevents/sdk-go v1.2.0
 	github.com/devigned/tab v0.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
 	github.com/golang-jwt/jwt/v4 v4.2.0
@@ -164,7 +163,6 @@ require (
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
 	github.com/kevinburke/rest v0.0.0-20210506044642-5611499aa33c // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
-	github.com/lightstep/tracecontext.go v0.0.0-20181129014701-1757c391b1ac // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
