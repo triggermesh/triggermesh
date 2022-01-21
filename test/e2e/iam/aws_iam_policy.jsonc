@@ -92,6 +92,20 @@
             ]
         },
         {
+            "Sid": "E2EFrameworkS3",
+            "Effect": "Allow",
+            "Action": [
+                "s3:CreateBucket",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:DeleteBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::e2e-*"
+            ]
+        },
+        {
             "Sid": "AWSCodeCommitSourceReceiveAdapter",
             "Effect": "Allow",
             "Action": [
@@ -176,6 +190,14 @@
                 "dynamodb:GetRecords"
             ],
             "Resource": "arn:aws:dynamodb:*:043455440429:table/e2e-*/stream/*"
+        },
+        {
+            "Sid": "AWSS3TargetReceiveAdapter",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:::e2e-*"
         }
     ]
 }
