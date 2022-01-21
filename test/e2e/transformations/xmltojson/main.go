@@ -48,7 +48,41 @@ var transAPIVersion = schema.GroupVersion{
 const (
 	transformationKind     = "XMLToJSONTransformation"
 	transformationResource = "xmltojsontransformations"
+
+	expectedResponseEvent = "{\"string\":\"\\u003cnote\\u003e\\u003cto\\u003eTove\\u003c/to\\u003e\\u003cfrom\\u003eJani\\u003c/from\\u003e\\u003cheading\\u003eReminder\\u003c/heading\\u003e\\u003cbody\\u003eDont forget me this weekend\\u003c/body\\u003e\\u003c/note\\u003e\"}"
 )
+
+// createTransformation creates an AWSKinesis object initialized with the given options.
+func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string, sink *duckv1.Destination) (*unstructured.Unstructured, error) {
+	trns := &unstructured.Unstructured{}
+	trns.SetAPIVersion(transAPIVersion.String())
+	trns.SetKind(transformationKind)
+	trns.SetNamespace(namespace)
+	trns.SetGenerateName(namePrefix)
+
+	if err := unstructured.SetNestedMap(trns.Object, ducktypes.DestinationToMap(sink), "spec", "sink"); err != nil {
+		framework.FailfWithOffset(2, "Failed to set spec.sink field: %s", err)
+	}
+
+	return trnsClient.Create(context.Background(), trns, metav1.CreateOptions{})
+}
+
+// readReceivedEvents returns a function that reads CloudEvents received by the
+// event-display application and stores the result as the value of the given
+// `receivedEvents` variable.
+// The returned function signature satisfies the contract expected by
+// gomega.Eventually: no argument and one or more return values.
+func readReceivedEvents(c clientset.Interface, namespace, eventDisplayDeplName string,
+	receivedEvents *[]cloudevents.Event) func() []cloudevents.Event {
+
+	return func() []cloudevents.Event {
+		ev := bridges.ReceivedEventDisplayEvents(
+			apps.GetLogs(c, namespace, eventDisplayDeplName),
+		)
+		*receivedEvents = ev
+		return ev
+	}
+}
 
 var _ = Describe("XMLToJSON Transformation", func() {
 	f := framework.New("xmltojsontransformation")
@@ -86,55 +120,19 @@ var _ = Describe("XMLToJSON Transformation", func() {
 				apps.WaitForCompletion(f.KubeClient, job)
 			})
 
-			Specify("should generate an event at the sink", func() {
-				const receiveTimeout = 10 * time.Second
-				const pollInterval = 500 * time.Millisecond
-
+			Specify("should generate a JSON event at the sink", func() {
 				var receivedEvents []cloudevents.Event
-
 				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
 
+				const receiveTimeout = 10 * time.Second
+				const pollInterval = 500 * time.Millisecond
 				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
 				Expect(receivedEvents).To(HaveLen(1))
 
 				e := receivedEvents[0]
 				Expect(e.Type()).To(Equal("e2e.test"))
+				Expect(string(e.DataEncoded)).To(Equal(expectedResponseEvent))
 			})
-
 		})
-
 	})
-
 })
-
-// createTransformation creates an AWSKinesis object initialized with the given options.
-func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string, sink *duckv1.Destination) (*unstructured.Unstructured, error) {
-	trns := &unstructured.Unstructured{}
-	trns.SetAPIVersion(transAPIVersion.String())
-	trns.SetKind(transformationKind)
-	trns.SetNamespace(namespace)
-	trns.SetGenerateName(namePrefix)
-
-	if err := unstructured.SetNestedMap(trns.Object, ducktypes.DestinationToMap(sink), "spec", "sink"); err != nil {
-		framework.FailfWithOffset(2, "Failed to set spec.sink field: %s", err)
-	}
-
-	return trnsClient.Create(context.Background(), trns, metav1.CreateOptions{})
-}
-
-// readReceivedEvents returns a function that reads CloudEvents received by the
-// event-display application and stores the result as the value of the given
-// `receivedEvents` variable.
-// The returned function signature satisfies the contract expected by
-// gomega.Eventually: no argument and one or more return values.
-func readReceivedEvents(c clientset.Interface, namespace, eventDisplayDeplName string,
-	receivedEvents *[]cloudevents.Event) func() []cloudevents.Event {
-
-	return func() []cloudevents.Event {
-		ev := bridges.ReceivedEventDisplayEvents(
-			apps.GetLogs(c, namespace, eventDisplayDeplName),
-		)
-		*receivedEvents = ev
-		return ev
-	}
-}
