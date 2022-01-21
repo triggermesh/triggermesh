@@ -28,8 +28,8 @@ import (
 	_ "github.com/triggermesh/triggermesh/test/e2e/framework"
 
 	// test suites
-	// _ "github.com/triggermesh/triggermesh/test/e2e/sources"
-	// _ "github.com/triggermesh/triggermesh/test/e2e/targets"
+	_ "github.com/triggermesh/triggermesh/test/e2e/sources"
+	_ "github.com/triggermesh/triggermesh/test/e2e/targets"
 	_ "github.com/triggermesh/triggermesh/test/e2e/transformations"
 )
 
