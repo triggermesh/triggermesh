@@ -30,14 +30,12 @@ const (
 )
 
 const (
-	// ConditionReady has status True when the router is ready to send events.
-	ConditionReady = apis.ConditionReady
-	// ConditionSinkProvided has status True when the router has been configured with a sink target.
+
+	// ConditionSinkProvided has status True when the component has been configured with a sink target.
 	ConditionSinkProvided apis.ConditionType = "SinkProvided"
 )
 
 var XMLToJSONCondSet = apis.NewLivingConditionSet(
-	ConditionReady,
 	ConditionSinkProvided,
 	ConditionDeployed,
 )
@@ -52,22 +50,11 @@ func (t *XMLToJSONTransformation) GetConditionSet() apis.ConditionSet {
 	return XMLToJSONCondSet
 }
 
-// InitializeConditions sets the initial values to the conditions.
-func (ts *XMLToJSONTransformationStatus) InitializeConditions() {
-	XMLToJSONCondSet.Manage(ts).InitializeConditions()
-}
-
 // MarkServiceUnavailable marks XMLToJSONTransformation as not ready with ServiceUnavailable reason.
 func (ts *XMLToJSONTransformationStatus) MarkServiceUnavailable(name string) {
 	XMLToJSONCondSet.Manage(ts).MarkFalse(
-		apis.ConditionReady,
 		"ServiceUnavailable",
 		"Service %q is not ready.", name)
-}
-
-// MarkServiceAvailable sets XMLToJSONTransformation condition to ready.
-func (ts *XMLToJSONTransformationStatus) MarkServiceAvailable() {
-	XMLToJSONCondSet.Manage(ts).MarkTrue(apis.ConditionReady)
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
