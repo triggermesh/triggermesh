@@ -97,12 +97,12 @@
             "Action": [
                 "s3:CreateBucket",
                 "s3:GetObject",
-                "s3:ListObjects",
+                "s3:ListBucket",
                 "s3:DeleteBucket",
                 "s3:DeleteObject"
             ],
             "Resource": [
-                "arn:aws:s3:*:043455440429:e2e-*"
+                "arn:aws:s3:::e2e-*"
             ]
         },
         {
@@ -197,7 +197,7 @@
             "Action": [
                 "s3:PutObject"
             ],
-            "Resource": "arn:aws:s3:*:043455440429:e2e-*"
+            "Resource": "arn:aws:s3:::e2e-*"
         }
     ]
 }
