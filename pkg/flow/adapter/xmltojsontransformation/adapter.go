@@ -48,7 +48,6 @@ type envAccessor struct {
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
 	// Sink defines the target sink for the events. If no Sink is defined the
 	// events are replied back to the sender.
-	// +optional
 	Sink string `envconfig:"K_SINK"`
 }
 
