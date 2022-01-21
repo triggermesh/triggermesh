@@ -45,7 +45,7 @@ func TestAdapter(t *testing.T) {
 	testCases := map[string]struct {
 		inEvent cloudevents.Event
 	}{
-		"recieves event": {
+		"Successful request": {
 			inEvent: newEvent(t),
 		},
 	}
