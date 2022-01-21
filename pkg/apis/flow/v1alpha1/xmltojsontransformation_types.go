@@ -47,6 +47,7 @@ var (
 	_ runtime.Object     = (*XMLToJSONTransformation)(nil)
 	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
 	_ duckv1.KRShaped    = (*XMLToJSONTransformation)(nil)
+	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
 )
 
 // XMLToJSONTransformationSpec holds the desired state of the XMLToJSONTransformation (from the client).
@@ -55,7 +56,8 @@ type XMLToJSONTransformationSpec struct {
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
 	// Sink is a reference to an object that will resolve to a uri to use as the sink.
-	Sink duckv1.Destination `json:"sink,omitempty"`
+	// +optional
+	Sink *duckv1.Destination `json:"sink,omitempty"`
 }
 
 // EventOptions modifies CloudEvents management at Targets.
