@@ -29,6 +29,7 @@ import (
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 )
@@ -147,14 +148,14 @@ func newCloudEvent(t *testing.T, data, contentType string, opts ...cloudEventOpt
 	event.SetType(tCloudEventType)
 	event.SetSource(tCloudEventSource)
 	err := event.SetData(contentType, []byte(data))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return event
 }
 
 func sendCE(t *testing.T, event *cloudevents.Event, cs cloudevents.Client, sink string) protocol.Result {
 	ctx := cloudevents.ContextWithTarget(context.Background(), sink)
 	c, err := cloudevents.NewClientHTTP()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	result := c.Send(ctx, *event)
 	return result

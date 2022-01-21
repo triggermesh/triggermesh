@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io/ioutil"
 
 	"go.uber.org/zap"
@@ -50,7 +49,7 @@ type envAccessor struct {
 	// Sink defines the target sink for the events. If no Sink is defined the
 	// events are replied back to the sender.
 	// +optional
-	Sink *string `envconfig:"K_SINK"`
+	Sink string `envconfig:"K_SINK"`
 }
 
 // NewAdapter adapter implementation
@@ -77,7 +76,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 var _ pkgadapter.Adapter = (*Adapter)(nil)
 
 type Adapter struct {
-	sink     *string
+	sink     string
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
@@ -111,9 +110,7 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
-	fmt.Println(a.sink)
-
-	if a.sink != nil {
+	if a.sink != "" {
 		if err := a.ceClient.Send(ctx, event); err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
