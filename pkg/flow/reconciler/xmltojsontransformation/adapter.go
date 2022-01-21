@@ -68,16 +68,19 @@ func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
 			Name:  libreconciler.EnvBridgeID,
 			Value: libreconciler.GetStatefulBridgeID(o),
 		},
-		{
-			Name:  "K_SINK",
-			Value: o.Status.SinkURI.String(),
-		},
 	}
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envEventsPayloadPolicy,
 			Value: string(*o.Spec.EventOptions.PayloadPolicy),
+		})
+	}
+
+	if o.Status.SinkURI != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  "K_SINK",
+			Value: o.Status.SinkURI.String(),
 		})
 	}
 
