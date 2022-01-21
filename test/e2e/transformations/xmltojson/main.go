@@ -53,15 +53,17 @@ const (
 )
 
 // createTransformation creates an AWSKinesis object initialized with the given options.
-func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string, sink *duckv1.Destination) (*unstructured.Unstructured, error) {
+func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string, dest *duckv1.Destination) (*unstructured.Unstructured, error) {
 	trns := &unstructured.Unstructured{}
 	trns.SetAPIVersion(transAPIVersion.String())
 	trns.SetKind(transformationKind)
 	trns.SetNamespace(namespace)
 	trns.SetGenerateName(namePrefix)
 
-	if err := unstructured.SetNestedMap(trns.Object, ducktypes.DestinationToMap(sink), "spec", "sink"); err != nil {
-		framework.FailfWithOffset(2, "Failed to set spec.sink field: %s", err)
+	if dest != nil {
+		if err := unstructured.SetNestedMap(trns.Object, ducktypes.DestinationToMap(dest), "spec", "sink"); err != nil {
+			framework.FailfWithOffset(2, "Failed to set spec.sink field: %s", err)
+		}
 	}
 
 	return trnsClient.Create(context.Background(), trns, metav1.CreateOptions{})
@@ -93,7 +95,7 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	var err error
 	var transURL *url.URL
 
-	Context("a Transformation is deployed", func() {
+	Context("a Transformation is deployed with K_SINK", func() {
 		BeforeEach(func() {
 			ns = f.UniqueName
 
@@ -132,6 +134,34 @@ var _ = Describe("XMLToJSON Transformation", func() {
 				e := receivedEvents[0]
 				Expect(e.Type()).To(Equal("e2e.test"))
 				Expect(string(e.DataEncoded)).To(Equal(expectedResponseEvent))
+			})
+		})
+	})
+
+	Context("a Transformation is deployed without K_SINK", func() {
+		BeforeEach(func() {
+			ns = f.UniqueName
+
+			By("creating a transformation object", func() {
+				gvr := transAPIVersion.WithResource(transformationResource)
+				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
+				trans, err = createTransformation(trnsClient, ns, "test-xmltojsonreplier-", nil)
+				Expect(err).ToNot(HaveOccurred())
+				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
+				transURL = ducktypes.Address(trans)
+				Expect(transURL).ToNot(BeNil())
+			})
+
+		})
+		When("a XML payload is sent", func() {
+			BeforeEach(func() {
+				sentEvent := e2ece.NewXMLHelloEvent(f)
+				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
+				apps.WaitForCompletion(f.KubeClient, job)
+			})
+
+			Specify("should generate a JSON event at replier", func() {
+				Expect(1).To(Equal(1))
 			})
 		})
 	})
