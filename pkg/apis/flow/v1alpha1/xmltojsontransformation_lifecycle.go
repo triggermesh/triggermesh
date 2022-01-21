@@ -29,14 +29,7 @@ const (
 	EventTypeXMLToJSONGenericResponse = "io.triggermesh.xmltojsontransformation.error"
 )
 
-const (
-
-	// ConditionSinkProvided has status True when the component has been configured with a sink target.
-	ConditionSinkProvided apis.ConditionType = "SinkProvided"
-)
-
 var XMLToJSONCondSet = apis.NewLivingConditionSet(
-	ConditionSinkProvided,
 	ConditionDeployed,
 )
 
@@ -89,24 +82,6 @@ func (ts *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *ser
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
 func (t *XMLToJSONTransformation) GetStatus() *duckv1.Status {
 	return &t.Status.Status
-}
-
-// MarkSink sets the SinkProvided condition to True using the given URI.
-func (ts *XMLToJSONTransformationStatus) MarkSink(uri *apis.URL) {
-	ts.SinkURI = uri
-	if uri == nil {
-		XMLToJSONCondSet.Manage(ts).MarkFalse(ConditionSinkProvided,
-			ReasonSinkEmpty, "The sink has no URI")
-		return
-	}
-	XMLToJSONCondSet.Manage(ts).MarkTrue(ConditionSinkProvided)
-}
-
-// MarkNoSink sets the SinkProvided condition to False.
-func (ts *XMLToJSONTransformationStatus) MarkNoSink() {
-	ts.SinkURI = nil
-	XMLToJSONCondSet.Manage(ts).MarkFalse(ConditionSinkProvided,
-		ReasonSinkNotFound, "The sink does not exist or its URI is not set")
 }
 
 // MarkNoKService sets the condition that the service is not ready
