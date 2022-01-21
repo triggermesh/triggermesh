@@ -30,6 +30,12 @@ import (
 )
 
 type envConfig struct {
+	EventPayload     map[string]string `envconfig:"EVENT_PAYLOAD" default:"{hello:world}"`
+	EventContentType string            `envconfig:"EVENT_CONTENT_TYPE" default:"application/json"`
+	EventID          string            `envconfig:"EVENT_ID" default:"12345"`
+	EventType        string            `envconfig:"EVENT_TYPE" default:"example.type"`
+	EventSource      string            `envconfig:"EVENT_SOURCE" default:"example/uri"`
+
 	Sink      string `envconfig:"K_SINK" required:"true"`
 	DebugSink string `envconfig:"K_DEBUG_SINK" required:"true"`
 }
@@ -45,24 +51,18 @@ func main() {
 		log.Fatalf("failed to create client, %v", err)
 	}
 
-	// Create an Event.
 	event := cloudevents.NewEvent()
-	event.SetSource("example/uri")
-	event.SetType("example.type")
-	event.SetData(cloudevents.ApplicationJSON, map[string]string{"hello": "world"})
+	event.SetSource(env.EventSource)
+	event.SetType(env.EventType)
+	event.SetData(env.EventContentType, env.EventPayload)
 
-	// Set a target.
 	ctx := cloudevents.ContextWithTarget(context.Background(), env.Sink)
-
-	// Send that Event.
 
 	e, _ := c.Request(ctx, event)
 	fmt.Printf("%+v", e)
 
-	// Change the target.
 	ctx = cloudevents.ContextWithTarget(context.Background(), env.DebugSink)
 
-	// Send event to debug sink
 	if result := c.Send(ctx, *e); cloudevents.IsUndelivered(result) {
 		log.Fatalf("failed to send, %v", result)
 	}

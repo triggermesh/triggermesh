@@ -1,0 +1,20 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: replierdebugger
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: "1"
+    spec:
+      serviceAccountName: gtflp
+      containers:
+        - image: ko://github.com/triggermesh/triggermesh/test/e2e/framework/tools/replierdebugger/cmd/eventsender
+          env:
+            - name: K_SINK
+              value:
+            - name: K_DEBUG_SINK
+              value:
+
+

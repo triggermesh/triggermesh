@@ -1,0 +1,16 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: replierdebugger
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/ultra-hologram-297914/eventsender-6f71dd4d98b0f6b0991209485bfb9e15@sha256:a8924a37e5ebd6606e24adc6015298500ede8dab4d8ca6c3e5ea3461474ac4cb
+          env:
+            - name: K_SINK
+              value: http://xmltojsontransformation-demo.debug.svc.cluster.local
+            - name: K_DEBUG_SINK
+              value: http://event-display.debug.34.122.188.254.sslip.io 
+
+---
