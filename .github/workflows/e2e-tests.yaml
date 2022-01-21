@@ -78,4 +78,4 @@ jobs:
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      run: ginkgo -p -slow-spec-threshold=1m -randomize-all ./test/e2e/
+      run: ginkgo -p -slow-spec-threshold=10m -randomize-all ./test/e2e/
