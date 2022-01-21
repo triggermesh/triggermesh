@@ -27,6 +27,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
@@ -60,7 +61,7 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 type adapter struct {
 	awsArnString string
 	awsArn       arn.ARN
-	sqsClient    *sqs.SQS
+	sqsClient    sqsiface.SQSAPI
 
 	discardCEContext bool
 	ceClient         cloudevents.Client
