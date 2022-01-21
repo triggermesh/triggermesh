@@ -100,31 +100,6 @@ func RunEventSender(c clientset.Interface, namespace, url string, payload *cloud
 	return job
 }
 
-// RunXMLEventSender runs a job which sends a CloudEvent payload to the given URL.
-// The function doesn't wait for the job to complete, but the job gets retried
-// in case of failure.
-func RunXMLEventSender(c clientset.Interface, namespace, url string, payload *cloudevents.Event) *batchv1.Job {
-	job := makeCurlJob(namespace, []string{
-		"-s",  // hide progress meter
-		"-S",  // show errors
-		"-D-", // dump headers to stdout
-
-		// In Structured Content Mode, the entire payload is sent in the request body.
-		// https://github.com/cloudevents/spec/blob/v1.0/http-protocol-binding.md#32-structured-content-mode
-		"-H", http.ContentType + ": " + cloudevents.ApplicationXML,
-		"--data-raw", string(payload.Data()),
-
-		url,
-	})
-
-	job, err := c.BatchV1().Jobs(namespace).Create(context.Background(), job, metav1.CreateOptions{})
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to create Job: %s", err)
-	}
-
-	return job
-}
-
 // makeCurlJob returns a Job object that runs a cURL command.
 func makeCurlJob(namespace string, args []string) *batchv1.Job {
 	return &batchv1.Job{

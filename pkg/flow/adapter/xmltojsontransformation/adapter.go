@@ -92,6 +92,8 @@ func (a *Adapter) Start(ctx context.Context) error {
 
 func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if !isValidXML(event.Data()) {
+		fmt.Println("Invalid XML")
+
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("invalid XML"), nil)
 	}

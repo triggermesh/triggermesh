@@ -29,11 +29,11 @@ package xmltmtojson
 import (
 	"context"
 	"net/url"
+	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
-
-	. "github.com/onsi/gomega" //nolint:stylecheck
+	. "github.com/onsi/gomega"    //nolint:stylecheck
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -62,24 +62,17 @@ const (
 
 var _ = Describe("XMLToJSON Transformation", func() {
 	f := framework.New("xmltojsontransformation")
-
 	var ns string
 	var sink *duckv1.Destination
-
 	var trnsClient dynamic.ResourceInterface
 	var trans *unstructured.Unstructured
 	var err error
 	var transURL *url.URL
 
-	// 	Context("a Transformation is deployed" ...
-	//   When("a XML payload is sent" ...
-	//     It("converts the payload to JSON")
-	//   When("a non XML payload is sent" ...
-	//     It("responds with an error event" ...
-
 	Context("a Transformation is deployed", func() {
 		BeforeEach(func() {
 			ns = f.UniqueName
+
 			By("creating an event sink", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 				Expect(sink).NotTo(BeNil())
@@ -90,7 +83,6 @@ var _ = Describe("XMLToJSON Transformation", func() {
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 				trans, err = createTransformation(trnsClient, ns, "test-xmltojson-", sink)
 				Expect(err).ToNot(HaveOccurred())
-
 				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
 				transURL = ducktypes.Address(trans)
 				Expect(transURL).ToNot(BeNil())
@@ -98,29 +90,28 @@ var _ = Describe("XMLToJSON Transformation", func() {
 
 		})
 		When("a XML payload is sent", func() {
-			It("should be created", func() {
-				Expect(1).To(Equal(1))
-				// sentEvent := e2ece.NewXMLHelloEvent(f)
-				// job := e2ece.RunXMLEventSender(f.KubeClient, ns, transURL.String()+":8080", sentEvent)
-				sentEvent := e2ece.NewHelloEvent(f)
+			BeforeEach(func() {
+				sentEvent := e2ece.NewXMLHelloEvent(f)
+				// job := e2ece.RunEventSender(f.KubeClient, ns, "http://event-display.test.34.135.10.105.sslip.io", sentEvent)
+				Expect(transURL.String()).To(Equal("http://event-display.test."))
 				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
 				apps.WaitForCompletion(f.KubeClient, job)
 			})
 
-			// It("should generate an event at the sink", func() {
+			Specify("should generate an event at the sink", func() {
+				const receiveTimeout = 10 * time.Second
+				const pollInterval = 500 * time.Millisecond
 
-			// 	var receivedEvents []cloudevents.Event
+				var receivedEvents []cloudevents.Event
 
-			// 	readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
+				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
 
-			// 	Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
-			// 	Expect(receivedEvents).To(HaveLen(1))
+				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
+				Expect(receivedEvents).To(HaveLen(1))
 
-			// 	e := receivedEvents[0]
-			// 	Expect(e.Type()).To(Equal("com.amazon.codecommit.push"))
-			// 	Expect(e.Source()).To(Equal(repoARN))
-			// 	Expect(e.Subject()).To(Equal(e2ecodecommit.DefaultBranch))
-			// })
+				e := receivedEvents[0]
+				Expect(e.Type()).To(Equal("e2e.test"))
+			})
 
 		})
 
