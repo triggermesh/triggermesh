@@ -27,7 +27,6 @@ import (
 	kubeclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
 	kserviceclient "knative.dev/serving/pkg/client/injection/client"
 	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
@@ -55,7 +54,6 @@ func NewController(
 	envconfig.MustProcess("", r)
 
 	impl := googlesheettarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	googlesheetsTargetInformer := googlesheetstargetinformer.Get(ctx)
 	googlesheetsTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

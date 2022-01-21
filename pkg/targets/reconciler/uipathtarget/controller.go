@@ -57,7 +57,6 @@ func NewController(
 	}
 
 	impl := uipathtarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	uipathTargetInformer := uipathtargetinformer.Get(ctx)
 	uipathTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

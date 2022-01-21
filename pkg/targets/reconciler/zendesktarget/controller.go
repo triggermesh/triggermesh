@@ -59,7 +59,6 @@ func NewController(
 	}
 
 	impl := zendesktarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	zendeskTargetInformer := zendesktargetinformer.Get(ctx)
 	zendeskTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
