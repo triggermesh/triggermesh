@@ -33,7 +33,6 @@ import (
 
 const (
 	tQueueArnResource = "MyQueue"
-	tQueueURL         = "https://sqs.us-fake-0.amazonaws.com/123456789012/MyQueue"
 
 	expectedResponse = "\"{\\n  MD5OfMessageBody: \\\"098f6bcd4621d373cade4e832627b4f6\\\",\\n  MessageId: \\\"00000000-0000-0000-0000-0000000001\\\",\\n  SequenceNumber: \\\"1\\\"\\n}\""
 
