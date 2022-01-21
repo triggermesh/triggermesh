@@ -21,7 +21,6 @@ import (
 	"context"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io/ioutil"
 
 	"go.uber.org/zap"
@@ -92,8 +91,6 @@ func (a *Adapter) Start(ctx context.Context) error {
 
 func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if !isValidXML(event.Data()) {
-		fmt.Println("Invalid XML")
-
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("invalid XML"), nil)
 	}
@@ -112,8 +109,6 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	if err := event.SetData(cloudevents.ApplicationJSON, readBuf); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
-
-	fmt.Println(a.sink)
 
 	if a.sink != nil {
 		if err := a.ceClient.Send(ctx, event); err != nil {

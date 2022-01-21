@@ -14,16 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Overflow
-
-// Create an Event Sink (Event Display)
-
-// Create a XMLToJSON Transformation (using the Event Display as a Sink)
-
-// Send the XMLToJSON Transformation a CloudEvent with XML in the payload
-
-// Expect valid JSON in the Event Display
-
 package xmltmtojson
 
 import (
@@ -92,8 +82,6 @@ var _ = Describe("XMLToJSON Transformation", func() {
 		When("a XML payload is sent", func() {
 			BeforeEach(func() {
 				sentEvent := e2ece.NewXMLHelloEvent(f)
-				// job := e2ece.RunEventSender(f.KubeClient, ns, "http://event-display.test.34.135.10.105.sslip.io", sentEvent)
-				Expect(transURL.String()).To(Equal("http://event-display.test."))
 				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
 				apps.WaitForCompletion(f.KubeClient, job)
 			})
