@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,4 +36,16 @@ type envAccessor struct {
 
 	// DiscardCEContext chooses to keep or discard the incoming cloudevent context
 	DiscardCEContext bool `envconfig:"DISCARD_CE_CONTEXT"`
+
+	// The environment variables below aren't read from the envConfig struct
+	// by the Event Hubs SDK, but rather directly using os.Getenv().
+	// They are nevertheless listed here for documentation purposes.
+	_ string `envconfig:"EVENTHUB_NAMESPACE"`
+	_ string `envconfig:"EVENTHUB_NAME"`
+	_ string `envconfig:"AZURE_TENANT_ID"`
+	_ string `envconfig:"AZURE_CLIENT_ID"`
+	_ string `envconfig:"AZURE_CLIENT_SECRET"`
+	_ string `envconfig:"EVENTHUB_KEY_NAME"`
+	_ string `envconfig:"EVENTHUB_KEY_VALUE"`
+	_ string `envconfig:"EVENTHUB_CONNECTION_STRING"`
 }
