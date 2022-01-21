@@ -105,29 +105,29 @@ func (t *XMLToJSONTransformation) GetStatus() *duckv1.Status {
 }
 
 // MarkSink sets the SinkProvided condition to True using the given URI.
-func (s *XMLToJSONTransformationStatus) MarkSink(uri *apis.URL) {
-	s.SinkURI = uri
+func (ts *XMLToJSONTransformationStatus) MarkSink(uri *apis.URL) {
+	ts.SinkURI = uri
 	if uri == nil {
-		XMLToJSONCondSet.Manage(s).MarkFalse(ConditionSinkProvided,
+		XMLToJSONCondSet.Manage(ts).MarkFalse(ConditionSinkProvided,
 			ReasonSinkEmpty, "The sink has no URI")
 		return
 	}
-	XMLToJSONCondSet.Manage(s).MarkTrue(ConditionSinkProvided)
+	XMLToJSONCondSet.Manage(ts).MarkTrue(ConditionSinkProvided)
 }
 
 // MarkNoSink sets the SinkProvided condition to False.
-func (s *XMLToJSONTransformationStatus) MarkNoSink() {
-	s.SinkURI = nil
-	XMLToJSONCondSet.Manage(s).MarkFalse(ConditionSinkProvided,
+func (ts *XMLToJSONTransformationStatus) MarkNoSink() {
+	ts.SinkURI = nil
+	XMLToJSONCondSet.Manage(ts).MarkFalse(ConditionSinkProvided,
 		ReasonSinkNotFound, "The sink does not exist or its URI is not set")
 }
 
 // MarkNoKService sets the condition that the service is not ready
-func (s *XMLToJSONTransformationStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	XMLToJSONCondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
+func (ts *XMLToJSONTransformationStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
+	XMLToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
 }
 
 // IsReady returns true if the resource is ready overall.
-func (s *XMLToJSONTransformationStatus) IsReady() bool {
-	return XMLToJSONCondSet.Manage(s).IsHappy()
+func (ts *XMLToJSONTransformationStatus) IsReady() bool {
+	return XMLToJSONCondSet.Manage(ts).IsHappy()
 }
