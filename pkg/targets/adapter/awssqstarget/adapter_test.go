@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,8 +45,6 @@ func TestAdapter(t *testing.T) {
 	testCases := map[string]struct {
 		inEvent cloudevents.Event
 	}{
-		// These test cases ensure the implementation isn't reliant on
-		// specific buffer sizes.
 		"recieves event": {
 			inEvent: newEvent(t),
 		},
@@ -63,19 +61,15 @@ func TestAdapter(t *testing.T) {
 				awsArn:           arn,
 				discardCEContext: false,
 			}
-
 			event, response := a.dispatch(tc.inEvent)
-
 			assert.Equal(t, expectedResponse, string(event.DataEncoded))
 			assert.Equal(t, "", response.Error())
-
 		})
 	}
 }
 
 func newEvent(t *testing.T) cloudevents.Event {
 	t.Helper()
-
 	ce := cloudevents.NewEvent()
 	ce.SetID("1234567890")
 	ce.SetSource("test.source")
@@ -102,7 +96,6 @@ func makeARN(resource string) arn.ARN {
 // responses and never errors.
 type standardMockSQSClient struct {
 	sqsiface.SQSAPI
-
 	sync.Mutex
 }
 
