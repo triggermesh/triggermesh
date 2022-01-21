@@ -43,12 +43,12 @@ type adapterConfig struct {
 }
 
 // makeAdapterKService generates (but does not insert into K8s) the Synchronizer Adapter KService.
-func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig) *servingv1.Service {
+func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig, sink string) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", o.Name)
 	lbl := libreconciler.MakeAdapterLabels(adapterName, o.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, o.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, o.Namespace)
-	envApp := makeAppEnv(o)
+	envApp := makeAppEnv(o, sink)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
@@ -62,7 +62,7 @@ func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig
 	)
 }
 
-func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink string) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  libreconciler.EnvBridgeID,
@@ -77,10 +77,10 @@ func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
 		})
 	}
 
-	if o.Status.SinkURI != nil {
+	if sink != "" {
 		env = append(env, corev1.EnvVar{
 			Name:  "K_SINK",
-			Value: o.Status.SinkURI.String(),
+			Value: sink,
 		})
 	}
 
