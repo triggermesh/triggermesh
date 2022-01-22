@@ -31,6 +31,7 @@ import (
 	"k8s.io/client-go/dynamic"
 	clientset "k8s.io/client-go/kubernetes"
 
+	corev1 "k8s.io/api/core/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
@@ -50,6 +51,8 @@ const (
 	transformationResource = "xmltojsontransformations"
 
 	expectedResponseEvent = "{\"string\":\"\\u003cnote\\u003e\\u003cto\\u003eTove\\u003c/to\\u003e\\u003cfrom\\u003eJani\\u003c/from\\u003e\\u003cheading\\u003eReminder\\u003c/heading\\u003e\\u003cbody\\u003eDont forget me this weekend\\u003c/body\\u003e\\u003c/note\\u003e\"}"
+
+	img = "gcr.io/ultra-hologram-297914/eventsender-6f71dd4d98b0f6b0991209485bfb9e15@sha256:a8924a37e5ebd6606e24adc6015298500ede8dab4d8ca6c3e5ea3461474ac4cb"
 )
 
 // createTransformation creates an AWSKinesis object initialized with the given options.
@@ -95,7 +98,50 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	var err error
 	var transURL *url.URL
 
-	Context("a Transformation is deployed with K_SINK", func() {
+	// Context("a Transformation is deployed with K_SINK", func() {
+	// 	BeforeEach(func() {
+	// 		ns = f.UniqueName
+
+	// 		By("creating an event sink", func() {
+	// 			sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
+	// 			Expect(sink).NotTo(BeNil())
+	// 		})
+
+	// 		By("creating a transformation object", func() {
+	// 			gvr := transAPIVersion.WithResource(transformationResource)
+	// 			trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
+	// 			trans, err = createTransformation(trnsClient, ns, "test-xmltojson-", sink)
+	// 			Expect(err).ToNot(HaveOccurred())
+	// 			trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
+	// 			transURL = ducktypes.Address(trans)
+	// 			Expect(transURL).ToNot(BeNil())
+	// 		})
+
+	// 	})
+	// 	When("a XML payload is sent", func() {
+	// 		BeforeEach(func() {
+	// 			sentEvent := e2ece.NewXMLHelloEvent(f)
+	// 			job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
+	// 			apps.WaitForCompletion(f.KubeClient, job)
+	// 		})
+
+	// 		Specify("should generate a JSON event at the sink", func() {
+	// 			var receivedEvents []cloudevents.Event
+	// 			readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
+
+	// 			const receiveTimeout = 10 * time.Second
+	// 			const pollInterval = 500 * time.Millisecond
+	// 			Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
+	// 			Expect(receivedEvents).To(HaveLen(1))
+
+	// 			e := receivedEvents[0]
+	// 			Expect(e.Type()).To(Equal("e2e.test"))
+	// 			Expect(string(e.DataEncoded)).To(Equal(expectedResponseEvent))
+	// 		})
+	// 	})
+	// })
+
+	Context("a Transformation is deployed without K_SINK", func() {
 		BeforeEach(func() {
 			ns = f.UniqueName
 
@@ -107,49 +153,35 @@ var _ = Describe("XMLToJSON Transformation", func() {
 			By("creating a transformation object", func() {
 				gvr := transAPIVersion.WithResource(transformationResource)
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-				trans, err = createTransformation(trnsClient, ns, "test-xmltojson-", sink)
-				Expect(err).ToNot(HaveOccurred())
-				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
-				transURL = ducktypes.Address(trans)
-				Expect(transURL).ToNot(BeNil())
-			})
-
-		})
-		When("a XML payload is sent", func() {
-			BeforeEach(func() {
-				sentEvent := e2ece.NewXMLHelloEvent(f)
-				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
-				apps.WaitForCompletion(f.KubeClient, job)
-			})
-
-			Specify("should generate a JSON event at the sink", func() {
-				var receivedEvents []cloudevents.Event
-				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, sink.Ref.Name, &receivedEvents)
-
-				const receiveTimeout = 10 * time.Second
-				const pollInterval = 500 * time.Millisecond
-				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
-				Expect(receivedEvents).To(HaveLen(1))
-
-				e := receivedEvents[0]
-				Expect(e.Type()).To(Equal("e2e.test"))
-				Expect(string(e.DataEncoded)).To(Equal(expectedResponseEvent))
-			})
-		})
-	})
-
-	Context("a Transformation is deployed without K_SINK", func() {
-		BeforeEach(func() {
-			ns = f.UniqueName
-
-			By("creating a transformation object", func() {
-				gvr := transAPIVersion.WithResource(transformationResource)
-				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 				trans, err = createTransformation(trnsClient, ns, "test-xmltojsonreplier-", nil)
 				Expect(err).ToNot(HaveOccurred())
 				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
 				transURL = ducktypes.Address(trans)
 				Expect(transURL).ToNot(BeNil())
+			})
+
+			By("creating a Replier Debugging service", func() {
+				const internalPort uint16 = 8080
+				const exposedPort uint16 = 80
+
+				env := &[]corev1.EnvVar{
+					{
+						Name:  "K_SINK",
+						Value: transURL.String(),
+					},
+					{
+						Name:  "K_DEBUG_SINK",
+						Value: "http://localhost:8080",
+					},
+				}
+
+				dep, svc := apps.CreateSimpleApplication(f.KubeClient, ns,
+					"debugger", img, internalPort, exposedPort, env,
+					apps.WithStartupProbe("/healthz"),
+				)
+				Expect(dep.GetSelfLink()).To(Equal("test"))
+				Expect(svc).NotTo(BeNil())
+				time.Sleep(1000 * time.Second)
 			})
 
 		})

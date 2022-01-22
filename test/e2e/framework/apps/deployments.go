@@ -44,7 +44,7 @@ import (
 // container managed by the Deployment. `exposedPort` is the TCP port number
 // exposed by the Service.
 func CreateSimpleApplication(c clientset.Interface, namespace string,
-	name, image string, internalPort, exposedPort uint16,
+	name, image string, internalPort, exposedPort uint16, envVar *[]corev1.EnvVar,
 	deplOpts ...DeploymentOption) (*appsv1.Deployment, *corev1.Service) {
 
 	svc := newSimpleService(namespace, name, exposedPort, internalPort)
@@ -54,7 +54,12 @@ func CreateSimpleApplication(c clientset.Interface, namespace string,
 		framework.FailfWithOffset(2, "Failed to create Service: %s", err)
 	}
 
-	depl := newSimpleDeployment(namespace, name, image, internalPort)
+	var depl *appsv1.Deployment
+	if envVar == nil {
+		depl = newSimpleDeployment(namespace, name, image, internalPort)
+	} else {
+		depl = newDeploymentWithEnv(namespace, name, image, internalPort, *envVar)
+	}
 
 	for _, o := range deplOpts {
 		o(depl)
@@ -191,6 +196,45 @@ func newSimpleService(namespace, name string, port, targetPort uint16) *corev1.S
 				Port:       int32(port),
 				TargetPort: intstr.FromInt(int(targetPort)),
 			}},
+		},
+	}
+}
+
+// newDeploymentWithEnv returns a Deployment object with a single container and
+// default settings.
+func newDeploymentWithEnv(namespace, name, image string, containerPort uint16, envVar []corev1.EnvVar) *appsv1.Deployment {
+	const containerName = "app"
+
+	lbls := labels.Set{
+		labelAppName:   name,
+		labelManagedBy: labelManagedByVal,
+	}
+
+	metadata := metav1.ObjectMeta{
+		Namespace: namespace,
+		Name:      name,
+		Labels:    lbls,
+	}
+
+	return &appsv1.Deployment{
+		ObjectMeta: metadata,
+		Spec: appsv1.DeploymentSpec{
+			Selector: metav1.SetAsLabelSelector(lbls),
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: lbls,
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{{
+						Name:  containerName,
+						Image: image,
+						Ports: []corev1.ContainerPort{{
+							ContainerPort: int32(containerPort),
+						}},
+						Env: envVar,
+					}},
+				},
+			},
 		},
 	}
 }
