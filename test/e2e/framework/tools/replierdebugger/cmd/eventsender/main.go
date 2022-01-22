@@ -66,5 +66,15 @@ func main() {
 	if result := c.Send(ctx, *e); cloudevents.IsUndelivered(result) {
 		log.Fatalf("failed to send, %v", result)
 	}
+	// The default client is HTTP.
+	ceh, err := cloudevents.NewClientHTTP()
+	if err != nil {
+		log.Fatalf("failed to create client, %v", err)
+	}
+	log.Fatal(ceh.StartReceiver(context.Background(), ceHandler))
 
+}
+
+func ceHandler(e cloudevents.Event) {
+	fmt.Printf("%+v", e)
 }
