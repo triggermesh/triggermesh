@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
 )
@@ -43,9 +44,10 @@ type XMLToJSONTransformation struct {
 }
 
 var (
+	_ runtime.Object     = (*XMLToJSONTransformation)(nil)
 	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
-	// Check that the type conforms to the duck Knative Resource shape.
-	_ duckv1.KRShaped = (*XMLToJSONTransformation)(nil)
+	_ duckv1.KRShaped    = (*XMLToJSONTransformation)(nil)
+	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
 )
 
 // XMLToJSONTransformationSpec holds the desired state of the XMLToJSONTransformation (from the client).
@@ -54,7 +56,8 @@ type XMLToJSONTransformationSpec struct {
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
 	// Sink is a reference to an object that will resolve to a uri to use as the sink.
-	Sink duckv1.Destination `json:"sink,omitempty"`
+	// +optional
+	Sink *duckv1.Destination `json:"sink,omitempty"`
 }
 
 // EventOptions modifies CloudEvents management at Targets.
@@ -72,11 +75,8 @@ type EventOptions struct {
 
 // XMLToJSONTransformationStatus communicates the observed state of the XMLToJSONTransformation (from the controller).
 type XMLToJSONTransformationStatus struct {
-	duckv1.SourceStatus `json:",inline"`
-
-	// Address holds the information needed to connect this Addressable up to receive events.
-	// +optional
-	Address *duckv1.Addressable `json:"address,omitempty"`
+	duckv1.SourceStatus  `json:",inline"`
+	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

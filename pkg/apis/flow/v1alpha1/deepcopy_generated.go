@@ -300,7 +300,11 @@ func (in *XMLToJSONTransformationSpec) DeepCopyInto(out *XMLToJSONTransformation
 		*out = new(EventOptions)
 		(*in).DeepCopyInto(*out)
 	}
-	in.Sink.DeepCopyInto(&out.Sink)
+	if in.Sink != nil {
+		in, out := &in.Sink, &out.Sink
+		*out = new(v1.Destination)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -318,11 +322,7 @@ func (in *XMLToJSONTransformationSpec) DeepCopy() *XMLToJSONTransformationSpec {
 func (in *XMLToJSONTransformationStatus) DeepCopyInto(out *XMLToJSONTransformationStatus) {
 	*out = *in
 	in.SourceStatus.DeepCopyInto(&out.SourceStatus)
-	if in.Address != nil {
-		in, out := &in.Address, &out.Address
-		*out = new(v1.Addressable)
-		(*in).DeepCopyInto(*out)
-	}
+	in.AddressStatus.DeepCopyInto(&out.AddressStatus)
 	return
 }
 

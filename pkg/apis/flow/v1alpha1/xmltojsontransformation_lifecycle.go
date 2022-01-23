@@ -29,7 +29,9 @@ const (
 	EventTypeXMLToJSONGenericResponse = "io.triggermesh.xmltojsontransformation.error"
 )
 
-var xmlToJSONCondSet = apis.NewLivingConditionSet()
+var xmlToJSONCondSet = apis.NewLivingConditionSet(
+	ConditionDeployed,
+)
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
 func (t *XMLToJSONTransformation) GetGroupVersionKind() schema.GroupVersionKind {
@@ -41,22 +43,11 @@ func (t *XMLToJSONTransformation) GetConditionSet() apis.ConditionSet {
 	return xmlToJSONCondSet
 }
 
-// InitializeConditions sets the initial values to the conditions.
-func (ts *XMLToJSONTransformationStatus) InitializeConditions() {
-	xmlToJSONCondSet.Manage(ts).InitializeConditions()
-}
-
 // MarkServiceUnavailable marks XMLToJSONTransformation as not ready with ServiceUnavailable reason.
 func (ts *XMLToJSONTransformationStatus) MarkServiceUnavailable(name string) {
 	xmlToJSONCondSet.Manage(ts).MarkFalse(
-		apis.ConditionReady,
 		"ServiceUnavailable",
 		"Service %q is not ready.", name)
-}
-
-// MarkServiceAvailable sets XMLToJSONTransformation condition to ready.
-func (ts *XMLToJSONTransformationStatus) MarkServiceAvailable() {
-	xmlToJSONCondSet.Manage(ts).MarkTrue(apis.ConditionReady)
 }
 
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
@@ -91,4 +82,14 @@ func (ts *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *ser
 // GetStatus retrieves the status of the resource. Implements the KRShaped interface.
 func (t *XMLToJSONTransformation) GetStatus() *duckv1.Status {
 	return &t.Status.Status
+}
+
+// MarkNoKService sets the condition that the service is not ready
+func (ts *XMLToJSONTransformationStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
+	xmlToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
+}
+
+// IsReady returns true if the resource is ready overall.
+func (ts *XMLToJSONTransformationStatus) IsReady() bool {
+	return xmlToJSONCondSet.Manage(ts).IsHappy()
 }

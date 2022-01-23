@@ -18,18 +18,23 @@ package xmltojsontransformation
 
 import (
 	"context"
+	"fmt"
 
+	"knative.dev/pkg/apis"
 	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/resolver"
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
-// Reconciler implements controller.Reconciler for the event target type.
+// Reconciler implements controller.Reconciler.
 type Reconciler struct {
 	// adapter properties
 	adapterCfg *adapterConfig
+
+	sinkResolver *resolver.URIResolver
 
 	// Knative Service reconciler
 	ksvcr libreconciler.KServiceReconciler
@@ -39,10 +44,29 @@ type Reconciler struct {
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XMLToJSONTransformation) pkgreconciler.Event {
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
+func (r *Reconciler) ReconcileKind(ctx context.Context, s *v1alpha1.XMLToJSONTransformation) pkgreconciler.Event {
+	var url string
 
-	trg.Status.PropagateKServiceAvailability(adapter)
+	if s.Spec.Sink != nil {
+		uri, err := r.resolveDestination(ctx, s)
+		if err != nil {
+			return fmt.Errorf("cannot resolve Sink destination: %w", err)
+		}
+		url = uri.String()
+	}
+
+	adapter, event := r.ksvcr.ReconcileKService(ctx, s, makeAdapterKService(s, r.adapterCfg, url))
+	s.Status.PropagateKServiceAvailability(adapter)
 
 	return event
+}
+
+func (r *Reconciler) resolveDestination(ctx context.Context, s *v1alpha1.XMLToJSONTransformation) (*apis.URL, error) {
+	dest := s.Spec.Sink.DeepCopy()
+	if dest.Ref != nil {
+		if dest.Ref.Namespace == "" {
+			dest.Ref.Namespace = s.GetNamespace()
+		}
+	}
+	return r.sinkResolver.URIFromDestinationV1(ctx, *dest, s)
 }

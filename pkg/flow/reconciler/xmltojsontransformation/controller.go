@@ -26,13 +26,14 @@ import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
+	"knative.dev/pkg/resolver"
 	servingclient "knative.dev/serving/pkg/client/injection/client"
 	serviceinformerv1 "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/xmltojsontransformation"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -47,7 +48,7 @@ func NewController(
 	}
 	envconfig.MustProcess(adapterName, adapterCfg)
 
-	targetInformer := informerv1alpha1.Get(ctx)
+	syncInformer := informerv1alpha1.Get(ctx)
 	serviceInformer := serviceinformerv1.Get(ctx)
 
 	r := &Reconciler{
@@ -56,7 +57,10 @@ func NewController(
 	}
 
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
-	targetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+
+	r.sinkResolver = resolver.NewURIResolverFromTracker(ctx, impl.Tracker)
+	syncInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+
 	serviceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
 		FilterFunc: controller.FilterControllerGVK((&v1alpha1.XMLToJSONTransformation{}).GetGroupVersionKind()),
 		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
