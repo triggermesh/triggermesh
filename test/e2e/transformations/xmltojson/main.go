@@ -52,7 +52,7 @@ const (
 
 	expectedResponseEvent = "{\"string\":\"\\u003cnote\\u003e\\u003cto\\u003eTove\\u003c/to\\u003e\\u003cfrom\\u003eJani\\u003c/from\\u003e\\u003cheading\\u003eReminder\\u003c/heading\\u003e\\u003cbody\\u003eDont forget me this weekend\\u003c/body\\u003e\\u003c/note\\u003e\"}"
 
-	img = "gcr.io/ultra-hologram-297914/eventsender-6f71dd4d98b0f6b0991209485bfb9e15@sha256:a8924a37e5ebd6606e24adc6015298500ede8dab4d8ca6c3e5ea3461474ac4cb"
+	img = "gcr.io/ultra-hologram-297914/eventsender-6f71dd4d98b0f6b0991209485bfb9e15@sha256:d06c9507428837f500a754a211f0daba6e4d0d35f691f9f4c55dcdc4bb1759d4"
 )
 
 // createTransformation creates an AWSKinesis object initialized with the given options.
@@ -148,6 +148,27 @@ var _ = Describe("XMLToJSON Transformation", func() {
 			By("creating an event sink", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 				Expect(sink).NotTo(BeNil())
+
+				// var services []interface{}
+				// gvr := schema.GroupVersionResource{
+				// 	Group:    "serving.knative.dev",
+				// 	Version:  "v1",
+				// 	Resource: "services",
+				// }
+
+				// time.Sleep(100 * time.Second)
+
+				// list, err := f.DynamicClient.Resource(gvr).Namespace(ns).List(context.Background(), metav1.ListOptions{})
+
+				// Expect(err).ToNot(HaveOccurred())
+				// Expect(list).To(Equal(1))
+				// for _, item := range list.Items {
+				// 	if item.GetName() == "event-display" {
+				// 		services = append(services, item.GetName())
+				// 	}
+				// }
+				// Expect(services).To(Equal(1))
+				// Expect(list).To(Equal(1))
 			})
 
 			By("creating a transformation object", func() {
@@ -171,29 +192,40 @@ var _ = Describe("XMLToJSON Transformation", func() {
 					},
 					{
 						Name:  "K_DEBUG_SINK",
-						Value: "http://localhost:8080",
+						Value: "http://event-display.debugger.34.122.188.254.sslip.io",
 					},
 				}
 
-				dep, svc := apps.CreateSimpleApplication(f.KubeClient, ns,
+				_, svc := apps.CreateSimpleApplication(f.KubeClient, ns,
 					"debugger", img, internalPort, exposedPort, env,
-					apps.WithStartupProbe("/healthz"),
 				)
-				Expect(dep.GetSelfLink()).To(Equal("test"))
+
 				Expect(svc).NotTo(BeNil())
-				time.Sleep(1000 * time.Second)
 			})
 
 		})
-		When("a XML payload is sent", func() {
+		When("an invalid payload is sent", func() {
 			BeforeEach(func() {
-				sentEvent := e2ece.NewXMLHelloEvent(f)
+				sentEvent := e2ece.NewHelloEvent(f)
 				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
 				apps.WaitForCompletion(f.KubeClient, job)
 			})
 
-			Specify("should generate a JSON event at replier", func() {
-				Expect(1).To(Equal(1))
+			Specify("should generate a JSON event at the sink", func() {
+				edname := bridges.EventDisplayDeploymentName(f.DynamicClient, "debugger")
+				edDeployment, err := f.KubeClient.AppsV1().Deployments("debugger").Get(context.Background(), edname, metav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(edDeployment).NotTo(BeNil())
+
+				var receivedEvents []cloudevents.Event
+				readReceivedEvents := readReceivedEvents(f.KubeClient, "debugger", edDeployment.Name, &receivedEvents)
+				const receiveTimeout = 10 * time.Second
+				const pollInterval = 500 * time.Millisecond
+				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
+				// Expect(receivedEvents).To(HaveLen(1))
+				e := receivedEvents[0]
+				Expect(e.Type()).To(Equal("io.triggermesh.xmltojsontransformation.error"))
+				// Expect(string(e.DataEncoded)).To(Equal(expectedResponseEvent))
 			})
 		})
 	})
