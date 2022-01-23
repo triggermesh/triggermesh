@@ -60,7 +60,6 @@ func NewController(
 	}
 
 	impl := sendgridtarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	sendgridTargetInformer := sendgridtargetinformer.Get(ctx)
 	sendgridTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

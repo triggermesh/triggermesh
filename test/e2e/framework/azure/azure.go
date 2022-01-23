@@ -18,6 +18,7 @@ package azure
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -116,4 +117,19 @@ func CreateStorageAccountCommon(ctx context.Context, cli *armstorage.StorageAcco
 	}
 
 	return newSaClient.StorageAccount
+}
+
+// randAlphanumString returns a random string of the given length containing
+// only lowercase alphanumeric characters.
+// It is useful to help in generating names for Azure resources.
+func randAlphanumString(n int) string {
+	const alphanumCharset = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = alphanumCharset[r.Intn(len(alphanumCharset))]
+	}
+	return string(b)
 }

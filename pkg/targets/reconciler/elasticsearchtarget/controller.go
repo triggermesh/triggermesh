@@ -59,7 +59,6 @@ func NewController(
 	}
 
 	impl := elasticsearchtarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	esInformer := estargetinformer.Get(ctx)
 	esInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

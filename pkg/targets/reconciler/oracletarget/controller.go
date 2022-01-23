@@ -60,7 +60,6 @@ func NewController(
 	}
 
 	impl := oracletarget.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	oracleTargetInformer := oracletargetinformer.Get(ctx)
 	oracleTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

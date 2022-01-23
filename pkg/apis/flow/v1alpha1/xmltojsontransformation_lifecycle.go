@@ -29,7 +29,7 @@ const (
 	EventTypeXMLToJSONGenericResponse = "io.triggermesh.xmltojsontransformation.error"
 )
 
-var XMLToJSONCondSet = apis.NewLivingConditionSet(
+var xmlToJSONCondSet = apis.NewLivingConditionSet(
 	ConditionDeployed,
 )
 
@@ -40,12 +40,12 @@ func (t *XMLToJSONTransformation) GetGroupVersionKind() schema.GroupVersionKind 
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
 func (t *XMLToJSONTransformation) GetConditionSet() apis.ConditionSet {
-	return XMLToJSONCondSet
+	return xmlToJSONCondSet
 }
 
 // MarkServiceUnavailable marks XMLToJSONTransformation as not ready with ServiceUnavailable reason.
 func (ts *XMLToJSONTransformationStatus) MarkServiceUnavailable(name string) {
-	XMLToJSONCondSet.Manage(ts).MarkFalse(
+	xmlToJSONCondSet.Manage(ts).MarkFalse(
 		"ServiceUnavailable",
 		"Service %q is not ready.", name)
 }
@@ -54,7 +54,7 @@ func (ts *XMLToJSONTransformationStatus) MarkServiceUnavailable(name string) {
 // ConditionDeployed should be marked as true or false.
 func (ts *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
 	if ksvc == nil {
-		XMLToJSONCondSet.Manage(ts).MarkUnknown(ConditionDeployed, ReasonUnavailable,
+		xmlToJSONCondSet.Manage(ts).MarkUnknown(ConditionDeployed, ReasonUnavailable,
 			"The status of the adapter Service can not be determined")
 		return
 	}
@@ -65,7 +65,7 @@ func (ts *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *ser
 	ts.Address.URL = ksvc.Status.URL
 
 	if ksvc.IsReady() {
-		XMLToJSONCondSet.Manage(ts).MarkTrue(ConditionDeployed)
+		xmlToJSONCondSet.Manage(ts).MarkTrue(ConditionDeployed)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (ts *XMLToJSONTransformationStatus) PropagateKServiceAvailability(ksvc *ser
 		msg += ": " + readyCond.Message
 	}
 
-	XMLToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
+	xmlToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
 
 }
 
@@ -86,10 +86,10 @@ func (t *XMLToJSONTransformation) GetStatus() *duckv1.Status {
 
 // MarkNoKService sets the condition that the service is not ready
 func (ts *XMLToJSONTransformationStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	XMLToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
+	xmlToJSONCondSet.Manage(ts).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
 }
 
 // IsReady returns true if the resource is ready overall.
 func (ts *XMLToJSONTransformationStatus) IsReady() bool {
-	return XMLToJSONCondSet.Manage(ts).IsHappy()
+	return xmlToJSONCondSet.Manage(ts).IsHappy()
 }

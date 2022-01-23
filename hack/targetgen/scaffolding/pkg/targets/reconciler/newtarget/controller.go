@@ -57,7 +57,6 @@ func NewController(
 	}
 
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
-	logging.FromContext(ctx).Info("Setting up event handlers")
 
 	targetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
