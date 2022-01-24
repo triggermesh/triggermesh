@@ -99,7 +99,7 @@ var _ = Describe("AWS S3 target", func() {
 
 			By("creating a S3 bucket", func() {
 				bucketName = e2es3.CreateBucket(s3Client, f, region)
-				bucketARN = createBucketARN(bucketName, region)
+				bucketARN = createBucketARN(bucketName)
 				awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
 			})
 		})
@@ -256,7 +256,7 @@ var _ = Describe("AWS S3 target", func() {
 
 		// Those tests do not require a real bucketARN or awsSecret
 		BeforeEach(func() {
-			bucketARN = "arn:aws:s3:eu-central-1:000000000000:test"
+			bucketARN = "arn:aws:s3:::test"
 			awsSecret = &corev1.Secret{}
 		})
 
@@ -268,7 +268,7 @@ var _ = Describe("AWS S3 target", func() {
 		Specify("the API server rejects the creation of that object", func() {
 
 			By("setting an invalid bucket ARN", func() {
-				invalidBucketARN := "arn:aws:s3:eu-central-1::"
+				invalidBucketARN := "arn:aws:s3:::"
 
 				_, err := createTarget(trgtClient, ns, "test-invalid-arn",
 					withARN(invalidBucketARN),
@@ -390,6 +390,6 @@ func readAWSCredentials(sess *session.Session) credentials.Value {
 }
 
 // createBucketARN will create the bucket ARN used by the k8s awss3target
-func createBucketARN(bucketName, region string) string {
-	return "arn:aws:s3:" + region + ":123456789012:" + bucketName
+func createBucketARN(bucketName string) string {
+	return "arn:aws:s3:::" + bucketName
 }
