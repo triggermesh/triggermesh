@@ -141,7 +141,6 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	Context("a Transformation is deployed without K_SINK", func() {
 		BeforeEach(func() {
 			ns = f.UniqueName
-
 		})
 		When("the service is created", func() {
 			BeforeEach(func() {
@@ -150,11 +149,9 @@ var _ = Describe("XMLToJSON Transformation", func() {
 				trans, err = createTransformation(trnsClient, ns, "test-xmltojsonreplier-", nil)
 				Expect(err).ToNot(HaveOccurred())
 			})
-
 			Specify("it becomes ready", func() {
 				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
-				transURL = ducktypes.Address(trans)
-				Expect(transURL).ToNot(BeNil())
+				Expect(trans).ToNot(BeNil())
 			})
 		})
 	})
