@@ -20,7 +20,7 @@ require (
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/pubsub v1.17.1
 	cloud.google.com/go/storage v1.18.2
-	cloud.google.com/go/workflows v1.1.0
+	cloud.google.com/go/workflows v1.1.1
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.2
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
 	github.com/Azure/azure-sdk-for-go v61.2.0+incompatible
@@ -74,7 +74,7 @@ require (
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/api v0.65.0
-	google.golang.org/genproto v0.0.0-20220107163113-42d7afdf6368
+	google.golang.org/genproto v0.0.0-20220114172242-44263ffb69e1
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
