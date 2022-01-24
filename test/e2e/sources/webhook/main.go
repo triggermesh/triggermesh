@@ -69,10 +69,7 @@ var _ = Describe("Webhook source", func() {
 		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	// PENDING SPEC (not executed)
-	// Requires a HTTP endpoint which address (Knative Service) is reachable by the CI host.
-	// TODO: configure Knative in CI to use resolvable KinD domain.
-	XContext("a source receives an HTTP request", func() {
+	Context("a source receives an HTTP request", func() {
 		var srcURL *url.URL
 
 		// sample payload struct and instance to be
