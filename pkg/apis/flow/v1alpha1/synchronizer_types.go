@@ -49,7 +49,7 @@ var (
 // SynchronizerSpec holds the desired state of the Synchronizer.
 type SynchronizerSpec struct {
 	CorrelationKey Correlation        `json:"correlationKey"`
-	Response       Response           `json:"response,omitempty"`
+	Response       Response           `json:"response"`
 	Sink           duckv1.Destination `json:"sink"`
 }
 
@@ -61,7 +61,7 @@ type Correlation struct {
 
 // Response defines the response handling configuration.
 type Response struct {
-	Timeout *apis.Duration `json:"timeout,omitempty"`
+	Timeout apis.Duration `json:"timeout"`
 }
 
 // SynchronizerStatus communicates the observed state of the Synchronizer.

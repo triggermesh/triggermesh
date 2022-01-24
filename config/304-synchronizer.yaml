@@ -57,8 +57,7 @@ spec:
                     description: The name of the correlation key that will be injected into the CloudEvents context.
                       Events without this attribute are forwarded to the Sink as the client requests while client
                       connections are held open. Events, which context already has the correlation key, are sent back
-                      to the open client connections. The correlation key cannot be present in client requests, hence
-                      standard CloudEvents attribute names are not permited.
+                      to the open client connections.
                     type: string
                   length:
                     description: The length of the correlation key to generate. The default value is 24.
@@ -73,12 +72,14 @@ spec:
                 type: object
                 properties:
                   timeout:
-                    description: The time during which the synchronizer will block the client and wait for the response.
+                    description: The time during which the synchronizer will block the client and wait for the
+                      response. Expressed as a duration string, which format is documented at
+                      https://pkg.go.dev/time#ParseDuration.
                     type: string
                 required:
                 - timeout
               sink:
-                description: The destination for the client requests.
+                description: The destination where the synchronizer will forward incoming requests from the clients.
                 type: object
                 properties:
                   ref:
@@ -106,6 +107,7 @@ spec:
                 - required: [uri]
             required:
             - correlationKey
+            - response
             - sink
           status:
             type: object

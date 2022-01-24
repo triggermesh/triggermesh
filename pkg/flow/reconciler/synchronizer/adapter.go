@@ -75,6 +75,10 @@ func makeAppEnv(o *v1alpha1.Synchronizer) []corev1.EnvVar {
 			Name:  "K_SINK",
 			Value: o.Status.SinkURI.String(),
 		},
+		{
+			Name:  "RESPONSE_WAIT_TIMEOUT",
+			Value: o.Spec.Response.Timeout.String(),
+		},
 	}
 
 	if o.Spec.CorrelationKey.Length != 0 {
@@ -83,13 +87,5 @@ func makeAppEnv(o *v1alpha1.Synchronizer) []corev1.EnvVar {
 			Value: strconv.Itoa(o.Spec.CorrelationKey.Length),
 		})
 	}
-
-	if o.Spec.Response.Timeout != nil {
-		env = append(env, corev1.EnvVar{
-			Name:  "RESPONSE_WAIT_TIMEOUT",
-			Value: o.Spec.Response.Timeout.String(),
-		})
-	}
-
 	return env
 }

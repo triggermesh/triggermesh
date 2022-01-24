@@ -96,16 +96,11 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 	sendErr := make(chan error)
 	defer close(sendErr)
 
-	go func(errChan chan error) {
+	go func() {
 		if res := a.ceClient.Send(cloudevents.ContextWithTarget(ctx, a.sinkURL), a.withBridgeIdentifier(&event)); cloudevents.IsUndelivered(res) {
-			errChan <- res
+			sendErr <- res
 		}
-	}(sendErr)
-
-	a.logger.Debugf("Request forwarded to %q", a.sinkURL)
-
-	t := time.NewTimer(a.responseTimeout)
-	defer t.Stop()
+	}()
 
 	a.logger.Debugf("Waiting response for %q", correlationID)
 
@@ -121,7 +116,7 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 		a.logger.Debugf("Received response for %q", correlationID)
 		res := a.withBridgeIdentifier(result)
 		return &res, cloudevents.ResultACK
-	case <-t.C:
+	case <-time.After(a.responseTimeout):
 		a.logger.Errorf("Request %q timed out", correlationID)
 		return nil, cloudevents.NewHTTPResult(http.StatusGatewayTimeout, "backend did not respond in time")
 	}
