@@ -107,17 +107,24 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	r := rds.New(cfg)
-	var resourceID string
-	dbi, err := r.DescribeDBInstances(&rds.DescribeDBInstancesInput{})
+
+	dbi, err := r.DescribeDBInstances(&rds.DescribeDBInstancesInput{
+		Filters: []*rds.Filter{
+			{
+				Name:   aws.String("db-instance-id"),
+				Values: aws.StringSlice([]string{a.String()}),
+			},
+		},
+	})
 	if err != nil {
-		logger.Panicf("Unable describe DB instances: %v", zap.Error(err))
+		logger.Panicw("Unable to describe DB instances", zap.Error(err))
 	}
 
-	for _, instance := range dbi.DBInstances {
-		if *instance.DBInstanceArn == a.String() {
-			resourceID = *instance.DbiResourceId
-		}
+	if len(dbi.DBInstances) != 1 {
+		logger.Panic("DB instance not found: " + a.String())
 	}
+
+	resourceID := *dbi.DBInstances[0].DbiResourceId
 
 	return &adapter{
 		logger: logger,
