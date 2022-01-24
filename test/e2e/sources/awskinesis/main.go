@@ -97,6 +97,12 @@ var _ = Describe("AWS Kinesis source", func() {
 			By("creating a Kinesis datastream", func() {
 				streamARN = e2ekinesis.CreateDatastream(kc, f)
 				streamName = path.Base(aws.ParseARN(streamARN).Resource)
+
+				DeferCleanup(func() {
+					By("deleting Kinesis datastream "+streamName, func() {
+						e2ekinesis.DeleteStream(kc, streamName)
+					})
+				})
 			})
 
 			By("creating an AWSKinesisSource object", func() {
@@ -115,12 +121,6 @@ var _ = Describe("AWS Kinesis source", func() {
 				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
 				//
 				time.Sleep(2 * time.Second)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting Kinesis datastream "+streamName, func() {
-				e2ekinesis.DeleteStream(kc, streamName)
 			})
 		})
 

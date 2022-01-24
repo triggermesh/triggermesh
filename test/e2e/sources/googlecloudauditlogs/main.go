@@ -118,17 +118,16 @@ var _ = Describe("Google Cloud Audit Logs source", func() {
 		})
 
 		When("a Pub/Sub topic is created", func() {
-			var topicID string
 
 			BeforeEach(func() {
 				By("creating a Pub/Sub topic", func() {
-					topicID = e2epubsub.CreateTopic(pubsubClient, f).ID()
-				})
-			})
+					topicID := e2epubsub.CreateTopic(pubsubClient, f).ID()
 
-			AfterEach(func() {
-				By("deleting the Pub/Sub topic "+topicID, func() {
-					e2epubsub.DeleteTopic(pubsubClient, topicID)
+					DeferCleanup(func() {
+						By("deleting the Pub/Sub topic "+topicID, func() {
+							e2epubsub.DeleteTopic(pubsubClient, topicID)
+						})
+					})
 				})
 			})
 

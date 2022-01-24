@@ -98,6 +98,12 @@ var _ = Describe("Google Cloud Repositories source", func() {
 
 			By("creating a source repository", func() {
 				repoName = e2erepo.CreateRepository(repoClient, gcloudProject, f).Name
+
+				DeferCleanup(func() {
+					By("deleting the source repository "+repoName, func() {
+						e2erepo.DeleteRepository(repoClient, repoName)
+					})
+				})
 			})
 
 			By("creating a GoogleCloudSourceRepositoriesSource object", func() {
@@ -108,12 +114,6 @@ var _ = Describe("Google Cloud Repositories source", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting the source repository "+repoName, func() {
-				e2erepo.DeleteRepository(repoClient, repoName)
 			})
 		})
 

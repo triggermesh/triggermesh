@@ -99,6 +99,12 @@ var _ = Describe("AWS DynamoDB source", func() {
 			By("creating a DynamoDB table", func() {
 				tableARN = e2edynamodb.CreateTable(dc, f)
 				tableName = path.Base(aws.ParseARN(tableARN).Resource)
+
+				DeferCleanup(func() {
+					By("deleting DynamoDB table "+tableName, func() {
+						e2edynamodb.DeleteTable(dc, tableName)
+					})
+				})
 			})
 
 			By("creating an AWSDynamoDBSource object", func() {
@@ -117,12 +123,6 @@ var _ = Describe("AWS DynamoDB source", func() {
 				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
 				//
 				time.Sleep(2 * time.Second)
-			})
-		})
-
-		AfterEach(func() {
-			By("deleting DynamoDB table "+tableName, func() {
-				e2edynamodb.DeleteTable(dc, tableName)
 			})
 		})
 
