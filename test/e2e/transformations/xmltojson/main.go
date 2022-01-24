@@ -19,7 +19,6 @@ package xmltmtojson
 import (
 	"context"
 	"net/url"
-	"strings"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -32,7 +31,6 @@ import (
 	"k8s.io/client-go/dynamic"
 	clientset "k8s.io/client-go/kubernetes"
 
-	corev1 "k8s.io/api/core/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
@@ -94,13 +92,10 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	f := framework.New("xmltojsontransformation")
 	var ns string
 	var sink *duckv1.Destination
-	var sinkPodName string
-	var sinkPodIP string
 	var trnsClient dynamic.ResourceInterface
 	var trans *unstructured.Unstructured
 	var err error
 	var transURL *url.URL
-	ctx := context.Background()
 
 	Context("a Transformation is deployed with K_SINK", func() {
 		BeforeEach(func() {
@@ -149,26 +144,6 @@ var _ = Describe("XMLToJSON Transformation", func() {
 		BeforeEach(func() {
 			ns = f.UniqueName
 
-			By("creating an event sink", func() {
-				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
-				Expect(sink).NotTo(BeNil())
-
-				pl, err := f.KubeClient.CoreV1().Pods(ns).List(ctx, metav1.ListOptions{})
-				Expect(err).ToNot(HaveOccurred())
-
-				for _, item := range pl.Items {
-					in := item.GetName()
-					contains := strings.Contains(in, "event-display")
-					if contains {
-						sinkPodName = item.GetName()
-					}
-				}
-
-				p, err := f.KubeClient.CoreV1().Pods(ns).Get(ctx, sinkPodName, metav1.GetOptions{})
-				Expect(err).ToNot(HaveOccurred())
-				sinkPodIP = p.Status.PodIP
-			})
-
 			By("creating a transformation object", func() {
 				gvr := transAPIVersion.WithResource(transformationResource)
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
@@ -179,46 +154,19 @@ var _ = Describe("XMLToJSON Transformation", func() {
 				Expect(transURL).ToNot(BeNil())
 			})
 
-			By("creating a Replier Debugging service", func() {
-				const internalPort uint16 = 8080
-				const exposedPort uint16 = 80
-				env := &[]corev1.EnvVar{
-					{
-						Name:  "K_SINK",
-						Value: transURL.String(),
-					},
-					{
-						Name:  "K_DEBUG_SINK",
-						Value: "http://" + sinkPodIP + ":8080",
-					},
-				}
-
-				_, svc := apps.CreateSimpleApplication(f.KubeClient, ns,
-					"debugger", replierDebuggerImg, internalPort, exposedPort, env,
-				)
-
-				Expect(svc).NotTo(BeNil())
-			})
-
 		})
-		When("an invalid payload is sent", func() {
+		When("the service is created", func() {
 			BeforeEach(func() {
-				sentEvent := e2ece.NewHelloEvent(f)
-				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
-				apps.WaitForCompletion(f.KubeClient, job)
+				gvr := transAPIVersion.WithResource(transformationResource)
+				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
+				trans, err = createTransformation(trnsClient, ns, "test-xmltojsonreplier-", nil)
+				Expect(err).ToNot(HaveOccurred())
 			})
 
-			Specify("should generate a JSON event at the sink", func() {
-				edDeployment, err := f.KubeClient.AppsV1().Deployments(ns).Get(ctx, "event-display", metav1.GetOptions{})
-				Expect(err).ToNot(HaveOccurred())
-				edname := edDeployment.Name
-				var receivedEvents []cloudevents.Event
-				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, edname, &receivedEvents)
-				const receiveTimeout = 10 * time.Second
-				const pollInterval = 500 * time.Millisecond
-				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
-				e := receivedEvents[0]
-				Expect(e.Type()).To(Equal("io.triggermesh.xmltojsontransformation.error"))
+			Specify("it becomes ready", func() {
+				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
+				transURL = ducktypes.Address(trans)
+				Expect(transURL).ToNot(BeNil())
 			})
 		})
 	})
