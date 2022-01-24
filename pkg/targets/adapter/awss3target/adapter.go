@@ -43,9 +43,14 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	a := MustParseARN(env.AwsTargetArn)
 
+	region, err := getBucketRegion(a.Resource, env)
+	if err != nil {
+		logger.Panicf("Error getting bucket region: %v", err)
+	}
+
 	s3Session := session.Must(session.NewSession(
 		env.GetAwsConfig().
-			WithRegion(a.Region).
+			WithRegion(region).
 			WithMaxRetries(5)))
 
 	return &adapter{

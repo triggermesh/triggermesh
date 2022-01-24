@@ -1,4 +1,4 @@
-# Copyright 2021 TriggerMesh Inc.
+# Copyright 2022 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ kind: AWSS3Target
 metadata:
   name: triggermesh-aws-s3-test
 spec:
-  arn: arn:aws:s3:us-west-2:<PROJECT_ID>:bucket/accesspoint
+  arn: arn:aws:s3:::bucket
   awsApiKey:
     secretKeyRef:
       name: aws
