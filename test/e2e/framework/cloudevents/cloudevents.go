@@ -56,20 +56,6 @@ func NewHelloEvent(f *framework.Framework) *cloudevents.Event {
 	return &event
 }
 
-// NewXMLHelloEvent generates a CloudEvent with dummy values and an XML data payload.
-func NewXMLHelloEvent(f *framework.Framework) *cloudevents.Event {
-	event := cloudevents.NewEvent()
-	event.SetID("0000")
-	event.SetType("e2e.test")
-	event.SetSource("e2e.triggermesh")
-	event.SetExtension(E2ECeExtension, f.UniqueName)
-	if err := event.SetData(cloudevents.ApplicationXML, `<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Dont forget me this weekend</body></note>`); err != nil {
-		framework.FailfWithOffset(2, "Error setting event data: %s", err)
-	}
-
-	return &event
-}
-
 // RunEventSender runs a job which sends a CloudEvent payload to the given URL.
 // The function doesn't wait for the job to complete, but the job gets retried
 // in case of failure.
