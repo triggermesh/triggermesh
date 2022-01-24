@@ -94,6 +94,14 @@ var _ = Describe("AWS CodeCommit source", func() {
 
 			By("creating a CodeCommit repository", func() {
 				repoARN = e2ecodecommit.CreateRepository(ccClient, f)
+
+				DeferCleanup(func() {
+					repoName := aws.ParseARN(repoARN).Resource
+
+					By("deleting the CodeCommit repository "+repoName, func() {
+						e2ecodecommit.DeleteRepository(ccClient, repoName)
+					})
+				})
 			})
 
 			By("creating an AWSCodeCommitSource object", func() {
@@ -112,14 +120,6 @@ var _ = Describe("AWS CodeCommit source", func() {
 				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
 				//
 				time.Sleep(2 * time.Second)
-			})
-		})
-
-		AfterEach(func() {
-			repoName := aws.ParseARN(repoARN).Resource
-
-			By("deleting the CodeCommit repository "+repoName, func() {
-				e2ecodecommit.DeleteRepository(ccClient, repoName)
 			})
 		})
 

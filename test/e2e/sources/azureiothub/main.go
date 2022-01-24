@@ -106,6 +106,10 @@ var _ = Describe("Azure IOT Hub Source", func() {
 		When("an event flows", func() {
 			BeforeEach(func() {
 				rg = azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+				DeferCleanup(func() {
+					_ = azure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
+				})
+
 				deviceKey, iotHubAddress = azure.CreateIOTHubComponents(ctx, subscriptionID, *rg.Name, region, ns)
 			})
 
@@ -158,9 +162,6 @@ var _ = Describe("Azure IOT Hub Source", func() {
 					Expect(testData["id"]).To(Equal("1"))
 					Expect(testData["data"]).To(Equal("a test payload"))
 				})
-			})
-			AfterEach(func() {
-				_ = azure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
 			})
 		})
 	})

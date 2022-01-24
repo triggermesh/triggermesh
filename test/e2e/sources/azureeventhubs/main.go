@@ -109,6 +109,10 @@ var _ = Describe("Azure EventHubs", func() {
 		When("an event flows", func() {
 			BeforeEach(func() {
 				rg = azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+				DeferCleanup(func() {
+					_ = azure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
+				})
+
 				hub = azure.CreateEventHubComponents(ctx, subscriptionID, ns, region, *rg.Name)
 
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
@@ -151,10 +155,6 @@ var _ = Describe("Azure EventHubs", func() {
 				err = json.Unmarshal(e.Data(), &data)
 				testID := fmt.Sprintf("%v", data["ID"])
 				Expect(data["ID"]).To(Equal(testID))
-			})
-
-			AfterEach(func() {
-				_ = azure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
 			})
 		})
 	})

@@ -152,6 +152,10 @@ var _ = Describe("Azure Queue Storage", func() {
 			accountName = strings.Replace(accountName, "e2eazurequeuestoragesource", "tme2etest", -1)
 
 			rg = e2eazure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+			DeferCleanup(func() {
+				_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
+			})
+
 			storageClient := e2eazure.CreateStorageAccountsClient(subscriptionID)
 
 			_ = e2eazure.CreateQueueStorageAccount(ctx, storageClient, accountName, *rg.Name, region)
@@ -168,10 +172,6 @@ var _ = Describe("Azure Queue Storage", func() {
 			By("creating a queue storage", func() {
 				queueMessage = e2eazure.CreateQueueStorage(ctx, ns, accountName, accountKey)
 			})
-		})
-
-		AfterEach(func() {
-			_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
 		})
 
 		Context("the subscription is managed by the source", func() {
