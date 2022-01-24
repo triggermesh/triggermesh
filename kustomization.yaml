@@ -87,6 +87,7 @@ resources:
 - config/302-splitter.yaml
 - config/303-function.yaml
 - config/304-transformation.yaml
+- config/304-xmltojsontransformation.yaml
 - config/304-xslttransform.yaml
 - config/500-controller.yaml
 - config/500-webhook-configuration.yaml
