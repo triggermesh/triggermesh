@@ -40,6 +40,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 const (
@@ -116,6 +117,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
+	go health.Start(ctx)
+
+	if _, err := a.getLatestStreamARN(ctx); err != nil {
+		return fmt.Errorf("verifying stream for table %q: %w", a.arn, err)
+	}
+
+	health.MarkReady()
+
 	a.logger.Info("Starting collection of DynamoDB records for table ", a.arn)
 
 	t := time.NewTimer(0)

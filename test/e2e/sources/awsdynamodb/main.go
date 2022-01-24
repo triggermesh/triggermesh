@@ -115,14 +115,6 @@ var _ = Describe("AWS DynamoDB source", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
-
-				// FIXME(antoineco): without this short pause, the receive adapter throws the following
-				// error when sending the event:
-				//
-				//   Sending DynamoDB event
-				//   Post "http://event-display.{...}": dial tcp 10.x.x.x:80: connect: connection refused
-				//
-				time.Sleep(2 * time.Second)
 			})
 		})
 

@@ -82,7 +82,6 @@ func TestNewContainer(t *testing.T) {
 					Port: intstr.FromString("health"),
 				},
 			},
-			InitialDelaySeconds: 2,
 		},
 		StartupProbe: &corev1.Probe{
 			Handler: corev1.Handler{

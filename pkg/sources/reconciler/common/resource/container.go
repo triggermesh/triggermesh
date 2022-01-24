@@ -163,10 +163,6 @@ func Probe(path, port string) ObjectOption {
 					Port: intstrPort,
 				},
 			},
-			// TODO(antoineco): remove delay after switching to StartupProbe, which is enabled by default
-			// starting with Kubernetes 1.18.
-			// Ref. https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
-			InitialDelaySeconds: 2,
 		}
 	}
 }

@@ -37,6 +37,8 @@ const (
 	envMetrics         = "PI_METRICS"
 )
 
+const healthPortName = "health"
+
 // adapterConfig contains properties used to configure the source's adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
@@ -59,9 +61,11 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVar(common.EnvARN, typedSrc.Spec.ARN.String()),
 		resource.EnvVar(envPollingInterval, typedSrc.Spec.PollingInterval.String()),
 		resource.EnvVar(envMetrics, strings.Join(typedSrc.Spec.Metrics, ",")),
-
 		resource.EnvVars(common.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+
+		resource.Port(healthPortName, 8080),
+		resource.StartupProbe("/health", healthPortName),
 	)
 }
 

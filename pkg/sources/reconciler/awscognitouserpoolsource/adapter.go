@@ -57,7 +57,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
-		resource.Probe("/health", healthPortName),
+		resource.StartupProbe("/health", healthPortName),
 	)
 }
 

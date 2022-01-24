@@ -93,7 +93,6 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 											Path: "/health",
 										},
 									},
-									InitialDelaySeconds: 2,
 								},
 								Resources: corev1.ResourceRequirements{
 									Requests: corev1.ResourceList{

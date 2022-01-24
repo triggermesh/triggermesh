@@ -36,6 +36,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 var (
@@ -109,6 +110,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
+	go health.Start(ctx)
+
+	if err := peekRepo(ctx, a.ccClient, a.arn.Resource); err != nil {
+		return fmt.Errorf("unable to access repository %q: %w", a.arn, err)
+	}
+
+	health.MarkReady()
+
 	if strings.Contains(a.gitEvents, pushEventType) {
 		a.logger.Info("Push events enabled")
 
@@ -290,4 +299,12 @@ func removeOldPRs(oldPrs, newPrs []*codecommit.PullRequest) []*codecommit.PullRe
 		}
 	}
 	return res
+}
+
+// peekRepo verifies that the provided repository exists.
+func peekRepo(ctx context.Context, cli codecommitiface.CodeCommitAPI, repoName string) error {
+	_, err := cli.GetRepositoryWithContext(ctx, &codecommit.GetRepositoryInput{
+		RepositoryName: &repoName,
+	})
+	return err
 }

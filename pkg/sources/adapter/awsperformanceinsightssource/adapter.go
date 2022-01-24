@@ -18,6 +18,7 @@ package awsperformanceinsightssource
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.uber.org/zap"
@@ -28,6 +29,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/pi"
+	"github.com/aws/aws-sdk-go/service/pi/piiface"
 	"github.com/aws/aws-sdk-go/service/rds"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
@@ -35,9 +37,8 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
-
-const serviceType = "RDS"
 
 // envConfig is a set parameters sourced from the environment for the source's
 // adapter.
@@ -142,6 +143,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
+	go health.Start(ctx)
+
+	if err := peekResourceMetrics(ctx, a.pIClient, a.resourceID); err != nil {
+		return fmt.Errorf("unable to read resource metrics: %w", err)
+	}
+
+	health.MarkReady()
+
 	a.logger.Info("Enabling AWS Performance Insights Source")
 
 	// Setup polling to retrieve metrics
@@ -169,7 +178,7 @@ func (a *adapter) PollMetrics(priorTime time.Time, currentTime time.Time) {
 		StartTime:     aws.Time(priorTime),
 		Identifier:    aws.String(a.resourceID),
 		MetricQueries: a.metricQueries,
-		ServiceType:   aws.String(serviceType),
+		ServiceType:   aws.String(pi.ServiceTypeRds),
 	}
 
 	rm, err := a.pIClient.GetResourceMetrics(rmi)
@@ -206,4 +215,16 @@ func (a *adapter) PollMetrics(priorTime time.Time, currentTime time.Time) {
 			}
 		}
 	}
+}
+
+// peekResourceMetrics verifies that there are metrics available for the given
+// DB instance.
+func peekResourceMetrics(ctx context.Context, cli piiface.PIAPI, dbInstanceID string) error {
+	_, err := cli.ListAvailableResourceMetricsWithContext(ctx, &pi.ListAvailableResourceMetricsInput{
+		Identifier:  &dbInstanceID,
+		MetricTypes: aws.StringSlice([]string{"os", "db"}),
+		ServiceType: aws.String(pi.ServiceTypeRds),
+		MaxResults:  aws.Int64(1),
+	})
+	return err
 }
