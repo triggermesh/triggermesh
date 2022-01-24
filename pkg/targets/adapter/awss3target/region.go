@@ -29,8 +29,7 @@ const defaultS3Region = "us-east-1"
 // getBucketRegion retrieves the region the provided bucket resides in.
 func getBucketRegion(bucketName string, env *envAccessor) (string, error) {
 	sess := session.Must(session.NewSession(env.GetAwsConfig().
-		WithRegion(defaultS3Region).
-		WithMaxRetries(5)))
+		WithRegion(defaultS3Region)))
 
 	resp, err := s3.New(sess).GetBucketLocation(&s3.GetBucketLocationInput{
 		Bucket: &bucketName,

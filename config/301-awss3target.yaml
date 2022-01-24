@@ -88,7 +88,7 @@ spec:
                 type: string
                 description: ARN of the S3 bucket that will receive events. The expected format is documented at
                   https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
-                pattern: ^arn:aws(-cn|-us-gov)?:s3:::.+$
+                pattern: ^arn:aws(-cn|-us-gov)?:s3:::[0-9a-z][0-9a-z.-]{2,62}$
               discardCloudEventContext:
                 description: Whether to omit CloudEvent context attributes in objects created in S3.
                   When this property is false (default), the entire CloudEvent payload is included.
