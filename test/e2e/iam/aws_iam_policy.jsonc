@@ -195,6 +195,7 @@
             "Sid": "AWSS3TargetReceiveAdapter",
             "Effect": "Allow",
             "Action": [
+                "s3:GetBucketLocation",
                 "s3:PutObject"
             ],
             "Resource": "arn:aws:s3:::e2e-*"
