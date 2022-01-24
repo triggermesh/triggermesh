@@ -45,9 +45,6 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, s *v1alpha1.Synchronizer) pkgreconciler.Event {
-	s.Status.InitializeConditions()
-	s.Status.ObservedGeneration = s.Generation
-
 	uri, err := r.resolveDestination(ctx, s)
 	if err != nil {
 		s.Status.MarkNoSink()

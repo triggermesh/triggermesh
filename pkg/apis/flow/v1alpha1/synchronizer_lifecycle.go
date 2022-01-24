@@ -35,11 +35,6 @@ var SynchronizerCondSet = apis.NewLivingConditionSet(
 	ConditionDeployed,
 )
 
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *SynchronizerStatus) InitializeConditions() {
-	SynchronizerCondSet.Manage(s).InitializeConditions()
-}
-
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
 // ConditionDeployed should be marked as true or false.
 func (s *SynchronizerStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
