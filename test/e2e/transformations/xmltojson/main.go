@@ -50,8 +50,6 @@ const (
 	transformationResource = "xmltojsontransformations"
 
 	expectedResponseEvent = "{\"string\":\"\\u003cnote\\u003e\\u003cto\\u003eTove\\u003c/to\\u003e\\u003cfrom\\u003eJani\\u003c/from\\u003e\\u003cheading\\u003eReminder\\u003c/heading\\u003e\\u003cbody\\u003eDont forget me this weekend\\u003c/body\\u003e\\u003c/note\\u003e\"}"
-
-	replierDebuggerImg = "gcr.io/ultra-hologram-297914/eventsender-6f71dd4d98b0f6b0991209485bfb9e15@sha256:d06c9507428837f500a754a211f0daba6e4d0d35f691f9f4c55dcdc4bb1759d4"
 )
 
 // createTransformation creates an AWSKinesis object initialized with the given options.
@@ -143,16 +141,6 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	Context("a Transformation is deployed without K_SINK", func() {
 		BeforeEach(func() {
 			ns = f.UniqueName
-
-			By("creating a transformation object", func() {
-				gvr := transAPIVersion.WithResource(transformationResource)
-				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
-				trans, err = createTransformation(trnsClient, ns, "test-xmltojsonreplier-", nil)
-				Expect(err).ToNot(HaveOccurred())
-				trans = ducktypes.WaitUntilReady(f.DynamicClient, trans)
-				transURL = ducktypes.Address(trans)
-				Expect(transURL).ToNot(BeNil())
-			})
 
 		})
 		When("the service is created", func() {

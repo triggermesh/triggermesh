@@ -55,7 +55,7 @@ func CreateEventDisplaySink(c clientset.Interface, namespace string) *duckv1.Des
 	const exposedPort uint16 = 80
 
 	_, svc := apps.CreateSimpleApplication(c, namespace,
-		eventDisplayName, eventDisplayContainerImage, internalPort, exposedPort, nil,
+		eventDisplayName, eventDisplayContainerImage, internalPort, exposedPort,
 		apps.WithStartupProbe("/healthz"),
 	)
 
