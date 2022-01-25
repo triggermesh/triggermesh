@@ -25,6 +25,7 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
+        { "type": "io.triggermesh.xslttransform.error" },
         { "type": "*" }
       ]
 spec:
