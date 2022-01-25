@@ -47,7 +47,7 @@ require (
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
 	github.com/golang-jwt/jwt/v4 v4.2.0
 	github.com/google/cel-go v0.9.0
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.7
 	github.com/google/uuid v1.3.0
 	github.com/ibm-messaging/mq-golang/v5 v5.2.4
 	github.com/jarcoal/httpmock v1.1.0
