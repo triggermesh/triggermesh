@@ -12,7 +12,7 @@ require (
 
 // Top-level module control over the exact version used for important direct dependencies.
 // https://github.com/golang/go/wiki/Modules#when-should-i-use-the-replace-directive
-replace k8s.io/client-go => k8s.io/client-go v0.21.4
+replace k8s.io/client-go => k8s.io/client-go v0.22.5
 
 require (
 	cloud.google.com/go/billing v1.0.0
