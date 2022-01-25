@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"time"
 
-	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/number"
 	"go.opentelemetry.io/otel/metric/sdkapi"
 	"go.opentelemetry.io/otel/metric/unit"
@@ -36,7 +35,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 }
 
 type Instrument struct {
-	metric.Descriptor
+	sdkapi.Descriptor
 	Name        string
 	Instrument  string
 	Number      string
@@ -91,7 +90,7 @@ func (is *Instruments) Decode(value string) error {
 			return fmt.Errorf("unknown metric number kind %q", i.Number)
 		}
 
-		i.Descriptor = metric.NewDescriptor(i.Name, ikind, nkind, i.Description, unit.Dimensionless)
+		i.Descriptor = sdkapi.NewDescriptor(i.Name, ikind, nkind, i.Description, unit.Dimensionless)
 	}
 
 	return nil
