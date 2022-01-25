@@ -96,8 +96,7 @@ func (a *Adapter) Start(ctx context.Context) error {
 }
 
 func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	// path := os.Getenv("KO_DATA_PATH") + "/static/dw"
-	path := "dw"
+	path := os.Getenv("KO_DATA_PATH") + "/static/dw"
 	f := os.NewFile(0, "event.json")
 	err := os.WriteFile("event.json", event.Data(), 0644)
 	if err != nil {
