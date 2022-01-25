@@ -163,7 +163,7 @@ CUSTOM_IMAGES 	   = $(foreach cmd,$(CUSTOM_BUILD_IMAGES),$(cmd).image)
 
 images: $(KO_IMAGES) $(CUSTOM_IMAGES) ## Build container images
 $(KO_IMAGES): %.image:
-	$(KO) publish --push=false -B --tag-only -t $(IMAGE_TAG) ./cmd/$*
+	$(KO) publish --push=false -B -t $(IMAGE_TAG) ./cmd/$*
 
 $(CUSTOM_IMAGES): %.image:
 	@$(MAKE) -C ./cmd/$* image CONTEXT=$(BASE_DIR) IMAGE_TAG=$(KO_DOCKER_REPO)/$*:$(IMAGE_TAG)
