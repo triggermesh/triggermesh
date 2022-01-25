@@ -113,6 +113,9 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 
 	output := string(out)
 	cleaned := strings.ReplaceAll(output, "\n", "")
-	event.SetData(a.contentType, cleaned)
+
+	if err := event.SetData(a.contentType, cleaned); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+	}
 	return &event, cloudevents.ResultACK
 }
