@@ -110,8 +110,9 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	}
 
 	if a.sink != "" {
-		if err := a.ceClient.Send(ctx, event); err != nil {
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+
 		}
 		return nil, cloudevents.ResultACK
 	}
