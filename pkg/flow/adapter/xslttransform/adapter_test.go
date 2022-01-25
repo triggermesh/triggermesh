@@ -275,7 +275,6 @@ func TestXSLTTransformKSINK(t *testing.T) {
 		expectCategory         string
 	}{
 		"transform ok": {
-			allowXSLTOverride:      false,
 			xslt:                   tXSLT,
 			inEvent:                newCloudEvent(tXML, cloudevents.ApplicationXML),
 			expectedStringResponse: tExpectedResponseString,
@@ -298,7 +297,7 @@ func TestXSLTTransformKSINK(t *testing.T) {
 					Sink:      svr.URL,
 				},
 				XSLT:              tc.xslt,
-				AllowXSLTOverride: tc.allowXSLTOverride,
+				AllowXSLTOverride: false,
 				BridgeIdentifier:  tBridgeID,
 			}
 			ctx := context.Background()
