@@ -89,10 +89,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 // or the context is cancelled.
 func (a *xsltTransformAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting XSLT transformer")
-	return a.ceClient.StartReceiver(ctx, a.dispatch)
+	return a.ceClient.StartReceiver(ctx, a.Dispatch)
 }
 
-func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *xsltTransformAdapter) Dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	isStructuredTransform := event.Type() == v1alpha1.EventTypeXSLTTransform
 	if isStructuredTransform && !a.xsltOverride {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,

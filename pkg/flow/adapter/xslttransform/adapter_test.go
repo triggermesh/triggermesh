@@ -19,10 +19,6 @@ package xslttransform
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -33,6 +29,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
+	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	logtesting "knative.dev/pkg/logging/testing"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
@@ -269,50 +266,59 @@ func TestXSLTTransformKSINK(t *testing.T) {
 		allowXSLTOverride bool
 		xslt              string
 
-		inEvent                cloudevents.Event
-		expectedStringResponse string
-		expectPanic            string
-		expectCategory         string
+		inEvent             cloudevents.Event
+		expectedEventString string
+		expectPanic         string
+		expectCategory      string
 	}{
 		"transform ok": {
-			xslt:                   tXSLT,
-			inEvent:                newCloudEvent(tXML, cloudevents.ApplicationXML),
-			expectedStringResponse: tExpectedResponseString,
-			expectCategory:         tSuccessAttribute,
+			xslt:                tXSLT,
+			inEvent:             newCloudEvent(tXML, cloudevents.ApplicationXML),
+			expectedEventString: "Context Attributes,\n  specversion: 1.0\n  type: ce.test.type\n  source: ce.test.source\n  id: ce-abcd-0123\n  datacontenttype: application/xml\nData (binary),\n  <?xml version=\"1.0\"?>\n<output>\n  <item>A1</item>\n  <item>B2</item>\n  <item>C3</item>\n</output>\n\n",
+			expectCategory:      tSuccessAttribute,
 		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				body, err := ioutil.ReadAll(r.Body)
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedStringResponse, string(body))
-				fmt.Fprintf(w, "OK")
-			}))
-			defer svr.Close()
+			ceClient := adaptertest.NewTestClient()
 
 			env := &envAccessor{
 				EnvConfig: adapter.EnvConfig{
 					Component: tCloudEventSource,
-					Sink:      svr.URL,
+					Sink:      "http://localhost:8080",
 				},
 				XSLT:              tc.xslt,
 				AllowXSLTOverride: false,
 				BridgeIdentifier:  tBridgeID,
 			}
+
 			ctx := context.Background()
-			c, err := cloudevents.NewClientHTTP()
+			style, err := parseXSLT(tc.xslt)
 			assert.NoError(t, err)
-			a := NewTarget(ctx, env, c)
 
-			go func() {
-				if err := a.Start(ctx); err != nil {
-					assert.FailNow(t, "could not start test adapter")
-				}
-			}()
+			replier, err := targetce.New(env.Component, logtesting.TestLogger(t),
+				targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
+				targetce.ReplierWithStaticDataContentType(cloudevents.ApplicationXML),
+				targetce.ReplierWithStaticErrorDataContentType(*cloudevents.StringOfApplicationJSON()),
+				targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)),
+				targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeXSLTTransformError))
+			assert.NoError(t, err)
 
-			response := sendCE(t, &tc.inEvent, c, svr.URL)
-			assert.NotEqual(t, cloudevents.IsUndelivered(response), response)
+			a := &xsltTransformAdapter{
+				logger: logtesting.TestLogger(t),
+
+				ceClient:     ceClient,
+				xsltOverride: false,
+				defaultXSLT:  style,
+				replier:      replier,
+				sink:         "http://localhost:8080",
+			}
+			a.Dispatch(ctx, tc.inEvent)
+
+			events := ceClient.Sent()
+
+			assert.Equal(t, 1, len(events))
+			assert.Equal(t, tc.expectedEventString, events[0].String())
 		})
 	}
 }
