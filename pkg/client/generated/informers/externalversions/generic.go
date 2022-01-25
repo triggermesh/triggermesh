@@ -61,6 +61,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Extensions().V1alpha1().Functions().Informer()}, nil
 
 		// Group=flow.triggermesh.io, Version=v1alpha1
+	case flowv1alpha1.SchemeGroupVersion.WithResource("synchronizers"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().Synchronizers().Informer()}, nil
 	case flowv1alpha1.SchemeGroupVersion.WithResource("transformations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().Transformations().Informer()}, nil
 	case flowv1alpha1.SchemeGroupVersion.WithResource("xmltojsontransformations"):

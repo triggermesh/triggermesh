@@ -265,6 +265,137 @@ func (w *wrapFlowV1alpha1) RESTClient() rest.Interface {
 	panic("RESTClient called on dynamic client!")
 }
 
+func (w *wrapFlowV1alpha1) Synchronizers(namespace string) typedflowv1alpha1.SynchronizerInterface {
+	return &wrapFlowV1alpha1SynchronizerImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "flow.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "synchronizers",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapFlowV1alpha1SynchronizerImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedflowv1alpha1.SynchronizerInterface = (*wrapFlowV1alpha1SynchronizerImpl)(nil)
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) Create(ctx context.Context, in *flowv1alpha1.Synchronizer, opts v1.CreateOptions) (*flowv1alpha1.Synchronizer, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "Synchronizer",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.Synchronizer{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*flowv1alpha1.Synchronizer, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.Synchronizer{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) List(ctx context.Context, opts v1.ListOptions) (*flowv1alpha1.SynchronizerList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.SynchronizerList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *flowv1alpha1.Synchronizer, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.Synchronizer{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) Update(ctx context.Context, in *flowv1alpha1.Synchronizer, opts v1.UpdateOptions) (*flowv1alpha1.Synchronizer, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "Synchronizer",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.Synchronizer{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) UpdateStatus(ctx context.Context, in *flowv1alpha1.Synchronizer, opts v1.UpdateOptions) (*flowv1alpha1.Synchronizer, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "flow.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "Synchronizer",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &flowv1alpha1.Synchronizer{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapFlowV1alpha1SynchronizerImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapFlowV1alpha1) Transformations(namespace string) typedflowv1alpha1.TransformationInterface {
 	return &wrapFlowV1alpha1TransformationImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
