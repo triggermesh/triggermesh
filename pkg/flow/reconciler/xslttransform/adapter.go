@@ -35,6 +35,7 @@ const (
 
 	envXSLT              = "XSLTTRANSFORM_XSLT"
 	envAllowXSLTOverride = "XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE"
+	envSink              = "K_SINK"
 )
 
 // adapterConfig contains properties used to configure the component's adapter.
@@ -47,8 +48,8 @@ type adapterConfig struct {
 }
 
 // makeAdapterKService generates the adapter knative service structure.
-func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig) (*servingv1.Service, error) {
-	envApp, err := makeAppEnv(o)
+func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig, sink string) (*servingv1.Service, error) {
+	envApp, err := makeAppEnv(o, sink)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig) (*servin
 		resources.KsvcPodEnvVars(envs)), nil
 }
 
-func makeAppEnv(o *v1alpha1.XSLTTransform) ([]corev1.EnvVar, error) {
+func makeAppEnv(o *v1alpha1.XSLTTransform, sink string) ([]corev1.EnvVar, error) {
 	env := []corev1.EnvVar{
 		*o.Spec.XSLT.ToEnvironmentVariable(envXSLT),
 		{
@@ -84,5 +85,11 @@ func makeAppEnv(o *v1alpha1.XSLTTransform) ([]corev1.EnvVar, error) {
 		})
 	}
 
+	if sink != "" {
+		env = append(env, corev1.EnvVar{
+			Name:  envSink,
+			Value: sink,
+		})
+	}
 	return env, nil
 }

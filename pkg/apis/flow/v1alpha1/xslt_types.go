@@ -61,6 +61,10 @@ type XSLTTransformSpec struct {
 	// Whether the default XSLT can be overriden at each event
 	// +optional
 	AllowPerEventXSLT *bool `json:"allowPerEventXSLT,omitempty"`
+
+	// Sink is a reference to an object that will resolve to a uri to use as the sink.
+	// +optional
+	Sink *duckv1.Destination `json:"sink,omitempty"`
 }
 
 // XSLTTransformStatus communicates the observed state of the component.

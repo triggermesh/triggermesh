@@ -42,6 +42,7 @@ type xsltTransformAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	sink     string
 }
 
 // NewTarget adapter implementation
@@ -57,7 +58,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
 		targetce.ReplierWithStaticDataContentType(cloudevents.ApplicationXML),
 		targetce.ReplierWithStaticErrorDataContentType(*cloudevents.StringOfApplicationJSON()),
-		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)))
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeXSLTTransformError))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
@@ -68,6 +70,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
+		sink:     env.Sink,
 	}
 
 	if env.XSLT != "" {
@@ -137,6 +140,23 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			fmt.Errorf("eror processing XML with XSLT: %v", err), nil)
+	}
+
+	if isXML {
+		if err := event.SetData(cloudevents.ApplicationXML, output); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+	} else {
+		if err := event.SetData(cloudevents.ApplicationJSON, output); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+	}
+
+	if a.sink != "" {
+		if err := a.ceClient.Send(ctx, event); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+		return nil, cloudevents.ResultACK
 	}
 
 	return a.replier.Ok(&event, []byte(output), targetce.ResponseWithDataContentType(cloudevents.ApplicationXML))
