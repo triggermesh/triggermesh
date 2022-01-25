@@ -46,14 +46,14 @@ var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransform) pkgreconciler.Event {
-	var url string
+	var url *apis.URL
 
 	if o.Spec.Sink != nil {
 		uri, err := r.resolveDestination(ctx, o)
 		if err != nil {
 			return fmt.Errorf("cannot resolve Sink destination: %w", err)
 		}
-		url = uri.String()
+		url = uri
 	}
 
 	ksvc, err := makeAdapterKService(o, r.adapterCfg, url)
