@@ -24,9 +24,7 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
-	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
@@ -125,8 +123,6 @@ const (
   <item>C3</item>
 </alt>
 `
-
-	tExpectedResponseString = "\n<tests>\n  <test>\n    <data>\n      <el1>A</el1>\n      <el2>1</el2>\n    </data>\n  </test>\n  <test>\n    <data>\n\t\t\t<el1>B</el1>\n\t\t\t<el2>2</el2>\n    </data>\n  </test>\n  <test>\n    <data>\n\t\t\t<el1>C</el1>\n\t\t\t<el2>3</el2>\n    </data>\n  </test>\n</tests>\n"
 )
 
 func TestXSLTTransformEvents(t *testing.T) {
@@ -285,11 +281,8 @@ func TestXSLTTransformKSINK(t *testing.T) {
 			env := &envAccessor{
 				EnvConfig: adapter.EnvConfig{
 					Component: tCloudEventSource,
-					Sink:      "http://localhost:8080",
 				},
-				XSLT:              tc.xslt,
-				AllowXSLTOverride: false,
-				BridgeIdentifier:  tBridgeID,
+				BridgeIdentifier: tBridgeID,
 			}
 
 			ctx := context.Background()
@@ -313,7 +306,9 @@ func TestXSLTTransformKSINK(t *testing.T) {
 				replier:      replier,
 				sink:         "http://localhost:8080",
 			}
-			a.Dispatch(ctx, tc.inEvent)
+
+			_, r := a.Dispatch(ctx, tc.inEvent)
+			assert.Equal(t, cloudevents.ResultACK, r)
 
 			events := ceClient.Sent()
 
@@ -378,13 +373,4 @@ func createErrorResponse(code, description string) string {
 	}
 
 	return string(b)
-}
-
-func sendCE(t *testing.T, event *cloudevents.Event, cs cloudevents.Client, sink string) protocol.Result {
-	ctx := cloudevents.ContextWithTarget(context.Background(), sink)
-	c, err := cloudevents.NewClientHTTP()
-	require.NoError(t, err)
-
-	result := c.Send(ctx, *event)
-	return result
 }
