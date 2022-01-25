@@ -30,8 +30,8 @@ import (
 
 	"go.opentelemetry.io/contrib/exporters/metric/cortex"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/number"
+	"go.opentelemetry.io/otel/metric/sdkapi"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
@@ -42,8 +42,8 @@ var _ pkgadapter.Adapter = (*cortexAdapter)(nil)
 
 // instrumentRef is a reference to an instrument descriptor and its implementation.
 type instrumentRef struct {
-	descriptor metric.Descriptor
-	sync       metric.SyncImpl
+	descriptor sdkapi.Descriptor
+	sync       sdkapi.SyncImpl
 }
 
 type opentelemetryAdapter struct {

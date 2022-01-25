@@ -22,7 +22,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/stretchr/testify/assert"
-	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/sdkapi"
 	"go.opentelemetry.io/otel/metric/unit"
 )
 
@@ -50,18 +50,18 @@ func TestEnvironmentInstruments(t *testing.T) {
 
 	testCases := map[string]struct {
 		envInstruments      string
-		expectedInstruments []metric.Descriptor
+		expectedInstruments []sdkapi.Descriptor
 		expectedErr         string
 	}{
 		"simple metric": {
 			envInstruments: `[{"name":"inst-name","instrument":"` + tInstKindString + `","number":"` + tInstNumKindString + `"}]`,
-			expectedInstruments: []metric.Descriptor{
-				metric.NewDescriptor(tInstName, tInstKind, tInstNumKind, "", tInstUnit),
+			expectedInstruments: []sdkapi.Descriptor{
+				sdkapi.NewDescriptor(tInstName, tInstKind, tInstNumKind, "", tInstUnit),
 			}},
 		"metric with description": {
 			envInstruments: `[{"name":"` + tInstName + `","instrument":"` + tInstKindString + `","number":"` + tInstNumKindString + `","description":"` + tInstDescription + `"}]`,
-			expectedInstruments: []metric.Descriptor{
-				metric.NewDescriptor(tInstName, tInstKind, tInstNumKind, tInstDescription, tInstUnit),
+			expectedInstruments: []sdkapi.Descriptor{
+				sdkapi.NewDescriptor(tInstName, tInstKind, tInstNumKind, tInstDescription, tInstUnit),
 			}},
 		"unknown instrument": {
 			envInstruments: `[{"name":"` + tInstName + `","instrument":"Unknown","number":"` + tInstNumKindString + `"}]`,
@@ -110,7 +110,7 @@ func TestEnvironmentInstruments(t *testing.T) {
 				return
 			}
 
-			insts := make([]metric.Descriptor, 0, len(env.Instruments))
+			insts := make([]sdkapi.Descriptor, 0, len(env.Instruments))
 			for _, i := range env.Instruments {
 				insts = append(insts, i.Descriptor)
 			}
