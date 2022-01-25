@@ -46,8 +46,6 @@ var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransform) pkgreconciler.Event {
-	o.Status.InitializeConditions()
-	o.Status.ObservedGeneration = o.Generation
 	var url string
 
 	if o.Spec.Sink != nil {
