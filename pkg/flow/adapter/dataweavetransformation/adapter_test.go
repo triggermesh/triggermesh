@@ -43,7 +43,7 @@ const (
 	tSpell1      = "output application/json --- payload filter (item) -> item.age > 15"
 	tJSONOutput1 = `[{"name": "User1","age": 19},{"name": "User2","age": 18},{"name": "User3","age": 15},{"name": "User4","age": 13},{"name": "User5","age": 16}]`
 
-	tFalseJson         = `"this is not JSON"`
+	tFalseJSON         = `"this is not JSON"`
 	tFalseJSONResponse = "{\"Code\":\"adapter-process\",\"Description\":\"exit status 255\",\"Details\":\"executing the spell\"}"
 	tReplierResponse   = "\"[  {    \\\"name\\\": \\\"User1\\\",    \\\"age\\\": 19  },  {    \\\"name\\\": \\\"User2\\\",    \\\"age\\\": 18  },  {    \\\"name\\\": \\\"User5\\\",    \\\"age\\\": 16  }]\""
 )
@@ -107,7 +107,7 @@ func TestReplier(t *testing.T) {
 			spell:       tSpell1,
 		},
 		"transform error": {
-			inEvent:     newCloudEvent(t, tFalseJson, cloudevents.ApplicationJSON),
+			inEvent:     newCloudEvent(t, tFalseJSON, cloudevents.ApplicationJSON),
 			expectEvent: newCloudEvent(t, tFalseJSONResponse, cloudevents.ApplicationXML),
 			spell:       tSpell1,
 		},
