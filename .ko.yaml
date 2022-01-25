@@ -3,6 +3,7 @@
 baseImageOverrides:
   github.com/triggermesh/triggermesh/cmd/confluenttarget-adapter: gcr.io/distroless/base:nonroot
   github.com/triggermesh/triggermesh/cmd/xslttransform-adapter: gcr.io/triggermesh/debian-libxml:v0.1.0
+  github.com/triggermesh/triggermesh/cmd/dataweavetransformation-adapter: ubuntu:latest
 
 builds:
 - id: confluenttarget-adapter

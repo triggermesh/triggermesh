@@ -1,0 +1,14 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: test
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/ultra-hologram-297914/dataweavetransformation-adapter-357a9fc4f54129c8d142db57dfa58519@sha256:66b356159f46bfe839a4b0b39db235567e79d4f3a71b1a984c053aa863e69954
+          env:
+            - name: DATAWEAVE_TRANSFORMATION_ADAPTER_IMAGE
+              value: gcr.io/ultra-hologram-297914/dataweavetransformation-adapter-357a9fc4f54129c8d142db57dfa58519@sha256:66b356159f46bfe839a4b0b39db235567e79d4f3a71b1a984c053aa863e69954
+
+
