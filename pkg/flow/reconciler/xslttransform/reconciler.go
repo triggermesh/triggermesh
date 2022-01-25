@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransfor
 	var url string
 
 	if o.Spec.Sink != nil {
-		uri, err := r.resolveDestination(ctx, s)
+		uri, err := r.resolveDestination(ctx, o)
 		if err != nil {
 			return fmt.Errorf("cannot resolve Sink destination: %w", err)
 		}
@@ -68,7 +68,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransfor
 	return event
 }
 
-func (r *reconciler) resolveDestination(ctx context.Context, s *v1alpha1.XMLToJSONTransformation) (*apis.URL, error) {
+func (r *reconciler) resolveDestination(ctx context.Context, s *v1alpha1.XSLTTransform) (*apis.URL, error) {
 	dest := s.Spec.Sink.DeepCopy()
 	if dest.Ref != nil {
 		if dest.Ref.Namespace == "" {

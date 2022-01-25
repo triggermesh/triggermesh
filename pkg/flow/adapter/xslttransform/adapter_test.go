@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,12 +19,18 @@ package xslttransform
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
+	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 	logtesting "knative.dev/pkg/logging/testing"
@@ -122,6 +128,8 @@ const (
   <item>C3</item>
 </alt>
 `
+
+	tExpectedResponseString = "\n<tests>\n  <test>\n    <data>\n      <el1>A</el1>\n      <el2>1</el2>\n    </data>\n  </test>\n  <test>\n    <data>\n\t\t\t<el1>B</el1>\n\t\t\t<el2>2</el2>\n    </data>\n  </test>\n  <test>\n    <data>\n\t\t\t<el1>C</el1>\n\t\t\t<el2>3</el2>\n    </data>\n  </test>\n</tests>\n"
 )
 
 func TestXSLTTransformEvents(t *testing.T) {
@@ -256,6 +264,60 @@ func TestXSLTTransformEvents(t *testing.T) {
 	}
 }
 
+func TestXSLTTransformKSINK(t *testing.T) {
+	testCases := map[string]struct {
+		allowXSLTOverride bool
+		xslt              string
+
+		inEvent                cloudevents.Event
+		expectedStringResponse string
+		expectPanic            string
+		expectCategory         string
+	}{
+		"transform ok": {
+			allowXSLTOverride:      false,
+			xslt:                   tXSLT,
+			inEvent:                newCloudEvent(tXML, cloudevents.ApplicationXML),
+			expectedStringResponse: tExpectedResponseString,
+			expectCategory:         tSuccessAttribute,
+		},
+	}
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				body, err := ioutil.ReadAll(r.Body)
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedStringResponse, string(body))
+				fmt.Fprintf(w, "OK")
+			}))
+			defer svr.Close()
+
+			env := &envAccessor{
+				EnvConfig: adapter.EnvConfig{
+					Component: tCloudEventSource,
+					Sink:      svr.URL,
+				},
+				XSLT:              tc.xslt,
+				AllowXSLTOverride: tc.allowXSLTOverride,
+				BridgeIdentifier:  tBridgeID,
+			}
+			ctx := context.Background()
+			c, err := cloudevents.NewClientHTTP()
+			assert.NoError(t, err)
+			a := NewTarget(ctx, env, c)
+
+			go func() {
+				if err := a.Start(ctx); err != nil {
+					assert.FailNow(t, "could not start test adapter")
+				}
+			}()
+
+			response := sendCE(t, &tc.inEvent, c, svr.URL)
+			assert.NotEqual(t, cloudevents.IsUndelivered(response), response)
+		})
+	}
+}
+
 type cloudEventOptions func(*cloudevents.Event)
 
 func newCloudEvent(data, contentType string, opts ...cloudEventOptions) cloudevents.Event {
@@ -311,4 +373,13 @@ func createErrorResponse(code, description string) string {
 	}
 
 	return string(b)
+}
+
+func sendCE(t *testing.T, event *cloudevents.Event, cs cloudevents.Client, sink string) protocol.Result {
+	ctx := cloudevents.ContextWithTarget(context.Background(), sink)
+	c, err := cloudevents.NewClientHTTP()
+	require.NoError(t, err)
+
+	result := c.Send(ctx, *event)
+	return result
 }
