@@ -52,47 +52,12 @@ const (
 	expectedResponseEvent = "{\"string\":\"\\u003cnote\\u003e\\u003cto\\u003eTove\\u003c/to\\u003e\\u003cfrom\\u003eJani\\u003c/from\\u003e\\u003cheading\\u003eReminder\\u003c/heading\\u003e\\u003cbody\\u003eDont forget me this weekend\\u003c/body\\u003e\\u003c/note\\u003e\"}"
 )
 
-// createTransformation creates an AWSKinesis object initialized with the given options.
-func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string, dest *duckv1.Destination) (*unstructured.Unstructured, error) {
-	trns := &unstructured.Unstructured{}
-	trns.SetAPIVersion(transAPIVersion.String())
-	trns.SetKind(transformationKind)
-	trns.SetNamespace(namespace)
-	trns.SetGenerateName(namePrefix)
-
-	if dest != nil {
-		if err := unstructured.SetNestedMap(trns.Object, ducktypes.DestinationToMap(dest), "spec", "sink"); err != nil {
-			framework.FailfWithOffset(2, "Failed to set spec.sink field: %s", err)
-		}
-	}
-
-	return trnsClient.Create(context.Background(), trns, metav1.CreateOptions{})
-}
-
-// readReceivedEvents returns a function that reads CloudEvents received by the
-// event-display application and stores the result as the value of the given
-// `receivedEvents` variable.
-// The returned function signature satisfies the contract expected by
-// gomega.Eventually: no argument and one or more return values.
-func readReceivedEvents(c clientset.Interface, namespace, eventDisplayDeplName string,
-	receivedEvents *[]cloudevents.Event) func() []cloudevents.Event {
-
-	return func() []cloudevents.Event {
-		ev := bridges.ReceivedEventDisplayEvents(
-			apps.GetLogs(c, namespace, eventDisplayDeplName),
-		)
-		*receivedEvents = ev
-		return ev
-	}
-}
-
-var _ = Describe("XMLToJSON Transformation", func() {
+var _ = FDescribe("XMLToJSON Transformation", func() {
 	f := framework.New("xmltojsontransformation")
 	var ns string
 	var sink *duckv1.Destination
 	var trnsClient dynamic.ResourceInterface
 	var trans *unstructured.Unstructured
-	var err error
 	var transURL *url.URL
 
 	Context("a Transformation is deployed with K_SINK", func() {
@@ -105,6 +70,7 @@ var _ = Describe("XMLToJSON Transformation", func() {
 			})
 
 			By("creating a transformation object", func() {
+				var err error
 				gvr := transAPIVersion.WithResource(transformationResource)
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 				trans, err = createTransformation(trnsClient, ns, "test-xmltojson-", sink)
@@ -117,7 +83,7 @@ var _ = Describe("XMLToJSON Transformation", func() {
 		})
 		When("a XML payload is sent", func() {
 			BeforeEach(func() {
-				sentEvent := e2ece.NewXMLHelloEvent(f)
+				sentEvent := newXMLHelloEvent(f)
 				job := e2ece.RunEventSender(f.KubeClient, ns, transURL.String(), sentEvent)
 				apps.WaitForCompletion(f.KubeClient, job)
 			})
@@ -156,3 +122,51 @@ var _ = Describe("XMLToJSON Transformation", func() {
 		})
 	})
 })
+
+// newXMLHelloEvent generates a CloudEvent with dummy values and an XML data payload.
+func newXMLHelloEvent(f *framework.Framework) *cloudevents.Event {
+	event := cloudevents.NewEvent()
+	event.SetID("0000")
+	event.SetType("e2e.test")
+	event.SetSource("e2e.triggermesh")
+	event.SetExtension("iotriggermeshe2e", f.UniqueName)
+	if err := event.SetData(cloudevents.ApplicationXML, `<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Dont forget me this weekend</body></note>`); err != nil {
+		framework.FailfWithOffset(2, "Error setting event data: %s", err)
+	}
+
+	return &event
+}
+
+// createTransformation creates an XMLToJSONTransformation object initialized with the given options.
+func createTransformation(trnsClient dynamic.ResourceInterface, namespace, namePrefix string, dest *duckv1.Destination) (*unstructured.Unstructured, error) {
+	trns := &unstructured.Unstructured{}
+	trns.SetAPIVersion(transAPIVersion.String())
+	trns.SetKind(transformationKind)
+	trns.SetNamespace(namespace)
+	trns.SetGenerateName(namePrefix)
+
+	if dest != nil {
+		if err := unstructured.SetNestedMap(trns.Object, ducktypes.DestinationToMap(dest), "spec", "sink"); err != nil {
+			framework.FailfWithOffset(2, "Failed to set spec.sink field: %s", err)
+		}
+	}
+
+	return trnsClient.Create(context.Background(), trns, metav1.CreateOptions{})
+}
+
+// readReceivedEvents returns a function that reads CloudEvents received by the
+// event-display application and stores the result as the value of the given
+// `receivedEvents` variable.
+// The returned function signature satisfies the contract expected by
+// gomega.Eventually: no argument and one or more return values.
+func readReceivedEvents(c clientset.Interface, namespace, eventDisplayDeplName string,
+	receivedEvents *[]cloudevents.Event) func() []cloudevents.Event {
+
+	return func() []cloudevents.Event {
+		ev := bridges.ReceivedEventDisplayEvents(
+			apps.GetLogs(c, namespace, eventDisplayDeplName),
+		)
+		*receivedEvents = ev
+		return ev
+	}
+}
