@@ -37,3 +37,8 @@ spec:
           </item>
         </xsl:template>
       </xsl:stylesheet>
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: event-display
