@@ -17,7 +17,6 @@ limitations under the License.
 package awssqstarget
 
 import (
-	"sync"
 	"testing"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -34,44 +33,75 @@ import (
 const (
 	tQueueArnResource = "MyQueue"
 
-	expectedSucessfulEvent  = "Context Attributes,\n  specversion: 1.0\n  type: io.triggermesh.targets.aws.sqs.result\n  source: arn:aws:kinesis:us-east-1:123456789012:stream/foo\n  id: \n  datacontenttype: application/json\nData,\n  \"{\\n  MD5OfMessageBody: \\\"098f6bcd4621d373cade4e832627b4f6\\\",\\n  MessageId: \\\"00000000-0000-0000-0000-0000000001\\\",\\n  SequenceNumber: \\\"1\\\"\\n}\"\n"
+	expectedSucessfulEvent  = "Context Attributes,\n  specversion: 1.0\n  type: io.triggermesh.targets.aws.sqs.result\n  source: arn:aws:sqs:us-west-2:925906438773:DemoQueue\n  id: \n  datacontenttype: application/json\nData,\n  \"{\\n  MD5OfMessageBody: \\\"098f6bcd4621d373cade4e832627b4f6\\\",\\n  MessageId: \\\"00000000-0000-0000-0000-0000000001\\\",\\n  SequenceNumber: \\\"1\\\"\\n}\"\n"
 	expectedFailureResponse = "500: error publishing to sqs"
 
 	tMsgIDPrefix = "00000000-0000-0000-0000-000000000" // + 3 digits appended for each msg
 )
 
-func TestAdapter(t *testing.T) {
+func TestSuccessfulRequest(t *testing.T) {
 	arn := makeARN(tQueueArnResource)
 	testCases := map[string]struct {
 		inEvent          cloudevents.Event
 		failSendMessage  bool
 		expectedResponse string
 		expectedEvent    string
+		client           *standardMockSQSClient
 	}{
 		"Successful request": {
 			inEvent:          newEvent(t),
 			failSendMessage:  false,
 			expectedResponse: "",
 			expectedEvent:    expectedSucessfulEvent,
-		},
-		"Failure request": {
-			inEvent:          newEvent(t),
-			failSendMessage:  true,
-			expectedResponse: expectedFailureResponse,
-			expectedEvent:    "",
+			client:           &standardMockSQSClient{failSendMessage: false},
 		},
 	}
 
 	for name, tc := range testCases {
 		//nolint:scopelint
 		t.Run(name, func(t *testing.T) {
-			sqsCli := &standardMockSQSClient{
-				failSendMessage: tc.failSendMessage,
-			}
 			a := adapter{
 				logger:           loggingtesting.TestLogger(t),
-				sqsClient:        sqsCli,
-				awsArnString:     "arn:aws:kinesis:us-east-1:123456789012:stream/foo",
+				sqsClient:        tc.client,
+				awsArnString:     "arn:aws:sqs:us-west-2:925906438773:DemoQueue",
+				awsArn:           arn,
+				discardCEContext: false,
+			}
+			event, response := a.dispatch(tc.inEvent)
+			if event != nil {
+				assert.Equal(t, tc.expectedEvent, event.String())
+			}
+			assert.Equal(t, tc.expectedResponse, response.Error())
+			assert.Lenf(t, tc.client.inputRecorder, 1, "Client records a single request")
+		})
+	}
+}
+
+func TestFailureRequest(t *testing.T) {
+	arn := makeARN(tQueueArnResource)
+	testCases := map[string]struct {
+		inEvent          cloudevents.Event
+		failSendMessage  bool
+		expectedResponse string
+		expectedEvent    string
+		client           *standardMockSQSClient
+	}{
+		"Failure request": {
+			inEvent:          newEvent(t),
+			failSendMessage:  true,
+			expectedResponse: expectedFailureResponse,
+			expectedEvent:    "",
+			client:           &standardMockSQSClient{failSendMessage: true},
+		},
+	}
+
+	for name, tc := range testCases {
+		//nolint:scopelint
+		t.Run(name, func(t *testing.T) {
+			a := adapter{
+				logger:           loggingtesting.TestLogger(t),
+				sqsClient:        tc.client,
+				awsArnString:     "arn:aws:sqs:us-west-2:925906438773:DemoQueue",
 				awsArn:           arn,
 				discardCEContext: false,
 			}
@@ -112,17 +142,25 @@ func makeARN(resource string) arn.ARN {
 // responses and never errors.
 type standardMockSQSClient struct {
 	sqsiface.SQSAPI
-	sync.Mutex
 	failSendMessage bool
+	inputRecorder   []*sqs.SendMessageInput
 }
 
-func (c *standardMockSQSClient) SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, error) {
+func (c *standardMockSQSClient) SendMessage(sqsmsg *sqs.SendMessageInput) (*sqs.SendMessageOutput, error) {
 	if c.failSendMessage {
 		return &sqs.SendMessageOutput{}, assert.AnError
 	}
+
+	c.logEvent(sqsmsg)
+
 	return &sqs.SendMessageOutput{
 		MessageId:        aws.String(tMsgIDPrefix + "1"),
 		SequenceNumber:   aws.String("1"),
 		MD5OfMessageBody: aws.String("098f6bcd4621d373cade4e832627b4f6"),
 	}, nil
+}
+
+func (c *standardMockSQSClient) logEvent(in *sqs.SendMessageInput) error {
+	c.inputRecorder = append(c.inputRecorder, in)
+	return nil
 }
