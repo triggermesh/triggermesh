@@ -86,6 +86,8 @@ spec:
                   retry:
                     description: The number of delivery retries before moving the message to DLQ.
                     type: integer
+                required:
+                - deadLetterQueue
               sink:
                 description: The destination of events sourced from IBM MQ.
                 type: object

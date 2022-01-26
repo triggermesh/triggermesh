@@ -65,7 +65,7 @@ func (a *ibmmqsourceAdapter) Start(ctx context.Context) error {
 	}
 	defer conn.Disc()
 
-	queue, err := mq.OpenQueue(a.mqEnvs.EnvConnectionConfig.QueueName, conn)
+	queue, err := mq.OpenQueue(a.mqEnvs.EnvConnectionConfig.QueueName, a.mqEnvs.DeadLetterQueue, conn)
 	if err != nil {
 		return fmt.Errorf("failed to open IBM MQ queue: %w", err)
 	}

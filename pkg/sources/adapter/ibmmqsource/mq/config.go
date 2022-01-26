@@ -36,6 +36,5 @@ func (e *EnvConnectionConfig) ConnectionConfig() *ConnConfig {
 		User:           e.User,
 		Password:       e.Password,
 		QueueManager:   e.QueueManager,
-		QueueName:      e.QueueName,
 	}
 }
