@@ -160,7 +160,6 @@ func (c *standardMockSQSClient) SendMessage(sqsmsg *sqs.SendMessageInput) (*sqs.
 	}, nil
 }
 
-func (c *standardMockSQSClient) logEvent(in *sqs.SendMessageInput) error {
+func (c *standardMockSQSClient) logEvent(in *sqs.SendMessageInput) {
 	c.inputRecorder = append(c.inputRecorder, in)
-	return nil
 }
