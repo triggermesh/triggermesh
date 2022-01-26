@@ -90,14 +90,12 @@ spec:
                 - required: [value]
                 - required: [valueFromSecret]
                 - required: [valueFromConfigMap]
-
               allowPerEventXSLT:
                 description: Whether the XSLT informed at the spec can be overriden at each CloudEvent.
                 type: boolean
             anyOf:
             - required: [xslt]
             - required: [allowPerEventXSLT]
-            
               sink:
                 description: The destination of events transformed by this component.
                 type: object
@@ -171,4 +169,3 @@ spec:
     - name: Reason
       type: string
       jsonPath: .status.conditions[?(@.type=='Ready')].reason
-
