@@ -171,3 +171,4 @@ spec:
     - name: Reason
       type: string
       jsonPath: .status.conditions[?(@.type=='Ready')].reason
+
