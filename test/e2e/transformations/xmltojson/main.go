@@ -52,7 +52,7 @@ const (
 	expectedResponseEvent = "{\"string\":\"\\u003cnote\\u003e\\u003cto\\u003eTove\\u003c/to\\u003e\\u003cfrom\\u003eJani\\u003c/from\\u003e\\u003cheading\\u003eReminder\\u003c/heading\\u003e\\u003cbody\\u003eDont forget me this weekend\\u003c/body\\u003e\\u003c/note\\u003e\"}"
 )
 
-var _ = FDescribe("XMLToJSON Transformation", func() {
+var _ = Describe("XMLToJSON Transformation", func() {
 	f := framework.New("xmltojsontransformation")
 	var ns string
 	var sink *duckv1.Destination
