@@ -109,6 +109,7 @@ var _ = Describe("XMLToJSON Transformation", func() {
 			ns = f.UniqueName
 		})
 		When("the service is created", func() {
+			var err error
 			BeforeEach(func() {
 				gvr := transAPIVersion.WithResource(transformationResource)
 				trnsClient = f.DynamicClient.Resource(gvr).Namespace(ns)
