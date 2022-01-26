@@ -259,19 +259,16 @@ func TestXSLTTransformEvents(t *testing.T) {
 
 func TestXSLTTransformKSINK(t *testing.T) {
 	testCases := map[string]struct {
-		allowXSLTOverride bool
-		xslt              string
-
-		inEvent             cloudevents.Event
-		expectedEventString string
-		expectPanic         string
-		expectCategory      string
+		xslt           string
+		inEvent        cloudevents.Event
+		expectedEvent  cloudevents.Event
+		expectCategory string
 	}{
 		"transform ok": {
-			xslt:                tXSLT,
-			inEvent:             newCloudEvent(tXML, cloudevents.ApplicationXML),
-			expectedEventString: "Context Attributes,\n  specversion: 1.0\n  type: ce.test.type\n  source: ce.test.source\n  id: ce-abcd-0123\n  datacontenttype: application/xml\nData (binary),\n  <?xml version=\"1.0\"?>\n<output>\n  <item>A1</item>\n  <item>B2</item>\n  <item>C3</item>\n</output>\n\n",
-			expectCategory:      tSuccessAttribute,
+			xslt:           tXSLT,
+			inEvent:        newCloudEvent(tXML, cloudevents.ApplicationXML),
+			expectedEvent:  newCloudEvent(tOutXML, cloudevents.ApplicationXML),
+			expectCategory: tSuccessAttribute,
 		},
 	}
 	for name, tc := range testCases {
@@ -291,8 +288,6 @@ func TestXSLTTransformKSINK(t *testing.T) {
 
 			replier, err := targetce.New(env.Component, logtesting.TestLogger(t),
 				targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-				targetce.ReplierWithStaticDataContentType(cloudevents.ApplicationXML),
-				targetce.ReplierWithStaticErrorDataContentType(*cloudevents.StringOfApplicationJSON()),
 				targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)),
 				targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeXSLTTransformError))
 			assert.NoError(t, err)
@@ -313,7 +308,7 @@ func TestXSLTTransformKSINK(t *testing.T) {
 			events := ceClient.Sent()
 
 			assert.Equal(t, 1, len(events))
-			assert.Equal(t, tc.expectedEventString, events[0].String())
+			assert.Equal(t, tc.expectedEvent, events[0])
 		})
 	}
 }
