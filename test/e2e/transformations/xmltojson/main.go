@@ -48,17 +48,17 @@ var transAPIVersion = schema.GroupVersion{
 const (
 	transformationKind     = "XMLToJSONTransformation"
 	transformationResource = "xmltojsontransformations"
-
-	expectedResponseEvent = "{\"string\":\"\\u003cnote\\u003e\\u003cto\\u003eTove\\u003c/to\\u003e\\u003cfrom\\u003eJani\\u003c/from\\u003e\\u003cheading\\u003eReminder\\u003c/heading\\u003e\\u003cbody\\u003eDont forget me this weekend\\u003c/body\\u003e\\u003c/note\\u003e\"}"
+	tXML1                  = `<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Dont forget me this weekend</body></note>`
 )
 
-var _ = Describe("XMLToJSON Transformation", func() {
+var _ = FDescribe("XMLToJSON Transformation", func() {
 	f := framework.New("xmltojsontransformation")
 	var ns string
 	var sink *duckv1.Destination
 	var trnsClient dynamic.ResourceInterface
 	var trans *unstructured.Unstructured
 	var transURL *url.URL
+	expectedResponseEvent := []byte(`{"note":{"body":"Dont forget me this weekend","from":"Jani","heading":"Reminder","to":"Tove"}}`)
 
 	Context("a Transformation is deployed with K_SINK", func() {
 		BeforeEach(func() {
@@ -99,7 +99,7 @@ var _ = Describe("XMLToJSON Transformation", func() {
 
 				e := receivedEvents[0]
 				Expect(e.Type()).To(Equal("e2e.test"))
-				Expect(string(e.DataEncoded)).To(Equal(expectedResponseEvent))
+				Expect(e.DataEncoded).To(Equal(expectedResponseEvent))
 			})
 		})
 	})
@@ -131,7 +131,7 @@ func newXMLHelloEvent(f *framework.Framework) *cloudevents.Event {
 	event.SetType("e2e.test")
 	event.SetSource("e2e.triggermesh")
 	event.SetExtension("iotriggermeshe2e", f.UniqueName)
-	if err := event.SetData(cloudevents.ApplicationXML, `<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Dont forget me this weekend</body></note>`); err != nil {
+	if err := event.SetData(cloudevents.ApplicationXML, []byte(tXML1)); err != nil {
 		framework.FailfWithOffset(2, "Error setting event data: %s", err)
 	}
 
