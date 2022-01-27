@@ -37,6 +37,7 @@ includedPermissions:
 - storage.buckets.delete
 - storage.objects.create
 - storage.objects.delete
+- storage.objects.list
 
 ---
 
