@@ -57,8 +57,10 @@ spec:
             description: Desired state of event target.
             properties:
               bucketName:
-                description: GCP Storage bucket to stream events to.
+                description: GCP Storage bucket to stream events to. Must meet the naming
+                  requirements described at https://cloud.google.com/storage/docs/naming-buckets
                 type: string
+                pattern: ^[a-z0-9][a-z0-9_-]{1,61}[a-z0-9](\.[a-z0-9][a-z0-9_-]{1,61}[a-z0-9])*$
               credentialsJson:
                 description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional
                   information, refer to https://cloud.google.com/docs/authentication/production.
