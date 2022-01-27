@@ -51,7 +51,7 @@ const (
 	tXML1                  = `<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Dont forget me this weekend</body></note>`
 )
 
-var _ = FDescribe("XMLToJSON Transformation", func() {
+var _ = Describe("XMLToJSON Transformation", func() {
 	f := framework.New("xmltojsontransformation")
 	var ns string
 	var sink *duckv1.Destination
