@@ -47,9 +47,8 @@ var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransform) pkgreconciler.Event {
 	var url *apis.URL
-	var err error
-
 	if o.Spec.Sink != nil {
+		var err error
 		url, err = r.resolveDestination(ctx, o)
 		if err != nil {
 			return fmt.Errorf("cannot resolve Sink destination: %w", err)
