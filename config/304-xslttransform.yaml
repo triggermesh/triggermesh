@@ -93,9 +93,6 @@ spec:
               allowPerEventXSLT:
                 description: Whether the XSLT informed at the spec can be overriden at each CloudEvent.
                 type: boolean
-            anyOf:
-            - required: [xslt]
-            - required: [allowPerEventXSLT]
               sink:
                 description: The destination of events transformed by this component.
                 type: object
@@ -123,6 +120,9 @@ spec:
                 oneOf:
                 - required: ['ref']
                 - required: ['uri']
+            anyOf:
+            - required: [xslt]
+            - required: [allowPerEventXSLT]
           status:
             description: Reported status.
             type: object
