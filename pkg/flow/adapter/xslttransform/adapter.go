@@ -142,14 +142,8 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 			fmt.Errorf("eror processing XML with XSLT: %v", err), nil)
 	}
 
-	if isXML {
-		if err := event.SetData(cloudevents.ApplicationXML, []byte(output)); err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
-		}
-	} else {
-		if err := event.SetData(cloudevents.ApplicationJSON, []byte(output)); err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
-		}
+	if err := event.SetData(cloudevents.ApplicationXML, []byte(output)); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	if a.sink != "" {

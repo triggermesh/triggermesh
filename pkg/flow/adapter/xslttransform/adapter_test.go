@@ -258,7 +258,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 	}
 }
 
-func TestXSLTTransformKSINK(t *testing.T) {
+func TestXSLTTransformToSink(t *testing.T) {
 	testCases := map[string]struct {
 		xslt          string
 		inEvent       cloudevents.Event
