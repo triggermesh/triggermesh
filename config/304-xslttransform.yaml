@@ -99,7 +99,8 @@ spec:
                 properties:
                   ref:
                     description: -|
-                     Reference to an addressable Kubernetes object to be used as the destination of events. If left empty, the events will be sent back to the sender/source.
+                     Reference to an addressable Kubernetes object to be used as the destination of events. 
+                     If left empty, the events will be sent back to the sender/source.
                     type: object
                     properties:
                       apiVersion:
