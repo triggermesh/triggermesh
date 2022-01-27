@@ -286,7 +286,8 @@ func TestXSLTTransformToSink(t *testing.T) {
 				sink:         "http://localhost:8080",
 			}
 
-			_, r := a.dispatch(ctx, tc.inEvent)
+			e, r := a.dispatch(ctx, tc.inEvent)
+			assert.Nil(t, e)
 			assert.Equal(t, cloudevents.ResultACK, r)
 
 			events := ceClient.Sent()
