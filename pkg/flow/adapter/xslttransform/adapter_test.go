@@ -275,21 +275,8 @@ func TestXSLTTransformKSINK(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
 
-			env := &envAccessor{
-				EnvConfig: adapter.EnvConfig{
-					Component: tCloudEventSource,
-				},
-				BridgeIdentifier: tBridgeID,
-			}
-
 			ctx := context.Background()
 			style, err := parseXSLT(tc.xslt)
-			assert.NoError(t, err)
-
-			replier, err := targetce.New(env.Component, logtesting.TestLogger(t),
-				targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-				targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)),
-				targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeXSLTTransformError))
 			assert.NoError(t, err)
 
 			a := &xsltTransformAdapter{
@@ -298,7 +285,6 @@ func TestXSLTTransformKSINK(t *testing.T) {
 				ceClient:     ceClient,
 				xsltOverride: false,
 				defaultXSLT:  style,
-				replier:      replier,
 				sink:         "http://localhost:8080",
 			}
 
