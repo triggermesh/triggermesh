@@ -172,6 +172,17 @@ var _ = Describe("Google Cloud Storage target", func() {
 		// to avoid creating a namespace for each spec, due to their simplicity.
 		Specify("the API server rejects the creation of that object", func() {
 
+			By("setting an invalid bucketName", func() {
+				invalidBucketName := "test-"
+
+				_, err := createTarget(trgtClient, ns, "test-invalid-bucketName",
+					withBucketName(invalidBucketName),
+					withCredentials(gcpSecret.Name),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("spec.bucketName: Invalid value: "))
+			})
+
 			By("omitting the bucketName", func() {
 				_, err := createTarget(trgtClient, ns, "test-no-bucketName",
 					withCredentials(gcpSecret.Name),
