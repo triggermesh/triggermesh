@@ -38,4 +38,3 @@ spec:
     name: curl
     stdin: true
     tty: true
-    
