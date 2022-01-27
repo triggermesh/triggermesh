@@ -136,9 +136,10 @@ var _ = Describe("Google Cloud Storage target", func() {
 
 				It("creates an object into the bucket", func() {
 					var receivedObj []byte
-					var err error
 
 					By("listing the bucket objects", func() {
+						var err error
+
 						receivedObjs := e2estorage.GetObjectsReader(storageClient, bucketName)
 						Expect(receivedObjs).To(HaveLen(1),
 							"Received %d objects instead of 1", len(receivedObjs))
