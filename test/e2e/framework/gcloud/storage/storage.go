@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -63,8 +63,17 @@ func CreateObject(storageCli *storage.Client, bucketName string, f *framework.Fr
 }
 
 // DeleteBucket deletes a bucket by name.
-// Buckets need to be emptied before they can be deleted.
 func DeleteBucket(storageCli *storage.Client, bucketName string) {
+	bucket := storageCli.Bucket(bucketName)
+	objects := getObjects(storageCli, bucketName)
+
+	for _, o := range objects {
+		err := bucket.Object(o).Delete(context.Background())
+		if err != nil {
+			framework.FailfWithOffset(2, "Failed to delete objects from bucket %s", err)
+		}
+	}
+
 	if err := storageCli.Bucket(bucketName).Delete(context.Background()); err != nil {
 		framework.FailfWithOffset(2, "Failed to delete bucket %q: %s", bucketName, err)
 	}
@@ -78,7 +87,7 @@ func DeleteObject(storageCli *storage.Client, bucketName, objectName string) {
 	}
 }
 
-// GetObjectsReader get objects reader from a storage bucket.
+// GetObjectsReader gets objects readers from a storage bucket.
 func GetObjectsReader(storageCli *storage.Client, bucketName string) []*storage.Reader {
 	var objectReaderList []*storage.Reader
 
@@ -98,20 +107,7 @@ func GetObjectsReader(storageCli *storage.Client, bucketName string) []*storage.
 	return objectReaderList
 }
 
-// DeleteObjects delete all objects from a storage bucket.
-func DeleteObjects(storageCli *storage.Client, bucketName string) {
-	bucket := storageCli.Bucket(bucketName)
-	objects := getObjects(storageCli, bucketName)
-
-	for _, o := range objects {
-		err := bucket.Object(o).Delete(context.Background())
-		if err != nil {
-			framework.FailfWithOffset(2, "Failed to delete objects from bucket %s", err)
-		}
-	}
-}
-
-// getObjects get objects from a storage bucket.
+// getObjects gets objects from a storage bucket.
 func getObjects(storageCli *storage.Client, bucketName string) []string {
 	var objectList []string
 	query := &storage.Query{Prefix: ""}

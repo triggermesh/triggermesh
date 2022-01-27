@@ -86,13 +86,10 @@ var _ = Describe("Google Cloud Storage target", func() {
 
 		var sentEvent *cloudevents.Event
 
-		var serviceaccountKey string
-		var gcloudProject string
-
 		BeforeEach(func() {
 			var err error
-			serviceaccountKey = e2egcloud.ServiceAccountKeyFromEnv()
-			gcloudProject = e2egcloud.ProjectNameFromEnv()
+			serviceaccountKey := e2egcloud.ServiceAccountKeyFromEnv()
+			gcloudProject := e2egcloud.ProjectNameFromEnv()
 
 			storageClient, err = storage.NewClient(context.Background(), option.WithCredentialsJSON([]byte(serviceaccountKey)))
 			Expect(err).ToNot(HaveOccurred())
@@ -104,7 +101,6 @@ var _ = Describe("Google Cloud Storage target", func() {
 
 				DeferCleanup(func() {
 					By("deleting Google Cloud Storage Bucket "+bucketName, func() {
-						e2estorage.DeleteObjects(storageClient, bucketName)
 						e2estorage.DeleteBucket(storageClient, bucketName)
 					})
 				})
@@ -138,7 +134,7 @@ var _ = Describe("Google Cloud Storage target", func() {
 					})
 				})
 
-				It("creates an object onto the bucket", func() {
+				It("creates an object into the bucket", func() {
 					var receivedObj []byte
 					var err error
 
@@ -236,7 +232,7 @@ func withCredentials(secretName string) targetOption {
 	}
 }
 
-// createGCPCredsSecret creates a Kubernetes Secret containing a GCP credentials.
+// createGCPCredsSecret creates a Kubernetes Secret containing GCP credentials.
 func createGCPCredsSecret(c clientset.Interface, namespace string, creds string) *corev1.Secret {
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -248,9 +244,7 @@ func createGCPCredsSecret(c clientset.Interface, namespace string, creds string)
 		},
 	}
 
-	var err error
-
-	secret, err = c.CoreV1().Secrets(namespace).Create(context.Background(), secret, metav1.CreateOptions{})
+	secret, err := c.CoreV1().Secrets(namespace).Create(context.Background(), secret, metav1.CreateOptions{})
 	if err != nil {
 		framework.FailfWithOffset(2, "Failed to create Secret: %s", err)
 	}
