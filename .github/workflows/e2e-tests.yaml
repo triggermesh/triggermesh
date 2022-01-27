@@ -118,3 +118,27 @@ jobs:
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       run: ginkgo -p -slow-spec-threshold=10m -randomize-all ./test/e2e/
+
+    # The KinD cluster can get shut down before all API objects created during
+    # E2E tests have been terminated, which leaks cloud resources depending on
+    # what test(s) are run last by Ginkgo.
+    # To prevent that, we delay the completion of the job until all namespaces
+    # labeled "e2e-framework" have been finalized.
+    - name: Wait for termination of E2E namespaces
+      if: always()
+      run: |
+        declare -i e2e_ns_count=-1
+
+        # retry for max 120s (60*2s)
+        for _ in $(seq 1 60); do
+            e2e_ns_count="$(kubectl get ns -l e2e-framework -o jsonpath='{.items}' | jq '. | length')"
+            if ! ((e2e_ns_count)); then
+                break
+            fi
+
+            echo -n '.' >&2
+            sleep 2
+        done
+
+        # flush stderr
+        echo >&2
