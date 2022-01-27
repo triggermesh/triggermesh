@@ -89,7 +89,7 @@ func makeAppEnv(o *v1alpha1.XSLTTransform, sink *apis.URL) ([]corev1.EnvVar, err
 	if sink != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envSink,
-			Value: sink.Path,
+			Value: sink.String(),
 		})
 	}
 	return env, nil

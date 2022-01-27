@@ -25,6 +25,7 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
@@ -259,22 +260,19 @@ func TestXSLTTransformEvents(t *testing.T) {
 
 func TestXSLTTransformKSINK(t *testing.T) {
 	testCases := map[string]struct {
-		xslt           string
-		inEvent        cloudevents.Event
-		expectedEvent  cloudevents.Event
-		expectCategory string
+		xslt          string
+		inEvent       cloudevents.Event
+		expectedEvent cloudevents.Event
 	}{
 		"transform ok": {
-			xslt:           tXSLT,
-			inEvent:        newCloudEvent(tXML, cloudevents.ApplicationXML),
-			expectedEvent:  newCloudEvent(tOutXML, cloudevents.ApplicationXML),
-			expectCategory: tSuccessAttribute,
+			xslt:          tXSLT,
+			inEvent:       newCloudEvent(tXML, cloudevents.ApplicationXML),
+			expectedEvent: newCloudEvent(tOutXML, cloudevents.ApplicationXML),
 		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
-
 			ctx := context.Background()
 			style, err := parseXSLT(tc.xslt)
 			assert.NoError(t, err)
@@ -288,12 +286,11 @@ func TestXSLTTransformKSINK(t *testing.T) {
 				sink:         "http://localhost:8080",
 			}
 
-			_, r := a.Dispatch(ctx, tc.inEvent)
+			_, r := a.dispatch(ctx, tc.inEvent)
 			assert.Equal(t, cloudevents.ResultACK, r)
 
 			events := ceClient.Sent()
-
-			assert.Equal(t, 1, len(events))
+			require.Equal(t, 1, len(events))
 			assert.Equal(t, tc.expectedEvent, events[0])
 		})
 	}
