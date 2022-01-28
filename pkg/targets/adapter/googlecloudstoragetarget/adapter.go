@@ -90,35 +90,38 @@ func (a *googlecloudstorageAdapter) dispatch(ctx context.Context, event cloudeve
 }
 
 func (a *googlecloudstorageAdapter) insertObjectData(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-
-	obj := a.bucket.Object(event.ID() + ".json")
-	w := obj.NewWriter(ctx)
-
-	if _, err := w.Write(event.Data()); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+	ep := &EventPayload{}
+	if err := event.DataAs(ep); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeCloudEventProcessing, err, "reading event data")
 	}
+
+	obj := a.bucket.Object(ep.FileName)
+	w := obj.NewWriter(ctx)
+	if _, err := w.Write(ep.Data); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "writing to storage")
+	}
+
 	if err := w.Close(); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "closing the writer")
 	}
 
 	return a.replier.Ok(&event, "ok")
-
 }
 
 func (a *googlecloudstorageAdapter) insertObject(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	d, err := json.Marshal(event)
 	if err != nil {
-		return a.replier.Error(&event, "error marshalling CloudEvent", err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeCloudEventProcessing, err, "reading event data")
 	}
 
 	obj := a.bucket.Object(event.ID() + ".json")
 	w := obj.NewWriter(ctx)
 
 	if _, err := w.Write(d); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "writing to storage")
 	}
 	if err := w.Close(); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "closing the writer")
 	}
 
 	return a.replier.Ok(&event, "ok")
