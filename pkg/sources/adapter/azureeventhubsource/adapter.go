@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,10 +37,13 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureeventhubsource/trace"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
-// Event Hub connection connTimeout
-const connTimeout = 20 * time.Second
+const (
+	connTimeout  = 20 * time.Second
+	drainTimeout = 1 * time.Minute
+)
 
 // envConfig is a set parameters sourced from the environment for the source's
 // adapter.
@@ -146,13 +149,17 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
+	go health.Start(ctx)
+
 	connCtx, cancel := context.WithTimeout(ctx, connTimeout)
 	runtimeInfo, err := a.ehClient.GetRuntimeInformation(connCtx)
 	cancel()
 	if err != nil {
-		a.logger.Fatal("GetRuntimeInformation failed:", err)
+		return fmt.Errorf("getting Event Hub runtime information: %w", err)
 	}
 	a.runtimeInfo = runtimeInfo
+
+	a.logger.Info("Starting Event Hub message receivers for partitions ", runtimeInfo.PartitionIDs)
 
 	// listen to each partition of the Event Hub
 	for _, partitionID := range runtimeInfo.PartitionIDs {
@@ -160,14 +167,32 @@ func (a *adapter) Start(ctx context.Context) error {
 		_, err := a.ehClient.Receive(connCtx, partitionID, a.handleMessage, eventhub.ReceiveWithLatestOffset())
 		cancel()
 		if err != nil {
-			a.logger.Error("failed to start Event Hub listener:", err)
-			continue
+			a.logger.Errorw("An error occurred while starting message receivers. "+
+				"Terminating all active receivers", zap.Error(err))
+
+			closeCtx, cancel := context.WithTimeout(ctx, drainTimeout)
+			defer cancel()
+			if err := a.ehClient.Close(closeCtx); err != nil {
+				a.logger.Errorw("An additional error occurred while terminating active "+
+					"Event Hub message receivers", zap.Error(err))
+			}
+
+			return fmt.Errorf("starting message receiver for partition %s: %w", partitionID, err)
 		}
 	}
 
-	<-ctx.Done()
+	health.MarkReady()
 
-	return a.ehClient.Close(context.Background())
+	<-ctx.Done()
+	a.logger.Info("Terminating all active Event Hub message receivers")
+
+	closeCtx, cancel := context.WithTimeout(context.Background(), drainTimeout)
+	defer cancel()
+	if err := a.ehClient.Close(closeCtx); err != nil {
+		return fmt.Errorf("terminating active Event Hub message receivers: %w", err)
+	}
+
+	return nil
 }
 
 // handleMessage satisfies eventhub.Handler.
