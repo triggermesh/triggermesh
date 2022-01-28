@@ -26,21 +26,30 @@ metadata:
 spec:
   connectionName: ibm-mq.default.svc.cluster.local(1414)
   queueManager: QM1
-  queueName: DEV.QUEUE.2
+  queueName: DEV.QUEUE.1
   channelName: DEV.APP.SVRCONN
   delivery:
     deadLetterQueue: DEV.DEAD.LETTER.QUEUE
-    backoffDelay: 10
     retry: 3
   credentials:
     username:
       valueFromSecret:
         name: ibm-mq-secret
-        key: password
+        key: username
     password:
       valueFromSecret:
         name: ibm-mq-secret
         key: password
+    tls:
+      cipher: TLS_RSA_WITH_AES_128_CBC_SHA256
+      clientAuthRequired: false
+      keyRepository:
+        kdbSecret:
+          name: ibm-mq-certificate
+          key: key.kdb
+        sthSecret:
+          name: ibm-mq-certificate
+          key: key.sth
   sink:
     ref:
       apiVersion: eventing.knative.dev/v1

@@ -45,6 +45,11 @@ const (
 	envDeadLetterQueue    = "DEAD_LETTER_QUEUE"
 	envBackoffDelay       = "BACKOFF_DELAY"
 	envRetry              = "DELIVERY_RETRY"
+	envTLSCipher          = "TLS_CIPHER"
+	envTLSClientAuth      = "TLS_CLIENT_AUTH"
+
+	KeystoreMountPath    = "/opt/mqm-keystore/key.kdb"
+	PasswdStashMountPath = "/opt/mqm-keystore/key.sth"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -65,12 +70,34 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	appEnv := makeAppEnv(typedSrc)
 	appEnv = common.MaybeAppendValueFromEnvVar(appEnv, envUser, typedSrc.Spec.Auth.User)
 	appEnv = common.MaybeAppendValueFromEnvVar(appEnv, envPassword, typedSrc.Spec.Auth.Password)
+
+	keystoreMount := func(interface{}) {}
+	passwdStashMount := func(interface{}) {}
+
+	if typedSrc.Spec.Auth.TLS != nil {
+		appEnv = append(appEnv, []corev1.EnvVar{
+			{
+				Name:  envTLSCipher,
+				Value: typedSrc.Spec.Auth.TLS.Cipher,
+			},
+			{
+				Name:  envTLSClientAuth,
+				Value: fmt.Sprintf("%t", typedSrc.Spec.Auth.TLS.ClientAuthRequired),
+			},
+		}...)
+
+		keystoreMount = resource.SecretMount("key-database", KeystoreMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase)
+		passwdStashMount = resource.SecretMount("db-password", PasswdStashMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash)
+	}
+
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(appEnv...),
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+		keystoreMount,
+		passwdStashMount,
 	)
 }
 

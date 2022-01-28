@@ -162,9 +162,59 @@ spec:
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
-                required:
-                - username
-                - password
+                  tls:
+                    description: TLS configuration for IBM MQ client. For more information, please refer to the IBM MQ
+                      documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mechanisms-tls-security-protocols-in-mq.
+                    type: object
+                    properties:
+                      cipher:
+                        description: Message encryption and authentication algorithm.
+                          For more information, please refer to the IBM MQ documentation at
+                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=tls-cipherspecs-ciphersuites.
+                        type: string
+                      clientAuthRequired:
+                        description: Parameter to specify whether TLS client authentication is required. For more
+                          information, please refer to the IBM MQ documentation at
+                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=fields-sslclientauth-mqlong.
+                        type: boolean
+                      keyRepository:
+                        description: Key repository for (m)TLS connection. For more information, please refer to the
+                          IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mq-ssltls-key-repository.
+                        type: object
+                        properties:
+                          kdbSecret:
+                            description: Reference to the secret with the key database file.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                          sthSecret:
+                            description: Reference to the secret with associated password stash file.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        required:
+                        - kdbSecret
+                        - sthSecret
+                    required:
+                    - cipher
+                    - clientAuthRequired
+                    - keyRepository
+                anyOf:
+                - required: [tls, username, password]
+                - required: [username, password]
+                - required: [tls]
             required:
             - connectionName
             - channelName

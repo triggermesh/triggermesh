@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
@@ -53,19 +54,34 @@ type IBMMQSourceSpec struct {
 	Auth Credentials `json:"credentials"`
 }
 
-// Delivery defines the source's message delivery behavior
+// Delivery defines the source's message delivery behavior.
 type Delivery struct {
-	DeadLetterQueueManager string `json:"deadLetterQueueManager"`
-	DeadLetterQueue        string `json:"deadLetterQueue"`
-	Retry                  int    `json:"retry"`
+	DeadLetterQueue string `json:"deadLetterQueue"`
+	Retry           int    `json:"retry"`
+
 	// currently not used
-	BackoffDelay int `json:"backoffDelay"`
+	DeadLetterQueueManager string `json:"deadLetterQueueManager,omitempty"`
+	BackoffDelay           int    `json:"backoffDelay,omitempty"`
 }
 
-// Credentials holds the auth details
+// Credentials holds the auth details.
 type Credentials struct {
-	User     ValueFromField `json:"username"`
-	Password ValueFromField `json:"password"`
+	User     ValueFromField `json:"username,omitempty"`
+	Password ValueFromField `json:"password,omitempty"`
+	TLS      *TLSSpec       `json:"tls,omitempty"`
+}
+
+// TLSSpec holds the IBM MQ TLS authentication parameters.
+type TLSSpec struct {
+	Cipher             string   `json:"cipher"`
+	ClientAuthRequired bool     `json:"clientAuthRequired"`
+	KeyRepository      Keystore `json:"keyRepository"`
+}
+
+// Keystore represents Key Database components.
+type Keystore struct {
+	KeyDatabase   *corev1.SecretKeySelector `json:"kdbSecret"`
+	PasswordStash *corev1.SecretKeySelector `json:"sthSecret"`
 }
 
 // IBMMQSourceStatus defines the observed state of the event source.

@@ -25,19 +25,12 @@ import (
 
 var _ pkgadapter.EnvConfigAccessor = (*SourceEnvAccessor)(nil)
 
-// SourceDeliveryConfig holds the delivery parameters used in the source.
-type SourceDeliveryConfig struct {
-	DeadLetterQManager string `envconfig:"DEAD_LETTER_QUEUE_MANAGER"`
-	DeadLetterQueue    string `envconfig:"DEAD_LETTER_QUEUE"`
-	BackoffDelay       int    `envconfig:"BACKOFF_DELAY"`
-	Retry              int    `envconfig:"DELIVERY_RETRY"`
-}
-
 // SourceEnvAccessor is the set of parameters parsed from the adapter's env.
 type SourceEnvAccessor struct {
 	pkgadapter.EnvConfig
-	mq.EnvConnectionConfig
-	SourceDeliveryConfig
+	mq.ConnectionConfig
+	mq.Delivery
+	mq.Auth
 
 	// BridgeIdentifier is the name of the bridge workflow this source is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
@@ -46,17 +39,4 @@ type SourceEnvAccessor struct {
 // EnvAccessorCtor for configuration parameters
 func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 	return &SourceEnvAccessor{}
-}
-
-// Delivery returns the MQ delivery parameters.
-func (e *SourceEnvAccessor) Delivery() *mq.Delivery {
-	if e.DeadLetterQManager == "" {
-		e.DeadLetterQManager = e.QueueManager
-	}
-	return &mq.Delivery{
-		DeadLetterQManager: e.DeadLetterQManager,
-		DeadLetterQueue:    e.DeadLetterQueue,
-		BackoffDelay:       e.BackoffDelay,
-		Retry:              e.Retry,
-	}
 }
