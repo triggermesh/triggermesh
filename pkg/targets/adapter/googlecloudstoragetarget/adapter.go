@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package googlecloudstoragetarget
 
 import (
 	"context"
+	"encoding/json"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
@@ -55,9 +56,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		client: client,
 		bucket: client.Bucket(env.BucketName),
 
-		replier:  replier,
-		ceClient: ceClient,
-		logger:   logger,
+		discardCEContext: env.DiscardCEContext,
+		replier:          replier,
+		ceClient:         ceClient,
+		logger:           logger,
 	}
 }
 
@@ -67,9 +69,10 @@ type googlecloudstorageAdapter struct {
 	client *storage.Client
 	bucket *storage.BucketHandle
 
-	replier  *targetce.Replier
-	ceClient cloudevents.Client
-	logger   *zap.SugaredLogger
+	discardCEContext bool
+	replier          *targetce.Replier
+	ceClient         cloudevents.Client
+	logger           *zap.SugaredLogger
 }
 
 // Returns if stopCh is closed or Send() returns an error.
@@ -79,15 +82,14 @@ func (a *googlecloudstorageAdapter) Start(ctx context.Context) error {
 }
 
 func (a *googlecloudstorageAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	switch typ := event.Type(); typ {
-	case v1alpha1.EventTypeGoogleCloudStorageObjectInsert:
+	if event.Type() == v1alpha1.EventTypeGoogleCloudStorageObjectInsert || a.discardCEContext {
+		return a.insertObjectData(ctx, event)
+	} else {
 		return a.insertObject(ctx, event)
-	default:
-		return a.instertArbitraryObject(ctx, event)
 	}
 }
 
-func (a *googlecloudstorageAdapter) instertArbitraryObject(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *googlecloudstorageAdapter) insertObjectData(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 
 	obj := a.bucket.Object(event.ID() + ".json")
 	w := obj.NewWriter(ctx)
@@ -104,15 +106,15 @@ func (a *googlecloudstorageAdapter) instertArbitraryObject(ctx context.Context, 
 }
 
 func (a *googlecloudstorageAdapter) insertObject(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	ep := &EventPayload{}
-	if err := event.DataAs(ep); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
+	d, err := json.Marshal(event)
+	if err != nil {
+		return a.replier.Error(&event, "error marshalling CloudEvent", err, nil)
 	}
 
-	obj := a.bucket.Object(ep.FileName)
+	obj := a.bucket.Object(event.ID() + ".json")
 	w := obj.NewWriter(ctx)
 
-	if _, err := w.Write(ep.Data); err != nil {
+	if _, err := w.Write(d); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 	if err := w.Close(); err != nil {

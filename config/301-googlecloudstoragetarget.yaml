@@ -81,6 +81,11 @@ spec:
                   payloadPolicy:
                     type: string
                     enum: [always, error, never]
+              discardCloudEventContext:
+                description: Whether to omit CloudEvent context attributes in objects created in GCP Storage.
+                  When this property is false (default), the entire CloudEvent payload is included.
+                  When this property is true, only the CloudEvent data is included.
+                type: boolean
             required:
             - credentialsJson
             - bucketName
