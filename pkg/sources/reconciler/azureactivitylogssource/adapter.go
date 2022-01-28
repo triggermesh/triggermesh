@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
+
+const healthPortName = "health"
 
 const defaultActivityLogsEventHubName = "insights-activity-logs"
 
@@ -83,6 +85,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVar(common.EnvCEType, ceType),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+
+		resource.Port(healthPortName, 8080),
+		resource.StartupProbe("/health", healthPortName),
 	)
 }
 

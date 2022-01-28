@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
+
+const healthPortName = "health"
 
 // adapterConfig contains properties used to configure the source's adapter.
 // These are automatically populated by envconfig.
@@ -68,6 +70,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 		resource.EnvVar(common.EnvHubName, typedSrc.Spec.EventHubID.ResourceName),
 		resource.EnvVars(hubEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+
+		resource.Port(healthPortName, 8080),
+		resource.StartupProbe("/health", healthPortName),
 	)
 }
 
