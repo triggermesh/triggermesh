@@ -31,7 +31,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	eventhubs "github.com/Azure/azure-event-hubs-go/v3"
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 
@@ -63,26 +62,15 @@ const (
 
   These will be done by the e2e test:
   - Create an Azure Resource Group, EventHubs Namespace, and EventHub
-  - Send an event to the Azure EventHub via the AzureEventHub Target and verify the event was sent
+  - Send an event to the Azure Event Hub via the Azure Event Hub Target and verify the event was sent
 */
 
-var _ = FDescribe("Azure EventHubs target", func() {
+var _ = Describe("Azure Event Hubs target", func() {
 	ctx := context.Background()
-	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
-	region := os.Getenv("AZURE_REGION")
-
-	if region == "" {
-		region = "westus2"
-	}
-
 	f := framework.New("azureeventhubstarget")
 
 	var ns string
-	var tgtURL *url.URL
 	var tgtClient dynamic.ResourceInterface
-
-	var rg armresources.ResourceGroup
-	var hub *eventhubs.Hub
 
 	BeforeEach(func() {
 		ns = f.UniqueName
@@ -92,29 +80,40 @@ var _ = FDescribe("Azure EventHubs target", func() {
 	})
 
 	Context("a target is deployed", func() {
+		var rg string
+		var hub *eventhubs.Hub
+
+		subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
+		region := os.Getenv("AZURE_REGION")
+
+		if region == "" {
+			region = "westus2"
+		}
+
 		BeforeEach(func() {
-			By("creating an azure resource group", func() {
-				rg = azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+			By("creating an Azure resource group", func() {
+				r := azure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+				rg = *r.Name
 				DeferCleanup(func() {
-					By("deleting the azure resource group", func() {
-						_ = azure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
+					By("deleting the Azure resource group", func() {
+						_ = azure.DeleteResourceGroup(ctx, subscriptionID, rg)
 					})
 				})
 			})
 
-			By("creating an azure eventhub", func() {
-				hub = azure.CreateEventHubComponents(ctx, subscriptionID, ns, region, *rg.Name)
+			By("creating an Azure Event Hub", func() {
+				hub = azure.CreateEventHubComponents(ctx, subscriptionID, ns, region, rg)
 			})
 		})
 
 		When("the spec contains default settings", func() {
-			var event *cloudevents.Event
+			var tgtURL *url.URL
 
 			BeforeEach(func() {
-				By("creating an AzureEventHubTarget object", func() {
+				By("creating an AzureEventHubsTarget object", func() {
 					tgt, err := createTarget(tgtClient, ns, "test-",
 						withServicePrincipal(),
-						withEventHubID(subscriptionID, *rg.Name, ns, ns))
+						withEventHubID(subscriptionID, rg, ns, ns))
 
 					Expect(err).ToNot(HaveOccurred())
 
@@ -124,34 +123,25 @@ var _ = FDescribe("Azure EventHubs target", func() {
 				})
 			})
 
-			It("receives an event on the Event Bus", func() {
-				var payload []byte
+			It("receives an event on the Event Hub", func() {
+				var event *cloudevents.Event
 				var partitionIDs []string
 				var eventHandler eventhubs.Handler
-				eventReceivedChannel := make(chan bool)
-				var evCtx context.Context       // Used to set a timeout for reading events
-				var evCancel context.CancelFunc // Used to cancel the reading context
+				var evCtx context.Context // Used to set a timeout for reading events
 
-				By("retrieving eventhub partition details", func() {
+				eventReceivedChannel := make(chan bool)
+
+				By("retrieving Event Hub partition details", func() {
 					info, err := hub.GetRuntimeInformation(ctx)
 					Expect(err).NotTo(HaveOccurred())
 
 					partitionIDs = info.PartitionIDs
-					Expect(len(partitionIDs) > 0).To(BeTrue())
+					Expect(len(partitionIDs)).To(BeNumerically(">", 0))
 				})
 
-				By("creating a handler to verify the received event", func() {
+				By("setting up a handler to verify the received event", func() {
 					eventHandler = func(ctx context.Context, ev *eventhubs.Event) error {
-						defer GinkgoRecover() // To circumvent being called from inside a goroutine
-
-						payload = ev.Data
-						Expect(len(payload) > 0).To(BeTrue())
-
-						// NOTE: The payload will be a stringified version of the cloudevent
-						Expect(payload).To(ContainSubstring(string(event.Data())))
-						Expect(payload).To(ContainSubstring("type: " + event.Type()))
-						Expect(payload).To(ContainSubstring("source: " + event.Source()))
-						Expect(payload).To(ContainSubstring("id: " + event.ID()))
+						verifyPayload(ev.Data, event)
 
 						// Pass the bool to the channel to terminate the receiver
 						eventReceivedChannel <- true
@@ -160,9 +150,10 @@ var _ = FDescribe("Azure EventHubs target", func() {
 					}
 				})
 
-				By("invoking the handler", func() {
+				By("starting the handler to consume events", func() {
 					// Set a context with a timeout to ensure the event handler isn't waiting forever
-					evCtx, evCancel = context.WithDeadline(ctx, time.Now().Add(time.Second*15))
+					var evCancel context.CancelFunc // Used to cancel the reading context
+					evCtx, evCancel = context.WithTimeout(ctx, time.Second*15)
 
 					for _, pID := range partitionIDs {
 						_, err := hub.Receive(
@@ -187,7 +178,7 @@ var _ = FDescribe("Azure EventHubs target", func() {
 					apps.WaitForCompletion(f.KubeClient, j)
 				})
 
-				By("waiting for the event to be received", func() {
+				By("waiting for the event to be received and verified", func() {
 					// don't exit till event is received by handler or times out
 					select {
 					case <-eventReceivedChannel:
@@ -200,9 +191,7 @@ var _ = FDescribe("Azure EventHubs target", func() {
 	})
 
 	When("a client creates a target with invalid details", func() {
-		BeforeEach(func() {
-			subscriptionID = "00000000-0000-0000-0000-000000000000"
-		})
+		subscriptionID := "00000000-0000-0000-0000-000000000000"
 
 		It("should reject the creation of the target", func() {
 			By("setting an invalid eventHubID", func() {
@@ -275,4 +264,19 @@ func withEventHubID(subscriptionID, resourceGroup, eventHubNS, eventHub string) 
 			framework.FailfWithOffset(2, "Failed to set spec.eventHubID field: %s", err)
 		}
 	}
+}
+
+func verifyPayload(payload []byte, event *cloudevents.Event) {
+	// To circumvent being called from inside a goroutine
+	// For more information, see: https://onsi.github.io/ginkgo/#mental-model-how-ginkgo-handles-failure
+	defer GinkgoRecover()
+
+	// Verify data was received
+	Expect(len(payload)).To(BeNumerically(">", 0))
+
+	// NOTE: The payload will be a stringified version of the cloudevent
+	Expect(payload).To(ContainSubstring(string(event.Data())))
+	Expect(payload).To(ContainSubstring("type: " + event.Type()))
+	Expect(payload).To(ContainSubstring("source: " + event.Source()))
+	Expect(payload).To(ContainSubstring("id: " + event.ID()))
 }
