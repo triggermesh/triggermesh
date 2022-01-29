@@ -173,19 +173,27 @@ func Probe(path, port string) ObjectOption {
 func StartupProbe(path, port string) ObjectOption {
 	return func(object interface{}) {
 		var sp **corev1.Probe
+		var intstrPort intstr.IntOrString
 
 		switch o := object.(type) {
 		case *corev1.Container:
 			sp = &o.StartupProbe
-		case *appsv1.Deployment:
+		case *appsv1.Deployment, *servingv1.Service:
 			sp = &firstContainer(o).StartupProbe
+		}
+
+		switch object.(type) {
+		case *corev1.Container, *appsv1.Deployment:
+			intstrPort = intstr.FromString(port)
+		case *servingv1.Service:
+			// setting port explicitly is invalid in a Knative Service
 		}
 
 		*sp = &corev1.Probe{
 			Handler: corev1.Handler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path: path,
-					Port: intstr.FromString(port),
+					Port: intstrPort,
 				},
 			},
 			PeriodSeconds:    1,

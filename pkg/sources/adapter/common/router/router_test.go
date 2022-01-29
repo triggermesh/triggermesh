@@ -31,6 +31,8 @@ const headerHandlerName = "HANDLER"
 func TestRouter(t *testing.T) {
 	r := &Router{}
 
+	assert.Equal(t, 0, r.HandlersCount())
+
 	// new router responds with status NotFound
 
 	resp := recordResponse(t, r, "/")
@@ -40,6 +42,8 @@ func TestRouter(t *testing.T) {
 
 	r.RegisterPath("/foo", responder("foo"))
 	r.RegisterPath("/bar", responder("bar"))
+
+	assert.Equal(t, 2, r.HandlersCount())
 
 	assert.Equal(t, []string{"/bar", "/foo"}, handlersKeys(r))
 
@@ -54,11 +58,15 @@ func TestRouter(t *testing.T) {
 	r.DeregisterPath("/")
 	r.DeregisterPath("/baz")
 
+	assert.Equal(t, 2, r.HandlersCount())
+
 	assert.Equal(t, []string{"/bar", "/foo"}, handlersKeys(r))
 
 	// delete a registered path
 
 	r.DeregisterPath("/foo")
+
+	assert.Equal(t, 1, r.HandlersCount())
 
 	assert.Equal(t, []string{"/bar"}, handlersKeys(r))
 
