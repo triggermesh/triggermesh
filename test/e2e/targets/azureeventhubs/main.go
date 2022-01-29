@@ -128,6 +128,7 @@ var _ = Describe("Azure Event Hubs target", func() {
 				var partitionIDs []string
 				var eventHandler eventhubs.Handler
 				var evCtx context.Context // Used to set a timeout for reading events
+				var payload []byte
 
 				eventReceivedChannel := make(chan bool)
 
@@ -141,7 +142,7 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 				By("setting up a handler to verify the received event", func() {
 					eventHandler = func(ctx context.Context, ev *eventhubs.Event) error {
-						verifyPayload(ev.Data, event)
+						payload = ev.Data
 
 						// Pass the bool to the channel to terminate the receiver
 						eventReceivedChannel <- true
@@ -178,13 +179,23 @@ var _ = Describe("Azure Event Hubs target", func() {
 					apps.WaitForCompletion(f.KubeClient, j)
 				})
 
-				By("waiting for the event to be received and verified", func() {
+				By("waiting for the event to be received", func() {
 					// don't exit till event is received by handler or times out
 					select {
 					case <-eventReceivedChannel:
 					case <-evCtx.Done():
 						framework.FailfWithOffset(2, "timed out while waiting for event")
 					}
+				})
+
+				By("verifying the sent event", func() {
+					Expect(len(payload)).To(BeNumerically(">", 0))
+
+					// NOTE: The payload will be a stringified version of the CloudEvent
+					Expect(payload).To(ContainSubstring(string(event.Data())))
+					Expect(payload).To(ContainSubstring("type: " + event.Type()))
+					Expect(payload).To(ContainSubstring("source: " + event.Source()))
+					Expect(payload).To(ContainSubstring("id: " + event.ID()))
 				})
 			})
 		})
@@ -264,19 +275,4 @@ func withEventHubID(subscriptionID, resourceGroup, eventHubNS, eventHub string) 
 			framework.FailfWithOffset(2, "Failed to set spec.eventHubID field: %s", err)
 		}
 	}
-}
-
-func verifyPayload(payload []byte, event *cloudevents.Event) {
-	// To circumvent being called from inside a goroutine
-	// For more information, see: https://onsi.github.io/ginkgo/#mental-model-how-ginkgo-handles-failure
-	defer GinkgoRecover()
-
-	// Verify data was received
-	Expect(len(payload)).To(BeNumerically(">", 0))
-
-	// NOTE: The payload will be a stringified version of the cloudevent
-	Expect(payload).To(ContainSubstring(string(event.Data())))
-	Expect(payload).To(ContainSubstring("type: " + event.Type()))
-	Expect(payload).To(ContainSubstring("source: " + event.Source()))
-	Expect(payload).To(ContainSubstring("id: " + event.ID()))
 }
