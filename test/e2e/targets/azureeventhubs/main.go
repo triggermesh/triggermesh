@@ -61,7 +61,7 @@ const (
   - AZURE_REGION - Define the Azure region to run the test (default westus2)
 
   These will be done by the e2e test:
-  - Create an Azure Resource Group, EventHubs Namespace, and EventHub
+  - Create an Azure Resource Group, Event Hubs Namespace, and Event Hub
   - Send an event to the Azure Event Hub via the Azure Event Hub Target and verify the event was sent
 */
 
