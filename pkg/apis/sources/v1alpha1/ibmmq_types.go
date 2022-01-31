@@ -17,7 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
@@ -80,8 +79,8 @@ type TLSSpec struct {
 
 // Keystore represents Key Database components.
 type Keystore struct {
-	KeyDatabase   *corev1.SecretKeySelector `json:"kdbSecret"`
-	PasswordStash *corev1.SecretKeySelector `json:"sthSecret"`
+	KeyDatabase   ValueFromField `json:"keyDatabase"`
+	PasswordStash ValueFromField `json:"passwordStash"`
 }
 
 // IBMMQSourceStatus defines the observed state of the event source.

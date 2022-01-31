@@ -183,37 +183,46 @@ spec:
                           IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mq-ssltls-key-repository.
                         type: object
                         properties:
-                          kdbSecret:
-                            description: Reference to the secret with the key database file.
+                          keyDatabase:
                             type: object
                             properties:
-                              name:
-                                type: string
-                              key:
-                                type: string
+                              valueFromSecret:
+                                description: A reference to a Kubernetes Secret object containing the key database.
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  key:
+                                    type: string
+                                required:
+                                - name
+                                - key
                             required:
-                            - name
-                            - key
-                          sthSecret:
-                            description: Reference to the secret with associated password stash file.
+                            - valueFromSecret
+                          passwordStash:
                             type: object
                             properties:
-                              name:
-                                type: string
-                              key:
-                                type: string
+                              valueFromSecret:
+                                description: A reference to a Kubernetes Secret object containing the password stash.
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  key:
+                                    type: string
+                                required:
+                                - name
+                                - key
                             required:
-                            - name
-                            - key
+                            - valueFromSecret
                         required:
-                        - kdbSecret
-                        - sthSecret
+                        - keyDatabase
+                        - passwordStash
                     required:
                     - cipher
                     - clientAuthRequired
                     - keyRepository
                 anyOf:
-                - required: [tls, username, password]
                 - required: [username, password]
                 - required: [tls]
             required:

@@ -86,8 +86,8 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 			},
 		}...)
 
-		keystoreMount = resource.SecretMount("key-database", KeystoreMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase)
-		passwdStashMount = resource.SecretMount("db-password", PasswdStashMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash)
+		keystoreMount = resource.SecretMount("key-database", KeystoreMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret)
+		passwdStashMount = resource.SecretMount("db-password", PasswdStashMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret)
 	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
