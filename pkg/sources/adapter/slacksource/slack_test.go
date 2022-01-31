@@ -57,7 +57,7 @@ func TestSlackEvent(t *testing.T) {
 			body: read("this is not an expected message"),
 
 			expectedCode:     http.StatusBadRequest,
-			expectedContains: "could not unmarshall JSON request:",
+			expectedContains: "could not unmarshal JSON request:",
 		},
 
 		"not an expected message": {

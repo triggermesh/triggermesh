@@ -117,13 +117,13 @@ func (h *slackEventAPIHandler) handleAll(w http.ResponseWriter, r *http.Request)
 	event := &SlackEventWrapper{}
 	err = json.Unmarshal(body, event)
 	if err != nil {
-		h.handleError(fmt.Errorf("could not unmarshall JSON request: %w", err), http.StatusBadRequest, w)
+		h.handleError(fmt.Errorf("could not unmarshal JSON request: %w", err), http.StatusBadRequest, w)
 		return
 	}
 
 	// There are only 2 documented types to be received from the Events API
 	// - `event_callback`, See: https://api.slack.com/events-api#receiving_events
-	// - `event_callback`, See: https://api.slack.com/events-api#subscriptions
+	// - `url_verification`, See: https://api.slack.com/events-api#subscriptions
 	switch eventType := sanitizeUserInput(event.Type); eventType {
 	case "event_callback":
 		// All paths that are not managed by this integration and are
@@ -221,12 +221,11 @@ func cloudEventFromEventWrapper(wrapper *SlackEventWrapper) (*cloudevents.Event,
 	return &event, nil
 }
 
+var newlineToSpace = strings.NewReplacer("\n", " ", "\r", " ")
+
 // sanitizeUserInput removes unwanted characters from the given string.
 // It also guarantees the safe logging of data that potentially originates from
 // user input (CWE-117, https://cwe.mitre.org/data/definitions/117.html).
 func sanitizeUserInput(s string) string {
-	return strings.Replace(
-		strings.Replace(s, "\n", "", -1),
-		"\r", "", -1,
-	)
+	return newlineToSpace.Replace(s)
 }
