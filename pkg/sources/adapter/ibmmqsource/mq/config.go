@@ -18,23 +18,31 @@ limitations under the License.
 
 package mq
 
-// EnvConnectionConfig is IBM MQ common connection parameters.
-type EnvConnectionConfig struct {
+// ConnectionConfig is IBM MQ common connection parameters.
+type ConnectionConfig struct {
 	QueueManager   string `envconfig:"QUEUE_MANAGER"`
 	ChannelName    string `envconfig:"CHANNEL_NAME"`
 	ConnectionName string `envconfig:"CONNECTION_NAME"`
-	User           string `envconfig:"USER"`
-	Password       string `envconfig:"PASSWORD"`
 	QueueName      string `envconfig:"QUEUE_NAME"`
 }
 
-// ConnectionConfig returns the connection configuration.
-func (e *EnvConnectionConfig) ConnectionConfig() *ConnConfig {
-	return &ConnConfig{
-		ChannelName:    e.ChannelName,
-		ConnectionName: e.ConnectionName,
-		User:           e.User,
-		Password:       e.Password,
-		QueueManager:   e.QueueManager,
-	}
+// Delivery holds the delivery parameters used in the source.
+type Delivery struct {
+	DeadLetterQManager string `envconfig:"DEAD_LETTER_QUEUE_MANAGER"`
+	DeadLetterQueue    string `envconfig:"DEAD_LETTER_QUEUE"`
+	BackoffDelay       int    `envconfig:"BACKOFF_DELAY"`
+	Retry              int    `envconfig:"DELIVERY_RETRY"`
+}
+
+// Auth contains IBM MQ authentication parameters.
+type Auth struct {
+	Username string `envconfig:"USER"`
+	Password string `envconfig:"PASSWORD"`
+	TLSConfig
+}
+
+// TLSConfig holds TLS connection parameters.
+type TLSConfig struct {
+	Cipher             string `envconfig:"TLS_CIPHER"`
+	ClientAuthRequired bool   `envconfig:"TLS_CLIENT_AUTH"`
 }

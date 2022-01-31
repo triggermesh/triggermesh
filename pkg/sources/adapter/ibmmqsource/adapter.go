@@ -20,6 +20,7 @@ package ibmmqsource
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -59,19 +60,19 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 func (a *ibmmqsourceAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting IBMMQSource Adapter")
 
-	conn, err := mq.NewConnection(a.mqEnvs.EnvConnectionConfig.ConnectionConfig())
+	conn, err := mq.NewConnection(a.mqEnvs.ConnectionConfig, a.mqEnvs.Auth)
 	if err != nil {
 		return fmt.Errorf("failed to create IBM MQ connection: %w", err)
 	}
 	defer conn.Disc()
 
-	queue, err := mq.OpenQueue(a.mqEnvs.EnvConnectionConfig.QueueName, a.mqEnvs.DeadLetterQueue, conn)
+	queue, err := mq.OpenQueue(a.mqEnvs.ConnectionConfig.QueueName, a.mqEnvs.DeadLetterQueue, conn)
 	if err != nil {
 		return fmt.Errorf("failed to open IBM MQ queue: %w", err)
 	}
 	defer queue.Close()
 
-	err = queue.RegisterCallback(a.eventHandler(), a.mqEnvs.Delivery(), a.logger)
+	err = queue.RegisterCallback(a.eventHandler(), a.mqEnvs.Delivery, a.logger)
 	if err != nil {
 		return fmt.Errorf("failed to register callback: %w", err)
 	}
@@ -91,11 +92,15 @@ func (a *ibmmqsourceAdapter) eventHandler() mq.Handler {
 	return func(data []byte, correlID string) error {
 		event := cloudevents.NewEvent(cloudevents.VersionV1)
 		event.SetType(v1alpha1.IBMMQSourceEventType)
-		event.SetSource(fmt.Sprintf("%s/%s", a.mqEnvs.EnvConnectionConfig.ConnectionName, strings.ToLower(a.mqEnvs.EnvConnectionConfig.ChannelName)))
+		event.SetSource(fmt.Sprintf("%s/%s", a.mqEnvs.ConnectionConfig.ConnectionName, strings.ToLower(a.mqEnvs.ConnectionConfig.QueueName)))
 		if correlID != "" {
 			event.SetExtension(mq.CECorrelIDAttr, correlID)
 		}
-		if err := event.SetData(cloudevents.ApplicationJSON, data); err != nil {
+		contentType := cloudevents.TextPlain
+		if json.Valid(data) {
+			contentType = cloudevents.ApplicationJSON
+		}
+		if err := event.SetData(contentType, data); err != nil {
 			a.logger.Errorf("Can't set Cloudevent data: %v", err)
 			return err
 		}

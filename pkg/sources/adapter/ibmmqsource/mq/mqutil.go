@@ -23,11 +23,15 @@ import (
 	"unicode"
 
 	"github.com/ibm-messaging/mq-golang/v5/ibmmq"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ibmmqsource"
 	"go.uber.org/zap"
 )
 
-// CECorrelIDAttr is the name of CloudEvent attribute used as IBM MQ Correlation ID.
-const CECorrelIDAttr = "correlationid"
+// IBM MQ source adapter constants.
+const (
+	CECorrelIDAttr          = "correlationid"
+	KeyRepositoryExtensions = ".kdb"
+)
 
 // Object is a local wrapper for IBM MQ objects required to communicate with the queue.
 type Object struct {
@@ -39,47 +43,45 @@ type Object struct {
 	mqcbd *ibmmq.MQCBD
 }
 
-// ConnConfig is a set of connection parameters.
-type ConnConfig struct {
-	ChannelName    string
-	ConnectionName string
-	User           string
-	Password       string
-	QueueManager   string
-}
-
-// Delivery describes the message delivery details.
-type Delivery struct {
-	DeadLetterQManager string
-	DeadLetterQueue    string
-	BackoffDelay       int
-	Retry              int
-}
-
 // Handler is a function used as IBM MQ callback.
 type Handler func([]byte, string) error
 
 // NewConnection creates the connection to IBM MQ server.
-func NewConnection(cfg *ConnConfig) (ibmmq.MQQueueManager, error) {
+func NewConnection(conn ConnectionConfig, auth Auth) (ibmmq.MQQueueManager, error) {
 	// create IBM MQ channel definition
 	channelDefinition := ibmmq.NewMQCD()
-	channelDefinition.ChannelName = cfg.ChannelName
-	channelDefinition.ConnectionName = cfg.ConnectionName
-
-	// init connection security params
-	connSecParams := ibmmq.NewMQCSP()
-	connSecParams.AuthenticationType = ibmmq.MQCSP_AUTH_USER_ID_AND_PWD
-	connSecParams.UserId = cfg.User
-	connSecParams.Password = cfg.Password
+	channelDefinition.ChannelName = conn.ChannelName
+	channelDefinition.ConnectionName = conn.ConnectionName
 
 	// setup MQ connection params
 	connOptions := ibmmq.NewMQCNO()
 	connOptions.Options = ibmmq.MQCNO_CLIENT_BINDING
 	connOptions.Options |= ibmmq.MQCNO_HANDLE_SHARE_BLOCK
-	connOptions.ClientConn = channelDefinition
-	connOptions.SecurityParms = connSecParams
 
-	return ibmmq.Connx(cfg.QueueManager, connOptions)
+	if auth.Cipher != "" {
+		channelDefinition.SSLCipherSpec = auth.Cipher
+		channelDefinition.SSLClientAuth = ibmmq.MQSCA_OPTIONAL
+		if auth.ClientAuthRequired {
+			channelDefinition.SSLClientAuth = ibmmq.MQSCA_REQUIRED
+		}
+
+		sco := ibmmq.NewMQSCO()
+		sco.KeyRepository = strings.TrimRight(ibmmqsource.KeystoreMountPath, KeyRepositoryExtensions)
+		connOptions.SSLConfig = sco
+	}
+	connOptions.ClientConn = channelDefinition
+
+	if auth.Username != "" {
+		// init connection security params
+		connSecParams := ibmmq.NewMQCSP()
+		connSecParams.AuthenticationType = ibmmq.MQCSP_AUTH_USER_ID_AND_PWD
+		connSecParams.UserId = auth.Username
+		connSecParams.Password = auth.Password
+
+		connOptions.SecurityParms = connSecParams
+	}
+
+	return ibmmq.Connx(conn.QueueManager, connOptions)
 }
 
 // OpenQueue opens IBM MQ queue.
@@ -137,7 +139,7 @@ func OpenQueue(queueName string, dlqName string, conn ibmmq.MQQueueManager) (Obj
 }
 
 // RegisterCallback registers the callback function for the incoming messages in the target queue.
-func (q *Object) RegisterCallback(f Handler, delivery *Delivery, log *zap.SugaredLogger) error {
+func (q *Object) RegisterCallback(f Handler, delivery Delivery, log *zap.SugaredLogger) error {
 	handler := func(
 		mqConn *ibmmq.MQQueueManager,
 		mqObj *ibmmq.MQObject,
