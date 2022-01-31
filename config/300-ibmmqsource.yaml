@@ -164,7 +164,8 @@ spec:
                     - required: [valueFromSecret]
                   tls:
                     description: TLS configuration for IBM MQ client. For more information, please refer to the IBM MQ
-                      documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mechanisms-tls-security-protocols-in-mq.
+                      documentation at
+                      https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mechanisms-tls-security-protocols-in-mq.
                     type: object
                     properties:
                       cipher:
