@@ -18,6 +18,7 @@ package azureeventhubstarget
 
 import (
 	"context"
+	"encoding/json"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"go.uber.org/zap"
@@ -82,7 +83,12 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
 	} else {
-		err := a.hub.Send(ctx, eventhub.NewEventFromString(event.String()))
+		// Serialize the event first, and then stream it
+		bs, err := json.Marshal(event)
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+		err = a.hub.Send(ctx, eventhub.NewEvent(bs))
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
