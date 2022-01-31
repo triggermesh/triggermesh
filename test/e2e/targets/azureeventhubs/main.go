@@ -211,7 +211,7 @@ var _ = Describe("Azure Event Hubs target", func() {
 				By("creating an AzureEventHubsTarget object", func() {
 					tgt, err := createTarget(tgtClient, ns, "test-",
 						withServicePrincipal(),
-						withoutCloudEvents(),
+						withDiscardCEContextEnabled(),
 						withEventHubID(subscriptionID, rg, ns, ns))
 
 					Expect(err).ToNot(HaveOccurred())
@@ -289,12 +289,7 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 				By("verifying the sent event", func() {
 					Expect(len(payload)).To(BeNumerically(">", 0))
-
-					// NOTE: The payload will be a stringified version of the CloudEvent
-					Expect(payload).To(ContainSubstring(string(event.Data())))
-					Expect(payload).ToNot(ContainSubstring("type: " + event.Type()))
-					Expect(payload).ToNot(ContainSubstring("source: " + event.Source()))
-					Expect(payload).ToNot(ContainSubstring("id: " + event.ID()))
+					Expect(payload).To(Equal(string(event.Data())))
 				})
 			})
 		})
@@ -376,7 +371,7 @@ func withEventHubID(subscriptionID, resourceGroup, eventHubNS, eventHub string) 
 	}
 }
 
-func withoutCloudEvents() targetOption {
+func withDiscardCEContextEnabled() targetOption {
 	return func(tgt *unstructured.Unstructured) {
 		if err := unstructured.SetNestedField(tgt.Object, true, "spec", "discardCloudEventContext"); err != nil {
 			framework.FailfWithOffset(2, "Failed to set spec.discardCloudEventContext field: %s", err)
