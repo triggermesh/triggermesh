@@ -18,6 +18,7 @@ package azureeventhubs
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
@@ -190,12 +191,105 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 				By("verifying the sent event", func() {
 					Expect(len(payload)).To(BeNumerically(">", 0))
+					var ce cloudevents.Event
 
-					// NOTE: The payload will be a stringified version of the CloudEvent
-					Expect(payload).To(ContainSubstring(string(event.Data())))
-					Expect(payload).To(ContainSubstring("type: " + event.Type()))
-					Expect(payload).To(ContainSubstring("source: " + event.Source()))
-					Expect(payload).To(ContainSubstring("id: " + event.ID()))
+					err := json.Unmarshal(payload, &ce)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(ce.Data()).To(ContainSubstring(string(event.Data())))
+					Expect(ce.ID()).To(Equal(event.ID()))
+					Expect(ce.Type()).To(Equal(event.Type()))
+					Expect(ce.Subject()).To(Equal(event.Subject()))
+				})
+			})
+		})
+
+		When("the spec contains default settings and the CloudEvent Context disabled", func() {
+			var tgtURL *url.URL
+
+			BeforeEach(func() {
+				By("creating an AzureEventHubsTarget object", func() {
+					tgt, err := createTarget(tgtClient, ns, "test-",
+						withServicePrincipal(),
+						withDiscardCEContextEnabled(),
+						withEventHubID(subscriptionID, rg, ns, ns))
+
+					Expect(err).ToNot(HaveOccurred())
+
+					tgt = ducktypes.WaitUntilReady(f.DynamicClient, tgt)
+					tgtURL = ducktypes.Address(tgt)
+					Expect(tgtURL).ToNot(BeNil())
+				})
+			})
+
+			It("receives an event on the Event Hub", func() {
+				var event *cloudevents.Event
+				var partitionIDs []string
+				var eventHandler eventhubs.Handler
+				var evCtx context.Context // Used to set a timeout for reading events
+				var payload []byte
+
+				eventReceivedChannel := make(chan bool)
+
+				By("retrieving Event Hub partition details", func() {
+					info, err := hub.GetRuntimeInformation(ctx)
+					Expect(err).NotTo(HaveOccurred())
+
+					partitionIDs = info.PartitionIDs
+					Expect(len(partitionIDs)).To(BeNumerically(">", 0))
+				})
+
+				By("setting up a handler to verify the received event", func() {
+					eventHandler = func(ctx context.Context, ev *eventhubs.Event) error {
+						payload = ev.Data
+
+						// Pass the bool to the channel to terminate the receiver
+						eventReceivedChannel <- true
+
+						return nil
+					}
+				})
+
+				By("starting the handler to consume events", func() {
+					// Set a context with a timeout to ensure the event handler isn't waiting forever
+					var evCancel context.CancelFunc // Used to cancel the reading context
+					evCtx, evCancel = context.WithTimeout(ctx, time.Second*15)
+
+					for _, pID := range partitionIDs {
+						_, err := hub.Receive(
+							ctx,
+							pID,
+							eventHandler,
+							eventhubs.ReceiveWithStartingOffset(persist.StartOfStream),
+						)
+
+						Expect(err).ToNot(HaveOccurred())
+					}
+
+					DeferCleanup(func() {
+						evCancel()
+					})
+				})
+
+				By("sending an event", func() {
+					event = e2ece.NewHelloEvent(f)
+
+					j := e2ece.RunEventSender(f.KubeClient, ns, tgtURL.String(), event)
+					apps.WaitForCompletion(f.KubeClient, j)
+				})
+
+				By("waiting for the event to be received", func() {
+					// don't exit till event is received by handler or times out
+					select {
+					case <-eventReceivedChannel:
+					case <-evCtx.Done():
+						framework.FailfWithOffset(2, "timed out while waiting for event")
+					}
+				})
+
+				By("verifying the sent event", func() {
+					Expect(len(payload)).To(BeNumerically(">", 0))
+					Expect(payload).To(Equal(string(event.Data())))
 				})
 			})
 		})
@@ -273,6 +367,14 @@ func withEventHubID(subscriptionID, resourceGroup, eventHubNS, eventHub string) 
 	return func(tgt *unstructured.Unstructured) {
 		if err := unstructured.SetNestedField(tgt.Object, eventHubID, "spec", "eventHubID"); err != nil {
 			framework.FailfWithOffset(2, "Failed to set spec.eventHubID field: %s", err)
+		}
+	}
+}
+
+func withDiscardCEContextEnabled() targetOption {
+	return func(tgt *unstructured.Unstructured) {
+		if err := unstructured.SetNestedField(tgt.Object, true, "spec", "discardCloudEventContext"); err != nil {
+			framework.FailfWithOffset(2, "Failed to set spec.discardCloudEventContext field: %s", err)
 		}
 	}
 }
