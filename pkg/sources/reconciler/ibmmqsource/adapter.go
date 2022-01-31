@@ -47,6 +47,7 @@ const (
 	envRetry              = "DELIVERY_RETRY"
 	envTLSCipher          = "TLS_CIPHER"
 	envTLSClientAuth      = "TLS_CLIENT_AUTH"
+	envTLSCertLabel       = "TLS_CERT_LABEL"
 
 	KeystoreMountPath    = "/opt/mqm-keystore/key.kdb"
 	PasswdStashMountPath = "/opt/mqm-keystore/key.sth"
@@ -83,6 +84,10 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 			{
 				Name:  envTLSClientAuth,
 				Value: fmt.Sprintf("%t", typedSrc.Spec.Auth.TLS.ClientAuthRequired),
+			},
+			{
+				Name:  envTLSCertLabel,
+				Value: typedSrc.Spec.Auth.TLS.CertLabel,
 			},
 		}...)
 

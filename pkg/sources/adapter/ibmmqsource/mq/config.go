@@ -45,4 +45,5 @@ type Auth struct {
 type TLSConfig struct {
 	Cipher             string `envconfig:"TLS_CIPHER"`
 	ClientAuthRequired bool   `envconfig:"TLS_CLIENT_AUTH"`
+	CertLabel          string `envconfig:"TLS_CERT_LABEL"`
 }

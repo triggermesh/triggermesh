@@ -66,6 +66,7 @@ func NewConnection(conn ConnectionConfig, auth Auth) (ibmmq.MQQueueManager, erro
 		}
 
 		sco := ibmmq.NewMQSCO()
+		sco.CertificateLabel = auth.CertLabel
 		sco.KeyRepository = strings.TrimRight(ibmmqsource.KeystoreMountPath, KeyRepositoryExtensions)
 		connOptions.SSLConfig = sco
 	}
