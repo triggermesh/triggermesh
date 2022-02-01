@@ -17,10 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
@@ -62,7 +61,7 @@ type AzureEventHubsTargetSpec struct {
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
-	DiscardCEContext bool `json:"discardCloudEventContext"`
+	DiscardCEContext bool `json:"discardCEContext"`
 }
 
 // AzureEventHubsTargetStatus communicates the observed state of the AzureEventHubsTarget (from the controller).
