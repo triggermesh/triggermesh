@@ -289,7 +289,7 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 				By("verifying the sent event", func() {
 					Expect(len(payload)).To(BeNumerically(">", 0))
-					Expect(payload).To(Equal(string(event.Data())))
+					Expect(payload).To(Equal(event.Data()))
 				})
 			})
 		})

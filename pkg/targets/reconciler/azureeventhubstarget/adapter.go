@@ -31,6 +31,7 @@ import (
 const (
 	adapterName = "azureeventhubstarget"
 
+	envDiscardCECtx    = "DISCARD_CE_CONTEXT"
 	envHubKeyName      = "EVENTHUB_KEY_NAME"
 	envHubNamespace    = "EVENTHUB_NAMESPACE"
 	envHubName         = "EVENTHUB_NAME"
@@ -80,6 +81,10 @@ func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapt
 			Name:  envEventsPayloadPolicy,
 			Value: string(*target.Spec.EventOptions.PayloadPolicy),
 		})
+	}
+
+	if target.Spec.DiscardCEContext {
+		envs = append(envs, corev1.EnvVar{Name: envDiscardCECtx, Value: "true"})
 	}
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
