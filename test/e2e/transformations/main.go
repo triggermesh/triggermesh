@@ -14,26 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package e2e
+package transformations
 
 import (
-	"testing"
-
-	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
-	. "github.com/onsi/gomega"    //nolint:stylecheck
-
-	// support client-go's auth providers
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-
-	_ "github.com/triggermesh/triggermesh/test/e2e/framework"
-
-	// test suites
-	_ "github.com/triggermesh/triggermesh/test/e2e/sources"
-	_ "github.com/triggermesh/triggermesh/test/e2e/targets"
-	_ "github.com/triggermesh/triggermesh/test/e2e/transformations"
+	_ "github.com/triggermesh/triggermesh/test/e2e/transformations/xmltojson"
 )
-
-func TestE2e(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "E2E Suite")
-}
