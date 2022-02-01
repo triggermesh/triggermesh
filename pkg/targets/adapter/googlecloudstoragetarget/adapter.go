@@ -82,19 +82,22 @@ func (a *googlecloudstorageAdapter) Start(ctx context.Context) error {
 }
 
 func (a *googlecloudstorageAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+	var data []byte
+	var err error
+
 	if event.Type() == v1alpha1.EventTypeGoogleCloudStorageObjectInsert || a.discardCEContext {
-		return a.insertObjectData(ctx, event)
+		data = event.Data()
 	} else {
-		return a.insertObject(ctx, event)
+		data, err = json.Marshal(event)
+		if err != nil {
+			return a.replier.Error(&event, "error marshalling CloudEvent", err, nil)
+		}
 	}
-}
-
-func (a *googlecloudstorageAdapter) insertObjectData(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 
 	obj := a.bucket.Object(event.ID() + ".json")
 	w := obj.NewWriter(ctx)
 
-	if _, err := w.Write(event.Data()); err != nil {
+	if _, err := w.Write(data); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 	if err := w.Close(); err != nil {
@@ -103,23 +106,4 @@ func (a *googlecloudstorageAdapter) insertObjectData(ctx context.Context, event 
 
 	return a.replier.Ok(&event, "ok")
 
-}
-
-func (a *googlecloudstorageAdapter) insertObject(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	d, err := json.Marshal(event)
-	if err != nil {
-		return a.replier.Error(&event, "error marshalling CloudEvent", err, nil)
-	}
-
-	obj := a.bucket.Object(event.ID() + ".json")
-	w := obj.NewWriter(ctx)
-
-	if _, err := w.Write(d); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
-	}
-	if err := w.Close(); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
-	}
-
-	return a.replier.Ok(&event, "ok")
 }
