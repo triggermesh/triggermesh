@@ -17,6 +17,8 @@ limitations under the License.
 package azureeventhubstarget
 
 import (
+	"strconv"
+
 	corev1 "k8s.io/api/core/v1"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
@@ -31,6 +33,7 @@ import (
 const (
 	adapterName = "azureeventhubstarget"
 
+	envDiscardCECtx    = "DISCARD_CE_CONTEXT"
 	envHubKeyName      = "EVENTHUB_KEY_NAME"
 	envHubNamespace    = "EVENTHUB_NAMESPACE"
 	envHubName         = "EVENTHUB_NAME"
@@ -90,5 +93,6 @@ func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapt
 		resources.KsvcPodEnvVars(envs),
 		resources.EnvVar(envHubNamespace, target.Spec.EventHubID.Namespace),
 		resources.EnvVar(envHubName, target.Spec.EventHubID.EventHub),
+		resources.EnvVar(envDiscardCECtx, strconv.FormatBool(target.Spec.DiscardCEContext)),
 	)
 }
