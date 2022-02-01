@@ -200,6 +200,7 @@ var _ = Describe("Azure Event Hubs target", func() {
 					Expect(ce.ID()).To(Equal(event.ID()))
 					Expect(ce.Type()).To(Equal(event.Type()))
 					Expect(ce.Subject()).To(Equal(event.Subject()))
+					Expect(ce.Source()).To(Equal(event.Source()))
 					Expect(ce.Extensions()[e2ece.E2ECeExtension]).
 						To(Equal(event.Extensions()[e2ece.E2ECeExtension]))
 				})
