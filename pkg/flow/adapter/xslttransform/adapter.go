@@ -142,11 +142,11 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 	}
 
 	if a.sink != "" {
+		event.SetType(event.Type() + ".response")
 		if err := event.SetData(cloudevents.ApplicationXML, []byte(output)); err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
 
-		event.SetType(event.Type() + ".response")
 		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "sending the cloudevent to the sink")
 		}
