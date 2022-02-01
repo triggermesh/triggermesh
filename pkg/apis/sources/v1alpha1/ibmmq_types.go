@@ -74,7 +74,7 @@ type Credentials struct {
 type TLSSpec struct {
 	Cipher             string   `json:"cipher"`
 	ClientAuthRequired bool     `json:"clientAuthRequired"`
-	CertLabel          string   `json:"certLabel"`
+	CertLabel          *string  `json:"certLabel,omitempty"`
 	KeyRepository      Keystore `json:"keyRepository"`
 }
 

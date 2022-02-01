@@ -85,11 +85,16 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 				Name:  envTLSClientAuth,
 				Value: fmt.Sprintf("%t", typedSrc.Spec.Auth.TLS.ClientAuthRequired),
 			},
-			{
-				Name:  envTLSCertLabel,
-				Value: typedSrc.Spec.Auth.TLS.CertLabel,
-			},
 		}...)
+
+		if typedSrc.Spec.Auth.TLS.CertLabel != nil {
+			appEnv = append(appEnv, []corev1.EnvVar{
+				{
+					Name:  envTLSCertLabel,
+					Value: *typedSrc.Spec.Auth.TLS.CertLabel,
+				},
+			}...)
+		}
 
 		keystoreMount = resource.SecretMount("key-database", KeystoreMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret)
 		passwdStashMount = resource.SecretMount("db-password", PasswdStashMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret)
