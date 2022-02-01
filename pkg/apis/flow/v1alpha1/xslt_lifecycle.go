@@ -38,8 +38,7 @@ const (
 
 // Managed event types
 const (
-	EventTypeXSLTTransform      = "io.triggermesh.xslt.transform"
-	EventTypeXSLTTransformError = "io.triggermesh.xslt.transform.error"
+	EventTypeXSLTTransform = "io.triggermesh.xslt.transform"
 )
 
 // GetGroupVersionKind returns the GroupVersionKind.

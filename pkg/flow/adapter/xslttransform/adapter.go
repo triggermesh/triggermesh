@@ -58,8 +58,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
 		targetce.ReplierWithStaticDataContentType(cloudevents.ApplicationXML),
 		targetce.ReplierWithStaticErrorDataContentType(*cloudevents.StringOfApplicationJSON()),
-		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)),
-		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeXSLTTransformError))
+		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(targetce.PayloadPolicyAlways)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
