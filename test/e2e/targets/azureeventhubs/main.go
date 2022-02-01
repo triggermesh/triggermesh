@@ -196,10 +196,12 @@ var _ = Describe("Azure Event Hubs target", func() {
 					err := json.Unmarshal(payload, &ce)
 					Expect(err).ToNot(HaveOccurred())
 
-					Expect(ce.Data()).To(ContainSubstring(string(event.Data())))
+					Expect(ce.Data()).To(Equal(event.Data()))
 					Expect(ce.ID()).To(Equal(event.ID()))
 					Expect(ce.Type()).To(Equal(event.Type()))
 					Expect(ce.Subject()).To(Equal(event.Subject()))
+					Expect(ce.Extensions()[e2ece.E2ECeExtension]).
+						To(Equal(event.Extensions()[e2ece.E2ECeExtension]))
 				})
 			})
 		})
@@ -288,7 +290,6 @@ var _ = Describe("Azure Event Hubs target", func() {
 				})
 
 				By("verifying the sent event", func() {
-					Expect(len(payload)).To(BeNumerically(">", 0))
 					Expect(payload).To(Equal(event.Data()))
 				})
 			})
