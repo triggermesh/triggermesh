@@ -10,6 +10,7 @@
     "permissions": [
       {
         "actions": [
+          "Microsoft.EventHub/namespaces/eventhubs/consumergroups/read",
           "Microsoft.EventHub/namespaces/read",
           "Microsoft.EventHub/namespaces/write",
           "Microsoft.Devices/iothubs/iothubkeys/listkeys/action",
@@ -26,6 +27,7 @@
           "Microsoft.Storage/storageAccounts/write"
         ],
         "dataActions": [
+          "Microsoft.EventHub/namespaces/messages/receive/action",
           "Microsoft.EventHub/namespaces/messages/send/action",
           "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete",
           "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write"
@@ -124,6 +126,23 @@
         ],
         "dataActions": [
           "Microsoft.EventHub/namespaces/messages/receive/action"
+        ],
+        "notActions": [],
+        "notDataActions": []
+      }
+    ],
+    "assignableScopes": [
+      "/subscriptions/52e4a8f0-1968-40a4-b38b-f19fac1e89ce"
+    ]
+  },
+  {
+    "roleName": "Event Hubs event target",
+    "description": "Role suitable for use with the TriggerMesh event target for Event Hubs.",
+    "permissions": [
+      {
+        "actions": [],
+        "dataActions": [
+          "Microsoft.EventHub/namespaces/messages/send/action"
         ],
         "notActions": [],
         "notDataActions": []
