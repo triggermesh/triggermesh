@@ -71,10 +71,25 @@ type MQReplyOptions struct {
 	QueueName    string `json:"queueName,omitempty"`
 }
 
-// Credentials holds the auth details
+// Credentials holds the auth details.
 type Credentials struct {
-	User     ValueFromField `json:"username"`
-	Password ValueFromField `json:"password"`
+	User     ValueFromField `json:"username,omitempty"`
+	Password ValueFromField `json:"password,omitempty"`
+	TLS      *TLSSpec       `json:"tls,omitempty"`
+}
+
+// TLSSpec holds the IBM MQ TLS authentication parameters.
+type TLSSpec struct {
+	Cipher             string   `json:"cipher"`
+	ClientAuthRequired bool     `json:"clientAuthRequired"`
+	CertLabel          *string  `json:"certLabel,omitempty"`
+	KeyRepository      Keystore `json:"keyRepository"`
+}
+
+// Keystore represents Key Database components.
+type Keystore struct {
+	KeyDatabase   ValueFromField `json:"keyDatabase"`
+	PasswordStash ValueFromField `json:"passwordStash"`
 }
 
 // IBMMQTargetStatus communicates the observed state of the event target. (from the controller).

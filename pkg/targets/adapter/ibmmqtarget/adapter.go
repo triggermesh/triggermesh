@@ -41,7 +41,6 @@ type ibmmqtargetAdapter struct {
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 	mqEnvs   *TargetEnvAccessor
-	reply    *mq.ReplyTo
 	queue    *mq.Object
 }
 
@@ -62,10 +61,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		ceClient: ceClient,
 		logger:   logger,
 		mqEnvs:   env,
-		reply: &mq.ReplyTo{
-			Manager: env.ReplyToManager,
-			Queue:   env.ReplyToQueue,
-		},
 	}
 }
 
@@ -73,13 +68,13 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 func (a *ibmmqtargetAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting IBMMQTarget Adapter")
 
-	conn, err := mq.NewConnection(a.mqEnvs.EnvConnectionConfig.ConnectionConfig())
+	conn, err := mq.NewConnection(a.mqEnvs.ConnectionConfig, a.mqEnvs.Auth)
 	if err != nil {
 		return fmt.Errorf("failed to create IBM MQ connection: %w", err)
 	}
 	defer conn.Disc()
 
-	queue, err := mq.OpenQueue(a.mqEnvs.EnvConnectionConfig.QueueName, a.reply, conn)
+	queue, err := mq.OpenQueue(a.mqEnvs.QueueName, &a.mqEnvs.ReplyTo, conn)
 	if err != nil {
 		return fmt.Errorf("failed to open IBM MQ queue: %w", err)
 	}
