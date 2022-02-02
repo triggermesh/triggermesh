@@ -25,12 +25,12 @@ import (
 
 var _ pkgadapter.EnvConfigAccessor = (*TargetEnvAccessor)(nil)
 
+// TargetEnvAccessor is the set of parameters parsed from the adapter's env.
 type TargetEnvAccessor struct {
 	pkgadapter.EnvConfig
-	mq.EnvConnectionConfig
-
-	ReplyToManager string `envconfig:"REPLY_TO_MANAGER"`
-	ReplyToQueue   string `envconfig:"REPLY_TO_QUEUE"`
+	mq.ConnectionConfig
+	mq.ReplyTo
+	mq.Auth
 
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`

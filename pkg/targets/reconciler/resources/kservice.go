@@ -17,6 +17,8 @@ limitations under the License.
 package resources
 
 import (
+	"path"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -153,4 +155,35 @@ func firstContainer(object interface{}) *corev1.Container {
 		*containers = make([]corev1.Container, 1)
 	}
 	return &(*containers)[0]
+}
+
+// SecretMount returns a build option that adds a volume mount to a service.
+func SecretMount(name string, target string, secret *corev1.SecretKeySelector) KsvcOpts {
+	return func(object *servingv1.Service) *servingv1.Service {
+		object.Spec.ConfigurationSpec.Template.Spec.Containers[0].VolumeMounts = append(
+			object.Spec.ConfigurationSpec.Template.Spec.Containers[0].VolumeMounts, corev1.VolumeMount{
+				Name:      name,
+				ReadOnly:  true,
+				MountPath: target,
+				SubPath:   secret.Key,
+			},
+		)
+		object.Spec.ConfigurationSpec.Template.Spec.Volumes = append(
+			object.Spec.ConfigurationSpec.Template.Spec.Volumes, corev1.Volume{
+				Name: name,
+				VolumeSource: corev1.VolumeSource{
+					Secret: &corev1.SecretVolumeSource{
+						SecretName: secret.Name,
+						Items: []corev1.KeyToPath{
+							{
+								Key:  secret.Key,
+								Path: path.Base(target),
+							},
+						},
+					},
+				},
+			},
+		)
+		return object
+	}
 }

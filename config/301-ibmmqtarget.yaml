@@ -141,9 +141,74 @@ spec:
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
-                required:
-                - username
-                - password
+                  tls:
+                    description: TLS configuration for IBM MQ client. For more information, please refer to the IBM MQ
+                      documentation at
+                      https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mechanisms-tls-security-protocols-in-mq.
+                    type: object
+                    properties:
+                      cipher:
+                        description: Message encryption and authentication algorithm.
+                          For more information, please refer to the IBM MQ documentation at
+                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=tls-cipherspecs-ciphersuites.
+                        type: string
+                      clientAuthRequired:
+                        description: Parameter to specify whether TLS client authentication is required. For more
+                          information, please refer to the IBM MQ documentation at
+                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=fields-sslclientauth-mqlong.
+                        type: boolean
+                      certLabel:
+                        description: Unique identifier representing a digital certificate stored in a key repository.
+                          For more information, please refer to the IBM MQ documentation at
+                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=repository-digital-certificate-labels-understanding-requirements.
+                        type: string
+                      keyRepository:
+                        description: Key repository for (m)TLS connection. For more information, please refer to the
+                          IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mq-ssltls-key-repository.
+                        type: object
+                        properties:
+                          keyDatabase:
+                            type: object
+                            properties:
+                              valueFromSecret:
+                                description: A reference to a Kubernetes Secret object containing the key database.
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  key:
+                                    type: string
+                                required:
+                                - name
+                                - key
+                            required:
+                            - valueFromSecret
+                          passwordStash:
+                            type: object
+                            properties:
+                              valueFromSecret:
+                                description: A reference to a Kubernetes Secret object containing the password stash.
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  key:
+                                    type: string
+                                required:
+                                - name
+                                - key
+                            required:
+                            - valueFromSecret
+                        required:
+                        - keyDatabase
+                        - passwordStash
+                    required:
+                    - cipher
+                    - clientAuthRequired
+                    - keyRepository
+                anyOf:
+                - required: [username, password]
+                - required: [tls]
             required:
             - connectionName
             - channelName

@@ -19,11 +19,17 @@ limitations under the License.
 package mq
 
 import (
+	"strings"
+
 	"github.com/ibm-messaging/mq-golang/v5/ibmmq"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ibmmqsource"
 )
 
-// CECorrelIDAttr is the name of CloudEvent attribute used as IBM MQ Correlation ID.
-const CECorrelIDAttr = "correlationid"
+// IBM MQ target adapter constants.
+const (
+	CECorrelIDAttr          = "correlationid"
+	KeyRepositoryExtensions = ".kdb"
+)
 
 // Object is a local wrapper for IBM MQ objects required to communicate with the queue.
 type Object struct {
@@ -34,59 +40,53 @@ type Object struct {
 	mqcbd *ibmmq.MQCBD
 }
 
-// ConnConfig is a set of connection parameters.
-type ConnConfig struct {
-	ChannelName    string
-	ConnectionName string
-	User           string
-	Password       string
-	QueueManager   string
-	QueueName      string
-}
-
-// ReplyTo holds the data used in MQ's Reply-to header.
-type ReplyTo struct {
-	Manager string
-	Queue   string
-}
-
 // NewConnection creates the connection to IBM MQ server.
-func NewConnection(cfg *ConnConfig) (ibmmq.MQQueueManager, error) {
+func NewConnection(conn ConnectionConfig, auth Auth) (ibmmq.MQQueueManager, error) {
 	// create IBM MQ channel definition
 	channelDefinition := ibmmq.NewMQCD()
-	channelDefinition.ChannelName = cfg.ChannelName
-	channelDefinition.ConnectionName = cfg.ConnectionName
-
-	// init connection security params
-	connSecParams := ibmmq.NewMQCSP()
-	connSecParams.AuthenticationType = ibmmq.MQCSP_AUTH_USER_ID_AND_PWD
-	connSecParams.UserId = cfg.User
-	connSecParams.Password = cfg.Password
+	channelDefinition.ChannelName = conn.ChannelName
+	channelDefinition.ConnectionName = conn.ConnectionName
 
 	// setup MQ connection params
 	connOptions := ibmmq.NewMQCNO()
 	connOptions.Options = ibmmq.MQCNO_CLIENT_BINDING
 	connOptions.Options |= ibmmq.MQCNO_HANDLE_SHARE_BLOCK
-	connOptions.ClientConn = channelDefinition
-	connOptions.SecurityParms = connSecParams
 
-	return ibmmq.Connx(cfg.QueueManager, connOptions)
+	if auth.Cipher != "" {
+		channelDefinition.SSLCipherSpec = auth.Cipher
+		channelDefinition.SSLClientAuth = ibmmq.MQSCA_OPTIONAL
+		if auth.ClientAuthRequired {
+			channelDefinition.SSLClientAuth = ibmmq.MQSCA_REQUIRED
+		}
+
+		sco := ibmmq.NewMQSCO()
+		sco.CertificateLabel = auth.CertLabel
+		sco.KeyRepository = strings.TrimRight(ibmmqsource.KeystoreMountPath, KeyRepositoryExtensions)
+		connOptions.SSLConfig = sco
+	}
+	connOptions.ClientConn = channelDefinition
+
+	if auth.Username != "" {
+		// init connection security params
+		connSecParams := ibmmq.NewMQCSP()
+		connSecParams.AuthenticationType = ibmmq.MQCSP_AUTH_USER_ID_AND_PWD
+		connSecParams.UserId = auth.Username
+		connSecParams.Password = auth.Password
+
+		connOptions.SecurityParms = connSecParams
+	}
+
+	return ibmmq.Connx(conn.QueueManager, connOptions)
 }
 
 // OpenQueue opens IBM MQ queue.
 func OpenQueue(queueName string, replyTo *ReplyTo, conn ibmmq.MQQueueManager) (Object, error) {
 	// Create the Object Descriptor that allows us to give the queue name
 	mqod := ibmmq.NewMQOD()
-
-	// We have to say how we are going to use this queue. In this case, to PUT
-	// messages. That is done in the openOptions parameter.
-	openOptions := ibmmq.MQOO_OUTPUT
-
-	// Opening a QUEUE (rather than a Topic or other object type) and give the name
 	mqod.ObjectType = ibmmq.MQOT_Q
 	mqod.ObjectName = queueName
 
-	qObject, err := conn.Open(mqod, openOptions)
+	qObject, err := conn.Open(mqod, ibmmq.MQOO_OUTPUT)
 	if err != nil {
 		return Object{}, err
 	}

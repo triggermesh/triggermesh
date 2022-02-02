@@ -17,6 +17,7 @@ limitations under the License.
 package ibmmqtarget
 
 import (
+	"fmt"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
@@ -43,9 +44,15 @@ const (
 	envQueueName      = "QUEUE_NAME"
 	envReplyToManager = "REPLY_TO_MANAGER"
 	envReplyToQueue   = "REPLY_TO_QUEUE"
+	envTLSCipher      = "TLS_CIPHER"
+	envTLSClientAuth  = "TLS_CLIENT_AUTH"
+	envTLSCertLabel   = "TLS_CERT_LABEL"
 
 	envDiscardCEContext    = "DISCARD_CE_CONTEXT"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
+
+	KeystoreMountPath    = "/opt/mqm-keystore/key.kdb"
+	PasswdStashMountPath = "/opt/mqm-keystore/key.sth"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -70,12 +77,42 @@ func makeTargetAdapterKService(target *v1alpha1.IBMMQTarget, cfg *adapterConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
 
+	keystoreMount := func(ksvc *servingv1.Service) *servingv1.Service { return ksvc }
+	passwdStashMount := func(ksvc *servingv1.Service) *servingv1.Service { return ksvc }
+
+	if target.Spec.Auth.TLS != nil {
+		envs = append(envs, []corev1.EnvVar{
+			{
+				Name:  envTLSCipher,
+				Value: target.Spec.Auth.TLS.Cipher,
+			},
+			{
+				Name:  envTLSClientAuth,
+				Value: fmt.Sprintf("%t", target.Spec.Auth.TLS.ClientAuthRequired),
+			},
+		}...)
+
+		if target.Spec.Auth.TLS.CertLabel != nil {
+			envs = append(envs, []corev1.EnvVar{
+				{
+					Name:  envTLSCertLabel,
+					Value: *target.Spec.Auth.TLS.CertLabel,
+				},
+			}...)
+		}
+
+		keystoreMount = resources.SecretMount("key-database", KeystoreMountPath, target.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret)
+		passwdStashMount = resources.SecretMount("db-password", PasswdStashMountPath, target.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret)
+	}
+
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
 		resources.KsvcLabels(lbl),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcOwner(target),
 		resources.KsvcPodLabels(podLabels),
 		resources.KsvcPodEnvVars(envs),
+		keystoreMount,
+		passwdStashMount,
 	)
 }
 
