@@ -163,6 +163,7 @@ var _ = Describe("Azure Blob Storage source", func() {
 				// topic upon creation of the Event Grid subscription by our reconciler (Blob Storage
 				// events are routed over Event Grid). The source shouldn't report Ready before this
 				// system topic is available, because events occuring prior to that are dropped.
+				// Ref. https://github.com/triggermesh/triggermesh/issues/446
 				time.Sleep(1 * time.Minute)
 			})
 		})
@@ -174,7 +175,7 @@ var _ = Describe("Azure Blob Storage source", func() {
 			// instead of
 			//   "When: a blob is created/deleted ..., Specify: the source generates ..."
 			// to avoid creating a separate set of Azure resources for each spec, which would significantly
-			// increases the duration of the test with no real benefit.
+			// increase the duration of the test with no real benefit.
 			Specify("the source generates events", func() {
 
 				By("creating a blob", func() {
