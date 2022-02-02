@@ -36,13 +36,14 @@ import (
 )
 
 const (
-	tBridgeID         = "bride-abdc-0123"
-	tComponent        = "xslt-adapter"
-	tCloudEventID     = "ce-abcd-0123"
-	tCloudEventType   = "ce.test.type"
-	tCloudEventSource = "ce.test.source"
-	tSuccessAttribute = "success"
-	tErrorAttribute   = "error"
+	tBridgeID               = "bride-abdc-0123"
+	tComponent              = "xslt-adapter"
+	tCloudEventID           = "ce-abcd-0123"
+	tCloudEventType         = "ce.test.type"
+	tCloudEventResponseType = "ce.test.type.response"
+	tCloudEventSource       = "ce.test.source"
+	tSuccessAttribute       = "success"
+	tErrorAttribute         = "error"
 
 	tXSLT = `
 <xsl:stylesheet version="1.0"	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -267,7 +268,7 @@ func TestXSLTTransformToSink(t *testing.T) {
 		"transform ok": {
 			xslt:          tXSLT,
 			inEvent:       newCloudEvent(tXML, cloudevents.ApplicationXML),
-			expectedEvent: newCloudEvent(tOutXML, cloudevents.ApplicationXML),
+			expectedEvent: newCloudEvent(tOutXML, cloudevents.ApplicationXML, cloudEventWithEventType(tCloudEventResponseType)),
 		},
 	}
 	for name, tc := range testCases {
