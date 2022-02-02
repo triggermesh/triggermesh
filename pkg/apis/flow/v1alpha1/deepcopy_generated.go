@@ -540,6 +540,11 @@ func (in *XSLTTransformSpec) DeepCopyInto(out *XSLTTransformSpec) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.Sink != nil {
+		in, out := &in.Sink, &out.Sink
+		*out = new(v1.Destination)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

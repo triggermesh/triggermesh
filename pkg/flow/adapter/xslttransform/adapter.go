@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ type xsltTransformAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	sink     string
 }
 
 // NewTarget adapter implementation
@@ -68,6 +69,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
+		sink:     env.Sink,
 	}
 
 	if env.XSLT != "" {
@@ -137,6 +139,18 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			fmt.Errorf("eror processing XML with XSLT: %v", err), nil)
+	}
+
+	if a.sink != "" {
+		event.SetType(event.Type() + ".response")
+		if err := event.SetData(cloudevents.ApplicationXML, []byte(output)); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "sending the cloudevent to the sink")
+		}
+		return nil, cloudevents.ResultACK
 	}
 
 	return a.replier.Ok(&event, []byte(output), targetce.ResponseWithDataContentType(cloudevents.ApplicationXML))

@@ -1,4 +1,4 @@
-# Copyright 2021 TriggerMesh Inc.
+# Copyright 2022 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
+        { "type": "io.triggermesh.xslttransform.error" },
         { "type": "*" }
       ]
 spec:
@@ -89,14 +90,40 @@ spec:
                 - required: [value]
                 - required: [valueFromSecret]
                 - required: [valueFromConfigMap]
-
               allowPerEventXSLT:
                 description: Whether the XSLT informed at the spec can be overriden at each CloudEvent.
                 type: boolean
+              sink:
+                description: The destination of events transformed by this component.
+                type: object
+                properties:
+                  ref:
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
+                     If left empty, the events will be sent back to the sender/source.
+                    type: object
+                    properties:
+                      apiVersion:
+                        type: string
+                      kind:
+                        type: string
+                      namespace:
+                        type: string
+                      name:
+                        type: string
+                    required:
+                    - apiVersion
+                    - kind
+                    - name
+                  uri:
+                    description: URI to use as the destination of events.
+                    type: string
+                    format: uri
+                oneOf:
+                - required: ['ref']
+                - required: ['uri']
             anyOf:
             - required: [xslt]
             - required: [allowPerEventXSLT]
-
           status:
             description: Reported status.
             type: object

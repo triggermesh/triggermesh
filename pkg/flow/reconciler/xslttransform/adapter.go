@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
+	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
@@ -35,6 +36,7 @@ const (
 
 	envXSLT              = "XSLTTRANSFORM_XSLT"
 	envAllowXSLTOverride = "XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE"
+	envSink              = "K_SINK"
 )
 
 // adapterConfig contains properties used to configure the component's adapter.
@@ -47,8 +49,8 @@ type adapterConfig struct {
 }
 
 // makeAdapterKService generates the adapter knative service structure.
-func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig) (*servingv1.Service, error) {
-	envApp, err := makeAppEnv(o)
+func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig, sink *apis.URL) (*servingv1.Service, error) {
+	envApp, err := makeAppEnv(o, sink)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +70,7 @@ func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig) (*servin
 		resources.KsvcPodEnvVars(envs)), nil
 }
 
-func makeAppEnv(o *v1alpha1.XSLTTransform) ([]corev1.EnvVar, error) {
+func makeAppEnv(o *v1alpha1.XSLTTransform, sink *apis.URL) ([]corev1.EnvVar, error) {
 	env := []corev1.EnvVar{
 		*o.Spec.XSLT.ToEnvironmentVariable(envXSLT),
 		{
@@ -84,5 +86,11 @@ func makeAppEnv(o *v1alpha1.XSLTTransform) ([]corev1.EnvVar, error) {
 		})
 	}
 
+	if sink != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envSink,
+			Value: sink.String(),
+		})
+	}
 	return env, nil
 }

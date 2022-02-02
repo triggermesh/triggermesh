@@ -20,6 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
+	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
@@ -43,7 +44,7 @@ type adapterConfig struct {
 }
 
 // makeAdapterKService generates (but does not insert into K8s) the Synchronizer Adapter KService.
-func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig, sink string) *servingv1.Service {
+func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig, sink *apis.URL) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", o.Name)
 	lbl := libreconciler.MakeAdapterLabels(adapterName, o.Name)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, o.Name)
@@ -62,7 +63,7 @@ func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig
 	)
 }
 
-func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink string) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink *apis.URL) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  libreconciler.EnvBridgeID,
@@ -77,10 +78,10 @@ func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink string) []corev1.EnvVa
 		})
 	}
 
-	if sink != "" {
+	if sink != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  "K_SINK",
-			Value: sink,
+			Value: sink.String(),
 		})
 	}
 

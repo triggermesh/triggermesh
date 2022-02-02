@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import (
 
 	// Link fake informers accessed by our controller
 	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/xslttransform/fake"
+	_ "knative.dev/pkg/client/injection/ducks/duck/v1/addressable/fake"
 	_ "knative.dev/pkg/injection/clients/dynamicclient/fake"
 	_ "knative.dev/serving/pkg/client/injection/informers/serving/v1/service/fake"
 )

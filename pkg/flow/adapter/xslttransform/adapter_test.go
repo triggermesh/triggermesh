@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"knative.dev/eventing/pkg/adapter/v2"
+	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	logtesting "knative.dev/pkg/logging/testing"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
@@ -34,13 +36,14 @@ import (
 )
 
 const (
-	tBridgeID         = "bride-abdc-0123"
-	tComponent        = "xslt-adapter"
-	tCloudEventID     = "ce-abcd-0123"
-	tCloudEventType   = "ce.test.type"
-	tCloudEventSource = "ce.test.source"
-	tSuccessAttribute = "success"
-	tErrorAttribute   = "error"
+	tBridgeID               = "bride-abdc-0123"
+	tComponent              = "xslt-adapter"
+	tCloudEventID           = "ce-abcd-0123"
+	tCloudEventType         = "ce.test.type"
+	tCloudEventResponseType = "ce.test.type.response"
+	tCloudEventSource       = "ce.test.source"
+	tSuccessAttribute       = "success"
+	tErrorAttribute         = "error"
 
 	tXSLT = `
 <xsl:stylesheet version="1.0"	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -252,6 +255,45 @@ func TestXSLTTransformEvents(t *testing.T) {
 				assert.Fail(t, "expected cloud event response was not received")
 			}
 
+		})
+	}
+}
+
+func TestXSLTTransformToSink(t *testing.T) {
+	testCases := map[string]struct {
+		xslt          string
+		inEvent       cloudevents.Event
+		expectedEvent cloudevents.Event
+	}{
+		"transform ok": {
+			xslt:          tXSLT,
+			inEvent:       newCloudEvent(tXML, cloudevents.ApplicationXML),
+			expectedEvent: newCloudEvent(tOutXML, cloudevents.ApplicationXML, cloudEventWithEventType(tCloudEventResponseType)),
+		},
+	}
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			ceClient := adaptertest.NewTestClient()
+			ctx := context.Background()
+			style, err := parseXSLT(tc.xslt)
+			assert.NoError(t, err)
+
+			a := &xsltTransformAdapter{
+				logger: logtesting.TestLogger(t),
+
+				ceClient:     ceClient,
+				xsltOverride: false,
+				defaultXSLT:  style,
+				sink:         "http://localhost:8080",
+			}
+
+			e, r := a.dispatch(ctx, tc.inEvent)
+			assert.Nil(t, e)
+			assert.Equal(t, cloudevents.ResultACK, r)
+
+			events := ceClient.Sent()
+			require.Equal(t, 1, len(events))
+			assert.Equal(t, tc.expectedEvent, events[0])
 		})
 	}
 }

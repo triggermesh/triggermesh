@@ -20,11 +20,15 @@ import (
 	"context"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 
+	"knative.dev/pkg/apis/duck"
+	"knative.dev/pkg/client/injection/ducks/duck/v1/addressable"
 	fakek8sinjectionclient "knative.dev/pkg/client/injection/kube/client/fake"
 	"knative.dev/pkg/controller"
+	fakedynamicclient "knative.dev/pkg/injection/clients/dynamicclient/fake"
 	"knative.dev/pkg/logging"
 	logtesting "knative.dev/pkg/logging/testing"
 	"knative.dev/pkg/reconciler"
@@ -65,6 +69,14 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		eventRecorder := record.NewFakeRecorder(eventRecorderBufferSize)
 		ctx = controller.WithEventRecorder(ctx, eventRecorder)
 
+		// duck informers (e.g. used by resolver.URIResolver) use a dynamic client.
+		ctx, _ = fakedynamicclient.With(ctx, scheme, ToUnstructured(t, tr.Objects)...)
+
+		// inject duck informer for Addressables, required by resolver.URIResolver.
+		// reconcilertesting.SetupFakeContext would also call this, but
+		// we don't need the other informers it registers.
+		ctx = addressable.WithDuck(ctx)
+
 		// set up Reconciler from fakes
 		r := ctor(t, ctx, &ls)
 
@@ -96,4 +108,29 @@ func MakeFactory(ctor Ctor) rt.Factory {
 
 		return r, actionRecorderList, eventList
 	}
+}
+
+// ToUnstructured takes a list of k8s resources and converts them to
+// Unstructured objects.
+// We must pass objects as Unstructured to the dynamic client fake, or it
+// won't handle them properly.
+func ToUnstructured(t *testing.T, objs []runtime.Object) (unstr []runtime.Object) {
+	for _, obj := range objs {
+		// Only objects that implement duck.OneOfOurs are considered so we can use the duck.ToUnstructured
+		// convenience function. This is sufficient for us because the only Unstructured objects we need to
+		// handle in tests are Addressables.
+		iface, ok := obj.(duck.OneOfOurs)
+		if !ok {
+			continue
+		}
+
+		unstrObj, err := duck.ToUnstructured(iface)
+		if err != nil {
+			t.Fatalf("Failed to convert object to Unstructured: %s", err)
+		}
+
+		unstr = append(unstr, unstrObj)
+	}
+
+	return unstr
 }
