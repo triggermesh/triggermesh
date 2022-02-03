@@ -18,6 +18,7 @@ package googlecloudstorage
 
 import (
 	"context"
+	"encoding/json"
 	"io/ioutil"
 	"net/url"
 
@@ -150,6 +151,101 @@ var _ = Describe("Google Cloud Storage target", func() {
 					})
 
 					By("inspecting the object payload", func() {
+						ObjData := make(map[string]interface{})
+						err := json.Unmarshal(receivedObj, &ObjData)
+						Expect(err).ToNot(HaveOccurred())
+
+						eventData, err := json.Marshal(ObjData)
+						Expect(err).ToNot(HaveOccurred())
+
+						gotEvent := &cloudevents.Event{}
+						err = json.Unmarshal(eventData, gotEvent)
+						Expect(err).ToNot(HaveOccurred())
+
+						Expect(gotEvent.ID()).To(Equal(sentEvent.ID()))
+						Expect(gotEvent.Type()).To(Equal(sentEvent.Type()))
+						Expect(gotEvent.Source()).To(Equal(sentEvent.Source()))
+						Expect(gotEvent.Data()).To(Equal(sentEvent.Data()))
+						Expect(gotEvent.Extensions()[e2ece.E2ECeExtension]).
+							To(Equal(sentEvent.Extensions()[e2ece.E2ECeExtension]))
+					})
+				})
+			})
+			When("an event with specific type is sent to the target", func() {
+
+				BeforeEach(func() {
+					By("sending an event with type com.google.cloud.storage.object.insert", func() {
+						sentEvent = e2ece.NewHelloEvent(f)
+						sentEvent.SetType("com.google.cloud.storage.object.insert")
+
+						job := e2ece.RunEventSender(f.KubeClient, ns, trgtURL.String(), sentEvent)
+						apps.WaitForCompletion(f.KubeClient, job)
+					})
+				})
+
+				It("only puts the event's data into the bucket object", func() {
+					var receivedObj []byte
+
+					By("listing the bucket objects", func() {
+						var err error
+
+						receivedObjs := e2estorage.GetObjectsReader(storageClient, bucketName)
+						Expect(receivedObjs).To(HaveLen(1),
+							"Received %d objects instead of 1", len(receivedObjs))
+
+						object := receivedObjs[0]
+						receivedObj, err = ioutil.ReadAll(object)
+						Expect(err).ToNot(HaveOccurred())
+					})
+
+					By("inspecting the object payload", func() {
+						Expect(receivedObj).To(Equal(sentEvent.Data()))
+					})
+				})
+			})
+		})
+
+		When("the CloudEvent context is discarded", func() {
+			BeforeEach(func() {
+				By("creating an GoogleCloudStorageTarget object with discardCEContext enabled", func() {
+					trgt, err := createTarget(trgtClient, ns, "test-",
+						withBucketName(bucketName),
+						withCredentials(gcpSecret.Name),
+						withDiscardCEContext(),
+					)
+					Expect(err).ToNot(HaveOccurred())
+
+					trgt = ducktypes.WaitUntilReady(f.DynamicClient, trgt)
+
+					trgtURL = ducktypes.Address(trgt)
+					Expect(trgtURL).ToNot(BeNil())
+				})
+			})
+			When("an event is sent to the target", func() {
+				BeforeEach(func() {
+					By("sending an event", func() {
+						sentEvent = e2ece.NewHelloEvent(f)
+
+						job := e2ece.RunEventSender(f.KubeClient, ns, trgtURL.String(), sentEvent)
+						apps.WaitForCompletion(f.KubeClient, job)
+					})
+				})
+
+				It("only puts the event's data into the bucket object", func() {
+					var receivedObj []byte
+
+					By("listing the bucket objects", func() {
+						var err error
+
+						receivedObjs := e2estorage.GetObjectsReader(storageClient, bucketName)
+						Expect(receivedObjs).To(HaveLen(1),
+							"Received %d objects instead of 1", len(receivedObjs))
+
+						object := receivedObjs[0]
+						receivedObj, err = ioutil.ReadAll(object)
+						Expect(err).ToNot(HaveOccurred())
+					})
+					By("inspecting the object payload", func() {
 						Expect(receivedObj).To(Equal(sentEvent.Data()))
 					})
 				})
@@ -225,6 +321,14 @@ func withBucketName(bucketName string) targetOption {
 	return func(trgt *unstructured.Unstructured) {
 		if err := unstructured.SetNestedField(trgt.Object, bucketName, "spec", "bucketName"); err != nil {
 			framework.FailfWithOffset(2, "Failed to set spec.bucketName field: %s", err)
+		}
+	}
+}
+
+func withDiscardCEContext() targetOption {
+	return func(trgt *unstructured.Unstructured) {
+		if err := unstructured.SetNestedField(trgt.Object, true, "spec", "discardCloudEventContext"); err != nil {
+			framework.FailfWithOffset(2, "Failed to set spec.discardCloudEventContext field: %s", err)
 		}
 	}
 }

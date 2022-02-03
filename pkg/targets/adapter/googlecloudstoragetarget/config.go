@@ -35,4 +35,6 @@ type envAccessor struct {
 
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
+
+	DiscardCEContext bool `envconfig:"GOOGLE_STORAGE_DISCARD_CE_CONTEXT"`
 }

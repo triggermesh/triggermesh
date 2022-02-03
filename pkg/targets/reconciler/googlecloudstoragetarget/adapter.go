@@ -17,6 +17,8 @@ limitations under the License.
 package googlecloudstoragetarget
 
 import (
+	"strconv"
+
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -73,6 +75,9 @@ func makeAppEnv(spec *v1alpha1.GoogleCloudStorageTargetSpec) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: spec.Credentials.SecretKeyRef,
 			},
+		}, {
+			Name:  "GOOGLE_STORAGE_DISCARD_CE_CONTEXT",
+			Value: strconv.FormatBool(spec.DiscardCEContext),
 		},
 	}
 
