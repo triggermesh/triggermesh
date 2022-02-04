@@ -117,7 +117,7 @@ jobs:
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      run: ginkgo -p -slow-spec-threshold=10m -randomize-all ./test/e2e/
+      run: ginkgo -procs=$(($(nproc)*2)) -slow-spec-threshold=10m -randomize-all ./test/e2e/
 
     # The KinD cluster can get shut down before all API objects created during
     # E2E tests have been terminated, which leaks cloud resources depending on
