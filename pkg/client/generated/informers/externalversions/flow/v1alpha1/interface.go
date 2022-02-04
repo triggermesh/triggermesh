@@ -62,5 +62,5 @@ func (v *version) XMLToJSONTransformations() XMLToJSONTransformationInformer {
 
 // XSLTTransformations returns a XSLTTransformationInformer.
 func (v *version) XSLTTransformations() XSLTTransformationInformer {
-	return &xSLTTransformInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+	return &xSLTTransformationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

@@ -39,7 +39,7 @@ type XSLTTransformationInformer interface {
 	Lister() v1alpha1.XSLTTransformationLister
 }
 
-type xSLTTransformInformer struct {
+type xSLTTransformationInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
@@ -77,14 +77,14 @@ func NewFilteredXSLTTransformationInformer(client internalclientset.Interface, n
 	)
 }
 
-func (f *xSLTTransformInformer) defaultInformer(client internalclientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+func (f *xSLTTransformationInformer) defaultInformer(client internalclientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 	return NewFilteredXSLTTransformationInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *xSLTTransformInformer) Informer() cache.SharedIndexInformer {
+func (f *xSLTTransformationInformer) Informer() cache.SharedIndexInformer {
 	return f.factory.InformerFor(&flowv1alpha1.XSLTTransformation{}, f.defaultInformer)
 }
 
-func (f *xSLTTransformInformer) Lister() v1alpha1.XSLTTransformationLister {
+func (f *xSLTTransformationInformer) Lister() v1alpha1.XSLTTransformationLister {
 	return v1alpha1.NewXSLTTransformationLister(f.Informer().GetIndexer())
 }

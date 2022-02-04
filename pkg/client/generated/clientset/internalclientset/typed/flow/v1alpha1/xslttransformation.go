@@ -38,9 +38,9 @@ type XSLTTransformationsGetter interface {
 
 // XSLTTransformationInterface has methods to work with XSLTTransformation resources.
 type XSLTTransformationInterface interface {
-	Create(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransformation, opts v1.CreateOptions) (*v1alpha1.XSLTTransformation, error)
-	Update(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (*v1alpha1.XSLTTransformation, error)
-	UpdateStatus(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (*v1alpha1.XSLTTransformation, error)
+	Create(ctx context.Context, xSLTTransformation *v1alpha1.XSLTTransformation, opts v1.CreateOptions) (*v1alpha1.XSLTTransformation, error)
+	Update(ctx context.Context, xSLTTransformation *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (*v1alpha1.XSLTTransformation, error)
+	UpdateStatus(ctx context.Context, xSLTTransformation *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (*v1alpha1.XSLTTransformation, error)
 	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
 	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
 	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.XSLTTransformation, error)
@@ -50,22 +50,22 @@ type XSLTTransformationInterface interface {
 	XSLTTransformationExpansion
 }
 
-// xSLTTransforms implements XSLTTransformationInterface
-type xSLTTransforms struct {
+// xSLTTransformations implements XSLTTransformationInterface
+type xSLTTransformations struct {
 	client rest.Interface
 	ns     string
 }
 
 // newXSLTTransformations returns a XSLTTransformations
-func newXSLTTransformations(c *FlowV1alpha1Client, namespace string) *xSLTTransforms {
-	return &xSLTTransforms{
+func newXSLTTransformations(c *FlowV1alpha1Client, namespace string) *xSLTTransformations {
+	return &xSLTTransformations{
 		client: c.RESTClient(),
 		ns:     namespace,
 	}
 }
 
-// Get takes name of the xSLTTransform, and returns the corresponding xSLTTransform object, and an error if there is any.
-func (c *xSLTTransforms) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.XSLTTransformation, err error) {
+// Get takes name of the xSLTTransformation, and returns the corresponding xSLTTransformation object, and an error if there is any.
+func (c *xSLTTransformations) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.XSLTTransformation, err error) {
 	result = &v1alpha1.XSLTTransformation{}
 	err = c.client.Get().
 		Namespace(c.ns).
@@ -78,7 +78,7 @@ func (c *xSLTTransforms) Get(ctx context.Context, name string, options v1.GetOpt
 }
 
 // List takes label and field selectors, and returns the list of XSLTTransformations that match those selectors.
-func (c *xSLTTransforms) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.XSLTTransformationList, err error) {
+func (c *xSLTTransformations) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.XSLTTransformationList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -94,8 +94,8 @@ func (c *xSLTTransforms) List(ctx context.Context, opts v1.ListOptions) (result 
 	return
 }
 
-// Watch returns a watch.Interface that watches the requested xSLTTransforms.
-func (c *xSLTTransforms) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested xSLTTransformations.
+func (c *xSLTTransformations) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -109,28 +109,28 @@ func (c *xSLTTransforms) Watch(ctx context.Context, opts v1.ListOptions) (watch.
 		Watch(ctx)
 }
 
-// Create takes the representation of a xSLTTransform and creates it.  Returns the server's representation of the xSLTTransform, and an error, if there is any.
-func (c *xSLTTransforms) Create(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransformation, opts v1.CreateOptions) (result *v1alpha1.XSLTTransformation, err error) {
+// Create takes the representation of a xSLTTransformation and creates it.  Returns the server's representation of the xSLTTransformation, and an error, if there is any.
+func (c *xSLTTransformations) Create(ctx context.Context, xSLTTransformation *v1alpha1.XSLTTransformation, opts v1.CreateOptions) (result *v1alpha1.XSLTTransformation, err error) {
 	result = &v1alpha1.XSLTTransformation{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("xslttransformations").
 		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(xSLTTransform).
+		Body(xSLTTransformation).
 		Do(ctx).
 		Into(result)
 	return
 }
 
-// Update takes the representation of a xSLTTransform and updates it. Returns the server's representation of the xSLTTransform, and an error, if there is any.
-func (c *xSLTTransforms) Update(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (result *v1alpha1.XSLTTransformation, err error) {
+// Update takes the representation of a xSLTTransformation and updates it. Returns the server's representation of the xSLTTransformation, and an error, if there is any.
+func (c *xSLTTransformations) Update(ctx context.Context, xSLTTransformation *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (result *v1alpha1.XSLTTransformation, err error) {
 	result = &v1alpha1.XSLTTransformation{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("xslttransformations").
-		Name(xSLTTransform.Name).
+		Name(xSLTTransformation.Name).
 		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(xSLTTransform).
+		Body(xSLTTransformation).
 		Do(ctx).
 		Into(result)
 	return
@@ -138,22 +138,22 @@ func (c *xSLTTransforms) Update(ctx context.Context, xSLTTransform *v1alpha1.XSL
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *xSLTTransforms) UpdateStatus(ctx context.Context, xSLTTransform *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (result *v1alpha1.XSLTTransformation, err error) {
+func (c *xSLTTransformations) UpdateStatus(ctx context.Context, xSLTTransformation *v1alpha1.XSLTTransformation, opts v1.UpdateOptions) (result *v1alpha1.XSLTTransformation, err error) {
 	result = &v1alpha1.XSLTTransformation{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("xslttransformations").
-		Name(xSLTTransform.Name).
+		Name(xSLTTransformation.Name).
 		SubResource("status").
 		VersionedParams(&opts, scheme.ParameterCodec).
-		Body(xSLTTransform).
+		Body(xSLTTransformation).
 		Do(ctx).
 		Into(result)
 	return
 }
 
-// Delete takes name of the xSLTTransform and deletes it. Returns an error if one occurs.
-func (c *xSLTTransforms) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+// Delete takes name of the xSLTTransformation and deletes it. Returns an error if one occurs.
+func (c *xSLTTransformations) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("xslttransformations").
@@ -164,7 +164,7 @@ func (c *xSLTTransforms) Delete(ctx context.Context, name string, opts v1.Delete
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *xSLTTransforms) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+func (c *xSLTTransformations) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	var timeout time.Duration
 	if listOpts.TimeoutSeconds != nil {
 		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
@@ -179,8 +179,8 @@ func (c *xSLTTransforms) DeleteCollection(ctx context.Context, opts v1.DeleteOpt
 		Error()
 }
 
-// Patch applies the patch and returns the patched xSLTTransform.
-func (c *xSLTTransforms) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XSLTTransformation, err error) {
+// Patch applies the patch and returns the patched xSLTTransformation.
+func (c *xSLTTransformations) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.XSLTTransformation, err error) {
 	result = &v1alpha1.XSLTTransformation{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
