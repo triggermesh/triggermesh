@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
 import (
 	"context"
@@ -127,7 +127,7 @@ const (
 `
 )
 
-func TestXSLTTransformEvents(t *testing.T) {
+func TestXSLTTransformationEvents(t *testing.T) {
 	testCases := map[string]struct {
 		allowXSLTOverride bool
 		xslt              string
@@ -159,7 +159,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 			inEvent: newCloudEvent(
 				createStructuredRequest(tXML, tXSLT),
 				cloudevents.ApplicationJSON,
-				cloudEventWithEventType(v1alpha1.EventTypeXSLTTransform)),
+				cloudEventWithEventType(v1alpha1.EventTypeXSLTTransformation)),
 
 			expectEvent:    newCloudEvent(tOutXML, cloudevents.ApplicationXML),
 			expectCategory: tSuccessAttribute,
@@ -171,7 +171,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 			inEvent: newCloudEvent(
 				createStructuredRequest(tXML, tAlternativeXSLT),
 				cloudevents.ApplicationJSON,
-				cloudEventWithEventType(v1alpha1.EventTypeXSLTTransform)),
+				cloudEventWithEventType(v1alpha1.EventTypeXSLTTransformation)),
 
 			expectEvent:    newCloudEvent(tAlternativeOutXML, cloudevents.ApplicationXML),
 			expectCategory: tSuccessAttribute,
@@ -259,7 +259,7 @@ func TestXSLTTransformEvents(t *testing.T) {
 	}
 }
 
-func TestXSLTTransformToSink(t *testing.T) {
+func TestXSLTTransformationToSink(t *testing.T) {
 	testCases := map[string]struct {
 		xslt          string
 		inEvent       cloudevents.Event
@@ -326,7 +326,7 @@ func cloudEventWithEventType(t string) cloudEventOptions {
 }
 
 func createStructuredRequest(xml, xslt string) string {
-	sr := XSLTTransformStructuredRequest{
+	sr := XSLTTransformationStructuredRequest{
 		XML:  xml,
 		XSLT: xslt,
 	}

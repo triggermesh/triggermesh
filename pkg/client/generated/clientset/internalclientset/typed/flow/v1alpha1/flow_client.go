@@ -29,7 +29,7 @@ type FlowV1alpha1Interface interface {
 	SynchronizersGetter
 	TransformationsGetter
 	XMLToJSONTransformationsGetter
-	XSLTTransformsGetter
+	XSLTTransformationsGetter
 }
 
 // FlowV1alpha1Client is used to interact with features provided by the flow.triggermesh.io group.
@@ -49,8 +49,8 @@ func (c *FlowV1alpha1Client) XMLToJSONTransformations(namespace string) XMLToJSO
 	return newXMLToJSONTransformations(c, namespace)
 }
 
-func (c *FlowV1alpha1Client) XSLTTransforms(namespace string) XSLTTransformInterface {
-	return newXSLTTransforms(c, namespace)
+func (c *FlowV1alpha1Client) XSLTTransformations(namespace string) XSLTTransformationInterface {
+	return newXSLTTransformations(c, namespace)
 }
 
 // NewForConfig creates a new FlowV1alpha1Client for the given config.

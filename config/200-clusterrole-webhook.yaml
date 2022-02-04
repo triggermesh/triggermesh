@@ -48,7 +48,7 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - xslttransforms
+  - xslttransformations
   verbs:
   - get
   - list
@@ -61,7 +61,7 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - xslttransforms/status
+  - xslttransformations/status
   verbs:
   - update
 

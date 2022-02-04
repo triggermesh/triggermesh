@@ -30,9 +30,9 @@ var (
 	errXSLTTooMany            = errs.Also(apis.ErrMultipleOneOf("value", "valueFromSecret", "valueFromConfigMap").ViaField("XSLT").ViaField("spec"))
 )
 
-func TestXSLTTransformValidate(t *testing.T) {
+func TestXSLTTransformationValidate(t *testing.T) {
 	testCases := map[string]struct {
-		xslt        *XSLTTransform
+		xslt        *XSLTTransformation
 		expectError *apis.FieldError
 	}{
 		"XSLT informed": {
@@ -83,10 +83,10 @@ func TestXSLTTransformValidate(t *testing.T) {
 	}
 }
 
-type xsltTransformOption func(*XSLTTransform)
+type xsltTransformOption func(*XSLTTransformation)
 
-func xsltTransform(opts ...xsltTransformOption) *XSLTTransform {
-	xslt := &XSLTTransform{}
+func xsltTransform(opts ...xsltTransformOption) *XSLTTransformation {
+	xslt := &XSLTTransformation{}
 
 	for _, o := range opts {
 		o(xslt)
@@ -96,13 +96,13 @@ func xsltTransform(opts ...xsltTransformOption) *XSLTTransform {
 }
 
 func xsltWithXSLT(vff *ValueFromField) xsltTransformOption {
-	return func(xslt *XSLTTransform) {
+	return func(xslt *XSLTTransformation) {
 		xslt.Spec.XSLT = vff
 	}
 }
 
 func xsltWithAllowEventXSLT(allowEventXSLT bool) xsltTransformOption {
-	return func(xslt *XSLTTransform) {
+	return func(xslt *XSLTTransformation) {
 		xslt.Spec.AllowPerEventXSLT = &allowEventXSLT
 	}
 }

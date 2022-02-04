@@ -22,12 +22,12 @@ import (
 	context "context"
 
 	fake "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/factory/fake"
-	xslttransform "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/xslttransform"
+	xslttransformation "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/xslttransformation"
 	controller "knative.dev/pkg/controller"
 	injection "knative.dev/pkg/injection"
 )
 
-var Get = xslttransform.Get
+var Get = xslttransformation.Get
 
 func init() {
 	injection.Fake.RegisterInformer(withInformer)
@@ -35,6 +35,6 @@ func init() {
 
 func withInformer(ctx context.Context) (context.Context, controller.Informer) {
 	f := fake.Get(ctx)
-	inf := f.Flow().V1alpha1().XSLTTransforms()
-	return context.WithValue(ctx, xslttransform.Key{}, inf), inf.Informer()
+	inf := f.Flow().V1alpha1().XSLTTransformations()
+	return context.WithValue(ctx, xslttransformation.Key{}, inf), inf.Informer()
 }

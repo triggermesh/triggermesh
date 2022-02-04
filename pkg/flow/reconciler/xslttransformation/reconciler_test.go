@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
 import (
 	"context"
@@ -40,7 +40,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xslttransform"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xslttransformation"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
 	. "github.com/triggermesh/triggermesh/pkg/flow/reconciler/testing"
@@ -168,7 +168,7 @@ func TestReconcile(t *testing.T) {
 	testCases.Test(t, MakeFactory(reconcilerCtor))
 }
 
-// reconcilerCtor returns a Ctor for a XSLTTransform Reconciler.
+// reconcilerCtor returns a Ctor for a XSLTTransformation Reconciler.
 var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) controller.Reconciler {
 	adapterCfg := &adapterConfig{
 		Image:   tImg,
@@ -184,13 +184,13 @@ var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) c
 	}
 
 	return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
-		fakeinjectionclient.Get(ctx), ls.GetXSLTTransformLister(),
+		fakeinjectionclient.Get(ctx), ls.GetXSLTTransformationLister(),
 		controller.GetEventRecorder(ctx), r)
 }
 
-// newComponent returns a test XSLTTransform object with pre-filled attributes.
-func newComponent() *v1alpha1.XSLTTransform {
-	o := &v1alpha1.XSLTTransform{
+// newComponent returns a test XSLTTransformation object with pre-filled attributes.
+func newComponent() *v1alpha1.XSLTTransformation {
+	o := &v1alpha1.XSLTTransformation{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
 			Name:      tName,
@@ -199,7 +199,7 @@ func newComponent() *v1alpha1.XSLTTransform {
 				libreconciler.LabelBridgeUsedByPrefix + tBridge: libreconciler.LabelValueBridgeDominant,
 			},
 		},
-		Spec: v1alpha1.XSLTTransformSpec{
+		Spec: v1alpha1.XSLTTransformationSpec{
 			XSLT: &v1alpha1.ValueFromField{
 				Value: &tXSLT,
 			},
@@ -211,14 +211,14 @@ func newComponent() *v1alpha1.XSLTTransform {
 }
 
 // Deployed: True
-func newComponentDeployed() *v1alpha1.XSLTTransform {
+func newComponentDeployed() *v1alpha1.XSLTTransformation {
 	o := newComponent()
 	o.Status.PropagateAvailability(newAdapterServiceReady())
 	return o
 }
 
 // Deployed: False
-func newComponentNotDeployed() *v1alpha1.XSLTTransform {
+func newComponentNotDeployed() *v1alpha1.XSLTTransformation {
 	o := newComponent()
 	o.Status.PropagateAvailability(newAdapterServiceNotReady())
 	return o
@@ -243,7 +243,7 @@ func newAdapterService() *servingv1.Service {
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(NewOwnerRefable(
 					tName,
-					(&v1alpha1.XSLTTransform{}).GetGroupVersionKind(),
+					(&v1alpha1.XSLTTransformation{}).GetGroupVersionKind(),
 					tUID,
 				)),
 			},
@@ -302,7 +302,7 @@ func newAdapterService() *servingv1.Service {
 func newAdapterServiceReady() *servingv1.Service {
 	svc := newAdapterService()
 	svc.Status.SetConditions(apis.Conditions{{
-		Type:   v1alpha1.XSLTTransformConditionReady,
+		Type:   v1alpha1.XSLTTransformationConditionReady,
 		Status: corev1.ConditionTrue,
 	}})
 	svc.Status.URL = &tAdapterURL
@@ -313,7 +313,7 @@ func newAdapterServiceReady() *servingv1.Service {
 func newAdapterServiceNotReady() *servingv1.Service {
 	svc := newAdapterService()
 	svc.Status.SetConditions(apis.Conditions{{
-		Type:   v1alpha1.XSLTTransformConditionReady,
+		Type:   v1alpha1.XSLTTransformationConditionReady,
 		Status: corev1.ConditionFalse,
 	}})
 	return svc

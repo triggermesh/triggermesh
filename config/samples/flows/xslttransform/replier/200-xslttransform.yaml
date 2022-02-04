@@ -13,7 +13,7 @@
 # limitations under the License.
 
 apiVersion: flow.triggermesh.io/v1alpha1
-kind: XSLTTransform
+kind: XSLTTransformation
 metadata:
   name: demo
 spec:

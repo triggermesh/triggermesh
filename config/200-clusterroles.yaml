@@ -223,7 +223,7 @@ rules:
   - synchronizers
   - transformations
   - xmltojsontransformations
-  - xslttransforms
+  - xslttransformations
   verbs:
   - list
   - watch
@@ -235,7 +235,7 @@ rules:
   - synchronizers/status
   - transformations/status
   - xmltojsontransformations/status
-  - xslttransforms/status
+  - xslttransformations/status
   verbs:
   - update
 # +rbac-check
@@ -359,7 +359,7 @@ rules:
   - synchronizers/finalizers
   - transformations/finalizers
   - xmltojsontransformations/finalizers
-  - xslttransforms/finalizers
+  - xslttransformations/finalizers
   verbs:
   - update
 # +rbac-check:subresource=finalizers
@@ -841,7 +841,7 @@ rules:
   - synchronizers
   - transformations
   - xmltojsontransformations
-  - xslttransforms
+  - xslttransformations
   verbs:
   - get
   - list

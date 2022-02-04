@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
 import (
 	"context"
@@ -92,7 +92,7 @@ func (a *xsltTransformAdapter) Start(ctx context.Context) error {
 }
 
 func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	isStructuredTransform := event.Type() == v1alpha1.EventTypeXSLTTransform
+	isStructuredTransform := event.Type() == v1alpha1.EventTypeXSLTTransformation
 	if isStructuredTransform && !a.xsltOverride {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("it is not allowed to override XSLT per CloudEvent"), nil)
@@ -106,7 +106,7 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 
 	switch {
 	case isStructuredTransform:
-		req := &XSLTTransformStructuredRequest{}
+		req := &XSLTTransformationStructuredRequest{}
 		if err := event.DataAs(req); err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}

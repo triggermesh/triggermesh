@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
 import (
 	"testing"
@@ -22,7 +22,7 @@ import (
 	. "github.com/triggermesh/triggermesh/pkg/flow/reconciler/testing"
 
 	// Link fake informers accessed by our controller
-	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/xslttransform/fake"
+	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/xslttransformation/fake"
 	_ "knative.dev/pkg/client/injection/ducks/duck/v1/addressable/fake"
 	_ "knative.dev/pkg/injection/clients/dynamicclient/fake"
 	_ "knative.dev/serving/pkg/client/injection/informers/serving/v1/service/fake"

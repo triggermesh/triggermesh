@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
-// XSLTTransformStructuredRequest contains an opinionated structure
+// XSLTTransformationStructuredRequest contains an opinionated structure
 // that informs both the XML and XSLT to transform.
-type XSLTTransformStructuredRequest struct {
+type XSLTTransformationStructuredRequest struct {
 	XML  string `json:"xml"`
 	XSLT string `json:"xslt,omitempty"`
 }

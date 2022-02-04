@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
 import (
 	"errors"
@@ -30,10 +30,10 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 	// XSLT document that will be used by default for transformation.
-	XSLT string `envconfig:"XSLTTRANSFORM_XSLT"`
+	XSLT string `envconfig:"XSLTTRANSFORMATION_XSLT"`
 	// If set to true, enables consuming structured CloudEvents that include
 	// fields for the XML and XSLT field.
-	AllowXSLTOverride bool `envconfig:"XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE" required:"true"`
+	AllowXSLTOverride bool `envconfig:"XSLTTRANSFORMATION_ALLOW_XSLT_OVERRIDE" required:"true"`
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 	// Sink defines the target sink for the events. If no Sink is defined the

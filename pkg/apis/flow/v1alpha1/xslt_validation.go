@@ -23,12 +23,12 @@ import (
 )
 
 // Validate implements apis.Validatable
-func (o *XSLTTransform) Validate(ctx context.Context) *apis.FieldError {
+func (o *XSLTTransformation) Validate(ctx context.Context) *apis.FieldError {
 	return o.Spec.Validate(ctx).ViaField("spec")
 }
 
 // Validate XSLT spec
-func (s *XSLTTransformSpec) Validate(ctx context.Context) *apis.FieldError {
+func (s *XSLTTransformationSpec) Validate(ctx context.Context) *apis.FieldError {
 	var errs *apis.FieldError
 
 	if (s.AllowPerEventXSLT == nil || !*s.AllowPerEventXSLT) && !s.XSLT.IsInformed() {

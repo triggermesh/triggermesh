@@ -22,7 +22,7 @@ OUTPUT_DIR        ?= $(BASE_DIR)/_output
 COMMANDS          := $(notdir $(wildcard cmd/*))
 
 # Commands and images that require custom build proccess
-CUSTOM_BUILD_BINARIES := confluenttarget-adapter ibmmqsource-adapter ibmmqtarget-adapter xslttransform-adapter
+CUSTOM_BUILD_BINARIES := confluenttarget-adapter ibmmqsource-adapter ibmmqtarget-adapter xslttransformation-adapter
 CUSTOM_BUILD_IMAGES   := ibmmqsource-adapter ibmmqtarget-adapter
 
 BIN_OUTPUT_DIR    ?= $(OUTPUT_DIR)
@@ -97,7 +97,7 @@ confluenttarget-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS_STATIC)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 # Not statically linked
-xslttransform-adapter: ## Builds XML related functionality
+xslttransformation-adapter: ## Builds XML related functionality
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster
@@ -123,7 +123,7 @@ release: ## Publish container images and generate release manifests
 	@cp config/namespace/100-namespace.yaml $(DIST_DIR)/triggermesh.yaml
 	$(KO) resolve $(KOFLAGS) -B -t latest -f config/ -l '!triggermesh.io/crd-install' > /dev/null
 	$(KO) resolve $(KOFLAGS) -B -t $(IMAGE_TAG) --tag-only -f config/ -l '!triggermesh.io/crd-install' >> $(DIST_DIR)/triggermesh.yaml
-	
+
 	@for component in $(CUSTOM_BUILD_IMAGES); do \
 		$(MAKE) -C ./cmd/$$component build CONTEXT=$(BASE_DIR) IMAGE_TAG=$(KO_DOCKER_REPO)/$$component:$(IMAGE_TAG) && \
 		$(MAKE) -C ./cmd/$$component tag IMAGE_TAG=$(KO_DOCKER_REPO)/$$component:$(IMAGE_TAG) TAGS=$(KO_DOCKER_REPO)/$$component:latest && \
@@ -137,9 +137,9 @@ gen-apidocs: ## Generate API docs
 GOPKGS_LIST ?= $(filter-out $(GOPKGS_SKIP_TESTS), $(shell go list $(GOPKGS)))
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
-	
+
 	$(GOTEST) -p=1 -race -cover -coverprofile=$(TEST_OUTPUT_DIR)/$(KREPO)-c.out $(GOPKGS_LIST)
-	
+
 	@for component in $(CUSTOM_BUILD_IMAGES); do \
 		$(MAKE) -C ./cmd/$$component test || exit 1; \
 	done

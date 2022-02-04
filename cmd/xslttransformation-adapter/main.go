@@ -17,10 +17,10 @@ limitations under the License.
 package main
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/flow/adapter/xslttransform"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/xslttransformation"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 func main() {
-	pkgadapter.Main("xslttransform-adapter", xslttransform.EnvAccessorCtor, xslttransform.NewTarget)
+	pkgadapter.Main("xslttransformation-adapter", xslttransformation.EnvAccessorCtor, xslttransformation.NewTarget)
 }

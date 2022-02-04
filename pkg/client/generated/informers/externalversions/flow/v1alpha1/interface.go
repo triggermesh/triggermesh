@@ -30,8 +30,8 @@ type Interface interface {
 	Transformations() TransformationInformer
 	// XMLToJSONTransformations returns a XMLToJSONTransformationInformer.
 	XMLToJSONTransformations() XMLToJSONTransformationInformer
-	// XSLTTransforms returns a XSLTTransformInformer.
-	XSLTTransforms() XSLTTransformInformer
+	// XSLTTransformations returns a XSLTTransformationInformer.
+	XSLTTransformations() XSLTTransformationInformer
 }
 
 type version struct {
@@ -60,7 +60,7 @@ func (v *version) XMLToJSONTransformations() XMLToJSONTransformationInformer {
 	return &xMLToJSONTransformationInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// XSLTTransforms returns a XSLTTransformInformer.
-func (v *version) XSLTTransforms() XSLTTransformInformer {
+// XSLTTransformations returns a XSLTTransformationInformer.
+func (v *version) XSLTTransformations() XSLTTransformationInformer {
 	return &xSLTTransformInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

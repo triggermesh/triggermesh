@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
 import (
 	"context"
@@ -26,7 +26,7 @@ import (
 	"knative.dev/pkg/resolver"
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xslttransform"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xslttransformation"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
 )
 
@@ -45,7 +45,7 @@ type reconciler struct {
 var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransform) pkgreconciler.Event {
+func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransformation) pkgreconciler.Event {
 	var url *apis.URL
 	if o.Spec.Sink != nil {
 		var err error
@@ -57,7 +57,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransfor
 
 	ksvc, err := makeAdapterKService(o, r.adapterCfg, url)
 	if err != nil {
-		o.Status.MarkNotDeployed(v1alpha1.XSLTTransformReasonWrongSpec, "Cannot create adapter from spec")
+		o.Status.MarkNotDeployed(v1alpha1.XSLTTransformationReasonWrongSpec, "Cannot create adapter from spec")
 		return controller.NewPermanentError(fmt.Errorf("could not make the desired knative service adapter based on the spec: %w", err))
 	}
 
@@ -67,7 +67,7 @@ func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransfor
 	return event
 }
 
-func (r *reconciler) resolveDestination(ctx context.Context, s *v1alpha1.XSLTTransform) (*apis.URL, error) {
+func (r *reconciler) resolveDestination(ctx context.Context, s *v1alpha1.XSLTTransformation) (*apis.URL, error) {
 	dest := s.Spec.Sink.DeepCopy()
 	if dest.Ref != nil {
 		if dest.Ref.Namespace == "" {

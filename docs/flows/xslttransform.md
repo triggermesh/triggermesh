@@ -84,8 +84,8 @@ and expect this output:
 The API can be inspected using `kubectl explain` for each field level:
 
 ```console
-kubectl explain  xslttransform.spec
-KIND:     XSLTTransform
+kubectl explain  xslttransformation.spec
+KIND:     XSLTTransformation
 VERSION:  flow.triggermesh.io/v1alpha1
 
 RESOURCE: spec <Object>
@@ -116,7 +116,7 @@ FIELDS:
 
 ## Example
 
-You can find an example at the [samples folder](../../config/samples/flows/xslttransform) which contains:
+You can find an example at the [samples folder](../../config/samples/flows/xslttransformation) which contains:
 
 - a broker.
 - an XSLT transformation.
@@ -129,7 +129,7 @@ You can find an example at the [samples folder](../../config/samples/flows/xsltt
 The example is setup with an XSLT transformation but also allows overriding the XSLT at each event if the type `io.triggermesh.xslt.transform` is used.
 
 ```console
-kubectl apply -f config/samples/flows/xslttransform
+kubectl apply -f config/samples/flows/xslttransformation
 ```
 
 ### Using configured XSLT
@@ -174,7 +174,7 @@ kubectl logs -l serving.knative.dev/service=event-display -c user-container
 Context Attributes,
   specversion: 1.0
   type: xml.document.response
-  source: xslttransform-adapter
+  source: xslttransformation-adapter
   id: 2a40265b-0bca-43d3-aa97-7c72fdff0813
   time: 2021-12-01T10:26:02.087630067Z
   datacontenttype: application/json
@@ -217,7 +217,7 @@ kubectl logs -l serving.knative.dev/service=event-display -c user-container
 Context Attributes,
   specversion: 1.0
   type: io.triggermesh.xslt.transform.response
-  source: xslttransform-adapter
+  source: xslttransformation-adapter
   id: 5d3b88c9-dd8b-46a6-9259-a63b56281647
   time: 2021-12-07T09:31:45.83337697Z
   datacontenttype: application/xml
@@ -236,4 +236,4 @@ Data,
 
 ## Developing
 
-When building XSLTTransform container image, make sure that [library depencencies are satisfied](../../hack/images/xslttransform).
+When building XSLTTransformation container image, make sure that [library depencencies are satisfied](../../hack/images/xslttransformation).

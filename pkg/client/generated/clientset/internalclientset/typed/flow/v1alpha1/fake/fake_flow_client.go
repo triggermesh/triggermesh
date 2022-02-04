@@ -40,8 +40,8 @@ func (c *FakeFlowV1alpha1) XMLToJSONTransformations(namespace string) v1alpha1.X
 	return &FakeXMLToJSONTransformations{c, namespace}
 }
 
-func (c *FakeFlowV1alpha1) XSLTTransforms(namespace string) v1alpha1.XSLTTransformInterface {
-	return &FakeXSLTTransforms{c, namespace}
+func (c *FakeFlowV1alpha1) XSLTTransformations(namespace string) v1alpha1.XSLTTransformationInterface {
+	return &FakeXSLTTransformations{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

@@ -24,4 +24,4 @@ type TransformationExpansion interface{}
 
 type XMLToJSONTransformationExpansion interface{}
 
-type XSLTTransformExpansion interface{}
+type XSLTTransformationExpansion interface{}

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package xslttransform
+package xslttransformation
 
 import (
 	"strconv"
@@ -32,10 +32,10 @@ import (
 )
 
 const (
-	adapterName = "xslttransform"
+	adapterName = "xslttransformation"
 
-	envXSLT              = "XSLTTRANSFORM_XSLT"
-	envAllowXSLTOverride = "XSLTTRANSFORM_ALLOW_XSLT_OVERRIDE"
+	envXSLT              = "XSLTTRANSFORMATION_XSLT"
+	envAllowXSLTOverride = "XSLTTRANSFORMATION_ALLOW_XSLT_OVERRIDE"
 	envSink              = "K_SINK"
 )
 
@@ -45,11 +45,11 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"XSLTTRANSFORM_IMAGE" default:"gcr.io/triggermesh/xslttransform-adapter"`
+	Image string `envconfig:"XSLTTRANSFORMATION_IMAGE" default:"gcr.io/triggermesh/xslttransformation-adapter"`
 }
 
 // makeAdapterKService generates the adapter knative service structure.
-func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig, sink *apis.URL) (*servingv1.Service, error) {
+func makeAdapterKService(o *v1alpha1.XSLTTransformation, cfg *adapterConfig, sink *apis.URL) (*servingv1.Service, error) {
 	envApp, err := makeAppEnv(o, sink)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func makeAdapterKService(o *v1alpha1.XSLTTransform, cfg *adapterConfig, sink *ap
 		resources.KsvcPodEnvVars(envs)), nil
 }
 
-func makeAppEnv(o *v1alpha1.XSLTTransform, sink *apis.URL) ([]corev1.EnvVar, error) {
+func makeAppEnv(o *v1alpha1.XSLTTransformation, sink *apis.URL) ([]corev1.EnvVar, error) {
 	env := []corev1.EnvVar{
 		*o.Spec.XSLT.ToEnvironmentVariable(envXSLT),
 		{

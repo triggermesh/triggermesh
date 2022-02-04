@@ -15,7 +15,7 @@
 kind: Trigger
 apiVersion: eventing.knative.dev/v1
 metadata:
-  name: xslttransform-xmldoc
+  name: xslttransformation-xmldoc
 spec:
   broker: demo
   filter:
@@ -26,7 +26,7 @@ spec:
   subscriber:
     ref:
       apiVersion: flow.triggermesh.io/v1alpha1
-      kind: XSLTTransform
+      kind: XSLTTransformation
       name: demo
 
 ---
@@ -34,7 +34,7 @@ spec:
 kind: Trigger
 apiVersion: eventing.knative.dev/v1
 metadata:
-  name: xslttransform-xslt-per-event
+  name: xslttransformation-xslt-per-event
 spec:
   broker: demo
   filter:
@@ -45,5 +45,5 @@ spec:
   subscriber:
     ref:
       apiVersion: flow.triggermesh.io/v1alpha1
-      kind: XSLTTransform
+      kind: XSLTTransformation
       name: demo

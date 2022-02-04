@@ -89,7 +89,7 @@ resources:
 - config/304-synchronizer.yaml
 - config/304-transformation.yaml
 - config/304-xmltojsontransformation.yaml
-- config/304-xslttransform.yaml
+- config/304-xslttransformation.yaml
 - config/500-controller.yaml
 - config/500-webhook-configuration.yaml
 - config/500-webhook.yaml

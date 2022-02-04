@@ -51,8 +51,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&SynchronizerList{},
 		&Transformation{},
 		&TransformationList{},
-		&XSLTTransform{},
-		&XSLTTransformList{},
+		&XSLTTransformation{},
+		&XSLTTransformationList{},
 		&XMLToJSONTransformation{},
 		&XMLToJSONTransformationList{},
 	)
