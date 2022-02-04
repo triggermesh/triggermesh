@@ -165,7 +165,7 @@ func SecretMount(name string, target string, secret *corev1.SecretKeySelector) K
 				Name:      name,
 				ReadOnly:  true,
 				MountPath: target,
-				SubPath:   secret.Key,
+				SubPath:   path.Base(target),
 			},
 		)
 		object.Spec.ConfigurationSpec.Template.Spec.Volumes = append(
