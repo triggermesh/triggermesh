@@ -268,7 +268,7 @@ func SecretMount(name string, target string, secret *corev1.SecretKeySelector) O
 			Name:      name,
 			ReadOnly:  true,
 			MountPath: target,
-			SubPath:   secret.Key,
+			SubPath:   path.Base(target),
 		}
 		volume := corev1.Volume{
 			Name: name,
