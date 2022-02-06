@@ -169,8 +169,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         - name: XMLTOJSONTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
-        - name: XSLTTRANSFORM_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/xslttransform-adapter
+        - name: XSLTTRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/xslttransformation-adapter
         - name: SYNCHRONIZER_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         # Routing adapters

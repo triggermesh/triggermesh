@@ -23,10 +23,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestXSLTTransformSetDefaults(t *testing.T) {
+func TestXSLTTransformationSetDefaults(t *testing.T) {
 	testCases := map[string]struct {
-		xslt      *XSLTTransform
-		defaulted *XSLTTransform
+		xslt      *XSLTTransformation
+		defaulted *XSLTTransformation
 	}{
 		"XSLT with allow event xslt value set to false, needs no defaulting": {
 			xslt: xsltTransform(

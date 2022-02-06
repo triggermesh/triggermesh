@@ -29,30 +29,30 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// XSLTTransform is the Schema for an XSLT transformation target.
-type XSLTTransform struct {
+// XSLTTransformation is the Schema for an XSLT transformation target.
+type XSLTTransformation struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the XSLTTransform object.
-	Spec XSLTTransformSpec `json:"spec"`
+	// Spec holds the desired state of the XSLTTransformation object.
+	Spec XSLTTransformationSpec `json:"spec"`
 
-	// Status communicates the observed state of the XSLTTransform object.
+	// Status communicates the observed state of the XSLTTransformation object.
 	// +optional
-	Status XSLTTransformStatus `json:"status,omitempty"`
+	Status XSLTTransformationStatus `json:"status,omitempty"`
 }
 
-// Check the interfaces XSLTTransform should be implementing.
+// Check the interfaces XSLTTransformation should be implementing.
 var (
-	_ runtime.Object     = (*XSLTTransform)(nil)
-	_ kmeta.OwnerRefable = (*XSLTTransform)(nil)
-	_ duckv1.KRShaped    = (*XSLTTransform)(nil)
-	_ apis.Validatable   = (*XSLTTransform)(nil)
-	_ apis.Defaultable   = (*XSLTTransform)(nil)
+	_ runtime.Object     = (*XSLTTransformation)(nil)
+	_ kmeta.OwnerRefable = (*XSLTTransformation)(nil)
+	_ duckv1.KRShaped    = (*XSLTTransformation)(nil)
+	_ apis.Validatable   = (*XSLTTransformation)(nil)
+	_ apis.Defaultable   = (*XSLTTransformation)(nil)
 )
 
-// XSLTTransformSpec holds the desired state of the XSLTTransform.
-type XSLTTransformSpec struct {
+// XSLTTransformationSpec holds the desired state of the XSLTTransformation.
+type XSLTTransformationSpec struct {
 	// XSLT document that will be used by default for transformation.
 	// Can be omited if the XSLT is informed at each event.
 	// +optional
@@ -67,8 +67,8 @@ type XSLTTransformSpec struct {
 	Sink *duckv1.Destination `json:"sink,omitempty"`
 }
 
-// XSLTTransformStatus communicates the observed state of the component.
-type XSLTTransformStatus struct {
+// XSLTTransformationStatus communicates the observed state of the component.
+type XSLTTransformationStatus struct {
 	// Although this is not a source, it is a CloudEvents producing entity.
 	duckv1.SourceStatus `json:",inline"`
 	// AddressStatus fulfills the Addressable contract.
@@ -78,10 +78,10 @@ type XSLTTransformStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// XSLTTransformList is a list of XSLTTransform resources
-type XSLTTransformList struct {
+// XSLTTransformationList is a list of XSLTTransformation resources
+type XSLTTransformationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
 
-	Items []XSLTTransform `json:"items"`
+	Items []XSLTTransformation `json:"items"`
 }

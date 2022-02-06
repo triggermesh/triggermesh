@@ -14,23 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package main
 
 import (
-	"context"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/xslttransformation"
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
-// SetDefaults implements apis.Defaultable
-func (o *XSLTTransformation) SetDefaults(ctx context.Context) {
-	if o != nil {
-		o.Spec.SetDefaults(ctx)
-	}
-}
-
-// SetDefaults implements apis.Defaultable
-func (s *XSLTTransformationSpec) SetDefaults(ctx context.Context) {
-	if s != nil && s.AllowPerEventXSLT == nil {
-		f := false
-		s.AllowPerEventXSLT = &f
-	}
+func main() {
+	pkgadapter.Main("xslttransformation-adapter", xslttransformation.EnvAccessorCtor, xslttransformation.NewTarget)
 }

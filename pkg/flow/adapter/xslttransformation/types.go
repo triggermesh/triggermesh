@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,23 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package xslttransformation
 
-import (
-	"context"
-)
-
-// SetDefaults implements apis.Defaultable
-func (o *XSLTTransformation) SetDefaults(ctx context.Context) {
-	if o != nil {
-		o.Spec.SetDefaults(ctx)
-	}
-}
-
-// SetDefaults implements apis.Defaultable
-func (s *XSLTTransformationSpec) SetDefaults(ctx context.Context) {
-	if s != nil && s.AllowPerEventXSLT == nil {
-		f := false
-		s.AllowPerEventXSLT = &f
-	}
+// XSLTTransformationStructuredRequest contains an opinionated structure
+// that informs both the XML and XSLT to transform.
+type XSLTTransformationStructuredRequest struct {
+	XML  string `json:"xml"`
+	XSLT string `json:"xslt,omitempty"`
 }

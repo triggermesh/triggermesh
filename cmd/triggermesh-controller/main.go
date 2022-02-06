@@ -22,7 +22,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xmltojsontransformation"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xslttransform"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xslttransformation"
 	"github.com/triggermesh/triggermesh/pkg/function"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/filter"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/splitter"
@@ -166,7 +166,7 @@ func main() {
 		synchronizer.NewController,
 		transformation.NewController,
 		xmltojsontransformation.NewController,
-		xslttransform.NewController,
+		xslttransformation.NewController,
 		// functions
 		function.NewController,
 		// routing

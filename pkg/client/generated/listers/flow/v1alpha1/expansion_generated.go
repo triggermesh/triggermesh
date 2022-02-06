@@ -42,10 +42,10 @@ type XMLToJSONTransformationListerExpansion interface{}
 // XMLToJSONTransformationNamespaceLister.
 type XMLToJSONTransformationNamespaceListerExpansion interface{}
 
-// XSLTTransformListerExpansion allows custom methods to be added to
-// XSLTTransformLister.
-type XSLTTransformListerExpansion interface{}
+// XSLTTransformationListerExpansion allows custom methods to be added to
+// XSLTTransformationLister.
+type XSLTTransformationListerExpansion interface{}
 
-// XSLTTransformNamespaceListerExpansion allows custom methods to be added to
-// XSLTTransformNamespaceLister.
-type XSLTTransformNamespaceListerExpansion interface{}
+// XSLTTransformationNamespaceListerExpansion allows custom methods to be added to
+// XSLTTransformationNamespaceLister.
+type XSLTTransformationNamespaceListerExpansion interface{}

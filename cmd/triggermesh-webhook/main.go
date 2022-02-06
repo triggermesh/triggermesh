@@ -35,8 +35,8 @@ import (
 )
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
-	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):     &routingv1alpha1.Filter{},
-	flowv1alpha1.SchemeGroupVersion.WithKind("XSLTTransform"): &flowv1alpha1.XSLTTransform{},
+	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):          &routingv1alpha1.Filter{},
+	flowv1alpha1.SchemeGroupVersion.WithKind("XSLTTransformation"): &flowv1alpha1.XSLTTransformation{},
 }
 
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}
