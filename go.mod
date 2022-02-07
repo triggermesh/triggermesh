@@ -64,7 +64,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.10.5+incompatible
 	github.com/stretchr/testify v1.7.0
 	github.com/tektoncd/pipeline v0.32.1
-	github.com/tidwall/gjson v1.13.0
+	github.com/tidwall/gjson v1.14.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.27.0
 	go.opentelemetry.io/otel v1.2.0
