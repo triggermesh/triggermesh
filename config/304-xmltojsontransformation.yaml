@@ -41,8 +41,6 @@ spec:
     - eventing
     - triggermesh
     - transformations
-    shortNames:
-    - xmltojsontrn
   versions:
   - name: v1alpha1
     served: true

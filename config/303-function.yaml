@@ -38,8 +38,6 @@ spec:
     - all
     - triggermesh
     - extensions
-    shortNames:
-    - fn
   versions:
   - name: v1alpha1
     served: true
