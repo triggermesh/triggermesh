@@ -40,8 +40,6 @@ spec:
     - eventing
     - triggermesh
     - transformations
-    shortNames:
-    - xslt
   versions:
   - name: v1alpha1
     served: true

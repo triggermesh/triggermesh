@@ -38,8 +38,6 @@ spec:
     - all
     - triggermesh
     - routing
-    shortNames:
-    - spl
   versions:
   - name: v1alpha1
     served: true
