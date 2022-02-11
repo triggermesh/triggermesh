@@ -72,6 +72,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&HasuraTargetList{},
 		&HTTPTarget{},
 		&HTTPTargetList{},
+		&IBMMQTarget{},
+		&IBMMQTargetList{},
 		&JiraTarget{},
 		&JiraTargetList{},
 		&InfraTarget{},
