@@ -35,7 +35,7 @@ const (
 // resource group and region.
 // Because storage account names are globally unique, this helper generates a
 // random name to reduce the risk of running into naming conflicts.
-func CreateBlobStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, rgName, region string) armstorage.StorageAccount {
+func CreateBlobStorageAccount(ctx context.Context, cli *armstorage.AccountsClient, rgName, region string) armstorage.Account {
 	const maxStorAccNameLen = 24
 	const stoAccNamePrefix = "tme2e"
 
