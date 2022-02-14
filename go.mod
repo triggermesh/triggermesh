@@ -15,7 +15,7 @@ require (
 replace k8s.io/client-go => k8s.io/client-go v0.22.5
 
 require (
-	cloud.google.com/go/billing v1.0.0
+	cloud.google.com/go/billing v1.1.0
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/pubsub v1.17.1
@@ -74,7 +74,7 @@ require (
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/api v0.68.0
-	google.golang.org/genproto v0.0.0-20220204002441-d6cc3cc0770e
+	google.golang.org/genproto v0.0.0-20220210181026-6fee9acbd336
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
