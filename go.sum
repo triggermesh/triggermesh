@@ -44,8 +44,8 @@ cloud.google.com/go/bigquery v1.7.0/go.mod h1://okPTzCYNXSlb24MZs83e2Do+h+VXtc4g
 cloud.google.com/go/bigquery v1.8.0/go.mod h1:J5hqkt3O0uAFnINi6JXValWIb1v0goeZM77hZzJN/fQ=
 cloud.google.com/go/bigtable v1.2.0/go.mod h1:JcVAOl45lrTmQfLj7T6TxyMzIN/3FGGcFm+2xVAli2o=
 cloud.google.com/go/bigtable v1.3.0/go.mod h1:z5EyKrPE8OQmeg4h5MNdKvuSnI9CCT49Ki3f23aBzio=
-cloud.google.com/go/billing v1.0.0 h1:FyozXweE5Fd0zcspVK+GqzZvusbXuk5vdYNV4w3eoO4=
-cloud.google.com/go/billing v1.0.0/go.mod h1:YVxbDAkAX2bO/EdW4jJJCsE/6Ld/cdQqSRqHXkl22aw=
+cloud.google.com/go/billing v1.1.0 h1:EGdpfFezVGPjNDw6Bky2ypIa/njqwNNzxGiU2oFOHFs=
+cloud.google.com/go/billing v1.1.0/go.mod h1:GAm5is2vJ1Sk5u/s5PbLuX67B8q7U8qOn+PNwIffr7U=
 cloud.google.com/go/compute v0.1.0/go.mod h1:GAesmwr110a34z04OlxYkATPBEfVhkymfTBXtfbBFow=
 cloud.google.com/go/compute v1.2.0 h1:EKki8sSdvDU0OO9mAXGwPXOTOgPz2l08R0/IutDH11I=
 cloud.google.com/go/compute v1.2.0/go.mod h1:xlogom/6gr8RJGBe7nT2eGsQYAFUbbv8dbC29qE3Xmw=
@@ -109,8 +109,9 @@ github.com/Azure/azure-sdk-for-go v59.0.0+incompatible/go.mod h1:9XXNKU+eRnpl9mo
 github.com/Azure/azure-sdk-for-go v61.5.0+incompatible h1:OSHSFeNm7D1InGsQrFjyN9hpxD5Ec60PdsWWudCpah4=
 github.com/Azure/azure-sdk-for-go v61.5.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0/go.mod h1:h6H6c8enJmmocHUbLiiGY6sx7f9i+X3m1CHdd5c6Rdw=
-github.com/Azure/azure-sdk-for-go/sdk/azcore v0.20.0 h1:KQgdWmEOmaJKxaUUZwHAYh12t+b+ZJf8q3friycK1kA=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.20.0/go.mod h1:ZPW/Z0kLCTdDZaDbYTetxc9Cxl/2lNqxYHYNOF2bti0=
+github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.1 h1:qoVeMsc9/fh/yhxVaA0obYjVH/oI/ihrOoMwsLS9KSA=
+github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.1/go.mod h1:fBF9PQNqB8scdgpZ3ufzaLntG0AG7C1WjPMsiFOmfHM=
 github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.11.0/go.mod h1:HcM1YX14R7CJcghJGOYCgdezslRSVzqwLf/q+4Y2r/0=
 github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.12.0 h1:VBvHGLJbaY0+c66NZHdS9cgjHVYSH6DDa0XJMyrblsI=
 github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.12.0/go.mod h1:GJzjM4SR9T0KyX5gKCVyz1ytD8FeWeUPCwtFCt1AyfE=
@@ -126,8 +127,8 @@ github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.2.0/go.mod h1:aSuRFfpDntiZkIh+XmoL9EV4FS4ViptLBwFRytECG/8=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.2.0 h1:CGIYpRDCMotOj1a/1OZOPAwKq0xFKV+/8lHo9GB6Lw4=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.2.0/go.mod h1:6OekxBFJ2ICBhqajYGgX4dY58H9x3J5FXikPo43nKYI=
-github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.2.0 h1:62Ew5xXg5UCGIXDOM7+y4IL5/6mQJq1nenhBCJAeGX8=
-github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.2.0/go.mod h1:eHWhQKXc1Gv1DvWH//UzgWjWFEo0Pp4pH2vBzjBw8Fc=
+github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0 h1:Px2UA+2RvSSvv+RvJNuUB6n7rs5Wsel4dXLe90Um2n4=
+github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0/go.mod h1:tPaiy8S5bQ+S5sOiDlINkp7+Ef339+Nz5L5XO+cnOHo=
 github.com/Azure/azure-service-bus-go v0.11.5 h1:EVMicXGNrSX+rHRCBgm/TRQ4VUZ1m3yAYM/AB2R/SOs=
 github.com/Azure/azure-service-bus-go v0.11.5/go.mod h1:MI6ge2CuQWBVq+ly456MY7XqNLJip5LO1iSFodbNLbU=
 github.com/Azure/azure-storage-blob-go v0.6.0/go.mod h1:oGfmITT1V6x//CswqY2gtAHND+xIP64/qL7a5QJix0Y=
@@ -2671,8 +2672,9 @@ google.golang.org/genproto v0.0.0-20220111164026-67b88f271998/go.mod h1:5CzLGKJ6
 google.golang.org/genproto v0.0.0-20220114172242-44263ffb69e1/go.mod h1:5CzLGKJ67TSI2B9POpiiyGha0AjJvZIUgRMt1dSmuhc=
 google.golang.org/genproto v0.0.0-20220114231437-d2e6a121cae0/go.mod h1:5CzLGKJ67TSI2B9POpiiyGha0AjJvZIUgRMt1dSmuhc=
 google.golang.org/genproto v0.0.0-20220201184016-50beb8ab5c44/go.mod h1:5CzLGKJ67TSI2B9POpiiyGha0AjJvZIUgRMt1dSmuhc=
-google.golang.org/genproto v0.0.0-20220204002441-d6cc3cc0770e h1:hXl9hnyOkeznztYpYxVPAVZfPzcbO6Q0C+nLXodza8k=
 google.golang.org/genproto v0.0.0-20220204002441-d6cc3cc0770e/go.mod h1:5CzLGKJ67TSI2B9POpiiyGha0AjJvZIUgRMt1dSmuhc=
+google.golang.org/genproto v0.0.0-20220210181026-6fee9acbd336 h1:RK2ysGpQApbI6U7xn+ROT2rrm08lE/t8AcGqG8XI1CY=
+google.golang.org/genproto v0.0.0-20220210181026-6fee9acbd336/go.mod h1:kGP+zUP2Ddo0ayMi4YuN7C3WZyJvGLZRh8Z5wnAqvEI=
 google.golang.org/grpc v0.0.0-20160317175043-d3ddb4469d5a/go.mod h1:yo6s7OP7yaDglbqo1J04qKzAhqBH6lvTonzMVmEdcZw=
 google.golang.org/grpc v1.8.0/go.mod h1:yo6s7OP7yaDglbqo1J04qKzAhqBH6lvTonzMVmEdcZw=
 google.golang.org/grpc v1.17.0/go.mod h1:6QZJwpn2B+Zp71q/5VxRsJ6NXXVCE5NRUHRo+f3cWCs=

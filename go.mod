@@ -15,7 +15,7 @@ require (
 replace k8s.io/client-go => k8s.io/client-go v0.22.5
 
 require (
-	cloud.google.com/go/billing v1.0.0
+	cloud.google.com/go/billing v1.1.0
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/pubsub v1.17.1
@@ -29,7 +29,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.2.0
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0
 	github.com/Azure/azure-service-bus-go v0.11.5
 	github.com/Azure/azure-storage-queue-go v0.0.0-20191125232315-636801874cdd
 	github.com/Azure/go-autorest/autorest v0.11.24
@@ -74,7 +74,7 @@ require (
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	google.golang.org/api v0.68.0
-	google.golang.org/genproto v0.0.0-20220204002441-d6cc3cc0770e
+	google.golang.org/genproto v0.0.0-20220210181026-6fee9acbd336
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
@@ -94,7 +94,7 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
 	github.com/Azure/azure-pipeline-go v0.1.9 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.20.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.3 // indirect
 	github.com/Azure/go-amqp v0.16.4 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
