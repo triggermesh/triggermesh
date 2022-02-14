@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,8 +34,11 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
-	servicebus "github.com/Azure/azure-service-bus-go"
+	"github.com/Azure/azure-amqp-common-go/v3/uuid"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"github.com/Azure/go-autorest/autorest/azure"
+	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureservicebussource/trace"
@@ -82,7 +85,7 @@ type envConfig struct {
 
 // adapter implements the source's adapter.
 type adapter struct {
-	msgRcvr  *servicebus.Receiver
+	msgRcvr  *azservicebus.Receiver
 	ceClient cloudevents.Client
 
 	msgPrcsr MessageProcessor
@@ -104,13 +107,20 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.EntityResourceID), zap.Error(err))
 	}
 
-	ns, err := servicebus.NewNamespace(namespaceFromEnvironment(entityID))
+	entityPath := entityPath(entityID)
+
+	client, err := clientFromEnvironment(entityID)
 	if err != nil {
 		logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
 	}
 
-	entityPath := entityPath(entityID)
-	rcvr, err := ns.NewReceiver(ctx, entityPath)
+	var rcvr *azservicebus.Receiver
+	switch entityID.ResourceType {
+	case resourceTypeQueues:
+		rcvr, err = client.NewReceiverForQueue(entityID.ResourceName, nil)
+	case resourceTypeSubscriptions, resourceTypeTopics:
+		rcvr, err = client.NewReceiverForSubscription(entityID.ResourceName, entityID.SubResourceName, nil)
+	}
 	if err != nil {
 		logger.Panicw("Unable to obtain message receiver for Service Bus entity "+strconv.Quote(entityPath), zap.Error(err))
 	}
@@ -180,27 +190,35 @@ func entityPath(entityID *v1alpha1.AzureResourceID) string {
 	}
 }
 
-// namespaceFromEnvironment mimics the behaviour of eventhub.NewHubFromEnvironment
-// by returning a servicebus.NamespaceOption that is suitable for the
+// clientFromEnvironment return a azservicebus.Client that is suitable for the
 // authentication method selected via environment variables.
-func namespaceFromEnvironment(entityID *v1alpha1.AzureResourceID) servicebus.NamespaceOption {
-	return func(ns *servicebus.Namespace) error {
-		// SAS authentication (token, connection string)
-		connStr := connectionStringFromEnvironment(entityID.Namespace, entityPath(entityID))
-		sasErr := servicebus.NamespaceWithConnectionString(connStr)(ns)
-		if sasErr == nil {
-			return nil
+func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Client, error) {
+	// SAS authentication (token, connection string)
+	connStr := connectionStringFromEnvironment(entityID.Namespace, entityPath(entityID))
+	if connStr != "" {
+		client, err := azservicebus.NewClientFromConnectionString(connStr, nil)
+		if err != nil {
+			return nil, fmt.Errorf("creating client with connection string: %w", err)
 		}
-
-		// AAD authentication (service principal)
-		aadErr := servicebus.NamespaceWithEnvironmentBinding(entityID.Namespace)(ns)
-		if aadErr == nil {
-			return nil
-		}
-
-		return fmt.Errorf("neither Azure Active Directory nor SAS token provider could be built - "+
-			"AAD error: %v, SAS error: %v", aadErr, sasErr)
+		return client, nil
 	}
+
+	// AAD authentication (service principal)
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create azure credentials: %w", err)
+	}
+
+	if cred != nil {
+		fqNamespace := entityID.Namespace + ".servicebus.windows.net"
+		client, err := azservicebus.NewClient(fqNamespace, cred, nil)
+		if err != nil {
+			return nil, fmt.Errorf("creating client with service principal: %w", err)
+		}
+		return client, nil
+	}
+
+	return nil, fmt.Errorf("neither Azure Active Directory nor SAS token provider could be built")
 }
 
 // connectionStringFromEnvironment returns a Service Bus connection string
@@ -230,22 +248,49 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 //  Both (DataAction):
 //  - Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
+	maxMessages := 5
 	logging.FromContext(ctx).Info("Listening for messages")
 
-	handle := a.msgRcvr.Listen(ctx, servicebus.HandlerFunc(a.handleMessage))
-	<-handle.Done()
-	return handle.Err()
+	messages, err := a.msgRcvr.ReceiveMessages(ctx, maxMessages, nil)
+	if err != nil {
+		return fmt.Errorf("error receiving messages: %w", err)
+	}
+
+	for _, m := range messages {
+		body, err := m.Body()
+		if err != nil {
+			return fmt.Errorf("error getting message data: %w", err)
+		}
+
+		msg := &Message{
+			Data:            body,
+			ReceivedMessage: *m,
+			LockToken:       stringifyLockToken((*uuid.UUID)(&m.LockToken)),
+		}
+
+		err = a.handleMessage(ctx, msg)
+		if err != nil {
+			return fmt.Errorf("error processing message: %w", err)
+		}
+
+		err = a.msgRcvr.CompleteMessage(ctx, m)
+		if err != nil {
+			return fmt.Errorf("error completing message: %w", err)
+		}
+	}
+
+	return err
 }
 
 // handleMessage satisfies servicebus.HandlerFunc.
-func (a *adapter) handleMessage(ctx context.Context, msg *servicebus.Message) error {
+func (a *adapter) handleMessage(ctx context.Context, msg *Message) error {
 	if msg == nil {
 		return nil
 	}
 
 	events, err := a.msgPrcsr.Process(msg)
 	if err != nil {
-		return fmt.Errorf("processing Service Bus message with ID %s: %w", msg.ID, err)
+		return fmt.Errorf("processing Service Bus message with ID %s: %w", msg.ReceivedMessage.MessageID, err)
 	}
 
 	var sendErrs errList
@@ -267,13 +312,7 @@ func (a *adapter) handleMessage(ctx context.Context, msg *servicebus.Message) er
 		return fmt.Errorf("sending events to the sink: %w", sendErrs)
 	}
 
-	return messageCompleteFunc(msg)(ctx)
-}
-
-// Function to execute to notify Azure that a Message was successfully handled.
-// Defined as a variable to that tests can override this function.
-var messageCompleteFunc = func(msg *servicebus.Message) servicebus.DispositionAction {
-	return msg.CompleteAction()
+	return nil
 }
 
 // sendCloudEvent sends a single CloudEvent to the event sink.
@@ -316,4 +355,13 @@ func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event
 	}
 
 	return origEvent
+}
+
+// stringifyLockToken converts a UUID byte-array into its string representation.
+func stringifyLockToken(id *uuid.UUID) *string {
+	if id == nil {
+		return nil
+	}
+
+	return to.StringPtr(id.String())
 }

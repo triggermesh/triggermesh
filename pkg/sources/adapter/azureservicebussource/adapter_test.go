@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,18 +24,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	servicebus "github.com/Azure/azure-service-bus-go"
-
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 )
 
 func TestHandleMessage(t *testing.T) {
-	origMsgCompleteFn := messageCompleteFunc
-	messageCompleteFunc = testMessageCompleteFunc
-	t.Cleanup(func() {
-		messageCompleteFunc = origMsgCompleteFn
-	})
-
 	testCases := []struct {
 		name            string
 		eventData       []byte
@@ -57,7 +49,7 @@ func TestHandleMessage(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
 
-			msg := &servicebus.Message{
+			msg := &Message{
 				Data: tc.eventData,
 			}
 
@@ -92,11 +84,6 @@ func extractDataFromEvent(t *testing.T, b []byte) string {
 	require.NoError(t, err)
 
 	return string(data)
-}
-
-// testMessageCompleteFunc can be used to override the messageCompleteFunc in tests.
-func testMessageCompleteFunc(*servicebus.Message) servicebus.DispositionAction {
-	return func(context.Context) error { return nil }
 }
 
 func TestParseServiceBusResourceID(t *testing.T) {

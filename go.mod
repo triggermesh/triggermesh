@@ -21,10 +21,11 @@ require (
 	cloud.google.com/go/pubsub v1.17.1
 	cloud.google.com/go/storage v1.19.0
 	cloud.google.com/go/workflows v1.1.1
-	github.com/Azure/azure-amqp-common-go/v3 v3.2.2
-	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
+	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
+	github.com/Azure/azure-event-hubs-go/v3 v3.3.17
 	github.com/Azure/azure-sdk-for-go v61.4.0+incompatible
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.12.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.0
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v0.3.3
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.2.0
@@ -38,7 +39,7 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.0+incompatible
-	github.com/amenzhinsky/iothub v0.8.0
+	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.14.0
 	github.com/aws/aws-sdk-go v1.42.44
 	github.com/basgys/goxml2json v1.1.0
@@ -94,15 +95,17 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
 	github.com/Azure/azure-pipeline-go v0.1.9 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.20.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.3 // indirect
-	github.com/Azure/go-amqp v0.16.4 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/internal v0.0.0-20211208010914-2b10e91d237e // indirect
+	github.com/Azure/go-amqp v0.17.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.4.5 // indirect
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
+	github.com/AzureAD/microsoft-authentication-library-for-go v0.4.0 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
@@ -162,6 +165,7 @@ require (
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
 	github.com/kevinburke/rest v0.0.0-20210506044642-5611499aa33c // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -171,7 +175,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/openzipkin/zipkin-go v0.3.0 // indirect
-	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4 // indirect
+	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.11.0 // indirect

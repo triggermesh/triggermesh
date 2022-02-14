@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/Azure/azure-amqp-common-go/v3/uuid"
-	servicebus "github.com/Azure/azure-service-bus-go"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 )
 
 func TestProcessMessage(t *testing.T) {
@@ -33,14 +33,14 @@ func TestProcessMessage(t *testing.T) {
 	const ceID = "someMessageID"
 	var ceTime = time.Unix(0, 0)
 
-	testData := &servicebus.Message{
-		ID: ceID,
-		SystemProperties: &servicebus.SystemProperties{
-			EnqueuedTime: &ceTime,
+	testData := &Message{
+		ReceivedMessage: azservicebus.ReceivedMessage{
+			MessageID:            ceID,
+			EnqueuedTime:         &ceTime,
+			ScheduledEnqueueTime: &ceTime,
 		},
-		LockToken: &uuid.Nil,
-
-		Data: sampleEvent,
+		Data:      sampleEvent,
+		LockToken: stringifyLockToken(&uuid.Nil),
 	}
 
 	msgPrcsr := &defaultMessageProcessor{
