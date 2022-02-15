@@ -25,6 +25,7 @@ require (
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
 	github.com/Azure/azure-sdk-for-go v61.5.0+incompatible
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.1
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v0.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.3.0
@@ -38,7 +39,7 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.0+incompatible
-	github.com/amenzhinsky/iothub v0.9.0
+	github.com/amenzhinsky/iothub v0.8.0
 	github.com/andygrunwald/go-jira v1.14.0
 	github.com/aws/aws-sdk-go v1.42.53
 	github.com/basgys/goxml2json v1.1.0
@@ -124,7 +125,6 @@ require (
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
-	github.com/gin-gonic/gin v1.7.4 // indirect
 	github.com/go-kit/log v0.1.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
