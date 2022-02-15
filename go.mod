@@ -18,7 +18,7 @@ require (
 	cloud.google.com/go/billing v1.1.0
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.4.2
-	cloud.google.com/go/pubsub v1.17.1
+	cloud.google.com/go/pubsub v1.18.0
 	cloud.google.com/go/storage v1.20.0
 	cloud.google.com/go/workflows v1.2.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.2
@@ -89,7 +89,6 @@ require (
 	cloud.google.com/go v0.100.2 // indirect
 	cloud.google.com/go/compute v1.2.0 // indirect
 	cloud.google.com/go/iam v0.1.1 // indirect
-	cloud.google.com/go/kms v1.1.0 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
 	contrib.go.opencensus.io/exporter/zipkin v0.1.2 // indirect
@@ -208,7 +207,7 @@ require (
 	golang.org/x/sys v0.0.0-20220204135822-1c1b9b1eba6a // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
+	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
 	golang.org/x/tools v0.1.8 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
