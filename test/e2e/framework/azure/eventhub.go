@@ -48,10 +48,8 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 
 	// create the eventhubs namespace
 	nsResp, err := nsClient.BeginCreateOrUpdate(ctx, rg, name, armeventhub.EHNamespace{
-		TrackedResource: armeventhub.TrackedResource{
-			Location: &region,
-			Tags:     map[string]*string{E2EInstanceTagKey: to.StringPtr(name)},
-		},
+		Location: &region,
+		Tags:     map[string]*string{E2EInstanceTagKey: to.StringPtr(name)},
 		Identity: &armeventhub.Identity{
 			Type: armeventhub.ManagedServiceIdentityTypeNone.ToPtr(),
 		},
@@ -73,7 +71,7 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 
 	if !omitHub {
 		ehResp, err := ehClient.CreateOrUpdate(ctx, rg, name, name, armeventhub.Eventhub{
-			Properties: &armeventhub.EventhubProperties{
+			Properties: &armeventhub.Properties{
 				MessageRetentionInDays: to.Int64Ptr(1),
 				PartitionCount:         to.Int64Ptr(2),
 			},

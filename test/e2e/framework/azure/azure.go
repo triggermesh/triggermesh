@@ -55,7 +55,7 @@ func CreateResourceGroup(ctx context.Context, subscriptionID, name, region strin
 }
 
 // DeleteResourceGroup will delete everything under it allowing for easy cleanup
-func DeleteResourceGroup(ctx context.Context, subscriptionID, name string) armresources.ResourceGroupsDeletePollerResponse {
+func DeleteResourceGroup(ctx context.Context, subscriptionID, name string) armresources.ResourceGroupsClientDeletePollerResponse {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		framework.FailfWithOffset(1, "Unable to authenticate: %s", err)
@@ -72,7 +72,7 @@ func DeleteResourceGroup(ctx context.Context, subscriptionID, name string) armre
 }
 
 // WaitForFutureDeletion will wait on the resource to be deleted before continuing
-func WaitForFutureDeletion(ctx context.Context, subscriptionID string, future armresources.ResourceGroupsDeletePollerResponse) {
+func WaitForFutureDeletion(ctx context.Context, subscriptionID string, future armresources.ResourceGroupsClientDeletePollerResponse) {
 	_, err := future.PollUntilDone(ctx, time.Second*30)
 	if err != nil {
 		framework.FailfWithOffset(1, "Resource group deletion failed: %s", err)
@@ -80,8 +80,8 @@ func WaitForFutureDeletion(ctx context.Context, subscriptionID string, future ar
 }
 
 // CreateStorageAccountCommon will create an azure storage account for both blob and queue storage tests
-func CreateStorageAccountCommon(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName, region string, isBlob bool) armstorage.StorageAccount {
-	storageParams := armstorage.StorageAccountCreateParameters{
+func CreateStorageAccountCommon(ctx context.Context, cli *armstorage.AccountsClient, name, rgName, region string, isBlob bool) armstorage.Account {
+	storageParams := armstorage.AccountCreateParameters{
 		Kind:     armstorage.KindStorage.ToPtr(),
 		Location: &region,
 		SKU: &armstorage.SKU{
@@ -91,13 +91,13 @@ func CreateStorageAccountCommon(ctx context.Context, cli *armstorage.StorageAcco
 		Identity: &armstorage.Identity{
 			Type: armstorage.IdentityTypeNone.ToPtr(),
 		},
-		Properties: &armstorage.StorageAccountPropertiesCreateParameters{},
+		Properties: &armstorage.AccountPropertiesCreateParameters{},
 	}
 
 	// Storage blob requires the access tier to be set and publicly available
 	if isBlob {
 		storageParams.Kind = armstorage.KindBlobStorage.ToPtr()
-		storageParams.Properties = &armstorage.StorageAccountPropertiesCreateParameters{
+		storageParams.Properties = &armstorage.AccountPropertiesCreateParameters{
 			AccessTier:            armstorage.AccessTierHot.ToPtr(),
 			AllowBlobPublicAccess: to.BoolPtr(true),
 		}
@@ -107,16 +107,16 @@ func CreateStorageAccountCommon(ctx context.Context, cli *armstorage.StorageAcco
 
 	if err != nil {
 		framework.FailfWithOffset(3, "unable to create storage account: %s", err)
-		return armstorage.StorageAccount{}
+		return armstorage.Account{}
 	}
 
 	newSaClient, err := resp.PollUntilDone(ctx, time.Second*30)
 	if err != nil {
 		framework.FailfWithOffset(3, "unable to complete storage account creation: %s", err)
-		return armstorage.StorageAccount{}
+		return armstorage.Account{}
 	}
 
-	return newSaClient.StorageAccount
+	return newSaClient.Account
 }
 
 // randAlphanumString returns a random string of the given length containing

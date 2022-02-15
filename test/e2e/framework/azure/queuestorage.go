@@ -29,19 +29,19 @@ import (
 )
 
 // CreateStorageAccountsClient will create the storage account client
-func CreateStorageAccountsClient(subscriptionID string) *armstorage.StorageAccountsClient {
+func CreateStorageAccountsClient(subscriptionID string) *armstorage.AccountsClient {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		framework.FailfWithOffset(3, "unable to authenticate: %s", err)
 	}
 
-	saClient := armstorage.NewStorageAccountsClient(subscriptionID, cred, nil)
+	saClient := armstorage.NewAccountsClient(subscriptionID, cred, nil)
 
 	return saClient
 }
 
 // CreateQueueStorageAccount provides a wrapper to support Queue storage test
-func CreateQueueStorageAccount(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName, region string) armstorage.StorageAccount {
+func CreateQueueStorageAccount(ctx context.Context, cli *armstorage.AccountsClient, name, rgName, region string) armstorage.Account {
 	return CreateStorageAccountCommon(ctx, cli, name, rgName, region, false)
 }
 
@@ -76,6 +76,6 @@ func CreateQueueStorage(ctx context.Context, name, accountName string, accountKe
 }
 
 // GetStorageAccountKey will return the storage account keys
-func GetStorageAccountKey(ctx context.Context, cli *armstorage.StorageAccountsClient, name, rgName string) (armstorage.StorageAccountsListKeysResponse, error) {
-	return cli.ListKeys(ctx, rgName, name, &armstorage.StorageAccountsListKeysOptions{})
+func GetStorageAccountKey(ctx context.Context, cli *armstorage.AccountsClient, name, rgName string) (armstorage.AccountsClientListKeysResponse, error) {
+	return cli.ListKeys(ctx, rgName, name, &armstorage.AccountsClientListKeysOptions{})
 }

@@ -38,8 +38,6 @@ spec:
     - all
     - triggermesh
     - routing
-    shortNames:
-    - fl
   versions:
   - name: v1alpha1
     served: true

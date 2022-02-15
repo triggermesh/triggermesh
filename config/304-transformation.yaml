@@ -38,8 +38,6 @@ spec:
     - knative
     - eventing
     - transformations
-    shortNames:
-    - trn
   versions:
   - name: v1alpha1
     served: true
