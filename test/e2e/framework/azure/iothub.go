@@ -44,14 +44,12 @@ func CreateIOTHubComponents(ctx context.Context, subscriptionID, rg, region, nam
 	}
 
 	// Create the new iothub
-	iothubClient := armiothub.NewIotHubResourceClient(subscriptionID, cred, nil)
+	iothubClient := armiothub.NewResourceClient(subscriptionID, cred, nil)
 
-	hub, err := iothubClient.BeginCreateOrUpdate(ctx, rg, name, armiothub.IotHubDescription{
-		Resource: armiothub.Resource{
-			Location: &region,
-			Tags:     map[string]*string{E2EInstanceTagKey: to.StringPtr(name)},
-		},
-		SKU: &armiothub.IotHubSKUInfo{
+	hub, err := iothubClient.BeginCreateOrUpdate(ctx, rg, name, armiothub.Description{
+		Location: &region,
+		Tags:     map[string]*string{E2EInstanceTagKey: to.StringPtr(name)},
+		SKU: &armiothub.SKUInfo{
 			Name:     armiothub.IotHubSKUF1.ToPtr(),
 			Capacity: to.Int64Ptr(1),
 			Tier:     armiothub.IotHubSKUTierFree.ToPtr(),
