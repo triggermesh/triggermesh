@@ -119,8 +119,8 @@ github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.1 h1:sLZ/Y+P/5RRtsXWylBjB5lk
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.1/go.mod h1:KLF4gFr6DcKFZwSuH8w8yEK6DpFl3LP5rhdvAb7Yz5I=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1 h1:H7szLSbPFwf/KUDkRTrmd+FZ4JrPs+wEaHM8QQrue4o=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1/go.mod h1:KoyM3gTaxQVEej5RN1RcMM+Fx+0SOZXGJCf858x6/mE=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.0 h1:W8ushF7U5zdtt1+jfxXHcVGZxzMV4t+RQfgn2Z0ntTg=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.0/go.mod h1:wP3AG0hqkVQVrwZKhL64CchEVaBnlRUWtay/5Zzz02w=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.1 h1:9nbs6sFJpTSxO7CYF1pe1hpbjDMsysnmpOt25E1JqGc=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.1/go.mod h1:zv5LFZJoOQaFzAxwi+z9IVMR60LnBFYbPztUQWoePaU=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.3.1 h1:EXTDtCSTfPauGawsG+Ae/W46B1PkrgzuKNrcFqy4ljM=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.3.1/go.mod h1:PoA99xQAlN13MyUjzgIPWMZEr0etHpYSuT25LmhR3zQ=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.3.0 h1:eAjCVVYhoxCxan05p4WUuvC0aVUpAbKB/P8xedcjBwQ=
