@@ -35,7 +35,12 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
 )
 
-const metricsPrometheusPort uint16 = 9092
+const (
+	metricsPrometheusPortName = "metrics"
+
+	metricsPrometheusPort     uint16 = 9090
+	metricsPrometheusPortKsvc uint16 = 9092
+)
 
 // ComponentName returns the component name for the given source object.
 func ComponentName(src kmeta.OwnerRefable) string {
@@ -123,6 +128,8 @@ func commonAdapterDeploymentOptions(src v1alpha1.EventSource) []resource.ObjectO
 		resource.ServiceAccount(ServiceAccountName(src)),
 
 		resource.EnvVar(envComponent, app),
+
+		resource.Port(metricsPrometheusPortName, int32(metricsPrometheusPort)),
 	}
 }
 
@@ -182,7 +189,7 @@ func commonAdapterKnServiceOptions(src v1alpha1.EventSource) []resource.ObjectOp
 		resource.ServiceAccount(MTAdapterObjectName(src)),
 
 		resource.EnvVar(envComponent, app),
-		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPort), 10)),
+		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
 	}
 }
 
