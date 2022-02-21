@@ -23,7 +23,7 @@ require (
 	cloud.google.com/go/workflows v1.2.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.2
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.16
-	github.com/Azure/azure-sdk-for-go v61.5.0+incompatible
+	github.com/Azure/azure-sdk-for-go v61.6.0+incompatible
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.0
