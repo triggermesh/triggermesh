@@ -107,8 +107,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.EntityResourceID), zap.Error(err))
 	}
 
-	entityPath := entityPath(entityID)
-
 	client, err := clientFromEnvironment(entityID)
 	if err != nil {
 		logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
@@ -122,7 +120,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		rcvr, err = client.NewReceiverForSubscription(entityID.ResourceName, entityID.SubResourceName, nil)
 	}
 	if err != nil {
-		logger.Panicw("Unable to obtain message receiver for Service Bus entity "+strconv.Quote(entityPath), zap.Error(err))
+		logger.Panicw("Unable to obtain message receiver for Service Bus entity "+strconv.Quote(strconv.Quote(entityPath(entityID))), zap.Error(err))
 	}
 
 	ceSource := env.EntityResourceID
@@ -190,7 +188,8 @@ func entityPath(entityID *v1alpha1.AzureResourceID) string {
 	}
 }
 
-// clientFromEnvironment return a azservicebus.Client that is suitable for the
+// clientFromEnvironment mimics the behaviour of eventhub.NewHubFromEnvironment
+// return a azservicebus.Client that is suitable for the
 // authentication method selected via environment variables.
 func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Client, error) {
 	// SAS authentication (token, connection string)
@@ -198,7 +197,7 @@ func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Cl
 	if connStr != "" {
 		client, err := azservicebus.NewClientFromConnectionString(connStr, nil)
 		if err != nil {
-			return nil, fmt.Errorf("creating client with connection string: %w", err)
+			return nil, fmt.Errorf("creating client from connection string: %w", err)
 		}
 		return client, nil
 	}
@@ -206,19 +205,15 @@ func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Cl
 	// AAD authentication (service principal)
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create azure credentials: %w", err)
+		return nil, fmt.Errorf("unable to create Azure credentials: %w", err)
 	}
 
-	if cred != nil {
-		fqNamespace := entityID.Namespace + ".servicebus.windows.net"
-		client, err := azservicebus.NewClient(fqNamespace, cred, nil)
-		if err != nil {
-			return nil, fmt.Errorf("creating client with service principal: %w", err)
-		}
-		return client, nil
+	fqNamespace := entityID.Namespace + ".servicebus.windows.net"
+	client, err := azservicebus.NewClient(fqNamespace, cred, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating client with service principal: %w", err)
 	}
-
-	return nil, fmt.Errorf("neither Azure Active Directory nor SAS token provider could be built")
+	return client, nil
 }
 
 // connectionStringFromEnvironment returns a Service Bus connection string
@@ -248,38 +243,45 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 //  Both (DataAction):
 //  - Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
-	maxMessages := 5
+	maxMessages := 100
 	logging.FromContext(ctx).Info("Listening for messages")
 
-	messages, err := a.msgRcvr.ReceiveMessages(ctx, maxMessages, nil)
-	if err != nil {
-		return fmt.Errorf("error receiving messages: %w", err)
+loop:
+	for {
+		select {
+		case <-ctx.Done():
+			break loop
+		default:
+			messages, err := a.msgRcvr.ReceiveMessages(ctx, maxMessages, nil)
+			if err != nil {
+				return fmt.Errorf("error receiving messages: %w", err)
+			}
+			for _, m := range messages {
+				body, err := m.Body()
+				if err != nil {
+					return fmt.Errorf("error getting message data: %w", err)
+				}
+
+				msg := &Message{
+					Data:            body,
+					ReceivedMessage: *m,
+					LockToken:       stringifyLockToken((*uuid.UUID)(&m.LockToken)),
+				}
+
+				err = a.handleMessage(ctx, msg)
+				if err != nil {
+					return fmt.Errorf("error processing message: %w", err)
+				}
+
+				err = a.msgRcvr.CompleteMessage(ctx, m)
+				if err != nil {
+					return fmt.Errorf("error completing message: %w", err)
+				}
+			}
+		}
 	}
 
-	for _, m := range messages {
-		body, err := m.Body()
-		if err != nil {
-			return fmt.Errorf("error getting message data: %w", err)
-		}
-
-		msg := &Message{
-			Data:            body,
-			ReceivedMessage: *m,
-			LockToken:       stringifyLockToken((*uuid.UUID)(&m.LockToken)),
-		}
-
-		err = a.handleMessage(ctx, msg)
-		if err != nil {
-			return fmt.Errorf("error processing message: %w", err)
-		}
-
-		err = a.msgRcvr.CompleteMessage(ctx, m)
-		if err != nil {
-			return fmt.Errorf("error completing message: %w", err)
-		}
-	}
-
-	return err
+	return nil
 }
 
 // handleMessage satisfies servicebus.HandlerFunc.
