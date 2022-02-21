@@ -105,7 +105,6 @@ github.com/Azure/azure-sdk-for-go v41.3.0+incompatible/go.mod h1:9XXNKU+eRnpl9mo
 github.com/Azure/azure-sdk-for-go v43.0.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go v51.1.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go v57.1.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
-github.com/Azure/azure-sdk-for-go v61.1.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go v61.6.0+incompatible h1:jdHWEqRK9boUrdUPIWDE9dKLmxbHmz+PFk3jRQ9s1C0=
 github.com/Azure/azure-sdk-for-go v61.6.0+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.21.0/go.mod h1:fBF9PQNqB8scdgpZ3ufzaLntG0AG7C1WjPMsiFOmfHM=
@@ -123,8 +122,8 @@ github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.1 h1
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.1/go.mod h1:zv5LFZJoOQaFzAxwi+z9IVMR60LnBFYbPztUQWoePaU=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.3.1 h1:EXTDtCSTfPauGawsG+Ae/W46B1PkrgzuKNrcFqy4ljM=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.3.1/go.mod h1:PoA99xQAlN13MyUjzgIPWMZEr0etHpYSuT25LmhR3zQ=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.3.0 h1:eAjCVVYhoxCxan05p4WUuvC0aVUpAbKB/P8xedcjBwQ=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.3.0/go.mod h1:wO83KRKZMp8AlchGkYb282omWyhXtY9lsB1CW7QZcGg=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.4.1 h1:wpcg7b+pgmC5729QzwDLK8DxtVsCrTjTD1TDrDi5p70=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.4.1/go.mod h1:S2g1TUG+fgzF38GicYn3o6cgg/QpaDY2MrYG53UIIPQ=
 github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0 h1:Px2UA+2RvSSvv+RvJNuUB6n7rs5Wsel4dXLe90Um2n4=
 github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0/go.mod h1:tPaiy8S5bQ+S5sOiDlINkp7+Ef339+Nz5L5XO+cnOHo=
 github.com/Azure/azure-service-bus-go v0.11.5 h1:EVMicXGNrSX+rHRCBgm/TRQ4VUZ1m3yAYM/AB2R/SOs=
