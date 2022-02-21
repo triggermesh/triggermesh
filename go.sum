@@ -117,8 +117,8 @@ github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.1/go.mod h1:+nVKciyKD2J9T
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.8.3/go.mod h1:KLF4gFr6DcKFZwSuH8w8yEK6DpFl3LP5rhdvAb7Yz5I=
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.1 h1:sLZ/Y+P/5RRtsXWylBjB5lkgixYfm0MQPiwrSX//JSo=
 github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.1/go.mod h1:KLF4gFr6DcKFZwSuH8w8yEK6DpFl3LP5rhdvAb7Yz5I=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.0 h1:+nZ7pqJhVyCn3NWNAZ9FZYaXvCyQ24RHIJH1Er4w+vk=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.0/go.mod h1:oRCjs4iR/nSXrOza61JZdmhkLuWPBw8P+IWihJjt/iU=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1 h1:H7szLSbPFwf/KUDkRTrmd+FZ4JrPs+wEaHM8QQrue4o=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1/go.mod h1:KoyM3gTaxQVEej5RN1RcMM+Fx+0SOZXGJCf858x6/mE=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.0 h1:W8ushF7U5zdtt1+jfxXHcVGZxzMV4t+RQfgn2Z0ntTg=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.0/go.mod h1:wP3AG0hqkVQVrwZKhL64CchEVaBnlRUWtay/5Zzz02w=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.3.0 h1:DRENE8RdmJnG9MmQKG4f7DbQwEGGjOpjCx2w3CsdkQw=
