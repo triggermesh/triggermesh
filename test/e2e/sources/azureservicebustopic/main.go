@@ -78,7 +78,7 @@ const (
  * Send an event to the AzureServiceBusTopicSource and look for a response
 */
 
-var _ = FDescribe("Azure ServiceBusTopic", func() {
+var _ = Describe("Azure ServiceBusTopic", func() {
 	ctx := context.Background()
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 	region := os.Getenv("AZURE_REGION")

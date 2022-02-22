@@ -78,7 +78,7 @@ const (
  * Send an event to the AzureServiceBusQueueSource and look for a response
 */
 
-var _ = FDescribe("Azure ServiceBusQueue", func() {
+var _ = Describe("Azure ServiceBusQueue", func() {
 	ctx := context.Background()
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 	region := os.Getenv("AZURE_REGION")

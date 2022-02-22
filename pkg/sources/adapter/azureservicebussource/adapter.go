@@ -188,8 +188,8 @@ func entityPath(entityID *v1alpha1.AzureResourceID) string {
 	}
 }
 
-// clientFromEnvironment mimics the behaviour of eventhub.NewHubFromEnvironment
-// return a azservicebus.Client that is suitable for the
+// clientFromEnvironment mimics the behaviour of eventhub.NewHubFromEnvironment.
+// It returns a azservicebus.Client that is suitable for the
 // authentication method selected via environment variables.
 func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Client, error) {
 	// SAS authentication (token, connection string)
@@ -211,7 +211,7 @@ func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Cl
 	fqNamespace := entityID.Namespace + ".servicebus.windows.net"
 	client, err := azservicebus.NewClient(fqNamespace, cred, nil)
 	if err != nil {
-		return nil, fmt.Errorf("creating client with service principal: %w", err)
+		return nil, fmt.Errorf("creating client from service principal: %w", err)
 	}
 	return client, nil
 }
@@ -243,7 +243,7 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 //  Both (DataAction):
 //  - Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
-	maxMessages := 100
+	const maxMessages = 100
 	logging.FromContext(ctx).Info("Listening for messages")
 
 loop:
@@ -284,7 +284,7 @@ loop:
 	return nil
 }
 
-// handleMessage satisfies servicebus.HandlerFunc.
+// handleMessage handles a single Service Bus message.
 func (a *adapter) handleMessage(ctx context.Context, msg *Message) error {
 	if msg == nil {
 		return nil
