@@ -23,8 +23,9 @@ import (
 	"os"
 	"time"
 
+	sv "github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
+	svadmin "github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus/admin"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
-	sv "github.com/Azure/azure-service-bus-go"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
 
@@ -77,7 +78,7 @@ const (
  * Send an event to the AzureServiceBusTopicSource and look for a response
 */
 
-var _ = Describe("Azure ServiceBusTopic", func() {
+var _ = FDescribe("Azure ServiceBusTopic", func() {
 	ctx := context.Background()
 	subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 	region := os.Getenv("AZURE_REGION")
@@ -92,55 +93,28 @@ var _ = Describe("Azure ServiceBusTopic", func() {
 	var srcClient dynamic.ResourceInterface
 	var sink *duckv1.Destination
 
-	var rg armresources.ResourceGroup
-	var topic *sv.TopicEntity
-	var topicSender *sv.Topic
-
 	BeforeEach(func() {
 		ns = f.UniqueName
 		gvr := sourceAPIVersion.WithResource(sourceResource + "s")
 		srcClient = f.DynamicClient.Resource(gvr).Namespace(ns)
 	})
 
-	Context("a source watches a servicebus topic", func() {
+	Context("a source watches an servicebus topic", func() {
 		var err error // stubbed
+		var rg armresources.ResourceGroup
+		var topicSender *sv.Sender
 
-		BeforeEach(func() {
-			rg = e2eazure.CreateResourceGroup(ctx, subscriptionID, ns, region)
-			DeferCleanup(func() {
-				_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
-			})
-
-			nsClient := e2eazure.CreateServiceBusNamespaceClient(ctx, subscriptionID, ns)
-			err := e2eazure.CreateServiceBusNamespace(ctx, *nsClient, *rg.Name, ns, region)
-			Expect(err).ToNot(HaveOccurred())
-			topic, topicSender = createTopic(ctx, ns, e2eazure.CreateNsService(ctx, region, ns, nsClient))
-		})
-
-		When("an event flows", func() {
-			It("should create an azure servicebus topic subscription", func() {
-				By("creating an event sink", func() {
-					sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
-				})
-				var src *unstructured.Unstructured
-				By("creating the azureservicebussource", func() {
-					src, err = createSource(srcClient, ns, "test-", sink,
-						withServicePrincipal(),
-						withSubscriptionID(subscriptionID),
-						withTopicID(createTopicID(subscriptionID, ns, topic.Name)),
-					)
-					Expect(err).ToNot(HaveOccurred())
-
-					ducktypes.WaitUntilReady(f.DynamicClient, src)
-				})
-
-				By("sending an event", func() {
-					err = topicSender.Send(ctx, sv.NewMessageFromString("hello world"))
+		SendMessageAndAssertReceivedEvent := func() func() {
+			return func() {
+				BeforeEach(func() {
+					err = topicSender.SendMessage(ctx, &sv.Message{
+						Body: []byte("hello world"),
+					})
 					Expect(err).ToNot(HaveOccurred())
 				})
 
-				By("verifying the event was sent", func() {
-					const receiveTimeout = 25 * time.Second // It needs some more time than our default 15s.
+				Specify("the source generates an event", func() {
+					const receiveTimeout = 15 * time.Second
 					const pollInterval = 500 * time.Millisecond
 
 					var receivedEvents []cloudevents.Event
@@ -153,13 +127,50 @@ var _ = Describe("Azure ServiceBusTopic", func() {
 					e := receivedEvents[0]
 
 					Expect(e.Type()).To(Equal("com.microsoft.azure.servicebus.message"))
-
 					data := make(map[string]interface{})
 					err = json.Unmarshal(e.Data(), &data)
-					testID := fmt.Sprintf("%v", data["ID"])
-					Expect(data["ID"]).To(Equal(testID))
+					testID := fmt.Sprintf("%v", data["MessageID"])
+					Expect(data["MessageID"]).To(Equal(testID))
+				})
+			}
+		}
+
+		BeforeEach(func() {
+			rg = e2eazure.CreateResourceGroup(ctx, subscriptionID, ns, region)
+			DeferCleanup(func() {
+				_ = e2eazure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
+			})
+
+			nsClient := e2eazure.CreateServiceBusNamespaceClient(ctx, subscriptionID, ns)
+			err := e2eazure.CreateServiceBusNamespace(ctx, *nsClient, *rg.Name, ns, region)
+			Expect(err).ToNot(HaveOccurred())
+			adminClient := e2eazure.CreateAdminClient(ctx, region, ns, nsClient)
+
+			By("creating an event sink", func() {
+				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
+			})
+
+			By("creating a topic", func() {
+				topicSender = createTopic(ctx, ns, e2eazure.CreateClient(ctx, region, ns, nsClient), adminClient)
+			})
+		})
+
+		Context("the subscription is managed by the source", func() {
+
+			BeforeEach(func() {
+				By("creating a AzureServiceBusTopicSource object", func() {
+					src, err := createSource(srcClient, ns, "test-", sink,
+						withServicePrincipal(),
+						withSubscriptionID(subscriptionID),
+						withTopicID(createTopicID(subscriptionID, ns)),
+					)
+					Expect(err).ToNot(HaveOccurred())
+
+					ducktypes.WaitUntilReady(f.DynamicClient, src)
 				})
 			})
+
+			When("a message is sent to the topic", SendMessageAndAssertReceivedEvent())
 		})
 	})
 
@@ -277,26 +288,25 @@ func readReceivedEvents(c clientset.Interface, namespace, eventDisplayName strin
 	}
 }
 
-// createTopic will create a servicebus topic and topicSender using the given name
-func createTopic(ctx context.Context, name string, ns *sv.Namespace) (*sv.TopicEntity, *sv.Topic) {
-	tm := ns.NewTopicManager()
+// createTopic will create a servicebus topic and a sender using the given name
+func createTopic(ctx context.Context, name string, client *sv.Client, adminClient *svadmin.Client) *sv.Sender {
 
-	topic, err := tm.Put(ctx, name)
+	// Create Topic
+	_, err := adminClient.CreateTopic(ctx, name, nil, nil)
 	if err != nil {
 		framework.FailfWithOffset(2, "Error creating topic: %s", err)
-		return nil, nil
+		return nil
 	}
 
-	topicSender, err := ns.NewTopic(topic.Name)
+	sender, err := client.NewSender(name, nil)
 	if err != nil {
-		framework.FailfWithOffset(2, "Unable to create the topic sender: %s", err)
-		return nil, nil
+		return nil
 	}
 
-	return topic, topicSender
+	return sender
 }
 
 // createTopicID will create the topicID path used by the k8s azureservicebustopicsource
-func createTopicID(subscriptionID, name, topicName string) string {
-	return "/subscriptions/" + subscriptionID + "/resourceGroups/" + name + "/providers/Microsoft.ServiceBus/namespaces/" + name + "/topics/" + topicName
+func createTopicID(subscriptionID, name string) string {
+	return "/subscriptions/" + subscriptionID + "/resourceGroups/" + name + "/providers/Microsoft.ServiceBus/namespaces/" + name + "/topics/" + name
 }

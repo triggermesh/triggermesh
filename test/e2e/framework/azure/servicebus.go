@@ -20,7 +20,8 @@ import (
 	"context"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/servicebus/mgmt/servicebus"
-	sv "github.com/Azure/azure-service-bus-go"
+	sv "github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
+	svadmin "github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus/admin"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 	"github.com/Azure/go-autorest/autorest/to"
 
@@ -66,8 +67,8 @@ func CreateServiceBusNamespace(ctx context.Context, cli servicebus.NamespacesCli
 	return nil
 }
 
-// CreateNsService will create a servicebus namespace service.
-func CreateNsService(ctx context.Context, region string, name string, nsCli *servicebus.NamespacesClient) *sv.Namespace {
+// CreateClient will create a servicebus client.
+func CreateClient(ctx context.Context, region string, name string, nsCli *servicebus.NamespacesClient) *sv.Client {
 	keys, err := nsCli.ListKeys(ctx, name, name, "RootManageSharedAccessKey")
 	if err != nil {
 		framework.FailfWithOffset(3, "unable to obtain the connection string: %s", err)
@@ -76,17 +77,30 @@ func CreateNsService(ctx context.Context, region string, name string, nsCli *ser
 
 	// Take the namespace connection string, and add the specific servicehub
 	connectionString := *keys.PrimaryConnectionString + ";EntityPath=" + name
-	svNs := sv.NamespaceWithConnectionString(connectionString)
-	if svNs == nil {
-		framework.FailfWithOffset(3, "unable to configure the servicebus namespace service: %s", err)
-		return nil
-	}
-
-	nsService, err := sv.NewNamespace(svNs)
+	client, err := sv.NewClientFromConnectionString(connectionString, nil)
 	if err != nil {
-		framework.FailfWithOffset(3, "unable to create the servicebus namespace service: %s", err)
+		framework.FailfWithOffset(3, "creating client from connection string: %s", err)
 		return nil
 	}
 
-	return nsService
+	return client
+}
+
+// CreateAdminClient will create a servicebus admin client.
+func CreateAdminClient(ctx context.Context, region string, name string, nsCli *servicebus.NamespacesClient) *svadmin.Client {
+	keys, err := nsCli.ListKeys(ctx, name, name, "RootManageSharedAccessKey")
+	if err != nil {
+		framework.FailfWithOffset(3, "unable to obtain the connection string: %s", err)
+		return nil
+	}
+
+	// Take the namespace connection string, and add the specific servicehub
+	connectionString := *keys.PrimaryConnectionString + ";EntityPath=" + name
+	client, err := svadmin.NewClientFromConnectionString(connectionString, nil)
+	if err != nil {
+		framework.FailfWithOffset(3, "creating admin client from connection string: %s", err)
+		return nil
+	}
+
+	return client
 }
