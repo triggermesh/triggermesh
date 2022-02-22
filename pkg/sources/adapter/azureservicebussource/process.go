@@ -22,7 +22,9 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
+	"github.com/Azure/azure-amqp-common-go/v3/uuid"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
+	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -103,4 +105,27 @@ type Message struct {
 type MessageWithRawJSONData struct {
 	Data json.RawMessage
 	*Message
+}
+
+// toMessage converts a azservicebus.ReceivedMessage into a Message
+func toMessage(rcvMsg *azservicebus.ReceivedMessage) (*Message, error) {
+	body, err := rcvMsg.Body()
+	if err != nil {
+		return nil, fmt.Errorf("reading message data: %w", err)
+	}
+
+	return &Message{
+		Data:            body,
+		ReceivedMessage: *rcvMsg,
+		LockToken:       stringifyLockToken((*uuid.UUID)(&rcvMsg.LockToken)),
+	}, nil
+}
+
+// stringifyLockToken converts a UUID byte-array into its string representation.
+func stringifyLockToken(id *uuid.UUID) *string {
+	if id == nil {
+		return nil
+	}
+
+	return to.StringPtr(id.String())
 }

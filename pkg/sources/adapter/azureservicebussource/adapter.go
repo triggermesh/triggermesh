@@ -34,11 +34,9 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
-	"github.com/Azure/azure-amqp-common-go/v3/uuid"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureservicebussource/trace"
@@ -257,15 +255,9 @@ loop:
 				return fmt.Errorf("error receiving messages: %w", err)
 			}
 			for _, m := range messages {
-				body, err := m.Body()
+				msg, err := toMessage(m)
 				if err != nil {
-					return fmt.Errorf("error getting message data: %w", err)
-				}
-
-				msg := &Message{
-					Data:            body,
-					ReceivedMessage: *m,
-					LockToken:       stringifyLockToken((*uuid.UUID)(&m.LockToken)),
+					return fmt.Errorf("error transforming message: %w", err)
 				}
 
 				err = a.handleMessage(ctx, msg)
@@ -357,13 +349,4 @@ func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event
 	}
 
 	return origEvent
-}
-
-// stringifyLockToken converts a UUID byte-array into its string representation.
-func stringifyLockToken(id *uuid.UUID) *string {
-	if id == nil {
-		return nil
-	}
-
-	return to.StringPtr(id.String())
 }
