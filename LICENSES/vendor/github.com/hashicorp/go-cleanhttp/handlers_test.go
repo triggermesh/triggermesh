@@ -30,22 +30,22 @@ func TestPrintablePathCheckHandler(t *testing.T) {
 		},
 
 		"invalid newline": {
-			path:       "/invalid\n",
+			path:       "/invalid%0A",
 			expectCode: http.StatusBadRequest,
 		},
 
 		"invalid carriage return": {
-			path:       "/invalid\r",
+			path:       "/invalid%0D",
 			expectCode: http.StatusBadRequest,
 		},
 
 		"invalid null": {
-			path:       "/invalid\x00",
+			path:       "/invalid%00",
 			expectCode: http.StatusBadRequest,
 		},
 
 		"invalid alternate status": {
-			path:       "/invalid\n",
+			path:       "/invalid%0A",
 			expectCode: http.StatusInternalServerError,
 			input: &HandlerInput{
 				ErrStatus: http.StatusInternalServerError,
