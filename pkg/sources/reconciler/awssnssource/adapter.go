@@ -48,6 +48,9 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, _ *apis.URL) *servin
 	return common.NewMTAdapterKnService(src,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+
+		// NOTE(antoineco): startupProbe isn't yet supported as of Knative 1.2
+		resource.Probe("/health", ""),
 	)
 }
 

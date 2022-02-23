@@ -42,6 +42,31 @@ func (r *Router) DeregisterPath(urlPath string) {
 	r.handlers.Delete(urlPath)
 }
 
+// HandlersCount returns the number of handlers that are currently registered.
+func (r *Router) HandlersCount(filters ...handlerMatcherFunc) int {
+	var count int
+
+	r.handlers.Range(func(urlPath, _ interface{}) bool {
+		for _, f := range filters {
+			if f(urlPath.(string)) {
+				return true
+			}
+		}
+
+		count++
+
+		return true
+	})
+
+	return count
+}
+
+// handlerMatcherFunc is a matcher that allows ignoring some of the handlers
+// inside HandlersCount() based on arbitrary predicates.
+// The function should return 'true' if the given urlPath matches the
+// predicate, in which case the handler is ignored.
+type handlerMatcherFunc func(urlPath string) bool
+
 // ServeHTTP implements http.Handler.
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	h, ok := r.handlers.Load(req.URL.Path)

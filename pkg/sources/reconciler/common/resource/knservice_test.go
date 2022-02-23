@@ -37,7 +37,8 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		EnvVar("TEST_ENV1", "val1"),
 		Port("h2c", 8080), // overrides previously defined port
 		Label("test.label/1", "val1"),
-		Probe("/health", "health"), // port is ignored
+		Probe("/health", "health"),             // port is ignored
+		StartupProbe("/initialized", "health"), // port is ignored
 		EnvVars(makeEnvVars(2, "MULTI_ENV", "val")...),
 		EnvVar("TEST_ENV2", "val2"),
 		Label("test.label/2", "val2"),
@@ -93,6 +94,15 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 											Path: "/health",
 										},
 									},
+								},
+								StartupProbe: &corev1.Probe{
+									Handler: corev1.Handler{
+										HTTPGet: &corev1.HTTPGetAction{
+											Path: "/initialized",
+										},
+									},
+									PeriodSeconds:    1,
+									FailureThreshold: 60,
 								},
 								Resources: corev1.ResourceRequirements{
 									Requests: corev1.ResourceList{

@@ -36,7 +36,9 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/client"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/awssnssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/awssnssource/handler"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/awssnssource/probe"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/awssnssource/status"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/env"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/router"
@@ -77,13 +79,20 @@ func NewAdapter(component string) pkgadapter.AdapterConstructor {
 		secrGetter := secretGetter(k8sclient.Get(ctx).CoreV1().Secrets(ns))
 		srcClient := client.Get(ctx).SourcesV1alpha1().AWSSNSSources(ns)
 
+		router := &router.Router{}
+
+		healthHandler := probe.ReadinessCheckerHTTPHandler(
+			probe.NewAdapterReadyChecker(informerv1alpha1.Get(ctx).Lister(), router),
+		)
+		router.RegisterPath(probe.EndpointPath, healthHandler)
+
 		return &adapter{
 			logger: logging.FromContext(ctx),
 
 			ceClient: ceClient,
 			snsCg:    snsclient.NewClientGetter(secrGetter),
 
-			router:        &router.Router{},
+			router:        router,
 			statusPatcher: status.NewPatcher(component, srcClient),
 		}
 	}
