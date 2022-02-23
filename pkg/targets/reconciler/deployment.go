@@ -43,6 +43,7 @@ type DeploymentReconciler interface {
 }
 
 // NewDeploymentReconciler creates the default implementation for Deployment reconciler.
+// Not used?
 func NewDeploymentReconciler(appsClientSet appsv1client.AppsV1Interface, deploymentLister appsv1listers.DeploymentLister) DeploymentReconciler {
 	return &deploymentReconciler{
 		appsClientSet:    appsClientSet,

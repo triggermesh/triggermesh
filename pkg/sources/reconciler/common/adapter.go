@@ -112,7 +112,7 @@ func NewMTAdapterDeployment(src v1alpha1.EventSource, opts ...resource.ObjectOpt
 func commonAdapterDeploymentOptions(src v1alpha1.EventSource) []resource.ObjectOption {
 	app := ComponentName(src)
 
-	return []resource.ObjectOption{
+	objectOptions := []resource.ObjectOption{
 		resource.TerminationErrorToLogs,
 
 		resource.Label(appNameLabel, app),
@@ -131,6 +131,16 @@ func commonAdapterDeploymentOptions(src v1alpha1.EventSource) []resource.ObjectO
 
 		resource.Port(metricsPrometheusPortName, int32(metricsPrometheusPort)),
 	}
+
+	parentLabels := src.GetLabels()
+	for _, key := range labelsPropagationList {
+		if value, exists := parentLabels[key]; exists {
+			objectOptions = append(objectOptions, resource.Label(key, value))
+			objectOptions = append(objectOptions, resource.PodLabel(key, value))
+		}
+	}
+
+	return objectOptions
 }
 
 // NewAdapterKnService is a wrapper around resource.NewKnService which
@@ -175,7 +185,7 @@ func NewMTAdapterKnService(src v1alpha1.EventSource, opts ...resource.ObjectOpti
 func commonAdapterKnServiceOptions(src v1alpha1.EventSource) []resource.ObjectOption {
 	app := ComponentName(src)
 
-	return []resource.ObjectOption{
+	objectOptions := []resource.ObjectOption{
 		resource.Label(appNameLabel, app),
 		resource.Label(appComponentLabel, componentAdapter),
 		resource.Label(appPartOfLabel, partOf),
@@ -191,6 +201,16 @@ func commonAdapterKnServiceOptions(src v1alpha1.EventSource) []resource.ObjectOp
 		resource.EnvVar(envComponent, app),
 		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
 	}
+
+	parentLabels := src.GetLabels()
+	for _, key := range labelsPropagationList {
+		if value, exists := parentLabels[key]; exists {
+			objectOptions = append(objectOptions, resource.Label(key, value))
+			objectOptions = append(objectOptions, resource.PodLabel(key, value))
+		}
+	}
+
+	return objectOptions
 }
 
 // newServiceAccount returns a ServiceAccount object with its OwnerReferences

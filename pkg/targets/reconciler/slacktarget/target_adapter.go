@@ -26,6 +26,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
@@ -41,7 +42,7 @@ type TargetAdapterArgs struct {
 
 // MakeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
-	labels := makeLabels(args.Target.Name)
+	labels := libreconciler.MakeAdapterLabels(targetPrefix, args.Target)
 	name := kmeta.ChildName(fmt.Sprintf("%s-%s", targetPrefix, args.Target.Name), "")
 	return &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -55,6 +56,9 @@ func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 		Spec: servingv1.ServiceSpec{
 			ConfigurationSpec: servingv1.ConfigurationSpec{
 				Template: servingv1.RevisionTemplateSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: labels,
+					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec: corev1.PodSpec{
 							Containers: []corev1.Container{{
@@ -66,13 +70,6 @@ func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 				},
 			},
 		},
-	}
-}
-
-func makeLabels(name string) map[string]string {
-	return map[string]string{
-		"knative-eventing-target-controller": "knative-targets-controller",
-		"knative-eventing-target-name":       name,
 	}
 }
 

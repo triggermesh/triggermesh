@@ -45,11 +45,13 @@ import (
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/extensions/v1alpha1/function"
 	"github.com/triggermesh/triggermesh/pkg/function/resources"
 	"github.com/triggermesh/triggermesh/pkg/function/semantic"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const (
+	adapterName         = "klrfunction"
 	klrEntrypoint       = "/opt/aws-custom-runtime"
-	labelKey            = "extensions.triggermesh.io/function"
+	functionNameLabel   = "extensions.triggermesh.io/function"
 	ceDefaultTypePrefix = "io.triggermesh.function."
 )
 
@@ -171,12 +173,12 @@ func (r *Reconciler) reconcileConfigmap(ctx context.Context, f *v1alpha1.Functio
 
 	expectedCm := resources.NewConfigmap(f.Name+"-"+rand.String(6), f.Namespace,
 		resources.CmOwner(f),
-		resources.CmLabel(map[string]string{labelKey: f.Name}),
+		resources.CmLabel(map[string]string{functionNameLabel: f.Name}),
 		resources.CmData(f.Spec.Code),
 	)
 
 	cmList, err := r.coreClientSet.CoreV1().ConfigMaps(f.Namespace).List(ctx, v1.ListOptions{
-		LabelSelector: fmt.Sprintf("%s=%s", labelKey, f.Name),
+		LabelSelector: fmt.Sprintf("%s=%s", functionNameLabel, f.Name),
 	})
 	if err != nil {
 		return nil, err
@@ -223,6 +225,9 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		responseMode = "event"
 	}
 
+	lbl := libreconciler.MakeAdapterLabels(adapterName, f)
+	lbl[functionNameLabel] = f.Name
+
 	expectedKsvc := resources.NewKnService(f.Name+"-"+rand.String(6), f.Namespace,
 		resources.KnSvcImage(image),
 		resources.KnSvcMountCm(cm.Name, filename),
@@ -235,11 +240,12 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		resources.KnSvcEnvVars(sortedEnvVarsWithPrefix("CE_OVERRIDES_", overrides)...),
 		resources.KnSvcAnnotation("extensions.triggermesh.io/codeVersion", cm.ResourceVersion),
 		resources.KnSvcVisibility(f.Spec.Public),
-		resources.KnSvcLabel(map[string]string{labelKey: f.Name}),
+		resources.KnSvcLabel(lbl),
+		resources.KnSvcPodLabels(lbl),
 		resources.KnSvcOwner(f),
 	)
 
-	ksvcList, err := r.knServiceLister.Services(f.Namespace).List(labels.SelectorFromSet(labels.Set{labelKey: f.Name}))
+	ksvcList, err := r.knServiceLister.Services(f.Namespace).List(labels.SelectorFromSet(labels.Set{functionNameLabel: f.Name}))
 	if err != nil {
 		return nil, err
 	}

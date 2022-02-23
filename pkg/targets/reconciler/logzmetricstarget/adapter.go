@@ -56,8 +56,8 @@ func makeTargetAdapterKService(o *v1alpha1.LogzMetricsTarget, cfg *adapterConfig
 		return nil, err
 	}
 
-	ksvcLabels := pkgreconciler.MakeAdapterLabels(adapterName, o.Name)
-	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, o.Name)
+	ksvcLabels := pkgreconciler.MakeAdapterLabels(adapterName, o)
+	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, o)
 	name := kmeta.ChildName(adapterName+"-", o.Name)
 	envSvc := pkgreconciler.MakeServiceEnv(o.Name, o.Namespace)
 	envObs := pkgreconciler.MakeObsEnv(cfg.configs)

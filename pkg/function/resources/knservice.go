@@ -21,6 +21,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	network "knative.dev/networking/pkg"
 	"knative.dev/pkg/kmeta"
@@ -110,6 +111,19 @@ func KnSvcLabel(labels map[string]string) KnSvcOption {
 			return
 		}
 		svc.SetLabels(labels)
+	}
+}
+
+// KnSvcPodLabels sets pod labels.
+func KnSvcPodLabels(ls labels.Set) KnSvcOption {
+	return func(svc *servingv1.Service) {
+		if svc.Spec.Template.Labels != nil {
+			for k, v := range ls {
+				svc.Spec.Template.Labels[k] = v
+			}
+			return
+		}
+		svc.Spec.Template.SetLabels(ls)
 	}
 }
 

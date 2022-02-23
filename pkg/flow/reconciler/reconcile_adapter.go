@@ -21,6 +21,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"knative.dev/eventing/pkg/reconciler/source"
+	"knative.dev/pkg/kmeta"
 )
 
 // MakeServiceEnv Adds default environment variables
@@ -52,7 +53,7 @@ func MakeObsEnv(cfg source.ConfigAccessor) []corev1.EnvVar {
 }
 
 // MakeAdapterLabels adds generic label generation
-func MakeAdapterLabels(adapterName, name string) labels.Set {
+func MakeAdapterLabels(adapterName string, object kmeta.OwnerRefable) labels.Set {
 	lbls := labels.Set{
 		resources.AppNameLabel:      adapterName,
 		resources.AppComponentLabel: resources.AdapterComponent,
@@ -60,8 +61,17 @@ func MakeAdapterLabels(adapterName, name string) labels.Set {
 		resources.AppManagedByLabel: resources.ManagedController,
 	}
 
-	if name != "" {
-		lbls[resources.AppInstanceLabel] = name
+	if object == nil {
+		return lbls
+	}
+
+	lbls[resources.AppInstanceLabel] = object.GetObjectMeta().GetName()
+
+	parentLabels := object.GetObjectMeta().GetLabels()
+	for _, key := range resources.LabelsPropagationList {
+		if value, exists := parentLabels[key]; exists {
+			lbls[key] = value
+		}
 	}
 
 	return lbls

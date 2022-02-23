@@ -25,6 +25,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
@@ -34,11 +35,6 @@ const (
 	envCredentialsJSON = "GOOGLE_CREDENTIALS_JSON"
 	envSheetID         = "SHEET_ID"
 	envDefaultPrefix   = "DEFAULT_SHEET_PREFIX"
-)
-
-const (
-	labelKnTargetController = "knative-eventing-target-controller"
-	labelKnTargetName       = "knative-eventing-target-name"
 )
 
 // TargetAdapterArgs are the arguments needed to create a Target Adapter.
@@ -53,13 +49,14 @@ type TargetAdapterArgs struct {
 func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 	name := kmeta.ChildName(targetPrefix+"-", args.Target.Name)
 	env := makeEnv(args)
-	labels := makeLabels(args.Target.Name)
+	ksvcLabels := libreconciler.MakeAdapterLabels(targetPrefix, args.Target)
+	podLabels := libreconciler.MakeAdapterLabels(targetPrefix, args.Target)
 
 	return &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: args.Target.Namespace,
 			Name:      name,
-			Labels:    labels,
+			Labels:    ksvcLabels,
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(args.Target),
 			},
@@ -67,6 +64,9 @@ func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 		Spec: servingv1.ServiceSpec{
 			ConfigurationSpec: servingv1.ConfigurationSpec{
 				Template: servingv1.RevisionTemplateSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: podLabels,
+					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec: corev1.PodSpec{
 							Containers: []corev1.Container{{
@@ -78,13 +78,6 @@ func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 				},
 			},
 		},
-	}
-}
-
-func makeLabels(name string) map[string]string {
-	return map[string]string{
-		labelKnTargetController: targetPrefix + "-controller",
-		labelKnTargetName:       name,
 	}
 }
 

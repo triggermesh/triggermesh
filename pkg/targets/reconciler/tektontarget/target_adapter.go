@@ -50,15 +50,15 @@ type TargetAdapterArgs struct {
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.TektonTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	podLabels := libreconciler.MakeAdapterLabels(adapterName, target)
+	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, target)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envApp := makeAppEnv(&target.Spec)
 	envs := append(append(envSvc, envObs...), envApp...)
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(lbl),
+		resources.KsvcLabels(ksvcLabels),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcServiceAccount(tektontargetServiceAccountName),
 		resources.KsvcOwner(target),
