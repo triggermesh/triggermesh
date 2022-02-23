@@ -6,7 +6,7 @@ go 1.17
 require (
 	github.com/cloudevents/sdk-go/v2 v2.8.0
 	knative.dev/eventing v0.29.0
-	knative.dev/pkg v0.0.0-20220118160532-77555ea48cd4
+	knative.dev/pkg v0.0.0-20220131144930-f4b57aef0006
 	knative.dev/serving v0.29.0
 )
 
@@ -63,7 +63,7 @@ require (
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sendgrid/sendgrid-go v3.11.0+incompatible
 	github.com/stretchr/testify v1.7.0
-	github.com/tektoncd/pipeline v0.32.1
+	github.com/tektoncd/pipeline v0.33.0
 	github.com/tidwall/gjson v1.14.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.27.0
@@ -142,7 +142,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/go-containerregistry v0.8.1-0.20220120151853-ac864e57b117 // indirect
+	github.com/google/go-containerregistry v0.8.1-0.20220211173031-41f8d92709b7 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/pprof v0.0.0-20210827144239-02619b876842 // indirect
@@ -219,7 +219,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.22.5 // indirect
 	k8s.io/gengo v0.0.0-20211129171323-c02415ce4185 // indirect
 	k8s.io/klog/v2 v2.40.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
+	k8s.io/kube-openapi v0.0.0-20220114203427-a0453230fd26 // indirect
 	k8s.io/utils v0.0.0-20211208161948-7d6a63dca704 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
