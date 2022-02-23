@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	"github.com/Azure/azure-amqp-common-go/v3/uuid"
-	servicebus "github.com/Azure/azure-service-bus-go"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
@@ -32,7 +32,7 @@ import (
 
 // MessageProcessor converts an Service Bus message to a CloudEvent.
 type MessageProcessor interface {
-	Process(*servicebus.Message) ([]*cloudevents.Event, error)
+	Process(*Message) ([]*cloudevents.Event, error)
 }
 
 var _ MessageProcessor = (*defaultMessageProcessor)(nil)
@@ -43,7 +43,7 @@ type defaultMessageProcessor struct {
 }
 
 // Process implements MessageProcessor.
-func (p *defaultMessageProcessor) Process(msg *servicebus.Message) ([]*cloudevents.Event, error) {
+func (p *defaultMessageProcessor) Process(msg *Message) ([]*cloudevents.Event, error) {
 	event, err := makeServiceBusEvent(msg, p.ceSource)
 	if err != nil {
 		return nil, fmt.Errorf("creating CloudEvent from Service Bus message: %w", err)
@@ -53,16 +53,16 @@ func (p *defaultMessageProcessor) Process(msg *servicebus.Message) ([]*cloudeven
 }
 
 // makeServiceBusEvent returns a CloudEvent for a generic Service Bus message.
-func makeServiceBusEvent(msg *servicebus.Message, srcAttr string) (*cloudevents.Event, error) {
+func makeServiceBusEvent(msg *Message, srcAttr string) (*cloudevents.Event, error) {
 	ceData := toCloudEventData(msg)
 
 	event := cloudevents.NewEvent()
-	event.SetID(msg.ID)
+	event.SetID(msg.ReceivedMessage.MessageID)
 	event.SetSource(srcAttr)
 	event.SetType(v1alpha1.AzureEventType(sources.AzureServiceServiceBus, v1alpha1.AzureServiceBusGenericEventType))
 
-	if sysProps := msg.SystemProperties; sysProps != nil && sysProps.EnqueuedTime != nil {
-		event.SetTime(*sysProps.EnqueuedTime)
+	if msg.ScheduledEnqueueTime != nil {
+		event.SetTime(*msg.ScheduledEnqueueTime)
 	}
 
 	if err := event.SetData(cloudevents.ApplicationJSON, ceData); err != nil {
@@ -72,43 +72,53 @@ func makeServiceBusEvent(msg *servicebus.Message, srcAttr string) (*cloudevents.
 	return &event, nil
 }
 
-// toCloudEventData returns a servicebus.Message in a shape that is suitable for
+// toCloudEventData returns a servicebus.ReceivedMessage in a shape that is suitable for
 // JSON serialization inside some CloudEvent data.
-func toCloudEventData(msg *servicebus.Message) interface{} {
+func toCloudEventData(msg *Message) interface{} {
 	var data interface{}
 
-	serialMsg := &Message{
-		LockToken: stringifyLockToken(msg.LockToken),
-		Message:   msg,
-	}
+	data = msg
 
-	data = serialMsg
-
-	// if event.Data contains raw JSON data, type it as json.RawMessage so
+	// if msg.Data contains raw JSON data, type it as json.RawMessage so
 	// it doesn't get encoded to base64 during the serialization of the
 	// CloudEvent data.
 	var rawData json.RawMessage
 	if err := json.Unmarshal(msg.Data, &rawData); err == nil {
 		data = &MessageWithRawJSONData{
 			Data:    rawData,
-			Message: serialMsg,
+			Message: msg,
 		}
 	}
 
 	return data
 }
 
-// Message is a servicebus.Message with some selected fields shadowed for
+// Message is a servicebus.ReceivedMessage with some selected fields shadowed for
 // improved serialization.
 type Message struct {
+	Data []byte
+	azservicebus.ReceivedMessage
 	LockToken *string
-	*servicebus.Message
 }
 
-// MessageWithRawJSONData is an Message with RawMessage-typed JSON data.
+// MessageWithRawJSONData is an ReceivedMessage with RawMessage-typed JSON data.
 type MessageWithRawJSONData struct {
 	Data json.RawMessage
 	*Message
+}
+
+// toMessage converts a azservicebus.ReceivedMessage into a Message
+func toMessage(rcvMsg *azservicebus.ReceivedMessage) (*Message, error) {
+	body, err := rcvMsg.Body()
+	if err != nil {
+		return nil, fmt.Errorf("reading message data: %w", err)
+	}
+
+	return &Message{
+		Data:            body,
+		ReceivedMessage: *rcvMsg,
+		LockToken:       stringifyLockToken((*uuid.UUID)(&rcvMsg.LockToken)),
+	}, nil
 }
 
 // stringifyLockToken converts a UUID byte-array into its string representation.
