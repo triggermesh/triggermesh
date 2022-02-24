@@ -52,8 +52,8 @@ func MakeObsEnv(cfg source.ConfigAccessor) []corev1.EnvVar {
 	return env
 }
 
-// MakeAdapterLabels adds generic label generation
-func MakeAdapterLabels(adapterName string, object kmeta.OwnerRefable) labels.Set {
+// MakeGenericLabels returns generic labels set.
+func MakeGenericLabels(adapterName string, componentName string) labels.Set {
 	lbls := labels.Set{
 		resources.AppNameLabel:      adapterName,
 		resources.AppComponentLabel: resources.AdapterComponent,
@@ -61,18 +61,27 @@ func MakeAdapterLabels(adapterName string, object kmeta.OwnerRefable) labels.Set
 		resources.AppManagedByLabel: resources.ManagedController,
 	}
 
-	if object == nil {
-		return lbls
-	}
-
-	lbls[resources.AppInstanceLabel] = object.GetObjectMeta().GetName()
-
-	parentLabels := object.GetObjectMeta().GetLabels()
-	for _, key := range resources.LabelsPropagationList {
-		if value, exists := parentLabels[key]; exists {
-			lbls[key] = value
-		}
+	if componentName != "" {
+		lbls[resources.AppInstanceLabel] = componentName
 	}
 
 	return lbls
+}
+
+// PropagateCommonLabels adds common labels to the existing label set.
+func PropagateCommonLabels(object kmeta.OwnerRefable, genericLabels labels.Set) labels.Set {
+	parentLabels := object.GetObjectMeta().GetLabels()
+	adapterLabels := make(labels.Set)
+
+	for _, key := range resources.LabelsPropagationList {
+		if value, exists := parentLabels[key]; exists {
+			adapterLabels[key] = value
+		}
+	}
+
+	for k, v := range genericLabels {
+		adapterLabels[k] = v
+	}
+
+	return adapterLabels
 }

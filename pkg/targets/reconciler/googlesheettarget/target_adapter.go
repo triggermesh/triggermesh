@@ -49,8 +49,9 @@ type TargetAdapterArgs struct {
 func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 	name := kmeta.ChildName(targetPrefix+"-", args.Target.Name)
 	env := makeEnv(args)
-	ksvcLabels := libreconciler.MakeAdapterLabels(targetPrefix, args.Target)
-	podLabels := libreconciler.MakeAdapterLabels(targetPrefix, args.Target)
+	genericLabels := libreconciler.MakeGenericLabels(targetPrefix, args.Target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(args.Target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(args.Target, genericLabels)
 
 	return &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{

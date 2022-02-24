@@ -42,8 +42,9 @@ type adapterConfig struct {
 
 // makeAdapterKnService returns a Knative Service object for the target's adapter.
 func makeAdapterKnService(o *v1alpha1.HasuraTarget, cfg *adapterConfig) (*servingv1.Service, error) {
-	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, o)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, o)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
 	name := kmeta.ChildName(adapterName+"-", o.Name)
 	env := libreconciler.MakeObsEnv(cfg.configs)
 	envSvc := libreconciler.MakeServiceEnv(o.Name, o.Namespace)

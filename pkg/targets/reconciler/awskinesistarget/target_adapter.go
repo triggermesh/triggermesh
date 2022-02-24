@@ -42,8 +42,9 @@ type adapterConfig struct {
 }
 
 func makeTargetKinesisAdapterKService(target *v1alpha1.AWSKinesisTarget, cfg *adapterConfig) *servingv1.Service {
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target)
-	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, target)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeCommonAppEnv(&target.Spec.AWSApiKey, &target.Spec.AWSApiSecret, target.Spec.ARN, target.Spec.DiscardCEContext, &target.Spec.Partition)

@@ -139,8 +139,9 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, trn *v1alpha1.Trans
 		return nil, fmt.Errorf("cannot marshal data transformation spec: %w", err)
 	}
 
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, trn)
-	ksvcLabels := podLabels
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, trn.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
 	ksvcLabels[pkgnetwork.VisibilityLabelKey] = serving.VisibilityClusterLocal
 
 	expectedKsvc := resources.NewKnService(trn.Namespace, trn.Name,

@@ -50,8 +50,9 @@ type adapterConfig struct {
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.AlibabaOSSTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, target)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeAppEnv(target)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)

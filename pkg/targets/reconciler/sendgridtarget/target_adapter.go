@@ -47,8 +47,9 @@ type TargetAdapterArgs struct {
 
 // MakeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.SendGridTarget, cfg *adapterConfig) *servingv1.Service {
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target)
-	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, target)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
 	name := kmeta.ChildName(adapterName+"-", target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeAppEnv(target)

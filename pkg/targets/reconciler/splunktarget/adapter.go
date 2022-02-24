@@ -54,8 +54,9 @@ type adapterConfig struct {
 
 // makeAdapterKnService returns a Knative Service object for the target's adapter.
 func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *servingv1.Service {
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, o)
-	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, o)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
 
 	ksvcLabels[network.VisibilityLabelKey] = serving.VisibilityClusterLocal
 

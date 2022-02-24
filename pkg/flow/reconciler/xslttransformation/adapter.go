@@ -55,8 +55,9 @@ func makeAdapterKService(o *v1alpha1.XSLTTransformation, cfg *adapterConfig, sin
 		return nil, err
 	}
 
-	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, o)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, o)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
 	name := kmeta.ChildName(adapterName+"-", o.Name)
 	envSvc := libreconciler.MakeServiceEnv(o.Name, o.Namespace)
 	envObs := libreconciler.MakeObsEnv(cfg.configs)

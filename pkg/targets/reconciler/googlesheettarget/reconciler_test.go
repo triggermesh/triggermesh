@@ -299,13 +299,14 @@ func newAdapterService() *servingv1.Service {
 		(&v1alpha1.GoogleSheetTarget{}).GetGroupVersionKind(),
 		tUID,
 	)
-	labels := libreconciler.MakeAdapterLabels(targetPrefix, owner)
+	labels := libreconciler.MakeGenericLabels(targetPrefix, tName)
+	adapterLabels := libreconciler.PropagateCommonLabels(owner, labels)
 
 	return &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
 			Name:      tGenName,
-			Labels:    labels,
+			Labels:    adapterLabels,
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(owner),
 			},
@@ -314,7 +315,7 @@ func newAdapterService() *servingv1.Service {
 			ConfigurationSpec: servingv1.ConfigurationSpec{
 				Template: servingv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
-						Labels: labels,
+						Labels: adapterLabels,
 					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec: corev1.PodSpec{

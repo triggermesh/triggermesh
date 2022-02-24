@@ -45,7 +45,6 @@ import (
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/extensions/v1alpha1/function"
 	"github.com/triggermesh/triggermesh/pkg/function/resources"
 	"github.com/triggermesh/triggermesh/pkg/function/semantic"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const (
@@ -225,8 +224,11 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		responseMode = "event"
 	}
 
-	lbl := libreconciler.MakeAdapterLabels(adapterName, f)
-	lbl[functionNameLabel] = f.Name
+	genericLabels := resources.MakeGenericLabels(adapterName, f.Name)
+	ksvcLabels := resources.PropagateCommonLabels(f, genericLabels)
+	podLabels := resources.PropagateCommonLabels(f, genericLabels)
+
+	ksvcLabels[functionNameLabel] = f.Name
 
 	expectedKsvc := resources.NewKnService(f.Name+"-"+rand.String(6), f.Namespace,
 		resources.KnSvcImage(image),
@@ -240,8 +242,8 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		resources.KnSvcEnvVars(sortedEnvVarsWithPrefix("CE_OVERRIDES_", overrides)...),
 		resources.KnSvcAnnotation("extensions.triggermesh.io/codeVersion", cm.ResourceVersion),
 		resources.KnSvcVisibility(f.Spec.Public),
-		resources.KnSvcLabel(lbl),
-		resources.KnSvcPodLabels(lbl),
+		resources.KnSvcLabel(ksvcLabels),
+		resources.KnSvcPodLabels(podLabels),
 		resources.KnSvcOwner(f),
 	)
 

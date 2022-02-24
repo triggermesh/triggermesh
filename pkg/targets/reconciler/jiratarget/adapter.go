@@ -49,8 +49,9 @@ type adapterConfig struct {
 func makeAdapterKnService(o *v1alpha1.JiraTarget, cfg *adapterConfig) *servingv1.Service {
 	envApp := makeCommonAppEnv(o)
 
-	ksvcLabels := pkgreconciler.MakeAdapterLabels(adapterName, o)
-	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, o)
+	genericLabels := pkgreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
 	name := kmeta.ChildName(adapterName+"-", o.Name)
 	envSvc := pkgreconciler.MakeServiceEnv(o.Name, o.Namespace)
 	envObs := pkgreconciler.MakeObsEnv(cfg.configs)

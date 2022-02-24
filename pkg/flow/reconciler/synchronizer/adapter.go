@@ -44,7 +44,9 @@ type adapterConfig struct {
 // makeAdapterKService generates (but does not insert into K8s) the Synchronizer Adapter KService.
 func makeAdapterKService(o *v1alpha1.Synchronizer, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", o.Name)
-	lbl := libreconciler.MakeAdapterLabels(adapterName, o)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
 	envSvc := libreconciler.MakeServiceEnv(name, o.Namespace)
 	envApp := makeAppEnv(o)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
@@ -52,10 +54,10 @@ func makeAdapterKService(o *v1alpha1.Synchronizer, cfg *adapterConfig) *servingv
 	envs = append(envs, envObs...)
 
 	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(lbl),
+		resources.KsvcLabels(ksvcLabels),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcOwner(o),
-		resources.KsvcPodLabels(lbl),
+		resources.KsvcPodLabels(podLabels),
 		resources.KsvcPodEnvVars(envs),
 	)
 }

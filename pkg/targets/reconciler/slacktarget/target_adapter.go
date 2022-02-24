@@ -42,13 +42,15 @@ type TargetAdapterArgs struct {
 
 // MakeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
-	labels := libreconciler.MakeAdapterLabels(targetPrefix, args.Target)
+	genericLabels := libreconciler.MakeGenericLabels(targetPrefix, args.Target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(args.Target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(args.Target, genericLabels)
 	name := kmeta.ChildName(fmt.Sprintf("%s-%s", targetPrefix, args.Target.Name), "")
 	return &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: args.Target.Namespace,
 			Name:      name,
-			Labels:    labels,
+			Labels:    ksvcLabels,
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(args.Target),
 			},
@@ -57,7 +59,7 @@ func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
 			ConfigurationSpec: servingv1.ConfigurationSpec{
 				Template: servingv1.RevisionTemplateSpec{
 					ObjectMeta: metav1.ObjectMeta{
-						Labels: labels,
+						Labels: podLabels,
 					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec: corev1.PodSpec{
