@@ -38,7 +38,7 @@ const (
 	componentAdapter = "adapter"
 )
 
-// LabelsPropagationList is the list of labels that should be propagated to the adapters.
+// labelsPropagationList is the list of labels that should be propagated to the adapters.
 var labelsPropagationList = []string{
 	"bridges.triggermesh.io/id",
 }
