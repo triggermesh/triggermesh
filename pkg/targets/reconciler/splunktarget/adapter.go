@@ -21,7 +21,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	network "knative.dev/networking/pkg"
@@ -31,6 +30,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
@@ -54,23 +54,11 @@ type adapterConfig struct {
 
 // makeAdapterKnService returns a Knative Service object for the target's adapter.
 func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *servingv1.Service {
-	svcLabels := labels.Set{
-		resources.AppNameLabel:      adapterName,
-		resources.AppInstanceLabel:  o.Name,
-		resources.AppComponentLabel: resources.AdapterComponent,
-		resources.AppPartOfLabel:    partOf,
-		resources.AppManagedByLabel: resources.ManagedController,
-		// do not expose the service publicly
-		network.VisibilityLabelKey: serving.VisibilityClusterLocal,
-	}
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
 
-	podLabels := labels.Set{
-		resources.AppNameLabel:      adapterName,
-		resources.AppInstanceLabel:  o.Name,
-		resources.AppComponentLabel: resources.AdapterComponent,
-		resources.AppPartOfLabel:    partOf,
-		resources.AppManagedByLabel: resources.ManagedController,
-	}
+	ksvcLabels[network.VisibilityLabelKey] = serving.VisibilityClusterLocal
 
 	hecURL := apis.URL{
 		Scheme: o.Spec.Endpoint.Scheme,
@@ -141,7 +129,7 @@ func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *serving
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: o.Namespace,
 			Name:      kmeta.ChildName(adapterName+"-", o.Name),
-			Labels:    svcLabels,
+			Labels:    ksvcLabels,
 			OwnerReferences: []metav1.OwnerReference{
 				*kmeta.NewControllerRef(o),
 			},

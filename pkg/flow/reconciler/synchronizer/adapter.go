@@ -26,8 +26,8 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
 )
 
 const adapterName = "synchronizer"
@@ -44,8 +44,9 @@ type adapterConfig struct {
 // makeAdapterKService generates (but does not insert into K8s) the Synchronizer Adapter KService.
 func makeAdapterKService(o *v1alpha1.Synchronizer, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", o.Name)
-	lbl := libreconciler.MakeAdapterLabels(adapterName, o.Name)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, o.Name)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
 	envSvc := libreconciler.MakeServiceEnv(name, o.Namespace)
 	envApp := makeAppEnv(o)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
@@ -53,7 +54,7 @@ func makeAdapterKService(o *v1alpha1.Synchronizer, cfg *adapterConfig) *servingv
 	envs = append(envs, envObs...)
 
 	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(lbl),
+		resources.KsvcLabels(ksvcLabels),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcOwner(o),
 		resources.KsvcPodLabels(podLabels),

@@ -58,8 +58,9 @@ type adapterConfig struct {
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := []corev1.EnvVar{}
@@ -86,10 +87,10 @@ func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapt
 	}
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(lbl),
+		resources.KsvcLabels(podLabels),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
+		resources.KsvcPodLabels(ksvcLabels),
 		resources.KsvcPodEnvVars(envs),
 		resources.EnvVar(envHubNamespace, target.Spec.EventHubID.Namespace),
 		resources.EnvVar(envHubName, target.Spec.EventHubID.EventHub),

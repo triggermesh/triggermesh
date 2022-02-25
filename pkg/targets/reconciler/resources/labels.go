@@ -37,3 +37,9 @@ const (
 	ManagedController = "knative-targets-controller"
 	AdapterComponent  = "adapter"
 )
+
+// LabelsPropagationList is the list of labels that should be propagated to the adapters.
+var LabelsPropagationList = []string{
+	"bridges.triggermesh.io/id",
+	"flow.triggermesh.io/created-by",
+}

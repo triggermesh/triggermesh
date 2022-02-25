@@ -21,6 +21,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"knative.dev/eventing/pkg/reconciler/source"
+	"knative.dev/pkg/kmeta"
 )
 
 // MakeServiceEnv Adds default environment variables
@@ -51,8 +52,8 @@ func MakeObsEnv(cfg source.ConfigAccessor) []corev1.EnvVar {
 	return env
 }
 
-// MakeAdapterLabels adds generic label generation
-func MakeAdapterLabels(adapterName, name string) labels.Set {
+// MakeGenericLabels returns generic labels set.
+func MakeGenericLabels(adapterName string, componentName string) labels.Set {
 	lbls := labels.Set{
 		resources.AppNameLabel:      adapterName,
 		resources.AppComponentLabel: resources.AdapterComponent,
@@ -60,9 +61,27 @@ func MakeAdapterLabels(adapterName, name string) labels.Set {
 		resources.AppManagedByLabel: resources.ManagedController,
 	}
 
-	if name != "" {
-		lbls[resources.AppInstanceLabel] = name
+	if componentName != "" {
+		lbls[resources.AppInstanceLabel] = componentName
 	}
 
 	return lbls
+}
+
+// PropagateCommonLabels adds common labels to the existing label set.
+func PropagateCommonLabels(object kmeta.OwnerRefable, genericLabels labels.Set) labels.Set {
+	parentLabels := object.GetObjectMeta().GetLabels()
+	adapterLabels := make(labels.Set)
+
+	for _, key := range resources.LabelsPropagationList {
+		if value, exists := parentLabels[key]; exists {
+			adapterLabels[key] = value
+		}
+	}
+
+	for k, v := range genericLabels {
+		adapterLabels[k] = v
+	}
+
+	return adapterLabels
 }

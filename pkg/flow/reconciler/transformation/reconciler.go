@@ -27,6 +27,7 @@ import (
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	pkgnetwork "knative.dev/networking/pkg"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/logging"
@@ -34,16 +35,20 @@ import (
 	"knative.dev/pkg/reconciler"
 	"knative.dev/pkg/resolver"
 	"knative.dev/pkg/tracker"
+	"knative.dev/serving/pkg/apis/serving"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 	servingv1client "knative.dev/serving/pkg/client/clientset/versioned"
 	servingv1listers "knative.dev/serving/pkg/client/listers/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation/resources"
 )
 
 const (
+	adapterName = "bumblebee"
+
 	envSink               = "K_SINK"
 	envTransformationCtx  = "TRANSFORMATION_CONTEXT"
 	envTransformationData = "TRANSFORMATION_DATA"
@@ -134,12 +139,18 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, trn *v1alpha1.Trans
 		return nil, fmt.Errorf("cannot marshal data transformation spec: %w", err)
 	}
 
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, trn.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
+	ksvcLabels[pkgnetwork.VisibilityLabelKey] = serving.VisibilityClusterLocal
+
 	expectedKsvc := resources.NewKnService(trn.Namespace, trn.Name,
 		resources.Image(r.transformerImage),
 		resources.EnvVar(envTransformationCtx, string(trnContext)),
 		resources.EnvVar(envTransformationData, string(trnData)),
 		resources.EnvVar(envSink, sink),
-		resources.KsvcLabelVisibilityClusterLocal(),
+		resources.KsvcLabels(ksvcLabels),
+		resources.KsvcPodLabels(podLabels),
 		resources.Owner(trn),
 	)
 

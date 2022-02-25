@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package common
+package resources
+
+import (
+	"k8s.io/apimachinery/pkg/labels"
+	"knative.dev/pkg/kmeta"
+)
 
 // Kubernetes recommended labels
 // https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/
@@ -38,8 +43,42 @@ const (
 	componentAdapter = "adapter"
 )
 
-// labelsPropagationList is the list of labels that should be propagated to the adapters.
+// LabelsPropagationList is the list of labels that should be propagated to the adapters.
 var labelsPropagationList = []string{
 	"bridges.triggermesh.io/id",
 	"flow.triggermesh.io/created-by",
+}
+
+// MakeGenericLabels returns generic labels set.
+func MakeGenericLabels(adapterName string, componentName string) labels.Set {
+	lbls := labels.Set{
+		appNameLabel:      adapterName,
+		appComponentLabel: componentAdapter,
+		appPartOfLabel:    partOf,
+		appManagedByLabel: managedBy,
+	}
+
+	if componentName != "" {
+		lbls[appInstanceLabel] = componentName
+	}
+
+	return lbls
+}
+
+// PropagateCommonLabels adds common labels to the existing label set.
+func PropagateCommonLabels(object kmeta.OwnerRefable, genericLabels labels.Set) labels.Set {
+	parentLabels := object.GetObjectMeta().GetLabels()
+	adapterLabels := make(labels.Set)
+
+	for _, key := range labelsPropagationList {
+		if value, exists := parentLabels[key]; exists {
+			adapterLabels[key] = value
+		}
+	}
+
+	for k, v := range genericLabels {
+		adapterLabels[k] = v
+	}
+
+	return adapterLabels
 }

@@ -50,8 +50,9 @@ type adapterConfig struct {
 // makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
 func makeTargetAdapterKService(target *v1alpha1.AWSComprehendTarget, cfg *adapterConfig) *servingv1.Service {
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	lbl := libreconciler.MakeAdapterLabels(adapterName, target.Name)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeAppEnv(&target.Spec)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
@@ -59,10 +60,10 @@ func makeTargetAdapterKService(target *v1alpha1.AWSComprehendTarget, cfg *adapte
 	envs = append(envs, envObs...)
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(lbl),
+		resources.KsvcLabels(podLabels),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
+		resources.KsvcPodLabels(ksvcLabels),
 		resources.KsvcPodEnvVars(envs),
 	)
 }

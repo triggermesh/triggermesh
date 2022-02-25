@@ -39,36 +39,36 @@ import (
 const metricsPrometheusPortKsvc uint16 = 9092
 
 // ComponentName returns the component name for the given source object.
-func ComponentName(src kmeta.OwnerRefable) string {
-	return strings.ToLower(src.GetGroupVersionKind().Kind)
+func ComponentName(rtr kmeta.OwnerRefable) string {
+	return strings.ToLower(rtr.GetGroupVersionKind().Kind)
 }
 
 // MTAdapterObjectName returns a unique name to apply to all objects related to
 // the given source's multi-tenant adapter (RBAC, KnService, ...).
-func MTAdapterObjectName(src kmeta.OwnerRefable) string {
-	return ComponentName(src) + "-" + componentAdapter
+func MTAdapterObjectName(rtr kmeta.OwnerRefable) string {
+	return ComponentName(rtr) + "-" + componentAdapter
 }
 
 // NewMTAdapterKnService is a wrapper around resource.NewKnService which
 // pre-populates attributes common to all multi-tenant adapters backed by a
 // Knative Service.
-func NewMTAdapterKnService(src v1alpha1.Router, opts ...resource.ObjectOption) *servingv1.Service {
-	srcNs := src.GetNamespace()
+func NewMTAdapterKnService(rtr v1alpha1.Router, opts ...resource.ObjectOption) *servingv1.Service {
+	rtrNs := rtr.GetNamespace()
 
-	return resource.NewKnService(srcNs, MTAdapterObjectName(src),
-		append(commonAdapterKnServiceOptions(src), append([]resource.ObjectOption{
-			resource.EnvVar(EnvNamespace, srcNs),
-			resource.EnvVar(system.NamespaceEnvKey, srcNs), // required to enable HA
+	return resource.NewKnService(rtrNs, MTAdapterObjectName(rtr),
+		append(commonAdapterKnServiceOptions(rtr), append([]resource.ObjectOption{
+			resource.EnvVar(EnvNamespace, rtrNs),
+			resource.EnvVar(system.NamespaceEnvKey, rtrNs), // required to enable HA
 		}, opts...)...)...,
 	)
 }
 
 // commonAdapterKnServiceOptions returns a set of ObjectOptions common to all
 // adapters backed by a Knative Service.
-func commonAdapterKnServiceOptions(src v1alpha1.Router) []resource.ObjectOption {
-	app := ComponentName(src)
+func commonAdapterKnServiceOptions(rtr v1alpha1.Router) []resource.ObjectOption {
+	app := ComponentName(rtr)
 
-	return []resource.ObjectOption{
+	objectOptions := []resource.ObjectOption{
 		resource.Label(appNameLabel, app),
 		resource.Label(appComponentLabel, componentAdapter),
 		resource.Label(appPartOfLabel, partOf),
@@ -80,16 +80,26 @@ func commonAdapterKnServiceOptions(src v1alpha1.Router) []resource.ObjectOption 
 		resource.PodLabel(appPartOfLabel, partOf),
 		resource.PodLabel(appManagedByLabel, managedBy),
 
-		resource.ServiceAccount(MTAdapterObjectName(src)),
+		resource.ServiceAccount(MTAdapterObjectName(rtr)),
 
 		resource.EnvVar(envComponent, app),
 		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
 	}
+
+	parentLabels := rtr.GetLabels()
+	for _, key := range labelsPropagationList {
+		if value, exists := parentLabels[key]; exists {
+			objectOptions = append(objectOptions, resource.Label(key, value))
+			objectOptions = append(objectOptions, resource.PodLabel(key, value))
+		}
+	}
+
+	return objectOptions
 }
 
 // newServiceAccount returns a ServiceAccount object with its OwnerReferences
 // metadata attribute populated from the given owners.
-func newServiceAccount(src v1alpha1.Router, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
+func newServiceAccount(rtr v1alpha1.Router, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
 	ownerRefs := make([]metav1.OwnerReference, len(owners))
 	for i, owner := range owners {
 		ownerRefs[i] = *kmeta.NewControllerRef(owner)
@@ -98,10 +108,10 @@ func newServiceAccount(src v1alpha1.Router, owners []kmeta.OwnerRefable) *corev1
 
 	return &corev1.ServiceAccount{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace:       src.GetNamespace(),
-			Name:            MTAdapterObjectName(src),
+			Namespace:       rtr.GetNamespace(),
+			Name:            MTAdapterObjectName(rtr),
 			OwnerReferences: ownerRefs,
-			Labels:          CommonObjectLabels(src),
+			Labels:          CommonObjectLabels(rtr),
 		},
 	}
 
@@ -109,18 +119,18 @@ func newServiceAccount(src v1alpha1.Router, owners []kmeta.OwnerRefable) *corev1
 
 // newRoleBinding returns a RoleBinding object that binds a ServiceAccount
 // (namespace-scoped) to a ClusterRole (cluster-scoped).
-func newRoleBinding(src v1alpha1.Router, owner *corev1.ServiceAccount) *rbacv1.RoleBinding {
+func newRoleBinding(rtr v1alpha1.Router, owner *corev1.ServiceAccount) *rbacv1.RoleBinding {
 	crGVK := rbacv1.SchemeGroupVersion.WithKind("ClusterRole")
 	saGVK := corev1.SchemeGroupVersion.WithKind("ServiceAccount")
 
-	ns := src.GetNamespace()
-	n := MTAdapterObjectName(src)
+	ns := rtr.GetNamespace()
+	n := MTAdapterObjectName(rtr)
 
 	rb := &rbacv1.RoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: ns,
 			Name:      n,
-			Labels:    CommonObjectLabels(src),
+			Labels:    CommonObjectLabels(rtr),
 		},
 		RoleRef: rbacv1.RoleRef{
 			APIGroup: crGVK.Group,
@@ -151,9 +161,9 @@ func OwnByServiceAccount(obj metav1.Object, owner *corev1.ServiceAccount) {
 
 // CommonObjectLabels returns a set of labels which are always applied to
 // objects reconciled for the given source type.
-func CommonObjectLabels(src kmeta.OwnerRefable) labels.Set {
+func CommonObjectLabels(rtr kmeta.OwnerRefable) labels.Set {
 	return labels.Set{
-		appNameLabel:      ComponentName(src),
+		appNameLabel:      ComponentName(rtr),
 		appComponentLabel: componentAdapter,
 		appPartOfLabel:    partOf,
 		appManagedByLabel: managedBy,

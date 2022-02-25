@@ -294,25 +294,29 @@ func newEventTargetServiceNotReady() *v1alpha1.GoogleSheetTarget {
 
 // newAdapterService returns a test Service object with pre-filled attributes.
 func newAdapterService() *servingv1.Service {
+	owner := NewOwnerRefable(
+		tName,
+		(&v1alpha1.GoogleSheetTarget{}).GetGroupVersionKind(),
+		tUID,
+	)
+	labels := libreconciler.MakeGenericLabels(targetPrefix, tName)
+	adapterLabels := libreconciler.PropagateCommonLabels(owner, labels)
+
 	return &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
 			Name:      tGenName,
-			Labels: map[string]string{
-				labelKnTargetController: targetPrefix + "-controller",
-				labelKnTargetName:       tName,
-			},
+			Labels:    adapterLabels,
 			OwnerReferences: []metav1.OwnerReference{
-				*kmeta.NewControllerRef(NewOwnerRefable(
-					tName,
-					(&v1alpha1.GoogleSheetTarget{}).GetGroupVersionKind(),
-					tUID,
-				)),
+				*kmeta.NewControllerRef(owner),
 			},
 		},
 		Spec: servingv1.ServiceSpec{
 			ConfigurationSpec: servingv1.ConfigurationSpec{
 				Template: servingv1.RevisionTemplateSpec{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: adapterLabels,
+					},
 					Spec: servingv1.RevisionSpec{
 						PodSpec: corev1.PodSpec{
 							Containers: []corev1.Container{{

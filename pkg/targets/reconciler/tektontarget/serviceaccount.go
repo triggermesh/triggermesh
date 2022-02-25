@@ -188,7 +188,7 @@ func newServiceAccount(ns string, tts []*v1alpha1.TektonTarget) *corev1.ServiceA
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace:       ns,
 			Name:            tektontargetServiceAccountName,
-			Labels:          libreconciler.MakeAdapterLabels(adapterName, ""),
+			Labels:          libreconciler.MakeGenericLabels(adapterName, ""),
 			OwnerReferences: ownerRefs,
 		},
 	}
@@ -203,7 +203,7 @@ func newRoleBinding(owner *corev1.ServiceAccount) *rbacv1.RoleBinding {
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: owner.Namespace,
 			Name:      tektontargetServiceAccountName,
-			Labels:    libreconciler.MakeAdapterLabels(adapterName, ""),
+			Labels:    libreconciler.MakeGenericLabels(adapterName, ""),
 			OwnerReferences: []metav1.OwnerReference{
 				*metav1.NewControllerRef(owner, saGVK),
 			},

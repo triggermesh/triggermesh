@@ -37,3 +37,9 @@ const (
 	managedBy        = "triggermesh-controller"
 	componentAdapter = "adapter"
 )
+
+// LabelsPropagationList is the list of labels that should be propagated to the adapters.
+var labelsPropagationList = []string{
+	"bridges.triggermesh.io/id",
+	"flow.triggermesh.io/created-by",
+}

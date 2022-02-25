@@ -42,9 +42,10 @@ type adapterConfig struct {
 }
 
 func makeTargetSNSAdapterKService(target *v1alpha1.AWSSNSTarget, cfg *adapterConfig) *servingv1.Service {
-	labels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
 	name := kmeta.ChildName(adapterName+"-", target.Name)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target.Name)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
 	envApp := makeCommonAppEnv(&target.Spec.AWSApiKey, &target.Spec.AWSApiSecret, target.Spec.ARN, target.Spec.DiscardCEContext)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
@@ -52,7 +53,7 @@ func makeTargetSNSAdapterKService(target *v1alpha1.AWSSNSTarget, cfg *adapterCon
 	envs = append(envs, envObs...)
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(labels),
+		resources.KsvcLabels(ksvcLabels),
 		resources.KsvcLabelVisibilityClusterLocal,
 		resources.KsvcOwner(target),
 		resources.KsvcPodLabels(podLabels),

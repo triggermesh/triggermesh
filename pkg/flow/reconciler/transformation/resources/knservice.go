@@ -19,10 +19,9 @@ package resources
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
-	network "knative.dev/networking/pkg"
 	"knative.dev/pkg/kmeta"
-	serving "knative.dev/serving/pkg/apis/serving"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
@@ -107,16 +106,16 @@ func firstContainer(svc *servingv1.Service) *corev1.Container {
 	return &(*containers)[0]
 }
 
-// KsvcLabelVisibilityClusterLocal sets label to avoid exposing the service externally.
-func KsvcLabelVisibilityClusterLocal() Option {
-	return func(svc *servingv1.Service) {
-		if svc.Labels != nil {
-			svc.Labels[network.VisibilityLabelKey] = serving.VisibilityClusterLocal
-			return
-		}
-		labels := map[string]string{
-			network.VisibilityLabelKey: serving.VisibilityClusterLocal,
-		}
-		svc.Labels = labels
+// KsvcLabels sets labels.
+func KsvcLabels(ls labels.Set) Option {
+	return func(ksvc *servingv1.Service) {
+		ksvc.SetLabels(ls)
+	}
+}
+
+// KsvcPodLabels sets pod labels.
+func KsvcPodLabels(ls labels.Set) Option {
+	return func(ksvc *servingv1.Service) {
+		ksvc.Spec.Template.SetLabels(ls)
 	}
 }

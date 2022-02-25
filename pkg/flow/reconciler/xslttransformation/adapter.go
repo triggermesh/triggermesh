@@ -27,7 +27,7 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
 )
 
@@ -55,11 +55,12 @@ func makeAdapterKService(o *v1alpha1.XSLTTransformation, cfg *adapterConfig, sin
 		return nil, err
 	}
 
-	ksvcLabels := pkgreconciler.MakeAdapterLabels(adapterName, o.Name)
-	podLabels := pkgreconciler.MakeAdapterLabels(adapterName, o.Name)
+	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
+	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
 	name := kmeta.ChildName(adapterName+"-", o.Name)
-	envSvc := pkgreconciler.MakeServiceEnv(o.Name, o.Namespace)
-	envObs := pkgreconciler.MakeObsEnv(cfg.configs)
+	envSvc := libreconciler.MakeServiceEnv(o.Name, o.Namespace)
+	envObs := libreconciler.MakeObsEnv(cfg.configs)
 	envs := append(envSvc, append(envApp, envObs...)...)
 
 	return resources.MakeKService(o.Namespace, name, cfg.Image,
@@ -74,8 +75,8 @@ func makeAppEnv(o *v1alpha1.XSLTTransformation, sink *apis.URL) ([]corev1.EnvVar
 	env := []corev1.EnvVar{
 		*o.Spec.XSLT.ToEnvironmentVariable(envXSLT),
 		{
-			Name:  pkgreconciler.EnvBridgeID,
-			Value: pkgreconciler.GetStatefulBridgeID(o),
+			Name:  libreconciler.EnvBridgeID,
+			Value: libreconciler.GetStatefulBridgeID(o),
 		},
 	}
 
