@@ -46,6 +46,7 @@ const (
 // LabelsPropagationList is the list of labels that should be propagated to the adapters.
 var labelsPropagationList = []string{
 	"bridges.triggermesh.io/id",
+	"flow.triggermesh.io/created-by",
 }
 
 // MakeGenericLabels returns generic labels set.
