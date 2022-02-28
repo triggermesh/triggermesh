@@ -24,7 +24,7 @@ jobs:
     # Therefore, this step should remain the first one that is executed after
     # the Go setup, in case other steps are added to this job in the future.
     - name: Lint Go code
-      uses: golangci/golangci-lint-action@v2
+      uses: golangci/golangci-lint-action@v3.1.0
       with:
         skip-go-installation: true
 
