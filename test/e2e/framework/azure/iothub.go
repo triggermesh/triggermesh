@@ -50,9 +50,8 @@ func CreateIOTHubComponents(ctx context.Context, subscriptionID, rg, region, nam
 		Location: &region,
 		Tags:     map[string]*string{E2EInstanceTagKey: to.StringPtr(name)},
 		SKU: &armiothub.SKUInfo{
-			Name:     armiothub.IotHubSKUF1.ToPtr(),
+			Name:     armiothub.IotHubSKUB1.ToPtr(),
 			Capacity: to.Int64Ptr(1),
-			Tier:     armiothub.IotHubSKUTierFree.ToPtr(),
 		},
 		Identity: &armiothub.ArmIdentity{
 			Type: armiothub.ResourceIdentityTypeNone.ToPtr(),
