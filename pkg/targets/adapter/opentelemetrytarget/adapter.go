@@ -28,7 +28,10 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
-	"go.opentelemetry.io/contrib/exporters/metric/cortex"
+	// "This package is no longer supported. Use the go.opentelemetry.io/otel/exporters/otlp/otlpmetric exporter as
+	// a replacement to send data to a collector which can then export with its PRW exporter."
+	"go.opentelemetry.io/contrib/exporters/metric/cortex" //nolint:staticcheck
+
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric/number"
 	"go.opentelemetry.io/otel/metric/sdkapi"
