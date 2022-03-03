@@ -18,10 +18,8 @@ package azureeventgridsource
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"net/http"
+	"hash/crc32"
 	"strconv"
 	"time"
 
@@ -31,9 +29,6 @@ import (
 	"knative.dev/pkg/reconciler"
 
 	azureeventgrid "github.com/Azure/azure-sdk-for-go/profiles/latest/eventgrid/mgmt/eventgrid"
-	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/adal"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -51,10 +46,12 @@ const (
 
 // ensureEventSubscription ensures an event subscription exists with the expected configuration.
 // Required permissions:
-//  - Microsoft.EventGrid/eventSubscriptions/read
-//  - Microsoft.EventGrid/eventSubscriptions/write
+//  - Microsoft.EventGrid/systemTopics/eventSubscriptions/read
+//  - Microsoft.EventGrid/systemTopics/eventSubscriptions/write
 //  - Microsoft.EventHub/namespaces/eventhubs/write
-func ensureEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptionsClient, eventHubResID string) error {
+func ensureEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptionsClient,
+	sysTopicResID *v1alpha1.AzureResourceID, eventHubResID string) error {
+
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -66,22 +63,25 @@ func ensureEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptio
 
 	// read current event subscription
 
-	scope := typedSrc.Spec.Scope.String()
-	subsName := subscriptionName(typedSrc)
+	rgName := sysTopicResID.ResourceGroup
+	sysTopicName := sysTopicResID.ResourceName
+	sysTopicResIDStr := sysTopicResID.String()
+	subsName := eventSubscriptionResourceName(typedSrc)
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
 	defer cancel()
 
-	currentEventSubs, err := cli.Get(restCtx, scope, subsName)
+	currentEventSubs, err := cli.Get(restCtx, rgName, sysTopicName, subsName)
 	switch {
 	case isNotFound(err):
 		// no-op
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Access denied to event subscription API: "+toErrMsg(err))
-		return controller.NewPermanentError(failGetEventSubscriptionEvent(scope, err))
+		return controller.NewPermanentError(failGetEventSubscriptionEvent(sysTopicResIDStr, err))
 	case err != nil:
 		status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Cannot look up event subscription: "+toErrMsg(err))
-		return fmt.Errorf("%w", failGetEventSubscriptionEvent(scope, err))
+		// wrap any other error to fail the reconciliation
+		return fmt.Errorf("%w", failGetEventSubscriptionEvent(sysTopicResIDStr, err))
 	}
 
 	subsExists := currentEventSubs.ID != nil
@@ -91,7 +91,7 @@ func ensureEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptio
 	desiredEventSubs := newEventSubscription(eventHubResID, typedSrc.GetEventTypes())
 
 	if equalEventSubscription(ctx, desiredEventSubs, currentEventSubs) {
-		eventSubscriptionResID, err := parseEventSubscriptionResID(*currentEventSubs.ID)
+		eventSubscriptionResID, err := parseResourceID(*currentEventSubs.ID)
 		if err != nil {
 			return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
 		}
@@ -104,33 +104,39 @@ func ensureEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptio
 	restCtx, cancel = context.WithTimeout(ctx, crudTimeout)
 	defer cancel()
 
-	_, err = cli.CreateOrUpdate(restCtx, scope, subsName, desiredEventSubs)
+	resultFuture, err := cli.CreateOrUpdate(restCtx, rgName, sysTopicName, subsName, desiredEventSubs)
 	switch {
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Access denied to event subscription API: "+toErrMsg(err))
-		return controller.NewPermanentError(failSubscribeEvent(scope, subsExists, err))
+		return controller.NewPermanentError(failSubscribeEvent(sysTopicResIDStr, subsExists, err))
 	case err != nil:
 		status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Cannot subscribe to events: "+toErrMsg(err))
-		return fmt.Errorf("%w", failSubscribeEvent(scope, subsExists, err))
+		return fmt.Errorf("%w", failSubscribeEvent(sysTopicResIDStr, subsExists, err))
 	}
 
-	recordSubscribedEvent(ctx, subsName, scope, subsExists)
+	if err := resultFuture.WaitForCompletionRef(ctx, cli.BaseClient()); err != nil {
+		return fmt.Errorf("waiting for creation of event subscription %q: %w", subsName, err)
+	}
 
-	// NOTE(antoineco): CreateOrUpdate() returns a "future" instead of the
-	// actual Event Grid subscription, so setting status.EventSubscriptionID
-	// here would require waiting for the async operation (create/update)
-	// to complete, which might take several seconds.
-	// Because reporting the subscription ID quickly isn't essential, we
-	// prefer to return early and accept that the subscription ID will only
-	// be propagated in the status during the next reconciliation.
+	subsResult, err := resultFuture.Result(cli.ConcreteClient())
+	if err != nil {
+		return fmt.Errorf("reading created/updated event subscription %q: %w", subsName, err)
+	}
 
+	recordSubscribedEvent(ctx, *subsResult.ID, subsExists)
+
+	eventSubscriptionResID, err := parseResourceID(*subsResult.ID)
+	if err != nil {
+		return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
+	}
+
+	status.EventSubscriptionID = eventSubscriptionResID
 	status.MarkSubscribed()
 
 	return nil
 }
 
-// newEventSubscription returns the desired state of the event subscription for
-// the given source.
+// newEventSubscription returns the desired state of the event subscription.
 func newEventSubscription(eventHubResID string, eventTypes []string) azureeventgrid.EventSubscription {
 	// Fields marked with a '*' below are attributes which would be
 	// defaulted on creation by Azure if not explicitly set, but which we
@@ -161,25 +167,38 @@ func newEventSubscription(eventHubResID string, eventTypes []string) azureeventg
 
 // ensureNoEventSubscription ensures the event subscription is removed.
 // Required permissions:
-//  - Microsoft.EventGrid/eventSubscriptions/delete
-func ensureNoEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptionsClient) reconciler.Event {
+//  - Microsoft.EventGrid/systemTopics/eventSubscriptions/delete
+func ensureNoEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptionsClient,
+	sysTopic *azureeventgrid.SystemTopic) reconciler.Event {
+
 	if skip.Skip(ctx) {
 		return nil
+	}
+
+	if sysTopic == nil {
+		event.Warn(ctx, ReasonUnsubscribed, "System topic not found, skipping finalization of event subscription")
+		return nil
+	}
+
+	sysTopicResID, err := parseResourceID(*sysTopic.ID)
+	if err != nil {
+		return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
 	}
 
 	src := v1alpha1.SourceFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
-	scope := typedSrc.Spec.Scope.String()
-	subsName := subscriptionName(typedSrc)
+	rgName := sysTopicResID.ResourceGroup
+	sysTopicName := sysTopicResID.ResourceName
+	subsName := eventSubscriptionResourceName(typedSrc)
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
 	defer cancel()
 
-	_, err := cli.Delete(restCtx, scope, subsName)
+	resultFuture, err := cli.Delete(restCtx, rgName, sysTopicName, subsName)
 	switch {
 	case isNotFound(err):
-		event.Warn(ctx, ReasonUnsubscribed, "Event subscription not found, skipping deletion")
+		event.Warn(ctx, ReasonUnsubscribed, "Event subscription %q not found, skipping deletion", subsName)
 		return nil
 	case isDenied(err):
 		// it is unlikely that we recover from auth errors in the
@@ -188,133 +207,62 @@ func ensureNoEventSubscription(ctx context.Context, cli eventgrid.EventSubscript
 			"Access denied to event subscription API. Ignoring: %s", toErrMsg(err))
 		return nil
 	case err != nil:
-		return failUnsubscribeEvent(scope, err)
+		return failUnsubscribeEvent(subsName, *sysTopic.ID, err)
 	}
 
-	event.Normal(ctx, ReasonUnsubscribed, "Deleted event subscription %q for Azure resource %q",
-		subsName, scope)
+	if err := resultFuture.WaitForCompletionRef(ctx, cli.BaseClient()); err != nil {
+		return fmt.Errorf("waiting for deletion of event subscription %q: %w", subsName, err)
+	}
+
+	event.Normal(ctx, ReasonUnsubscribed, "Deleted event subscription %q from system topic %q", subsName, *sysTopic.ID)
 
 	return nil
 }
 
-// parseEventSubscriptionResID parses the given Event Hub resource ID string to
-// a structured resource ID.
-func parseEventSubscriptionResID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
-	resID := &v1alpha1.AzureResourceID{}
-
-	err := json.Unmarshal([]byte(strconv.Quote(resIDStr)), resID)
-	if err != nil {
-		return nil, fmt.Errorf("deserializing resource ID string: %w", err)
-	}
-
-	return resID, nil
-}
-
-// toErrMsg returns the given error as a string.
-// If the error is an Azure API error, the error message is sanitized while
-// still preserving the concatenation of all nested levels of errors.
-//
-// Used to remove clutter from errors before writing them to status conditions.
-func toErrMsg(err error) string {
-	return recursErrMsg("", err)
-}
-
-// recursErrMsg concatenates the messages of deeply nested API errors recursively.
-func recursErrMsg(errMsg string, err error) string {
-	if errMsg != "" {
-		errMsg += ": "
-	}
-
-	switch tErr := err.(type) {
-	case autorest.DetailedError:
-		return recursErrMsg(errMsg+tErr.Message, tErr.Original)
-	case *azure.RequestError:
-		if tErr.DetailedError.Original != nil {
-			return recursErrMsg(errMsg+tErr.DetailedError.Message, tErr.DetailedError.Original)
-		}
-		if tErr.ServiceError != nil {
-			return errMsg + tErr.ServiceError.Message
-		}
-	case adal.TokenRefreshError:
-		// This type of error is returned when the OAuth authentication with Azure Active Directory fails, often
-		// due to an invalid or expired secret.
-		//
-		// The associated message is typically opaque and contains elements that are unique to each request
-		// (trace/correlation IDs, timestamps), which causes an infinite loop of reconciliation if propagated to
-		// the object's status conditions.
-		// Instead of resorting to over-engineered error parsing techniques to get around the verbosity of the
-		// message, we simply return a short and generic error description.
-		return errMsg + "failed to refresh token: the provided secret is either invalid or expired"
-	}
-
-	return errMsg + err.Error()
-}
-
-// isNotFound returns whether the given error indicates that some Azure
-// resource was not found.
-func isNotFound(err error) bool {
-	if dErr := (autorest.DetailedError{}); errors.As(err, &dErr) {
-		return dErr.StatusCode == http.StatusNotFound
-	}
-	return false
-}
-
-// isDenied returns whether the given error indicates that a request to the
-// Azure API could not be authorized.
-// This category of issues is unrecoverable without user intervention.
-func isDenied(err error) bool {
-	if dErr := (autorest.DetailedError{}); errors.As(err, &dErr) {
-		if code, ok := dErr.StatusCode.(int); ok {
-			return code == http.StatusUnauthorized || code == http.StatusForbidden
-		}
-	}
-
-	return false
-}
-
-// subscriptionName returns a predictable name for an Event Grid event
-// subscription associated with the given source instance.
-func subscriptionName(o *v1alpha1.AzureEventGridSource) string {
-	return "io.triggermesh.azureeventgridsources." + o.Namespace + "." + o.Name
+// eventSubscriptionResourceName returns a deterministic name for an Event Grid
+// event subscription associated with the given source instance.
+// The Event Subscription name must be 3-64 characters in length and can only
+// contain a-z, A-Z, 0-9, and "-".
+func eventSubscriptionResourceName(src *v1alpha1.AzureEventGridSource) string {
+	nsNameChecksum := crc32.ChecksumIEEE([]byte(src.Namespace + "/" + src.Name))
+	return "io-triggermesh-azureeventgridsources-" + strconv.FormatUint(uint64(nsNameChecksum), 10)
 }
 
 // recordSubscribedEvent records a Kubernetes API event which indicates that an
 // event subscription was either created or updated.
-func recordSubscribedEvent(ctx context.Context, subsName, resource string, isUpdate bool) {
+func recordSubscribedEvent(ctx context.Context, subsID string, isUpdate bool) {
 	verb := "Created"
 	if isUpdate {
 		verb = "Updated"
 	}
 
-	event.Normal(ctx, ReasonSubscribed, "%s event subscription %q for Azure resource %q",
-		verb, subsName, resource)
+	event.Normal(ctx, ReasonSubscribed, "%s event subscription %q", verb, subsID)
 }
 
 // failGetEventSubscriptionEvent returns a reconciler event which indicates
-// that an event subscription for the given Azure resource could not be
-// retrieved from the Azure API.
-func failGetEventSubscriptionEvent(resource string, origErr error) reconciler.Event {
+// that an event subscription for the given system topic could not be retrieved
+// from the Azure API.
+func failGetEventSubscriptionEvent(sysTopic string, origErr error) reconciler.Event {
 	return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-		"Error getting event subscription for Azure resource %q: %s", resource, toErrMsg(origErr))
+		"Error getting event subscription from system topic %q: %s", sysTopic, toErrMsg(origErr))
 }
 
 // failSubscribeEvent returns a reconciler event which indicates that an event
-// subscription for the given Azure resource could not be created or updated
-// via the Azure API.
-func failSubscribeEvent(resource string, isUpdate bool, origErr error) reconciler.Event {
+// subscription for the given system topic could not be created or updated via
+// the Azure API.
+func failSubscribeEvent(sysTopic string, isUpdate bool, origErr error) reconciler.Event {
 	verb := "creating"
 	if isUpdate {
 		verb = "updating"
 	}
 
 	return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-		"Error %s event subscription for Azure resource %q: %s", verb, resource, toErrMsg(origErr))
+		"Error %s event subscription in system topic %q: %s", verb, sysTopic, toErrMsg(origErr))
 }
 
 // failUnsubscribeEvent returns a reconciler event which indicates that an
-// event subscription for the given Azure resource could not be deleted via
-// the Azure API.
-func failUnsubscribeEvent(resource string, origErr error) reconciler.Event {
+// event subscription could not be deleted via the Azure API.
+func failUnsubscribeEvent(subs, sysTopic string, origErr error) reconciler.Event {
 	return reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
-		"Error deleting event subscription for Azure resource %q: %s", resource, toErrMsg(origErr))
+		"Error deleting event subscription %q from system topic %q: %s", subs, sysTopic, toErrMsg(origErr))
 }
