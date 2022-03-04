@@ -1,23 +1,17 @@
 name: End-to-End Testing
 
 on:
-  push:
-    # NOTE(antoineco): To avoid exposing repository secrets to user supplied
-    # code in pull requests, we only allow this workflow to run on the 'main'
-    # branch, where all code changes are expected to have been reviewed by
-    # maintainers.
-    #
-    # We may want to relax this in the future, on condition that safeguards are
-    # added to prevent the workflow from running automatically when an external
-    # contributor submits code changes inside the .github/workflows/ or
-    # test/e2e/ directories.
-    #
-    # Ref. https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
-    branches: [ main ]
+  pull_request_review:
+    types: [submitted]
+    # Run the e2e test once the PR has been approved to allow for a final check before
+    # merging the PR. One of the contributers metioned in CODEOWNERS must approve the PR
+    # if it touches .github/ or test/e2e/ to prevent potential credential leakage.
 
 jobs:
 
   e2e-triggermesh:
+    if: github.event.review.state == 'approved'
+
     name: Test TriggerMesh components
     runs-on: ubuntu-latest
 
