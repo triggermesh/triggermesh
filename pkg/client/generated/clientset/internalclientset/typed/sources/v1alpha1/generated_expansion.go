@@ -56,6 +56,8 @@ type AzureServiceBusQueueSourceExpansion interface{}
 
 type AzureServiceBusTopicSourceExpansion interface{}
 
+type CloudEventsSourceExpansion interface{}
+
 type GoogleCloudAuditLogsSourceExpansion interface{}
 
 type GoogleCloudBillingSourceExpansion interface{}

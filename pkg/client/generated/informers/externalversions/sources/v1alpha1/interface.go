@@ -62,6 +62,8 @@ type Interface interface {
 	AzureServiceBusQueueSources() AzureServiceBusQueueSourceInformer
 	// AzureServiceBusTopicSources returns a AzureServiceBusTopicSourceInformer.
 	AzureServiceBusTopicSources() AzureServiceBusTopicSourceInformer
+	// CloudEventsSources returns a CloudEventsSourceInformer.
+	CloudEventsSources() CloudEventsSourceInformer
 	// GoogleCloudAuditLogsSources returns a GoogleCloudAuditLogsSourceInformer.
 	GoogleCloudAuditLogsSources() GoogleCloudAuditLogsSourceInformer
 	// GoogleCloudBillingSources returns a GoogleCloudBillingSourceInformer.
@@ -196,6 +198,11 @@ func (v *version) AzureServiceBusQueueSources() AzureServiceBusQueueSourceInform
 // AzureServiceBusTopicSources returns a AzureServiceBusTopicSourceInformer.
 func (v *version) AzureServiceBusTopicSources() AzureServiceBusTopicSourceInformer {
 	return &azureServiceBusTopicSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// CloudEventsSources returns a CloudEventsSourceInformer.
+func (v *version) CloudEventsSources() CloudEventsSourceInformer {
+	return &cloudEventsSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GoogleCloudAuditLogsSources returns a GoogleCloudAuditLogsSourceInformer.

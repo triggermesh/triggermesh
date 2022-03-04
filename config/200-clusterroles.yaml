@@ -81,6 +81,7 @@ rules:
   - azurequeuestoragesources
   - azureservicebusqueuesources
   - azureservicebustopicsources
+  - cloudeventssources
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudiotsources
@@ -122,6 +123,8 @@ rules:
   - azurequeuestoragesources/status
   - azureservicebusqueuesources/status
   - azureservicebustopicsources/status
+  - cloudeventssources/status
+  - cloudeventssources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
   - googlecloudiotsources/status
@@ -298,6 +301,7 @@ rules:
   - azurequeuestoragesources/finalizers
   - azureservicebusqueuesources/finalizers
   - azureservicebustopicsources/finalizers
+  - cloudeventssources/finalizers
   - googlecloudauditlogssources/finalizers
   - googlecloudbillingsources/finalizers
   - googlecloudiotsources/finalizers
@@ -740,6 +744,7 @@ rules:
   - azurequeuestoragesources
   - azureservicebusqueuesources
   - azureservicebustopicsources
+  - cloudeventssources
   - googlecloudauditlogssources
   - googlecloudbillingsources
   - googlecloudiotsources
