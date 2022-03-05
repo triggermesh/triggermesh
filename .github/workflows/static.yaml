@@ -25,8 +25,6 @@ jobs:
     # the Go setup, in case other steps are added to this job in the future.
     - name: Lint Go code
       uses: golangci/golangci-lint-action@v3
-      with:
-        skip-go-installation: true
 
   lint-config:
     name: Configuration Linting
