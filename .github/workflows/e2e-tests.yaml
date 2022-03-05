@@ -6,6 +6,8 @@ on:
     # Run the e2e test once the PR has been approved to allow for a final check before
     # merging the PR. One of the contributers metioned in CODEOWNERS must approve the PR
     # if it touches .github/ or test/e2e/ to prevent potential credential leakage.
+  push:
+    branches: [main]
 
 jobs:
 
