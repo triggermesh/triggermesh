@@ -88,9 +88,10 @@ const (
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/rt/rn
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns
 	azureResourceResourceIDSplitElements = 9
-	// Namespaced resource
+	// Resource with subresource (including namespaced resource)
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn
-	azureNamespacedResourceResourceIDSplitElements = 11
+	azureSubResourceResourceIDSplitElements = 11
 	// Namespaced resource with subresource
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn
 	azureNamespacedSubResourceResourceIDSplitElements = 13
@@ -107,7 +108,7 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 	if n := len(sections); n != azureSubscriptionResourceIDSplitElements &&
 		n != azureResourceGroupResourceIDSplitElements &&
 		n != azureResourceResourceIDSplitElements &&
-		n != azureNamespacedResourceResourceIDSplitElements &&
+		n != azureSubResourceResourceIDSplitElements &&
 		n != azureNamespacedSubResourceResourceIDSplitElements {
 
 		return newParseAzureResourceIDError(dataStr)
@@ -119,6 +120,8 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 		resourceProviderIdx = 6
 		resourceTypeIdx     = 7
 		resourceNameIdx     = 8
+		subresourceTypeIdx  = 9
+		subresourceNameIdx  = 10
 		// with namespace
 		namespaceIdx         = 8
 		resourceTypeNsIdx    = 9
@@ -156,17 +159,25 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 	}
 
 	var namespace string
-	if len(sections) >= azureNamespacedResourceResourceIDSplitElements {
-		namespace = sections[namespaceIdx]
-		resourceType = sections[resourceTypeNsIdx]
-		resourceName = sections[resourceNameNsIdx]
-		if namespace == "" || resourceType == "" || resourceName == "" {
-			return errAzureResourceIDEmptyAttrs
+	var subresourceType string
+	var subresourceName string
+	if len(sections) >= azureSubResourceResourceIDSplitElements {
+		if strings.ToLower(resourceType) == "namespaces" {
+			namespace = sections[namespaceIdx]
+			resourceType = sections[resourceTypeNsIdx]
+			resourceName = sections[resourceNameNsIdx]
+			if namespace == "" || resourceType == "" || resourceName == "" {
+				return errAzureResourceIDEmptyAttrs
+			}
+		} else {
+			subresourceType = sections[subresourceTypeIdx]
+			subresourceName = sections[subresourceNameIdx]
+			if subresourceType == "" || subresourceName == "" {
+				return errAzureResourceIDEmptyAttrs
+			}
 		}
 	}
 
-	var subresourceType string
-	var subresourceName string
 	if len(sections) == azureNamespacedSubResourceResourceIDSplitElements {
 		subresourceType = sections[subresourceTypeNsIdx]
 		subresourceName = sections[subresourceNameNsIdx]
