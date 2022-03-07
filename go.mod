@@ -20,7 +20,7 @@ require (
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/pubsub v1.19.0
 	cloud.google.com/go/storage v1.21.0
-	cloud.google.com/go/workflows v1.2.0
+	cloud.google.com/go/workflows v1.3.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.17
 	github.com/Azure/azure-sdk-for-go v62.1.0+incompatible
