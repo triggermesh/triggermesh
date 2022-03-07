@@ -83,7 +83,7 @@ func (k *correlationKey) set(event *cloudevents.Event) string {
 // randString generates the random string with fixed length.
 func randString(length int) string {
 	k := make([]byte, length)
-	l := len(correlationKeycharset)
+	l := len(correlationKeycharset) - 1
 	for i := range k {
 		k[i] = correlationKeycharset[seededRand.Intn(l)]
 	}
