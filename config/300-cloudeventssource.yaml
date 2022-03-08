@@ -44,41 +44,102 @@ spec:
         type: object
         properties:
           spec:
-            description: Desired state of the event source.
+            description: Specification for the CloudEvents source.
             type: object
             properties:
 
-              corsAllowOrigin:
-                description: "Value of the CORS 'Access-Control-Allow-Origin' header to set on ingested requests."
-                type: string
-              basicAuthUsername:
-                description: User name HTTP clients must set to authenticate with the source using HTTP Basic
-                  authentication.
-                type: string
-              basicAuthPassword:
-                description: Password HTTP clients must set to authenticate with the source using HTTP Basic
-                  authentication.
+              credentials:
+                description: Optional credentials specification for incoming requests.
                 type: object
                 properties:
-                  value:
-                    description: Literal value of the password.
-                    type: string
-                  valueFromSecret:
-                    description: A reference to a Kubernetes Secret object containing the password.
+
+                  basicAuth:
+                    description: HTTP basic authentication parameters.
                     type: object
                     properties:
-                      name:
-                        description: Name of the Secret object.
+                      user:
+                        description: User name for HTTP Basic authentication.
                         type: string
-                      key:
-                        description: Key from the Secret object.
-                        type: string
+                      password:
+                        description: Password for HTTP Basic authentication.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the password.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the password.
+                            type: object
+                            properties:
+                              name:
+                                description: Name of the Secret object.
+                                type: string
+                              key:
+                                description: Key from the Secret object.
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
                     required:
-                    - name
-                    - key
-                oneOf:
-                - required: [value]
-                - required: [valueFromSecret]
+                    - user
+                    - password
+
+                  token:
+                    description: API Token at HTTP header.
+                    type: object
+                    properties:
+                      header:
+                        description: HTTP header name informing the token.
+                        type: string
+                      values:
+                        description: HTTP token valid values. A request containing any of
+                          these values will be accepted.
+                        type: array
+                        items:
+                          type: string
+                          minLength: 1
+                    required:
+                    - header
+                    - values
+
+              path:
+                description: Path where incoming CloudEvents will be accepted.
+                type: string
+
+              rateLimiter:
+                description: Rate limiter parameters.
+                type: object
+                properties:
+                  requests:
+                    description: Number of requests accepted per time duration.
+                    type: integer
+                  duration:
+                    description: Slidding time window duration where requests will be counted. Expressed as a
+                      duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
+                    type: string
+                required:
+                - requests
+                - duration
+
+              ceOverrides:
+                description: Defines overrides/additions to incoming CloudEvents attributes.
+                type: object
+                properties:
+                  extensions:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      source:
+                        type: string
+                      subject:
+                        type: string
+                required:
+                - extensions
+
               sink:
                 description: The destination of events generated from requests to the source.
                 type: object
