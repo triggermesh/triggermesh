@@ -119,7 +119,7 @@ func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	}
 
 	// init indicates if we need to run initial step transformation
-	var init bool = true
+	var init = true
 	var errs []string
 
 	// Run init step such as load Pipeline variables first
