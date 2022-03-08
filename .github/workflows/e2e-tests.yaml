@@ -1,8 +1,10 @@
 name: End-to-End Testing
 
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request_target:
+    # Rely on default actions of opened, reopened, and syncrhonize to trigger a run
+  #pull_request_review:
+  #  types: [submitted]
     # Run the e2e test once the PR has been approved to allow for a final check before
     # merging the PR. One of the contributers metioned in CODEOWNERS must approve the PR
     # if it touches .github/ or test/e2e/ to prevent potential credential leakage.
