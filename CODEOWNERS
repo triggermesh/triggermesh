@@ -1,0 +1,5 @@
+# Reflect current maintainers allowed to approve pull requests that touch the .github
+# and test/e2e directories. This is the TriggerMesh engineering team.
+
+/.github/workflows/   @triggermesh/engineering
+/test/e2e/            @triggermesh/engineering
