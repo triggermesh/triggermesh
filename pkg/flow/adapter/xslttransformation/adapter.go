@@ -131,6 +131,7 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("unexpected type or media-type for the incoming event"), nil)
 	}
+	defer xmlin.Free()
 
 	output, err := style.Process(xmlin, xslt.StylesheetOptions{
 		IndentOutput: true,
