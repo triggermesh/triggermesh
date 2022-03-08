@@ -19,8 +19,8 @@ codegen: $(generators)
 
 # http://blog.jgc.org/2007/06/escaping-comma-and-space-in-gnu-make.html
 comma := ,
-space :=
-space +=
+null  :=
+space := $(null) $(null)
 
 deepcopy:
 	@echo "+ Generating deepcopy funcs for $(API_GROUPS)"
