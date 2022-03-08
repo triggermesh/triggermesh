@@ -99,7 +99,6 @@ func (t *Handler) receiveAndSend(ctx context.Context, event cloudevents.Event) e
 }
 
 func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
-	log.Printf("Received %q event", event.Type())
 	// HTTPTargets sets content type from HTTP headers, i.e.:
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality
@@ -120,8 +119,16 @@ func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	}
 
 	// Run init step such as load Pipeline variables first
-	t.ContextPipeline.initStep(localContextBytes)
-	t.DataPipeline.initStep(event.Data())
+	localContextBytes, err = t.ContextPipeline.initStep(localContextBytes)
+	if err != nil {
+		log.Printf("Cannot apply init step transformation on CE context: %v", err)
+		return nil, fmt.Errorf("cannot apply init step transformation on CE context: %w", err)
+	}
+	eventPayload, err := t.DataPipeline.initStep(event.Data())
+	if err != nil {
+		log.Printf("Cannot apply init step transformation on CE payload: %v", err)
+		return nil, fmt.Errorf("cannot apply init step transformation on CE payload: %w", err)
+	}
 
 	// CE Context transformation
 	localContextBytes, err = t.ContextPipeline.apply(localContextBytes)
@@ -129,7 +136,6 @@ func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 		log.Printf("Cannot apply transformation on CE context: %v", err)
 		return nil, fmt.Errorf("cannot apply transformation on CE context: %w", err)
 	}
-
 	if err := json.Unmarshal(localContextBytes, &localContext); err != nil {
 		log.Printf("Cannot decode CE new context: %v", err)
 		return nil, fmt.Errorf("cannot decode CE new context: %w", err)
@@ -143,16 +149,14 @@ func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	}
 
 	// CE Data transformation
-	data, err := t.DataPipeline.apply(event.Data())
+	eventPayload, err = t.DataPipeline.apply(eventPayload)
 	if err != nil {
 		log.Printf("Cannot apply transformation on CE data: %v", err)
 		return nil, fmt.Errorf("cannot apply transformation on CE data: %w", err)
 	}
-	if err = event.SetData(cloudevents.ApplicationJSON, data); err != nil {
+	if err = event.SetData(cloudevents.ApplicationJSON, eventPayload); err != nil {
 		log.Printf("Cannot set data: %v", err)
 		return nil, fmt.Errorf("cannot set data: %w", err)
 	}
-
-	log.Printf("Sending %q event", event.Type())
 	return &event, nil
 }

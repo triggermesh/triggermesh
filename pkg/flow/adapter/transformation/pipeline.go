@@ -25,6 +25,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer/add"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer/delete"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer/parse"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer/shift"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer/store"
 )
@@ -43,6 +44,7 @@ func register() map[string]transformer.Transformer {
 	delete.Register(transformations)
 	shift.Register(transformations)
 	store.Register(transformations)
+	parse.Register(transformations)
 
 	return transformations
 }
@@ -76,15 +78,18 @@ func (p *Pipeline) setStorage(s *storage.Storage) {
 }
 
 // InitStep runs Transformations that are marked as InitStep.
-func (p *Pipeline) initStep(data []byte) {
+func (p *Pipeline) initStep(data []byte) ([]byte, error) {
+	var err error
 	for _, v := range p.Transformers {
 		if !v.InitStep() {
 			continue
 		}
-		if _, err := v.Apply(data); err != nil {
-			log.Printf("Failed to apply Init step: %v", err)
+		data, err = v.Apply(data)
+		if err != nil {
+			return data, err
 		}
 	}
+	return data, nil
 }
 
 // Apply applies Pipeline transformations.
