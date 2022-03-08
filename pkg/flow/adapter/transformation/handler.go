@@ -118,25 +118,25 @@ func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 		return nil, fmt.Errorf("cannot encode CE context: %w", err)
 	}
 
+	// init indicates if we need to run initial step transformation
+	var init bool = false
+	var errs []string
+
 	// Run init step such as load Pipeline variables first
-	localContextBytes, err = t.ContextPipeline.initStep(localContextBytes)
+	eventContext, err := t.ContextPipeline.apply(localContextBytes, init)
 	if err != nil {
-		log.Printf("Cannot apply init step transformation on CE context: %v", err)
-		return nil, fmt.Errorf("cannot apply init step transformation on CE context: %w", err)
+		errs = append(errs, err.Error())
 	}
-	eventPayload, err := t.DataPipeline.initStep(event.Data())
+	eventPayload, err := t.DataPipeline.apply(event.Data(), init)
 	if err != nil {
-		log.Printf("Cannot apply init step transformation on CE payload: %v", err)
-		return nil, fmt.Errorf("cannot apply init step transformation on CE payload: %w", err)
+		errs = append(errs, err.Error())
 	}
 
 	// CE Context transformation
-	localContextBytes, err = t.ContextPipeline.apply(localContextBytes)
-	if err != nil {
-		log.Printf("Cannot apply transformation on CE context: %v", err)
-		return nil, fmt.Errorf("cannot apply transformation on CE context: %w", err)
+	if eventContext, err = t.ContextPipeline.apply(eventContext, !init); err != nil {
+		errs = append(errs, err.Error())
 	}
-	if err := json.Unmarshal(localContextBytes, &localContext); err != nil {
+	if err := json.Unmarshal(eventContext, &localContext); err != nil {
 		log.Printf("Cannot decode CE new context: %v", err)
 		return nil, fmt.Errorf("cannot decode CE new context: %w", err)
 	}
@@ -149,14 +149,17 @@ func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	}
 
 	// CE Data transformation
-	eventPayload, err = t.DataPipeline.apply(eventPayload)
-	if err != nil {
-		log.Printf("Cannot apply transformation on CE data: %v", err)
-		return nil, fmt.Errorf("cannot apply transformation on CE data: %w", err)
+	if eventPayload, err = t.DataPipeline.apply(eventPayload, !init); err != nil {
+		errs = append(errs, err.Error())
 	}
 	if err = event.SetData(cloudevents.ApplicationJSON, eventPayload); err != nil {
-		log.Printf("Cannot set data: %v", err)
 		return nil, fmt.Errorf("cannot set data: %w", err)
 	}
+	// Failed transformation operations should not stop event flow
+	// therefore, just log the errors
+	if len(errs) != 0 {
+		log.Printf("Event transformation errors: %s", strings.Join(errs, ","))
+	}
+
 	return &event, nil
 }

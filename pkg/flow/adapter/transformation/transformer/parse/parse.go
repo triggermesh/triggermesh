@@ -82,26 +82,15 @@ func (p *Parse) Apply(data []byte) ([]byte, error) {
 		if err := json.Unmarshal(data, &event); err != nil {
 			return data, err
 		}
-		value := readValue(event, path)
-		jsonValue, err := parseJSON(value)
+		jsonValue, err := parseJSON(readValue(event, path))
 		if err != nil {
-			fmt.Println(err)
 			return data, err
 		}
 		newObject := convert.SliceToMap(strings.Split(p.Path, "."), jsonValue)
-		fmt.Printf("Merged Appendix is: %+v\n", newObject)
-		result := convert.MergeJSONWithMap(event, newObject)
-		fmt.Printf("Result JSON is: %+v\n", result)
-		data, err = json.Marshal(result)
-		if err != nil {
-			return data, err
-		}
+		return json.Marshal(convert.MergeJSONWithMap(event, newObject))
 	default:
 		return data, fmt.Errorf("parse operation does not support %q type of value", p.Value)
 	}
-
-	fmt.Printf("Result Object is: %s\n", data)
-	return data, nil
 }
 
 func parseJSON(data interface{}) (interface{}, error) {

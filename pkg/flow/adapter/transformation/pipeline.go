@@ -19,6 +19,7 @@ package transformation
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
@@ -77,32 +78,19 @@ func (p *Pipeline) setStorage(s *storage.Storage) {
 	}
 }
 
-// InitStep runs Transformations that are marked as InitStep.
-func (p *Pipeline) initStep(data []byte) ([]byte, error) {
+// Apply applies Pipeline transformations.
+func (p *Pipeline) apply(data []byte, init bool) ([]byte, error) {
 	var err error
+	var errs []string
 	for _, v := range p.Transformers {
-		if !v.InitStep() {
-			continue
-		}
-		data, err = v.Apply(data)
-		if err != nil {
-			return data, err
+		if init == v.InitStep() {
+			if data, err = v.Apply(data); err != nil {
+				errs = append(errs, err.Error())
+			}
 		}
 	}
-	return data, nil
-}
-
-// Apply applies Pipeline transformations.
-func (p *Pipeline) apply(data []byte) ([]byte, error) {
-	var err error
-	for _, v := range p.Transformers {
-		if v.InitStep() {
-			continue
-		}
-		data, err = v.Apply(data)
-		if err != nil {
-			return data, err
-		}
+	if len(errs) != 0 {
+		return data, fmt.Errorf(strings.Join(errs, ","))
 	}
 	return data, nil
 }
