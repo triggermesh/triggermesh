@@ -62,9 +62,9 @@ jobs:
     - name: MetalLB load-balancer
       # Based on https://kind.sigs.k8s.io/docs/user/loadbalancer/
       run: |
-        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
         kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
-        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
         kubectl -n metallb-system wait --timeout=1m --for=condition=Available deployments.apps/controller
 
         cat <<'EOM' | kubectl create -f-
