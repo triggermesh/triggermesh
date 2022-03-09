@@ -63,7 +63,7 @@ spec:
                     operation:
                       description: Name of the transformation operation.
                       type: string
-                      enum: ['add', 'delete', 'shift', 'store']
+                      enum: ['add', 'delete', 'shift', 'store', 'parse']
                     paths:
                       description: Key-value event pairs to apply the transformations on.
                       type: array
@@ -90,7 +90,7 @@ spec:
                     operation:
                       description: Name of the transformation operation.
                       type: string
-                      enum: ['add', 'delete', 'shift', 'store']
+                      enum: ['add', 'delete', 'shift', 'store', 'parse']
                     paths:
                       description: Key-value event pairs to apply the transformations on.
                       type: array

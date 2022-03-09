@@ -95,9 +95,11 @@ func (s *Shift) Apply(data []byte) ([]byte, error) {
 			return data, nil
 		}
 	}
+	if value == nil {
+		return data, nil
+	}
 
 	newPath := convert.SliceToMap(strings.Split(s.NewPath, "."), value)
-
 	result := convert.MergeJSONWithMap(newEvent, newPath)
 	output, err := json.Marshal(result)
 	if err != nil {

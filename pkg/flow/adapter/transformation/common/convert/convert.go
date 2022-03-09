@@ -92,6 +92,8 @@ func MergeJSONWithMap(source, appendix interface{}) interface{} {
 		source = resArr
 	case map[string]interface{}:
 		switch s := source.(type) {
+		case float64, bool, string:
+			return appendixValue
 		case nil:
 			source = make(map[string]interface{})
 			return MergeJSONWithMap(source, appendixValue)
