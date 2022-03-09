@@ -123,7 +123,7 @@ jobs:
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Installing ko
-          command: go install github.com/google/ko@v0.10.0
+          command: go install github.com/google/ko@v0.9.3
       - run:
           # XSLTTransformation needs libxml2.
           name: Install libxml2
