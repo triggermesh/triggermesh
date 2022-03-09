@@ -68,7 +68,9 @@ func SliceToMap(path []string, value interface{}) map[string]interface{} {
 // Source map keys are being overwritten by appendix keys if they overlap.
 func MergeJSONWithMap(source, appendix interface{}) interface{} {
 	switch appendixValue := appendix.(type) {
-	case float64, bool, string, nil:
+	case nil:
+		return source
+	case float64, bool, string:
 		return appendixValue
 	case []interface{}:
 		sourceInterface, ok := source.([]interface{})
@@ -81,13 +83,14 @@ func MergeJSONWithMap(source, appendix interface{}) interface{} {
 		}
 		resArr := make([]interface{}, resArrLen)
 		for i := range resArr {
-			if i < len(appendixValue) && appendixValue[i] != nil {
-				resArr[i] = appendixValue[i]
-				continue
+			var a, b interface{}
+			if i < len(appendixValue) {
+				b = appendixValue[i]
 			}
 			if i < len(sourceInterface) {
-				resArr[i] = sourceInterface[i]
+				a = sourceInterface[i]
 			}
+			resArr[i] = MergeJSONWithMap(a, b)
 		}
 		source = resArr
 	case map[string]interface{}:
