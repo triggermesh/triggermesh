@@ -107,14 +107,14 @@ jobs:
     executor:
       name: go/default
       tag: '1.17'
-    resource_class: xlarge
+    resource_class: 2xlarge
     steps:
       - checkout
-      - gcp-cli/install
-      - gcp-cli/initialize
-      - run:
-          name: Adding Docker credHelpers for GCR
-          command: gcloud auth configure-docker
+      #- gcp-cli/install
+      #- gcp-cli/initialize
+      #- run:
+      #    name: Adding Docker credHelpers for GCR
+      #    command: gcloud auth configure-docker
       - go/load-cache
       - restore_cache:
           name: Restoring Go build cache
@@ -133,16 +133,16 @@ jobs:
           docker_layer_caching: true
       - run:
           name: Publishing container images
-          command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
+          command: ko resolve -L -B -t latest -f config/
           environment:
-            KO_DOCKER_REPO: gcr.io/triggermesh
+            #KO_DOCKER_REPO: gcr.io/triggermesh
             DIST_DIR: /tmp/dist/
-      - persist_to_workspace:
-          root: /tmp/
-          paths:
-            - dist/
-      - store_artifacts:
-          path: /tmp/dist/
+      #- persist_to_workspace:
+      #    root: /tmp/
+      #    paths:
+      #      - dist/
+      #- store_artifacts:
+      #    path: /tmp/dist/
 
   update-manifests:
     description: Patches target cluster configuration
@@ -237,59 +237,59 @@ jobs:
 workflows:
   test-and-publish:
     jobs:
-      - gomod-cache:
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      - test:
-          requires:
-            - gomod-cache
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      - gen-apidocs:
-          requires:
-            - test
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              only: main
+      - gomod-cache
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #- test:
+      #    requires:
+      #      - gomod-cache
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #- gen-apidocs:
+      #    requires:
+      #      - test
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #      branches:
+      #        only: main
       - publish-image:
           context: production
-          requires:
-            - gen-apidocs
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              only: main
-      - update-manifests:
-          name: update-staging-config
-          cluster: staging
-          requires:
-            - publish-image
-          filters:
-            branches:
-              only: main
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      - update-manifests:
-          name: update-production-config
-          cluster: prod
-          requires:
-            - update-staging-config
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              ignore: /.*/
-      - release:
-          context: production
-          requires:
-            - publish-image
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              ignore: /.*/
+          #requires:
+          #  - gen-apidocs
+          #filters:
+          #  tags:
+          #    only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+          #  branches:
+          #    only: main
+      #- update-manifests:
+      #    name: update-staging-config
+      #    cluster: staging
+      #    requires:
+      #      - publish-image
+      #    filters:
+      #      branches:
+      #        only: main
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #- update-manifests:
+      #    name: update-production-config
+      #    cluster: prod
+      #    requires:
+      #      - update-staging-config
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #      branches:
+      #        ignore: /.*/
+      #- release:
+      #    context: production
+      #    requires:
+      #      - publish-image
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #      branches:
+      #        ignore: /.*/
