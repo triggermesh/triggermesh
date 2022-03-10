@@ -42,6 +42,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&AWSComprehendTargetList{},
 		&AWSDynamoDBTarget{},
 		&AWSDynamoDBTargetList{},
+		&AWSEventBridgeTarget{},
+		&AWSEventBridgeTargetList{},
 		&AWSLambdaTarget{},
 		&AWSLambdaTargetList{},
 		&AWSS3Target{},

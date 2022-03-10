@@ -54,6 +54,7 @@ resources:
 - config/301-alibabaosstarget.yaml
 - config/301-awscomprehendtarget.yaml
 - config/301-awsdynamodbtarget.yaml
+- config/301-awseventbridgetarget.yaml
 - config/301-awskinesistarget.yaml
 - config/301-awslambdatarget.yaml
 - config/301-awss3target.yaml

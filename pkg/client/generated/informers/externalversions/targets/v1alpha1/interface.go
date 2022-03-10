@@ -28,6 +28,8 @@ type Interface interface {
 	AWSComprehendTargets() AWSComprehendTargetInformer
 	// AWSDynamoDBTargets returns a AWSDynamoDBTargetInformer.
 	AWSDynamoDBTargets() AWSDynamoDBTargetInformer
+	// AWSEventBridgeTargets returns a AWSEventBridgeTargetInformer.
+	AWSEventBridgeTargets() AWSEventBridgeTargetInformer
 	// AWSKinesisTargets returns a AWSKinesisTargetInformer.
 	AWSKinesisTargets() AWSKinesisTargetInformer
 	// AWSLambdaTargets returns a AWSLambdaTargetInformer.
@@ -109,6 +111,11 @@ func (v *version) AWSComprehendTargets() AWSComprehendTargetInformer {
 // AWSDynamoDBTargets returns a AWSDynamoDBTargetInformer.
 func (v *version) AWSDynamoDBTargets() AWSDynamoDBTargetInformer {
 	return &aWSDynamoDBTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AWSEventBridgeTargets returns a AWSEventBridgeTargetInformer.
+func (v *version) AWSEventBridgeTargets() AWSEventBridgeTargetInformer {
+	return &aWSEventBridgeTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // AWSKinesisTargets returns a AWSKinesisTargetInformer.

@@ -46,6 +46,11 @@ func (s *AWSDynamoDBTarget) GetGroupVersionKind() schema.GroupVersionKind {
 }
 
 // GetGroupVersionKind returns the GroupVersionKind.
+func (s *AWSEventBridgeTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSEventBridgeTarget")
+}
+
+// GetGroupVersionKind returns the GroupVersionKind.
 func (s *AWSLambdaTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSLambdaTarget")
 }

@@ -22,6 +22,8 @@ type AWSComprehendTargetExpansion interface{}
 
 type AWSDynamoDBTargetExpansion interface{}
 
+type AWSEventBridgeTargetExpansion interface{}
+
 type AWSKinesisTargetExpansion interface{}
 
 type AWSLambdaTargetExpansion interface{}

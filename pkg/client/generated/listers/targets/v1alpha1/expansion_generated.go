@@ -34,6 +34,14 @@ type AWSDynamoDBTargetListerExpansion interface{}
 // AWSDynamoDBTargetNamespaceLister.
 type AWSDynamoDBTargetNamespaceListerExpansion interface{}
 
+// AWSEventBridgeTargetListerExpansion allows custom methods to be added to
+// AWSEventBridgeTargetLister.
+type AWSEventBridgeTargetListerExpansion interface{}
+
+// AWSEventBridgeTargetNamespaceListerExpansion allows custom methods to be added to
+// AWSEventBridgeTargetNamespaceLister.
+type AWSEventBridgeTargetNamespaceListerExpansion interface{}
+
 // AWSKinesisTargetListerExpansion allows custom methods to be added to
 // AWSKinesisTargetLister.
 type AWSKinesisTargetListerExpansion interface{}
