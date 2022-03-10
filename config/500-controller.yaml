@@ -169,8 +169,6 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         - name: XMLTOJSONTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
-        - name: XSLTTRANSFORMATION_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/xslttransformation-adapter
         - name: SYNCHRONIZER_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         # Routing adapters
@@ -193,6 +191,8 @@ spec:
           value: gcr.io/triggermesh/ibmmqsource-adapter:latest
         - name: IBMMQTARGET_ADAPTER_IMAGE
           value: gcr.io/triggermesh/ibmmqtarget-adapter:latest
+        - name: XSLTTRANSFORMATION_IMAGE
+          value: gcr.io/triggermesh/xslttransformation-adapter:latest
 
         securityContext:
           allowPrivilegeEscalation: false

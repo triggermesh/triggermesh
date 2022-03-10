@@ -2,14 +2,9 @@
 # dynamic binary with a dependency on glibc.
 baseImageOverrides:
   github.com/triggermesh/triggermesh/cmd/confluenttarget-adapter: gcr.io/distroless/base:nonroot
-  github.com/triggermesh/triggermesh/cmd/xslttransformation-adapter: gcr.io/triggermesh/debian-libxml:v0.1.0
 
 builds:
 - id: confluenttarget-adapter
   main: ./cmd/confluenttarget-adapter
-  env:
-  - CGO_ENABLED=1
-- id: xslttransformation-adapter
-  main: ./cmd/xslttransformation-adapter
   env:
   - CGO_ENABLED=1

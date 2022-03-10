@@ -23,7 +23,7 @@ COMMANDS          := $(notdir $(wildcard cmd/*))
 
 # Commands and images that require custom build proccess
 CUSTOM_BUILD_BINARIES := confluenttarget-adapter ibmmqsource-adapter ibmmqtarget-adapter xslttransformation-adapter
-CUSTOM_BUILD_IMAGES   := ibmmqsource-adapter ibmmqtarget-adapter
+CUSTOM_BUILD_IMAGES   := ibmmqsource-adapter ibmmqtarget-adapter xslttransformation-adapter
 
 BIN_OUTPUT_DIR    ?= $(OUTPUT_DIR)
 DOCS_OUTPUT_DIR   ?= $(OUTPUT_DIR)
