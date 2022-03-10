@@ -15,7 +15,7 @@
 apiVersion: flow.triggermesh.io/v1alpha1
 kind: Transformation
 metadata:
-  name: string-json-transformation
+  name: parse-transformation
 spec:
   sink:
     ref:
@@ -25,8 +25,70 @@ spec:
   data:
   - operation: parse
     paths:
-    - key: metadata.client
+    - key: result[0].data
       value: JSON
-  - operation: shift
+  - operation: store
     paths:
-    - key: metadata.client.host:address
+    - key: $control
+      value: result[0].data.control
+    - key: $id
+      value: result[0].id
+    - key: $reason
+      value: result[0].data.reason
+    - key: $time
+      value: result[0].time
+    - key: $containerid
+      value: result[0].data.containerid
+    - key: $category
+      value: result[0].data.category
+    - key: $container
+      value: result[0].data.container
+    - key: $region
+      value: result[0].data.vm_location
+    - key: $image
+      value: result[0].data.image
+
+  - operation: delete
+    paths:
+    - key:
+
+  - operation: add
+    paths:
+    - key: dictionary.name
+      value: empty
+    - key: dictionary.version
+      value: "0.0.1"
+    - key: event.name
+      value: $control
+    - key: event.guid
+      value: $id
+    - key: event.url
+      value: ""
+    - key: event.shortDescription
+      value: $reason
+    - key: event.longDescription
+      value: $reason
+    - key: event.severity
+      value: high
+    - key: event.time
+      value: $time
+    - key: reporter.name
+      value: Aqua Security
+    - key: producer.name
+      value: Aqua Security
+    - key: resource.accountId
+      value: ""
+    - key: resource.platform
+      value: Azure
+    - key: resource.guid
+      value: $containerid
+    - key: resource.type
+      value: $category
+    - key: resource.name
+      value: $container
+    - key: resource.service
+      value: Azure Kubernetes Service
+    - key: resource.region
+      value: $region
+    - key: resource.package
+      value: $image

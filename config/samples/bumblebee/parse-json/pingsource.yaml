@@ -15,18 +15,114 @@
 apiVersion: sources.knative.dev/v1
 kind: PingSource
 metadata:
-  name: ping-source
+  name: json-source
 spec:
   schedule: "*/1 * * * *"
   contentType: "application/json"
   data: '{
-    "key1": "value1",
-    "metadata": {
-      "client": "{\"host\": \"localhost\",\"user-agent\": \"Mozilla/4.0\"}"
-    }
-  }'
+	"count": 2,
+	"page": 1,
+	"pagesize": 100,
+	"result": [{
+		"id": 442, "time": 1627587060, "date": 0, "type": "Container.Engine",
+		"user": "", "action": "exec", "image": "httpd:latest", "imagehash":
+		"sha256:73b8cfec11558fe86f565b4357f6d6c8560f4c49a5f15ae970a24da86c9adc93",
+		"imageid": "", "container": "apache", "containerid":
+		"5a4da19ff2703ad2f48db4d55e563a37828dccc0f11fb6c00e60a271ab3c37cb", "host":
+		"aks-default-15484652-vmss000001.tpe5bzjk4yoevknn00ux3h31kb.ax.internal.cloudapp.net",
+		"hostid": "5f38a4a3-8047-4b63-adf5-5608f2a9f6eb", "category": "container",
+		"result": 2, "data": "{\"host\":
+		\"aks-default-15484652-vmss000001.tpe5bzjk4yoevknn00ux3h31kb.ax.internal.cloudapp.net\",
+		\"rule\": \"test-block-exec\", \"time\": 1627587060, \"image\":
+		\"httpd:latest\", \"level\": \"block\", \"vm_id\":
+		\"909679a6-f7a8-4d1e-ab49-ebce7eaef47d\", \"action\": \"exec\", \"hostid\":
+		\"5f38a4a3-8047-4b63-adf5-5608f2a9f6eb\", \"hostip\": \"10.240.0.5\",
+		\"reason\": \"Unauthorized container exec\", \"result\": 2, \"tactic\":
+		\"Execution\", \"control\": \"Block Container Exec\", \"imageid\":
+		\"73b8cfec11558fe86f565b4357f6d6c8560f4c49a5f15ae970a24da86c9adc93\",
+		\"podname\": \"apache\", \"podtype\": \"container\", \"vm_name\":
+		\"aks-default-15484652-vmss_1\", \"category\": \"container\", \"resource\":
+		\"bash\", \"vm_group\": \"MC_rnd-aks2729-aks-rg_aks2729_westeurope\",
+		\"container\": \"apache\", \"hostgroup\":
+		\"aquactl-default-enforcer-group\", \"rule_type\": \"runtime.policy\",
+		\"technique\": \"Command and Script Interpreter\", \"repository\":
+		\"httpd\", \"containerid\":
+		\"5a4da19ff2703ad2f48db4d55e563a37828dccc0f11fb6c00e60a271ab3c37cb\",
+		\"k8s_cluster\": \"aqua-secure\", \"vm_location\": \"westeurope\",
+		\"podnamespace\": \"test\"}", "account_id": 0
+	}, {
+		"id": 436, "time": 1627587034, "date": 0, "type": "Container.Engine",
+		"user": "", "action": "exec", "image": "httpd:latest", "imagehash":
+		"sha256:73b8cfec11558fe86f565b4357f6d6c8560f4c49a5f15ae970a24da86c9adc93",
+		"imageid": "", "container": "apache", "containerid":
+		"273c69f6491d4b4020f722f2dd8b03e019e191eaa477cce7a18598d51835ebe4", "host":
+		"gke-gke13858-default-pool-7d239b21-fd49.c.aqua-envs-project.internal",
+		"hostid": "a682b26f-e6dd-45a7-9396-74827310daa7", "category": "container",
+		"result": 2, "data": "{\"host\":
+		\"gke-gke13858-default-pool-7d239b21-fd49.c.aqua-envs-project.internal\",
+		\"rule\": \"test-block-exec\", \"time\": 1627587034, \"image\":
+		\"httpd:latest\", \"level\": \"block\", \"vm_id\": \"7433215295842373882\",
+		\"action\": \"exec\", \"hostid\": \"a682b26f-e6dd-45a7-9396-74827310daa7\",
+		\"hostip\": \"10.43.0.2\", \"reason\": \"Unauthorized container exec\",
+		\"result\": 2, \"tactic\": \"Execution\", \"control\": \"Block Container
+		Exec\", \"imageid\":
+		\"73b8cfec11558fe86f565b4357f6d6c8560f4c49a5f15ae970a24da86c9adc93\",
+		\"podname\": \"apache\", \"podtype\": \"container\", \"vm_name\":
+		\"gke-gke13858-default-pool-7d239b21-fd49\", \"category\": \"container\",
+		\"resource\": \"bash\", \"container\": \"apache\", \"hostgroup\":
+		\"aquactl-default-enforcer-group\", \"rule_type\": \"runtime.policy\",
+		\"technique\": \"Command and Script Interpreter\", \"repository\":
+		\"httpd\", \"containerid\":
+		\"273c69f6491d4b4020f722f2dd8b03e019e191eaa477cce7a18598d51835ebe4\",
+		\"k8s_cluster\": \"Cluster-1\", \"vm_location\": \"us-central1-c\",
+		\"podnamespace\": \"test\"}", "account_id": 0
+	}],
+	"query": {
+		"identifiers_only": false,
+		"alert": 2,
+		"time": "",
+		"type": "",
+		"policy_name": "",
+		"cfappname": "",
+		"cfspace": "",
+		"cforg": "",
+		"servicefabric_cluster": "",
+		"servicefabric_service": "",
+		"servicefabric_app": "",
+		"container_name": "",
+		"container_id": "",
+		"action": "",
+		"host_name": "",
+		"image_name": "",
+		"user": "",
+		"docker_type": "",
+		"pod_name": "",
+		"pod_type": "",
+		"pod_namespace": "",
+		"pod_deployment": "",
+		"pod_daemonset": "",
+		"pod_job": "",
+		"swarm_service": "",
+		"time_unit": "",
+		"domain_name": "",
+		"tenant_name": "",
+		"registry_name": "",
+		"enforcer_group": "",
+		"kubernetes_cluster_name": "",
+		"image_repository": "",
+		"from_date": 0,
+		"to_date": 0,
+		"digest": "",
+		"tactic": "",
+		"technique": "",
+		"page": 1,
+		"pagesize": 100
+	},
+	"more_data_all_pages": 0,
+	"is_estimated_count": false
+}'
   sink:
     ref:
       apiVersion: flow.triggermesh.io/v1alpha1
       kind: Transformation
-      name: string-json-transformation
+      name: parse-transformation

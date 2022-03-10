@@ -218,29 +218,15 @@ func TestReceiveAndTransform(t *testing.T) {
 		}, {
 			name: "Parse operation",
 			originalEvent: setData(t, newEvent(),
-				json.RawMessage(`{"key1":"value1","strJSON":"{\"foo\":123,\"bar\":\"value2\",\"baz\":[\"one\",\"two\",\"three\"]}"}`)),
-			expectedEventData: `{"key1":"value1","number":"three"}`,
+				json.RawMessage(`{"key1":"value1","key2":[{"key3":"value3","strJSON":"{\"foo\":123,\"bar\":\"value2\",\"baz\":[\"one\",\"two\",\"three\"]}"}]}`)),
+			expectedEventData: `{"key1":"value1","key2":[{"key3":"value3","strJSON":{"bar":"value2","baz":["one","two","three"],"foo":123}}]}`,
 			data: []v1alpha1.Transform{
 				{
 					Operation: "parse",
 					Paths: []v1alpha1.Path{
 						{
-							Key:   "strJSON",
+							Key:   "key2[0].strJSON",
 							Value: "json",
-						},
-					},
-				}, {
-					Operation: "shift",
-					Paths: []v1alpha1.Path{
-						{
-							Key: "strJSON.baz[2]:number",
-						},
-					},
-				}, {
-					Operation: "delete",
-					Paths: []v1alpha1.Path{
-						{
-							Key: "strJSON",
 						},
 					},
 				},
