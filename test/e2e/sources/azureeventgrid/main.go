@@ -147,13 +147,6 @@ var _ = Describe("Azure Event Grid source", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
-
-				// FIXME(antoineco): Azure needs some extra time for setting up Event Grid's system
-				// topic upon creation of the Event Grid subscription by our reconciler. The source
-				// shouldn't report Ready before this system topic is available, because events occuring
-				// prior to that are dropped.
-				// Ref. https://github.com/triggermesh/triggermesh/issues/446
-				time.Sleep(1 * time.Minute)
 			})
 		})
 
