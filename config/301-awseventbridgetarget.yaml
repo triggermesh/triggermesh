@@ -84,7 +84,7 @@ spec:
                       name:
                         type: string
               arn:
-                description: ARN of the EventBridge EventBus that will receive events. The expected format is documented at
+                description: ARN of the EventBridge that will receive events. The expected format is documented at
                   https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoneventbridge.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:events:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:event-bus\/.+$
