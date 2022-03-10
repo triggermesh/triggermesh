@@ -724,6 +724,7 @@ func (in *AWSTargetStatus) DeepCopyInto(out *AWSTargetStatus) {
 	*out = *in
 	in.Status.DeepCopyInto(&out.Status)
 	in.AddressStatus.DeepCopyInto(&out.AddressStatus)
+	in.CloudEventStatus.DeepCopyInto(&out.CloudEventStatus)
 	return
 }
 
