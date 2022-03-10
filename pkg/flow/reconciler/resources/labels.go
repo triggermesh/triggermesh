@@ -33,7 +33,7 @@ const (
 
 // Common label values
 const (
-	PartOf            = "triggermesh-flow"
+	PartOf            = "triggermesh"
 	ManagedController = "triggermesh-controller"
 	AdapterComponent  = "adapter"
 )
