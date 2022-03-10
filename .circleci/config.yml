@@ -36,10 +36,6 @@ jobs:
               # should at least be up-to-date for the current dependencies' versions.
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
-          # XSLTTransformation needs libxml2.
-          name: Install libxml2
-          command: sudo apt-get update && sudo apt-get install -y libxml2-dev
-      - run:
           name: Run test/cover
           command: make cover
           environment:
@@ -110,11 +106,11 @@ jobs:
     resource_class: xlarge
     steps:
       - checkout
-      - gcp-cli/install
-      - gcp-cli/initialize
-      - run:
-          name: Adding Docker credHelpers for GCR
-          command: gcloud auth configure-docker
+      #- gcp-cli/install
+      #- gcp-cli/initialize
+      #- run:
+      #    name: Adding Docker credHelpers for GCR
+      #    command: gcloud auth configure-docker
       - go/load-cache
       - restore_cache:
           name: Restoring Go build cache
@@ -123,22 +119,22 @@ jobs:
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Installing ko
-          command: go install github.com/google/ko@v0.9.3
+          command: go install github.com/google/ko@3cf55a10c9f6b4b2f0804c859a2ee01ec7d62d23
       - setup_remote_docker:
           version: 20.10.11
           docker_layer_caching: true
       - run:
           name: Publishing container images
-          command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
+          command: ko resolve -L -B -t latest -f config/
           environment:
-            KO_DOCKER_REPO: gcr.io/triggermesh
+            #KO_DOCKER_REPO: gcr.io/triggermesh
             DIST_DIR: /tmp/dist/
-      - persist_to_workspace:
-          root: /tmp/
-          paths:
-            - dist/
-      - store_artifacts:
-          path: /tmp/dist/
+      #- persist_to_workspace:
+      #    root: /tmp/
+      #    paths:
+      #      - dist/
+      #- store_artifacts:
+      #    path: /tmp/dist/
 
   update-manifests:
     description: Patches target cluster configuration
@@ -241,59 +237,59 @@ jobs:
 workflows:
   test-and-publish:
     jobs:
-      - gomod-cache:
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      - test:
-          requires:
-            - gomod-cache
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      - gen-apidocs:
-          requires:
-            - test
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              only: main
+      - gomod-cache
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #- test:
+      #    requires:
+      #      - gomod-cache
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #- gen-apidocs:
+      #    requires:
+      #      - test
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #      branches:
+      #        only: main
       - publish-image:
           context: production
-          requires:
-            - gen-apidocs
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              only: main
-      - update-manifests:
-          name: update-staging-config
-          cluster: staging
-          requires:
-            - publish-image
-          filters:
-            branches:
-              only: main
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-      - update-manifests:
-          name: update-production-config
-          cluster: prod
-          requires:
-            - update-staging-config
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              ignore: /.*/
-      - release:
-          context: production
-          requires:
-            - publish-image
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              ignore: /.*/
+          #requires:
+          #  - gen-apidocs
+          #filters:
+          #  tags:
+          #    only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+          #  branches:
+          #    only: main
+      #- update-manifests:
+      #    name: update-staging-config
+      #    cluster: staging
+      #    requires:
+      #      - publish-image
+      #    filters:
+      #      branches:
+      #        only: main
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #- update-manifests:
+      #    name: update-production-config
+      #    cluster: prod
+      #    requires:
+      #      - update-staging-config
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #      branches:
+      #        ignore: /.*/
+      #- release:
+      #    context: production
+      #    requires:
+      #      - publish-image
+      #    filters:
+      #      tags:
+      #        only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+      #      branches:
+      #        ignore: /.*/
