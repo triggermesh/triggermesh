@@ -48,7 +48,7 @@ import (
 )
 
 const (
-	adapterName         = "klrfunction"
+	adapterName         = "function"
 	klrEntrypoint       = "/opt/aws-custom-runtime"
 	functionNameLabel   = "extensions.triggermesh.io/function"
 	ceDefaultTypePrefix = "io.triggermesh.function."

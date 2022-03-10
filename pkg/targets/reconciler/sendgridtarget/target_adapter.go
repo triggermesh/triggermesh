@@ -27,7 +27,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
-const adapterName = "sendgrid"
+const adapterName = "sendgridtarget"
 
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
