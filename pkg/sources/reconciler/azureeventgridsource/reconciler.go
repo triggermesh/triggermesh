@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureEventGr
 	// inject source into context for usage in reconciliation logic
 	ctx = v1alpha1.WithSource(ctx, o)
 
-	eventSubsCli, eventHubsCli, err := r.cg.Get(o)
+	sysTopicsCli, providersCli, resGroupsCli, eventSubsCli, eventHubsCli, err := r.cg.Get(o)
 	switch {
 	case isNoCredentials(err):
 		o.Status.MarkNotSubscribed(v1alpha1.AzureReasonNoClient, "Azure credentials missing: "+toErrMsg(err))
@@ -73,6 +73,11 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureEventGr
 			"Error obtaining Azure clients: %s", err))
 	}
 
+	sysTopicResID, err := ensureSystemTopic(ctx, sysTopicsCli, providersCli, resGroupsCli)
+	if err != nil {
+		return fmt.Errorf("failed to reconcile Event Grid system topic: %w", err)
+	}
+
 	eventHubResID, err := ensureEventHub(ctx, eventHubsCli)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile Event Hub: %w", err)
@@ -82,7 +87,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureEventGr
 		return fmt.Errorf("failed to reconcile Event Hubs event source adapter: %w", err)
 	}
 
-	return ensureEventSubscription(ctx, eventSubsCli, eventHubResID)
+	return ensureEventSubscription(ctx, eventSubsCli, sysTopicResID, eventHubResID)
 }
 
 // FinalizeKind is called when the resource is deleted.
@@ -90,7 +95,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureEventGri
 	// inject source into context for usage in finalization logic
 	ctx = v1alpha1.WithSource(ctx, o)
 
-	eventSubsCli, eventHubsCli, err := r.cg.Get(o)
+	sysTopicsCli, _, _, eventSubsCli, eventHubsCli, err := r.cg.Get(o)
 	switch {
 	case isNoCredentials(err):
 		// the finalizer is unlikely to recover from missing
@@ -104,14 +109,33 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureEventGri
 	}
 
 	// The finalizer blocks the deletion of the source object until the
-	// deletion of the event subscription and Event Hub succeed to ensure
-	// that we don't leave any dangling resources behind us.
+	// deletion of the event subscription, Event Hub, and system topic
+	// succeed to ensure that we don't leave any dangling resources behind us.
 
-	if err := ensureNoEventSubscription(ctx, eventSubsCli); err != nil {
+	systemTopic, err := findSystemTopic(ctx, sysTopicsCli, o)
+	switch {
+	case isDenied(err):
+		// it is unlikely that we recover from auth errors in the
+		// finalizer, so we simply record a warning event and continue
+		event.Warn(ctx, ReasonFailedUnsubscribe,
+			"Access denied to system topic API. Ignoring: %s", toErrMsg(err))
+	case err != nil:
+		return fmt.Errorf("looking up system topic: %w", err)
+	}
+
+	if err := ensureNoEventSubscription(ctx, eventSubsCli, systemTopic); err != nil {
 		return fmt.Errorf("failed to finalize event subscription: %w", err)
 	}
 
-	return ensureNoEventHub(ctx, eventHubsCli)
+	if err := ensureNoEventHub(ctx, eventHubsCli); err != nil {
+		return fmt.Errorf("failed to finalize Event Hub: %w", err)
+	}
+
+	if err := ensureNoSystemTopic(ctx, sysTopicsCli, eventSubsCli, systemTopic); err != nil {
+		return fmt.Errorf("failed to finalize event subscription: %w", err)
+	}
+
+	return nil
 }
 
 // isNoCredentials returns whether the given error indicates that some required

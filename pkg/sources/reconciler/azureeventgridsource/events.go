@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,6 +17,22 @@ limitations under the License.
 package azureeventgridsource
 
 const (
+	// ReasonSystemTopicSynced indicates that a system topic was created or updated.
+	ReasonSystemTopicSynced = "SystemTopicSynced"
+	// ReasonSystemTopicFinalized indicates that a system topic was finalized.
+	ReasonSystemTopicFinalized = "SystemTopicFinalized"
+	// ReasonFailedSystemTopic indicates a failure while synchronizing a system topic.
+	ReasonFailedSystemTopic = "FailedSystemTopic"
+
+	// ReasonSubscribed indicates that an event subscription was created or updated inside a system topic.
+	ReasonSubscribed = "Subscribed"
+	// ReasonUnsubscribed indicates that an event subscription was removed from a system topic.
+	ReasonUnsubscribed = "Unsubscribed"
+	// ReasonFailedSubscribe indicates a failure while synchronizing an event subscription in a system topic.
+	ReasonFailedSubscribe = "FailedSubscribe"
+	// ReasonFailedUnsubscribe indicates a failure while removing an event subscription from a system topic.
+	ReasonFailedUnsubscribe = "FailedUnsubscribe"
+
 	// ReasonEventHubCreated indicates that an Event Hub was created for receiving events.
 	ReasonEventHubCreated = "EventHubCreated"
 	// ReasonEventHubDeleted indicates that an Event Hub used for receiving events was deleted.
@@ -24,12 +40,8 @@ const (
 	// ReasonFailedEventHub indicates a failure while synchronizing the Event Hub for receiving events.
 	ReasonFailedEventHub = "FailedEventHub"
 
-	// ReasonSubscribed indicates that an event subscription was enabled for an Azure resource.
-	ReasonSubscribed = "Subscribed"
-	// ReasonUnsubscribed indicates that an event subscription was removed for an Azure resource.
-	ReasonUnsubscribed = "Unsubscribed"
-	// ReasonFailedSubscribe indicates a failure while synchronizing an event subscription for an Azure resource.
-	ReasonFailedSubscribe = "FailedSubscribe"
-	// ReasonFailedUnsubscribe indicates a failure while removing an event subscription for an Azure resource.
-	ReasonFailedUnsubscribe = "FailedUnsubscribe"
+	// ReasonResourceGroupCreated indicates that a resource group was created.
+	ReasonResourceGroupCreated = "ResourceGroupCreated"
+	// ReasonFailedEventHub indicates a failure while synchronizing a resource group.
+	ReasonFailedResourceGroup = "FailedResourceGroup"
 )
