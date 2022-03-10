@@ -39,8 +39,8 @@ var _ reconcilers.Interface = (*eventBridgeReconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *eventBridgeReconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSEventBridgeTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
+	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
+	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
 
 	if trg.Spec.AWSApiKey.SecretKeyRef != nil {
 		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.AWSApiKey.SecretKeyRef)

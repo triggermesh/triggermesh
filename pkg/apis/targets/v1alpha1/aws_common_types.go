@@ -31,4 +31,7 @@ type AWSTargetStatus struct {
 
 	// AddressStatus fulfills the Addressable contract.
 	duckv1.AddressStatus `json:",inline"`
+
+	// Accepted/emitted CloudEvent attributes
+	CloudEventStatus `json:",inline"`
 }

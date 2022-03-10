@@ -20,7 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	"knative.dev/pkg/kmeta"
 )
@@ -56,7 +55,7 @@ type AWSEventBridgeTargetSpec struct {
 	// AWS account secret key
 	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
 
-	// Amazon Resource Name of the EventBridge EventBus.
+	// Amazon Resource Name of the EventBridge Event Bus.
 	// https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoneventbridge.html
 	ARN string `json:"arn"`
 
@@ -74,14 +73,4 @@ type AWSEventBridgeTargetList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []AWSEventBridgeTarget `json:"items"`
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AWSEventBridgeTarget) GetConditionSet() apis.ConditionSet {
-	return AwsCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AWSEventBridgeTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
 }

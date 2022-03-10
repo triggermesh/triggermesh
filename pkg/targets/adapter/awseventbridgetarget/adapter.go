@@ -101,8 +101,13 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 		return a.reportError("error publishing to eventbridge", err)
 	}
 
+	jsonResult, err := json.Marshal(result.GoString())
+	if err != nil {
+		return a.reportError("Error marshalling result", err)
+	}
+
 	responseEvent := cloudevents.NewEvent(cloudevents.VersionV1)
-	err = responseEvent.SetData(cloudevents.ApplicationJSON, result.GoString())
+	err = responseEvent.SetData(cloudevents.ApplicationJSON, jsonResult)
 	if err != nil {
 		return a.reportError("error generating response event", err)
 	}

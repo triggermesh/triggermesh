@@ -38,7 +38,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AWS_EVENTBRIDGE_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awseventbridgetarget-adapter"`
+	Image string `envconfig:"AWS_EVENTBRIDGETARGET_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awseventbridgetarget-adapter"`
 }
 
 func makeTargetEventBridgeAdapterKService(target *v1alpha1.AWSEventBridgeTarget, cfg *adapterConfig) *servingv1.Service {

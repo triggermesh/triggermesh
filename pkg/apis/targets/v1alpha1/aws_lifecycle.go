@@ -50,6 +50,11 @@ func (s *AWSEventBridgeTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSEventBridgeTarget")
 }
 
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (s *AWSKinesisTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSKinesisTarget")
+}
+
 // GetGroupVersionKind returns the GroupVersionKind.
 func (s *AWSLambdaTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSLambdaTarget")
@@ -63,11 +68,6 @@ func (s *AWSSNSTarget) GetGroupVersionKind() schema.GroupVersionKind {
 // GetGroupVersionKind implements kmeta.OwnerRefable.
 func (s *AWSSQSTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("AWSSQSTarget")
-}
-
-// GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *AWSKinesisTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AWSKinesisTarget")
 }
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
