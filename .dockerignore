@@ -1,0 +1,31 @@
+# Top level files and directories
+/.assets/
+/.circleci/
+/.git/
+/.github/
+/docs/
+/hack/
+!/hack/inc.Codegen.mk
+/packer/
+/schemas/
+/test/
+/.dockerignore
+/.golangci.yaml
+/.ko.yaml
+/CODEOWNERS
+/README.md
+/kustomization.yaml
+
+# Files copied to KO_DATA_PATH directory
+!/.git/HEAD
+!/.git/refs/
+
+# Patterns
+**/config/
+**/*.md
+**/*_test.go
+**/.gitignore
+**/Dockerfile
+
+# Binaries
+**/_output/
