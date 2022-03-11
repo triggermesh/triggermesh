@@ -26,6 +26,7 @@ import (
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	xslt "github.com/wamuir/go-xslt"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
@@ -111,19 +112,11 @@ const (
 `
 
 	tOutXML = `<?xml version="1.0"?>
-<output>
-  <item>A1</item>
-  <item>B2</item>
-  <item>C3</item>
-</output>
+<output><item>A1</item><item>B2</item><item>C3</item></output>
 `
 
 	tAlternativeOutXML = `<?xml version="1.0"?>
-<alt>
-  <item>A1</item>
-  <item>B2</item>
-  <item>C3</item>
-</alt>
+<alt><item>A1</item><item>B2</item><item>C3</item></alt>
 `
 )
 
@@ -181,7 +174,7 @@ func TestXSLTTransformationEvents(t *testing.T) {
 			allowXSLTOverride: false,
 			xslt:              tFaultyXML,
 
-			expectPanic: "Non valid XSLT document",
+			expectPanic: "XSLT validation error: failed to parse xsl",
 		},
 
 		"wrong configuration not providing XSLT": {
@@ -197,7 +190,7 @@ func TestXSLTTransformationEvents(t *testing.T) {
 			inEvent:           newCloudEvent(tFaultyXML, cloudevents.ApplicationXML),
 
 			expectEvent: newCloudEvent(
-				createErrorResponse(targetce.ErrorCodeRequestParsing, "failed to parse xml input"),
+				createErrorResponse(targetce.ErrorCodeRequestValidation, "error processing XML with XSLT: xsl transformation failed"),
 				cloudevents.ApplicationJSON),
 			expectCategory: tErrorAttribute,
 		},
@@ -275,7 +268,7 @@ func TestXSLTTransformationToSink(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
 			ctx := context.Background()
-			style, err := parseXSLT(tc.xslt)
+			style, err := xslt.NewStylesheet([]byte(tc.xslt))
 			assert.NoError(t, err)
 
 			a := &xsltTransformAdapter{
@@ -293,6 +286,7 @@ func TestXSLTTransformationToSink(t *testing.T) {
 
 			events := ceClient.Sent()
 			require.Equal(t, 1, len(events))
+			t.Log(string(events[0].Data()))
 			assert.Equal(t, tc.expectedEvent, events[0])
 		})
 	}

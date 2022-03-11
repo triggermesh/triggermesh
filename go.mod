@@ -51,8 +51,6 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/ibm-messaging/mq-golang/v5 v5.2.5
 	github.com/jarcoal/httpmock v1.1.0
-	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f
-	github.com/jbowtie/ratago v0.0.0-20200401224626-3140c0a9b186
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
@@ -65,6 +63,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tektoncd/pipeline v0.32.1
 	github.com/tidwall/gjson v1.14.0
+	github.com/wamuir/go-xslt v0.1.4
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.29.0
 	go.opentelemetry.io/otel v1.4.1

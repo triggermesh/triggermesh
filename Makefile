@@ -53,7 +53,9 @@ GOPKGS_SKIP_TESTS  = $(GOMODULE)/pkg/sources/reconciler/ibmmqsource \
                      $(GOMODULE)/pkg/targets/adapter/ibmmqtarget \
                      $(GOMODULE)/pkg/sources/adapter/ibmmqsource \
                      $(GOMODULE)/cmd/ibmmqsource-adapter \
-                     $(GOMODULE)/cmd/ibmmqtarget-adapter
+                     $(GOMODULE)/cmd/ibmmqtarget-adapter \
+                     $(GOMODULE)/cmd/xslttransformation-adapter \
+                     $(GOMODULE)/pkg/flow/adapter/xslttransformation
 
 LDFLAGS            = -w -s
 LDFLAGS_STATIC     = $(LDFLAGS) -extldflags=-static
@@ -95,10 +97,6 @@ $(filter-out $(CUSTOM_BUILD_BINARIES), $(COMMANDS)): ## Build artifact
 
 confluenttarget-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS_STATIC)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
-
-# Not statically linked
-xslttransformation-adapter: ## Builds XML related functionality
-	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster
 	$(KO) resolve -f $(BASE_DIR)/config > $(BASE_DIR)/triggermesh-$(IMAGE_TAG).yaml
