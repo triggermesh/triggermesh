@@ -62,6 +62,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awscomprehendtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awsdynamodbtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awseventbridgetarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awskinesistarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awslambdatarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awss3target"
@@ -133,6 +134,7 @@ func main() {
 		alibabaosstarget.NewController,
 		awscomprehendtarget.NewController,
 		awsdynamodbtarget.NewController,
+		awseventbridgetarget.NewController,
 		awskinesistarget.NewController,
 		awslambdatarget.NewController,
 		awss3target.NewController,

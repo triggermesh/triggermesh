@@ -5681,6 +5681,137 @@ func (w *wrapTargetsV1alpha1AWSDynamoDBTargetImpl) Watch(ctx context.Context, op
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapTargetsV1alpha1) AWSEventBridgeTargets(namespace string) typedtargetsv1alpha1.AWSEventBridgeTargetInterface {
+	return &wrapTargetsV1alpha1AWSEventBridgeTargetImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "targets.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "awseventbridgetargets",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapTargetsV1alpha1AWSEventBridgeTargetImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedtargetsv1alpha1.AWSEventBridgeTargetInterface = (*wrapTargetsV1alpha1AWSEventBridgeTargetImpl)(nil)
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.AWSEventBridgeTarget, opts v1.CreateOptions) (*targetsv1alpha1.AWSEventBridgeTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AWSEventBridgeTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AWSEventBridgeTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.AWSEventBridgeTarget, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AWSEventBridgeTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.AWSEventBridgeTargetList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AWSEventBridgeTargetList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.AWSEventBridgeTarget, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AWSEventBridgeTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.AWSEventBridgeTarget, opts v1.UpdateOptions) (*targetsv1alpha1.AWSEventBridgeTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AWSEventBridgeTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AWSEventBridgeTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.AWSEventBridgeTarget, opts v1.UpdateOptions) (*targetsv1alpha1.AWSEventBridgeTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AWSEventBridgeTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AWSEventBridgeTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AWSEventBridgeTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapTargetsV1alpha1) AWSKinesisTargets(namespace string) typedtargetsv1alpha1.AWSKinesisTargetInterface {
 	return &wrapTargetsV1alpha1AWSKinesisTargetImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{

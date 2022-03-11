@@ -36,6 +36,10 @@ func (c *FakeTargetsV1alpha1) AWSDynamoDBTargets(namespace string) v1alpha1.AWSD
 	return &FakeAWSDynamoDBTargets{c, namespace}
 }
 
+func (c *FakeTargetsV1alpha1) AWSEventBridgeTargets(namespace string) v1alpha1.AWSEventBridgeTargetInterface {
+	return &FakeAWSEventBridgeTargets{c, namespace}
+}
+
 func (c *FakeTargetsV1alpha1) AWSKinesisTargets(namespace string) v1alpha1.AWSKinesisTargetInterface {
 	return &FakeAWSKinesisTargets{c, namespace}
 }

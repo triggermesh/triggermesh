@@ -145,6 +145,7 @@ rules:
   - alibabaosstargets
   - awscomprehendtargets
   - awsdynamodbtargets
+  - awseventbridgetargets
   - awskinesistargets
   - awslambdatargets
   - awss3targets
@@ -185,6 +186,7 @@ rules:
   - alibabaosstargets/status
   - awscomprehendtargets/status
   - awsdynamodbtargets/status
+  - awseventbridgetargets/status
   - awskinesistargets/status
   - awslambdatargets/status
   - awss3targets/status
@@ -321,6 +323,7 @@ rules:
   - alibabaosstargets/finalizers
   - awscomprehendtargets/finalizers
   - awsdynamodbtargets/finalizers
+  - awseventbridgetargets/finalizers
   - awskinesistargets/finalizers
   - awslambdatargets/finalizers
   - awss3targets/finalizers
@@ -801,6 +804,7 @@ rules:
   - alibabaosstargets
   - awscomprehendtargets
   - awsdynamodbtargets
+  - awseventbridgetargets
   - awskinesistargets
   - awslambdatargets
   - awss3targets
