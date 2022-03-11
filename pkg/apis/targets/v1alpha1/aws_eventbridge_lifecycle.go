@@ -30,7 +30,6 @@ const (
 // AcceptedEventTypes implements IntegrationTarget.
 func (*AWSEventBridgeTarget) AcceptedEventTypes() []string {
 	return []string{
-		EventTypeAWSEventBridgeResult,
 		EventTypeWildcard,
 	}
 }
@@ -44,7 +43,7 @@ func (*AWSEventBridgeTarget) GetEventTypes() []string {
 
 // AsEventSource implements targets.EventSource.
 func (s *AWSEventBridgeTarget) AsEventSource() string {
-	return s.Spec.ARN
+	return "io.triggermesh.awseventbridgetargets/" + s.Namespace + "/" + s.Name
 }
 
 // GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
