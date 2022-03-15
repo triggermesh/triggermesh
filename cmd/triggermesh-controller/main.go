@@ -19,6 +19,8 @@ package main
 import (
 	"knative.dev/pkg/injection/sharedmain"
 
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
+
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xmltojsontransformation"
@@ -167,6 +169,7 @@ func main() {
 		// transformation
 		synchronizer.NewController,
 		transformation.NewController,
+		jqtransformation.NewController,
 		xmltojsontransformation.NewController,
 		xslttransformation.NewController,
 		// functions

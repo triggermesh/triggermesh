@@ -171,6 +171,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         - name: XMLTOJSONTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
+        - name: JQTRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
         - name: SYNCHRONIZER_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         # Routing adapters

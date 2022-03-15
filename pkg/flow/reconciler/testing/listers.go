@@ -77,6 +77,11 @@ func (l *Listers) GetXSLTTransformationObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(triggermeshclient.AddToScheme)
 }
 
+// GetJQTransformationObjects returns objects from the TriggerMesh API.
+func (l *Listers) GetJQTransformationObjects() []runtime.Object {
+	return l.sorter.ObjectsForSchemeFunc(triggermeshclient.AddToScheme)
+}
+
 // GetKubeObjects returns objects from the targets API.
 func (l *Listers) GetKubeObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakek8sclient.AddToScheme)
@@ -87,9 +92,14 @@ func (l *Listers) GetServingObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
 }
 
-// GetXSLTTransformationLister returns a Lister for GoogleSheetTarget objects.
+// GetXSLTTransformationLister returns a Lister for XSLTTransformation objects.
 func (l *Listers) GetXSLTTransformationLister() flowlisters.XSLTTransformationLister {
 	return flowlisters.NewXSLTTransformationLister(l.IndexerFor(&flowv1alpha1.XSLTTransformation{}))
+}
+
+// GetJQTransformationLister returns a Lister for JQTransformation objects.
+func (l *Listers) GetJQTransformationLister() flowlisters.JQTransformationLister {
+	return flowlisters.NewJQTransformationLister(l.IndexerFor(&flowv1alpha1.JQTransformation{}))
 }
 
 // GetServiceLister returns a lister for Service objects.

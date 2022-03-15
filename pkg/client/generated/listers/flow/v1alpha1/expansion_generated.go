@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1alpha1
 
+// JQTransformationListerExpansion allows custom methods to be added to
+// JQTransformationLister.
+type JQTransformationListerExpansion interface{}
+
+// JQTransformationNamespaceListerExpansion allows custom methods to be added to
+// JQTransformationNamespaceLister.
+type JQTransformationNamespaceListerExpansion interface{}
+
 // SynchronizerListerExpansion allows custom methods to be added to
 // SynchronizerLister.
 type SynchronizerListerExpansion interface{}
