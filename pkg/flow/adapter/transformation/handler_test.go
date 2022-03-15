@@ -36,21 +36,21 @@ var availableTransformations = []v1alpha1.Transform{
 }
 
 func TestNewHandler(t *testing.T) {
-	_, err := NewHandler(availableTransformations, availableTransformations)
+	_, err := newHandler(availableTransformations, availableTransformations)
 	assert.NoError(t, err)
 }
 
 func TestStart(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	pipeline, err := NewHandler(availableTransformations, availableTransformations)
+	pipeline, err := newHandler(availableTransformations, availableTransformations)
 	assert.NoError(t, err)
 
 	errChan := make(chan error)
 
 	go func() {
 		defer close(errChan)
-		errChan <- pipeline.Start(ctx, "")
+		errChan <- pipeline.Start(ctx)
 	}()
 
 	cancel()
@@ -280,7 +280,7 @@ func TestReceiveAndTransform(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			pipeline, err := NewHandler([]v1alpha1.Transform{}, tc.data)
+			pipeline, err := newHandler([]v1alpha1.Transform{}, tc.data)
 			assert.NoError(t, err)
 
 			transformedEvent, err := pipeline.applyTransformations(tc.originalEvent)
