@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/kelseyhightower/envconfig"
@@ -148,18 +149,29 @@ func (t *adapter) Start(ctx context.Context) error {
 }
 
 func (t *adapter) receiveAndReply(event cloudevents.Event) (*cloudevents.Event, error) {
-	return t.applyTransformations(event)
+	result, err := t.applyTransformations(event)
+	if err != nil {
+		t.sr.reportEventProcessingError()
+	}
+	return result, err
 }
 
 func (t *adapter) receiveAndSend(ctx context.Context, event cloudevents.Event) error {
 	result, err := t.applyTransformations(event)
 	if err != nil {
+		t.sr.reportEventProcessingError()
 		return err
 	}
 	return t.client.Send(ctx, *result)
 }
 
 func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
+	t.sr.reportEventProcessingCount()
+	start := time.Now()
+	defer func() {
+		duration := time.Since(start)
+		t.sr.reportEventProcessingTime(duration.Microseconds())
+	}()
 	// HTTPTargets sets content type from HTTP headers, i.e.:
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality

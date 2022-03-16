@@ -21,6 +21,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
+	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
@@ -34,7 +35,10 @@ import (
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
 )
 
-type envConfig struct {
+type adapterConfig struct {
+	// Configuration accessor for logging/metrics/tracing
+	configs source.ConfigAccessor
+
 	Image string `envconfig:"TRANSFORMER_IMAGE" default:"gcr.io/triggermesh/transformation-adapter"`
 }
 
@@ -45,18 +49,19 @@ func NewController(
 ) *controller.Impl {
 	logger := logging.FromContext(ctx)
 
+	adapterCfg := &adapterConfig{
+		configs: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
+	}
+	envconfig.MustProcess(adapterName, adapterCfg)
+
 	transformationInformer := informerv1alpha1.Get(ctx)
 	knsvcInformer := knsvcinformer.Get(ctx)
 
 	r := &Reconciler{
 		servingClientSet: servingv1client.Get(ctx),
 		knServiceLister:  knsvcInformer.Lister(),
+		adapterCfg:       adapterCfg,
 	}
-
-	env := &envConfig{}
-	envconfig.MustProcess("", env)
-
-	r.transformerImage = env.Image
 
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))

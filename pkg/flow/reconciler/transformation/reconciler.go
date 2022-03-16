@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strconv"
 
 	"go.uber.org/zap"
 	corev1 "k8s.io/api/core/v1"
@@ -43,7 +44,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
 	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation/resources"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
 )
 
 const (
@@ -52,6 +53,9 @@ const (
 	envSink               = "K_SINK"
 	envTransformationCtx  = "TRANSFORMATION_CONTEXT"
 	envTransformationData = "TRANSFORMATION_DATA"
+
+	metricsPrometheusPortKsvc uint16 = 9092
+	envMetricsPrometheusPort         = "METRICS_PROMETHEUS_PORT"
 )
 
 // newReconciledNormal makes a new reconciler event with event type Normal, and
@@ -71,9 +75,10 @@ type Reconciler struct {
 	knServiceLister  servingv1listers.ServiceLister
 	servingClientSet servingv1client.Interface
 
-	sinkResolver *resolver.URIResolver
+	// adapter properties
+	adapterCfg *adapterConfig
 
-	transformerImage string
+	sinkResolver *resolver.URIResolver
 }
 
 // Check that our Reconciler implements Interface
@@ -142,16 +147,18 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, trn *v1alpha1.Trans
 	genericLabels := libreconciler.MakeGenericLabels(adapterName, trn.Name)
 	ksvcLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
 	podLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
+	envSvc := libreconciler.MakeServiceEnv(trn.Name, trn.Namespace)
 	ksvcLabels[pkgnetwork.VisibilityLabelKey] = serving.VisibilityClusterLocal
 
-	expectedKsvc := resources.NewKnService(trn.Namespace, trn.Name,
-		resources.Image(r.transformerImage),
+	expectedKsvc := resources.MakeKService(trn.Namespace, trn.Name, r.adapterCfg.Image,
+		resources.KsvcPodEnvVars(append(r.adapterCfg.configs.ToEnvVars(), envSvc...)),
 		resources.EnvVar(envTransformationCtx, string(trnContext)),
 		resources.EnvVar(envTransformationData, string(trnData)),
 		resources.EnvVar(envSink, sink),
+		resources.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
 		resources.KsvcLabels(ksvcLabels),
 		resources.KsvcPodLabels(podLabels),
-		resources.Owner(trn),
+		resources.KsvcOwner(trn),
 	)
 
 	ksvc, err := r.knServiceLister.Services(trn.Namespace).Get(trn.Name)
