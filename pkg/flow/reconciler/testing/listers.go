@@ -72,13 +72,8 @@ func (l *Listers) IndexerFor(obj runtime.Object) cache.Indexer {
 	return l.sorter.IndexerForObjectType(obj)
 }
 
-// GetXSLTTransformationObjects returns objects from the TriggerMesh API.
-func (l *Listers) GetXSLTTransformationObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(triggermeshclient.AddToScheme)
-}
-
-// GetJQTransformationObjects returns objects from the TriggerMesh API.
-func (l *Listers) GetJQTransformationObjects() []runtime.Object {
+// GetFlowObjects returns objects from the TriggerMesh API.
+func (l *Listers) GetFlowObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(triggermeshclient.AddToScheme)
 }
 
