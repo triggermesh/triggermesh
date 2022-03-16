@@ -19,6 +19,7 @@ package main
 import (
 	"knative.dev/pkg/injection/sharedmain"
 
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xmltojsontransformation"
@@ -165,6 +166,7 @@ func main() {
 		uipathtarget.NewController,
 		zendesktarget.NewController,
 		// transformation
+		jqtransformation.NewController,
 		synchronizer.NewController,
 		transformation.NewController,
 		xmltojsontransformation.NewController,

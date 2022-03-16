@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -51,6 +51,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&SynchronizerList{},
 		&Transformation{},
 		&TransformationList{},
+		&JQTransformation{},
+		&JQTransformationList{},
 		&XSLTTransformation{},
 		&XSLTTransformationList{},
 		&XMLToJSONTransformation{},

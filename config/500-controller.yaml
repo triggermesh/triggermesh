@@ -167,12 +167,14 @@ spec:
         - name: ZENDESK_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
         # Flow adapters
+        - name: JQTRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
+        - name: SYNCHRONIZER_ADAPTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         - name: XMLTOJSONTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
-        - name: SYNCHRONIZER_ADAPTER_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         # Routing adapters
         - name: FILTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter

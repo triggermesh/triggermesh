@@ -58,7 +58,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 
 		// the controller.Reconciler uses an internal client to handle
 		// component objects
-		ctx, xsltclient := faketminjectionclient.With(ctx, ls.GetXSLTTransformationObjects()...)
+		ctx, flowclient := faketminjectionclient.With(ctx, ls.GetFlowObjects()...)
 
 		// all clients used inside reconciler implementations should be
 		// injected as well
@@ -88,7 +88,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 
 		// inject reactors from table row
 		for _, reactor := range tr.WithReactors {
-			xsltclient.PrependReactor("*", "*", reactor)
+			flowclient.PrependReactor("*", "*", reactor)
 			k8sClient.PrependReactor("*", "*", reactor)
 			servingClient.PrependReactor("*", "*", reactor)
 		}
@@ -96,7 +96,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		actionRecorderList := rt.ActionRecorderList{
 			// TriggerMesh clients are merely used here to record status updates,
 			// reconcilers don't create or update these objects otherwise.
-			xsltclient,
+			flowclient,
 
 			k8sClient,
 			servingClient,
