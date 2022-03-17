@@ -21,9 +21,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"strings"
 
+	"go.uber.org/zap"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
@@ -35,6 +41,25 @@ type Handler struct {
 	DataPipeline    *Pipeline
 
 	client cloudevents.Client
+
+	sinkURI *url.URL
+}
+
+var _ pkgadapter.Adapter = (*Handler)(nil)
+
+// envConfig is a set of parameters sourced from the environment and used to
+// initialize the handler.
+type envConfig struct {
+	pkgadapter.EnvConfig
+
+	// Transformation specifications
+	TransformationContext string `envconfig:"TRANSFORMATION_CONTEXT"`
+	TransformationData    string `envconfig:"TRANSFORMATION_DATA"`
+}
+
+// NewEnvConfig returns an accessor for the component's envConfig.
+func NewEnvConfig() pkgadapter.EnvConfigAccessor {
+	return &envConfig{}
 }
 
 // ceContext represents CloudEvents context structure but with exported Extensions.
@@ -43,16 +68,29 @@ type ceContext struct {
 	Extensions                  map[string]interface{} `json:"Extensions,omitempty"`
 }
 
-// NewHandler creates Handler instance.
-func NewHandler(context, data []v1alpha1.Transform) (Handler, error) {
-	contextPipeline, err := newPipeline(context)
-	if err != nil {
-		return Handler{}, err
+// NewHandler satisfies pkgadapter.AdapterConstructor by creating a Handler instance.
+func NewHandler(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, _ cloudevents.Client) pkgadapter.Adapter {
+	logger := logging.FromContext(ctx)
+
+	env := envAcc.(*envConfig)
+
+	trnContext, trnData := []v1alpha1.Transform{}, []v1alpha1.Transform{}
+
+	if err := json.Unmarshal([]byte(env.TransformationContext), &trnContext); err != nil {
+		logger.Panicw("Cannot unmarshal Context Transformation variable", zap.Error(err))
+	}
+	if err := json.Unmarshal([]byte(env.TransformationData), &trnData); err != nil {
+		logger.Panicw("Cannot unmarshal Data Transformation variable", zap.Error(err))
 	}
 
-	dataPipeline, err := newPipeline(data)
+	contextPipeline, err := newPipeline(trnContext)
 	if err != nil {
-		return Handler{}, err
+		logger.Panicw("Failed to create Context pipeline", zap.Error(err))
+	}
+
+	dataPipeline, err := newPipeline(trnData)
+	if err != nil {
+		logger.Panicw("Failed to create Data pipeline", zap.Error(err))
 	}
 
 	sharedVars := storage.New()
@@ -61,25 +99,33 @@ func NewHandler(context, data []v1alpha1.Transform) (Handler, error) {
 
 	ceClient, err := cloudevents.NewClientHTTP()
 	if err != nil {
-		return Handler{}, err
+		logger.Panicw("Failed to create CloudEvents client", zap.Error(err))
 	}
 
-	return Handler{
+	var sinkURI *url.URL
+	if sinkEnv := env.GetSink(); sinkEnv != "" {
+		sinkURI, err = url.Parse(sinkEnv)
+	}
+
+	return &Handler{
 		ContextPipeline: contextPipeline,
 		DataPipeline:    dataPipeline,
 
 		client: ceClient,
-	}, nil
+
+		sinkURI: sinkURI,
+	}
 }
 
 // Start runs CloudEvent receiver and applies transformation Pipeline
 // on incoming events.
-func (t *Handler) Start(ctx context.Context, sink string) error {
-	log.Println("Starting CloudEvent receiver")
+func (t *Handler) Start(ctx context.Context) error {
+	logging.FromContext(ctx).Info("Starting CloudEvents receiver")
+
 	var receiver interface{}
 	receiver = t.receiveAndReply
-	if sink != "" {
-		ctx = cloudevents.ContextWithTarget(ctx, sink)
+	if t.sinkURI != nil {
+		ctx = cloudevents.ContextWithTarget(ctx, t.sinkURI.String())
 		receiver = t.receiveAndSend
 	}
 
