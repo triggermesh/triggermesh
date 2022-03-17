@@ -163,9 +163,9 @@ var _ = Describe("Azure Event Grid source", func() {
 			})
 
 			Specify("the source generates an event", func() {
-				// There can be a significant delay (1-4 min) between the moment an Azure resource is
+				// There can be a significant delay (1-10 min) between the moment an Azure resource is
 				// created and Event Grid emits the corresponding 'ResourceWriteSuccess' event.
-				const receiveTimeout = 4 * time.Minute
+				const receiveTimeout = 10 * time.Minute
 				const pollInterval = 500 * time.Millisecond
 
 				var receivedEvents []cloudevents.Event
