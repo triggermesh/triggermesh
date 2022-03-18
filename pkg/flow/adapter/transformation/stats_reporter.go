@@ -30,9 +30,9 @@ import (
 )
 
 const (
-	metricNameEventsProcessingTime  = "events_processing_time"
-	metricNameEventsProcessingCount = "events_processing_count"
-	metricNameEventsProcessingErrs  = "events_processing_errors"
+	metricNameEventsProcessingLatencies = "events_processing_latencies"
+	metricNameEventsProcessingCount     = "events_processing_count"
+	metricNameEventsProcessingErrs      = "events_processing_errors"
 )
 
 var (
@@ -41,19 +41,21 @@ var (
 	tagKeyName          = tag.MustNewKey(eventingmetrics.LabelName)
 )
 
-// eventsProcessingTime
-var eventsProcessingTime = stats.Int64(
-	metricNameEventsProcessingTime,
-	"Time spent on the events transformation",
+// eventsProcessingLatencies records the latencies of events processing.
+var eventsProcessingLatencies = stats.Int64(
+	metricNameEventsProcessingLatencies,
+	"The time spent on the events transformation",
 	stats.UnitMilliseconds,
 )
 
+// eventsProcessingLatencies records the count of events transformation.
 var eventsProcessingCount = stats.Int64(
 	metricNameEventsProcessingCount,
 	"Number of transformed events",
 	stats.UnitDimensionless,
 )
 
+// eventsProcessingLatencies records the count of events processing errors.
 var eventsProcessingErrs = stats.Int64(
 	metricNameEventsProcessingErrs,
 	"Number of times adapter failed to send the event",
@@ -77,15 +79,15 @@ func mustRegisterStatsView() {
 
 	err := view.Register(
 		&view.View{
-			Measure:     eventsProcessingTime,
-			Description: eventsProcessingTime.Description(),
-			Aggregation: view.Count(),
+			Measure:     eventsProcessingLatencies,
+			Description: eventsProcessingLatencies.Description(),
+			Aggregation: view.Distribution(metrics.Buckets125(1, 1000)...), // 1, 2, 5, 10, 20, 50, 100, 500, 1000, 5000, 10000
 			TagKeys:     tagKeys,
 		},
 		&view.View{
 			Measure:     eventsProcessingCount,
 			Description: eventsProcessingCount.Description(),
-			Aggregation: view.Sum(),
+			Aggregation: view.Count(),
 			TagKeys:     tagKeys,
 		},
 		&view.View{
@@ -117,17 +119,17 @@ func mustNewStatsReporter(tags *pkgadapter.MetricTag) *statsReporter {
 	}
 }
 
-// reportEventProcessingTime
+// reportEventProcessingTime sets the value of eventsProcessingLatencies.
 func (r *statsReporter) reportEventProcessingTime(duration int64) {
-	metrics.Record(r.tagsCtx, eventsProcessingTime.M(duration))
+	metrics.Record(r.tagsCtx, eventsProcessingLatencies.M(duration))
 }
 
-// reportEventProcessingCount
+// reportEventProcessingCount sets the value of eventsProcessingCount.
 func (r *statsReporter) reportEventProcessingCount() {
 	metrics.Record(r.tagsCtx, eventsProcessingCount.M(1))
 }
 
-// reportEventProcessingCount
+// reportEventProcessingCount sets the value of eventsProcessingErrs.
 func (r *statsReporter) reportEventProcessingError() {
 	metrics.Record(r.tagsCtx, eventsProcessingErrs.M(1))
 }

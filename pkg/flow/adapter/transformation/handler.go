@@ -169,8 +169,7 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	t.sr.reportEventProcessingCount()
 	start := time.Now()
 	defer func() {
-		duration := time.Since(start)
-		t.sr.reportEventProcessingTime(duration.Microseconds())
+		t.sr.reportEventProcessingTime(time.Since(start).Milliseconds())
 	}()
 	// HTTPTargets sets content type from HTTP headers, i.e.:
 	// "datacontenttype: application/json; charset=utf-8"
