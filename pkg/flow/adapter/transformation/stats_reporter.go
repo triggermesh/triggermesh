@@ -129,7 +129,7 @@ func (r *statsReporter) reportEventProcessingCount() {
 	metrics.Record(r.tagsCtx, eventsProcessingCount.M(1))
 }
 
-// reportEventProcessingCount sets the value of eventsProcessingErrs.
+// reportEventProcessingError sets the value of eventsProcessingErrs.
 func (r *statsReporter) reportEventProcessingError() {
 	metrics.Record(r.tagsCtx, eventsProcessingErrs.M(1))
 }

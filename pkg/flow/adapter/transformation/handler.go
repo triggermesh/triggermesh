@@ -149,6 +149,11 @@ func (t *adapter) Start(ctx context.Context) error {
 }
 
 func (t *adapter) receiveAndReply(event cloudevents.Event) (*cloudevents.Event, error) {
+	t.sr.reportEventProcessingCount()
+	start := time.Now()
+	defer func() {
+		t.sr.reportEventProcessingTime(time.Since(start).Milliseconds())
+	}()
 	result, err := t.applyTransformations(event)
 	if err != nil {
 		t.sr.reportEventProcessingError()
@@ -157,6 +162,11 @@ func (t *adapter) receiveAndReply(event cloudevents.Event) (*cloudevents.Event, 
 }
 
 func (t *adapter) receiveAndSend(ctx context.Context, event cloudevents.Event) error {
+	t.sr.reportEventProcessingCount()
+	start := time.Now()
+	defer func() {
+		t.sr.reportEventProcessingTime(time.Since(start).Milliseconds())
+	}()
 	result, err := t.applyTransformations(event)
 	if err != nil {
 		t.sr.reportEventProcessingError()
@@ -166,11 +176,6 @@ func (t *adapter) receiveAndSend(ctx context.Context, event cloudevents.Event) e
 }
 
 func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
-	t.sr.reportEventProcessingCount()
-	start := time.Now()
-	defer func() {
-		t.sr.reportEventProcessingTime(time.Since(start).Milliseconds())
-	}()
 	// HTTPTargets sets content type from HTTP headers, i.e.:
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality
