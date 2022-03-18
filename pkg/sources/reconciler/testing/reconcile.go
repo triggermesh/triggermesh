@@ -32,7 +32,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	clientgotesting "k8s.io/client-go/testing"
 
-	"knative.dev/eventing/pkg/apis/eventing"
 	eventingv1 "knative.dev/eventing/pkg/apis/eventing/v1"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
@@ -103,7 +102,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(noCEAttributes),
 			},
 			WantCreates: func() []runtime.Object {
@@ -148,7 +147,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, notDeployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -163,7 +162,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -178,7 +177,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -196,7 +195,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(noOwner),
 				newRoleBinding(),
@@ -239,7 +238,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 				rt.InduceFailure("create", r),
 			},
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -263,7 +262,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 				rt.InduceFailure("update", r),
 			},
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -354,7 +353,7 @@ func Populate(srcCpy v1alpha1.EventSource) {
 	srcCpy.SetName(tName)
 	srcCpy.SetUID(tUID)
 
-	addr := newAdressable()
+	addr := newAddressable()
 	addrGVK := addr.GetGroupVersionKind()
 
 	srcCpy.GetSink().Ref = &duckv1.KReference{
@@ -548,8 +547,8 @@ func bumpImage(object runtime.Object) {
 
 /* Event sink */
 
-// newAdressable returns a test Addressable to be used as a sink.
-func newAdressable() *eventingv1.Broker {
+// newAddressable returns a test Addressable to be used as a sink.
+func newAddressable() *eventingv1.Broker {
 	return &eventingv1.Broker{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
@@ -691,6 +690,10 @@ func failUpdateAdapterEvent(name, kind, resource string) string {
 		"inducing failure for update %s", kind, name, resource)
 }
 func badSinkEvent() string {
+	sinkObj := newAddressable()
+	gvr, _ := meta.UnsafeGuessKindToResource(sinkObj.GetGroupVersionKind())
+
 	return eventtesting.Eventf(corev1.EventTypeWarning, common.ReasonBadSinkURI, "Could not resolve sink URI: "+
-		"%s %q not found", eventing.BrokersResource, tName)
+		"failed to get object %s/%s: %s %q not found",
+		sinkObj.Namespace, sinkObj.Name, gvr.GroupResource(), sinkObj.Name)
 }
