@@ -1,4 +1,4 @@
-FROM golang:bullseye as builder
+FROM golang:1.17-bullseye as builder
 
 RUN apt-get update && \
     apt-get install -y curl && \
