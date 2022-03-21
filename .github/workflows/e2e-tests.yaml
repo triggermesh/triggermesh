@@ -89,7 +89,7 @@ jobs:
         kubectl -n knative-serving wait --timeout=1m --for=condition=Complete jobs.batch/default-domain
 
     - name: Install ko
-      run: go install github.com/google/ko@v0.9.3
+      run: go install github.com/google/ko@v0.11.1
 
     - name: Deploy TriggerMesh
       env:
