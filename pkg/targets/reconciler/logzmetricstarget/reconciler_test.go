@@ -325,6 +325,9 @@ func newAdapterService() *servingv1.Service {
 										Name: source.EnvMetricsCfg,
 									}, {
 										Name: source.EnvTracingCfg,
+									}, {
+										Name:  "METRICS_PROMETHEUS_PORT",
+										Value: "9092",
 									},
 								},
 							}},

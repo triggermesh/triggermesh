@@ -92,18 +92,8 @@ func makeEnv(args *TargetAdapterArgs) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: args.Target.Spec.Token.SecretKeyRef,
 			},
-		}}
+		},
+	}
 
-	env = append(env, args.Configs.ToEnvVars()...)
-
-	// FIXME(antoineco): default metrics port 9090 overlaps with queue-proxy
-	// Requires fix from https://github.com/knative/pkg/pull/1411:
-	// {
-	//	Name: "METRICS_PROMETHEUS_PORT",
-	//	Value: "9092",
-	// }
-	return append(env, corev1.EnvVar{
-		Name:  source.EnvMetricsCfg,
-		Value: "",
-	})
+	return append(env, libreconciler.MakeObsEnv(args.Configs)...)
 }
