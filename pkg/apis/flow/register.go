@@ -16,7 +16,17 @@ limitations under the License.
 
 package flow
 
+import "k8s.io/apimachinery/pkg/runtime/schema"
+
 const (
 	// GroupName is the name of the API group this package's resources belong to.
 	GroupName = "flow.triggermesh.io"
+)
+
+var (
+	// TransformationResource respresents a Bumblebee transformation.
+	TransformationResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "transformations",
+	}
 )

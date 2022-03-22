@@ -29,8 +29,10 @@ import (
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 type envConfig struct {
@@ -50,7 +52,7 @@ type adapter struct {
 	DataPipeline    *Pipeline
 
 	mt *pkgadapter.MetricTag
-	sr *statsReporter
+	sr *metrics.EventProcessingStatsReporter
 
 	sink string
 
@@ -74,7 +76,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		log.Fatalf("Failed to process env var: %v", err)
 	}
 
-	mustRegisterStatsView()
+	metrics.MustRegisterEventProcessingStatsView()
 
 	trnContext, trnData := []v1alpha1.Transform{}, []v1alpha1.Transform{}
 	err := json.Unmarshal([]byte(env.TransformationContext), &trnContext)
@@ -92,11 +94,11 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	mt := &pkgadapter.MetricTag{
-		ResourceGroup: env.Component,
+		ResourceGroup: flow.TransformationResource.String(),
 		Namespace:     env.GetNamespace(),
 		Name:          env.GetName(),
 	}
-	sr := mustNewStatsReporter(mt)
+	sr := metrics.MustNewEventProcessingStatsReporter(mt)
 
 	adapter.sr = sr
 	adapter.mt = mt
@@ -145,34 +147,52 @@ func (t *adapter) Start(ctx context.Context) error {
 		receiver = t.receiveAndSend
 	}
 
+	ctx = pkgadapter.ContextWithMetricTag(ctx, t.mt)
+
 	return t.client.StartReceiver(ctx, receiver)
 }
 
 func (t *adapter) receiveAndReply(event cloudevents.Event) (*cloudevents.Event, error) {
-	t.sr.reportEventProcessingCount()
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
 	start := time.Now()
 	defer func() {
-		t.sr.reportEventProcessingTime(time.Since(start).Milliseconds())
+		t.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
 	}()
+
 	result, err := t.applyTransformations(event)
 	if err != nil {
-		t.sr.reportEventProcessingError()
+		t.sr.ReportProcessingError(false, ceTypeTag, ceSrcTag)
+	} else {
+		t.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	}
+
 	return result, err
 }
 
 func (t *adapter) receiveAndSend(ctx context.Context, event cloudevents.Event) error {
-	t.sr.reportEventProcessingCount()
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
 	start := time.Now()
 	defer func() {
-		t.sr.reportEventProcessingTime(time.Since(start).Milliseconds())
+		t.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
 	}()
+
 	result, err := t.applyTransformations(event)
 	if err != nil {
-		t.sr.reportEventProcessingError()
+		t.sr.ReportProcessingError(false, ceTypeTag, ceSrcTag)
 		return err
 	}
-	return t.client.Send(ctx, *result)
+
+	if result := t.client.Send(ctx, *result); !cloudevents.IsACK(result) {
+		t.sr.ReportProcessingError(false, ceTypeTag, ceSrcTag)
+		return result
+	}
+
+	t.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
+	return nil
 }
 
 func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
