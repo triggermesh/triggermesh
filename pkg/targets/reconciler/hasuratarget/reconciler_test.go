@@ -322,6 +322,9 @@ func newAdapterService() *servingv1.Service {
 									}, {
 										Name: source.EnvTracingCfg,
 									}, {
+										Name:  "METRICS_PROMETHEUS_PORT",
+										Value: "9092",
+									}, {
 										Name:  "HASURA_ENDPOINT",
 										Value: tEndpointURL.String(),
 									}, {

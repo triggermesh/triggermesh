@@ -17,11 +17,13 @@ limitations under the License.
 package reconciler
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
 )
 
 // MakeServiceEnv Adds default environment variables
@@ -39,17 +41,10 @@ func MakeServiceEnv(name, namespace string) []corev1.EnvVar {
 
 // MakeObsEnv adds support for observability configs
 func MakeObsEnv(cfg source.ConfigAccessor) []corev1.EnvVar {
-	env := cfg.ToEnvVars()
-
-	// port already used by queue proxy
-	for i := range env {
-		if env[i].Name == source.EnvMetricsCfg {
-			env[i].Value = ""
-			break
-		}
-	}
-
-	return env
+	return append(cfg.ToEnvVars(), corev1.EnvVar{
+		Name:  "METRICS_PROMETHEUS_PORT",
+		Value: "9092",
+	})
 }
 
 // MakeGenericLabels returns generic labels set.

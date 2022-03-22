@@ -349,8 +349,8 @@ func newAdapterService() *servingv1.Service {
 									}, {
 										Name: source.EnvTracingCfg,
 									}, {
-										// FIXME(antoineco): remove dupe. See target_adapter.go
-										Name: source.EnvMetricsCfg,
+										Name:  "METRICS_PROMETHEUS_PORT",
+										Value: "9092",
 									},
 								},
 							}},

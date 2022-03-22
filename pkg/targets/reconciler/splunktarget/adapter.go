@@ -112,18 +112,7 @@ func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *serving
 		})
 	}
 
-	env = append(env, cfg.configs.ToEnvVars()...)
-
-	// FIXME(antoineco): default metrics port 9090 overlaps with queue-proxy
-	// Requires fix from https://github.com/knative/pkg/pull/1411:
-	// {
-	//	Name: "METRICS_PROMETHEUS_PORT",
-	//	Value: "9092",
-	// }
-	env = append(env, corev1.EnvVar{
-		Name:  source.EnvMetricsCfg,
-		Value: "",
-	})
+	env = append(env, libreconciler.MakeObsEnv(cfg.configs)...)
 
 	svc := &servingv1.Service{
 		ObjectMeta: metav1.ObjectMeta{
