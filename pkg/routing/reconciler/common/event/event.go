@@ -37,5 +37,5 @@ func Warn(ctx context.Context, reason, msgFmt string, args ...interface{}) {
 }
 
 func recordEvent(ctx context.Context, typ, reason, msgFmt string, args ...interface{}) {
-	controller.GetEventRecorder(ctx).Eventf(v1alpha1.RouterFromContext(ctx), typ, reason, msgFmt, args...)
+	controller.GetEventRecorder(ctx).Eventf(v1alpha1.ReconcilableFromContext(ctx), typ, reason, msgFmt, args...)
 }

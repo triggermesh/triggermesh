@@ -36,7 +36,7 @@ type TwilioSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*TwilioSource)(nil)
+	_ Reconcilable = (*TwilioSource)(nil)
 )
 
 // TwilioSourceSpec defines the desired state of the event source.

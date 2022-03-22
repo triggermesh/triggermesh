@@ -39,7 +39,7 @@ func ensureTopicAssociated(ctx context.Context, cli *gcloudiot.Service, topicRes
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
 	status := &src.Status
 
 	registryName := src.Spec.Registry.String()
@@ -88,7 +88,7 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gcloudiot
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
 
 	registryName := src.Spec.Registry.String()
 

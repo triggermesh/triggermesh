@@ -36,7 +36,7 @@ type AzureEventGridSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AzureEventGridSource)(nil)
+	_ Reconcilable = (*AzureEventGridSource)(nil)
 )
 
 // AzureEventGridSourceSpec defines the desired state of the event source.

@@ -233,7 +233,7 @@ func saName(name string) resource.ServiceAccountOption {
 
 /* Events */
 
-func createServiceAccountEvent(src v1alpha1.EventSource) string {
+func createServiceAccountEvent(src v1alpha1.Reconcilable) string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
 		"Created ServiceAccount %q due to the creation of a AWSSQSSource object",
 		common.ServiceAccountName(src))

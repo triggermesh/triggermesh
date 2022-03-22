@@ -38,20 +38,20 @@ func (s *OCIMetricsSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *OCIMetricsSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *OCIMetricsSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *OCIMetricsSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *OCIMetricsSource) AsEventSource() string {
 	return OCIGenerateEventSource(s.Namespace, s.Name)
 }
@@ -66,7 +66,7 @@ const (
 	OCIMetricsGenericEventType = "com.oracle.cloud.monitoring"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (*OCIMetricsSource) GetEventTypes() []string {
 	return []string{
 		OCIMetricsGenericEventType,

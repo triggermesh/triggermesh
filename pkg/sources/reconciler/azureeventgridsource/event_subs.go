@@ -56,7 +56,7 @@ func ensureEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptio
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
 	status := &typedSrc.Status
@@ -185,7 +185,7 @@ func ensureNoEventSubscription(ctx context.Context, cli eventgrid.EventSubscript
 		return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
 	rgName := sysTopicResID.ResourceGroup

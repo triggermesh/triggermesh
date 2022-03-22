@@ -36,7 +36,7 @@ type SalesforceSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*SalesforceSource)(nil)
+	_ Reconcilable = (*SalesforceSource)(nil)
 )
 
 // SalesforceSourceSpec defines the desired state of the event source.

@@ -36,7 +36,7 @@ type WebhookSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*WebhookSource)(nil)
+	_ Reconcilable = (*WebhookSource)(nil)
 )
 
 // WebhookSourceSpec defines the desired state of the event source.

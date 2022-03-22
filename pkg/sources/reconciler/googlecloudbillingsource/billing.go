@@ -41,7 +41,7 @@ func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, to
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
 	budgetRequest := &budgets.GetBudgetRequest{
@@ -103,7 +103,7 @@ func ensureNoBudgetNotification(ctx context.Context, cli *billing.BudgetClient) 
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
 	budgetRequest := &budgets.GetBudgetRequest{

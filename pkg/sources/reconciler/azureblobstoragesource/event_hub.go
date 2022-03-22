@@ -54,7 +54,7 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 		return "", nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
 	status := &src.Status
 
 	if userProvidedHub := src.Spec.Endpoint.EventHubs.HubName; userProvidedHub != nil {
@@ -138,7 +138,7 @@ func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) *v1al
 // Required permissions:
 //  - Microsoft.EventHub/namespaces/eventhubs/delete
 func ensureNoEventHub(ctx context.Context, cli storage.EventHubsClient) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
 
 	if userProvidedHub := src.Spec.Endpoint.EventHubs.HubName; userProvidedHub != nil {
 		// do not delete Event Hubs managed by the user

@@ -66,16 +66,16 @@ var eventSourceConditionTypes = []apis.ConditionType{
 	ConditionDeployed,
 }
 
-// EventSourceStatusManager manages the status of event sources.
+// StatusManager manages the status of a TriggerMesh component.
 //
 // +k8s:deepcopy-gen=false
-type EventSourceStatusManager struct {
+type StatusManager struct {
 	apis.ConditionSet
 	*EventSourceStatus
 }
 
 // MarkSink sets the SinkProvided condition to True using the given URI.
-func (m *EventSourceStatusManager) MarkSink(uri *apis.URL) {
+func (m *StatusManager) MarkSink(uri *apis.URL) {
 	m.SinkURI = uri
 	if uri == nil {
 		m.Manage(m).MarkFalse(ConditionSinkProvided,
@@ -86,7 +86,7 @@ func (m *EventSourceStatusManager) MarkSink(uri *apis.URL) {
 }
 
 // MarkNoSink sets the SinkProvided condition to False.
-func (m *EventSourceStatusManager) MarkNoSink() {
+func (m *StatusManager) MarkNoSink() {
 	m.SinkURI = nil
 	m.ConditionSet.Manage(m).MarkFalse(ConditionSinkProvided,
 		ReasonSinkNotFound, "The sink does not exist or its URI is not set")
@@ -94,7 +94,7 @@ func (m *EventSourceStatusManager) MarkNoSink() {
 
 // MarkRBACNotBound sets the Deployed condition to False, indicating that the
 // adapter's ServiceAccount couldn't be bound.
-func (m *EventSourceStatusManager) MarkRBACNotBound() {
+func (m *StatusManager) MarkRBACNotBound() {
 	m.ConditionSet.Manage(m).MarkFalse(ConditionDeployed,
 		ReasonRBACNotBound, "The adapter's ServiceAccount can not be bound")
 }
@@ -105,7 +105,7 @@ func (m *EventSourceStatusManager) MarkRBACNotBound() {
 // Given an optional PodInterface, the status of dependant Pods is inspected to
 // generate a more meaningful failure reason in case of non-ready status of the
 // Deployment.
-func (m *EventSourceStatusManager) PropagateDeploymentAvailability(ctx context.Context,
+func (m *StatusManager) PropagateDeploymentAvailability(ctx context.Context,
 	d *appsv1.Deployment, pi coreclientv1.PodInterface) {
 
 	// Deployments are not addressable
@@ -146,7 +146,7 @@ func (m *EventSourceStatusManager) PropagateDeploymentAvailability(ctx context.C
 
 // PropagateServiceAvailability uses the readiness of the provided Service to
 // determine whether the Deployed condition should be marked as True or False.
-func (m *EventSourceStatusManager) PropagateServiceAvailability(ksvc *servingv1.Service) {
+func (m *StatusManager) PropagateServiceAvailability(ksvc *servingv1.Service) {
 	if ksvc == nil {
 		m.ConditionSet.Manage(m).MarkUnknown(ConditionDeployed, ReasonUnavailable,
 			"The status of the adapter Service can not be determined")
@@ -187,7 +187,7 @@ func (m *EventSourceStatusManager) PropagateServiceAvailability(ksvc *servingv1.
 }
 
 // SetRoute appends the given URL path to the current source's URL.
-func (m *EventSourceStatusManager) SetRoute(urlPath string) {
+func (m *StatusManager) SetRoute(urlPath string) {
 	if m.Address == nil || m.Address.URL == nil {
 		return
 	}

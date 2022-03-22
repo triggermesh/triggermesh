@@ -42,7 +42,7 @@ type GoogleCloudIoTSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*GoogleCloudIoTSource)(nil)
+	_ Reconcilable = (*GoogleCloudIoTSource)(nil)
 )
 
 // GoogleCloudIoTSourceSpec defines the desired state of the event source.

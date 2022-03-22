@@ -39,7 +39,7 @@ type OCIMetricsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*OCIMetricsSource)(nil)
+	_ Reconcilable = (*OCIMetricsSource)(nil)
 )
 
 // OCIMetricsSourceSpec defines the desired state of the event source.

@@ -43,14 +43,14 @@ func (s *AWSS3Source) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AWSS3Source) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSS3Source) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AWSS3Source) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status.EventSourceStatus,
 	}
@@ -66,7 +66,7 @@ const (
 	AWSS3TestEventType                     = "testevent"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *AWSS3Source) GetEventTypes() []string {
 	selectedTypes := make(map[string]struct{})
 	for _, t := range s.Spec.EventTypes {
@@ -99,7 +99,7 @@ func s3EventTypeFromSpecEventType(specEventType string) string {
 	return strings.ToLower(strings.SplitN(strings.TrimPrefix(specEventType, "s3:"), ":", 2)[0])
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AWSS3Source) AsEventSource() string {
 	return s3.RealBucketARN(s.Spec.ARN)
 }

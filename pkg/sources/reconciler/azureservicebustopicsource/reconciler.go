@@ -58,7 +58,7 @@ var _ reconcilerv1alpha1.Finalizer = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureServiceBusTopicSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	subsCli, err := r.cg.Get(o)
 	switch {
@@ -77,13 +77,13 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureService
 		return fmt.Errorf("failed to reconcile Service Bus Subscription: %w", err)
 	}
 
-	return r.base.ReconcileSource(ctx, r)
+	return r.base.ReconcileAdapter(ctx, r)
 }
 
 // FinalizeKind is called when the resource is deleted.
 func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureServiceBusTopicSource) reconciler.Event {
 	// inject source into context for usage in finalization logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	subsCli, err := r.cg.Get(o)
 	switch {

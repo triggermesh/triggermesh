@@ -52,8 +52,8 @@ func NewController(
 	envconfig.MustProcess(app, adapterCfg)
 
 	r := &Reconciler{
-		adapterCfg:     adapterCfg,
-		splitterLister: informer.Lister().Splitters,
+		adapterCfg: adapterCfg,
+		rtrLister:  informer.Lister().Splitters,
 	}
 
 	impl := splitterreconciler.NewImpl(ctx, r)

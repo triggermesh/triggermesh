@@ -38,20 +38,20 @@ func (s *AWSCodeCommitSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AWSCodeCommitSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSCodeCommitSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AWSCodeCommitSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
 }
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *AWSCodeCommitSource) GetEventTypes() []string {
 	types := make([]string, len(s.Spec.EventTypes))
 
@@ -62,7 +62,7 @@ func (s *AWSCodeCommitSource) GetEventTypes() []string {
 	return types
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AWSCodeCommitSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }

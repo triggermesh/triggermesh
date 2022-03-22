@@ -37,21 +37,21 @@ const (
 	FilterGenericEventType = "io.triggermesh.routing.filter"
 )
 
-// GetEventTypes implements Router.
+// GetEventTypes implements Reconcilable.
 func (*Filter) GetEventTypes() []string {
 	return []string{
 		FilterGenericEventType,
 	}
 }
 
-// GetSink implements Router.
+// GetSink implements Reconcilable.
 func (f *Filter) GetSink() *duckv1.Destination {
 	return f.Spec.Sink
 }
 
-// GetStatusManager implements Router.
-func (f *Filter) GetStatusManager() *RouterStatusManager {
-	return &RouterStatusManager{
+// GetStatusManager implements Reconcilable.
+func (f *Filter) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet: f.GetConditionSet(),
 		RouterStatus: &f.Status,
 	}

@@ -50,19 +50,19 @@ var _ reconcilerv1alpha1.Finalizer = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureActivityLogsSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	if err := r.ensureDiagnosticSettings(ctx); err != nil {
 		return fmt.Errorf("failed to ensure Diagnostic Settings: %w", err)
 	}
 
-	return r.base.ReconcileSource(ctx, r)
+	return r.base.ReconcileAdapter(ctx, r)
 }
 
 // FinalizeKind is called when the resource is deleted.
 func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureActivityLogsSource) reconciler.Event {
 	// inject source into context for usage in finalization logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	// The finalizer blocks the deletion of the source object until the
 	// deletion of the Diagnostic Settings succeeds to ensure that we don't

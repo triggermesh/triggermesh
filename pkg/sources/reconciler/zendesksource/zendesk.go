@@ -47,7 +47,7 @@ func (r *Reconciler) ensureZendeskTargetAndTrigger(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	status := &src.(*v1alpha1.ZendeskSource).Status
 
 	isDeployed := status.GetCondition(v1alpha1.ConditionDeployed).IsTrue()
@@ -250,7 +250,7 @@ func (r *Reconciler) ensureNoZendeskTargetAndTrigger(ctx context.Context) error 
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 
 	title := targetTitle(src)
 

@@ -74,7 +74,7 @@ func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 		return nil, nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
 	status := &typedSrc.Status
@@ -221,7 +221,7 @@ func ensureNoSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 		return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
 	rgName := sysTopicResID.ResourceGroup

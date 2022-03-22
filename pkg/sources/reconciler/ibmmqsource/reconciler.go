@@ -41,6 +41,6 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.IBMMQSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, src)
-	return r.base.ReconcileSource(ctx, r)
+	ctx = v1alpha1.WithReconcilable(ctx, src)
+	return r.base.ReconcileAdapter(ctx, r)
 }

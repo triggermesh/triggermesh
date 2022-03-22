@@ -38,7 +38,7 @@ type AWSCognitoIdentitySource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSCognitoIdentitySource)(nil)
+	_ Reconcilable = (*AWSCognitoIdentitySource)(nil)
 )
 
 // AWSCognitoIdentitySourceSpec defines the desired state of the event source.

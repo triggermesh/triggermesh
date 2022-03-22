@@ -26,19 +26,13 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/routing/status"
 )
 
-// EventType returns an event type in a format suitable for usage as a
-// CloudEvent type attribute.
-func EventType(service, eventType string) string {
-	return "io.triggermesh." + service + "." + eventType
-}
-
 // routerConditionSet is a generic set of status conditions used by
 // default in all routers.
 var routerConditionSet = NewRouterConditionSet()
 
-// NewRouterConditionSet returns a set of status conditions for routers.
-// Default conditions can be augmented by passing condition types as
-// function arguments.
+// NewRouterConditionSet returns a set of status conditions for a router.
+// Default conditions can be augmented by passing condition types as function
+// arguments.
 func NewRouterConditionSet(cts ...apis.ConditionType) apis.ConditionSet {
 	return apis.NewLivingConditionSet(
 		append(routerConditionTypes, cts...)...,
@@ -51,16 +45,16 @@ var routerConditionTypes = []apis.ConditionType{
 	ConditionDeployed,
 }
 
-// RouterStatusManager manages the status of routers.
+// StatusManager manages the status of a TriggerMesh component.
 //
 // +k8s:deepcopy-gen=false
-type RouterStatusManager struct {
+type StatusManager struct {
 	apis.ConditionSet
 	*RouterStatus
 }
 
 // MarkSink sets the SinkProvided condition to True using the given URI.
-func (m *RouterStatusManager) MarkSink(uri *apis.URL) {
+func (m *StatusManager) MarkSink(uri *apis.URL) {
 	m.SinkURI = uri
 	if uri == nil {
 		m.Manage(m).MarkFalse(ConditionSinkProvided,
@@ -71,7 +65,7 @@ func (m *RouterStatusManager) MarkSink(uri *apis.URL) {
 }
 
 // MarkNoSink sets the SinkProvided condition to False.
-func (m *RouterStatusManager) MarkNoSink() {
+func (m *StatusManager) MarkNoSink() {
 	m.SinkURI = nil
 	m.ConditionSet.Manage(m).MarkFalse(ConditionSinkProvided,
 		ReasonSinkNotFound, "The sink does not exist or its URI is not set")
@@ -79,14 +73,14 @@ func (m *RouterStatusManager) MarkNoSink() {
 
 // MarkRBACNotBound sets the Deployed condition to False, indicating that the
 // adapter's ServiceAccount couldn't be bound.
-func (m *RouterStatusManager) MarkRBACNotBound() {
+func (m *StatusManager) MarkRBACNotBound() {
 	m.ConditionSet.Manage(m).MarkFalse(ConditionDeployed,
 		ReasonRBACNotBound, "The adapter's ServiceAccount can not be bound")
 }
 
 // PropagateServiceAvailability uses the readiness of the provided Service to
 // determine whether the Deployed condition should be marked as True or False.
-func (m *RouterStatusManager) PropagateServiceAvailability(ksvc *servingv1.Service) {
+func (m *StatusManager) PropagateServiceAvailability(ksvc *servingv1.Service) {
 	if ksvc == nil {
 		m.ConditionSet.Manage(m).MarkUnknown(ConditionDeployed, ReasonUnavailable,
 			"The status of the adapter Service can not be determined")
@@ -127,7 +121,7 @@ func (m *RouterStatusManager) PropagateServiceAvailability(ksvc *servingv1.Servi
 }
 
 // SetRoute appends the given URL path to the current source's URL.
-func (m *RouterStatusManager) SetRoute(urlPath string) {
+func (m *StatusManager) SetRoute(urlPath string) {
 	if m.Address == nil || m.Address.URL == nil {
 		return
 	}
