@@ -24,7 +24,6 @@ import (
 	"strconv"
 
 	"go.uber.org/zap"
-	corev1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -57,12 +56,6 @@ const (
 	metricsPrometheusPortKsvc uint16 = 9092
 	envMetricsPrometheusPort         = "METRICS_PROMETHEUS_PORT"
 )
-
-// newReconciledNormal makes a new reconciler event with event type Normal, and
-// reason AddressableServiceReconciled.
-func newReconciledNormal(namespace, name string) reconciler.Event {
-	return reconciler.NewEvent(corev1.EventTypeNormal, "TransformationReconciled", "Transformation reconciled: \"%s/%s\"", namespace, name)
-}
 
 // Reconciler implements addressableservicereconciler.Interface for
 // Transformation resources.
@@ -118,7 +111,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, trn *v1alpha1.Transforma
 	trn.Status.CloudEventAttributes = r.createCloudEventAttributes(&trn.Spec)
 
 	logger.Debug("Transformation reconciled")
-	return newReconciledNormal(trn.Namespace, trn.Name)
+	return nil
 }
 
 func (r *Reconciler) reconcileKnService(ctx context.Context, trn *v1alpha1.Transformation) (*servingv1.Service, error) {
