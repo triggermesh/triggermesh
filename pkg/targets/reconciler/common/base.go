@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,49 +20,28 @@ import (
 	"context"
 
 	"go.uber.org/zap"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	appsclientv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	rbacclientv1 "k8s.io/client-go/kubernetes/typed/rbac/v1"
-	appslistersv1 "k8s.io/client-go/listers/apps/v1"
 	corelistersv1 "k8s.io/client-go/listers/core/v1"
 	rbaclistersv1 "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
 
 	k8sclient "knative.dev/pkg/client/injection/kube/client"
-	deploymentinformerv1 "knative.dev/pkg/client/injection/kube/informers/apps/v1/deployment"
 	sainformerv1 "knative.dev/pkg/client/injection/kube/informers/core/v1/serviceaccount"
 	rbinformerv1 "knative.dev/pkg/client/injection/kube/informers/rbac/v1/rolebinding"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/kmeta"
-	"knative.dev/pkg/resolver"
-	"knative.dev/pkg/tracker"
 	servingclientv1 "knative.dev/serving/pkg/client/clientset/versioned/typed/serving/v1"
 	servingclient "knative.dev/serving/pkg/client/injection/client"
 	serviceinformerv1 "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 	servinglistersv1 "knative.dev/serving/pkg/client/listers/serving/v1"
 )
 
-// GenericDeploymentReconciler contains interfaces shared across Deployment reconcilers.
-type GenericDeploymentReconciler struct {
-	// URI resolver for sinks
-	SinkResolver *resolver.URIResolver
-	// API clients
-	Client    func(namespace string) appsclientv1.DeploymentInterface
-	PodClient func(namespace string) coreclientv1.PodInterface
-	// objects listers
-	Lister func(namespace string) appslistersv1.DeploymentNamespaceLister
-
-	*GenericRBACReconciler
-}
-
 // GenericServiceReconciler contains interfaces shared across Service reconcilers.
 type GenericServiceReconciler struct {
-	// URI resolver for sinks
-	SinkResolver *resolver.URIResolver
 	// API clients
 	Client func(namespace string) servingclientv1.ServiceInterface
 	// objects listers
@@ -81,35 +60,9 @@ type GenericRBACReconciler struct {
 	RBLister func(namespace string) rbaclistersv1.RoleBindingNamespaceLister
 }
 
-// NewGenericDeploymentReconciler creates a new GenericDeploymentReconciler and
-// attaches a default event handler to its Deployment informer.
-func NewGenericDeploymentReconciler(ctx context.Context, gvk schema.GroupVersionKind,
-	tracker tracker.Interface,
-	adapterHandlerFn func(obj interface{}),
-) GenericDeploymentReconciler {
-
-	informer := deploymentinformerv1.Get(ctx)
-
-	r := GenericDeploymentReconciler{
-		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker),
-		Client:                k8sclient.Get(ctx).AppsV1().Deployments,
-		PodClient:             k8sclient.Get(ctx).CoreV1().Pods,
-		Lister:                informer.Lister().Deployments,
-		GenericRBACReconciler: NewGenericRBACReconciler(ctx),
-	}
-
-	informer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGVK(gvk),
-		Handler:    controller.HandleAll(adapterHandlerFn),
-	})
-
-	return r
-}
-
 // NewGenericServiceReconciler creates a new GenericServiceReconciler and
 // attaches a default event handler to its Service informer.
 func NewGenericServiceReconciler(ctx context.Context, gvk schema.GroupVersionKind,
-	tracker tracker.Interface,
 	adapterHandlerFn func(obj interface{}),
 ) GenericServiceReconciler {
 
@@ -118,14 +71,13 @@ func NewGenericServiceReconciler(ctx context.Context, gvk schema.GroupVersionKin
 		Handler:    controller.HandleAll(adapterHandlerFn),
 	})
 
-	return newGenericServiceReconciler(ctx, tracker)
+	return newGenericServiceReconciler(ctx)
 }
 
 // NewMTGenericServiceReconciler creates a new GenericServiceReconciler for a
 // multi-tenant adapter and attaches a default event handler to its Service
 // informer.
 func NewMTGenericServiceReconciler(ctx context.Context, typ kmeta.OwnerRefable,
-	tracker tracker.Interface,
 	adapterHandlerFn func(obj interface{}),
 ) GenericServiceReconciler {
 
@@ -134,7 +86,7 @@ func NewMTGenericServiceReconciler(ctx context.Context, typ kmeta.OwnerRefable,
 		Handler:    controller.HandleAll(adapterHandlerFn),
 	})
 
-	return newGenericServiceReconciler(ctx, tracker)
+	return newGenericServiceReconciler(ctx)
 }
 
 // NewGenericRBACReconciler creates a new GenericRBACReconciler.
@@ -148,12 +100,9 @@ func NewGenericRBACReconciler(ctx context.Context) *GenericRBACReconciler {
 }
 
 // newGenericServiceReconciler creates a new GenericServiceReconciler.
-func newGenericServiceReconciler(ctx context.Context,
-	tracker tracker.Interface,
-) GenericServiceReconciler {
+func newGenericServiceReconciler(ctx context.Context) GenericServiceReconciler {
 
 	return GenericServiceReconciler{
-		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker),
 		Client:                servingclient.Get(ctx).ServingV1().Services,
 		Lister:                serviceinformerv1.Get(ctx).Lister().Services,
 		GenericRBACReconciler: NewGenericRBACReconciler(ctx),

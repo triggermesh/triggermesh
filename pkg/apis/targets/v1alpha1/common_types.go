@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,6 +43,15 @@ type ValueFromField struct {
 	// Field value from a Kubernetes Secret.
 	// +optional
 	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
+}
+
+// TargetStatus defines the observed state of an event target.
+type TargetStatus struct {
+	duckv1.Status        `json:",inline"`
+	duckv1.AddressStatus `json:",inline"`
+
+	// Accepted/emitted CloudEvent attributes
+	CloudEventStatus `json:",inline"`
 }
 
 // CloudEventStatus contains attributes that target types can embed to declare

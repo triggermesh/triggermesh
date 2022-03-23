@@ -34,6 +34,9 @@ const (
 
 // reasons for conditions
 const (
+	// ReasonRBACNotBound is set on a ServiceReady condition when an
+	// adapter's ServiceAccount cannot be bound.
+	ReasonRBACNotBound = "RBACNotBound"
 	// ReasonUnavailable is set on a ServiceReady condition when an adapter in unavailable.
 	ReasonUnavailable = "AdapterUnavailable"
 

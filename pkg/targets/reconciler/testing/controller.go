@@ -17,17 +17,17 @@ limitations under the License.
 package testing
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"knative.dev/pkg/configmap"
-	"knative.dev/pkg/controller"
 	"knative.dev/pkg/injection"
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/metrics"
 	rt "knative.dev/pkg/reconciler/testing"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/testing/structs"
 )
 
 type constructorTestConfig struct {
@@ -80,7 +80,7 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 	ctrler := ctor(ctx, cmw)
 
 	// catch unitialized fields in Reconciler struct
-	ensureNoNilField(t, ctrler)
+	structs.EnsureNoNilField(t, ctrler)
 }
 
 // TestControllerConstructorFailures tests that a controller constructor fails
@@ -130,26 +130,5 @@ func TestControllerConstructorFailures(t *testing.T, ctor injection.ControllerCo
 				_ = ctor(ctx, cmw)
 			})
 		})
-	}
-}
-
-// ensureNoNilField fails the test if the provided Impl's reconciler contains
-// nil pointers or interfaces.
-func ensureNoNilField(t *testing.T, impl *controller.Impl) {
-	t.Helper()
-
-	recVal := reflect.ValueOf(impl.Reconciler).Elem().
-		FieldByName("reconciler"). // knative.dev/pkg/controller.Reconciler
-		Elem().                    // injection/reconciler/targets/v1alpha1/<type>.Interface
-		Elem()                     //*reconciler.Reconciler
-
-	for i := 0; i < recVal.NumField(); i++ {
-		f := recVal.Field(i)
-		switch f.Kind() {
-		case reflect.Interface, reflect.Ptr, reflect.Func:
-			if f.IsNil() {
-				t.Errorf("struct field %q is nil", recVal.Type().Field(i).Name)
-			}
-		}
 	}
 }

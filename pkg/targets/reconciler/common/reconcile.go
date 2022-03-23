@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,16 +29,18 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"knative.dev/pkg/apis"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/reconciler"
 	"knative.dev/serving/pkg/apis/serving"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common/semantic"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/event"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/semantic"
+	"github.com/triggermesh/triggermesh/pkg/targets/routing"
 )
 
 // List of annotations set on Knative Serving objects by the Knative Serving
@@ -58,25 +60,23 @@ type RBACOwnersLister interface {
 // objects related to a component's adapter backed by a Knative Service.
 type AdapterServiceBuilder interface {
 	RBACOwnersLister
-	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service
+	BuildAdapter(rcl v1alpha1.Reconcilable) *servingv1.Service
 }
 
 // ReconcileAdapter reconciles a receive adapter for a component instance.
 func (r *GenericServiceReconciler) ReconcileAdapter(ctx context.Context, ab AdapterServiceBuilder) reconciler.Event {
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	rcl.GetStatusManager().CloudEventAttributes = CreateCloudEventAttributes(
-		rcl.AsEventSource(), rcl.GetEventTypes())
-
-	sinkURI, err := r.resolveSinkURL(ctx)
-	if err != nil {
-		rcl.GetStatusManager().MarkNoSink()
-		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning,
-			ReasonBadSinkURI, "Could not resolve sink URI: %s", err))
+	if src, isEventSource := rcl.(targets.EventSource); isEventSource {
+		rcl.GetStatusManager().ResponseAttributes = CreateCloudEventResponseAttributes(
+			src.AsEventSource(), src.GetEventTypes())
 	}
-	rcl.GetStatusManager().MarkSink(sinkURI)
 
-	desiredAdapter := ab.BuildAdapter(rcl, sinkURI)
+	if itrg, isIntegrationTarget := rcl.(targets.IntegrationTarget); isIntegrationTarget {
+		rcl.GetStatusManager().AcceptedEventTypes = itrg.AcceptedEventTypes()
+	}
+
+	desiredAdapter := ab.BuildAdapter(rcl)
 
 	saOwners, err := ab.RBACOwners(rcl)
 	if err != nil {
@@ -87,18 +87,6 @@ func (r *GenericServiceReconciler) ReconcileAdapter(ctx context.Context, ab Adap
 		return fmt.Errorf("failed to reconcile adapter: %w", err)
 	}
 	return nil
-}
-
-// resolveSinkURL resolves the URL of a sink reference.
-func (r *GenericServiceReconciler) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
-	rcl := v1alpha1.ReconcilableFromContext(ctx)
-	sink := rcl.GetSink()
-
-	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
-		sinkRef.Namespace = rcl.GetNamespace()
-	}
-
-	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, rcl)
 }
 
 // reconcileAdapter reconciles the state of the component's adapter.
@@ -135,7 +123,7 @@ func (r *GenericServiceReconciler) reconcileAdapter(ctx context.Context,
 
 	rcl.GetStatusManager().PropagateServiceAvailability(currentAdapter)
 	if isMultiTenant {
-		rcl.GetStatusManager().SetRoute(URLPath(rcl))
+		rcl.GetStatusManager().SetRoute(routing.URLPath(rcl))
 	}
 
 	return nil
@@ -253,6 +241,10 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
 	desiredSA := newServiceAccount(rcl, owners)
+	for _, m := range serviceAccountMutations(rcl) {
+		m(desiredSA)
+	}
+
 	currentSA, err := r.getOrCreateAdapterServiceAccount(ctx, desiredSA)
 	if err != nil {
 		return nil, err
@@ -308,7 +300,7 @@ func (r *GenericRBACReconciler) getOrCreateAdapterServiceAccount(ctx context.Con
 func (r *GenericRBACReconciler) syncAdapterServiceAccount(ctx context.Context,
 	currentSA, desiredSA *corev1.ServiceAccount) (*corev1.ServiceAccount, error) {
 
-	if reflect.DeepEqual(desiredSA.OwnerReferences, currentSA.OwnerReferences) {
+	if semantic.Semantic.DeepEqual(desiredSA, currentSA) {
 		return currentSA, nil
 	}
 
@@ -337,6 +329,18 @@ func (r *GenericRBACReconciler) syncAdapterServiceAccount(ctx context.Context,
 		sa.Name, v1alpha1.ReconcilableFromContext(ctx).GetGroupVersionKind().Kind)
 
 	return sa, nil
+}
+
+// serviceAccountMutations returns functional options for mutating the
+// ServiceAccount associated with the given component instance.
+func serviceAccountMutations(rcl v1alpha1.Reconcilable) []resource.ServiceAccountOption {
+	if !v1alpha1.WantsOwnServiceAccount(rcl) {
+		return nil
+	}
+
+	var saMutations []resource.ServiceAccountOption
+
+	return append(saMutations, v1alpha1.ServiceAccountOptions(rcl)...)
 }
 
 // getOrCreateAdapterRoleBinding returns the existing adapter RoleBinding, or

@@ -19,8 +19,12 @@ package testing
 import (
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	fakek8sclient "k8s.io/client-go/kubernetes/fake"
+	corelistersv1 "k8s.io/client-go/listers/core/v1"
+	rbaclistersv1 "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
 
 	rt "knative.dev/pkg/reconciler/testing"
@@ -72,6 +76,31 @@ func (l *Listers) IndexerFor(obj runtime.Object) cache.Indexer {
 	return l.sorter.IndexerForObjectType(obj)
 }
 
+// GetTargetsObjects returns objects from the targets API.
+func (l *Listers) GetTargetsObjects() []runtime.Object {
+	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
+}
+
+// GetKubeObjects returns objects from Kubernetes APIs.
+func (l *Listers) GetKubeObjects() []runtime.Object {
+	return l.sorter.ObjectsForSchemeFunc(fakek8sclient.AddToScheme)
+}
+
+// GetServingObjects returns objects from the serving API.
+func (l *Listers) GetServingObjects() []runtime.Object {
+	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
+}
+
+// GetServiceAccountLister returns a lister for ServiceAccount objects.
+func (l *Listers) GetServiceAccountLister() corelistersv1.ServiceAccountLister {
+	return corelistersv1.NewServiceAccountLister(l.IndexerFor(&corev1.ServiceAccount{}))
+}
+
+// GetRoleBindingLister returns a lister for RoleBinding objects
+func (l *Listers) GetRoleBindingLister() rbaclistersv1.RoleBindingLister {
+	return rbaclistersv1.NewRoleBindingLister(l.IndexerFor(&rbacv1.RoleBinding{}))
+}
+
 // GetAlibabaOSSTargetsObjects returns objects from the targets API.
 func (l *Listers) GetAlibabaOSSTargetsObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
@@ -107,17 +136,7 @@ func (l *Listers) GetLogzTargetObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
 }
 
-// GetKubeObjects returns objects from the targets API.
-func (l *Listers) GetKubeObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(fakek8sclient.AddToScheme)
-}
-
-// GetServingObjects returns objects from the serving API.
-func (l *Listers) GetServingObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
-}
-
-// GetAlibabaOSSTargetLister returns a Lister for GoogleSheetTarget objects.
+// GetAlibabaOSSTargetLister returns a Lister for AlibabaOSSTarget objects.
 func (l *Listers) GetAlibabaOSSTargetLister() targetslisters.AlibabaOSSTargetLister {
 	return targetslisters.NewAlibabaOSSTargetLister(l.IndexerFor(&targetsv1alpha1.AlibabaOSSTarget{}))
 }
