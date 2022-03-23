@@ -42,7 +42,7 @@ import (
 // ensureQueue ensures the existence of a SQS queue for sending S3 event
 // notifications.
 func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, error) {
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	status := &typedSrc.Status
@@ -114,7 +114,7 @@ func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, erro
 // ensureNoQueue ensures that the SQS queue created for sending S3 event
 // notifications is deleted.
 func ensureNoQueue(ctx context.Context, cli sqsiface.SQSAPI) error {
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	if dest := typedSrc.Spec.Destination; dest != nil {

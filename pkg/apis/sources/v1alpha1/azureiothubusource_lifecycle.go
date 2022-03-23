@@ -51,20 +51,20 @@ func (s *AzureIOTHubSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AzureIOTHubSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AzureIOTHubSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AzureIOTHubSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status.EventSourceStatus,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AzureIOTHubSource) AsEventSource() string {
 	return AzureIOTHubSourceName(s.Namespace, s.Name)
 }

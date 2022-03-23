@@ -51,34 +51,34 @@ var knativeServingAnnotations = []string{
 // RBACOwnersLister returns a list of OwnerRefable to be set as a the
 // OwnerReferences metadata attribute of a ServiceAccount.
 type RBACOwnersLister interface {
-	RBACOwners(namespace string) ([]kmeta.OwnerRefable, error)
+	RBACOwners(rcl v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error)
 }
 
 // AdapterServiceBuilder provides all the necessary information for building
-// objects related to a Router's adapter backed by a Knative Service.
+// objects related to a component's adapter backed by a Knative Service.
 type AdapterServiceBuilder interface {
 	RBACOwnersLister
-	BuildAdapter(r v1alpha1.Router, sinkURI *apis.URL) *servingv1.Service
+	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service
 }
 
-// ReconcileAdapter reconciles a receive adapter.
+// ReconcileAdapter reconciles a receive adapter for a component instance.
 func (r *GenericServiceReconciler) ReconcileAdapter(ctx context.Context, ab AdapterServiceBuilder) reconciler.Event {
-	router := v1alpha1.RouterFromContext(ctx)
+	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	router.GetStatusManager().CloudEventAttributes = CreateCloudEventAttributes(
-		router.AsEventSource(), router.GetEventTypes())
+	rcl.GetStatusManager().CloudEventAttributes = CreateCloudEventAttributes(
+		rcl.AsEventSource(), rcl.GetEventTypes())
 
 	sinkURI, err := r.resolveSinkURL(ctx)
 	if err != nil {
-		router.GetStatusManager().MarkNoSink()
+		rcl.GetStatusManager().MarkNoSink()
 		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning,
 			ReasonBadSinkURI, "Could not resolve sink URI: %s", err))
 	}
-	router.GetStatusManager().MarkSink(sinkURI)
+	rcl.GetStatusManager().MarkSink(sinkURI)
 
-	desiredAdapter := ab.BuildAdapter(router, sinkURI)
+	desiredAdapter := ab.BuildAdapter(rcl, sinkURI)
 
-	saOwners, err := ab.RBACOwners(router.GetNamespace())
+	saOwners, err := ab.RBACOwners(rcl)
 	if err != nil {
 		return fmt.Errorf("listing ServiceAccount owners: %w", err)
 	}
@@ -91,40 +91,40 @@ func (r *GenericServiceReconciler) ReconcileAdapter(ctx context.Context, ab Adap
 
 // resolveSinkURL resolves the URL of a sink reference.
 func (r *GenericServiceReconciler) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
-	router := v1alpha1.RouterFromContext(ctx)
-	sink := router.GetSink()
+	rcl := v1alpha1.ReconcilableFromContext(ctx)
+	sink := rcl.GetSink()
 
 	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
-		sinkRef.Namespace = router.GetNamespace()
+		sinkRef.Namespace = rcl.GetNamespace()
 	}
 
-	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, router)
+	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, rcl)
 }
 
-// reconcileAdapter reconciles the state of the Router's adapter.
+// reconcileAdapter reconciles the state of the component's adapter.
 func (r *GenericServiceReconciler) reconcileAdapter(ctx context.Context,
 	desiredAdapter *servingv1.Service, rbacOwners []kmeta.OwnerRefable) error {
 
-	router := v1alpha1.RouterFromContext(ctx)
+	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	isMultiTenant := v1alpha1.IsMultiTenant(router)
+	isMultiTenant := v1alpha1.IsMultiTenant(rcl)
 
 	sa, err := r.reconcileRBAC(ctx, rbacOwners)
 	if err != nil {
-		router.GetStatusManager().MarkRBACNotBound()
+		rcl.GetStatusManager().MarkRBACNotBound()
 		return fmt.Errorf("reconciling RBAC objects: %w", err)
 	}
 
 	if isMultiTenant {
 		// delegate ownership to the ServiceAccount in order to cause a
-		// garbage collection once all instances of the given Router
+		// garbage collection once all instances of the given component
 		// type have been deleted from the namespace
 		OwnByServiceAccount(desiredAdapter, sa)
 	}
 
 	currentAdapter, err := r.getOrCreateAdapter(ctx, desiredAdapter)
 	if err != nil {
-		router.GetStatusManager().PropagateServiceAvailability(currentAdapter)
+		rcl.GetStatusManager().PropagateServiceAvailability(currentAdapter)
 		return err
 	}
 
@@ -133,23 +133,23 @@ func (r *GenericServiceReconciler) reconcileAdapter(ctx context.Context,
 		return fmt.Errorf("failed to synchronize adapter Service: %w", err)
 	}
 
-	router.GetStatusManager().PropagateServiceAvailability(currentAdapter)
+	rcl.GetStatusManager().PropagateServiceAvailability(currentAdapter)
 	if isMultiTenant {
-		router.GetStatusManager().SetRoute(URLPath(router))
+		rcl.GetStatusManager().SetRoute(URLPath(rcl))
 	}
 
 	return nil
 }
 
 // getOrCreateAdapter returns the existing adapter Service for a given
-// Router, or creates it if it is missing.
+// component instance, or creates it if it is missing.
 func (r *GenericServiceReconciler) getOrCreateAdapter(ctx context.Context, desiredAdapter *servingv1.Service) (*servingv1.Service, error) {
-	router := v1alpha1.RouterFromContext(ctx)
+	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	adapter, err := findAdapter(r, router, metav1.GetControllerOfNoCopy(desiredAdapter))
+	adapter, err := findAdapter(r, rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
 	switch {
 	case apierrors.IsNotFound(err):
-		adapter, err = r.Client(router.GetNamespace()).Create(ctx, desiredAdapter, metav1.CreateOptions{})
+		adapter, err = r.Client(rcl.GetNamespace()).Create(ctx, desiredAdapter, metav1.CreateOptions{})
 		if err != nil {
 			return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterCreate,
 				"Failed to create adapter Service %q: %s", desiredAdapter.Name, err)
@@ -196,23 +196,23 @@ func (r *GenericServiceReconciler) syncAdapterService(ctx context.Context,
 	return adapter, nil
 }
 
-// findAdapter returns the adapter object for a given Router if it exists.
+// findAdapter returns the adapter object for a given component instance if it exists.
 func findAdapter(genericReconciler *GenericServiceReconciler,
-	router v1alpha1.Router, owner *metav1.OwnerReference) (metav1.Object, error) {
+	rcl v1alpha1.Reconcilable, owner *metav1.OwnerReference) (metav1.Object, error) {
 
-	ls := CommonObjectLabels(router)
+	ls := CommonObjectLabels(rcl)
 
-	if !v1alpha1.IsMultiTenant(router) {
+	if !v1alpha1.IsMultiTenant(rcl) {
 		// the combination of standard labels {name,instance} is unique
-		// and immutable for single-tenant Routers
-		ls[appInstanceLabel] = router.GetName()
+		// and immutable for single-tenant components
+		ls[appInstanceLabel] = rcl.GetName()
 	}
 
 	sel := labels.SelectorFromValidatedSet(ls)
 
 	var objs []metav1.Object
 
-	svcs, err := genericReconciler.Lister(router.GetNamespace()).List(sel)
+	svcs, err := genericReconciler.Lister(rcl.GetNamespace()).List(sel)
 	if err != nil {
 		return nil, err
 	}
@@ -248,16 +248,17 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 	owners []kmeta.OwnerRefable) (*corev1.ServiceAccount, error) {
 
 	// The ServiceAccount's ownership is shared between all instances of a
-	// given Router type. It gets garbage collected by Kubernetes as soon
-	// as its last owner (Router) is deleted, so we don't need to clean
-	// things up explicitly once the last Router gets deleted.
+	// given component type. It gets garbage collected by Kubernetes as
+	// soon as its last owner (component instance) is deleted, so we don't
+	// need to clean things up explicitly once the last component instance
+	// gets deleted.
 	if len(owners) == 0 {
 		return nil, nil
 	}
 
-	router := v1alpha1.RouterFromContext(ctx)
+	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	desiredSA := newServiceAccount(router, owners)
+	desiredSA := newServiceAccount(rcl, owners)
 	currentSA, err := r.getOrCreateAdapterServiceAccount(ctx, desiredSA)
 	if err != nil {
 		return nil, err
@@ -267,8 +268,8 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 		return nil, fmt.Errorf("synchronizing adapter ServiceAccount: %w", err)
 	}
 
-	if v1alpha1.IsMultiTenant(router) {
-		desiredRB := newRoleBinding(router, currentSA)
+	if v1alpha1.IsMultiTenant(rcl) {
+		desiredRB := newRoleBinding(rcl, currentSA)
 		currentRB, err := r.getOrCreateAdapterRoleBinding(ctx, desiredRB)
 		if err != nil {
 			return nil, err
@@ -283,13 +284,13 @@ func (r *GenericRBACReconciler) reconcileRBAC(ctx context.Context,
 }
 
 // getOrCreateAdapterServiceAccount returns the existing adapter ServiceAccount
-// for a given Router, or creates it if it is missing.
+// for a given component instance, or creates it if it is missing.
 func (r *GenericRBACReconciler) getOrCreateAdapterServiceAccount(ctx context.Context,
 	desiredSA *corev1.ServiceAccount) (*corev1.ServiceAccount, error) {
 
-	router := v1alpha1.RouterFromContext(ctx)
+	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	sa, err := r.SALister(router.GetNamespace()).Get(desiredSA.Name)
+	sa, err := r.SALister(rcl.GetNamespace()).Get(desiredSA.Name)
 	switch {
 	case apierrors.IsNotFound(err):
 		sa, err = r.SAClient(desiredSA.Namespace).Create(ctx, desiredSA, metav1.CreateOptions{})
@@ -299,7 +300,7 @@ func (r *GenericRBACReconciler) getOrCreateAdapterServiceAccount(ctx context.Con
 		}
 		controller.GetEventRecorder(ctx).Eventf(newNamespace(desiredSA.Namespace), corev1.EventTypeNormal,
 			ReasonRBACCreate, "Created ServiceAccount %q due to the creation of a %s object",
-			sa.Name, router.GetGroupVersionKind().Kind)
+			sa.Name, rcl.GetGroupVersionKind().Kind)
 
 	case err != nil:
 		return nil, fmt.Errorf("getting adapter ServiceAccount from cache: %w", err)
@@ -339,7 +340,7 @@ func (r *GenericRBACReconciler) syncAdapterServiceAccount(ctx context.Context,
 
 	controller.GetEventRecorder(ctx).Eventf(newNamespace(sa.Namespace), corev1.EventTypeNormal,
 		ReasonRBACUpdate, "Updated ServiceAccount %q due to the creation/deletion of a %s object",
-		sa.Name, v1alpha1.RouterFromContext(ctx).GetGroupVersionKind().Kind)
+		sa.Name, v1alpha1.ReconcilableFromContext(ctx).GetGroupVersionKind().Kind)
 
 	return sa, nil
 }
@@ -349,19 +350,19 @@ func (r *GenericRBACReconciler) syncAdapterServiceAccount(ctx context.Context,
 func (r *GenericRBACReconciler) getOrCreateAdapterRoleBinding(ctx context.Context,
 	desiredRB *rbacv1.RoleBinding) (*rbacv1.RoleBinding, error) {
 
-	router := v1alpha1.RouterFromContext(ctx)
+	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
 	rb, err := r.RBLister(desiredRB.Namespace).Get(desiredRB.Name)
 	switch {
 	case apierrors.IsNotFound(err):
-		rb, err = r.RBClient(router.GetNamespace()).Create(ctx, desiredRB, metav1.CreateOptions{})
+		rb, err = r.RBClient(rcl.GetNamespace()).Create(ctx, desiredRB, metav1.CreateOptions{})
 		if err != nil {
 			return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedRBACCreate,
 				"Failed to create adapter RoleBinding %q: %s", desiredRB.Name, err)
 		}
 		controller.GetEventRecorder(ctx).Eventf(newNamespace(rb.Namespace), corev1.EventTypeNormal,
 			ReasonRBACCreate, "Created RoleBinding %q due to the creation of a %s object",
-			rb.Name, router.GetGroupVersionKind().Kind)
+			rb.Name, rcl.GetGroupVersionKind().Kind)
 
 	case err != nil:
 		return nil, fmt.Errorf("getting adapter RoleBinding from cache: %w", err)

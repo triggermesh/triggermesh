@@ -58,7 +58,7 @@ var _ reconcilerv1alpha1.Finalizer = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureBlobStorageSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	eventSubsCli, eventHubsCli, err := r.cg.Get(o)
 	switch {
@@ -78,7 +78,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureBlobSto
 		return fmt.Errorf("failed to reconcile Event Hub: %w", err)
 	}
 
-	if err := r.base.ReconcileSource(ctx, r); err != nil {
+	if err := r.base.ReconcileAdapter(ctx, r); err != nil {
 		return fmt.Errorf("failed to reconcile Event Hubs event source adapter: %w", err)
 	}
 
@@ -88,7 +88,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureBlobSto
 // FinalizeKind is called when the resource is deleted.
 func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureBlobStorageSource) reconciler.Event {
 	// inject source into context for usage in finalization logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	eventSubsCli, eventHubsCli, err := r.cg.Get(o)
 	switch {

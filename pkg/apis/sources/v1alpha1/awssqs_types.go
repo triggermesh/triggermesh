@@ -38,7 +38,7 @@ type AWSSQSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource            = (*AWSSQSSource)(nil)
+	_ Reconcilable           = (*AWSSQSSource)(nil)
 	_ serviceAccountProvider = (*AWSSQSSource)(nil)
 )
 

@@ -57,7 +57,7 @@ func ensureSubscription(ctx context.Context, cli *pubsub.Client) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudPubSubSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudPubSubSource)
 	status := &src.Status
 
 	topicResName := src.Spec.Topic
@@ -159,7 +159,7 @@ func ensureNoSubscription(ctx context.Context, cli *pubsub.Client) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudPubSubSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudPubSubSource)
 
 	if src.Spec.SubscriptionID != nil {
 		// do not delete subscriptions managed by the user
@@ -230,7 +230,7 @@ func makeSubscriptionResourceName(proj, subsID string) *v1alpha1.GCloudResourceN
 //
 // Resource IDs aren't allowed to start with "goog" and can only contain a
 // limited set of characters.
-func subscriptionID(src v1alpha1.EventSource) string {
+func subscriptionID(src v1alpha1.Reconcilable) string {
 	return src.GetNamespace() + "." + src.GetName() + "~" + sources.GoogleCloudPubSubSourceResource.String()
 }
 

@@ -38,20 +38,20 @@ func (s *AzureQueueStorageSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AzureQueueStorageSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AzureQueueStorageSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AzureQueueStorageSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AzureQueueStorageSource) AsEventSource() string {
 	return AzureQueueStorageSourceName(s.Namespace, s.Name)
 }

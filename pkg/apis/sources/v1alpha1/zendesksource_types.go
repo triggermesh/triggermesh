@@ -36,8 +36,8 @@ type ZendeskSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*ZendeskSource)(nil)
-	_ multiTenant = (*ZendeskSource)(nil)
+	_ Reconcilable = (*ZendeskSource)(nil)
+	_ multiTenant  = (*ZendeskSource)(nil)
 )
 
 // ZendeskSourceSpec defines the desired state of the event source.

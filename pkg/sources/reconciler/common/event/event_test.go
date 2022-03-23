@@ -43,8 +43,8 @@ func TestEvents(t *testing.T) {
 	const eventRecorderBufferSize = 10
 	er := record.NewFakeRecorder(eventRecorderBufferSize)
 
-	ctx := controller.WithEventRecorder(context.TODO(), er)
-	ctx = v1alpha1.WithSource(ctx, &v1alpha1.AWSCodeCommitSource{})
+	ctx := controller.WithEventRecorder(context.Background(), er)
+	ctx = v1alpha1.WithReconcilable(ctx, (*v1alpha1.AWSCodeCommitSource)(nil))
 
 	Normal(ctx, reason, messageFmt, normalMsg)
 	Warn(ctx, reason, messageFmt, warningMsg)

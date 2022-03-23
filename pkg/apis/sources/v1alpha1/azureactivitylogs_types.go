@@ -36,7 +36,7 @@ type AzureActivityLogsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AzureActivityLogsSource)(nil)
+	_ Reconcilable = (*AzureActivityLogsSource)(nil)
 )
 
 // AzureActivityLogsSourceSpec defines the desired state of the event source.

@@ -38,20 +38,20 @@ func (s *HTTPPollerSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *HTTPPollerSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *HTTPPollerSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *HTTPPollerSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *HTTPPollerSource) AsEventSource() string {
 	if s.Spec.EventSource != nil {
 		return *s.Spec.EventSource
@@ -65,7 +65,7 @@ func (s *HTTPPollerSource) AsEventSource() string {
 	return sourceName
 }
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *HTTPPollerSource) GetEventTypes() []string {
 	return []string{
 		s.Spec.EventType,

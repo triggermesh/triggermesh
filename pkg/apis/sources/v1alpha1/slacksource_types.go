@@ -36,7 +36,7 @@ type SlackSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*SlackSource)(nil)
+	_ Reconcilable = (*SlackSource)(nil)
 )
 
 // SlackSourceSpec defines the desired state of the event source.

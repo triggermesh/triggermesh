@@ -36,7 +36,7 @@ type GoogleCloudAuditLogsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*GoogleCloudAuditLogsSource)(nil)
+	_ Reconcilable = (*GoogleCloudAuditLogsSource)(nil)
 )
 
 // GoogleCloudAuditLogsSourceSpec defines the desired state of the event source.

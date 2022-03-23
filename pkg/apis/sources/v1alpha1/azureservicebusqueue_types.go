@@ -36,7 +36,7 @@ type AzureServiceBusQueueSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AzureServiceBusQueueSource)(nil)
+	_ Reconcilable = (*AzureServiceBusQueueSource)(nil)
 )
 
 // AzureServiceBusQueueSourceSpec defines the desired state of the event source.

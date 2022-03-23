@@ -38,20 +38,20 @@ func (s *SlackSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *SlackSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *SlackSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *SlackSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *SlackSource) AsEventSource() string {
 	return "slack/" + s.Name
 }
@@ -61,7 +61,7 @@ const (
 	SlackGenericEventType = "com.slack.events"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (*SlackSource) GetEventTypes() []string {
 	return []string{
 		SlackGenericEventType,

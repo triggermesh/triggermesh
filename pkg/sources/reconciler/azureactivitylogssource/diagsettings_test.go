@@ -155,7 +155,7 @@ func TestEnsureDiagnosticSettings(t *testing.T) {
 				},
 			}
 
-			ctx := v1alpha1.WithSource(testContext(t), src)
+			ctx := v1alpha1.WithReconcilable(testContext(t), src)
 
 			returnedErr := make(chan error)
 			go func() {

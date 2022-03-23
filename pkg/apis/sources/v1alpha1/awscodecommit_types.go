@@ -38,7 +38,7 @@ type AWSCodeCommitSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSCodeCommitSource)(nil)
+	_ Reconcilable = (*AWSCodeCommitSource)(nil)
 )
 
 // AWSCodeCommitSourceSpec defines the desired state of the event source.

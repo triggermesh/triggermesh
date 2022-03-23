@@ -38,20 +38,20 @@ func (s *TwilioSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *TwilioSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *TwilioSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *TwilioSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *TwilioSource) AsEventSource() string {
 	return TwilioSourceName(s.Namespace, s.Name)
 }
@@ -67,7 +67,7 @@ const (
 	TwilioSourceGenericEventType = "com.triggermesh.twilio.sms"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *TwilioSource) GetEventTypes() []string {
 	return []string{
 		TwilioSourceGenericEventType,

@@ -44,7 +44,7 @@ import (
 // ensureNotificationsEnabled ensures that event notifications are enabled in
 // the S3 bucket.
 func (r *Reconciler) ensureNotificationsEnabled(ctx context.Context, cli s3iface.S3API, queueARN string) error {
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	status := &typedSrc.Status
@@ -94,7 +94,7 @@ func (r *Reconciler) ensureNotificationsEnabled(ctx context.Context, cli s3iface
 // ensureNotificationsDisabled ensures that event notifications are disabled in
 // the S3 bucket.
 func (r *Reconciler) ensureNotificationsDisabled(ctx context.Context, cli s3iface.S3API) error {
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	bucketARN := typedSrc.Spec.ARN

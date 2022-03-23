@@ -40,14 +40,14 @@ func (s *AWSCloudWatchSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AWSCloudWatchSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSCloudWatchSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AWSCloudWatchSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
@@ -63,7 +63,7 @@ const (
 // https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatch.html#amazoncloudwatch-resources-for-iam-policies
 const ServiceCloudWatch = "cloudwatch"
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (*AWSCloudWatchSource) GetEventTypes() []string {
 	return []string{
 		AWSEventType(ServiceCloudWatch, AWSCloudWatchMetricEventType),
@@ -71,7 +71,7 @@ func (*AWSCloudWatchSource) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AWSCloudWatchSource) AsEventSource() string {
 	return AWSCloudWatchSourceName(s.Namespace, s.Name)
 }

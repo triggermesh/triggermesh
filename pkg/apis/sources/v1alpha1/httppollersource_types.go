@@ -40,7 +40,7 @@ type HTTPPollerSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*HTTPPollerSource)(nil)
+	_ Reconcilable = (*HTTPPollerSource)(nil)
 )
 
 // HTTPPollerSourceSpec defines the desired state of the event source.

@@ -38,14 +38,14 @@ func (s *AWSPerformanceInsightsSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AWSPerformanceInsightsSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSPerformanceInsightsSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AWSPerformanceInsightsSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
@@ -56,14 +56,14 @@ const (
 	AWSPerformanceInsightsGenericEventType = "com.amazon.rds.pi.metric"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *AWSPerformanceInsightsSource) GetEventTypes() []string {
 	return []string{
 		AWSEventType(s.Spec.ARN.Service, AWSPerformanceInsightsGenericEventType),
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AWSPerformanceInsightsSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }

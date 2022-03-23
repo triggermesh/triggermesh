@@ -38,14 +38,14 @@ func (s *AWSDynamoDBSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AWSDynamoDBSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSDynamoDBSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AWSDynamoDBSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
@@ -56,14 +56,14 @@ const (
 	AWSDynamoDBGenericEventType = "stream_record"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *AWSDynamoDBSource) GetEventTypes() []string {
 	return []string{
 		AWSEventType(s.Spec.ARN.Service, AWSDynamoDBGenericEventType),
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AWSDynamoDBSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }

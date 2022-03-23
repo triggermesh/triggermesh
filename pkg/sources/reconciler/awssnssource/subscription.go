@@ -49,7 +49,7 @@ func (r *Reconciler) ensureSubscribed(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AWSSNSSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AWSSNSSource)
 	status := &src.Status
 
 	isDeployed := status.GetCondition(v1alpha1.ConditionDeployed).IsTrue()
@@ -147,7 +147,7 @@ func (r *Reconciler) ensureUnsubscribed(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AWSSNSSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AWSSNSSource)
 	status := src.Status
 
 	snsClient, err := r.snsCg.Get(src)

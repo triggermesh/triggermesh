@@ -42,14 +42,14 @@ func (s *AWSSQSSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *AWSSQSSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSSQSSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *AWSSQSSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
@@ -60,14 +60,14 @@ const (
 	AWSSQSGenericEventType = "message"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *AWSSQSSource) GetEventTypes() []string {
 	return []string{
 		AWSEventType(s.Spec.ARN.Service, AWSSQSGenericEventType),
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *AWSSQSSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }

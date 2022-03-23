@@ -69,7 +69,7 @@ func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
 	status := &src.Status
 
 	// initialize clients
@@ -210,7 +210,7 @@ func (r *Reconciler) ensureNoDiagnosticSettings(ctx context.Context) reconciler.
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
 
 	_, diagSettingsCli, err := r.cg.Get(src)
 	switch {

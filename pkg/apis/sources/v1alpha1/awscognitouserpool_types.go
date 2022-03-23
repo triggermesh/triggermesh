@@ -38,7 +38,7 @@ type AWSCognitoUserPoolSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSCognitoUserPoolSource)(nil)
+	_ Reconcilable = (*AWSCognitoUserPoolSource)(nil)
 )
 
 // AWSCognitoUserPoolSourceSpec defines the desired state of the event source.

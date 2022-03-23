@@ -38,8 +38,8 @@ type AWSSNSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSSNSSource)(nil)
-	_ multiTenant = (*AWSSNSSource)(nil)
+	_ Reconcilable = (*AWSSNSSource)(nil)
+	_ multiTenant  = (*AWSSNSSource)(nil)
 )
 
 // AWSSNSSourceSpec defines the desired state of the event source.

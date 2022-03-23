@@ -62,7 +62,7 @@ var _ reconcilerv1alpha1.Finalizer = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudBillingSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	pubsubCli, biCli, err := r.cg.Get(o)
 	switch {
@@ -86,13 +86,13 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudB
 		return fmt.Errorf("failed to reconcile Billing notification: %w", err)
 	}
 
-	return r.base.ReconcileSource(ctx, r)
+	return r.base.ReconcileAdapter(ctx, r)
 }
 
 // FinalizeKind is called when the resource is deleted.
 func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudBillingSource) reconciler.Event {
 	// inject source into context for usage in finalization logic
-	ctx = v1alpha1.WithSource(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	pubsubCli, biCli, err := r.cg.Get(o)
 	switch {

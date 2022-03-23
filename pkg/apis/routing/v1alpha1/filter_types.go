@@ -48,8 +48,8 @@ var (
 	_ apis.Validatable = (*Filter)(nil)
 	_ apis.Defaultable = (*Filter)(nil)
 
-	_ Router      = (*Filter)(nil)
-	_ multiTenant = (*Filter)(nil)
+	_ Reconcilable = (*Filter)(nil)
+	_ multiTenant  = (*Filter)(nil)
 )
 
 // FilterSpec contains CEL expression string and the destination sink
@@ -75,7 +75,7 @@ func (f *Filter) GetStatus() *duckv1.Status {
 	return &f.Status.Status
 }
 
-// AsEventSource implements Router.
+// AsEventSource implements Reconcilable.
 func (f *Filter) AsEventSource() string {
 	return "filter/" + f.Name
 }
