@@ -102,7 +102,7 @@ spec:
         - name: ZENDESKSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesksource-adapter
         # Target adapters
-        - name: ALIBABAOSS_ADAPTER_IMAGE
+        - name: ALIBABAOSSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/alibabaosstarget-adapter
         - name: AWS_COMPREHEND_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehendtarget-adapter
