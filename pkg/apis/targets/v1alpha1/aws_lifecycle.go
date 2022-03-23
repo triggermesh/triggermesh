@@ -78,6 +78,10 @@ func (s *AWSS3Target) GetGroupVersionKind() schema.GroupVersionKind {
 // PropagateKServiceAvailability uses the availability of the provided KService to determine if
 // ConditionServiceReady should be marked as true or false.
 func (a *AWSTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
+	if a.Address == nil {
+		a.Address = &duckv1.Addressable{}
+	}
+
 	if ksvc != nil && ksvc.IsReady() {
 		a.Address.URL = ksvc.Status.Address.URL
 		AwsCondSet.Manage(a).MarkTrue(ConditionServiceReady)
