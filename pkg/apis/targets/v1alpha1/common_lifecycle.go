@@ -40,21 +40,21 @@ const (
 	EventTypeResponse = "io.triggermesh.targets.response"
 )
 
-// routerConditionSet is a generic set of status conditions used by
-// default in all routers.
-var routerConditionSet = NewRouterConditionSet()
+// targetConditionSet is a generic set of status conditions used by
+// default in all targets.
+var targetConditionSet = NewTargetConditionSet()
 
-// NewRouterConditionSet returns a set of status conditions for a router.
+// NewTargetConditionSet returns a set of status conditions for a target.
 // Default conditions can be augmented by passing condition types as function
 // arguments.
-func NewRouterConditionSet(cts ...apis.ConditionType) apis.ConditionSet {
+func NewTargetConditionSet(cts ...apis.ConditionType) apis.ConditionSet {
 	return apis.NewLivingConditionSet(
-		append(routerConditionTypes, cts...)...,
+		append(targetConditionTypes, cts...)...,
 	)
 }
 
-// routerConditionTypes is a list of condition types common to all routers.
-var routerConditionTypes = []apis.ConditionType{
+// targetConditionTypes is a list of condition types common to all targets.
+var targetConditionTypes = []apis.ConditionType{
 	ConditionDeployed,
 }
 

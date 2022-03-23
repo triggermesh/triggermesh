@@ -23,29 +23,7 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
-
-// SlackCondSet is the group of possible conditions
-var SlackCondSet = apis.NewLivingConditionSet(
-	ConditionServiceReady,
-)
-
-// GetCondition returns the condition currently associated with the given type, or nil.
-func (s *SlackTargetStatus) GetCondition(t apis.ConditionType) *apis.Condition {
-	return SlackCondSet.Manage(s).GetCondition(t)
-}
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *SlackTargetStatus) InitializeConditions() {
-	SlackCondSet.Manage(s).InitializeConditions()
-	s.Address = &duckv1.Addressable{}
-}
-
-// GetGroupVersionKind returns the GroupVersionKind.
-func (*SlackTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("SlackTarget")
-}
 
 // Accepted event types
 const (
@@ -53,6 +31,29 @@ const (
 	// https://api.slack.com/methods
 	EventTypeSlackAPI = "com.slack.webapi.*"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*SlackTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("SlackTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*SlackTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *SlackTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *SlackTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*SlackTarget) AcceptedEventTypes() []string {
@@ -68,43 +69,8 @@ func (*SlackTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
+// AsEventSource implements EventSource.
 func (s *SlackTarget) AsEventSource() string {
 	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
 	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
-}
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionServiceReady should be marked as true or false.
-func (s *SlackTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc != nil && ksvc.IsReady() {
-		s.Address.URL = ksvc.Status.Address.URL
-		SlackCondSet.Manage(s).MarkTrue(ConditionServiceReady)
-		return
-	} else if ksvc == nil {
-		s.MarkNoKService(ReasonUnavailable, "Adapter service unknown: ksvc is not available")
-	} else {
-		s.MarkNoKService(ReasonUnavailable, "Adapter service \"%s/%s\" is unavailable", ksvc.Namespace, ksvc.Name)
-	}
-	s.Address.URL = nil
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *SlackTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	SlackCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *SlackTargetStatus) IsReady() bool {
-	return SlackCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (*SlackTarget) GetConditionSet() apis.ConditionSet {
-	return SlackCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *SlackTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
 }

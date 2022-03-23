@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,28 +18,27 @@ package v1alpha1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
-func (*SplunkTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("SplunkTarget")
+func (*AWSSNSTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSSNSTarget")
 }
 
 // GetConditionSet implements duckv1.KRShaped.
-func (*SplunkTarget) GetConditionSet() apis.ConditionSet {
+func (*AWSSNSTarget) GetConditionSet() apis.ConditionSet {
 	return targetConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
-func (t *SplunkTarget) GetStatus() *duckv1.Status {
+func (t *AWSSNSTarget) GetStatus() *duckv1.Status {
 	return &t.Status.Status
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *SplunkTarget) GetStatusManager() *StatusManager {
+func (t *AWSSNSTarget) GetStatusManager() *StatusManager {
 	return &StatusManager{
 		ConditionSet: t.GetConditionSet(),
 		TargetStatus: &t.Status,

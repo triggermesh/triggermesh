@@ -18,10 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 )
@@ -42,17 +38,15 @@ type SalesforceTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SalesforceTargetSpec   `json:"spec"`
-	Status SalesforceTargetStatus `json:"status,omitempty"`
+	Spec   SalesforceTargetSpec `json:"spec"`
+	Status TargetStatus         `json:"status,omitempty"`
 }
 
-// Check the interfaces SalesforceTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*SalesforceTarget)(nil)
-	_ kmeta.OwnerRefable        = (*SalesforceTarget)(nil)
+	_ Reconcilable              = (*SalesforceTarget)(nil)
 	_ targets.IntegrationTarget = (*SalesforceTarget)(nil)
 	_ targets.EventSource       = (*SalesforceTarget)(nil)
-	_ duckv1.KRShaped           = (*SalesforceTarget)(nil)
 )
 
 // SalesforceTargetSpec holds the desired state of the SalesforceTarget.
@@ -81,13 +75,6 @@ type SalesforceAuth struct {
 	User string `json:"user"`
 	// CertKey is the private key used to sign requests from the target.
 	CertKey SecretValueFromSource `json:"certKey"`
-}
-
-// SalesforceTargetStatus communicates the observed state of the SalesforceTarget (from the controller).
-type SalesforceTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-	CloudEventStatus     `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -18,9 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 )
@@ -31,25 +28,18 @@ import (
 
 // SendGridTarget is the Schema for an Sendgrid Target.
 type SendGridTarget struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the SendGridTarget (from the client).
-	Spec SendGridTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the SendGridTarget (from the controller).
-	// +optional
-	Status SendGridTargetStatus `json:"status,omitempty"`
+	Spec   SendGridTargetSpec `json:"spec"`
+	Status TargetStatus       `json:"status,omitempty"`
 }
 
-// Check the interfaces SendGridTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*SendGridTarget)(nil)
-	_ kmeta.OwnerRefable        = (*SendGridTarget)(nil)
+	_ Reconcilable              = (*SendGridTarget)(nil)
 	_ targets.IntegrationTarget = (*SendGridTarget)(nil)
 	_ targets.EventSource       = (*SendGridTarget)(nil)
-	_ duckv1.KRShaped           = (*SendGridTarget)(nil)
 )
 
 // SendGridTargetSpec holds the desired state of the SendGridTarget.
@@ -84,22 +74,6 @@ type SendGridTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-}
-
-// SendGridTargetStatus communicates the observed state of the SendGridTarget (from the controller).
-type SendGridTargetStatus struct {
-	// inherits duck/v1beta1 Status, which currently provides:
-	// * ObservedGeneration - the 'Generation' of the Service that was last
-	//   processed by the controller.
-	// * Conditions - the latest available observations of a resource's current
-	//   state.
-	duckv1.Status `json:",inline"`
-
-	// AddressStatus fulfills the Addressable contract.
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

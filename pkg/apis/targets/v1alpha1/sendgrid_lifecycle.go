@@ -23,30 +23,7 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
-
-// SendgridCondSet is the group of possible conditions
-var SendgridCondSet = apis.NewLivingConditionSet(
-	ConditionServiceReady,
-	ConditionSecretsProvided,
-)
-
-// GetCondition returns the condition currently associated with the given type, or nil.
-func (s *SendGridTargetStatus) GetCondition(t apis.ConditionType) *apis.Condition {
-	return SendgridCondSet.Manage(s).GetCondition(t)
-}
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *SendGridTargetStatus) InitializeConditions() {
-	SendgridCondSet.Manage(s).InitializeConditions()
-	s.Address = &duckv1.Addressable{}
-}
-
-// GetGroupVersionKind returns the GroupVersionKind.
-func (s *SendGridTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("SendGridTarget")
-}
 
 // Accepted event types
 const (
@@ -55,6 +32,29 @@ const (
 	// EventTypeSendGridEmailSendResponse represents a response from the API after sending an email
 	EventTypeSendGridEmailSendResponse = "io.triggermesh.sendgrid.email.send.response"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*SendGridTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("SendGridTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*SendGridTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *SendGridTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *SendGridTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*SendGridTarget) AcceptedEventTypes() []string {
@@ -71,50 +71,8 @@ func (*SendGridTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
+// AsEventSource implements EventSource.
 func (s *SendGridTarget) AsEventSource() string {
 	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
 	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
-}
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionServiceReady should be marked as true or false.
-func (s *SendGridTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc.IsReady() && ksvc.Status.Address != nil && ksvc.Status.Address.URL != nil && !ksvc.Status.Address.URL.IsEmpty() {
-		s.Address.URL = ksvc.Status.Address.URL
-		SendgridCondSet.Manage(s).MarkTrue(ConditionServiceReady)
-		return
-	}
-	s.Address.URL = nil
-	s.MarkNoKService(ReasonUnavailable, "Adapter service \"%s/%s\" is unavailable", ksvc.Namespace, ksvc.Name)
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *SendGridTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	SendgridCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *SendGridTargetStatus) IsReady() bool {
-	return SendgridCondSet.Manage(s).IsHappy()
-}
-
-// MarkSecrets sets the condition that the resource is valid
-func (s *SendGridTargetStatus) MarkSecrets() {
-	SendgridCondSet.Manage(s).MarkTrue(ConditionSecretsProvided)
-}
-
-// MarkNoSecrets sets the condition that the resource is not valid
-func (s *SendGridTargetStatus) MarkNoSecrets(reason, messageFormat string, messageA ...interface{}) {
-	SendgridCondSet.Manage(s).MarkFalse(ConditionSecretsProvided, reason, messageFormat, messageA...)
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *SendGridTarget) GetConditionSet() apis.ConditionSet {
-	return SendgridCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *SendGridTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
 }

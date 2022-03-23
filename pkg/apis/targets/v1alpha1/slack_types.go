@@ -18,9 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 )
@@ -31,16 +28,11 @@ import (
 
 // SlackTarget defines the schema for the Slack target.
 type SlackTarget struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the SlackTarget (from the client).
-	Spec SlackTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the SlackTarget (from the controller).
-	// +optional
-	Status SlackTargetStatus `json:"status,omitempty"`
+	Spec   SlackTargetSpec `json:"spec"`
+	Status TargetStatus    `json:"status,omitempty"`
 }
 
 // SlackTargetSpec defines the spec for the Slack Taret.
@@ -49,30 +41,12 @@ type SlackTargetSpec struct {
 	Token SecretValueFromSource `json:"token"`
 }
 
-// Check the interfaces SlackTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*SlackTarget)(nil)
-	_ kmeta.OwnerRefable        = (*SlackTarget)(nil)
+	_ Reconcilable              = (*SlackTarget)(nil)
 	_ targets.IntegrationTarget = (*SlackTarget)(nil)
 	_ targets.EventSource       = (*SlackTarget)(nil)
-	_ duckv1.KRShaped           = (*SlackTarget)(nil)
 )
-
-// SlackTargetStatus communicates the observed state of the SlackTarget (from the controller).
-type SlackTargetStatus struct {
-	// inherits duck/v1beta1 Status, which currently provides:
-	// * ObservedGeneration - the 'Generation' of the Service that was last
-	//   processed by the controller.
-	// * Conditions - the latest available observations of a resource's current
-	//   state.
-	duckv1.Status `json:",inline"`
-
-	// AddressStatus fulfills the Addressable contract.
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
-}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
