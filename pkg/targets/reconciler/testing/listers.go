@@ -231,14 +231,14 @@ func (l *Listers) GetOracleTargetLister() targetslisters.OracleTargetLister {
 	return targetslisters.NewOracleTargetLister(l.IndexerFor(&targetsv1alpha1.OracleTarget{}))
 }
 
-// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
-func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
-	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
-}
-
 // GetSalesforceTargetLister returns a Lister for SalesforceTarget objects.
 func (l *Listers) GetSalesforceTargetLister() targetslisters.SalesforceTargetLister {
 	return targetslisters.NewSalesforceTargetLister(l.IndexerFor(&targetsv1alpha1.SalesforceTarget{}))
+}
+
+// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
+func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
+	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
 }
 
 // GetServiceLister returns a lister for Service objects.
