@@ -101,11 +101,6 @@ func (l *Listers) GetRoleBindingLister() rbaclistersv1.RoleBindingLister {
 	return rbaclistersv1.NewRoleBindingLister(l.IndexerFor(&rbacv1.RoleBinding{}))
 }
 
-// GetSplunkTargetsObjects returns objects from the targets API.
-func (l *Listers) GetSplunkTargetsObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
 // GetAlibabaOSSTargetLister returns a Lister for AlibabaOSSTarget objects.
 func (l *Listers) GetAlibabaOSSTargetLister() targetslisters.AlibabaOSSTargetLister {
 	return targetslisters.NewAlibabaOSSTargetLister(l.IndexerFor(&targetsv1alpha1.AlibabaOSSTarget{}))
