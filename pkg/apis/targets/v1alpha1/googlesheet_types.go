@@ -42,11 +42,6 @@ var (
 	_ targets.EventSource       = (*GoogleSheetTarget)(nil)
 )
 
-const (
-	// GoogleSheetTargetEventType is the GoogleSheetTarget CloudEvent type.
-	GoogleSheetTargetEventType = "dev.knative.source.GoogleSheet"
-)
-
 // GoogleSheetTargetSpec holds the desired state of the GoogleSheetTarget.
 type GoogleSheetTargetSpec struct {
 	// GoogleSheet credential JSON for auth

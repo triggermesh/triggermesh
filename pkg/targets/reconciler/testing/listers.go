@@ -101,11 +101,6 @@ func (l *Listers) GetRoleBindingLister() rbaclistersv1.RoleBindingLister {
 	return rbaclistersv1.NewRoleBindingLister(l.IndexerFor(&rbacv1.RoleBinding{}))
 }
 
-// GetGoogleSheetTargetsObjects returns objects from the targets API.
-func (l *Listers) GetGoogleSheetTargetsObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
 // GetSplunkTargetsObjects returns objects from the targets API.
 func (l *Listers) GetSplunkTargetsObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)

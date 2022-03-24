@@ -128,14 +128,14 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/datadogtarget-adapter
         - name: ELASTICSEARCHTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearchtarget-adapter
-        - name: GOOGLESHEET_ADAPTER_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
         - name: GOOGLECLOUDFIRESTORE_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestoretarget-adapter
         - name: GOOGLECLOUDSTORAGE_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter
         - name: GOOGLECLOUDWORKFLOWS_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflowstarget-adapter
+        - name: GOOGLESHEETTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
         - name: HASURATARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/hasuratarget-adapter
         - name: HTTPTARGET_IMAGE
