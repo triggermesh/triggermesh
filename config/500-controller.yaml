@@ -118,7 +118,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awss3target-adapter
         - name: AWSSNSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssnstarget-adapter
-        - name: AWS_SQS_ADAPTER_IMAGE
+        - name: AWSSQSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssqstarget-adapter
         - name: AZURE_EVENTHUBS_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubstarget-adapter

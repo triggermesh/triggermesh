@@ -171,6 +171,11 @@ func (l *Listers) GetAWSSNSTargetLister() targetslisters.AWSSNSTargetLister {
 	return targetslisters.NewAWSSNSTargetLister(l.IndexerFor(&targetsv1alpha1.AWSSNSTarget{}))
 }
 
+// GetAWSSQSTargetLister returns a Lister for AWSSQSTarget objects.
+func (l *Listers) GetAWSSQSTargetLister() targetslisters.AWSSQSTargetLister {
+	return targetslisters.NewAWSSQSTargetLister(l.IndexerFor(&targetsv1alpha1.AWSSQSTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
