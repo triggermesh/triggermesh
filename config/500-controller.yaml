@@ -104,7 +104,7 @@ spec:
         # Target adapters
         - name: ALIBABAOSSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/alibabaosstarget-adapter
-        - name: AWS_COMPREHEND_ADAPTER_IMAGE
+        - name: AWSCOMPREHENDTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehendtarget-adapter
         - name: AWS_DYNAMODB_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbtarget-adapter

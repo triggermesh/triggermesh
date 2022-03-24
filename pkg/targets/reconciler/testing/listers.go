@@ -136,6 +136,11 @@ func (l *Listers) GetAlibabaOSSTargetLister() targetslisters.AlibabaOSSTargetLis
 	return targetslisters.NewAlibabaOSSTargetLister(l.IndexerFor(&targetsv1alpha1.AlibabaOSSTarget{}))
 }
 
+// GetAWSComprehendTargetLister returns a Lister for AWSComprehendTarget objects.
+func (l *Listers) GetAWSComprehendTargetLister() targetslisters.AWSComprehendTargetLister {
+	return targetslisters.NewAWSComprehendTargetLister(l.IndexerFor(&targetsv1alpha1.AWSComprehendTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
