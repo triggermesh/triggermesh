@@ -255,3 +255,8 @@ func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
 func (l *Listers) GetTektonTargetLister() targetslisters.TektonTargetLister {
 	return targetslisters.NewTektonTargetLister(l.IndexerFor(&targetsv1alpha1.TektonTarget{}))
 }
+
+// GetTwilioTargetLister returns a Lister for TwilioTarget objects.
+func (l *Listers) GetTwilioTargetLister() targetslisters.TwilioTargetLister {
+	return targetslisters.NewTwilioTargetLister(l.IndexerFor(&targetsv1alpha1.TwilioTarget{}))
+}

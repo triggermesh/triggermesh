@@ -160,7 +160,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
         - name: TEKTONTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
-        - name: TWILIO_ADAPTER_IMAGE
+        - name: TWILIOTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
         - name: UIPATH_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter

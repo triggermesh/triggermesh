@@ -44,7 +44,6 @@ var (
 
 // TwilioTargetSpec holds the desired state of the TwilioTarget.
 type TwilioTargetSpec struct {
-
 	// Twilio account SID
 	AccountSID SecretValueFromSource `json:"sid"`
 

@@ -25,7 +25,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
-// Accepted event types
+// Managed event types
 const (
 	// EventTypeTwilioSMSSend represents a task to send a SMS.
 	EventTypeTwilioSMSSend = "io.triggermesh.twilio.sms.send"
