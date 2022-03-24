@@ -17,22 +17,19 @@ limitations under the License.
 package awsdynamodbtarget
 
 import (
-	"strconv"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
-	"github.com/aws/aws-sdk-go/aws/arn"
-
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
-
-const adapterName = "awsdynamodbtarget"
 
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
@@ -40,61 +37,55 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AWS_DYNAMODB_ADAPTER_IMAGE" default:"gcr.io/triggermesh/awsdynamodbtarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/awsdynamodbtarget-adapter"`
 }
 
-// makeTargetDynamoDBAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetDynamoDBAdapterKService(target *v1alpha1.AWSDynamoDBTarget, cfg *adapterConfig) *servingv1.Service {
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeCommonAppEnv(&target.Spec.AWSApiKey, &target.Spec.AWSApiSecret, target.Spec.ARN, false)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.AWSDynamoDBTarget)
+
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	)
 }
 
-func makeCommonAppEnv(key, secret *v1alpha1.SecretValueFromSource, arnStr string,
-	discardCEContext bool) []corev1.EnvVar {
-
-	var targetType string
-	if arn, err := arn.Parse(arnStr); err == nil {
-		// An invalid ARN would cause targetType to remain empty, but
-		// this kind of error can be safely discarded because a valid
-		// ARN is required for the target adapter to operate.
-		targetType = arn.Service
+func makeAppEnv(o *v1alpha1.AWSDynamoDBTarget) []corev1.EnvVar {
+	envs := []corev1.EnvVar{
+		{
+			Name: "AWS_ACCESS_KEY_ID",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.AWSApiKey.SecretKeyRef,
+			},
+		}, {
+			Name: "AWS_SECRET_ACCESS_KEY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.AWSApiSecret.SecretKeyRef,
+			},
+		}, {
+			Name:  "AWS_TARGET_ARN",
+			Value: o.Spec.ARN,
+		},
 	}
 
-	envs := []corev1.EnvVar{{
-		Name: "AWS_ACCESS_KEY_ID",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: key.SecretKeyRef,
-		},
-	}, {
-		Name: "AWS_SECRET_ACCESS_KEY",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: secret.SecretKeyRef,
-		},
-	}, {
-		Name:  "AWS_TARGET_TYPE",
-		Value: targetType,
-	}, {
-		Name:  "AWS_TARGET_ARN",
-		Value: arnStr,
-	}, {
-		Name:  "AWS_DISCARD_CE_CONTEXT",
-		Value: strconv.FormatBool(discardCEContext),
-	}}
-
 	return envs
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

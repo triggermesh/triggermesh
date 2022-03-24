@@ -141,6 +141,11 @@ func (l *Listers) GetAWSComprehendTargetLister() targetslisters.AWSComprehendTar
 	return targetslisters.NewAWSComprehendTargetLister(l.IndexerFor(&targetsv1alpha1.AWSComprehendTarget{}))
 }
 
+// GetAWSDynamoDBTargetLister returns a Lister for AWSDynamoDBTarget objects.
+func (l *Listers) GetAWSDynamoDBTargetLister() targetslisters.AWSDynamoDBTargetLister {
+	return targetslisters.NewAWSDynamoDBTargetLister(l.IndexerFor(&targetsv1alpha1.AWSDynamoDBTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
