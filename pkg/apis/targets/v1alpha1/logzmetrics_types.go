@@ -49,7 +49,6 @@ type LogzMetricsTarget struct {
 var (
 	_ Reconcilable              = (*LogzMetricsTarget)(nil)
 	_ targets.IntegrationTarget = (*LogzMetricsTarget)(nil)
-	_ targets.EventSource       = (*LogzMetricsTarget)(nil)
 )
 
 // LogzMetricsTargetSpec holds the desired state of the LogzMetricsTarget.

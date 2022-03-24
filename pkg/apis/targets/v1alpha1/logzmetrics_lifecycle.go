@@ -17,18 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"strings"
-
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-)
-
-// Reasons for status conditions
-const (
-	// LogzMetricsReasonWrongSpec is set when an adapter cannot be built from the spec.
-	LogzMetricsReasonWrongSpec = "WrongSpec"
 )
 
 // Managed event types
@@ -64,15 +56,4 @@ func (*LogzMetricsTarget) AcceptedEventTypes() []string {
 	return []string{
 		EventTypeOpenTelemetryMetricsPush,
 	}
-}
-
-// GetEventTypes implements EventSource.
-func (*LogzMetricsTarget) GetEventTypes() []string {
-	return []string{}
-}
-
-// AsEventSource implements EventSource.
-func (s *LogzMetricsTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
 }

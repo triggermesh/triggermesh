@@ -106,11 +106,6 @@ func (l *Listers) GetSplunkTargetsObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
 }
 
-// GetLogzMetricsTargetObjects returns objects from the targets API.
-func (l *Listers) GetLogzMetricsTargetObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
 // GetLogzTargetObjects returns objects from the targets API.
 func (l *Listers) GetLogzTargetObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
@@ -226,14 +221,14 @@ func (l *Listers) GetJiraTargetLister() targetslisters.JiraTargetLister {
 	return targetslisters.NewJiraTargetLister(l.IndexerFor(&targetsv1alpha1.JiraTarget{}))
 }
 
-// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
-func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
-	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
-}
-
 // GetLogzMetricsTargetLister returns a Lister for LogzMetricsTarget objects.
 func (l *Listers) GetLogzMetricsTargetLister() targetslisters.LogzMetricsTargetLister {
 	return targetslisters.NewLogzMetricsTargetLister(l.IndexerFor(&targetsv1alpha1.LogzMetricsTarget{}))
+}
+
+// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
+func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
+	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
 }
 
 // GetLogzTargetLister returns a Lister for LogzTarget objects.
