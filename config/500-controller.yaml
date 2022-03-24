@@ -158,7 +158,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter
         - name: SPLUNKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
-        - name: TEKTON_ADAPTER_IMAGE
+        - name: TEKTONTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
         - name: TWILIO_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
@@ -188,7 +188,7 @@ spec:
         - name: RUNTIME_KLR_RUBY
           value: gcr.io/triggermesh/knative-lambda-ruby25:v1.12.0
         # Type-specific options
-        - name: TEKTON_REAPING_INTERVAL
+        - name: TEKTONTARGET_REAPING_INTERVAL
           value: 2m
         # Custom build adapters
         - name: IBMMQSOURCE_IMAGE

@@ -91,6 +91,11 @@ func (l *Listers) GetServingObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
 }
 
+// GetServiceLister returns a lister for Service objects.
+func (l *Listers) GetServiceLister() servinglistersv1.ServiceLister {
+	return servinglistersv1.NewServiceLister(l.IndexerFor(&servingv1.Service{}))
+}
+
 // GetServiceAccountLister returns a lister for ServiceAccount objects.
 func (l *Listers) GetServiceAccountLister() corelistersv1.ServiceAccountLister {
 	return corelistersv1.NewServiceAccountLister(l.IndexerFor(&corev1.ServiceAccount{}))
@@ -246,7 +251,7 @@ func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
 	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
 }
 
-// GetServiceLister returns a lister for Service objects.
-func (l *Listers) GetServiceLister() servinglistersv1.ServiceLister {
-	return servinglistersv1.NewServiceLister(l.IndexerFor(&servingv1.Service{}))
+// GetTektonTargetLister returns a Lister for TektonTarget objects.
+func (l *Listers) GetTektonTargetLister() targetslisters.TektonTargetLister {
+	return targetslisters.NewTektonTargetLister(l.IndexerFor(&targetsv1alpha1.TektonTarget{}))
 }
