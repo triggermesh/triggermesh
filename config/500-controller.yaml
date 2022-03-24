@@ -162,7 +162,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
         - name: TWILIOTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
-        - name: UIPATH_ADAPTER_IMAGE
+        - name: UIPATHTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
         - name: ZENDESK_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter

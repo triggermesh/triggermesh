@@ -260,3 +260,8 @@ func (l *Listers) GetTektonTargetLister() targetslisters.TektonTargetLister {
 func (l *Listers) GetTwilioTargetLister() targetslisters.TwilioTargetLister {
 	return targetslisters.NewTwilioTargetLister(l.IndexerFor(&targetsv1alpha1.TwilioTarget{}))
 }
+
+// GetUiPathTargetLister returns a Lister for UiPathTarget objects.
+func (l *Listers) GetUiPathTargetLister() targetslisters.UiPathTargetLister { //nolint:stylecheck
+	return targetslisters.NewUiPathTargetLister(l.IndexerFor(&targetsv1alpha1.UiPathTarget{}))
+}

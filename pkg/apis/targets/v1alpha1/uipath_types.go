@@ -45,7 +45,7 @@ var (
 // UiPathTargetSpec defines the desired state of the event target.
 type UiPathTargetSpec struct { //nolint:stylecheck
 	// UserKey An OAuth token used to obtain an access key.
-	UserKey *SecretValueFromSource `json:"userKey"`
+	UserKey SecretValueFromSource `json:"userKey"`
 	// RobotName is the robot to invoke with this target.
 	RobotName string `json:"robotName"`
 	// ProccessName is the process name that will be used by UiPath for the target.
