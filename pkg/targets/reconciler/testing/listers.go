@@ -236,6 +236,11 @@ func (l *Listers) GetSalesforceTargetLister() targetslisters.SalesforceTargetLis
 	return targetslisters.NewSalesforceTargetLister(l.IndexerFor(&targetsv1alpha1.SalesforceTarget{}))
 }
 
+// GetSendGridTargetLister returns a Lister for SendGridTarget objects.
+func (l *Listers) GetSendGridTargetLister() targetslisters.SendGridTargetLister {
+	return targetslisters.NewSendGridTargetLister(l.IndexerFor(&targetsv1alpha1.SendGridTarget{}))
+}
+
 // GetSplunkTargetLister returns a Lister for SplunkTarget objects.
 func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
 	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))

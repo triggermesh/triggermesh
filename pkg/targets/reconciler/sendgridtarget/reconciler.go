@@ -19,57 +19,29 @@ package sendgridtarget
 import (
 	"context"
 
-	"go.uber.org/zap"
+	"knative.dev/pkg/reconciler"
 
-	"knative.dev/pkg/logging"
-	pkgreconciler "knative.dev/pkg/reconciler"
-
-	sendgridv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilersendgrid "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/sendgridtarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/sendgridtarget"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
-// Reconciler reconciles the target adapter object
-type reconciler struct {
-	logger *zap.SugaredLogger
-	ksvcr  libreconciler.KServiceReconciler
-	vg     libreconciler.ValueGetter
-
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
+
+	trgLister func(namespace string) listersv1alpha1.SendGridTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilersendgrid.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *sendgridv1alpha1.SendGridTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-	// NOTE(antoineco): the adapter currently doesn't evaluate the attributes of incoming events.
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.SendGridTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.APIKey.SecretKeyRef)
-	if err != nil {
-		trg.Status.MarkNoSecrets("APIKeyNotFound", "%s", err)
-		return err
-	}
-	trg.Status.MarkSecrets()
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
-
-	if event != nil {
-		logging.FromContext(ctx).Debugf("returning because an event was raised reconciling adapter KService")
-		if adapter == nil {
-			trg.Status.MarkNoKService("ServicePending", event.Error())
-		} else {
-			trg.Status.PropagateKServiceAvailability(adapter)
-		}
-		return event
-	}
-
-	trg.Status.PropagateKServiceAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

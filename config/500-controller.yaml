@@ -152,7 +152,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/oracletarget-adapter
         - name: SALESFORCETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/salesforcetarget-adapter
-        - name: SENDGRID_ADAPTER_IMAGE
+        - name: SENDGRIDTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/sendgridtarget-adapter
         - name: SLACK_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter

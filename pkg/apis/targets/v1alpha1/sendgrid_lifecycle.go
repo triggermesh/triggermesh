@@ -72,7 +72,7 @@ func (*SendGridTarget) GetEventTypes() []string {
 }
 
 // AsEventSource implements EventSource.
-func (s *SendGridTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
+func (t *SendGridTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }
