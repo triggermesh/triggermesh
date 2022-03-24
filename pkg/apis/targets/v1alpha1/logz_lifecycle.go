@@ -61,7 +61,7 @@ func (*LogzTarget) GetEventTypes() []string {
 }
 
 // AsEventSource implements EventSource.
-func (s *LogzTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
+func (t *LogzTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }
