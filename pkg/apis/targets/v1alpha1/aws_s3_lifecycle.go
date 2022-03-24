@@ -73,6 +73,6 @@ func (*AWSS3Target) GetEventTypes() []string {
 }
 
 // AsEventSource implements EventSource.
-func (s *AWSS3Target) AsEventSource() string {
-	return s.Spec.ARN
+func (t *AWSS3Target) AsEventSource() string {
+	return t.Spec.ARN
 }

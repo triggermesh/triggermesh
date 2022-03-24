@@ -19,50 +19,29 @@ package awss3target
 import (
 	"context"
 
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/reconciler"
 
-	awsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/awss3target"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/awss3target"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
-// Reconciler reconciles the target adapter object
+// Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	ksvcr libreconciler.KServiceReconciler
-	vg    libreconciler.ValueGetter
-
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
+
+	trgLister func(namespace string) listersv1alpha1.AWSS3TargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilers.Interface = (*Reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trg *awsv1alpha1.AWSS3Target) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.AWSS3Target) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	if trg.Spec.AWSApiKey.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.AWSApiKey.SecretKeyRef)
-		if err != nil {
-			trg.Status.MarkNoSecrets("AwsApiKeySecretNotFound", "%s", err)
-			return err
-		}
-	}
-	if trg.Spec.AWSApiSecret.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.AWSApiSecret.SecretKeyRef)
-		if err != nil {
-			trg.Status.MarkNoSecrets("AwsApiSecretNotFound", "%s", err)
-			return err
-		}
-	}
-	trg.Status.MarkSecrets()
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
-
-	trg.Status.PropagateKServiceAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }
