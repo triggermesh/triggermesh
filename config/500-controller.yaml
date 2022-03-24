@@ -130,7 +130,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearchtarget-adapter
         - name: GOOGLECLOUDFIRESTORETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestoretarget-adapter
-        - name: GOOGLECLOUDSTORAGE_ADAPTER_IMAGE
+        - name: GOOGLECLOUDSTORAGETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter
         - name: GOOGLECLOUDWORKFLOWS_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflowstarget-adapter
