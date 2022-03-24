@@ -191,6 +191,11 @@ func (l *Listers) GetDatadogTargetLister() targetslisters.DatadogTargetLister {
 	return targetslisters.NewDatadogTargetLister(l.IndexerFor(&targetsv1alpha1.DatadogTarget{}))
 }
 
+// GetElasticsearchTargetLister returns a Lister for ElasticsearchTarget objects.
+func (l *Listers) GetElasticsearchTargetLister() targetslisters.ElasticsearchTargetLister {
+	return targetslisters.NewElasticsearchTargetLister(l.IndexerFor(&targetsv1alpha1.ElasticsearchTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))

@@ -126,7 +126,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/confluenttarget-adapter
         - name: DATADOGTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/datadogtarget-adapter
-        - name: ELASTICSEARCH_ADAPTER_IMAGE
+        - name: ELASTICSEARCHTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearchtarget-adapter
         - name: GOOGLESHEET_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
