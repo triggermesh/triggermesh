@@ -25,26 +25,28 @@ import (
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
 
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/ibmmqsource"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/ibmmqsource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 )
 
-// NewController initializes the controller and is called by the generated code
-// Registers event handlers to enqueue events
+// NewController creates a Reconciler for the event source and returns the result of NewImpl.
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
+
 	typ := (*v1alpha1.IBMMQSource)(nil)
 	app := common.ComponentName(typ)
+
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYSOURCE_IMAGE.
 	adapterCfg := &adapterConfig{
 		configs: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
-
 	envconfig.MustProcess(app, adapterCfg)
+
 	informer := informerv1alpha1.Get(ctx)
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
@@ -52,6 +54,7 @@ func NewController(
 	}
 
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
+
 	r.base = common.NewGenericDeploymentReconciler(
 		ctx,
 		typ.GetGroupVersionKind(),
@@ -60,5 +63,6 @@ func NewController(
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+
 	return impl
 }

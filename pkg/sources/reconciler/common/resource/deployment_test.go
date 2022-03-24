@@ -48,6 +48,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		TerminationErrorToLogs,
+		SecretMount("test-volume", "/path/to/file.ext", "test-secret", "someKey"),
 	)
 
 	expectDepl := &appsv1.Deployment{
@@ -129,6 +130,24 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 							},
 						},
 						TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,
+						VolumeMounts: []corev1.VolumeMount{{
+							Name:      "test-volume",
+							MountPath: "/path/to/file.ext",
+							SubPath:   "file.ext",
+							ReadOnly:  true,
+						}},
+					}},
+					Volumes: []corev1.Volume{{
+						Name: "test-volume",
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{
+								SecretName: "test-secret",
+								Items: []corev1.KeyToPath{{
+									Key:  "someKey",
+									Path: "file.ext",
+								}},
+							},
+						},
 					}},
 				},
 			},

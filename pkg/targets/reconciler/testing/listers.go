@@ -211,6 +211,11 @@ func (l *Listers) GetHTTPTargetLister() targetslisters.HTTPTargetLister {
 	return targetslisters.NewHTTPTargetLister(l.IndexerFor(&targetsv1alpha1.HTTPTarget{}))
 }
 
+// GetIBMMQTargetLister returns a Lister for IBMMQTarget objects.
+func (l *Listers) GetIBMMQTargetLister() targetslisters.IBMMQTargetLister {
+	return targetslisters.NewIBMMQTargetLister(l.IndexerFor(&targetsv1alpha1.IBMMQTarget{}))
+}
+
 // GetSplunkTargetLister returns a Lister for SplunkTarget objects.
 func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
 	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))

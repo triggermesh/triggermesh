@@ -45,6 +45,7 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		ServiceAccount("god-mode"),
 		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
+		SecretMount("test-volume", "/path/to/file.ext", "test-secret", "someKey"),
 	)
 
 	expectKsvc := &servingv1.Service{
@@ -112,6 +113,24 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 									Limits: corev1.ResourceList{
 										corev1.ResourceCPU:    *resource.NewMilliQuantity(250, resource.DecimalSI),
 										corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
+									},
+								},
+								VolumeMounts: []corev1.VolumeMount{{
+									Name:      "test-volume",
+									MountPath: "/path/to/file.ext",
+									SubPath:   "file.ext",
+									ReadOnly:  true,
+								}},
+							}},
+							Volumes: []corev1.Volume{{
+								Name: "test-volume",
+								VolumeSource: corev1.VolumeSource{
+									Secret: &corev1.SecretVolumeSource{
+										SecretName: "test-secret",
+										Items: []corev1.KeyToPath{{
+											Key:  "someKey",
+											Path: "file.ext",
+										}},
 									},
 								},
 							}},

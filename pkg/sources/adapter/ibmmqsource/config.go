@@ -31,9 +31,6 @@ type SourceEnvAccessor struct {
 	mq.ConnectionConfig
 	mq.Delivery
 	mq.Auth
-
-	// BridgeIdentifier is the name of the bridge workflow this source is part of
-	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 }
 
 // EnvAccessorCtor for configuration parameters
