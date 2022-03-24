@@ -181,6 +181,11 @@ func (l *Listers) GetAzureEventHubsTargetLister() targetslisters.AzureEventHubsT
 	return targetslisters.NewAzureEventHubsTargetLister(l.IndexerFor(&targetsv1alpha1.AzureEventHubsTarget{}))
 }
 
+// GetConfluentTargetLister returns a Lister for ConfluentTarget objects.
+func (l *Listers) GetConfluentTargetLister() targetslisters.ConfluentTargetLister {
+	return targetslisters.NewConfluentTargetLister(l.IndexerFor(&targetsv1alpha1.ConfluentTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
