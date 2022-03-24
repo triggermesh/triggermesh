@@ -216,14 +216,14 @@ func (l *Listers) GetIBMMQTargetLister() targetslisters.IBMMQTargetLister {
 	return targetslisters.NewIBMMQTargetLister(l.IndexerFor(&targetsv1alpha1.IBMMQTarget{}))
 }
 
-// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
-func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
-	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
-}
-
 // GetInfraTargetLister returns a Lister for InfraTarget objects.
 func (l *Listers) GetInfraTargetLister() targetslisters.InfraTargetLister {
 	return targetslisters.NewInfraTargetLister(l.IndexerFor(&targetsv1alpha1.InfraTarget{}))
+}
+
+// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
+func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
+	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
 }
 
 // GetJiraTargetLister returns a Lister for JiraTarget objects.
