@@ -22,6 +22,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -29,7 +30,9 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"github.com/triggermesh/triggermesh/pkg/targets/adapter/ibmmqtarget/mq"
 )
@@ -42,12 +45,16 @@ type ibmmqtargetAdapter struct {
 	logger   *zap.SugaredLogger
 	mqEnvs   *TargetEnvAccessor
 	queue    *mq.Object
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // NewAdapter adapter implementation
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*TargetEnvAccessor)
 	logger := logging.FromContext(ctx)
+
+	metrics.MustRegisterEventProcessingStatsView()
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -56,11 +63,20 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.IBMMQTargetResource.String(),
+		Namespace:     env.GetNamespace(),
+		Name:          env.GetName(),
+	}
+
 	return &ibmmqtargetAdapter{
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
 		mqEnvs:   env,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -86,6 +102,14 @@ func (a *ibmmqtargetAdapter) Start(ctx context.Context) error {
 }
 
 func (a *ibmmqtargetAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
+	start := time.Now()
+	defer func() {
+		a.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
+	}()
+
 	var msg []byte
 
 	if a.mqEnvs.DiscardCEContext {
@@ -93,6 +117,7 @@ func (a *ibmmqtargetAdapter) dispatch(ctx context.Context, event cloudevents.Eve
 	} else {
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
+			a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 		msg = jsonEvent
@@ -107,8 +132,10 @@ func (a *ibmmqtargetAdapter) dispatch(ctx context.Context, event cloudevents.Eve
 	}
 
 	if err := a.queue.Put(msg, correlationID); err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
+	a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	return a.replier.Ok(&event, "ok")
 }
