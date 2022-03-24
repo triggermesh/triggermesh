@@ -154,7 +154,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/salesforcetarget-adapter
         - name: SENDGRIDTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/sendgridtarget-adapter
-        - name: SLACK_ADAPTER_IMAGE
+        - name: SLACKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter
         - name: SPLUNKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
