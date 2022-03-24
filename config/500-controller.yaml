@@ -132,7 +132,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestoretarget-adapter
         - name: GOOGLECLOUDSTORAGETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter
-        - name: GOOGLECLOUDWORKFLOWS_ADAPTER_IMAGE
+        - name: GOOGLECLOUDWORKFLOWSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflowstarget-adapter
         - name: GOOGLESHEETTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter

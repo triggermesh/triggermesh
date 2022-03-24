@@ -201,6 +201,11 @@ func (l *Listers) GetGoogleCloudStorageTargetLister() targetslisters.GoogleCloud
 	return targetslisters.NewGoogleCloudStorageTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudStorageTarget{}))
 }
 
+// GetGoogleCloudWorkflowsTargetLister returns a Lister for GoogleCloudWorkflowsTarget objects.
+func (l *Listers) GetGoogleCloudWorkflowsTargetLister() targetslisters.GoogleCloudWorkflowsTargetLister {
+	return targetslisters.NewGoogleCloudWorkflowsTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudWorkflowsTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
