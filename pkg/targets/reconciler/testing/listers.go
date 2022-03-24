@@ -156,6 +156,11 @@ func (l *Listers) GetAWSKinesisTargetLister() targetslisters.AWSKinesisTargetLis
 	return targetslisters.NewAWSKinesisTargetLister(l.IndexerFor(&targetsv1alpha1.AWSKinesisTarget{}))
 }
 
+// GetAWSLambdaTargetLister returns a Lister for AWSLambdaTarget objects.
+func (l *Listers) GetAWSLambdaTargetLister() targetslisters.AWSLambdaTargetLister {
+	return targetslisters.NewAWSLambdaTargetLister(l.IndexerFor(&targetsv1alpha1.AWSLambdaTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))

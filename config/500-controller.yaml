@@ -112,7 +112,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awseventbridgetarget-adapter
         - name: AWSKINESISTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awskinesistarget-adapter
-        - name: AWS_LAMBDA_ADAPTER_IMAGE
+        - name: AWSLAMBDATARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awslambdatarget-adapter
         - name: AWS_S3_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awss3target-adapter
