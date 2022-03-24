@@ -44,7 +44,6 @@ var (
 
 // ZendeskTargetSpec holds the desired state of the ZendeskTarget.
 type ZendeskTargetSpec struct {
-
 	// Token contains the Zendesk account Token.
 	Token SecretValueFromSource `json:"token"`
 

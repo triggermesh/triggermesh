@@ -265,3 +265,8 @@ func (l *Listers) GetTwilioTargetLister() targetslisters.TwilioTargetLister {
 func (l *Listers) GetUiPathTargetLister() targetslisters.UiPathTargetLister { //nolint:stylecheck
 	return targetslisters.NewUiPathTargetLister(l.IndexerFor(&targetsv1alpha1.UiPathTarget{}))
 }
+
+// GetZendeskTargetLister returns a Lister for ZendeskTarget objects.
+func (l *Listers) GetZendeskTargetLister() targetslisters.ZendeskTargetLister {
+	return targetslisters.NewZendeskTargetLister(l.IndexerFor(&targetsv1alpha1.ZendeskTarget{}))
+}

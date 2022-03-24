@@ -164,7 +164,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
         - name: UIPATHTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
-        - name: ZENDESK_ADAPTER_IMAGE
+        - name: ZENDESKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
         # Flow adapters
         - name: JQTRANSFORMATION_IMAGE
