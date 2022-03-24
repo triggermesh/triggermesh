@@ -226,6 +226,11 @@ func (l *Listers) GetLogzTargetLister() targetslisters.LogzTargetLister {
 	return targetslisters.NewLogzTargetLister(l.IndexerFor(&targetsv1alpha1.LogzTarget{}))
 }
 
+// GetOracleTargetLister returns a Lister for OracleTarget objects.
+func (l *Listers) GetOracleTargetLister() targetslisters.OracleTargetLister {
+	return targetslisters.NewOracleTargetLister(l.IndexerFor(&targetsv1alpha1.OracleTarget{}))
+}
+
 // GetSplunkTargetLister returns a Lister for SplunkTarget objects.
 func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
 	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
