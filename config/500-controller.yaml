@@ -116,7 +116,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awslambdatarget-adapter
         - name: AWSS3TARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awss3target-adapter
-        - name: AWS_SNS_ADAPTER_IMAGE
+        - name: AWSSNSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssnstarget-adapter
         - name: AWS_SQS_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssqstarget-adapter
