@@ -186,6 +186,11 @@ func (l *Listers) GetConfluentTargetLister() targetslisters.ConfluentTargetListe
 	return targetslisters.NewConfluentTargetLister(l.IndexerFor(&targetsv1alpha1.ConfluentTarget{}))
 }
 
+// GetDatadogTargetLister returns a Lister for DatadogTarget objects.
+func (l *Listers) GetDatadogTargetLister() targetslisters.DatadogTargetLister {
+	return targetslisters.NewDatadogTargetLister(l.IndexerFor(&targetsv1alpha1.DatadogTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
