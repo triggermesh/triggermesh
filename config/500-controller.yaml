@@ -128,7 +128,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/datadogtarget-adapter
         - name: ELASTICSEARCHTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearchtarget-adapter
-        - name: GOOGLECLOUDFIRESTORE_ADAPTER_IMAGE
+        - name: GOOGLECLOUDFIRESTORETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestoretarget-adapter
         - name: GOOGLECLOUDSTORAGE_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter

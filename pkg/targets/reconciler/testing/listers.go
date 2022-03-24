@@ -191,6 +191,11 @@ func (l *Listers) GetElasticsearchTargetLister() targetslisters.ElasticsearchTar
 	return targetslisters.NewElasticsearchTargetLister(l.IndexerFor(&targetsv1alpha1.ElasticsearchTarget{}))
 }
 
+// GetGoogleCloudFirestoreTargetLister returns a Lister for GoogleCloudFirestoreTarget objects.
+func (l *Listers) GetGoogleCloudFirestoreTargetLister() targetslisters.GoogleCloudFirestoreTargetLister {
+	return targetslisters.NewGoogleCloudFirestoreTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudFirestoreTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
