@@ -151,6 +151,11 @@ func (l *Listers) GetAWSEventBridgeTargetLister() targetslisters.AWSEventBridgeT
 	return targetslisters.NewAWSEventBridgeTargetLister(l.IndexerFor(&targetsv1alpha1.AWSEventBridgeTarget{}))
 }
 
+// GetAWSKinesisTargetLister returns a Lister for AWSKinesisTarget objects.
+func (l *Listers) GetAWSKinesisTargetLister() targetslisters.AWSKinesisTargetLister {
+	return targetslisters.NewAWSKinesisTargetLister(l.IndexerFor(&targetsv1alpha1.AWSKinesisTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))

@@ -110,7 +110,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbtarget-adapter
         - name: AWSEVENTBRIDGETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awseventbridgetarget-adapter
-        - name: AWS_KINESIS_ADAPTER_IMAGE
+        - name: AWSKINESISTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awskinesistarget-adapter
         - name: AWS_LAMBDA_ADAPTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awslambdatarget-adapter
