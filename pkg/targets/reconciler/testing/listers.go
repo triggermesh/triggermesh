@@ -221,14 +221,14 @@ func (l *Listers) GetInfraTargetLister() targetslisters.InfraTargetLister {
 	return targetslisters.NewInfraTargetLister(l.IndexerFor(&targetsv1alpha1.InfraTarget{}))
 }
 
-// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
-func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
-	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
-}
-
 // GetJiraTargetLister returns a Lister for JiraTarget objects.
 func (l *Listers) GetJiraTargetLister() targetslisters.JiraTargetLister {
 	return targetslisters.NewJiraTargetLister(l.IndexerFor(&targetsv1alpha1.JiraTarget{}))
+}
+
+// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
+func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
+	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
 }
 
 // GetLogzMetricsTargetLister returns a Lister for LogzMetricsTarget objects.
