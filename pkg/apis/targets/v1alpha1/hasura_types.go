@@ -57,7 +57,7 @@ type HasuraTargetSpec struct {
 	DefaultRole *string `json:"defaultRole,omitempty"`
 	// A predefined list of queries that an event can specify in the io.triggermesh.graphql.query event type.
 	// +optional
-	Queries *map[string]string `json:"queries,omitempty"`
+	Queries map[string]string `json:"queries,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

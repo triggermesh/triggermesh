@@ -78,7 +78,7 @@ func (*HasuraTarget) GetEventTypes() []string {
 }
 
 // AsEventSource implements EventSource.
-func (s *HasuraTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
+func (t *HasuraTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }

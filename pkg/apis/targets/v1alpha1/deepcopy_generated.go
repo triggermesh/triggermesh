@@ -1861,13 +1861,9 @@ func (in *HasuraTargetSpec) DeepCopyInto(out *HasuraTargetSpec) {
 	}
 	if in.Queries != nil {
 		in, out := &in.Queries, &out.Queries
-		*out = new(map[string]string)
-		if **in != nil {
-			in, out := *in, *out
-			*out = make(map[string]string, len(*in))
-			for key, val := range *in {
-				(*out)[key] = val
-			}
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
 		}
 	}
 	return
