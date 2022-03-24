@@ -146,6 +146,11 @@ func (l *Listers) GetAWSDynamoDBTargetLister() targetslisters.AWSDynamoDBTargetL
 	return targetslisters.NewAWSDynamoDBTargetLister(l.IndexerFor(&targetsv1alpha1.AWSDynamoDBTarget{}))
 }
 
+// GetAWSEventBridgeTargetLister returns a Lister for AWSEventBridgeTarget objects.
+func (l *Listers) GetAWSEventBridgeTargetLister() targetslisters.AWSEventBridgeTargetLister {
+	return targetslisters.NewAWSEventBridgeTargetLister(l.IndexerFor(&targetsv1alpha1.AWSEventBridgeTarget{}))
+}
+
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetLister {
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
