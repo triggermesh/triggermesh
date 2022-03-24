@@ -56,7 +56,7 @@ func (t *AzureEventHubsTarget) GetStatusManager() *StatusManager {
 // AcceptedEventTypes implements IntegrationTarget.
 func (*AzureEventHubsTarget) AcceptedEventTypes() []string {
 	return []string{
-		"*",
+		EventTypeWildcard,
 	}
 }
 

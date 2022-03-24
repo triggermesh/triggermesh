@@ -32,8 +32,6 @@ import (
 )
 
 const (
-	envAWSAPIKey           = "AWS_ACCESS_KEY_ID"
-	envAWSSecretKey        = "AWS_SECRET_ACCESS_KEY"
 	envRegion              = "COMPREHEND_REGION"
 	envLanguage            = "COMPREHEND_LANGUAGE"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
@@ -71,12 +69,12 @@ func makeAppEnv(o *v1alpha1.AWSComprehendTarget) []corev1.EnvVar {
 			Name:  envLanguage,
 			Value: o.Spec.Language,
 		}, {
-			Name: envAWSAPIKey,
+			Name: common.EnvAccessKeyID,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.AWSApiKey.SecretKeyRef,
 			},
 		}, {
-			Name: envAWSSecretKey,
+			Name: common.EnvSecretAccessKey,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.AWSApiSecret.SecretKeyRef,
 			},

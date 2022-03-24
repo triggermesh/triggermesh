@@ -63,7 +63,7 @@ func makeAppEnv(o *v1alpha1.GoogleCloudStorageTarget) []corev1.EnvVar {
 			Name:  "GOOGLE_STORAGE_BUCKET_NAME",
 			Value: o.Spec.BucketName,
 		}, {
-			Name: "GOOGLE_STORAGE_CREDENTIALS_JSON",
+			Name: common.EnvGCloudSAKey,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.Credentials.SecretKeyRef,
 			},

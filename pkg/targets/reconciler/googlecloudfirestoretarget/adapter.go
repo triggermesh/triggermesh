@@ -28,14 +28,12 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
 
 const (
 	envDefaultCollection   = "GOOGLE_FIRESTORE_DEFAULT_COLLECTION"
-	envCredentials         = "GOOGLE_CREDENTIALS_JSON"
 	envProjectID           = "GOOGLE_FIRESTORE_PROJECT_ID"
 	envDiscardCEContext    = "DISCARD_CE_CONTEXT"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
@@ -70,8 +68,8 @@ func makeAppEnv(o *v1alpha1.GoogleCloudFirestoreTarget) []corev1.EnvVar {
 			Name:  envDefaultCollection,
 			Value: o.Spec.DefaultCollection,
 		}, {
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		}, {
 			Name:  envProjectID,
 			Value: o.Spec.ProjectID,
@@ -79,7 +77,7 @@ func makeAppEnv(o *v1alpha1.GoogleCloudFirestoreTarget) []corev1.EnvVar {
 			Name:  envDiscardCEContext,
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
 		}, {
-			Name: envCredentials,
+			Name: common.EnvGCloudSAKey,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.Credentials.SecretKeyRef,
 			},

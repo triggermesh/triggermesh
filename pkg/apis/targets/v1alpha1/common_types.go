@@ -17,11 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"fmt"
-
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	corev1 "k8s.io/api/core/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 /* Provide common structs that are used by the targets such as secret definitions */
@@ -79,9 +78,3 @@ type EventOptions struct {
 	// +optional
 	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
 }
-
-// EnvKeyValue is a list of keys/values that can be serialized to a format
-// compatible with kelseyhightower/envconfig.
-type EnvKeyValue map[string]string
-
-var _ fmt.Stringer = (EnvKeyValue)(nil)

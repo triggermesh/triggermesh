@@ -27,7 +27,6 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
@@ -115,8 +114,8 @@ func makeAppEnv(o *v1alpha1.SendGridTarget) []corev1.EnvVar {
 	}
 
 	env = append(env, corev1.EnvVar{
-		Name:  libreconciler.EnvBridgeID,
-		Value: libreconciler.GetStatefulBridgeID(o),
+		Name:  common.EnvBridgeID,
+		Value: common.GetStatefulBridgeID(o),
 	})
 
 	return env

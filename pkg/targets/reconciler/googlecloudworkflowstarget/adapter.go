@@ -32,7 +32,6 @@ import (
 )
 
 const (
-	envCredentials         = "GOOGLE_WORKFLOWS_CREDENTIALS_JSON"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -62,7 +61,7 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 func makeAppEnv(o *v1alpha1.GoogleCloudWorkflowsTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name: envCredentials,
+			Name: common.EnvGCloudSAKey,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.Credentials.SecretKeyRef,
 			},

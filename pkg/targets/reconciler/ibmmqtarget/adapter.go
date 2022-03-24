@@ -28,7 +28,6 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
@@ -102,8 +101,8 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 func makeAppEnv(o *v1alpha1.IBMMQTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		},
 		{
 			Name:  envConnectionName,

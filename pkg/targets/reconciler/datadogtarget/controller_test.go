@@ -30,10 +30,7 @@ import (
 
 func TestNewController(t *testing.T) {
 	t.Run("No failure", func(t *testing.T) {
-		TestControllerConstructor(t, NewController,
-			// expected informers: Target, Kn Service, ServiceAccount, RoleBinding
-			WithInformerNumber(4),
-		)
+		TestControllerConstructor(t, NewController)
 	})
 
 	t.Run("Failure cases", func(t *testing.T) {

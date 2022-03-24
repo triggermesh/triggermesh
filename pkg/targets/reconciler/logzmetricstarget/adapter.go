@@ -28,7 +28,6 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
@@ -76,8 +75,8 @@ func makeAppEnv(o *v1alpha1.LogzMetricsTarget) []corev1.EnvVar {
 			Name:  envCortexEndpoint,
 			Value: o.Spec.Connection.ListenerURL,
 		}, {
-			Name:  pkgreconciler.EnvBridgeID,
-			Value: pkgreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		},
 	}
 

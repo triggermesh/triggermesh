@@ -54,7 +54,7 @@ func (t *AlibabaOSSTarget) GetStatusManager() *StatusManager {
 // AcceptedEventTypes implements IntegrationTarget.
 func (*AlibabaOSSTarget) AcceptedEventTypes() []string {
 	return []string{
-		"*",
+		EventTypeWildcard,
 	}
 }
 

@@ -57,17 +57,17 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 func makeAppEnv(o *v1alpha1.AWSDynamoDBTarget) []corev1.EnvVar {
 	envs := []corev1.EnvVar{
 		{
-			Name: "AWS_ACCESS_KEY_ID",
+			Name: common.EnvAccessKeyID,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.AWSApiKey.SecretKeyRef,
 			},
 		}, {
-			Name: "AWS_SECRET_ACCESS_KEY",
+			Name: common.EnvSecretAccessKey,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.AWSApiSecret.SecretKeyRef,
 			},
 		}, {
-			Name:  "AWS_TARGET_ARN",
+			Name:  common.EnvARN,
 			Value: o.Spec.ARN,
 		},
 	}

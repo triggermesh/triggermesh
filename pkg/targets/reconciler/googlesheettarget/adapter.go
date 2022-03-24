@@ -32,9 +32,8 @@ import (
 )
 
 const (
-	envCredentialsJSON = "GOOGLE_CREDENTIALS_JSON"
-	envSheetID         = "SHEET_ID"
-	envDefaultPrefix   = "DEFAULT_SHEET_PREFIX"
+	envSheetID       = "SHEET_ID"
+	envDefaultPrefix = "DEFAULT_SHEET_PREFIX"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -63,7 +62,7 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 func makeAppEnv(o *v1alpha1.GoogleSheetTarget) []corev1.EnvVar {
 	return []corev1.EnvVar{
 		{
-			Name: envCredentialsJSON,
+			Name: common.EnvGCloudSAKey,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.GoogleServiceAccount.SecretKeyRef,
 			},

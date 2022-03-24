@@ -18,8 +18,6 @@ package v1alpha1
 
 import (
 	"path"
-	"sort"
-	"strings"
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
@@ -122,29 +120,4 @@ func (m *StatusManager) SetRoute(urlPath string) {
 	}
 
 	m.Address.URL.Path = path.Join(m.Address.URL.Path, urlPath)
-}
-
-// String implements fmt.Stringer.
-func (kv EnvKeyValue) String() string {
-	keys := make([]string, 0, len(kv))
-
-	for k := range kv {
-		keys = append(keys, k)
-	}
-
-	sort.Strings(keys)
-
-	var b strings.Builder
-
-	for i, k := range keys {
-		b.WriteString(k)
-		b.WriteByte(':')
-		b.WriteString(kv[k])
-
-		if i+1 < len(keys) {
-			b.WriteByte(',')
-		}
-	}
-
-	return b.String()
 }

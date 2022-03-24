@@ -33,16 +33,7 @@ import (
 )
 
 const (
-	envDiscardCECtx    = "DISCARD_CE_CONTEXT"
-	envHubKeyName      = "EVENTHUB_KEY_NAME"
-	envHubNamespace    = "EVENTHUB_NAMESPACE"
-	envHubName         = "EVENTHUB_NAME"
-	envHubKeyValue     = "EVENTHUB_KEY_VALUE"
-	envHubConnStr      = "EVENTHUB_CONNECTION_STRING"
-	envAADTenantID     = "AZURE_TENANT_ID"
-	envAADClientID     = "AZURE_CLIENT_ID"
-	envAADClientSecret = "AZURE_CLIENT_SECRET"
-
+	envDiscardCECtx        = "DISCARD_CE_CONTEXT"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -65,15 +56,15 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 	var envs []corev1.EnvVar
 
 	if sasAuth := typedTrg.Spec.Auth.SASToken; sasAuth != nil {
-		envs = common.MaybeAppendValueFromEnvVar(envs, envHubKeyName, sasAuth.KeyName)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envHubKeyValue, sasAuth.KeyValue)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envHubConnStr, sasAuth.ConnectionString)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyName, sasAuth.KeyName)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyValue, sasAuth.KeyValue)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubConnStr, sasAuth.ConnectionString)
 	}
 
 	if spAuth := typedTrg.Spec.Auth.ServicePrincipal; spAuth != nil {
-		envs = common.MaybeAppendValueFromEnvVar(envs, envAADTenantID, spAuth.TenantID)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientID, spAuth.ClientID)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientSecret, spAuth.ClientSecret)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADTenantID, spAuth.TenantID)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADClientID, spAuth.ClientID)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
 	if typedTrg.Spec.EventOptions != nil && typedTrg.Spec.EventOptions.PayloadPolicy != nil {
@@ -85,8 +76,8 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 
 	return common.NewAdapterKnService(trg,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVar(envHubNamespace, typedTrg.Spec.EventHubID.Namespace),
-		resource.EnvVar(envHubName, typedTrg.Spec.EventHubID.EventHub),
+		resource.EnvVar(common.EnvHubNamespace, typedTrg.Spec.EventHubID.Namespace),
+		resource.EnvVar(common.EnvHubName, typedTrg.Spec.EventHubID.EventHub),
 		resource.EnvVar(envDiscardCECtx, strconv.FormatBool(typedTrg.Spec.DiscardCEContext)),
 		resource.EnvVars(envs...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),

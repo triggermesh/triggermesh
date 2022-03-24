@@ -56,23 +56,25 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 }
 
 func makeAppEnv(o *v1alpha1.AWSEventBridgeTarget) []corev1.EnvVar {
-	envs := []corev1.EnvVar{{
-		Name: "AWS_ACCESS_KEY_ID",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: o.Spec.AWSApiKey.SecretKeyRef,
+	envs := []corev1.EnvVar{
+		{
+			Name: common.EnvAccessKeyID,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.AWSApiKey.SecretKeyRef,
+			},
+		}, {
+			Name: common.EnvSecretAccessKey,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.AWSApiSecret.SecretKeyRef,
+			},
+		}, {
+			Name:  common.EnvARN,
+			Value: o.Spec.ARN,
+		}, {
+			Name:  "AWS_DISCARD_CE_CONTEXT",
+			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
 		},
-	}, {
-		Name: "AWS_SECRET_ACCESS_KEY",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: o.Spec.AWSApiSecret.SecretKeyRef,
-		},
-	}, {
-		Name:  "AWS_TARGET_ARN",
-		Value: o.Spec.ARN,
-	}, {
-		Name:  "AWS_DISCARD_CE_CONTEXT",
-		Value: strconv.FormatBool(o.Spec.DiscardCEContext),
-	}}
+	}
 
 	return envs
 }

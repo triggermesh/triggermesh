@@ -30,31 +30,9 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/testing/structs"
 )
 
-type constructorTestConfig struct {
-	numberInformers int
-}
-
-// ControllerTestOptions is a functional option for a constructorTestConfig.
-type ControllerTestOptions func(*constructorTestConfig)
-
-// WithInformerNumber sets the number of expected informers for the test
-func WithInformerNumber(n int) ControllerTestOptions {
-	return func(c *constructorTestConfig) {
-		c.numberInformers = n
-	}
-}
-
 // TestControllerConstructor tests that a controller constructor meets our requirements.
-func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor, opts ...ControllerTestOptions) {
+func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor) {
 	t.Helper()
-
-	cto := &constructorTestConfig{
-		numberInformers: 2,
-	}
-
-	for _, o := range opts {
-		o(cto)
-	}
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -64,8 +42,8 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 
 	ctx, informers := rt.SetupFakeContext(t)
 
-	// expected informers: Target, Knative Service
-	if expect, got := cto.numberInformers, len(informers); got != expect {
+	// expected informers: Target, Kn Service, ServiceAccount, RoleBinding
+	if expect, got := 4, len(informers); got != expect {
 		t.Errorf("Expected %d injected informers, got %d", expect, got)
 	}
 
@@ -73,8 +51,8 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 	t.Setenv(metrics.DomainEnv, "testing")
 
 	cmw := configmap.NewStaticWatcher(
-		NewConfigMap(logging.ConfigMapName(), nil),
 		NewConfigMap(metrics.ConfigMapName(), nil),
+		NewConfigMap(logging.ConfigMapName(), nil),
 	)
 
 	ctrler := ctor(ctx, cmw)

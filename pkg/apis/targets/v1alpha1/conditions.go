@@ -16,9 +16,7 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	"knative.dev/pkg/apis"
-)
+import "knative.dev/pkg/apis"
 
 // status conditions
 const (
