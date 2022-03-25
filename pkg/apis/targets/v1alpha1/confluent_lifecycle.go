@@ -20,61 +20,27 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
-// ConfluentCondSet is the group of possible conditions
-var ConfluentCondSet = apis.NewLivingConditionSet(
-	ConditionServiceReady,
-)
-
-// GetCondition returns the condition currently associated with the given type, or nil.
-func (s *ConfluentTargetStatus) GetCondition(t apis.ConditionType) *apis.Condition {
-	return ConfluentCondSet.Manage(s).GetCondition(t)
-}
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *ConfluentTargetStatus) InitializeConditions() {
-	ConfluentCondSet.Manage(s).InitializeConditions()
-	s.Address = &duckv1.Addressable{}
-}
-
-// GetGroupVersionKind returns the GroupVersionKind.
-func (s *ConfluentTarget) GetGroupVersionKind() schema.GroupVersionKind {
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*ConfluentTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("ConfluentTarget")
 }
 
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionServiceReady should be marked as true or false.
-func (s *ConfluentTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc != nil && ksvc.IsReady() {
-		s.Address = ksvc.Status.Address
-		ConfluentCondSet.Manage(s).MarkTrue(ConditionServiceReady)
-		return
-	} else if ksvc == nil {
-		s.MarkNoKService(ReasonUnavailable, "Adapter service unknown: ksvc is not available")
-	} else {
-		s.MarkNoKService(ReasonUnavailable, "Adapter service \"%s/%s\" is unavailable", ksvc.Namespace, ksvc.Name)
+// GetConditionSet implements duckv1.KRShaped.
+func (*ConfluentTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *ConfluentTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *ConfluentTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
 	}
-	s.Address.URL = nil
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *ConfluentTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	ConfluentCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *ConfluentTargetStatus) IsReady() bool {
-	return ConfluentCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *ConfluentTarget) GetConditionSet() apis.ConditionSet {
-	return ConfluentCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *ConfluentTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
 }

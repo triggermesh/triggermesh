@@ -18,94 +18,97 @@ package hasuratarget
 
 import (
 	"encoding/json"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
-
-const adapterName = "hasuratarget"
 
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
 type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	obsConfig source.ConfigAccessor
 	// Container image
 	Image string `default:"gcr.io/triggermesh/hasuratarget-adapter"`
 }
 
-// makeAdapterKnService returns a Knative Service object for the target's adapter.
-func makeAdapterKnService(o *v1alpha1.HasuraTarget, cfg *adapterConfig) (*servingv1.Service, error) {
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
-	name := kmeta.ChildName(adapterName+"-", o.Name)
-	env := libreconciler.MakeObsEnv(cfg.configs)
-	envSvc := libreconciler.MakeServiceEnv(o.Name, o.Namespace)
-	envApp, err := makeAppEnv(&o.Spec)
-	if err != nil {
-		return nil, err
-	}
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	env = append(env, append(envApp, envSvc...)...)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.HasuraTarget)
 
-	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(o),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(env),
-	), nil
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	)
 }
 
-// makeAppEnv return target-specific environment
-func makeAppEnv(spec *v1alpha1.HasuraTargetSpec) ([]corev1.EnvVar, error) {
+func makeAppEnv(o *v1alpha1.HasuraTarget) []corev1.EnvVar {
 	envs := []corev1.EnvVar{{
 		Name:  "HASURA_ENDPOINT",
-		Value: spec.Endpoint,
+		Value: o.Spec.Endpoint,
 	}}
 
-	if spec.DefaultRole != nil {
+	if o.Spec.DefaultRole != nil {
 		envs = append(envs, corev1.EnvVar{
 			Name:  "HASURA_DEFAULT_ROLE",
-			Value: *spec.DefaultRole,
+			Value: *o.Spec.DefaultRole,
 		})
 	}
 
-	if spec.AdminToken != nil {
+	if o.Spec.AdminToken != nil {
 		envs = append(envs, corev1.EnvVar{
 			Name: "HASURA_ADMIN_TOKEN",
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.AdminToken.SecretKeyRef,
+				SecretKeyRef: o.Spec.AdminToken.SecretKeyRef,
 			},
 		})
 	}
 
-	if spec.JwtToken != nil {
+	if o.Spec.JwtToken != nil {
 		envs = append(envs, corev1.EnvVar{
 			Name: "HASURA_JWT_TOKEN",
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.JwtToken.SecretKeyRef,
+				SecretKeyRef: o.Spec.JwtToken.SecretKeyRef,
 			},
 		})
 	}
 
-	if spec.Queries != nil {
-		encodedQuery, err := json.Marshal(*spec.Queries)
-		if err != nil {
-			return nil, err
+	if len(o.Spec.Queries) > 0 {
+		if encodedQuery, err := json.Marshal(o.Spec.Queries); err == nil {
+			envs = append(envs, corev1.EnvVar{
+				Name:  "HASURA_QUERIES",
+				Value: string(encodedQuery),
+			})
 		}
-		envs = append(envs, corev1.EnvVar{
-			Name:  "HASURA_QUERIES",
-			Value: string(encodedQuery),
-		})
 	}
 
-	return envs, nil
+	return envs
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

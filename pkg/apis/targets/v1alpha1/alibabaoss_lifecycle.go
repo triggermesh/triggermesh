@@ -21,7 +21,6 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // Managed event types
@@ -29,10 +28,33 @@ const (
 	EventTypeAlibabaOSSGenericResponse = "io.triggermesh.alibaba.oss.response"
 )
 
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*AlibabaOSSTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AlibabaOSSTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*AlibabaOSSTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *AlibabaOSSTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *AlibabaOSSTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
+
 // AcceptedEventTypes implements IntegrationTarget.
 func (*AlibabaOSSTarget) AcceptedEventTypes() []string {
 	return []string{
-		"*",
+		EventTypeWildcard,
 	}
 }
 
@@ -43,71 +65,7 @@ func (*AlibabaOSSTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *AlibabaOSSTarget) AsEventSource() string {
-	return "https://" + s.Spec.Bucket + "." + s.Spec.Endpoint
-}
-
-// GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *AlibabaOSSTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AlibabaOSSTarget")
-}
-
-// AlibabaOSSCondSet is the group of possible conditions
-var AlibabaOSSCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *AlibabaOSSTargetStatus) InitializeConditions() {
-	AlibabaOSSCondSet.Manage(s).InitializeConditions()
-}
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionDeployed should be marked as true or false.
-func (s *AlibabaOSSTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		AlibabaOSSCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		AlibabaOSSCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	AlibabaOSSCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
-
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *AlibabaOSSTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	AlibabaOSSCondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *AlibabaOSSTargetStatus) IsReady() bool {
-	return AlibabaOSSCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AlibabaOSSTarget) GetConditionSet() apis.ConditionSet {
-	return AlibabaOSSCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AlibabaOSSTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *AlibabaOSSTarget) AsEventSource() string {
+	return "https://" + t.Spec.Bucket + "." + t.Spec.Endpoint
 }

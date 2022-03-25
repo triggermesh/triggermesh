@@ -28,6 +28,6 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 	SheetID            string `envconfig:"SHEET_ID" required:"true"`
-	CredentialJSON     string `envconfig:"GOOGLE_CREDENTIALS_JSON" required:"true"`
+	CredentialJSON     string `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
 	DefaultSheetPrefix string `envconfig:"DEFAULT_SHEET_PREFIX" required:"true"`
 }

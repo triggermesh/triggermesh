@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
@@ -27,6 +28,29 @@ const (
 	EventTypeAWSDynamoDBResult = "io.triggermesh.targets.aws.dynamodb.result"
 )
 
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*AWSDynamoDBTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSDynamoDBTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*AWSDynamoDBTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *AWSDynamoDBTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *AWSDynamoDBTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
+
 // GetEventTypes implements EventSource.
 func (*AWSDynamoDBTarget) GetEventTypes() []string {
 	return []string{
@@ -34,17 +58,7 @@ func (*AWSDynamoDBTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *AWSDynamoDBTarget) AsEventSource() string {
-	return s.Spec.ARN
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AWSDynamoDBTarget) GetConditionSet() apis.ConditionSet {
-	return AwsCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AWSDynamoDBTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *AWSDynamoDBTarget) AsEventSource() string {
+	return t.Spec.ARN
 }

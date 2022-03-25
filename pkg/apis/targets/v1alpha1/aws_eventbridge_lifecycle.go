@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
@@ -26,6 +27,29 @@ const (
 	// EventTypeAWSEventBridgeResult contains the result of the processing of an eventbridge event.
 	EventTypeAWSEventBridgeResult = "io.triggermesh.targets.aws.eventbridge.result"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*AWSEventBridgeTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSEventBridgeTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*AWSEventBridgeTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *AWSEventBridgeTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *AWSEventBridgeTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*AWSEventBridgeTarget) AcceptedEventTypes() []string {
@@ -41,17 +65,7 @@ func (*AWSEventBridgeTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *AWSEventBridgeTarget) AsEventSource() string {
-	return "io.triggermesh.awseventbridgetargets/" + s.Namespace + "/" + s.Name
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AWSEventBridgeTarget) GetConditionSet() apis.ConditionSet {
-	return AwsCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AWSEventBridgeTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *AWSEventBridgeTarget) AsEventSource() string {
+	return "io.triggermesh.awseventbridgetargets/" + t.Namespace + "/" + t.Name
 }

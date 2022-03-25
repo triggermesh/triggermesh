@@ -18,9 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -32,18 +29,13 @@ type ConfluentTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the ConfluentTarget (from the client).
-	Spec ConfluentTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the ConfluentTarget (from the controller).
-	Status ConfluentTargetStatus `json:"status,omitempty"`
+	Spec   ConfluentTargetSpec `json:"spec"`
+	Status TargetStatus        `json:"status,omitempty"`
 }
 
-// Check the interfaces ConfluentTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*ConfluentTarget)(nil)
-	_ kmeta.OwnerRefable = (*ConfluentTarget)(nil)
-	_ duckv1.KRShaped    = (*ConfluentTarget)(nil)
+	_ Reconcilable = (*ConfluentTarget)(nil)
 )
 
 // ConfluentTargetSpec holds the desired state of the ConfluentTarget.
@@ -78,19 +70,6 @@ type ConfluentTargetSpec struct {
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
-}
-
-// ConfluentTargetStatus communicates the observed state of the ConfluentTarget (from the controller).
-type ConfluentTargetStatus struct {
-	// inherits duck/v1beta1 Status, which currently provides:
-	// * ObservedGeneration - the 'Generation' of the Service that was last
-	//   processed by the controller.
-	// * Conditions - the latest available observations of a resource's current
-	//   state.
-	duckv1.Status `json:",inline"`
-
-	// AddressStatus fulfills the Addressable contract.
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

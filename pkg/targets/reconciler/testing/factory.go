@@ -31,11 +31,12 @@ import (
 	rt "knative.dev/pkg/reconciler/testing"
 	fakeservinginjectionclient "knative.dev/serving/pkg/client/injection/client/fake"
 
-	faketargetsinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
+	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
 // Ctor constructs a controller.Reconciler.
-type Ctor func(*testing.T, context.Context, *Listers) controller.Reconciler
+type Ctor func(*testing.T, context.Context, *rt.TableRow, *Listers) controller.Reconciler
 
 // MakeFactory creates a testing factory for our controller.Reconciler, and
 // initializes a Reconciler using the given Ctor as part of the process.
@@ -54,12 +55,7 @@ func MakeFactory(ctor Ctor) rt.Factory {
 
 		// the controller.Reconciler uses an internal client to handle
 		// target objects
-		ctx, ossclient := faketargetsinjectionclient.With(ctx, ls.GetAlibabaOSSTargetsObjects()...)
-		ctx, gsclient := faketargetsinjectionclient.With(ctx, ls.GetGoogleSheetTargetsObjects()...)
-		ctx, splunkclient := faketargetsinjectionclient.With(ctx, ls.GetSplunkTargetsObjects()...)
-		ctx, httpclient := faketargetsinjectionclient.With(ctx, ls.GetHTTPTargetsObjects()...)
-		ctx, logzclient := faketargetsinjectionclient.With(ctx, ls.GetLogzTargetObjects()...)
-		ctx, logzmetricsclient := faketargetsinjectionclient.With(ctx, ls.GetLogzMetricsTargetObjects()...)
+		ctx, client := fakeinjectionclient.With(ctx, ls.GetTargetsObjects()...)
 
 		// all clients used inside reconciler implementations should be
 		// injected as well
@@ -71,35 +67,25 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		ctx = controller.WithEventRecorder(ctx, eventRecorder)
 
 		// set up Reconciler from fakes
-		r := ctor(t, ctx, &ls)
+		r := ctor(t, ctx, tr, &ls)
 
-		// If the reconcilers is leader aware, then promote it.
+		// promote the reconciler if it is leader aware
 		if la, ok := r.(reconciler.LeaderAware); ok {
-			//nolint:golint,errcheck
-			la.Promote(reconciler.UniversalBucket(), func(reconciler.Bucket, types.NamespacedName) {})
+			err := la.Promote(reconciler.UniversalBucket(), func(reconciler.Bucket, types.NamespacedName) {})
+			if err != nil {
+				t.Fatalf("Failed to promote reconciler to leader: %s", err)
+			}
 		}
 
 		// inject reactors from table row
 		for _, reactor := range tr.WithReactors {
-			ossclient.PrependReactor("*", "*", reactor)
-			gsclient.PrependReactor("*", "*", reactor)
-			splunkclient.PrependReactor("*", "*", reactor)
-			httpclient.PrependReactor("*", "*", reactor)
-			logzclient.PrependReactor("*", "*", reactor)
+			client.PrependReactor("*", "*", reactor)
 			k8sClient.PrependReactor("*", "*", reactor)
 			servingClient.PrependReactor("*", "*", reactor)
 		}
 
 		actionRecorderList := rt.ActionRecorderList{
-			// target clients are merely used here to record status updates,
-			// reconcilers don't create or update targets otherwise.
-			ossclient,
-			gsclient,
-			splunkclient,
-			httpclient,
-			logzclient,
-			logzmetricsclient,
-
+			client, // record status updates
 			k8sClient,
 			servingClient,
 		}
@@ -109,5 +95,25 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		}
 
 		return r, actionRecorderList, eventList
+	}
+}
+
+// NewTestServiceReconciler returns a GenericServiceReconciler initialized with
+// test clients.
+func NewTestServiceReconciler(ctx context.Context, ls *Listers) common.GenericServiceReconciler {
+	return common.GenericServiceReconciler{
+		Lister:                ls.GetServiceLister().Services,
+		Client:                fakeservinginjectionclient.Get(ctx).ServingV1().Services,
+		GenericRBACReconciler: newTestRBACReconciler(ctx, ls),
+	}
+}
+
+// newTestRBACReconciler returns a GenericRBACReconciler initialized with test clients.
+func newTestRBACReconciler(ctx context.Context, ls *Listers) *common.GenericRBACReconciler {
+	return &common.GenericRBACReconciler{
+		SALister: ls.GetServiceAccountLister().ServiceAccounts,
+		RBLister: ls.GetRoleBindingLister().RoleBindings,
+		SAClient: fakek8sinjectionclient.Get(ctx).CoreV1().ServiceAccounts,
+		RBClient: fakek8sinjectionclient.Get(ctx).RbacV1().RoleBindings,
 	}
 }

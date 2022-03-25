@@ -23,36 +23,36 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
-
-// GoogleSheetCondSet is the group of possible conditions.
-var GoogleSheetCondSet = apis.NewLivingConditionSet(
-	ConditionServiceReady,
-	ConditionSecretsProvided,
-)
-
-// GetCondition returns the condition currently associated with the given type, or nil.
-func (s *GoogleSheetTargetStatus) GetCondition(t apis.ConditionType) *apis.Condition {
-	return GoogleSheetCondSet.Manage(s).GetCondition(t)
-}
-
-// GetGroupVersionKind returns the GroupVersionKind.
-func (*GoogleSheetTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("GoogleSheetTarget")
-}
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *GoogleSheetTargetStatus) InitializeConditions() {
-	GoogleSheetCondSet.Manage(s).InitializeConditions()
-	s.Address = &duckv1.Addressable{}
-}
 
 // Accepted event types
 const (
 	// EventTypeGoogleSheetAppend represents a task to append a row to a sheet.
 	EventTypeGoogleSheetAppend = "io.triggermesh.googlesheet.append"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*GoogleSheetTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("GoogleSheetTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*GoogleSheetTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *GoogleSheetTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *GoogleSheetTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*GoogleSheetTarget) AcceptedEventTypes() []string {
@@ -68,67 +68,8 @@ func (*GoogleSheetTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *GoogleSheetTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
-}
-
-// PropagateAvailability uses the readiness of the provided Knative Service to
-// determine whether the ServiceReady condition should be marked as true or false.
-func (s *GoogleSheetTargetStatus) PropagateAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		GoogleSheetCondSet.Manage(s).MarkUnknown(ConditionServiceReady, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		GoogleSheetCondSet.Manage(s).MarkTrue(ConditionServiceReady)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	GoogleSheetCondSet.Manage(s).MarkFalse(ConditionServiceReady, ReasonUnavailable, msg)
-}
-
-// MarkNoService sets the condition that the service is not ready.
-func (s *GoogleSheetTargetStatus) MarkNoService(reason, messageFormat string, messageA ...interface{}) {
-	GoogleSheetCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *GoogleSheetTargetStatus) IsReady() bool {
-	return GoogleSheetCondSet.Manage(s).IsHappy()
-}
-
-// MarkSecrets sets the condition that the resource is valid.
-func (s *GoogleSheetTargetStatus) MarkSecrets() {
-	GoogleSheetCondSet.Manage(s).MarkTrue(ConditionSecretsProvided)
-}
-
-// MarkNoSecrets sets the condition that the resource is not valid.
-func (s *GoogleSheetTargetStatus) MarkNoSecrets(err error) {
-	GoogleSheetCondSet.Manage(s).MarkFalse(ConditionSecretsProvided,
-		ReasonNotFound, err.Error())
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (*GoogleSheetTarget) GetConditionSet() apis.ConditionSet {
-	return GoogleSheetCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *GoogleSheetTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *GoogleSheetTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }

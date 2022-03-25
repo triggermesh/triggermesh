@@ -14,43 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package splunktarget contains the reconciliation logic for the event target.
 package splunktarget
 
 import (
 	"context"
 
-	"go.uber.org/zap"
-
 	"knative.dev/pkg/reconciler"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/splunktarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	logger *zap.SugaredLogger
-
-	// adapter properties
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
 
-	// Knative Service reconciler
-	ksvcr libreconciler.KServiceReconciler
+	trgLister func(namespace string) listersv1alpha1.SplunkTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.SplunkTarget) reconciler.Event {
-	o.Status.InitializeConditions()
-	o.Status.ObservedGeneration = o.Generation
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.SplunkTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	adapter, event := r.ksvcr.ReconcileKService(ctx, o, makeAdapterKnService(o, r.adapterCfg))
-
-	o.Status.PropagateAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

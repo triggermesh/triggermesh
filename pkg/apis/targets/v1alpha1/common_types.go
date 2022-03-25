@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"fmt"
-
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	corev1 "k8s.io/api/core/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 /* Provide common structs that are used by the targets such as secret definitions */
@@ -43,6 +42,15 @@ type ValueFromField struct {
 	// Field value from a Kubernetes Secret.
 	// +optional
 	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
+}
+
+// TargetStatus defines the observed state of an event target.
+type TargetStatus struct {
+	duckv1.Status        `json:",inline"`
+	duckv1.AddressStatus `json:",inline"`
+
+	// Accepted/emitted CloudEvent attributes
+	CloudEventStatus `json:",inline"`
 }
 
 // CloudEventStatus contains attributes that target types can embed to declare
@@ -70,9 +78,3 @@ type EventOptions struct {
 	// +optional
 	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
 }
-
-// EnvKeyValue is a list of keys/values that can be serialized to a format
-// compatible with kelseyhightower/envconfig.
-type EnvKeyValue map[string]string
-
-var _ fmt.Stringer = (EnvKeyValue)(nil)

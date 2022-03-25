@@ -21,21 +21,18 @@ import (
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	tmcommon "github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
-
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
 
 const (
-	adapterName = "ibmmqtarget"
-
 	envQueueManager   = "QUEUE_MANAGER"
 	envChannelName    = "CHANNEL_NAME"
 	envConnectionName = "CONNECTION_NAME"
@@ -61,57 +58,41 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"IBMMQTARGET_ADAPTER_IMAGE" default:"gcr.io/triggermesh/ibmmqtarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/ibmmqtarget-adapter"`
 }
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.IBMMQTarget, cfg *adapterConfig) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(target)
-	envApp = tmcommon.MaybeAppendValueFromEnvVar(envApp, envUser, target.Spec.Auth.User)
-	envApp = tmcommon.MaybeAppendValueFromEnvVar(envApp, envPassword, target.Spec.Auth.Password)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	keystoreMount := func(ksvc *servingv1.Service) *servingv1.Service { return ksvc }
-	passwdStashMount := func(ksvc *servingv1.Service) *servingv1.Service { return ksvc }
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.IBMMQTarget)
 
-	if target.Spec.Auth.TLS != nil {
-		envs = append(envs, []corev1.EnvVar{
-			{
-				Name:  envTLSCipher,
-				Value: target.Spec.Auth.TLS.Cipher,
-			},
-			{
-				Name:  envTLSClientAuth,
-				Value: fmt.Sprintf("%t", target.Spec.Auth.TLS.ClientAuthRequired),
-			},
-		}...)
+	keystoreMount := resource.ObjectOption(func(interface{}) {})
+	passwdStashMount := resource.ObjectOption(func(interface{}) {})
 
-		if target.Spec.Auth.TLS.CertLabel != nil {
-			envs = append(envs, []corev1.EnvVar{
-				{
-					Name:  envTLSCertLabel,
-					Value: *target.Spec.Auth.TLS.CertLabel,
-				},
-			}...)
-		}
+	if typedTrg.Spec.Auth.TLS != nil {
+		keystoreMount = resource.SecretMount(
+			"key-database",
+			KeystoreMountPath,
+			typedTrg.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Name,
+			typedTrg.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key,
+		)
 
-		keystoreMount = resources.SecretMount("key-database", KeystoreMountPath, target.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret)
-		passwdStashMount = resources.SecretMount("db-password", PasswdStashMountPath, target.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret)
+		passwdStashMount = resource.SecretMount(
+			"db-password",
+			PasswdStashMountPath,
+			typedTrg.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
+			typedTrg.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key,
+		)
 	}
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+
 		keystoreMount,
 		passwdStashMount,
 	)
@@ -120,8 +101,8 @@ func makeTargetAdapterKService(target *v1alpha1.IBMMQTarget, cfg *adapterConfig)
 func makeAppEnv(o *v1alpha1.IBMMQTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		},
 		{
 			Name:  envConnectionName,
@@ -158,6 +139,9 @@ func makeAppEnv(o *v1alpha1.IBMMQTarget) []corev1.EnvVar {
 		}...)
 	}
 
+	env = common.MaybeAppendValueFromEnvVar(env, envUser, o.Spec.Auth.User)
+	env = common.MaybeAppendValueFromEnvVar(env, envPassword, o.Spec.Auth.Password)
+
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envEventsPayloadPolicy,
@@ -165,6 +149,42 @@ func makeAppEnv(o *v1alpha1.IBMMQTarget) []corev1.EnvVar {
 		})
 	}
 
-	return env
+	if o.Spec.Auth.TLS != nil {
+		env = append(env, []corev1.EnvVar{
+			{
+				Name:  envTLSCipher,
+				Value: o.Spec.Auth.TLS.Cipher,
+			},
+			{
+				Name:  envTLSClientAuth,
+				Value: strconv.FormatBool(o.Spec.Auth.TLS.ClientAuthRequired),
+			},
+		}...)
 
+		if o.Spec.Auth.TLS.CertLabel != nil {
+			env = append(env, []corev1.EnvVar{
+				{
+					Name:  envTLSCertLabel,
+					Value: *o.Spec.Auth.TLS.CertLabel,
+				},
+			}...)
+		}
+	}
+
+	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

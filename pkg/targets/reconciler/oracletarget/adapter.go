@@ -17,16 +17,19 @@ limitations under the License.
 package oracletarget
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-)
 
-const adapterName = "oracletarget"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
+)
 
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
@@ -34,69 +37,73 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"ORACLE_ADAPTER_IMAGE" default:"gcr.io/triggermesh/oracletarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/oracletarget-adapter"`
 }
 
-// TargetAdapterArgs are the arguments needed to create a Target Adapter.
-// Every field is required.
-type TargetAdapterArgs struct {
-	Image  string
-	Target *v1alpha1.OracleTarget
-}
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.OracleTarget, cfg *adapterConfig) *servingv1.Service {
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(&target.Spec)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.OracleTarget)
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	)
 }
 
-func makeAppEnv(spec *v1alpha1.OracleTargetSpec) []corev1.EnvVar {
-	var fnID string
-	if spec.OracleFunctionSpec != nil {
-		fnID = spec.OracleFunctionSpec.Function
+func makeAppEnv(o *v1alpha1.OracleTarget) []corev1.EnvVar {
+	env := []corev1.EnvVar{
+		{
+			Name: "ORACLE_API_PRIVATE_KEY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.OracleAPIPrivateKey.SecretKeyRef,
+			},
+		}, {
+			Name: "ORACLE_API_PRIVATE_KEY_PASSPHRASE",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.OracleAPIPrivateKeyPassphrase.SecretKeyRef,
+			},
+		}, {
+			Name: "ORACLE_API_PRIVATE_KEY_FINGERPRINT",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.OracleAPIPrivateKeyFingerprint.SecretKeyRef,
+			},
+		}, {
+			Name:  "TENANT_OCID",
+			Value: o.Spec.Tenancy,
+		}, {
+			Name:  "ORACLE_REGION",
+			Value: o.Spec.Region,
+		}, {
+			Name:  "USER_OCID",
+			Value: o.Spec.User,
+		},
 	}
 
-	return []corev1.EnvVar{{
-		Name: "ORACLE_API_PRIVATE_KEY",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: spec.OracleAPIPrivateKey.SecretKeyRef,
-		},
-	}, {
-		Name: "ORACLE_API_PRIVATE_KEY_PASSPHRASE",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: spec.OracleAPIPrivateKeyPassphrase.SecretKeyRef,
-		},
-	}, {
-		Name: "ORACLE_API_PRIVATE_KEY_FINGERPRINT",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: spec.OracleAPIPrivateKeyFingerprint.SecretKeyRef,
-		},
-	}, {
-		Name:  "TENANT_OCID",
-		Value: spec.Tenancy,
-	}, {
-		Name:  "ORACLE_REGION",
-		Value: spec.Region,
-	}, {
-		Name:  "USER_OCID",
-		Value: spec.User,
-	}, {
-		Name:  "ORACLE_FUNCTION",
-		Value: fnID,
-	}}
+	if o.Spec.OracleFunctionSpec != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  "ORACLE_FUNCTION",
+			Value: o.Spec.OracleFunctionSpec.Function,
+		})
+	}
+
+	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

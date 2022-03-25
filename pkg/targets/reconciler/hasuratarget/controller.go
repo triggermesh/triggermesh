@@ -21,54 +21,48 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
-	"k8s.io/client-go/tools/cache"
-
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
-	servingclient "knative.dev/serving/pkg/client/injection/client"
-	serviceinformerv1 "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/hasuratarget"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/hasuratarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
-// NewController creates a Reconciler for the event target and returns the result of NewImpl.
+// NewController initializes the controller and is called by the generated code
+// Registers event handlers to enqueue events
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
 
+	typ := (*v1alpha1.HasuraTarget)(nil)
+	app := common.ComponentName(typ)
+
 	// Calling envconfig.Process() with a prefix appends that prefix
 	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
 	adapterCfg := &adapterConfig{
-		configs: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
+		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
-	envconfig.MustProcess(adapterName, adapterCfg)
+	envconfig.MustProcess(app, adapterCfg)
 
-	logger := logging.FromContext(ctx)
-
-	targetInformer := informerv1alpha1.Get(ctx)
-	ksvcInformer := serviceinformerv1.Get(ctx)
+	informer := informerv1alpha1.Get(ctx)
 
 	r := &Reconciler{
-		logger:     logger,
 		adapterCfg: adapterCfg,
-		ksvcr:      libreconciler.NewKServiceReconciler(servingclient.Get(ctx), ksvcInformer.Lister()),
+		trgLister:  informer.Lister().HasuraTargets,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	logger.Info("Setting up event handlers")
+	r.base = common.NewGenericServiceReconciler(
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.EnqueueControllerOf,
+	)
 
-	targetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
-
-	ksvcInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGVK((&v1alpha1.HasuraTarget{}).GetGroupVersionKind()),
-		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
-	})
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	return impl
 }

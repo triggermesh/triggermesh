@@ -18,10 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"knative.dev/pkg/apis"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -33,18 +29,13 @@ type AWSSQSTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the AWSSQSTarget (from the client).
-	Spec AWSSQSTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the AWSSQSTarget (from the controller).
-	Status AWSTargetStatus `json:"status,omitempty"`
+	Spec   AWSSQSTargetSpec `json:"spec"`
+	Status TargetStatus     `json:"status,omitempty"`
 }
 
-// Check the interfaces AWSSQSTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*AWSSQSTarget)(nil)
-	_ kmeta.OwnerRefable = (*AWSSQSTarget)(nil)
-	_ duckv1.KRShaped    = (*AWSSQSTarget)(nil)
+	_ Reconcilable = (*AWSSQSTarget)(nil)
 )
 
 // AWSSQSTargetSpec holds the desired state of the event target.
@@ -73,14 +64,4 @@ type AWSSQSTargetList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []AWSSQSTarget `json:"items"`
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AWSSQSTarget) GetConditionSet() apis.ConditionSet {
-	return AwsCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AWSSQSTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
 }

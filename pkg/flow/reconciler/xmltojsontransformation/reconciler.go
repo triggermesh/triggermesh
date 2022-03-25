@@ -26,7 +26,7 @@ import (
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
 )
 
 // Reconciler implements controller.Reconciler.
