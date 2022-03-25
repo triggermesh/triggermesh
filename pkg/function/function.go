@@ -224,7 +224,7 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 
 	ksvcLabels[functionNameLabel] = f.Name
 
-	expectedKsvc := resources.NewKnService(f.Name+"-"+rand.String(6), f.Namespace,
+	expectedKsvc := resources.NewKnService(fmt.Sprintf("function-%s-%s", f.Name, rand.String(6)), f.Namespace,
 		resources.KnSvcImage(image),
 		resources.KnSvcMountCm(cm.Name, filename),
 		resources.KnSvcEntrypoint(klrEntrypoint),
