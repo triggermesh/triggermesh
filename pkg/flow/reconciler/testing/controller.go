@@ -17,44 +17,22 @@ limitations under the License.
 package testing
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"knative.dev/pkg/configmap"
-	"knative.dev/pkg/controller"
 	"knative.dev/pkg/injection"
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/metrics"
 	rt "knative.dev/pkg/reconciler/testing"
+
+	"github.com/triggermesh/triggermesh/pkg/flow/testing/structs"
 )
 
-type constructorTestConfig struct {
-	numberInformers int
-}
-
-// ControllerTestOptions is a functional option for a constructorTestConfig.
-type ControllerTestOptions func(*constructorTestConfig)
-
-// WithInformerNumber sets the number of expected informers for the test
-func WithInformerNumber(n int) ControllerTestOptions {
-	return func(c *constructorTestConfig) {
-		c.numberInformers = n
-	}
-}
-
 // TestControllerConstructor tests that a controller constructor meets our requirements.
-func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor, opts ...ControllerTestOptions) {
+func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor) {
 	t.Helper()
-
-	cto := &constructorTestConfig{
-		numberInformers: 2,
-	}
-
-	for _, o := range opts {
-		o(cto)
-	}
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -64,8 +42,8 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 
 	ctx, informers := rt.SetupFakeContext(t)
 
-	// expected informers: component, Knative Service
-	if expect, got := cto.numberInformers, len(informers); got != expect {
+	// expected informers: Flow, Kn Service, ServiceAccount, RoleBinding
+	if expect, got := 4, len(informers); got != expect {
 		t.Errorf("Expected %d injected informers, got %d", expect, got)
 	}
 
@@ -73,14 +51,14 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 	t.Setenv(metrics.DomainEnv, "testing")
 
 	cmw := configmap.NewStaticWatcher(
-		NewConfigMap(logging.ConfigMapName(), nil),
 		NewConfigMap(metrics.ConfigMapName(), nil),
+		NewConfigMap(logging.ConfigMapName(), nil),
 	)
 
 	ctrler := ctor(ctx, cmw)
 
 	// catch unitialized fields in Reconciler struct
-	ensureNoNilField(t, ctrler)
+	structs.EnsureNoNilField(t, ctrler)
 }
 
 // TestControllerConstructorFailures tests that a controller constructor fails
@@ -130,26 +108,5 @@ func TestControllerConstructorFailures(t *testing.T, ctor injection.ControllerCo
 				_ = ctor(ctx, cmw)
 			})
 		})
-	}
-}
-
-// ensureNoNilField fails the test if the provided Impl's reconciler contains
-// nil pointers or interfaces.
-func ensureNoNilField(t *testing.T, impl *controller.Impl) {
-	t.Helper()
-
-	recVal := reflect.ValueOf(impl.Reconciler).Elem().
-		FieldByName("reconciler"). // knative.dev/pkg/controller.Reconciler
-		Elem().                    // injection/reconciler/flow/v1alpha1/<type>.Interface
-		Elem()                     //*reconciler.Reconciler
-
-	for i := 0; i < recVal.NumField(); i++ {
-		f := recVal.Field(i)
-		switch f.Kind() {
-		case reflect.Interface, reflect.Ptr, reflect.Func:
-			if f.IsNil() {
-				t.Errorf("struct field %q is nil", recVal.Type().Field(i).Name)
-			}
-		}
 	}
 }

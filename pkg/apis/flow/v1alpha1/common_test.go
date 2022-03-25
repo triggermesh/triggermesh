@@ -16,9 +16,7 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	corev1 "k8s.io/api/core/v1"
-)
+import corev1 "k8s.io/api/core/v1"
 
 var (
 	tValue = "test-value"
@@ -41,7 +39,7 @@ func valueFromField(opts ...valueFromFieldOptions) *ValueFromField {
 
 func vffWithValue(value string) valueFromFieldOptions {
 	return func(vff *ValueFromField) {
-		vff.Value = &value
+		vff.Value = value
 	}
 }
 

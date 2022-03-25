@@ -19,24 +19,33 @@ package testing
 import (
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	fakek8sclient "k8s.io/client-go/kubernetes/fake"
+	corelistersv1 "k8s.io/client-go/listers/core/v1"
+	rbaclistersv1 "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
 
+	fakeeventingclientset "knative.dev/eventing/pkg/client/clientset/versioned/fake"
 	rt "knative.dev/pkg/reconciler/testing"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 	fakeservingclient "knative.dev/serving/pkg/client/clientset/versioned/fake"
 	servinglistersv1 "knative.dev/serving/pkg/client/listers/serving/v1"
 
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	triggermeshclient "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/fake"
+	fakeflowclient "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/fake"
 	flowlisters "github.com/triggermesh/triggermesh/pkg/client/generated/listers/flow/v1alpha1"
 )
 
 var clientSetSchemes = []func(*runtime.Scheme) error{
-	triggermeshclient.AddToScheme,
+	fakeflowclient.AddToScheme,
 	fakek8sclient.AddToScheme,
 	fakeservingclient.AddToScheme,
+	// although our reconcilers do not handle eventing objects directly, we
+	// do need to register the eventing Scheme so that sink URI resolvers
+	// can recognize the Broker objects we use in tests
+	fakeeventingclientset.AddToScheme,
 }
 
 // NewScheme returns a new scheme populated with the types defined in clientSetSchemes.
@@ -72,12 +81,12 @@ func (l *Listers) IndexerFor(obj runtime.Object) cache.Indexer {
 	return l.sorter.IndexerForObjectType(obj)
 }
 
-// GetFlowObjects returns objects from the TriggerMesh API.
+// GetFlowObjects returns objects from the flow API.
 func (l *Listers) GetFlowObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(triggermeshclient.AddToScheme)
+	return l.sorter.ObjectsForSchemeFunc(fakeflowclient.AddToScheme)
 }
 
-// GetKubeObjects returns objects from the targets API.
+// GetKubeObjects returns objects from Kubernetes APIs.
 func (l *Listers) GetKubeObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakek8sclient.AddToScheme)
 }
@@ -87,9 +96,19 @@ func (l *Listers) GetServingObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
 }
 
-// GetXSLTTransformationLister returns a Lister for XSLTTransformation objects.
-func (l *Listers) GetXSLTTransformationLister() flowlisters.XSLTTransformationLister {
-	return flowlisters.NewXSLTTransformationLister(l.IndexerFor(&flowv1alpha1.XSLTTransformation{}))
+// GetServiceLister returns a lister for Service objects.
+func (l *Listers) GetServiceLister() servinglistersv1.ServiceLister {
+	return servinglistersv1.NewServiceLister(l.IndexerFor(&servingv1.Service{}))
+}
+
+// GetServiceAccountLister returns a lister for ServiceAccount objects.
+func (l *Listers) GetServiceAccountLister() corelistersv1.ServiceAccountLister {
+	return corelistersv1.NewServiceAccountLister(l.IndexerFor(&corev1.ServiceAccount{}))
+}
+
+// GetRoleBindingLister returns a lister for RoleBinding objects
+func (l *Listers) GetRoleBindingLister() rbaclistersv1.RoleBindingLister {
+	return rbaclistersv1.NewRoleBindingLister(l.IndexerFor(&rbacv1.RoleBinding{}))
 }
 
 // GetJQTransformationLister returns a Lister for JQTransformation objects.
@@ -97,7 +116,22 @@ func (l *Listers) GetJQTransformationLister() flowlisters.JQTransformationLister
 	return flowlisters.NewJQTransformationLister(l.IndexerFor(&flowv1alpha1.JQTransformation{}))
 }
 
-// GetServiceLister returns a lister for Service objects.
-func (l *Listers) GetServiceLister() servinglistersv1.ServiceLister {
-	return servinglistersv1.NewServiceLister(l.IndexerFor(&servingv1.Service{}))
+// GetSynchronizerLister returns a Lister for Synchronizer objects.
+func (l *Listers) GetSynchronizerLister() flowlisters.SynchronizerLister {
+	return flowlisters.NewSynchronizerLister(l.IndexerFor(&flowv1alpha1.Synchronizer{}))
+}
+
+// GetTransformationLister returns a Lister for Transformation objects.
+func (l *Listers) GetTransformationLister() flowlisters.TransformationLister {
+	return flowlisters.NewTransformationLister(l.IndexerFor(&flowv1alpha1.Transformation{}))
+}
+
+// GetXMLToJSONTransformationLister returns a Lister for XMLToJSONTransformation objects.
+func (l *Listers) GetXMLToJSONTransformationLister() flowlisters.XMLToJSONTransformationLister {
+	return flowlisters.NewXMLToJSONTransformationLister(l.IndexerFor(&flowv1alpha1.XMLToJSONTransformation{}))
+}
+
+// GetXSLTTransformationLister returns a Lister for XSLTTransformation objects.
+func (l *Listers) GetXSLTTransformationLister() flowlisters.XSLTTransformationLister {
+	return flowlisters.NewXSLTTransformationLister(l.IndexerFor(&flowv1alpha1.XSLTTransformation{}))
 }

@@ -18,9 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -30,36 +30,30 @@ import (
 // Transformation is a Knative abstraction that encapsulates the interface by which Knative
 // components express a desire to have a particular image cached.
 type Transformation struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the Transformation (from the client).
-	// +optional
-	Spec TransformationSpec `json:"spec,omitempty"`
-
-	// Status communicates the observed state of the Transformation (from the controller).
-	// +optional
-	Status TransformationStatus `json:"status,omitempty"`
+	Spec   TransformationSpec `json:"spec,omitempty"`
+	Status TargetStatus       `json:"status,omitempty"`
 }
 
 var (
-	// Check that Transformation can be validated and defaulted.
-	_ apis.Validatable   = (*Transformation)(nil)
-	_ apis.Defaultable   = (*Transformation)(nil)
-	_ kmeta.OwnerRefable = (*Transformation)(nil)
-	// Check that the type conforms to the duck Knative Resource shape.
-	_ duckv1.KRShaped = (*Transformation)(nil)
+	_ apis.Validatable = (*Transformation)(nil)
+	_ apis.Defaultable = (*Transformation)(nil)
+
+	_ Reconcilable = (*Transformation)(nil)
+	_ EventSender  = (*Transformation)(nil)
 )
 
 // TransformationSpec holds the desired state of the Transformation (from the client).
 type TransformationSpec struct {
-	// Sink is a reference to an object that will resolve to a uri to use as the sink.
-	Sink duckv1.Destination `json:"sink,omitempty"`
 	// Context contains Transformations that must be applied on CE Context
 	Context []Transform `json:"context,omitempty"`
 	// Data contains Transformations that must be applied on CE Data
 	Data []Transform `json:"data,omitempty"`
+
+	// Support sending to an event sink instead of replying.
+	duckv1.SourceSpec `json:",inline"`
 }
 
 // Transform describes transformation schemes for different CE types.
@@ -74,21 +68,6 @@ type Path struct {
 	Value string `json:"value,omitempty"`
 }
 
-const (
-	// TransformationConditionReady is set when the revision is starting to materialize
-	// runtime resources, and becomes true when those resources are ready.
-	TransformationConditionReady = apis.ConditionReady
-)
-
-// TransformationStatus communicates the observed state of the Transformation (from the controller).
-type TransformationStatus struct {
-	duckv1.SourceStatus `json:",inline"`
-
-	// Address holds the information needed to connect this Addressable up to receive events.
-	// +optional
-	Address *duckv1.Addressable `json:"address,omitempty"`
-}
-
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // TransformationList is a list of Transformation resources
@@ -97,9 +76,4 @@ type TransformationList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []Transformation `json:"items"`
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (t *Transformation) GetStatus() *duckv1.Status {
-	return &t.Status.Status
 }

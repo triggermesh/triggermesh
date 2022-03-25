@@ -47,16 +47,16 @@ var (
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
+		&JQTransformation{},
+		&JQTransformationList{},
 		&Synchronizer{},
 		&SynchronizerList{},
 		&Transformation{},
 		&TransformationList{},
-		&JQTransformation{},
-		&JQTransformationList{},
-		&XSLTTransformation{},
-		&XSLTTransformationList{},
 		&XMLToJSONTransformation{},
 		&XMLToJSONTransformationList{},
+		&XSLTTransformation{},
+		&XSLTTransformationList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

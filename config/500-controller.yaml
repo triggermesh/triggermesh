@@ -169,7 +169,7 @@ spec:
         # Flow adapters
         - name: JQTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
-        - name: SYNCHRONIZER_ADAPTER_IMAGE
+        - name: SYNCHRONIZER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter

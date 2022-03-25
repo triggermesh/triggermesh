@@ -28,7 +28,7 @@ func (v *ValueFromField) Validate(_ context.Context) *apis.FieldError {
 		return nil
 	}
 
-	val := v.Value != nil && *v.Value != ""
+	val := v.Value != ""
 	secret := v.ValueFromSecret != nil && (v.ValueFromSecret.Name != "" || v.ValueFromSecret.Key != "")
 	cm := v.ValueFromConfigMap != nil && (v.ValueFromConfigMap.Name != "" || v.ValueFromConfigMap.Key != "")
 

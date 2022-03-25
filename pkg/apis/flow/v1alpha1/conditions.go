@@ -20,11 +20,11 @@ import "knative.dev/pkg/apis"
 
 // Status conditions
 const (
-	// ConditionReady has status True when the router is ready to send events.
+	// ConditionReady has status True when the component is ready to receive/send events.
 	ConditionReady = apis.ConditionReady
-	// ConditionSinkProvided has status True when the router has been configured with a sink target.
+	// ConditionSinkProvided has status True when the component has been configured with an event sink.
 	ConditionSinkProvided apis.ConditionType = "SinkProvided"
-	// ConditionDeployed has status True when the router's adapter is up and running.
+	// ConditionDeployed has status True when the component's adapter is up and running.
 	ConditionDeployed apis.ConditionType = "Deployed"
 )
 

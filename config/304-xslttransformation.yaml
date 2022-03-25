@@ -126,6 +126,10 @@ spec:
             description: Reported status.
             type: object
             properties:
+              sinkUri:
+                description: URI of the sink where events are currently sent to.
+                type: string
+                format: uri
               observedGeneration:
                 type: integer
                 format: int64

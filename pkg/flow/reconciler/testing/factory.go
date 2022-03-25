@@ -33,13 +33,16 @@ import (
 	logtesting "knative.dev/pkg/logging/testing"
 	"knative.dev/pkg/reconciler"
 	rt "knative.dev/pkg/reconciler/testing"
+	"knative.dev/pkg/resolver"
+	"knative.dev/pkg/tracker"
 	fakeservinginjectionclient "knative.dev/serving/pkg/client/injection/client/fake"
 
-	faketminjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
+	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
 )
 
 // Ctor constructs a controller.Reconciler.
-type Ctor func(*testing.T, context.Context, *Listers) controller.Reconciler
+type Ctor func(*testing.T, context.Context, *rt.TableRow, *Listers) controller.Reconciler
 
 // MakeFactory creates a testing factory for our controller.Reconciler, and
 // initializes a Reconciler using the given Ctor as part of the process.
@@ -57,17 +60,13 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		ctx = logging.WithLogger(ctx, logtesting.TestLogger(t))
 
 		// the controller.Reconciler uses an internal client to handle
-		// component objects
-		ctx, flowclient := faketminjectionclient.With(ctx, ls.GetFlowObjects()...)
+		// flow objects
+		ctx, client := fakeinjectionclient.With(ctx, ls.GetFlowObjects()...)
 
 		// all clients used inside reconciler implementations should be
 		// injected as well
 		ctx, k8sClient := fakek8sinjectionclient.With(ctx, ls.GetKubeObjects()...)
 		ctx, servingClient := fakeservinginjectionclient.With(ctx, ls.GetServingObjects()...)
-
-		const eventRecorderBufferSize = 10
-		eventRecorder := record.NewFakeRecorder(eventRecorderBufferSize)
-		ctx = controller.WithEventRecorder(ctx, eventRecorder)
 
 		// duck informers (e.g. used by resolver.URIResolver) use a dynamic client.
 		ctx, _ = fakedynamicclient.With(ctx, scheme, ToUnstructured(t, tr.Objects)...)
@@ -77,27 +76,30 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		// we don't need the other informers it registers.
 		ctx = addressable.WithDuck(ctx)
 
-		// set up Reconciler from fakes
-		r := ctor(t, ctx, &ls)
+		const eventRecorderBufferSize = 10
+		eventRecorder := record.NewFakeRecorder(eventRecorderBufferSize)
+		ctx = controller.WithEventRecorder(ctx, eventRecorder)
 
-		// If the reconcilers is leader aware, then promote it.
+		// set up Reconciler from fakes
+		r := ctor(t, ctx, tr, &ls)
+
+		// promote the reconciler if it is leader aware
 		if la, ok := r.(reconciler.LeaderAware); ok {
-			//nolint:golint,errcheck
-			la.Promote(reconciler.UniversalBucket(), func(reconciler.Bucket, types.NamespacedName) {})
+			err := la.Promote(reconciler.UniversalBucket(), func(reconciler.Bucket, types.NamespacedName) {})
+			if err != nil {
+				t.Fatalf("Failed to promote reconciler to leader: %s", err)
+			}
 		}
 
 		// inject reactors from table row
 		for _, reactor := range tr.WithReactors {
-			flowclient.PrependReactor("*", "*", reactor)
+			client.PrependReactor("*", "*", reactor)
 			k8sClient.PrependReactor("*", "*", reactor)
 			servingClient.PrependReactor("*", "*", reactor)
 		}
 
 		actionRecorderList := rt.ActionRecorderList{
-			// TriggerMesh clients are merely used here to record status updates,
-			// reconcilers don't create or update these objects otherwise.
-			flowclient,
-
+			client, // record status updates
 			k8sClient,
 			servingClient,
 		}
@@ -107,6 +109,27 @@ func MakeFactory(ctor Ctor) rt.Factory {
 		}
 
 		return r, actionRecorderList, eventList
+	}
+}
+
+// NewTestServiceReconciler returns a GenericServiceReconciler initialized with
+// test clients.
+func NewTestServiceReconciler(ctx context.Context, ls *Listers) common.GenericServiceReconciler {
+	return common.GenericServiceReconciler{
+		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker.New(func(types.NamespacedName) {}, 0)),
+		Lister:                ls.GetServiceLister().Services,
+		Client:                fakeservinginjectionclient.Get(ctx).ServingV1().Services,
+		GenericRBACReconciler: newTestRBACReconciler(ctx, ls),
+	}
+}
+
+// newTestRBACReconciler returns a GenericRBACReconciler initialized with test clients.
+func newTestRBACReconciler(ctx context.Context, ls *Listers) *common.GenericRBACReconciler {
+	return &common.GenericRBACReconciler{
+		SALister: ls.GetServiceAccountLister().ServiceAccounts,
+		RBLister: ls.GetRoleBindingLister().RoleBindings,
+		SAClient: fakek8sinjectionclient.Get(ctx).CoreV1().ServiceAccounts,
+		RBClient: fakek8sinjectionclient.Get(ctx).RbacV1().RoleBindings,
 	}
 }
 
