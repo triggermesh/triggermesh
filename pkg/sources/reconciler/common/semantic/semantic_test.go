@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -174,7 +174,7 @@ func TestKnServiceEqual(t *testing.T) {
 	}
 
 	for name, tc := range testCases {
-		// //nolint:scopelint
+		//nolint:scopelint
 		t.Run(name, func(t *testing.T) {
 			desired := tc.prep()
 			switch tc.expect {
@@ -259,7 +259,7 @@ func TestServiceAccountEqual(t *testing.T) {
 	}
 
 	for name, tc := range testCases {
-		// //nolint:scopelint
+		//nolint:scopelint
 		t.Run(name, func(t *testing.T) {
 			desired := tc.prep()
 			switch tc.expect {

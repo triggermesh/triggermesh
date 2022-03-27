@@ -174,7 +174,7 @@ func TestKnServiceEqual(t *testing.T) {
 	}
 
 	for name, tc := range testCases {
-		// //nolint:scopelint
+		//nolint:scopelint
 		t.Run(name, func(t *testing.T) {
 			desired := tc.prep()
 			switch tc.expect {
@@ -259,7 +259,7 @@ func TestServiceAccountEqual(t *testing.T) {
 	}
 
 	for name, tc := range testCases {
-		// //nolint:scopelint
+		//nolint:scopelint
 		t.Run(name, func(t *testing.T) {
 			desired := tc.prep()
 			switch tc.expect {
