@@ -38,7 +38,12 @@ import (
 const (
 	metricsPrometheusPortName = "metrics"
 
-	metricsPrometheusPort     uint16 = 9090
+	metricsPrometheusPort uint16 = 9090
+
+	// TCP port used to expose metrics via the Prometheus metrics exporter in
+	// components backed by a Knative Service.
+	// It is necessary to override Knative's default value of "9090" because this
+	// port is already reserved by the "queue-proxy" container in Knative Services.
 	metricsPrometheusPortKsvc uint16 = 9092
 )
 
