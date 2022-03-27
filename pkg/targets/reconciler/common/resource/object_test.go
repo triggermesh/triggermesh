@@ -32,13 +32,6 @@ import (
 	"knative.dev/pkg/ptr"
 )
 
-const (
-	tNs   = "testns"
-	tName = "testname"
-
-	tImg = "registry/image:tag"
-)
-
 func makeEnvVars(count int, name, val string) []corev1.EnvVar {
 	envVars := make([]corev1.EnvVar, count)
 	for i := 1; i <= count; i++ {

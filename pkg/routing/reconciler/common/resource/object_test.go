@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,13 +28,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"knative.dev/pkg/kmeta"
-)
-
-const (
-	tNs   = "testns"
-	tName = "testname"
-
-	tImg = "registry/image:tag"
 )
 
 func makeEnvVars(count int, name, val string) []corev1.EnvVar {
