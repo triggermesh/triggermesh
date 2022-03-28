@@ -131,8 +131,8 @@ func hasAdapterLabelsForType(typ kmeta.OwnerRefable) objectFilterFunc {
 	}
 }
 
-// isInNamespace returns a function that filters all objects which are not in
-// the given namespace.
+// isInNamespace returns a filter function which returns whether the object
+// passed to the filter is in the given namespace.
 func isInNamespace(ns string) objectFilterFunc {
 	return func(obj interface{}) bool {
 		object := obj.(metav1.Object)
