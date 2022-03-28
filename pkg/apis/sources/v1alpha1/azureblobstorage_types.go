@@ -36,7 +36,7 @@ type AzureBlobStorageSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AzureBlobStorageSource)(nil)
+	_ Reconcilable = (*AzureBlobStorageSource)(nil)
 )
 
 // AzureBlobStorageSourceSpec defines the desired state of the event source.

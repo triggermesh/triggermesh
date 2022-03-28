@@ -90,7 +90,8 @@ func TestNewContainer(t *testing.T) {
 					Port: intstr.FromString("health"),
 				},
 			},
-			PeriodSeconds: 1,
+			PeriodSeconds:    1,
+			FailureThreshold: 60,
 		},
 		Resources: corev1.ResourceRequirements{
 			Requests: corev1.ResourceList{

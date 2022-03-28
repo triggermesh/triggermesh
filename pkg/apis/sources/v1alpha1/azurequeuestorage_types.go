@@ -36,7 +36,7 @@ type AzureQueueStorageSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AzureQueueStorageSource)(nil)
+	_ Reconcilable = (*AzureQueueStorageSource)(nil)
 )
 
 // AzureQueueStorageSourceSpec defines the desired state of the event source.

@@ -52,8 +52,8 @@ func NewController(
 	envconfig.MustProcess(app, adapterCfg)
 
 	r := &Reconciler{
-		adapterCfg:   adapterCfg,
-		filterLister: informer.Lister().Filters,
+		adapterCfg: adapterCfg,
+		rtrLister:  informer.Lister().Filters,
 	}
 
 	impl := filterreconciler.NewImpl(ctx, r)

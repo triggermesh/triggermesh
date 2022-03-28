@@ -36,7 +36,7 @@ type AzureIOTHubSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AzureIOTHubSource)(nil)
+	_ Reconcilable = (*AzureIOTHubSource)(nil)
 )
 
 // AzureIOTHubSourceSpec defines the desired state of the event source.

@@ -30,7 +30,7 @@ const (
 	IBMMQSourceEventType = "io.triggermesh.ibm.mq.message"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (*IBMMQSource) GetEventTypes() []string {
 	return []string{
 		IBMMQSourceEventType,
@@ -57,20 +57,20 @@ func (s *IBMMQSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *IBMMQSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *IBMMQSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *IBMMQSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status.EventSourceStatus,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *IBMMQSource) AsEventSource() string {
 	return fmt.Sprintf("%s/%s", s.Spec.ConnectionName, strings.ToLower(s.Spec.ChannelName))
 }

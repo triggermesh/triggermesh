@@ -17,21 +17,21 @@ limitations under the License.
 package googlecloudworkflowstarget
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
 
 const (
-	adapterName = "googlecloudworkflowstarget"
-
-	envCredentials         = "GOOGLE_WORKFLOWS_CREDENTIALS_JSON"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -41,47 +41,54 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"GOOGLECLOUDWORKFLOWS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlecloudworkflowstarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/googlecloudworkflowstarget-adapter"`
 }
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.GoogleCloudWorkflowsTarget, cfg *adapterConfig) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(&target.Spec)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.GoogleCloudWorkflowsTarget)
+
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	)
 }
 
-func makeAppEnv(spec *v1alpha1.GoogleCloudWorkflowsTargetSpec) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.GoogleCloudWorkflowsTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name: envCredentials,
+			Name: common.EnvGCloudSAKey,
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.Credentials.SecretKeyRef,
+				SecretKeyRef: o.Spec.Credentials.SecretKeyRef,
 			},
 		},
 	}
 
-	if spec.EventOptions != nil && spec.EventOptions.PayloadPolicy != nil {
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envEventsPayloadPolicy,
-			Value: string(*spec.EventOptions.PayloadPolicy),
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
 		})
 	}
 
 	return env
+}
 
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -61,6 +61,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Extensions().V1alpha1().Functions().Informer()}, nil
 
 		// Group=flow.triggermesh.io, Version=v1alpha1
+	case flowv1alpha1.SchemeGroupVersion.WithResource("jqtransformations"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().JQTransformations().Informer()}, nil
 	case flowv1alpha1.SchemeGroupVersion.WithResource("synchronizers"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().Synchronizers().Informer()}, nil
 	case flowv1alpha1.SchemeGroupVersion.WithResource("transformations"):
@@ -149,6 +151,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AWSComprehendTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("awsdynamodbtargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AWSDynamoDBTargets().Informer()}, nil
+	case targetsv1alpha1.SchemeGroupVersion.WithResource("awseventbridgetargets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AWSEventBridgeTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("awskinesistargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AWSKinesisTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("awslambdatargets"):

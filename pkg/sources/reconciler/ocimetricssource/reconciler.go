@@ -41,7 +41,7 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.OCIMetricsSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, src)
+	ctx = v1alpha1.WithReconcilable(ctx, src)
 
-	return r.base.ReconcileSource(ctx, r)
+	return r.base.ReconcileAdapter(ctx, r)
 }

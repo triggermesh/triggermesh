@@ -32,7 +32,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	clientgotesting "k8s.io/client-go/testing"
 
-	"knative.dev/eventing/pkg/apis/eventing"
 	eventingv1 "knative.dev/eventing/pkg/apis/eventing/v1"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
@@ -79,7 +78,7 @@ var (
 //  2. MakeFactory injects those clients into a context along with fake event recorders, etc.
 //  3. A Reconciler is constructed via a Ctor function using the values injected above
 //  4. The Reconciler returned by MakeFactory is used to run the test case
-func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, adapterBuilder interface{}) {
+func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.Reconcilable, adapterBuilder interface{}) {
 	assertPopulatedSource(t, src)
 
 	newEventSource := eventSourceCtor(src)
@@ -103,7 +102,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(noCEAttributes),
 			},
 			WantCreates: func() []runtime.Object {
@@ -148,7 +147,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, notDeployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -163,7 +162,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -178,7 +177,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -196,7 +195,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 			Key:  tKey,
 			Ctx:  skipCtx,
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(noOwner),
 				newRoleBinding(),
@@ -239,7 +238,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 				rt.InduceFailure("create", r),
 			},
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -263,7 +262,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 				rt.InduceFailure("update", r),
 			},
 			Objects: []runtime.Object{
-				newAdressable(),
+				newAddressable(),
 				newEventSource(withSink, deployed(a)),
 				newServiceAccount(),
 				newRoleBinding(),
@@ -293,7 +292,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, src v1alpha1.EventSource, ada
 
 // assertPopulatedSource asserts that all source attributes required in
 // reconciliation tests are populated and valid.
-func assertPopulatedSource(t *testing.T, src v1alpha1.EventSource) {
+func assertPopulatedSource(t *testing.T, src v1alpha1.Reconcilable) {
 	t.Helper()
 
 	// used to generate the adapter's owner reference
@@ -349,12 +348,12 @@ func insertString(strs []string, str string, pos int) []string {
 /* Event sources */
 
 // Populate populates an event source with generic attributes.
-func Populate(srcCpy v1alpha1.EventSource) {
+func Populate(srcCpy v1alpha1.Reconcilable) {
 	srcCpy.SetNamespace(tNs)
 	srcCpy.SetName(tName)
 	srcCpy.SetUID(tUID)
 
-	addr := newAdressable()
+	addr := newAddressable()
 	addrGVK := addr.GetGroupVersionKind()
 
 	srcCpy.GetSink().Ref = &duckv1.KReference{
@@ -373,14 +372,14 @@ func Populate(srcCpy v1alpha1.EventSource) {
 
 // sourceCtorWithOptions is a function that returns a source object with
 // modifications applied.
-type sourceCtorWithOptions func(...sourceOption) v1alpha1.EventSource
+type sourceCtorWithOptions func(...sourceOption) v1alpha1.Reconcilable
 
 // eventSourceCtor creates a copy of the given source object and returns a
 // function that can be invoked to return that source, with the possibility to
 // apply options to it.
-func eventSourceCtor(src v1alpha1.EventSource) sourceCtorWithOptions {
-	return func(opts ...sourceOption) v1alpha1.EventSource {
-		srcCpy := src.DeepCopyObject().(v1alpha1.EventSource)
+func eventSourceCtor(src v1alpha1.Reconcilable) sourceCtorWithOptions {
+	return func(opts ...sourceOption) v1alpha1.Reconcilable {
+		srcCpy := src.DeepCopyObject().(v1alpha1.Reconcilable)
 
 		for _, opt := range opts {
 			opt(srcCpy)
@@ -391,20 +390,20 @@ func eventSourceCtor(src v1alpha1.EventSource) sourceCtorWithOptions {
 }
 
 // sourceOption is a functional option for a source interface.
-type sourceOption func(v1alpha1.EventSource)
+type sourceOption func(v1alpha1.Reconcilable)
 
 // noCEAttributes sets empty CE attributes. Simulates the creation of a new source.
-func noCEAttributes(src v1alpha1.EventSource) {
+func noCEAttributes(src v1alpha1.Reconcilable) {
 	src.GetStatusManager().CloudEventAttributes = nil
 }
 
 // Sink: True
-func withSink(src v1alpha1.EventSource) {
+func withSink(src v1alpha1.Reconcilable) {
 	src.GetStatusManager().MarkSink(tSinkURI)
 }
 
 // Sink: False
-func withoutSink(src v1alpha1.EventSource) {
+func withoutSink(src v1alpha1.Reconcilable) {
 	src.GetStatusManager().MarkNoSink()
 }
 
@@ -438,8 +437,8 @@ func unknownDeployedWithError(adapter runtime.Object) sourceOption {
 	return propagateAdapterAvailabilityFunc(nilObj)
 }
 
-func propagateAdapterAvailabilityFunc(adapter runtime.Object) func(src v1alpha1.EventSource) {
-	return func(src v1alpha1.EventSource) {
+func propagateAdapterAvailabilityFunc(adapter runtime.Object) func(src v1alpha1.Reconcilable) {
+	return func(src v1alpha1.Reconcilable) {
 		switch a := adapter.(type) {
 		case *appsv1.Deployment:
 			src.GetStatusManager().PropagateDeploymentAvailability(context.Background(), a, nil)
@@ -454,7 +453,7 @@ func propagateAdapterAvailabilityFunc(adapter runtime.Object) func(src v1alpha1.
 }
 
 // deleted marks the source as deleted.
-func deleted(src v1alpha1.EventSource) {
+func deleted(src v1alpha1.Reconcilable) {
 	t := metav1.Unix(0, 0)
 	src.SetDeletionTimestamp(&t)
 	// ignore assertion of Finalizer in those tests because not all types
@@ -470,7 +469,7 @@ type adapterCtorWithOptions func(...adapterOption) runtime.Object
 
 // adapterCtor creates a copy of the given adapter object and returns a
 // function that can apply options to that object.
-func adapterCtor(adapterBuilder interface{}, src v1alpha1.EventSource) adapterCtorWithOptions {
+func adapterCtor(adapterBuilder interface{}, src v1alpha1.Reconcilable) adapterCtorWithOptions {
 	return func(opts ...adapterOption) runtime.Object {
 		var obj runtime.Object
 
@@ -548,8 +547,8 @@ func bumpImage(object runtime.Object) {
 
 /* Event sink */
 
-// newAdressable returns a test Addressable to be used as a sink.
-func newAdressable() *eventingv1.Broker {
+// newAddressable returns a test Addressable to be used as a sink.
+func newAddressable() *eventingv1.Broker {
 	return &eventingv1.Broker{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tNs,
@@ -569,7 +568,7 @@ func newAdressable() *eventingv1.Broker {
 type ServiceAccountCtorWithOptions func(...resource.ServiceAccountOption) *corev1.ServiceAccount
 
 // NewServiceAccount returns a ServiceAccountCtorWithOptions for the given source.
-func NewServiceAccount(src v1alpha1.EventSource) ServiceAccountCtorWithOptions {
+func NewServiceAccount(src v1alpha1.Reconcilable) ServiceAccountCtorWithOptions {
 	name := common.ServiceAccountName(src)
 	labels := common.CommonObjectLabels(src)
 
@@ -661,17 +660,17 @@ func NewRoleBinding(sa *corev1.ServiceAccount) func() *rbacv1.RoleBinding {
 
 /* Events */
 
-func createServiceAccountEvent(src v1alpha1.EventSource) string {
+func createServiceAccountEvent(src v1alpha1.Reconcilable) string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
 		"Created ServiceAccount %q due to the creation of a %s object",
 		common.MTAdapterObjectName(src), src.GetGroupVersionKind().Kind)
 }
-func updateServiceAccountEvent(src v1alpha1.EventSource) string {
+func updateServiceAccountEvent(src v1alpha1.Reconcilable) string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACUpdate,
 		"Updated ServiceAccount %q due to the creation/deletion of a %s object",
 		common.MTAdapterObjectName(src), src.GetGroupVersionKind().Kind)
 }
-func createRoleBindingEvent(src v1alpha1.EventSource) string {
+func createRoleBindingEvent(src v1alpha1.Reconcilable) string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
 		"Created RoleBinding %q due to the creation of a %s object",
 		common.MTAdapterObjectName(src), src.GetGroupVersionKind().Kind)
@@ -691,6 +690,10 @@ func failUpdateAdapterEvent(name, kind, resource string) string {
 		"inducing failure for update %s", kind, name, resource)
 }
 func badSinkEvent() string {
+	sinkObj := newAddressable()
+	gvr, _ := meta.UnsafeGuessKindToResource(sinkObj.GetGroupVersionKind())
+
 	return eventtesting.Eventf(corev1.EventTypeWarning, common.ReasonBadSinkURI, "Could not resolve sink URI: "+
-		"%s %q not found", eventing.BrokersResource, tName)
+		"failed to get object %s/%s: %s %q not found",
+		sinkObj.Namespace, sinkObj.Name, gvr.GroupResource(), sinkObj.Name)
 }

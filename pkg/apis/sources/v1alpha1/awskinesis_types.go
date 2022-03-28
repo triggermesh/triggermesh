@@ -38,7 +38,7 @@ type AWSKinesisSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSKinesisSource)(nil)
+	_ Reconcilable = (*AWSKinesisSource)(nil)
 )
 
 // AWSKinesisSourceSpec defines the desired state of the event source.

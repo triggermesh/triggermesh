@@ -18,21 +18,21 @@ package logzmetricstarget
 
 import (
 	"encoding/json"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
 
 const (
-	adapterName = "logzmetricstarget"
-
 	envCortexEndpoint           = "OPENTELEMETRY_CORTEX_ENDPOINT"
 	envCortexBearerToken        = "OPENTELEMETRY_CORTEX_BEARER_TOKEN"
 	envOpenTelemetryInstruments = "OPENTELEMETRY_INSTRUMENTS"
@@ -44,40 +44,27 @@ const (
 // Public fields are automatically populated by envconfig.
 type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	obsConfig source.ConfigAccessor
 	// Container image
+	// Uses the adapter for OpenTelemetry instead of a source-specific image.
 	Image string `envconfig:"OPENTELEMETRYTARGET_IMAGE" default:"gcr.io/triggermesh/opentelemetrytarget-adapter"`
 }
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(o *v1alpha1.LogzMetricsTarget, cfg *adapterConfig) (*servingv1.Service, error) {
-	envApp, err := makeAppEnv(o)
-	if err != nil {
-		return nil, err
-	}
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	genericLabels := pkgreconciler.MakeGenericLabels(adapterName, o.Name)
-	ksvcLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
-	podLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
-	name := kmeta.ChildName(adapterName+"-", o.Name)
-	envSvc := pkgreconciler.MakeServiceEnv(o.Name, o.Namespace)
-	envObs := pkgreconciler.MakeObsEnv(cfg.configs)
-	envs := append(envSvc, append(envApp, envObs...)...)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.LogzMetricsTarget)
 
-	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcOwner(o),
-		resources.KsvcPodEnvVars(envs)), nil
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	)
 }
 
-func makeAppEnv(o *v1alpha1.LogzMetricsTarget) ([]corev1.EnvVar, error) {
-	instruments, err := json.Marshal(o.Spec.Instruments)
-	if err != nil {
-		return nil, err
-	}
-
+func makeAppEnv(o *v1alpha1.LogzMetricsTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name: envCortexBearerToken,
@@ -88,12 +75,16 @@ func makeAppEnv(o *v1alpha1.LogzMetricsTarget) ([]corev1.EnvVar, error) {
 			Name:  envCortexEndpoint,
 			Value: o.Spec.Connection.ListenerURL,
 		}, {
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
+		},
+	}
+
+	if instruments, err := json.Marshal(o.Spec.Instruments); err == nil {
+		env = append(env, corev1.EnvVar{
 			Name:  envOpenTelemetryInstruments,
 			Value: string(instruments),
-		}, {
-			Name:  pkgreconciler.EnvBridgeID,
-			Value: pkgreconciler.GetStatefulBridgeID(o),
-		},
+		})
 	}
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
@@ -103,5 +94,20 @@ func makeAppEnv(o *v1alpha1.LogzMetricsTarget) ([]corev1.EnvVar, error) {
 		})
 	}
 
-	return env, nil
+	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

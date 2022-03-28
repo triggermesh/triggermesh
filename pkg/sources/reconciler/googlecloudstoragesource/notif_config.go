@@ -46,7 +46,7 @@ func ensureNotificationConfig(ctx context.Context, cli *storage.Client,
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
 	status := &src.Status
 
 	desiredNotif := &storage.Notification{
@@ -110,7 +110,7 @@ func ensureNoNotificationConfig(ctx context.Context, cli *storage.Client) error 
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
 	status := &src.Status
 
 	notifID := status.NotificationID

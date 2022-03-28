@@ -72,8 +72,8 @@ func (l *Listers) IndexerFor(obj runtime.Object) cache.Indexer {
 	return l.sorter.IndexerForObjectType(obj)
 }
 
-// GetXSLTTransformationObjects returns objects from the TriggerMesh API.
-func (l *Listers) GetXSLTTransformationObjects() []runtime.Object {
+// GetFlowObjects returns objects from the TriggerMesh API.
+func (l *Listers) GetFlowObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(triggermeshclient.AddToScheme)
 }
 
@@ -87,9 +87,14 @@ func (l *Listers) GetServingObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
 }
 
-// GetXSLTTransformationLister returns a Lister for GoogleSheetTarget objects.
+// GetXSLTTransformationLister returns a Lister for XSLTTransformation objects.
 func (l *Listers) GetXSLTTransformationLister() flowlisters.XSLTTransformationLister {
 	return flowlisters.NewXSLTTransformationLister(l.IndexerFor(&flowv1alpha1.XSLTTransformation{}))
+}
+
+// GetJQTransformationLister returns a Lister for JQTransformation objects.
+func (l *Listers) GetJQTransformationLister() flowlisters.JQTransformationLister {
+	return flowlisters.NewJQTransformationLister(l.IndexerFor(&flowv1alpha1.JQTransformation{}))
 }
 
 // GetServiceLister returns a lister for Service objects.

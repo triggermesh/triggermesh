@@ -17,32 +17,23 @@ limitations under the License.
 package azureeventhubstarget
 
 import (
+	"fmt"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
 
 const (
-	adapterName = "azureeventhubstarget"
-
-	envDiscardCECtx    = "DISCARD_CE_CONTEXT"
-	envHubKeyName      = "EVENTHUB_KEY_NAME"
-	envHubNamespace    = "EVENTHUB_NAMESPACE"
-	envHubName         = "EVENTHUB_NAME"
-	envHubKeyValue     = "EVENTHUB_KEY_VALUE"
-	envHubConnStr      = "EVENTHUB_CONNECTION_STRING"
-	envAADTenantID     = "AZURE_TENANT_ID"
-	envAADClientID     = "AZURE_CLIENT_ID"
-	envAADClientSecret = "AZURE_CLIENT_SECRET"
-
+	envDiscardCECtx        = "DISCARD_CE_CONTEXT"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -52,48 +43,58 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"AZURE_EVENTHUBS_ADAPTER_IMAGE" default:"gcr.io/triggermesh/azureeventhubstarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/azureeventhubstarget-adapter"`
 }
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.AzureEventHubsTarget, cfg *adapterConfig) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := []corev1.EnvVar{}
-	envs = append(envs, envSvc...)
-	envs = append(envs, envObs...)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	if sasAuth := target.Spec.Auth.SASToken; sasAuth != nil {
-		envs = common.MaybeAppendValueFromEnvVar(envs, envHubKeyName, sasAuth.KeyName)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envHubKeyValue, sasAuth.KeyValue)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envHubConnStr, sasAuth.ConnectionString)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.AzureEventHubsTarget)
+
+	var envs []corev1.EnvVar
+
+	if sasAuth := typedTrg.Spec.Auth.SASToken; sasAuth != nil {
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyName, sasAuth.KeyName)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyValue, sasAuth.KeyValue)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubConnStr, sasAuth.ConnectionString)
 	}
 
-	if spAuth := target.Spec.Auth.ServicePrincipal; spAuth != nil {
-		envs = common.MaybeAppendValueFromEnvVar(envs, envAADTenantID, spAuth.TenantID)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientID, spAuth.ClientID)
-		envs = common.MaybeAppendValueFromEnvVar(envs, envAADClientSecret, spAuth.ClientSecret)
+	if spAuth := typedTrg.Spec.Auth.ServicePrincipal; spAuth != nil {
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADTenantID, spAuth.TenantID)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADClientID, spAuth.ClientID)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
-	if target.Spec.EventOptions != nil && target.Spec.EventOptions.PayloadPolicy != nil {
+	if typedTrg.Spec.EventOptions != nil && typedTrg.Spec.EventOptions.PayloadPolicy != nil {
 		envs = append(envs, corev1.EnvVar{
 			Name:  envEventsPayloadPolicy,
-			Value: string(*target.Spec.EventOptions.PayloadPolicy),
+			Value: string(*typedTrg.Spec.EventOptions.PayloadPolicy),
 		})
 	}
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(podLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(ksvcLabels),
-		resources.KsvcPodEnvVars(envs),
-		resources.EnvVar(envHubNamespace, target.Spec.EventHubID.Namespace),
-		resources.EnvVar(envHubName, target.Spec.EventHubID.EventHub),
-		resources.EnvVar(envDiscardCECtx, strconv.FormatBool(target.Spec.DiscardCEContext)),
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVar(common.EnvHubNamespace, typedTrg.Spec.EventHubID.Namespace),
+		resource.EnvVar(common.EnvHubName, typedTrg.Spec.EventHubID.EventHub),
+		resource.EnvVar(envDiscardCECtx, strconv.FormatBool(typedTrg.Spec.DiscardCEContext)),
+		resource.EnvVars(envs...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	)
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

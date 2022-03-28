@@ -36,7 +36,7 @@ type GoogleCloudBillingSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*GoogleCloudBillingSource)(nil)
+	_ Reconcilable = (*GoogleCloudBillingSource)(nil)
 )
 
 // GoogleCloudBillingSourceSpec defines the desired state of the event source.

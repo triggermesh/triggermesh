@@ -38,7 +38,7 @@ type AWSPerformanceInsightsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSPerformanceInsightsSource)(nil)
+	_ Reconcilable = (*AWSPerformanceInsightsSource)(nil)
 )
 
 // AWSPerformanceInsightsSourceSpec defines the desired state of the event source.

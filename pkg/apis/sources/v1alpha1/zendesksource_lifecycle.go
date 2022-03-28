@@ -38,20 +38,20 @@ func (s *ZendeskSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *ZendeskSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *ZendeskSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *ZendeskSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status.EventSourceStatus,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *ZendeskSource) AsEventSource() string {
 	return s.Spec.Subdomain + ".zendesk.com/" + s.Namespace + "/" + s.Name
 }
@@ -67,7 +67,7 @@ const (
 	ZendeskTicketCreatedEventType = "com.zendesk.ticket.created"
 )
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (*ZendeskSource) GetEventTypes() []string {
 	return []string{
 		ZendeskTicketCreatedEventType,

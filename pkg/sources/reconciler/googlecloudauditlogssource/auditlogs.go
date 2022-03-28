@@ -58,7 +58,7 @@ func reconcileSink(ctx context.Context, lacli *logadmin.Client, pscli *pubsub.Cl
 // - logging.sinks.get
 // - logging.sinks.create
 func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *v1alpha1.GCloudResourceName) (*logadmin.Sink, error) {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
 	sinkID := generateSinkID(src)
@@ -111,7 +111,7 @@ func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *
 // - pubsub.topics.setIamPolicy
 // - pubsub.topics.publish
 func ensureSinkIsPublisher(ctx context.Context, sink *logadmin.Sink, cli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
 	topicIam := cli.Topic(topicResName.Resource).IAM()
@@ -145,7 +145,7 @@ func (r *Reconciler) ensureNoSink(ctx context.Context, cli *logadmin.Client) err
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
+	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
 	sink := status.AuditLogsSink

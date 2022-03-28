@@ -38,7 +38,7 @@ type AWSCloudWatchSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSCloudWatchSource)(nil)
+	_ Reconcilable = (*AWSCloudWatchSource)(nil)
 )
 
 // AWSCloudWatchSourceSpec defines the desired state of the event source.

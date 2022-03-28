@@ -54,7 +54,7 @@ type GenericServiceReconciler struct {
 	*GenericRBACReconciler
 }
 
-// GenericRBACReconciler reconciles RBAC objects for source adapters.
+// GenericRBACReconciler reconciles RBAC objects for components adapters.
 type GenericRBACReconciler struct {
 	// API clients
 	SAClient func(namespace string) coreclientv1.ServiceAccountInterface
@@ -103,7 +103,7 @@ type filteredGlobalResyncFunc func(func(interface{}) bool, cache.SharedInformer)
 type objectFilterFunc func(interface{}) bool
 
 // hasAdapterLabelsForType returns a function that filters based on standard
-// labels applied to all adapters of the given source type.
+// labels applied to all adapters of the given component type.
 func hasAdapterLabelsForType(typ kmeta.OwnerRefable) objectFilterFunc {
 	return func(obj interface{}) bool {
 		object, ok := obj.(metav1.Object)
@@ -127,8 +127,8 @@ func isInNamespace(ns string) objectFilterFunc {
 
 // EnqueueObjectsInNamespaceOf accepts an object and triggers a global resync
 // of all objects in the given informer matching that object's namespace.
-// Intended to be used to resync source objects when the state of their
-// (common) multi-tenant adapter changes.
+// Intended to be used to resync objects when the state of their (common)
+// multi-tenant adapter changes.
 func EnqueueObjectsInNamespaceOf(inf cache.SharedInformer, resyncFn filteredGlobalResyncFunc,
 	logger *zap.SugaredLogger) func(interface{}) {
 

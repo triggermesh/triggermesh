@@ -123,7 +123,7 @@ jobs:
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Installing ko
-          command: go install github.com/google/ko@v0.9.3
+          command: go install github.com/google/ko@v0.11.1
       - setup_remote_docker:
           version: 20.10.11
           docker_layer_caching: true
@@ -214,6 +214,14 @@ jobs:
             PRE_RELEASE=${CIRCLE_TAG/${CIRCLE_TAG%-rc[0-9]*}/}
             github-release delete -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} 2>/dev/null ||:
             ./hack/release-notes.sh ${CIRCLE_TAG} | github-release release ${PRE_RELEASE:+-p} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -d -
+
+            # wait for github to report the release before attaching the artifacts
+            max_tries=5
+            for _ in $(seq 1 ${max_tries}); do
+              github-release info -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} >/dev/null && break
+              sleep 1
+            done
+
             for f in $(find /tmp/workspace/dist/ -type f); do
               github-release upload -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -n $(basename ${f}) -f ${f}
             done

@@ -77,12 +77,6 @@ type Reconciler struct {
 // Check that our Reconciler implements Interface
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
-// newReconciledNormal makes a new reconciler event with event type Normal, and
-// reason AddressableServiceReconciled.
-func newReconciledNormal(namespace, name string) reconciler.Event {
-	return reconciler.NewEvent(corev1.EventTypeNormal, "FunctionReconciled", "Function reconciled: \"%s/%s\"", namespace, name)
-}
-
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Function) reconciler.Event {
 	logger := logging.FromContext(ctx)
@@ -151,7 +145,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Function) re
 	}
 
 	logger.Debug("Function reconciled")
-	return newReconciledNormal(o.Namespace, o.Name)
+	return nil
 }
 
 func (r *Reconciler) resolveSink(ctx context.Context, f *v1alpha1.Function) (*apis.URL, error) {
@@ -230,7 +224,7 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 
 	ksvcLabels[functionNameLabel] = f.Name
 
-	expectedKsvc := resources.NewKnService(f.Name+"-"+rand.String(6), f.Namespace,
+	expectedKsvc := resources.NewKnService(fmt.Sprintf("function-%s-%s", f.Name, rand.String(6)), f.Namespace,
 		resources.KnSvcImage(image),
 		resources.KnSvcMountCm(cm.Name, filename),
 		resources.KnSvcEntrypoint(klrEntrypoint),

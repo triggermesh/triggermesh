@@ -36,7 +36,7 @@ type IBMMQSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*IBMMQSource)(nil)
+	_ Reconcilable = (*IBMMQSource)(nil)
 )
 
 // IBMMQSourceSpec holds the desired state of the event source.

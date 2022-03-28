@@ -38,7 +38,7 @@ type AWSDynamoDBSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSDynamoDBSource)(nil)
+	_ Reconcilable = (*AWSDynamoDBSource)(nil)
 )
 
 // AWSDynamoDBSourceSpec defines the desired state of the event source.

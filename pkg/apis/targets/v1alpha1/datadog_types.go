@@ -19,10 +19,6 @@ package v1alpha1
 import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -34,17 +30,15 @@ type DatadogTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   DatadogTargetSpec   `json:"spec"`
-	Status DatadogTargetStatus `json:"status,omitempty"`
+	Spec   DatadogTargetSpec `json:"spec"`
+	Status TargetStatus      `json:"status,omitempty"`
 }
 
-// Check the interfaces DatadogTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*DatadogTarget)(nil)
-	_ kmeta.OwnerRefable        = (*DatadogTarget)(nil)
+	_ Reconcilable              = (*DatadogTarget)(nil)
 	_ targets.IntegrationTarget = (*DatadogTarget)(nil)
 	_ targets.EventSource       = (*DatadogTarget)(nil)
-	_ duckv1.KRShaped           = (*DatadogTarget)(nil)
 )
 
 // DatadogTargetSpec holds the desired state of the DatadogTarget.
@@ -58,15 +52,6 @@ type DatadogTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-}
-
-// DatadogTargetStatus communicates the observed state of the DatadogTarget (from the controller).
-type DatadogTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

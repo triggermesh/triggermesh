@@ -23,7 +23,8 @@ import (
 
 	// Link fake informers accessed by our controller
 	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/httptarget/fake"
-	_ "knative.dev/pkg/injection/clients/dynamicclient/fake"
+	_ "knative.dev/pkg/client/injection/kube/informers/core/v1/serviceaccount/fake"
+	_ "knative.dev/pkg/client/injection/kube/informers/rbac/v1/rolebinding/fake"
 	_ "knative.dev/serving/pkg/client/injection/informers/serving/v1/service/fake"
 )
 

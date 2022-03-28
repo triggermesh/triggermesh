@@ -44,23 +44,23 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.Router, _ *apis.URL) *servingv1.Service {
-	return common.NewMTAdapterKnService(src,
+func (r *Reconciler) BuildAdapter(rtr v1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
+	return common.NewMTAdapterKnService(rtr,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }
 
 // RBACOwners implements common.AdapterServiceBuilder.
-func (r *Reconciler) RBACOwners(namespace string) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.splitterLister(namespace).List(labels.Everything())
+func (r *Reconciler) RBACOwners(rtr v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	rtrs, err := r.rtrLister(rtr.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}
 
-	ownerRefables := make([]kmeta.OwnerRefable, len(srcs))
-	for i := range srcs {
-		ownerRefables[i] = srcs[i]
+	ownerRefables := make([]kmeta.OwnerRefable, len(rtrs))
+	for i := range rtrs {
+		ownerRefables[i] = rtrs[i]
 	}
 
 	return ownerRefables, nil

@@ -38,20 +38,20 @@ func (s *WebhookSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements Reconcilable.
 func (s *WebhookSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *WebhookSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *WebhookSource) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet:      s.GetConditionSet(),
 		EventSourceStatus: &s.Status,
 	}
 }
 
-// AsEventSource implements EventSource.
+// AsEventSource implements Reconcilable.
 func (s *WebhookSource) AsEventSource() string {
 	if s.Spec.EventSource != nil {
 		return *s.Spec.EventSource
@@ -65,7 +65,7 @@ func (s *WebhookSource) AsEventSource() string {
 	return sourceName
 }
 
-// GetEventTypes implements EventSource.
+// GetEventTypes implements Reconcilable.
 func (s *WebhookSource) GetEventTypes() []string {
 	return []string{
 		s.Spec.EventType,

@@ -19,6 +19,7 @@ package main
 import (
 	"knative.dev/pkg/injection/sharedmain"
 
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xmltojsontransformation"
@@ -62,6 +63,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awscomprehendtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awsdynamodbtarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awseventbridgetarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awskinesistarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awslambdatarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awss3target"
@@ -133,6 +135,7 @@ func main() {
 		alibabaosstarget.NewController,
 		awscomprehendtarget.NewController,
 		awsdynamodbtarget.NewController,
+		awseventbridgetarget.NewController,
 		awskinesistarget.NewController,
 		awslambdatarget.NewController,
 		awss3target.NewController,
@@ -163,6 +166,7 @@ func main() {
 		uipathtarget.NewController,
 		zendesktarget.NewController,
 		// transformation
+		jqtransformation.NewController,
 		synchronizer.NewController,
 		transformation.NewController,
 		xmltojsontransformation.NewController,

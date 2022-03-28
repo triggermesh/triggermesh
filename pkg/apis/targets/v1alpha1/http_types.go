@@ -18,11 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	"knative.dev/pkg/apis"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -34,15 +31,13 @@ type HTTPTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   HTTPTargetSpec   `json:"spec"`
-	Status HTTPTargetStatus `json:"status,omitempty"`
+	Spec   HTTPTargetSpec `json:"spec"`
+	Status TargetStatus   `json:"status,omitempty"`
 }
 
-// Check the interfaces HTTPTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*HTTPTarget)(nil)
-	_ kmeta.OwnerRefable = (*HTTPTarget)(nil)
-	_ duckv1.KRShaped    = (*HTTPTarget)(nil)
+	_ Reconcilable = (*HTTPTarget)(nil)
 )
 
 // HTTPTargetSpec holds the desired state of the HTTPTarget.
@@ -100,12 +95,6 @@ type HTTPEventResponse struct {
 
 	// EventSource for the reply.
 	EventSource string `json:"eventSource"`
-}
-
-// HTTPTargetStatus communicates the observed state of the HTTPTarget (from the controller).
-type HTTPTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

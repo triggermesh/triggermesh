@@ -19,10 +19,6 @@ package v1alpha1
 import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -34,17 +30,15 @@ type AlibabaOSSTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AlibabaOSSTargetSpec   `json:"spec"`
-	Status AlibabaOSSTargetStatus `json:"status,omitempty"`
+	Spec   AlibabaOSSTargetSpec `json:"spec"`
+	Status TargetStatus         `json:"status,omitempty"`
 }
 
-// Check the interfaces AlibabaOSSTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*AlibabaOSSTarget)(nil)
-	_ kmeta.OwnerRefable        = (*AlibabaOSSTarget)(nil)
+	_ Reconcilable              = (*AlibabaOSSTarget)(nil)
 	_ targets.IntegrationTarget = (*AlibabaOSSTarget)(nil)
 	_ targets.EventSource       = (*AlibabaOSSTarget)(nil)
-	_ duckv1.KRShaped           = (*AlibabaOSSTarget)(nil)
 )
 
 // AlibabaOSSTargetSpec holds the desired state of the AlibabaOSSTarget.
@@ -67,15 +61,6 @@ type AlibabaOSSTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-}
-
-// AlibabaOSSTargetStatus communicates the observed state of the AlibabaOSSTarget (from the controller).
-type AlibabaOSSTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

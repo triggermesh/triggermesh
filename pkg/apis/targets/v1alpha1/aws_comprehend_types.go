@@ -18,10 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-
-	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 )
@@ -35,19 +31,14 @@ type AWSComprehendTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the AWSComprehendTarget (from the client).
-	Spec AWSComprehendTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the AWSComprehendTarget (from the controller).
-	Status AWSComprehendTargetStatus `json:"status,omitempty"`
+	Spec   AWSComprehendTargetSpec `json:"spec"`
+	Status TargetStatus            `json:"status,omitempty"`
 }
 
-// Check the interfaces AWSComprehendTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object      = (*AWSComprehendTarget)(nil)
-	_ kmeta.OwnerRefable  = (*AWSComprehendTarget)(nil)
+	_ Reconcilable        = (*AWSComprehendTarget)(nil)
 	_ targets.EventSource = (*AWSComprehendTarget)(nil)
-	_ duckv1.KRShaped     = (*AWSComprehendTarget)(nil)
 )
 
 // AWSComprehendTargetSpec holds the desired state of the event target.
@@ -66,13 +57,6 @@ type AWSComprehendTargetSpec struct {
 
 	// Language code to use to interact with Comprehend. The supported list can be found at: https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html
 	Language string `json:"language"`
-}
-
-// AWSComprehendTargetStatus communicates the observed state of the event target.
-type AWSComprehendTargetStatus struct {
-	AWSTargetStatus `json:",inline"`
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -30,9 +30,9 @@ import (
 // Reconciler implements addressableservicereconciler.Interface for
 // AddressableService resources.
 type Reconciler struct {
-	base           common.GenericServiceReconciler
-	splitterLister func(namespace string) listersv1alpha1.SplitterNamespaceLister
-	adapterCfg     *adapterConfig
+	base       common.GenericServiceReconciler
+	rtrLister  func(namespace string) listersv1alpha1.SplitterNamespaceLister
+	adapterCfg *adapterConfig
 }
 
 // Check that our Reconciler implements Interface
@@ -41,7 +41,7 @@ var _ splitterreconciler.Interface = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Splitter) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithRouter(ctx, o)
+	ctx = v1alpha1.WithReconcilable(ctx, o)
 
 	return r.base.ReconcileAdapter(ctx, r)
 }

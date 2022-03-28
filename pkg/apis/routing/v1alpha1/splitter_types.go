@@ -48,8 +48,8 @@ var (
 	_ apis.Validatable = (*Splitter)(nil)
 	_ apis.Defaultable = (*Splitter)(nil)
 
-	_ Router      = (*Splitter)(nil)
-	_ multiTenant = (*Splitter)(nil)
+	_ Reconcilable = (*Splitter)(nil)
+	_ multiTenant  = (*Splitter)(nil)
 )
 
 // SplitterSpec holds the desired state of the Splitter.
@@ -81,7 +81,7 @@ func (s *Splitter) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// AsEventSource implements Router.
+// AsEventSource implements Reconcilable.
 func (s *Splitter) AsEventSource() string {
 	return "splitter/" + s.Name
 }

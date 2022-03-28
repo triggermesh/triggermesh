@@ -42,21 +42,21 @@ const (
 	SplitterGenericEventType = "io.triggermesh.routing.splitter"
 )
 
-// GetEventTypes implements Router.
+// GetEventTypes implements Reconcilable.
 func (*Splitter) GetEventTypes() []string {
 	return []string{
 		SplitterGenericEventType,
 	}
 }
 
-// GetSink implements Router.
+// GetSink implements Reconcilable.
 func (s *Splitter) GetSink() *duckv1.Destination {
 	return s.Spec.Sink
 }
 
-// GetStatusManager implements Router.
-func (s *Splitter) GetStatusManager() *RouterStatusManager {
-	return &RouterStatusManager{
+// GetStatusManager implements Reconcilable.
+func (s *Splitter) GetStatusManager() *StatusManager {
+	return &StatusManager{
 		ConditionSet: s.GetConditionSet(),
 		RouterStatus: &s.Status,
 	}

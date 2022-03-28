@@ -16,31 +16,21 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	"knative.dev/pkg/apis"
-)
+import "knative.dev/pkg/apis"
 
 // status conditions
 const (
 	// ConditionReady has status True when the target is ready to receive events.
 	ConditionReady = apis.ConditionReady
-	// ConditionServiceReady has status True when the target's adapter is up and running.
-	ConditionServiceReady apis.ConditionType = "ServiceReady"
-	// ConditionSecretsProvided has status True when the secrets requested has been provided
-	ConditionSecretsProvided apis.ConditionType = "SecretsProvided"
 	// ConditionDeployed has status True when the target's adapter is up and running.
 	ConditionDeployed apis.ConditionType = "Deployed"
 )
 
 // reasons for conditions
 const (
-	// ReasonUnavailable is set on a ServiceReady condition when an adapter in unavailable.
+	// ReasonRBACNotBound is set on a Deployed condition when an adapter's
+	// ServiceAccount cannot be bound.
+	ReasonRBACNotBound = "RBACNotBound"
+	// ReasonUnavailable is set on a Deployed condition when an adapter is unavailable.
 	ReasonUnavailable = "AdapterUnavailable"
-
-	// ReasonResourceUnavailable is set on any object whose condition is  unavailable.
-	ReasonResourceUnavailable = "ResourceUnavailable"
-
-	// ReasonNotFound is set on a SecretsProvided condition when secret
-	// credentials can't be found.
-	ReasonNotFound = "NotFound"
 )

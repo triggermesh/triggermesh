@@ -36,7 +36,7 @@ type GoogleCloudPubSubSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*GoogleCloudPubSubSource)(nil)
+	_ Reconcilable = (*GoogleCloudPubSubSource)(nil)
 )
 
 // GoogleCloudPubSubSourceSpec defines the desired state of the event source.

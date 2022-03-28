@@ -18,55 +18,30 @@ package googlesheettarget
 
 import (
 	"context"
-	"fmt"
 
-	"knative.dev/eventing/pkg/reconciler/source"
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/reconciler"
 
-	gsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilergsv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlesheettarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlesheettarget"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
-// reconciler reconciles the target adapter object
-type reconciler struct {
-	TargetAdapterImage string `envconfig:"GOOGLESHEET_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlesheettarget-adapter"`
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
+	adapterCfg *adapterConfig
 
-	ksvcr libreconciler.KServiceReconciler
-	vg    libreconciler.ValueGetter
-
-	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	trgLister func(namespace string) listersv1alpha1.GoogleSheetTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilergsv1alpha1.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *gsv1alpha1.GoogleSheetTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-	// NOTE(antoineco): the adapter currently doesn't evaluate the attributes of incoming events.
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.GoogleSheetTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.GoogleServiceAccount.SecretKeyRef)
-	if err != nil {
-		trg.Status.MarkNoSecrets(err)
-		return err
-	}
-	trg.Status.MarkSecrets()
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, MakeTargetAdapterKService(&TargetAdapterArgs{
-		Image:   r.TargetAdapterImage,
-		Configs: r.configs,
-		Target:  trg,
-	}))
-	if err != nil {
-		return fmt.Errorf("failed to synchronize adapter Service: %w", err)
-	}
-	trg.Status.PropagateAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

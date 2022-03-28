@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ type TargetsV1alpha1Interface interface {
 	RESTClient() rest.Interface
 	AWSComprehendTargetsGetter
 	AWSDynamoDBTargetsGetter
+	AWSEventBridgeTargetsGetter
 	AWSKinesisTargetsGetter
 	AWSLambdaTargetsGetter
 	AWSS3TargetsGetter
@@ -71,6 +72,10 @@ func (c *TargetsV1alpha1Client) AWSComprehendTargets(namespace string) AWSCompre
 
 func (c *TargetsV1alpha1Client) AWSDynamoDBTargets(namespace string) AWSDynamoDBTargetInterface {
 	return newAWSDynamoDBTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) AWSEventBridgeTargets(namespace string) AWSEventBridgeTargetInterface {
+	return newAWSEventBridgeTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) AWSKinesisTargets(namespace string) AWSKinesisTargetInterface {

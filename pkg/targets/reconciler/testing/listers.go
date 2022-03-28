@@ -19,8 +19,12 @@ package testing
 import (
 	"fmt"
 
+	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	fakek8sclient "k8s.io/client-go/kubernetes/fake"
+	corelistersv1 "k8s.io/client-go/listers/core/v1"
+	rbaclistersv1 "k8s.io/client-go/listers/rbac/v1"
 	"k8s.io/client-go/tools/cache"
 
 	rt "knative.dev/pkg/reconciler/testing"
@@ -72,42 +76,12 @@ func (l *Listers) IndexerFor(obj runtime.Object) cache.Indexer {
 	return l.sorter.IndexerForObjectType(obj)
 }
 
-// GetAlibabaOSSTargetsObjects returns objects from the targets API.
-func (l *Listers) GetAlibabaOSSTargetsObjects() []runtime.Object {
+// GetTargetsObjects returns objects from the targets API.
+func (l *Listers) GetTargetsObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
 }
 
-// GetGoogleSheetTargetsObjects returns objects from the targets API.
-func (l *Listers) GetGoogleSheetTargetsObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
-// GetSplunkTargetsObjects returns objects from the targets API.
-func (l *Listers) GetSplunkTargetsObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
-// GetHTTPTargetsObjects returns objects from the targets API.
-func (l *Listers) GetHTTPTargetsObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
-// GetHasuraTargetsObjects returns objects from the targets API.
-func (l *Listers) GetHasuraTargetsObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
-// GetLogzMetricsTargetObjects returns objects from the targets API.
-func (l *Listers) GetLogzMetricsTargetObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
-// GetLogzTargetObjects returns objects from the targets API.
-func (l *Listers) GetLogzTargetObjects() []runtime.Object {
-	return l.sorter.ObjectsForSchemeFunc(faketargetsclient.AddToScheme)
-}
-
-// GetKubeObjects returns objects from the targets API.
+// GetKubeObjects returns objects from Kubernetes APIs.
 func (l *Listers) GetKubeObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakek8sclient.AddToScheme)
 }
@@ -117,9 +91,99 @@ func (l *Listers) GetServingObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
 }
 
-// GetAlibabaOSSTargetLister returns a Lister for GoogleSheetTarget objects.
+// GetServiceLister returns a lister for Service objects.
+func (l *Listers) GetServiceLister() servinglistersv1.ServiceLister {
+	return servinglistersv1.NewServiceLister(l.IndexerFor(&servingv1.Service{}))
+}
+
+// GetServiceAccountLister returns a lister for ServiceAccount objects.
+func (l *Listers) GetServiceAccountLister() corelistersv1.ServiceAccountLister {
+	return corelistersv1.NewServiceAccountLister(l.IndexerFor(&corev1.ServiceAccount{}))
+}
+
+// GetRoleBindingLister returns a lister for RoleBinding objects
+func (l *Listers) GetRoleBindingLister() rbaclistersv1.RoleBindingLister {
+	return rbaclistersv1.NewRoleBindingLister(l.IndexerFor(&rbacv1.RoleBinding{}))
+}
+
+// GetAlibabaOSSTargetLister returns a Lister for AlibabaOSSTarget objects.
 func (l *Listers) GetAlibabaOSSTargetLister() targetslisters.AlibabaOSSTargetLister {
 	return targetslisters.NewAlibabaOSSTargetLister(l.IndexerFor(&targetsv1alpha1.AlibabaOSSTarget{}))
+}
+
+// GetAWSComprehendTargetLister returns a Lister for AWSComprehendTarget objects.
+func (l *Listers) GetAWSComprehendTargetLister() targetslisters.AWSComprehendTargetLister {
+	return targetslisters.NewAWSComprehendTargetLister(l.IndexerFor(&targetsv1alpha1.AWSComprehendTarget{}))
+}
+
+// GetAWSDynamoDBTargetLister returns a Lister for AWSDynamoDBTarget objects.
+func (l *Listers) GetAWSDynamoDBTargetLister() targetslisters.AWSDynamoDBTargetLister {
+	return targetslisters.NewAWSDynamoDBTargetLister(l.IndexerFor(&targetsv1alpha1.AWSDynamoDBTarget{}))
+}
+
+// GetAWSEventBridgeTargetLister returns a Lister for AWSEventBridgeTarget objects.
+func (l *Listers) GetAWSEventBridgeTargetLister() targetslisters.AWSEventBridgeTargetLister {
+	return targetslisters.NewAWSEventBridgeTargetLister(l.IndexerFor(&targetsv1alpha1.AWSEventBridgeTarget{}))
+}
+
+// GetAWSKinesisTargetLister returns a Lister for AWSKinesisTarget objects.
+func (l *Listers) GetAWSKinesisTargetLister() targetslisters.AWSKinesisTargetLister {
+	return targetslisters.NewAWSKinesisTargetLister(l.IndexerFor(&targetsv1alpha1.AWSKinesisTarget{}))
+}
+
+// GetAWSLambdaTargetLister returns a Lister for AWSLambdaTarget objects.
+func (l *Listers) GetAWSLambdaTargetLister() targetslisters.AWSLambdaTargetLister {
+	return targetslisters.NewAWSLambdaTargetLister(l.IndexerFor(&targetsv1alpha1.AWSLambdaTarget{}))
+}
+
+// GetAWSS3TargetLister returns a Lister for AWSS3Target objects.
+func (l *Listers) GetAWSS3TargetLister() targetslisters.AWSS3TargetLister {
+	return targetslisters.NewAWSS3TargetLister(l.IndexerFor(&targetsv1alpha1.AWSS3Target{}))
+}
+
+// GetAWSSNSTargetLister returns a Lister for AWSSNSTarget objects.
+func (l *Listers) GetAWSSNSTargetLister() targetslisters.AWSSNSTargetLister {
+	return targetslisters.NewAWSSNSTargetLister(l.IndexerFor(&targetsv1alpha1.AWSSNSTarget{}))
+}
+
+// GetAWSSQSTargetLister returns a Lister for AWSSQSTarget objects.
+func (l *Listers) GetAWSSQSTargetLister() targetslisters.AWSSQSTargetLister {
+	return targetslisters.NewAWSSQSTargetLister(l.IndexerFor(&targetsv1alpha1.AWSSQSTarget{}))
+}
+
+// GetAzureEventHubsTargetLister returns a Lister for AzureEventHubsTarget objects.
+func (l *Listers) GetAzureEventHubsTargetLister() targetslisters.AzureEventHubsTargetLister {
+	return targetslisters.NewAzureEventHubsTargetLister(l.IndexerFor(&targetsv1alpha1.AzureEventHubsTarget{}))
+}
+
+// GetConfluentTargetLister returns a Lister for ConfluentTarget objects.
+func (l *Listers) GetConfluentTargetLister() targetslisters.ConfluentTargetLister {
+	return targetslisters.NewConfluentTargetLister(l.IndexerFor(&targetsv1alpha1.ConfluentTarget{}))
+}
+
+// GetDatadogTargetLister returns a Lister for DatadogTarget objects.
+func (l *Listers) GetDatadogTargetLister() targetslisters.DatadogTargetLister {
+	return targetslisters.NewDatadogTargetLister(l.IndexerFor(&targetsv1alpha1.DatadogTarget{}))
+}
+
+// GetElasticsearchTargetLister returns a Lister for ElasticsearchTarget objects.
+func (l *Listers) GetElasticsearchTargetLister() targetslisters.ElasticsearchTargetLister {
+	return targetslisters.NewElasticsearchTargetLister(l.IndexerFor(&targetsv1alpha1.ElasticsearchTarget{}))
+}
+
+// GetGoogleCloudFirestoreTargetLister returns a Lister for GoogleCloudFirestoreTarget objects.
+func (l *Listers) GetGoogleCloudFirestoreTargetLister() targetslisters.GoogleCloudFirestoreTargetLister {
+	return targetslisters.NewGoogleCloudFirestoreTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudFirestoreTarget{}))
+}
+
+// GetGoogleCloudStorageTargetLister returns a Lister for GoogleCloudStorageTarget objects.
+func (l *Listers) GetGoogleCloudStorageTargetLister() targetslisters.GoogleCloudStorageTargetLister {
+	return targetslisters.NewGoogleCloudStorageTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudStorageTarget{}))
+}
+
+// GetGoogleCloudWorkflowsTargetLister returns a Lister for GoogleCloudWorkflowsTarget objects.
+func (l *Listers) GetGoogleCloudWorkflowsTargetLister() targetslisters.GoogleCloudWorkflowsTargetLister {
+	return targetslisters.NewGoogleCloudWorkflowsTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudWorkflowsTarget{}))
 }
 
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
@@ -127,9 +191,9 @@ func (l *Listers) GetGoogleSheetTargetLister() targetslisters.GoogleSheetTargetL
 	return targetslisters.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
 }
 
-// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
-func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
-	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
+// GetHasuraTargetLister returns a Lister for HasuraTarget objects.
+func (l *Listers) GetHasuraTargetLister() targetslisters.HasuraTargetLister {
+	return targetslisters.NewHasuraTargetLister(l.IndexerFor(&targetsv1alpha1.HasuraTarget{}))
 }
 
 // GetHTTPTargetLister returns a Lister for HTTPTarget objects.
@@ -137,9 +201,9 @@ func (l *Listers) GetHTTPTargetLister() targetslisters.HTTPTargetLister {
 	return targetslisters.NewHTTPTargetLister(l.IndexerFor(&targetsv1alpha1.HTTPTarget{}))
 }
 
-// GetHasuraTargetLister returns a Lister for HasuraTarget objects.
-func (l *Listers) GetHasuraTargetLister() targetslisters.HasuraTargetLister {
-	return targetslisters.NewHasuraTargetLister(l.IndexerFor(&targetsv1alpha1.HasuraTarget{}))
+// GetIBMMQTargetLister returns a Lister for IBMMQTarget objects.
+func (l *Listers) GetIBMMQTargetLister() targetslisters.IBMMQTargetLister {
+	return targetslisters.NewIBMMQTargetLister(l.IndexerFor(&targetsv1alpha1.IBMMQTarget{}))
 }
 
 // GetInfraTargetLister returns a Lister for InfraTarget objects.
@@ -162,12 +226,47 @@ func (l *Listers) GetLogzTargetLister() targetslisters.LogzTargetLister {
 	return targetslisters.NewLogzTargetLister(l.IndexerFor(&targetsv1alpha1.LogzTarget{}))
 }
 
+// GetOracleTargetLister returns a Lister for OracleTarget objects.
+func (l *Listers) GetOracleTargetLister() targetslisters.OracleTargetLister {
+	return targetslisters.NewOracleTargetLister(l.IndexerFor(&targetsv1alpha1.OracleTarget{}))
+}
+
 // GetSalesforceTargetLister returns a Lister for SalesforceTarget objects.
 func (l *Listers) GetSalesforceTargetLister() targetslisters.SalesforceTargetLister {
 	return targetslisters.NewSalesforceTargetLister(l.IndexerFor(&targetsv1alpha1.SalesforceTarget{}))
 }
 
-// GetServiceLister returns a lister for Service objects.
-func (l *Listers) GetServiceLister() servinglistersv1.ServiceLister {
-	return servinglistersv1.NewServiceLister(l.IndexerFor(&servingv1.Service{}))
+// GetSendGridTargetLister returns a Lister for SendGridTarget objects.
+func (l *Listers) GetSendGridTargetLister() targetslisters.SendGridTargetLister {
+	return targetslisters.NewSendGridTargetLister(l.IndexerFor(&targetsv1alpha1.SendGridTarget{}))
+}
+
+// GetSlackTargetLister returns a Lister for SlackTarget objects.
+func (l *Listers) GetSlackTargetLister() targetslisters.SlackTargetLister {
+	return targetslisters.NewSlackTargetLister(l.IndexerFor(&targetsv1alpha1.SlackTarget{}))
+}
+
+// GetSplunkTargetLister returns a Lister for SplunkTarget objects.
+func (l *Listers) GetSplunkTargetLister() targetslisters.SplunkTargetLister {
+	return targetslisters.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
+}
+
+// GetTektonTargetLister returns a Lister for TektonTarget objects.
+func (l *Listers) GetTektonTargetLister() targetslisters.TektonTargetLister {
+	return targetslisters.NewTektonTargetLister(l.IndexerFor(&targetsv1alpha1.TektonTarget{}))
+}
+
+// GetTwilioTargetLister returns a Lister for TwilioTarget objects.
+func (l *Listers) GetTwilioTargetLister() targetslisters.TwilioTargetLister {
+	return targetslisters.NewTwilioTargetLister(l.IndexerFor(&targetsv1alpha1.TwilioTarget{}))
+}
+
+// GetUiPathTargetLister returns a Lister for UiPathTarget objects.
+func (l *Listers) GetUiPathTargetLister() targetslisters.UiPathTargetLister { //nolint:stylecheck
+	return targetslisters.NewUiPathTargetLister(l.IndexerFor(&targetsv1alpha1.UiPathTarget{}))
+}
+
+// GetZendeskTargetLister returns a Lister for ZendeskTarget objects.
+func (l *Listers) GetZendeskTargetLister() targetslisters.ZendeskTargetLister {
+	return targetslisters.NewZendeskTargetLister(l.IndexerFor(&targetsv1alpha1.ZendeskTarget{}))
 }

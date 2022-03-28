@@ -23,7 +23,6 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"knative.dev/pkg/apis"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // Managed event types
@@ -32,6 +31,29 @@ const (
 
 	EventTypeGoogleCloudStorageResponse = "com.google.cloud.storage.object.insert.response"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*GoogleCloudStorageTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("GoogleCloudStorageTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*GoogleCloudStorageTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *GoogleCloudStorageTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *GoogleCloudStorageTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*GoogleCloudStorageTarget) AcceptedEventTypes() []string {
@@ -48,71 +70,8 @@ func (*GoogleCloudStorageTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *GoogleCloudStorageTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
-}
-
-// GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *GoogleCloudStorageTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("GoogleCloudStorageTarget")
-}
-
-// GoogleCloudStorageCondSet is the group of possible conditions
-var GoogleCloudStorageCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *GoogleCloudStorageTargetStatus) InitializeConditions() {
-	GoogleCloudStorageCondSet.Manage(s).InitializeConditions()
-}
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionServiceReady should be marked as true or false.
-func (s *GoogleCloudStorageTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		GoogleSheetCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		GoogleCloudStorageCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	GoogleCloudStorageCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *GoogleCloudStorageTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	GoogleCloudStorageCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *GoogleCloudStorageTargetStatus) IsReady() bool {
-	return GoogleCloudStorageCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *GoogleCloudStorageTarget) GetConditionSet() apis.ConditionSet {
-	return GoogleCloudStorageCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *GoogleCloudStorageTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *GoogleCloudStorageTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }

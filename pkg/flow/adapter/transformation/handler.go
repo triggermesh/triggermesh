@@ -22,17 +22,39 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/kelseyhightower/envconfig"
 
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
-// Handler contains Pipelines for CE transformations and CloudEvents client.
-type Handler struct {
+type envConfig struct {
+	pkgadapter.EnvConfig
+
+	// Sink URL where to send cloudevents
+	Sink string `envconfig:"K_SINK"`
+
+	// Transformation specifications
+	TransformationContext string `envconfig:"TRANSFORMATION_CONTEXT"`
+	TransformationData    string `envconfig:"TRANSFORMATION_DATA"`
+}
+
+// adapter contains Pipelines for CE transformations and CloudEvents client.
+type adapter struct {
 	ContextPipeline *Pipeline
 	DataPipeline    *Pipeline
+
+	mt *pkgadapter.MetricTag
+	sr *metrics.EventProcessingStatsReporter
+
+	sink string
 
 	client cloudevents.Client
 }
@@ -43,16 +65,58 @@ type ceContext struct {
 	Extensions                  map[string]interface{} `json:"Extensions,omitempty"`
 }
 
-// NewHandler creates Handler instance.
-func NewHandler(context, data []v1alpha1.Transform) (Handler, error) {
+// NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
+func NewEnvConfig() pkgadapter.EnvConfigAccessor {
+	return &envConfig{}
+}
+
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+	var env envConfig
+	if err := envconfig.Process("", &env); err != nil {
+		log.Fatalf("Failed to process env var: %v", err)
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	trnContext, trnData := []v1alpha1.Transform{}, []v1alpha1.Transform{}
+	err := json.Unmarshal([]byte(env.TransformationContext), &trnContext)
+	if err != nil {
+		log.Fatalf("Cannot unmarshal Context Transformation variable: %v", err)
+	}
+	err = json.Unmarshal([]byte(env.TransformationData), &trnData)
+	if err != nil {
+		log.Fatalf("Cannot unmarshal Data Transformation variable: %v", err)
+	}
+
+	adapter, err := newHandler(trnContext, trnData)
+	if err != nil {
+		log.Fatalf("Cannot create transformation handler: %v", err)
+	}
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: flow.TransformationResource.String(),
+		Namespace:     env.GetNamespace(),
+		Name:          env.GetName(),
+	}
+	sr := metrics.MustNewEventProcessingStatsReporter(mt)
+
+	adapter.sr = sr
+	adapter.mt = mt
+	adapter.sink = env.Sink
+
+	return adapter
+}
+
+// newHandler creates Handler instance.
+func newHandler(context, data []v1alpha1.Transform) (*adapter, error) {
 	contextPipeline, err := newPipeline(context)
 	if err != nil {
-		return Handler{}, err
+		return nil, err
 	}
 
 	dataPipeline, err := newPipeline(data)
 	if err != nil {
-		return Handler{}, err
+		return nil, err
 	}
 
 	sharedVars := storage.New()
@@ -61,10 +125,10 @@ func NewHandler(context, data []v1alpha1.Transform) (Handler, error) {
 
 	ceClient, err := cloudevents.NewClientHTTP()
 	if err != nil {
-		return Handler{}, err
+		return nil, err
 	}
 
-	return Handler{
+	return &adapter{
 		ContextPipeline: contextPipeline,
 		DataPipeline:    dataPipeline,
 
@@ -74,31 +138,64 @@ func NewHandler(context, data []v1alpha1.Transform) (Handler, error) {
 
 // Start runs CloudEvent receiver and applies transformation Pipeline
 // on incoming events.
-func (t *Handler) Start(ctx context.Context, sink string) error {
+func (t *adapter) Start(ctx context.Context) error {
 	log.Println("Starting CloudEvent receiver")
 	var receiver interface{}
 	receiver = t.receiveAndReply
-	if sink != "" {
-		ctx = cloudevents.ContextWithTarget(ctx, sink)
+	if t.sink != "" {
+		ctx = cloudevents.ContextWithTarget(ctx, t.sink)
 		receiver = t.receiveAndSend
 	}
+
+	ctx = pkgadapter.ContextWithMetricTag(ctx, t.mt)
 
 	return t.client.StartReceiver(ctx, receiver)
 }
 
-func (t *Handler) receiveAndReply(event cloudevents.Event) (*cloudevents.Event, error) {
-	return t.applyTransformations(event)
-}
+func (t *adapter) receiveAndReply(event cloudevents.Event) (*cloudevents.Event, error) {
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
 
-func (t *Handler) receiveAndSend(ctx context.Context, event cloudevents.Event) error {
+	start := time.Now()
+	defer func() {
+		t.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
+	}()
+
 	result, err := t.applyTransformations(event)
 	if err != nil {
-		return err
+		t.sr.ReportProcessingError(false, ceTypeTag, ceSrcTag)
+	} else {
+		t.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	}
-	return t.client.Send(ctx, *result)
+
+	return result, err
 }
 
-func (t *Handler) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
+func (t *adapter) receiveAndSend(ctx context.Context, event cloudevents.Event) error {
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
+	start := time.Now()
+	defer func() {
+		t.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
+	}()
+
+	result, err := t.applyTransformations(event)
+	if err != nil {
+		t.sr.ReportProcessingError(false, ceTypeTag, ceSrcTag)
+		return err
+	}
+
+	if result := t.client.Send(ctx, *result); !cloudevents.IsACK(result) {
+		t.sr.ReportProcessingError(false, ceTypeTag, ceSrcTag)
+		return result
+	}
+
+	t.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
+	return nil
+}
+
+func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
 	// HTTPTargets sets content type from HTTP headers, i.e.:
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality

@@ -17,6 +17,8 @@ limitations under the License.
 package resource
 
 import (
+	"path"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -67,5 +69,48 @@ func ServiceAccount(sa string) ObjectOption {
 		}
 
 		*saName = sa
+	}
+}
+
+// SecretMount adds a Secret volume and a corresponding mount to a PodSpecable.
+func SecretMount(name, target, secretName, secretKey string) ObjectOption {
+	return func(object interface{}) {
+		var vols *[]corev1.Volume
+
+		switch o := object.(type) {
+		case *appsv1.Deployment:
+			vols = &o.Spec.Template.Spec.Volumes
+		case *servingv1.Service:
+			vols = &o.Spec.Template.Spec.Volumes
+		}
+
+		*vols = append(*vols, corev1.Volume{
+			Name: name,
+			VolumeSource: corev1.VolumeSource{
+				Secret: &corev1.SecretVolumeSource{
+					SecretName: secretName,
+					Items: []corev1.KeyToPath{
+						{
+							Key:  secretKey,
+							Path: path.Base(target),
+						},
+					},
+				},
+			},
+		})
+
+		var volMounts *[]corev1.VolumeMount
+
+		switch o := object.(type) {
+		case *appsv1.Deployment, *servingv1.Service:
+			volMounts = &firstContainer(o).VolumeMounts
+		}
+
+		*volMounts = append(*volMounts, corev1.VolumeMount{
+			Name:      name,
+			ReadOnly:  true,
+			MountPath: target,
+			SubPath:   path.Base(target),
+		})
 	}
 }

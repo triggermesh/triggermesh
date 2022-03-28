@@ -19,37 +19,29 @@ package confluenttarget
 import (
 	"context"
 
-	"go.uber.org/zap"
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/reconciler"
 
-	confluentv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilerconfluent "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/confluenttarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/confluenttarget"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
-// reconciler reconciles the target adapter object
-type reconciler struct {
-	logger *zap.SugaredLogger
-	ksvcr  libreconciler.KServiceReconciler
-
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
+
+	trgLister func(namespace string) listersv1alpha1.ConfluentTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilerconfluent.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *confluentv1alpha1.ConfluentTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.ConfluentTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
-
-	if adapter != nil {
-		trg.Status.PropagateKServiceAvailability(adapter)
-	} else {
-		trg.Status.MarkNoKService("ServicePending", event.Error())
-	}
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

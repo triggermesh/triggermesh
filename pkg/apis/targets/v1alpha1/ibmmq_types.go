@@ -18,9 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 )
@@ -34,17 +31,15 @@ type IBMMQTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   IBMMQTargetSpec   `json:"spec"`
-	Status IBMMQTargetStatus `json:"status,omitempty"`
+	Spec   IBMMQTargetSpec `json:"spec"`
+	Status TargetStatus    `json:"status,omitempty"`
 }
 
-// Check the interfaces IBMMQTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*IBMMQTarget)(nil)
-	_ kmeta.OwnerRefable        = (*IBMMQTarget)(nil)
+	_ Reconcilable              = (*IBMMQTarget)(nil)
 	_ targets.IntegrationTarget = (*IBMMQTarget)(nil)
 	_ targets.EventSource       = (*IBMMQTarget)(nil)
-	_ duckv1.KRShaped           = (*IBMMQTarget)(nil)
 )
 
 // IBMMQTargetSpec holds the desired state of the event target.
@@ -90,15 +85,6 @@ type TLSSpec struct {
 type Keystore struct {
 	KeyDatabase   ValueFromField `json:"keyDatabase"`
 	PasswordStash ValueFromField `json:"passwordStash"`
-}
-
-// IBMMQTargetStatus communicates the observed state of the event target. (from the controller).
-type IBMMQTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

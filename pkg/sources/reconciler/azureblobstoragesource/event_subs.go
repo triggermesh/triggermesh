@@ -64,7 +64,7 @@ func ensureEventSubscription(ctx context.Context, cli storage.EventSubscriptions
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureBlobStorageSource)
 
 	status := &typedSrc.Status
@@ -159,7 +159,7 @@ func ensureNoEventSubscription(ctx context.Context, cli storage.EventSubscriptio
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureBlobStorageSource)
 
 	stAccID := typedSrc.Spec.StorageAccountID.String()

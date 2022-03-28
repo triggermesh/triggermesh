@@ -21,7 +21,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
-// RouterStatus defines the observed state of an event source.
+// RouterStatus defines the observed state of a router.
 type RouterStatus struct {
 	duckv1.SourceStatus  `json:",inline"`
 	duckv1.AddressStatus `json:",inline"`

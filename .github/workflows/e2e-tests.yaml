@@ -30,7 +30,7 @@ jobs:
         go-version: '1.17'
 
     - name: Go caches
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cache/go-build
@@ -89,7 +89,7 @@ jobs:
         kubectl -n knative-serving wait --timeout=1m --for=condition=Complete jobs.batch/default-domain
 
     - name: Install ko
-      run: go install github.com/google/ko@v0.9.3
+      run: go install github.com/google/ko@v0.11.1
 
     - name: Deploy TriggerMesh
       env:

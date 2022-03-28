@@ -53,7 +53,7 @@ func ensureSubscription(ctx context.Context, cli servicebustopics.SubscriptionsC
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureServiceBusTopicSource)
 
 	status := &typedSrc.Status
@@ -130,7 +130,7 @@ func ensureNoSubscription(ctx context.Context, cli servicebustopics.Subscription
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := v1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureServiceBusTopicSource)
 
 	topic := typedSrc.Spec.TopicID.String()
@@ -243,7 +243,7 @@ func isDenied(err error) bool {
 // doesn't give us a lot of characters for indicating what component owns the
 // Subscription. Therefore, we compute the CRC32 checksum of the source's
 // name/namespace (8 characters) and make it part of the name.
-func subscriptionName(src v1alpha1.EventSource) string {
+func subscriptionName(src v1alpha1.Reconcilable) string {
 	nsNameChecksum := crc32.ChecksumIEEE([]byte(src.GetNamespace() + "/" + src.GetName()))
 	return "io.triggermesh.azureservicebussources-" + strconv.FormatUint(uint64(nsNameChecksum), 10)
 }

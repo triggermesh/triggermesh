@@ -44,7 +44,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, _ *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(src v1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
 	return common.NewMTAdapterKnService(src,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
@@ -52,7 +52,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, _ *apis.URL) *servin
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error) {
+func (r *Reconciler) RBACOwners(src v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
 	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
