@@ -53,7 +53,21 @@ GOPKGS_SKIP_TESTS  = $(GOMODULE)/pkg/sources/reconciler/ibmmqsource \
                      $(GOMODULE)/pkg/targets/adapter/ibmmqtarget \
                      $(GOMODULE)/pkg/sources/adapter/ibmmqsource \
                      $(GOMODULE)/cmd/ibmmqsource-adapter \
-                     $(GOMODULE)/cmd/ibmmqtarget-adapter
+                     $(GOMODULE)/cmd/ibmmqtarget-adapter \
+                     $(GOMODULE)/cmd/xslttransformation-adapter \
+                     $(GOMODULE)/pkg/flow/adapter/xslttransformation
+
+# List of packages that expect the environment to have installed
+# the dependencies for running tests:
+#
+# libxml2-dev
+#
+GOPKGS_TESTS_WITH_DEPENDENCIES  = $(GOMODULE)/cmd/xslttransformation-adapter \
+				   $(GOMODULE)/pkg/flow/adapter/xslttransformation
+
+# This environment variable should be set when dependencies have been installed
+# at the running instance.
+WITH_DEPENDENCIES          ?=
 
 LDFLAGS            = -w -s
 LDFLAGS_STATIC     = $(LDFLAGS) -extldflags=-static
@@ -96,10 +110,6 @@ $(filter-out $(CUSTOM_BUILD_BINARIES), $(COMMANDS)): ## Build artifact
 confluenttarget-adapter:
 	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS_STATIC)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
-# Not statically linked
-xslttransformation-adapter: ## Builds XML related functionality
-	CGO_ENABLED=1 $(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
-
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster
 	$(KO) resolve -f $(BASE_DIR)/config > $(BASE_DIR)/triggermesh-$(IMAGE_TAG).yaml
 	@for component in $(CUSTOM_BUILD_IMAGES); do \
@@ -134,7 +144,11 @@ release: ## Publish container images and generate release manifests
 gen-apidocs: ## Generate API docs
 	GOPATH="" OUTPUT_DIR=$(DOCS_OUTPUT_DIR) ./hack/gen-api-reference-docs.sh
 
+
 GOPKGS_LIST ?= $(filter-out $(GOPKGS_SKIP_TESTS), $(shell go list $(GOPKGS)))
+ifdef WITH_DEPENDENCIES
+	GOPKGS_LIST += $(GOPKGS_TESTS_WITH_DEPENDENCIES)
+endif
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
 
