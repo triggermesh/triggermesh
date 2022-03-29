@@ -18,186 +18,30 @@ package transformation
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"reflect"
-	"strconv"
 
-	"go.uber.org/zap"
-	apierrs "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	pkgnetwork "knative.dev/networking/pkg"
-	"knative.dev/pkg/apis"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/logging"
-	"knative.dev/pkg/network"
 	"knative.dev/pkg/reconciler"
-	"knative.dev/pkg/resolver"
-	"knative.dev/pkg/tracker"
-	"knative.dev/serving/pkg/apis/serving"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-	servingv1client "knative.dev/serving/pkg/client/clientset/versioned"
-	servingv1listers "knative.dev/serving/pkg/client/listers/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
 )
 
-const (
-	adapterName = "bumblebee"
-
-	envSink               = "K_SINK"
-	envTransformationCtx  = "TRANSFORMATION_CONTEXT"
-	envTransformationData = "TRANSFORMATION_DATA"
-
-	metricsPrometheusPortKsvc uint16 = 9092
-	envMetricsPrometheusPort         = "METRICS_PROMETHEUS_PORT"
-)
-
-// Reconciler implements addressableservicereconciler.Interface for
-// Transformation resources.
+// Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	// Tracker builds an index of what resources are watching other resources
-	// so that we can immediately react to changes tracked resources.
-	Tracker tracker.Interface
-
-	// Listers index properties about resources
-	knServiceLister  servingv1listers.ServiceLister
-	servingClientSet servingv1client.Interface
-
-	// adapter properties
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
 
-	sinkResolver *resolver.URIResolver
+	trgLister func(namespace string) listersv1alpha1.TransformationNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trn *v1alpha1.Transformation) reconciler.Event {
-	logger := logging.FromContext(ctx)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.Transformation) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	if err := r.Tracker.TrackReference(tracker.Reference{
-		APIVersion: "serving.knative.dev/v1",
-		Kind:       "Service",
-		Name:       trn.Name,
-		Namespace:  trn.Namespace,
-	}, trn); err != nil {
-		logger.Errorf("Error tracking service %s: %v", trn.Name, err)
-		return err
-	}
-
-	// Reconcile Transformation Adapter
-	ksvc, err := r.reconcileKnService(ctx, trn)
-	if err != nil {
-		logger.Error("Error reconciling Kn Service", zap.Error(err))
-		trn.Status.MarkServiceUnavailable(trn.Name)
-		return err
-	}
-
-	if ksvc.IsReady() {
-		trn.Status.Address = &duckv1.Addressable{
-			URL: &apis.URL{
-				Scheme: "http",
-				Host:   network.GetServiceHostname(trn.Name, trn.Namespace),
-			},
-		}
-		trn.Status.MarkServiceAvailable()
-	}
-	trn.Status.CloudEventAttributes = r.createCloudEventAttributes(&trn.Spec)
-
-	logger.Debug("Transformation reconciled")
-	return nil
-}
-
-func (r *Reconciler) reconcileKnService(ctx context.Context, trn *v1alpha1.Transformation) (*servingv1.Service, error) {
-	logger := logging.FromContext(ctx)
-
-	var sink string
-	if trn.Spec.Sink != (duckv1.Destination{}) {
-		uri, err := r.resolveDestination(ctx, trn)
-		if err != nil {
-			return nil, fmt.Errorf("cannot resolve Sink destination: %w", err)
-		}
-		trn.Status.SinkURI = uri
-		sink = uri.String()
-	}
-
-	trnContext, err := json.Marshal(trn.Spec.Context)
-	if err != nil {
-		return nil, fmt.Errorf("cannot marshal context transformation spec: %w", err)
-	}
-
-	trnData, err := json.Marshal(trn.Spec.Data)
-	if err != nil {
-		return nil, fmt.Errorf("cannot marshal data transformation spec: %w", err)
-	}
-
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, trn.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(trn, genericLabels)
-	envSvc := libreconciler.MakeServiceEnv(trn.Name, trn.Namespace)
-	ksvcLabels[pkgnetwork.VisibilityLabelKey] = serving.VisibilityClusterLocal
-
-	expectedKsvc := resources.MakeKService(trn.Namespace, trn.Name, r.adapterCfg.Image,
-		resources.KsvcPodEnvVars(append(r.adapterCfg.configs.ToEnvVars(), envSvc...)),
-		resources.EnvVar(envTransformationCtx, string(trnContext)),
-		resources.EnvVar(envTransformationData, string(trnData)),
-		resources.EnvVar(envSink, sink),
-		resources.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcOwner(trn),
-	)
-
-	ksvc, err := r.knServiceLister.Services(trn.Namespace).Get(trn.Name)
-	if apierrs.IsNotFound(err) {
-		logger.Infof("Creating Kn Service %q", trn.Name)
-		return r.servingClientSet.ServingV1().Services(trn.Namespace).Create(ctx, expectedKsvc, v1.CreateOptions{})
-	} else if err != nil {
-		return nil, err
-	}
-
-	if !reflect.DeepEqual(ksvc.Spec.ConfigurationSpec.Template.Spec,
-		expectedKsvc.Spec.ConfigurationSpec.Template.Spec) {
-		ksvc.Spec = expectedKsvc.Spec
-		return r.servingClientSet.ServingV1().Services(trn.Namespace).Update(ctx, ksvc, v1.UpdateOptions{})
-	}
-	return ksvc, nil
-}
-
-func (r *Reconciler) createCloudEventAttributes(ts *v1alpha1.TransformationSpec) []duckv1.CloudEventAttributes {
-	ceAttributes := make([]duckv1.CloudEventAttributes, 0)
-	for _, item := range ts.Context {
-		if item.Operation == "add" {
-			attribute := duckv1.CloudEventAttributes{}
-			for _, path := range item.Paths {
-				switch path.Key {
-				case "type":
-					attribute.Type = path.Value
-				case "source":
-					attribute.Source = path.Value
-				}
-			}
-			if attribute.Source != "" || attribute.Type != "" {
-				ceAttributes = append(ceAttributes, attribute)
-			}
-			break
-		}
-	}
-	return ceAttributes
-}
-
-func (r *Reconciler) resolveDestination(ctx context.Context, trn *v1alpha1.Transformation) (*apis.URL, error) {
-	dest := trn.Spec.Sink.DeepCopy()
-	if dest.Ref != nil {
-		if dest.Ref.Namespace == "" {
-			dest.Ref.Namespace = trn.GetNamespace()
-		}
-	}
-	return r.sinkResolver.URIFromDestinationV1(ctx, *dest, trn)
+	return r.base.ReconcileAdapter(ctx, r)
 }

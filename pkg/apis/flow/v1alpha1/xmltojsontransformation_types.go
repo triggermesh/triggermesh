@@ -17,11 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	runtime "k8s.io/apimachinery/pkg/runtime"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -30,24 +27,16 @@ import (
 
 // XMLToJSONTransformation is the schema for the event transformer.
 type XMLToJSONTransformation struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the XMLToJSONTransformation (from the client).
-	// +optional
-	Spec XMLToJSONTransformationSpec `json:"spec,omitempty"`
-
-	// Status communicates the observed state of the XMLToJSONTransformation (from the controller).
-	// +optional
-	Status XMLToJSONTransformationStatus `json:"status,omitempty"`
+	Spec   XMLToJSONTransformationSpec `json:"spec,omitempty"`
+	Status TargetStatus                `json:"status,omitempty"`
 }
 
 var (
-	_ runtime.Object     = (*XMLToJSONTransformation)(nil)
-	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
-	_ duckv1.KRShaped    = (*XMLToJSONTransformation)(nil)
-	_ kmeta.OwnerRefable = (*XMLToJSONTransformation)(nil)
+	_ Reconcilable = (*XMLToJSONTransformation)(nil)
+	_ EventSender  = (*XMLToJSONTransformation)(nil)
 )
 
 // XMLToJSONTransformationSpec holds the desired state of the XMLToJSONTransformation (from the client).
@@ -55,28 +44,8 @@ type XMLToJSONTransformationSpec struct {
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
-	// Sink is a reference to an object that will resolve to a uri to use as the sink.
-	// +optional
-	Sink *duckv1.Destination `json:"sink,omitempty"`
-}
-
-// EventOptions modifies CloudEvents management at Targets.
-type EventOptions struct {
-	// PayloadPolicy indicates if replies from the target should include
-	// a payload if available. Possible values are:
-	//
-	// - always: will return a with the reply payload if avaliable.
-	// - errors: will only reply with payload in case of an error.
-	// - never: will not reply with payload.
-	//
-	// +optional
-	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
-}
-
-// XMLToJSONTransformationStatus communicates the observed state of the XMLToJSONTransformation (from the controller).
-type XMLToJSONTransformationStatus struct {
-	duckv1.SourceStatus  `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
+	// Support sending to an event sink instead of replying.
+	duckv1.SourceSpec `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

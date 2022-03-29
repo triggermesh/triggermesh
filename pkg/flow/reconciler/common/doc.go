@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,13 +14,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package resources
-
-// Common environment variables propagated to adapters.
-const (
-	EnvName          = "NAME"
-	EnvNamespace     = "NAMESPACE"
-	EnvMetricsDomain = "METRICS_DOMAIN"
-
-	DefaultMetricsDomain = "triggermesh.io/flow"
-)
+// Package common contains reconciliation helpers shared between target reconcilers.
+package common

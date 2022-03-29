@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,5 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package reconciler contains constants shared by reconcilers.
-package reconciler
+package common
+
+// Common environment variables propagated to adapters.
+const (
+	EnvName      = "NAME"
+	EnvNamespace = "NAMESPACE"
+
+	envSink                  = "K_SINK"
+	envComponent             = "K_COMPONENT"
+	envMetricsPrometheusPort = "METRICS_PROMETHEUS_PORT"
+)

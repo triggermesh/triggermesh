@@ -35,6 +35,10 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
 
+// TCP port used to expose metrics via the Prometheus metrics exporter in
+// components backed by a Knative Service.
+// It is necessary to override Knative's default value of "9090" because this
+// port is already reserved by the "queue-proxy" container in Knative Services.
 const metricsPrometheusPortKsvc uint16 = 9092
 
 // ComponentName returns the component name for the given object.

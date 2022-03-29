@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,17 +17,9 @@ limitations under the License.
 package testing
 
 import (
-	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-// Eventf returns the attributes of an API event in the format returned by
-// Kubernetes' FakeRecorder.
-func Eventf(eventtype, reason, messageFmt string, args ...interface{}) string {
-	return fmt.Sprintf(eventtype+" "+reason+" "+messageFmt, args...)
-}
 
 // NewConfigMap returns a ConfigMap object.
 func NewConfigMap(name string, data map[string]string) *corev1.ConfigMap {

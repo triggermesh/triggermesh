@@ -18,61 +18,30 @@ package xslttransformation
 
 import (
 	"context"
-	"fmt"
 
-	"knative.dev/pkg/apis"
-	"knative.dev/pkg/controller"
-	pkgreconciler "knative.dev/pkg/reconciler"
-	"knative.dev/pkg/resolver"
+	"knative.dev/pkg/reconciler"
 
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xslttransformation"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
 )
 
-// Reconciler implements controller.Reconciler for the component type.
-type reconciler struct {
-	// adapter properties
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
 
-	// Knative Service reconciler
-	ksvcr libreconciler.KServiceReconciler
-
-	sinkResolver *resolver.URIResolver
+	trgLister func(namespace string) listersv1alpha1.XSLTTransformationNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.XSLTTransformation) pkgreconciler.Event {
-	var url *apis.URL
-	if o.Spec.Sink != nil {
-		var err error
-		url, err = r.resolveDestination(ctx, o)
-		if err != nil {
-			return fmt.Errorf("cannot resolve Sink destination: %w", err)
-		}
-	}
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XSLTTransformation) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	ksvc, err := makeAdapterKService(o, r.adapterCfg, url)
-	if err != nil {
-		o.Status.MarkNotDeployed(v1alpha1.XSLTTransformationReasonWrongSpec, "Cannot create adapter from spec")
-		return controller.NewPermanentError(fmt.Errorf("could not make the desired knative service adapter based on the spec: %w", err))
-	}
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, o, ksvc)
-	o.Status.PropagateAvailability(adapter)
-
-	return event
-}
-
-func (r *reconciler) resolveDestination(ctx context.Context, s *v1alpha1.XSLTTransformation) (*apis.URL, error) {
-	dest := s.Spec.Sink.DeepCopy()
-	if dest.Ref != nil {
-		if dest.Ref.Namespace == "" {
-			dest.Ref.Namespace = s.GetNamespace()
-		}
-	}
-	return r.sinkResolver.URIFromDestinationV1(ctx, *dest, s)
+	return r.base.ReconcileAdapter(ctx, r)
 }

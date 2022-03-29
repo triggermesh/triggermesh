@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,6 +36,10 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common/resource"
 )
 
+// TCP port used to expose metrics via the Prometheus metrics exporter in
+// components backed by a Knative Service.
+// It is necessary to override Knative's default value of "9090" because this
+// port is already reserved by the "queue-proxy" container in Knative Services.
 const metricsPrometheusPortKsvc uint16 = 9092
 
 // ComponentName returns the component name for the given object.

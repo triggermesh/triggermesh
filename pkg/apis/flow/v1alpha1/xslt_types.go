@@ -18,11 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -34,21 +32,17 @@ type XSLTTransformation struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the XSLTTransformation object.
-	Spec XSLTTransformationSpec `json:"spec"`
-
-	// Status communicates the observed state of the XSLTTransformation object.
-	// +optional
-	Status XSLTTransformationStatus `json:"status,omitempty"`
+	Spec   XSLTTransformationSpec `json:"spec"`
+	Status TargetStatus           `json:"status,omitempty"`
 }
 
 // Check the interfaces XSLTTransformation should be implementing.
 var (
-	_ runtime.Object     = (*XSLTTransformation)(nil)
-	_ kmeta.OwnerRefable = (*XSLTTransformation)(nil)
-	_ duckv1.KRShaped    = (*XSLTTransformation)(nil)
-	_ apis.Validatable   = (*XSLTTransformation)(nil)
-	_ apis.Defaultable   = (*XSLTTransformation)(nil)
+	_ apis.Validatable = (*XSLTTransformation)(nil)
+	_ apis.Defaultable = (*XSLTTransformation)(nil)
+
+	_ Reconcilable = (*XSLTTransformation)(nil)
+	_ EventSender  = (*XSLTTransformation)(nil)
 )
 
 // XSLTTransformationSpec holds the desired state of the XSLTTransformation.
@@ -62,18 +56,8 @@ type XSLTTransformationSpec struct {
 	// +optional
 	AllowPerEventXSLT *bool `json:"allowPerEventXSLT,omitempty"`
 
-	// Sink is a reference to an object that will resolve to a uri to use as the sink.
-	// +optional
-	Sink *duckv1.Destination `json:"sink,omitempty"`
-}
-
-// XSLTTransformationStatus communicates the observed state of the component.
-type XSLTTransformationStatus struct {
-	// Although this is not a source, it is a CloudEvents producing entity.
-	duckv1.SourceStatus `json:",inline"`
-	// AddressStatus fulfills the Addressable contract.
-	// +optional
-	duckv1.AddressStatus `json:",inline"`
+	// Support sending to an event sink instead of replying.
+	duckv1.SourceSpec `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

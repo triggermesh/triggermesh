@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	corev1 "k8s.io/api/core/v1"
-)
+import corev1 "k8s.io/api/core/v1"
 
 var (
 	tValue = "test-value"
@@ -41,7 +39,7 @@ func valueFromField(opts ...valueFromFieldOptions) *ValueFromField {
 
 func vffWithValue(value string) valueFromFieldOptions {
 	return func(vff *ValueFromField) {
-		vff.Value = &value
+		vff.Value = value
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,12 +36,12 @@ import (
 // DeepDerivative comparisons to work as expected.
 var Semantic = conversion.EqualitiesOrDie(
 	deploymentEqual,
-	serviceEqual,
 	knServiceEqual,
+	serviceAccountEqual,
 )
 
 // eq is an instance of Equalities for internal deep derivative comparisons
-// of API objects. Adapted from "k8s.io/apimachinery/equality".Semantic.
+// of API objects. Adapted from "k8s.io/apimachinery/pkg/api/equality".Semantic.
 var eq = conversion.EqualitiesOrDie(
 	func(a, b resource.Quantity) bool {
 		if a.IsZero() {
@@ -61,30 +61,38 @@ var eq = conversion.EqualitiesOrDie(
 		}
 		return a == b
 	},
+	// Needed because DeepDerivative compares int values directly, which
+	// doesn't yield the expected result with defaulted int32 probe fields.
+	func(a, b *corev1.Probe) bool {
+		if a == nil {
+			return true
+		}
+		if b == nil {
+			return false
+		}
+
+		if a.InitialDelaySeconds != 0 && a.InitialDelaySeconds != b.InitialDelaySeconds {
+			return false
+		}
+		if a.TimeoutSeconds != 0 && a.TimeoutSeconds != b.TimeoutSeconds {
+			return false
+		}
+		if a.PeriodSeconds != 0 && a.PeriodSeconds != b.PeriodSeconds {
+			return false
+		}
+		if a.SuccessThreshold != 0 && a.SuccessThreshold != b.SuccessThreshold {
+			return false
+		}
+		if a.FailureThreshold != 0 && a.FailureThreshold != b.FailureThreshold {
+			return false
+		}
+
+		return (conversion.Equalities{}).DeepDerivative(a.Handler, b.Handler)
+	},
 )
 
 // deploymentEqual returns whether two Deployments are semantically equivalent.
 func deploymentEqual(a, b *appsv1.Deployment) bool {
-	if a == b {
-		return true
-	}
-	if a == nil || b == nil {
-		return false
-	}
-
-	if !eq.DeepDerivative(&a.ObjectMeta, &b.ObjectMeta) {
-		return false
-	}
-
-	if !eq.DeepDerivative(&a.Spec, &b.Spec) {
-		return false
-	}
-
-	return true
-}
-
-// serviceEqual returns whether two Services are semantically equivalent.
-func serviceEqual(a, b *corev1.Service) bool {
 	if a == b {
 		return true
 	}
@@ -117,6 +125,32 @@ func knServiceEqual(a, b *servingv1.Service) bool {
 	}
 
 	if !eq.DeepDerivative(&a.Spec.Template, &b.Spec.Template) {
+		return false
+	}
+
+	return true
+}
+
+// serviceAccountEqual returns whether two ServiceAccounts are semantically equivalent.
+func serviceAccountEqual(a, b *corev1.ServiceAccount) bool {
+	if a == b {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+
+	if !eq.DeepDerivative(&a.ObjectMeta, &b.ObjectMeta) {
+		return false
+	}
+
+	if !eq.DeepDerivative(&a.Secrets, &b.Secrets) {
+		return false
+	}
+	if !eq.DeepDerivative(&a.ImagePullSecrets, &b.ImagePullSecrets) {
+		return false
+	}
+	if !eq.DeepDerivative(&a.AutomountServiceAccountToken, &b.AutomountServiceAccountToken) {
 		return false
 	}
 
