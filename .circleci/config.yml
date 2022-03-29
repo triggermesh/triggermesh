@@ -38,7 +38,7 @@ jobs:
       - run:
           # XSLTTransformation needs libxml2.
           name: Install libxml2
-          command: sudo apt-get update && sudo apt-get install -y libxml2-dev
+          command: sudo apt-get update && sudo apt install -y libxml2-dev libxslt1-dev liblzma-dev zlib1g-dev
       - run:
           name: Run test/cover
           command: WITH_DEPENDENCIES=true make cover
