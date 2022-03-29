@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 
 	"go.uber.org/zap"
@@ -52,6 +53,8 @@ const (
 	klrEntrypoint       = "/opt/aws-custom-runtime"
 	functionNameLabel   = "extensions.triggermesh.io/function"
 	ceDefaultTypePrefix = "io.triggermesh.function."
+
+	metricsPrometheusPortKsvc uint16 = 9092
 )
 
 // Reconciler implements addressableservicereconciler.Interface for
@@ -228,6 +231,10 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 		resources.KnSvcImage(image),
 		resources.KnSvcMountCm(cm.Name, filename),
 		resources.KnSvcEntrypoint(klrEntrypoint),
+		resources.KnSvcEnvVar(resources.EnvName, f.Name),
+		resources.KnSvcEnvVar(resources.EnvNamespace, f.Namespace),
+		resources.KnSvcEnvVar(resources.EnvComponent, adapterName),
+		resources.KnSvcEnvVar(resources.EnvMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
 		resources.KnSvcEnvVar(eventStoreEnv, f.Spec.EventStore.URI),
 		resources.KnSvcEnvVar("K_SINK", sink.String()),
 		resources.KnSvcEnvVar("_HANDLER", handler),
