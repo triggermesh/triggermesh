@@ -87,6 +87,11 @@ func (l *Listers) GetServingObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakeservingclient.AddToScheme)
 }
 
+// GetDataWeaveTransformationLister returns a Lister for DataWeaveTransformation objects.
+func (l *Listers) GetDataWeaveTransformationLister() flowlisters.DataWeaveTransformationLister {
+	return flowlisters.NewDataWeaveTransformationLister(l.IndexerFor(&flowv1alpha1.DataWeaveTransformation{}))
+}
+
 // GetXSLTTransformationLister returns a Lister for XSLTTransformation objects.
 func (l *Listers) GetXSLTTransformationLister() flowlisters.XSLTTransformationLister {
 	return flowlisters.NewXSLTTransformationLister(l.IndexerFor(&flowv1alpha1.XSLTTransformation{}))

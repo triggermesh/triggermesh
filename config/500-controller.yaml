@@ -191,6 +191,8 @@ spec:
         - name: TEKTON_REAPING_INTERVAL
           value: 2m
         # Custom build adapters
+        - name: DATAWEAVETRANSFORMATION_IMAGE
+          value: gcr.io/triggermesh/dataweavetransformation-adapter:latest
         - name: IBMMQSOURCE_ADAPTER_IMAGE
           value: gcr.io/triggermesh/ibmmqsource-adapter:latest
         - name: IBMMQTARGET_ADAPTER_IMAGE
