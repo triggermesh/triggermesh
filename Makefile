@@ -57,6 +57,18 @@ GOPKGS_SKIP_TESTS  = $(GOMODULE)/pkg/sources/reconciler/ibmmqsource \
                      $(GOMODULE)/cmd/xslttransformation-adapter \
                      $(GOMODULE)/pkg/flow/adapter/xslttransformation
 
+# List of packages that expect the environment to have installed
+# the dependencies for running tests:
+#
+# libxml2-dev
+#
+GOPKGS_TESTS_WITH_DEPENDENCIES  = $(GOMODULE)/cmd/xslttransformation-adapter \
+				   $(GOMODULE)/pkg/flow/adapter/xslttransformation
+
+# This environment variable should be set when dependencies have been installed
+# at the running instance.
+WITH_DEPENDENCIES          ?=
+
 LDFLAGS            = -w -s
 LDFLAGS_STATIC     = $(LDFLAGS) -extldflags=-static
 
@@ -132,7 +144,11 @@ release: ## Publish container images and generate release manifests
 gen-apidocs: ## Generate API docs
 	GOPATH="" OUTPUT_DIR=$(DOCS_OUTPUT_DIR) ./hack/gen-api-reference-docs.sh
 
+
 GOPKGS_LIST ?= $(filter-out $(GOPKGS_SKIP_TESTS), $(shell go list $(GOPKGS)))
+ifdef WITH_DEPENDENCIES
+	GOPKGS_LIST += $(GOPKGS_TESTS_WITH_DEPENDENCIES)
+endif
 test: install-gotestsum ## Run unit tests
 	@mkdir -p $(TEST_OUTPUT_DIR)
 

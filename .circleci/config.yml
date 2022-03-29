@@ -41,7 +41,7 @@ jobs:
           command: sudo apt-get update && sudo apt-get install -y libxml2-dev
       - run:
           name: Run test/cover
-          command: make cover
+          command: WITH_DEPENDENCIES=true make cover
           environment:
             TEST_OUTPUT_DIR: /tmp/test-results/
             COVER_OUTPUT_DIR: /tmp/cover-results/
