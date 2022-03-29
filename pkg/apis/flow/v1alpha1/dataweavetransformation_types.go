@@ -33,12 +33,8 @@ type DataWeaveTransformation struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the DataWeaveTransformation object.
-	Spec DataWeaveTransformationSpec `json:"spec"`
-
-	// Status communicates the observed state of the DataWeaveTransformation object.
-	// +optional
-	Status DataWeaveTransformationStatus `json:"status,omitempty"`
+	Spec   DataWeaveTransformationSpec `json:"spec"`
+	Status TargetStatus                `json:"status,omitempty"`
 }
 
 // Check the interfaces DataWeaveTransformation should be implementing.
@@ -60,18 +56,8 @@ type DataWeaveTransformationSpec struct {
 	// Content type for transformation Output.
 	OutputContentType string `json:"output_content_type"`
 
-	// Sink is a reference to an object that will resolve to a uri to use as the sink.
-	// +optional
-	Sink *duckv1.Destination `json:"sink,omitempty"`
-}
-
-// DataWeaveTransformationStatus communicates the observed state of the component.
-type DataWeaveTransformationStatus struct {
-	// Although this is not a source, it is a CloudEvents producing entity.
-	duckv1.SourceStatus `json:",inline"`
-	// AddressStatus fulfills the Addressable contract.
-	// +optional
-	duckv1.AddressStatus `json:",inline"`
+	// Support sending to an event sink instead of replying.
+	duckv1.SourceSpec `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
