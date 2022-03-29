@@ -18,11 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	"knative.dev/pkg/apis"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -34,15 +31,13 @@ type SplunkTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SplunkTargetSpec   `json:"spec,omitempty"`
-	Status SplunkTargetStatus `json:"status,omitempty"`
+	Spec   SplunkTargetSpec `json:"spec,omitempty"`
+	Status TargetStatus     `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*SplunkTarget)(nil)
-	_ kmeta.OwnerRefable = (*SplunkTarget)(nil)
-	_ duckv1.KRShaped    = (*SplunkTarget)(nil)
+	_ Reconcilable = (*SplunkTarget)(nil)
 )
 
 // SplunkTargetSpec defines the desired state of the event target.
@@ -63,12 +58,6 @@ type SplunkTargetSpec struct {
 	// chain and host name when communicating over TLS.
 	// +optional
 	SkipTLSVerify *bool `json:"skipTLSVerify,omitempty"`
-}
-
-// SplunkTargetStatus defines the observed state of the event target.
-type SplunkTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

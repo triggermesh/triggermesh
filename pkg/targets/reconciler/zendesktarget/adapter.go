@@ -17,18 +17,19 @@ limitations under the License.
 package zendesktarget
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-)
 
-const adapterName = "zendesktarget"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
+)
 
 // adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
@@ -36,51 +37,52 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"ZENDESK_ADAPTER_IMAGE" default:"gcr.io/triggermesh/zendesktarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/zendesktarget-adapter"`
 }
 
-// TargetAdapterArgs are the arguments needed to create a Target Adapter.
-// Every field is required.
-type TargetAdapterArgs struct {
-	Image  string
-	Target *v1alpha1.ZendeskTarget
-}
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.ZendeskTarget, cfg *adapterConfig) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(&target.Spec)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.ZendeskTarget)
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	)
 }
 
-func makeAppEnv(spec *v1alpha1.ZendeskTargetSpec) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.ZendeskTarget) []corev1.EnvVar {
 	return []corev1.EnvVar{{
 		Name: "TOKEN",
 		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: spec.Token.SecretKeyRef,
+			SecretKeyRef: o.Spec.Token.SecretKeyRef,
 		},
 	}, {
 		Name:  "EMAIL",
-		Value: spec.Email,
+		Value: o.Spec.Email,
 	}, {
 		Name:  "SUBJECT",
-		Value: spec.Subject,
+		Value: o.Spec.Subject,
 	}, {
 		Name:  "SUBDOMAIN",
-		Value: spec.Subdomain,
+		Value: o.Spec.Subdomain,
 	}}
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

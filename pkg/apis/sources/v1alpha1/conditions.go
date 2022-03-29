@@ -40,7 +40,7 @@ const (
 	// ReasonRBACNotBound is set on a Deployed condition when an adapter's
 	// ServiceAccount cannot be bound.
 	ReasonRBACNotBound = "RBACNotBound"
-	// ReasonUnavailable is set on a Deployed condition when an adapter in unavailable.
+	// ReasonUnavailable is set on a Deployed condition when an adapter is unavailable.
 	ReasonUnavailable = "AdapterUnavailable"
 
 	// ReasonFailedSync is set on a status condition when some external resource can not be reconciled.

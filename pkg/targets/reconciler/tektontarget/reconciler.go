@@ -18,65 +18,30 @@ package tektontarget
 
 import (
 	"context"
-	"fmt"
 
-	"go.uber.org/zap"
-
-	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	rbacclientv1 "k8s.io/client-go/kubernetes/typed/rbac/v1"
-	corelistersv1 "k8s.io/client-go/listers/core/v1"
-	rbaclistersv1 "k8s.io/client-go/listers/rbac/v1"
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/reconciler"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/tektontarget"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/tektontarget"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
 )
 
-// reconciler reconciles the target adapter object
-type reconciler struct {
-	logger *zap.SugaredLogger
-	ksvcr  libreconciler.KServiceReconciler
-	vg     libreconciler.ValueGetter
-
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
 
-	// API clients
-	saClient func(namespace string) coreclientv1.ServiceAccountInterface
-	rbClient func(namespace string) rbacclientv1.RoleBindingInterface
-	// objects listers
-	targetLister func(namespace string) listersv1alpha1.TektonTargetNamespaceLister
-	saLister     func(namespace string) corelistersv1.ServiceAccountNamespaceLister
-	rbLister     func(namespace string) rbaclistersv1.RoleBindingNamespaceLister
+	trgLister func(namespace string) listersv1alpha1.TektonTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilers.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.TektonTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.TektonTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	if err := r.reconcileServiceAccounts(ctx, trg.Namespace); err != nil {
-		return fmt.Errorf("reconciling adapter ServiceAccount: %w", err)
-	}
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
-
-	if adapter != nil && adapter.Status.Address != nil {
-		trg.Status.PropagateKServiceAvailability(adapter)
-	} else {
-		eventErr := ""
-		if event != nil {
-			eventErr = event.Error()
-		}
-		trg.Status.MarkNoKService("ServicePending", eventErr)
-	}
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

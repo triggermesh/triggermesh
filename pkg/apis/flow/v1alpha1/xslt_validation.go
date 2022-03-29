@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import (
 )
 
 // Validate implements apis.Validatable
-func (o *XSLTTransformation) Validate(ctx context.Context) *apis.FieldError {
-	return o.Spec.Validate(ctx).ViaField("spec")
+func (t *XSLTTransformation) Validate(ctx context.Context) *apis.FieldError {
+	return t.Spec.Validate(ctx).ViaField("spec")
 }
 
 // Validate XSLT spec

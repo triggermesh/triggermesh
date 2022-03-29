@@ -18,22 +18,8 @@ package v1alpha1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
-
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-)
-
-// Reasons for status conditions
-const (
-	// XSLTTransformationReasonWrongSpec is set when an adapter cannot be built from the spec.
-	XSLTTransformationReasonWrongSpec = "WrongSpec"
-)
-
-const (
-	// ConditionReady is set when the runtime resources for the component
-	// are ready to be used.
-	XSLTTransformationConditionReady = apis.ConditionReady
 )
 
 // Managed event types
@@ -41,59 +27,33 @@ const (
 	EventTypeXSLTTransformation = "io.triggermesh.xslt.transform"
 )
 
-// GetGroupVersionKind returns the GroupVersionKind.
+// GetGroupVersionKind implements kmeta.OwnerRefable.
 func (*XSLTTransformation) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("XSLTTransformation")
 }
 
-var xsltTransformrCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (*XSLTTransformation) GetConditionSet() apis.ConditionSet {
-	return xsltTransformrCondSet
+// GetConditionSet implements duckv1.KRShaped.
+func (t *XSLTTransformation) GetConditionSet() apis.ConditionSet {
+	if t.Spec.Sink.Ref != nil || t.Spec.Sink.URI != nil {
+		return eventSenderConditionSet
+	}
+	return targetConditionSet
 }
 
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (o *XSLTTransformation) GetStatus() *duckv1.Status {
-	return &o.Status.Status
+// GetStatus implements duckv1.KRShaped.
+func (t *XSLTTransformation) GetStatus() *duckv1.Status {
+	return &t.Status.Status
 }
 
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *XSLTTransformationStatus) InitializeConditions() {
-	xsltTransformrCondSet.Manage(s).InitializeConditions()
+// GetStatusManager implements Reconcilable.
+func (t *XSLTTransformation) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
 }
 
-// PropagateAvailability uses the readiness of the provided Knative Service to
-// determine whether the Deployed condition should be marked as true or false.
-func (s *XSLTTransformationStatus) PropagateAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		xsltTransformrCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		xsltTransformrCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	s.MarkNotDeployed(ReasonUnavailable, msg)
-}
-
-// MarkNotDeployed sets the condition that the service has not been deployed.
-func (s *XSLTTransformationStatus) MarkNotDeployed(reason, messageFormat string, messageA ...interface{}) {
-	xsltTransformrCondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
+// GetSink implements EventSender.
+func (t *XSLTTransformation) GetSink() *duckv1.Destination {
+	return &t.Spec.Sink
 }

@@ -16,13 +16,7 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
-)
+import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // +genclient
 // +genreconciler
@@ -33,18 +27,13 @@ type AWSEventBridgeTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the AWSEventBridgeTarget (from the client).
-	Spec AWSEventBridgeTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the AWSEventBridgeTarget (from the controller).
-	Status AWSTargetStatus `json:"status,omitempty"`
+	Spec   AWSEventBridgeTargetSpec `json:"spec"`
+	Status TargetStatus             `json:"status,omitempty"`
 }
 
-// Check the interfaces AWSEventBridgeTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*AWSEventBridgeTarget)(nil)
-	_ kmeta.OwnerRefable = (*AWSEventBridgeTarget)(nil)
-	_ duckv1.KRShaped    = (*AWSEventBridgeTarget)(nil)
+	_ Reconcilable = (*AWSEventBridgeTarget)(nil)
 )
 
 // AWSEventBridgeTargetSpec holds the desired state of the event target.

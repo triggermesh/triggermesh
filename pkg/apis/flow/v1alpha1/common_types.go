@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,12 @@ package v1alpha1
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
+
+/* Provide common structs that are used by the targets such as secret definitions */
 
 // ValueFromField is a struct field that can have its value either defined
 // explicitly or sourced from another entity.
@@ -27,11 +32,41 @@ type ValueFromField struct {
 
 	// Field value.
 	// +optional
-	Value *string `json:"value,omitempty"`
+	Value string `json:"value,omitempty"`
 	// Field value from a Kubernetes Secret.
 	// +optional
 	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
 	// Field value from a Kubernetes ConfigMap.
 	// +optional
 	ValueFromConfigMap *corev1.ConfigMapKeySelector `json:"valueFromConfigMap,omitempty"`
+}
+
+// TargetStatus defines the observed state of an event target.
+type TargetStatus struct {
+	duckv1.SourceStatus  `json:",inline"`
+	duckv1.AddressStatus `json:",inline"`
+
+	// Accepted CloudEvent attributes
+	CloudEventStatus `json:",inline"`
+}
+
+// CloudEventStatus contains attributes that target types can embed to declare
+// the event types they accept.
+type CloudEventStatus struct {
+	// AcceptedEventTypes are the CloudEvent types that a target can process.
+	// +optional
+	AcceptedEventTypes []string `json:"acceptedEventTypes,omitempty"`
+}
+
+// EventOptions modifies CloudEvents management at Targets.
+type EventOptions struct {
+	// PayloadPolicy indicates if replies from the target should include
+	// a payload if available. Possible values are:
+	//
+	// - always: will return a with the reply payload if avaliable.
+	// - errors: will only reply with payload in case of an error.
+	// - never: will not reply with payload.
+	//
+	// +optional
+	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
 }

@@ -26,7 +26,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	Credentials string `envconfig:"GOOGLE_STORAGE_CREDENTIALS_JSON" required:"true"`
+	Credentials string `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
 
 	BucketName string `envconfig:"GOOGLE_STORAGE_BUCKET_NAME" required:"true"`
 

@@ -17,11 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -33,15 +30,14 @@ type JiraTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   JiraTargetSpec   `json:"spec"`
-	Status JiraTargetStatus `json:"status,omitempty"`
+	Spec   JiraTargetSpec `json:"spec"`
+	Status TargetStatus   `json:"status,omitempty"`
 }
 
-// Check the interfaces JiraTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*JiraTarget)(nil)
-	_ kmeta.OwnerRefable = (*JiraTarget)(nil)
-	_ duckv1.KRShaped    = (*JiraTarget)(nil)
+	_ Reconcilable        = (*JiraTarget)(nil)
+	_ targets.EventSource = (*JiraTarget)(nil)
 )
 
 // JiraTargetSpec holds the desired state of the JiraTarget.
@@ -59,12 +55,6 @@ type JiraAuth struct {
 	User string `json:"user"`
 	// Jira API token bound to the user.
 	Token SecretValueFromSource `json:"token"`
-}
-
-// JiraTargetStatus communicates the observed state of the JiraTarget (from the controller).
-type JiraTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

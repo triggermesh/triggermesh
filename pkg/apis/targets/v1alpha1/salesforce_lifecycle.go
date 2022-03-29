@@ -23,7 +23,6 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // Managed event types
@@ -31,6 +30,29 @@ const (
 	EventTypeSalesforceAPICall         = "io.triggermesh.salesforce.apicall"
 	EventTypeSalesforceAPICallResponse = "io.triggermesh.salesforce.apicall.response"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*SalesforceTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("SalesforceTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*SalesforceTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *SalesforceTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *SalesforceTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*SalesforceTarget) AcceptedEventTypes() []string {
@@ -46,60 +68,8 @@ func (*SalesforceTarget) GetEventTypes() []string {
 	}
 }
 
-// GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *SalesforceTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("SalesforceTarget")
-}
-
-// AsEventSource implements targets.EventSource.
-func (s *SalesforceTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
-}
-
-var salesforceCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *SalesforceTargetStatus) InitializeConditions() {
-	salesforceCondSet.Manage(s).InitializeConditions()
-}
-
-// PropagateAvailability uses the readiness of the provided Knative Service to
-// determine whether the Deployed condition should be marked as true or false.
-func (s *SalesforceTargetStatus) PropagateAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		salesforceCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		salesforceCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	salesforceCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *SalesforceTarget) GetConditionSet() apis.ConditionSet {
-	return salesforceCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *SalesforceTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *SalesforceTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }

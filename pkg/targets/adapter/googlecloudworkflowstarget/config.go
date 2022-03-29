@@ -28,7 +28,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	Credentials string `envconfig:"GOOGLE_WORKFLOWS_CREDENTIALS_JSON" required:"true"`
+	Credentials string `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
 
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`

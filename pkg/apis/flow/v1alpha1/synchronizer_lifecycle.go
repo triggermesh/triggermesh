@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,83 +21,35 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *Synchronizer) GetGroupVersionKind() schema.GroupVersionKind {
+func (*Synchronizer) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("Synchronizer")
 }
 
-// SynchronizerCondSet is the group of possible conditions
-var SynchronizerCondSet = apis.NewLivingConditionSet(
-	ConditionSinkProvided,
-	ConditionDeployed,
-)
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionDeployed should be marked as true or false.
-func (s *SynchronizerStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		SynchronizerCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
+// GetConditionSet implements duckv1.KRShaped.
+func (t *Synchronizer) GetConditionSet() apis.ConditionSet {
+	if t.Spec.Sink.Ref != nil || t.Spec.Sink.URI != nil {
+		return eventSenderConditionSet
 	}
+	return targetConditionSet
+}
 
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
+// GetStatus implements duckv1.KRShaped.
+func (t *Synchronizer) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *Synchronizer) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
 	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		SynchronizerCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	SynchronizerCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
-
 }
 
-// MarkSink sets the SinkProvided condition to True using the given URI.
-func (s *SynchronizerStatus) MarkSink(uri *apis.URL) {
-	s.SinkURI = uri
-	if uri == nil {
-		SynchronizerCondSet.Manage(s).MarkFalse(ConditionSinkProvided,
-			ReasonSinkEmpty, "The sink has no URI")
-		return
-	}
-	SynchronizerCondSet.Manage(s).MarkTrue(ConditionSinkProvided)
-}
-
-// MarkNoSink sets the SinkProvided condition to False.
-func (s *SynchronizerStatus) MarkNoSink() {
-	s.SinkURI = nil
-	SynchronizerCondSet.Manage(s).MarkFalse(ConditionSinkProvided,
-		ReasonSinkNotFound, "The sink does not exist or its URI is not set")
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *SynchronizerStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	SynchronizerCondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *SynchronizerStatus) IsReady() bool {
-	return SynchronizerCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *Synchronizer) GetConditionSet() apis.ConditionSet {
-	return SynchronizerCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *Synchronizer) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// GetSink implements EventSender.
+func (t *Synchronizer) GetSink() *duckv1.Destination {
+	return &t.Spec.Sink
 }

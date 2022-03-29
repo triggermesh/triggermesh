@@ -17,11 +17,12 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"strings"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
 // Managed event types
@@ -33,6 +34,29 @@ const (
 	EventTypeJiraIssue          = "io.triggermesh.jira.issue"
 	EventTypeJiraCustomResponse = "io.triggermesh.jira.custom.response"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*JiraTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("JiraTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*JiraTarget) GetConditionSet() apis.ConditionSet {
+	return targetConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *JiraTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *JiraTarget) GetStatusManager() *StatusManager {
+	return &StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		TargetStatus: &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*JiraTarget) AcceptedEventTypes() []string {
@@ -51,54 +75,8 @@ func (*JiraTarget) GetEventTypes() []string {
 	}
 }
 
-// GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *JiraTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("JiraTarget")
-}
-
-var jiraCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *JiraTargetStatus) InitializeConditions() {
-	jiraCondSet.Manage(s).InitializeConditions()
-}
-
-// PropagateAvailability uses the readiness of the provided Knative Service to
-// determine whether the Deployed condition should be marked as true or false.
-func (s *JiraTargetStatus) PropagateAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		jiraCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		jiraCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	jiraCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *JiraTarget) GetConditionSet() apis.ConditionSet {
-	return jiraCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *JiraTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *JiraTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }

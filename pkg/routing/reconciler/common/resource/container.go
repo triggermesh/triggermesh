@@ -186,7 +186,8 @@ func StartupProbe(path, port string) ObjectOption {
 					Port: intstr.FromString(port),
 				},
 			},
-			PeriodSeconds: 1,
+			PeriodSeconds:    1,
+			FailureThreshold: 60,
 		}
 	}
 }

@@ -17,93 +17,76 @@ limitations under the License.
 package googlesheettarget
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
-
-const targetPrefix = "googlesheettarget"
 
 const (
-	envCredentialsJSON = "GOOGLE_CREDENTIALS_JSON"
-	envSheetID         = "SHEET_ID"
-	envDefaultPrefix   = "DEFAULT_SHEET_PREFIX"
+	envSheetID       = "SHEET_ID"
+	envDefaultPrefix = "DEFAULT_SHEET_PREFIX"
 )
 
-// TargetAdapterArgs are the arguments needed to create a Target Adapter.
-// Every field is required.
-type TargetAdapterArgs struct {
-	Image   string
-	Configs source.ConfigAccessor
-	Target  *v1alpha1.GoogleSheetTarget
+// adapterConfig contains properties used to configure the target's adapter.
+// Public fields are automatically populated by envconfig.
+type adapterConfig struct {
+	// Configuration accessor for logging/metrics/tracing
+	obsConfig source.ConfigAccessor
+	// Container image
+	Image string `default:"gcr.io/triggermesh/googlesheettarget-adapter"`
 }
 
-// MakeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func MakeTargetAdapterKService(args *TargetAdapterArgs) *servingv1.Service {
-	name := kmeta.ChildName(targetPrefix+"-", args.Target.Name)
-	env := makeEnv(args)
-	genericLabels := libreconciler.MakeGenericLabels(targetPrefix, args.Target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(args.Target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(args.Target, genericLabels)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	return &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: args.Target.Namespace,
-			Name:      name,
-			Labels:    ksvcLabels,
-			OwnerReferences: []metav1.OwnerReference{
-				*kmeta.NewControllerRef(args.Target),
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.GoogleSheetTarget)
+
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	)
+}
+
+func makeAppEnv(o *v1alpha1.GoogleSheetTarget) []corev1.EnvVar {
+	return []corev1.EnvVar{
+		{
+			Name: common.EnvGCloudSAKey,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.GoogleServiceAccount.SecretKeyRef,
 			},
-		},
-		Spec: servingv1.ServiceSpec{
-			ConfigurationSpec: servingv1.ConfigurationSpec{
-				Template: servingv1.RevisionTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: podLabels,
-					},
-					Spec: servingv1.RevisionSpec{
-						PodSpec: corev1.PodSpec{
-							Containers: []corev1.Container{{
-								Image: args.Image,
-								Env:   env,
-							}},
-						},
-					},
-				},
-			},
+		}, {
+			Name:  envSheetID,
+			Value: o.Spec.ID,
+		}, {
+			Name:  envDefaultPrefix,
+			Value: o.Spec.DefaultPrefix,
 		},
 	}
 }
 
-func makeEnv(args *TargetAdapterArgs) []corev1.EnvVar {
-	env := []corev1.EnvVar{{
-		Name:  resources.EnvNamespace,
-		Value: args.Target.Namespace,
-	}, {
-		Name:  resources.EnvName,
-		Value: args.Target.Name,
-	}, {
-		Name:  resources.EnvMetricsDomain,
-		Value: resources.DefaultMetricsDomain,
-	}, {
-		Name: envCredentialsJSON,
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: args.Target.Spec.GoogleServiceAccount.SecretKeyRef,
-		},
-	}, {
-		Name:  envSheetID,
-		Value: args.Target.Spec.ID,
-	}, {
-		Name:  envDefaultPrefix,
-		Value: args.Target.Spec.DefaultPrefix,
-	}}
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
 
-	return append(env, libreconciler.MakeObsEnv(args.Configs)...)
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

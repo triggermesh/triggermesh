@@ -17,12 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 )
 
 // +genclient
@@ -34,16 +31,14 @@ type LogzTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   LogzTargetSpec   `json:"spec"`
-	Status LogzTargetStatus `json:"status,omitempty"`
+	Spec   LogzTargetSpec `json:"spec"`
+	Status TargetStatus   `json:"status,omitempty"`
 }
 
-// Check the interfaces LogzTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object      = (*LogzTarget)(nil)
-	_ kmeta.OwnerRefable  = (*LogzTarget)(nil)
+	_ Reconcilable        = (*LogzTarget)(nil)
 	_ targets.EventSource = (*LogzTarget)(nil)
-	_ duckv1.KRShaped     = (*LogzTarget)(nil)
 )
 
 // LogzTargetSpec holds the desired state of the LogzTarget.
@@ -57,13 +52,6 @@ type LogzTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-}
-
-// LogzTargetStatus communicates the observed state of the LogzTarget (from the controller).
-type LogzTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-	CloudEventStatus     `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -18,56 +18,30 @@ package xmltojsontransformation
 
 import (
 	"context"
-	"fmt"
 
-	"knative.dev/pkg/apis"
-	pkgreconciler "knative.dev/pkg/reconciler"
-	"knative.dev/pkg/resolver"
+	"knative.dev/pkg/reconciler"
 
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
 )
 
-// Reconciler implements controller.Reconciler.
+// Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	// adapter properties
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
 
-	sinkResolver *resolver.URIResolver
-
-	// Knative Service reconciler
-	ksvcr libreconciler.KServiceReconciler
+	trgLister func(namespace string) listersv1alpha1.XMLToJSONTransformationNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, s *v1alpha1.XMLToJSONTransformation) pkgreconciler.Event {
-	var url *apis.URL
-	var err error
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.XMLToJSONTransformation) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = v1alpha1.WithReconcilable(ctx, trg)
 
-	if s.Spec.Sink != nil {
-		url, err = r.resolveDestination(ctx, s)
-		if err != nil {
-			return fmt.Errorf("cannot resolve Sink destination: %w", err)
-		}
-
-	}
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, s, makeAdapterKService(s, r.adapterCfg, url))
-	s.Status.PropagateKServiceAvailability(adapter)
-
-	return event
-}
-
-func (r *Reconciler) resolveDestination(ctx context.Context, s *v1alpha1.XMLToJSONTransformation) (*apis.URL, error) {
-	dest := s.Spec.Sink.DeepCopy()
-	if dest.Ref != nil {
-		if dest.Ref.Namespace == "" {
-			dest.Ref.Namespace = s.GetNamespace()
-		}
-	}
-	return r.sinkResolver.URIFromDestinationV1(ctx, *dest, s)
+	return r.base.ReconcileAdapter(ctx, r)
 }

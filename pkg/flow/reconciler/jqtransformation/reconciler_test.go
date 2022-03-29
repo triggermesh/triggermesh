@@ -20,297 +20,63 @@ import (
 	"context"
 	"testing"
 
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
-	clientgotesting "k8s.io/client-go/testing"
 	"knative.dev/eventing/pkg/reconciler/source"
-	network "knative.dev/networking/pkg"
-	"knative.dev/pkg/apis"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/logging"
 	rt "knative.dev/pkg/reconciler/testing"
-	"knative.dev/serving/pkg/apis/serving"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-	fakeservinginjectionclient "knative.dev/serving/pkg/client/injection/client/fake"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/jqtransformation"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
 	. "github.com/triggermesh/triggermesh/pkg/flow/reconciler/testing"
 )
 
-const (
-	tNs   = "testns"
-	tName = "test"
-	tKey  = tNs + "/" + tName
-	tUID  = types.UID("00000000-0000-0000-0000-000000000000")
-
-	tImg = "registry/image:tag"
-
-	tBridge = "test-bridge"
-)
-
-var (
-	query    = `.foo | ..`
-	tGenName = kmeta.ChildName(adapterName+"-", tName)
-)
-
-var tAdapterURL = apis.URL{
-	Scheme: "https",
-	Host:   tGenName + "." + tNs + ".svc.cluster.local",
-}
-
-// Test the Reconcile method of the controller.Reconciler implemented by our controller.
-//
-// The environment for each test case is set up as follows:
-//  1. MakeFactory initializes fake clients with the objects declared in the test case
-//  2. MakeFactory injects those clients into a context along with fake event recorders, etc.
-//  3. A Reconciler is constructed via a Ctor function using the values injected above
-//  4. The Reconciler returned by MakeFactory is used to run the test case
 func TestReconcile(t *testing.T) {
-	testCases := rt.TableTest{
-		// Creation
-
-		{
-			Name: "Component object creation",
-			Key:  tKey,
-			Objects: []runtime.Object{
-				newComponent(),
-			},
-			WantCreates: []runtime.Object{
-				newAdapterService(),
-			},
-			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
-				Object: newComponentNotDeployed(),
-			}},
-			WantEvents: []string{
-				createAdapterEvent(),
-			},
-		},
-
-		// Lifecycle
-
-		{
-			Name: "Adapter becomes Ready",
-			Key:  tKey,
-			Objects: []runtime.Object{
-				newComponentNotDeployed(),
-				newAdapterServiceReady(),
-			},
-			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
-				Object: newComponentDeployed(),
-			}},
-		},
-		{
-			Name: "Adapter becomes NotReady",
-			Key:  tKey,
-			Objects: []runtime.Object{
-				newComponentDeployed(),
-				newAdapterServiceNotReady(),
-			},
-			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
-				Object: newComponentNotDeployed(),
-			}},
-		},
-		{
-			Name: "Adapter is outdated",
-			Key:  tKey,
-			Objects: []runtime.Object{
-				newComponentDeployed(),
-				setAdapterImage(
-					newAdapterServiceReady(),
-					tImg+":old",
-				),
-			},
-			WantUpdates: []clientgotesting.UpdateActionImpl{{
-				Object: newAdapterServiceReady(),
-			}},
-			WantEvents: []string{
-				updateAdapterEvent(),
-			},
-		},
-
-		// Edge cases
-
-		{
-			Name:    "Reconcile a non-existing object",
-			Key:     tKey,
-			Objects: nil,
-			WantErr: false,
-		},
-	}
-
-	testCases.Test(t, MakeFactory(reconcilerCtor))
-}
-
-// reconcilerCtor returns a Ctor for a JQTransformation Reconciler.
-var reconcilerCtor Ctor = func(t *testing.T, ctx context.Context, ls *Listers) controller.Reconciler {
 	adapterCfg := &adapterConfig{
-		Image:     tImg,
+		Image:     "registry/image:tag",
 		obsConfig: &source.EmptyVarsGenerator{},
 	}
 
-	r := &reconciler{
-		adapterCfg: adapterCfg,
-		ksvcr: libreconciler.NewKServiceReconciler(
-			fakeservinginjectionclient.Get(ctx),
-			ls.GetServiceLister(),
-		),
-	}
+	ctor := reconcilerCtor(adapterCfg)
+	trg := newTarget()
+	ab := adapterBuilder(adapterCfg)
 
-	return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
-		fakeinjectionclient.Get(ctx), ls.GetJQTransformationLister(),
-		controller.GetEventRecorder(ctx), r)
+	TestReconcileAdapter(t, ctor, trg, ab)
 }
 
-// newComponent returns a test JQTransformation object with pre-filled attributes.
-func newComponent() *v1alpha1.JQTransformation {
-	o := &v1alpha1.JQTransformation{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: tNs,
-			Name:      tName,
-			UID:       tUID,
-			Labels: labels.Set{
-				libreconciler.LabelBridgeUsedByPrefix + tBridge: libreconciler.LabelValueBridgeDominant,
-			},
-		},
+// reconcilerCtor returns a Ctor for a JQTransformation Reconciler.
+func reconcilerCtor(cfg *adapterConfig) Ctor {
+	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
+		r := &Reconciler{
+			base:       NewTestServiceReconciler(ctx, ls),
+			adapterCfg: cfg,
+			trgLister:  ls.GetJQTransformationLister().JQTransformations,
+		}
+
+		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
+			fakeinjectionclient.Get(ctx), ls.GetJQTransformationLister(),
+			controller.GetEventRecorder(ctx), r)
+	}
+}
+
+// newTarget returns a populated target object.
+func newTarget() *v1alpha1.JQTransformation {
+	trg := &v1alpha1.JQTransformation{
 		Spec: v1alpha1.JQTransformationSpec{
-			Query: query,
+			Query: ".test",
 		},
 	}
 
-	o.Status.InitializeConditions()
-	return o
+	Populate(trg)
+
+	return trg
 }
 
-// Deployed: True
-func newComponentDeployed() *v1alpha1.JQTransformation {
-	o := newComponent()
-	o.Status.PropagateKServiceAvailability(newAdapterServiceReady())
-	return o
-}
-
-// Deployed: False
-func newComponentNotDeployed() *v1alpha1.JQTransformation {
-	o := newComponent()
-	o.Status.PropagateKServiceAvailability(newAdapterServiceNotReady())
-	return o
-}
-
-// Ready: True
-func newAdapterServiceReady() *servingv1.Service {
-	svc := newAdapterService()
-	svc.Status.SetConditions(apis.Conditions{{
-		Type:   v1alpha1.JQTransformationConditionReady,
-		Status: corev1.ConditionTrue,
-	}})
-	svc.Status.URL = &tAdapterURL
-	return svc
-}
-
-// Ready: False
-func newAdapterServiceNotReady() *servingv1.Service {
-	svc := newAdapterService()
-	svc.Status.SetConditions(apis.Conditions{{
-		Type:   v1alpha1.JQTransformationConditionReady,
-		Status: corev1.ConditionFalse,
-	}})
-	return svc
-}
-
-func setAdapterImage(o *servingv1.Service, img string) *servingv1.Service {
-	o.Spec.Template.Spec.Containers[0].Image = img
-	return o
-}
-
-/* Events */
-
-// TODO(cab): make event generators public inside pkg/reconciler for
-// easy reuse in tests
-
-func createAdapterEvent() string {
-	return Eventf(corev1.EventTypeNormal, "KServiceCreated", "created kservice: \"%s/%s\"",
-		tNs, tGenName)
-}
-
-func updateAdapterEvent() string {
-	return Eventf(corev1.EventTypeNormal, "KServiceUpdated", "updated kservice: \"%s/%s\"",
-		tNs, tGenName)
-}
-
-/* Adapter service */
-
-// newAdapterService returns a test Service object with pre-filled attributes.
-func newAdapterService() *servingv1.Service {
-	return &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: tNs,
-			Name:      tGenName,
-			Labels: labels.Set{
-				resources.AppNameLabel:      adapterName,
-				resources.AppInstanceLabel:  tName,
-				resources.AppComponentLabel: resources.AdapterComponent,
-				resources.AppPartOfLabel:    resources.PartOf,
-				resources.AppManagedByLabel: resources.ManagedController,
-				network.VisibilityLabelKey:  serving.VisibilityClusterLocal,
-			},
-			OwnerReferences: []metav1.OwnerReference{
-				*kmeta.NewControllerRef(NewOwnerRefable(
-					tName,
-					(&v1alpha1.JQTransformation{}).GetGroupVersionKind(),
-					tUID,
-				)),
-			},
-		},
-		Spec: servingv1.ServiceSpec{
-			ConfigurationSpec: servingv1.ConfigurationSpec{
-				Template: servingv1.RevisionTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: labels.Set{
-							resources.AppNameLabel:      adapterName,
-							resources.AppInstanceLabel:  tName,
-							resources.AppComponentLabel: resources.AdapterComponent,
-							resources.AppPartOfLabel:    resources.PartOf,
-							resources.AppManagedByLabel: resources.ManagedController,
-						},
-					},
-					Spec: servingv1.RevisionSpec{
-						PodSpec: corev1.PodSpec{
-							Containers: []corev1.Container{{
-								Name:  resources.AdapterComponent,
-								Image: tImg,
-								Env: []corev1.EnvVar{
-									{
-										Name:  resources.EnvNamespace,
-										Value: tNs,
-									}, {
-										Name:  resources.EnvName,
-										Value: tGenName,
-									}, {
-										Name:  libreconciler.EnvBridgeID,
-										Value: tBridge,
-									}, {
-										Name:  envQuery,
-										Value: query,
-									}, {
-										Name: source.EnvLoggingCfg,
-									}, {
-										Name: source.EnvMetricsCfg,
-									}, {
-										Name: source.EnvTracingCfg,
-									},
-								},
-							}},
-						},
-					},
-				},
-			},
-		},
+// adapterBuilder returns a slim Reconciler containing only the fields accessed
+// by r.BuildAdapter().
+func adapterBuilder(cfg *adapterConfig) common.AdapterServiceBuilder {
+	return &Reconciler{
+		adapterCfg: cfg,
 	}
 }

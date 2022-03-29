@@ -38,7 +38,7 @@ jobs:
       - run:
           # XSLTTransformation needs libxml2.
           name: Install libxml2
-          command: sudo apt-get update && sudo apt-get install -y libxml2-dev
+          command: sudo apt-get update && sudo apt install -y libxml2-dev libxslt1-dev liblzma-dev zlib1g-dev
       - run:
           # DataWeaveTransformation needs dw cli
           name: Install DataWeave CLI
@@ -50,7 +50,7 @@ jobs:
             DW_VERSION: 1.0.19
       - run:
           name: Run test/cover
-          command: make cover
+          command: WITH_DEPENDENCIES=true make cover
           environment:
             TEST_OUTPUT_DIR: /tmp/test-results/
             COVER_OUTPUT_DIR: /tmp/cover-results/

@@ -18,10 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -33,21 +30,13 @@ type JQTransformation struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the JQTransformation (from the client).
-	// +optional
-	Spec JQTransformationSpec `json:"spec,omitempty"`
-
-	// Status communicates the observed state of the JQTransformation (from the controller).
-	// +optional
-	Status JQTransformationStatus `json:"status,omitempty"`
+	Spec   JQTransformationSpec `json:"spec"`
+	Status TargetStatus         `json:"status,omitempty"`
 }
 
 var (
-	_ runtime.Object     = (*JQTransformation)(nil)
-	_ kmeta.OwnerRefable = (*JQTransformation)(nil)
-	_ duckv1.KRShaped    = (*JQTransformation)(nil)
-	_ apis.Validatable   = (*XSLTTransformation)(nil)
-	_ apis.Defaultable   = (*XSLTTransformation)(nil)
+	_ Reconcilable = (*JQTransformation)(nil)
+	_ EventSender  = (*JQTransformation)(nil)
 )
 
 // JQTransformationSpec holds the desired state of the JQTransformation (from the client).
@@ -58,9 +47,8 @@ type JQTransformationSpec struct {
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
-	// Sink is a reference to an object that will resolve to a uri to use as the sink.
-	// +optional
-	Sink *duckv1.Destination `json:"sink,omitempty"`
+	// Support sending to an event sink instead of replying.
+	duckv1.SourceSpec `json:",inline"`
 }
 
 // JQTransformationStatus communicates the observed state of the JQTransformation (from the controller).

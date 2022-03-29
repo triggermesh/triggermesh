@@ -24,63 +24,46 @@ import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
-	"knative.dev/pkg/resolver"
-	"knative.dev/pkg/tracker"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-	servingv1client "knative.dev/serving/pkg/client/injection/client"
-	knsvcinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/transformation"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
 )
 
-type adapterConfig struct {
-	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
-
-	Image string `envconfig:"TRANSFORMER_IMAGE" default:"gcr.io/triggermesh/transformation-adapter"`
-}
-
-// NewController creates a Reconciler and returns the result of NewImpl.
+// NewController initializes the controller and is called by the generated code
+// Registers event handlers to enqueue events
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
-	logger := logging.FromContext(ctx)
 
+	typ := (*v1alpha1.Transformation)(nil)
+	app := common.ComponentName(typ)
+
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
 	adapterCfg := &adapterConfig{
-		configs: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
+		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
-	envconfig.MustProcess(adapterName, adapterCfg)
+	envconfig.MustProcess(app, adapterCfg)
 
-	transformationInformer := informerv1alpha1.Get(ctx)
-	knsvcInformer := knsvcinformer.Get(ctx)
+	informer := informerv1alpha1.Get(ctx)
 
 	r := &Reconciler{
-		servingClientSet: servingv1client.Get(ctx),
-		knServiceLister:  knsvcInformer.Lister(),
-		adapterCfg:       adapterCfg,
+		adapterCfg: adapterCfg,
+		trgLister:  informer.Lister().Transformations,
 	}
-
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
-	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))
 
-	r.sinkResolver = resolver.NewURIResolverFromTracker(ctx, impl.Tracker)
+	r.base = common.NewGenericServiceReconciler(
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.Tracker,
+		impl.EnqueueControllerOf,
+	)
 
-	logger.Info("Setting up event handlers.")
-
-	transformationInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
-
-	knsvcInformer.Informer().AddEventHandler(controller.HandleAll(
-		// Call the tracker's OnChanged method, but we've seen the objects
-		// coming through this path missing TypeMeta, so ensure it is properly
-		// populated.
-		controller.EnsureTypeMeta(
-			r.Tracker.OnChanged,
-			servingv1.SchemeGroupVersion.WithKind("Service"),
-		),
-	))
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	return impl
 }

@@ -18,12 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
-
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -35,17 +31,15 @@ type AzureEventHubsTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AzureEventHubsTargetSpec   `json:"spec"`
-	Status AzureEventHubsTargetStatus `json:"status,omitempty"`
+	Spec   AzureEventHubsTargetSpec `json:"spec"`
+	Status TargetStatus             `json:"status,omitempty"`
 }
 
-// Check the interfaces AzureEventHubsTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*AzureEventHubsTarget)(nil)
-	_ kmeta.OwnerRefable        = (*AzureEventHubsTarget)(nil)
+	_ Reconcilable              = (*AzureEventHubsTarget)(nil)
 	_ targets.IntegrationTarget = (*AzureEventHubsTarget)(nil)
 	_ targets.EventSource       = (*AzureEventHubsTarget)(nil)
-	_ duckv1.KRShaped           = (*AzureEventHubsTarget)(nil)
 )
 
 // AzureEventHubsTargetSpec holds the desired state of the AzureEventHubsTarget.
@@ -63,15 +57,6 @@ type AzureEventHubsTargetSpec struct {
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
 	DiscardCEContext bool `json:"discardCloudEventContext"`
-}
-
-// AzureEventHubsTargetStatus communicates the observed state of the AzureEventHubsTarget (from the controller).
-type AzureEventHubsTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

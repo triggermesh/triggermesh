@@ -210,26 +210,20 @@ func findAdapter(genericReconciler *GenericServiceReconciler,
 
 	sel := labels.SelectorFromValidatedSet(ls)
 
-	var objs []metav1.Object
-
 	svcs, err := genericReconciler.Lister(rcl.GetNamespace()).List(sel)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, s := range svcs {
-		objs = append(objs, s)
-	}
-
-	gr := servingv1.Resource("service")
-
-	for _, obj := range objs {
+	for _, obj := range svcs {
 		objOwner := metav1.GetControllerOfNoCopy(obj)
 
 		if objOwner.UID == owner.UID {
 			return obj, nil
 		}
 	}
+
+	gr := servingv1.Resource("service")
 
 	return nil, newNotFoundForSelector(gr, sel)
 }

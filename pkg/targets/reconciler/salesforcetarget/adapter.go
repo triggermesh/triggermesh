@@ -17,20 +17,21 @@ limitations under the License.
 package salesforcetarget
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
 )
 
 const (
-	adapterName = "salesforcetarget"
-
 	envSalesforceAuthClientID = "SALESFORCE_AUTH_CLIENT_ID"
 	envSalesforceAuthServer   = "SALESFORCE_AUTH_SERVER"
 	envSalesforceAuthUser     = "SALESFORCE_AUTH_USER"
@@ -43,29 +44,23 @@ const (
 // Public fields are automatically populated by envconfig.
 type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	obsConfig source.ConfigAccessor
 	// Container image
 	Image string `default:"gcr.io/triggermesh/salesforcetarget-adapter"`
 }
 
-// makeAdapterKnService returns a Knative Service object for the target's adapter.
-func makeAdapterKnService(o *v1alpha1.SalesforceTarget, cfg *adapterConfig) *servingv1.Service {
-	envApp := makeAppEnv(o)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	genericLabels := pkgreconciler.MakeGenericLabels(adapterName, o.Name)
-	ksvcLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
-	podLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
-	name := kmeta.ChildName(adapterName+"-", o.Name)
-	envSvc := pkgreconciler.MakeServiceEnv(o.Name, o.Namespace)
-	envObs := pkgreconciler.MakeObsEnv(cfg.configs)
-	envs := append(envSvc, append(envApp, envObs...)...)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.SalesforceTarget)
 
-	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcOwner(o),
-		resources.KsvcPodEnvVars(envs))
+	return common.NewAdapterKnService(trg,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	)
 }
 
 func makeAppEnv(o *v1alpha1.SalesforceTarget) []corev1.EnvVar {
@@ -89,8 +84,8 @@ func makeAppEnv(o *v1alpha1.SalesforceTarget) []corev1.EnvVar {
 			},
 		},
 		{
-			Name:  pkgreconciler.EnvBridgeID,
-			Value: pkgreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		},
 	}
 
@@ -109,4 +104,19 @@ func makeAppEnv(o *v1alpha1.SalesforceTarget) []corev1.EnvVar {
 	}
 
 	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

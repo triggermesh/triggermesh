@@ -17,9 +17,11 @@ limitations under the License.
 package xslttransformation
 
 import (
+	"fmt"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
@@ -27,56 +29,44 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
+	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common/resource"
 )
 
 const (
-	adapterName = "xslttransformation"
-
 	envXSLT              = "XSLTTRANSFORMATION_XSLT"
 	envAllowXSLTOverride = "XSLTTRANSFORMATION_ALLOW_XSLT_OVERRIDE"
-	envSink              = "K_SINK"
 )
 
-// adapterConfig contains properties used to configure the component's adapter.
+// adapterConfig contains properties used to configure the target's adapter.
 // Public fields are automatically populated by envconfig.
 type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"XSLTTRANSFORMATION_IMAGE" default:"gcr.io/triggermesh/xslttransformation-adapter"`
+	Image string `default:"gcr.io/triggermesh/xslttransformation-adapter"`
 }
 
-// makeAdapterKService generates the adapter knative service structure.
-func makeAdapterKService(o *v1alpha1.XSLTTransformation, cfg *adapterConfig, sink *apis.URL) (*servingv1.Service, error) {
-	envApp, err := makeAppEnv(o, sink)
-	if err != nil {
-		return nil, err
-	}
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
-	name := kmeta.ChildName(adapterName+"-", o.Name)
-	envSvc := libreconciler.MakeServiceEnv(o.Name, o.Namespace)
-	envObs := libreconciler.MakeObsEnv(cfg.configs)
-	envs := append(envSvc, append(envApp, envObs...)...)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.XSLTTransformation)
 
-	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcOwner(o),
-		resources.KsvcPodEnvVars(envs)), nil
+	return common.NewAdapterKnService(trg, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	)
 }
 
-func makeAppEnv(o *v1alpha1.XSLTTransformation, sink *apis.URL) ([]corev1.EnvVar, error) {
+func makeAppEnv(o *v1alpha1.XSLTTransformation) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		*o.Spec.XSLT.ToEnvironmentVariable(envXSLT),
 		{
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		},
 	}
 
@@ -87,11 +77,20 @@ func makeAppEnv(o *v1alpha1.XSLTTransformation, sink *apis.URL) ([]corev1.EnvVar
 		})
 	}
 
-	if sink != nil {
-		env = append(env, corev1.EnvVar{
-			Name:  envSink,
-			Value: sink.String(),
-		})
+	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}
-	return env, nil
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }
