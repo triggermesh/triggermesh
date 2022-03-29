@@ -14,11 +14,10 @@ RUN go build -o /dataweavetransformation-adapter ./cmd/dataweavetransformation-a
 
 FROM debian:stable-slim
 
-WORKDIR /opt/dw
-ENV DW_HOME=/opt/dw
-ENV PATH=/opt/dw:$PATH
+WORKDIR /tmp/dw
+ENV DW_HOME=/tmp/dw
 
 COPY --from=builder /dataweavetransformation-adapter /
-COPY --from=builder /go/project/dw .
+COPY --from=builder /go/project/dw /usr/local/bin/.
 
 ENTRYPOINT ["/dataweavetransformation-adapter"]

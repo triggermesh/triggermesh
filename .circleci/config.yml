@@ -43,7 +43,7 @@ jobs:
           # DataWeaveTransformation needs dw cli
           name: Install DataWeave CLI
           command: |
-            mkdir /opt/dw
+            mkdir /tmp/dw
             curl -sSLO https://github.com/mulesoft-labs/data-weave-cli/releases/download/v$DW_VERSION/dw-$DW_VERSION-Linux
             unzip -p dw-$DW_VERSION-Linux 'bin/dw' > dw && chmod +x dw && mv dw $(go env GOPATH)/bin/
           environment:

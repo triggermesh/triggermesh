@@ -84,7 +84,7 @@ func (a *dataweaveTransformAdapter) Start(ctx context.Context) error {
 func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var err error
 	var tmpfile *os.File
-	path := "/opt/dw"
+	path := "/tmp/dw"
 	dwFolder := path + "/custom"
 
 	switch a.incomingContentType {
