@@ -23,7 +23,7 @@ require (
 	cloud.google.com/go/workflows v1.3.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.17
-	github.com/Azure/azure-sdk-for-go v62.3.0+incompatible
+	github.com/Azure/azure-sdk-for-go v63.0.0+incompatible
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.2
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v0.3.6
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1
@@ -37,7 +37,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
-	github.com/aliyun/aliyun-oss-go-sdk v2.2.1+incompatible
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.2+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.15.1
 	github.com/aws/aws-sdk-go v1.43.27
