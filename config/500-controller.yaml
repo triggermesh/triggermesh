@@ -182,11 +182,11 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/splitter-adapter
         # Function Runtimes
         - name: RUNTIME_KLR_PYTHON
-          value: gcr.io/triggermesh/knative-lambda-python37:v1.12.0
+          value: gcr.io/triggermesh/knative-lambda-python37:v1.15.3
         - name: RUNTIME_KLR_NODE
-          value: gcr.io/triggermesh/knative-lambda-node10:v1.12.0
+          value: gcr.io/triggermesh/knative-lambda-node10:v1.15.3
         - name: RUNTIME_KLR_RUBY
-          value: gcr.io/triggermesh/knative-lambda-ruby25:v1.12.0
+          value: gcr.io/triggermesh/knative-lambda-ruby25:v1.15.3
         # Type-specific options
         - name: TEKTONTARGET_REAPING_INTERVAL
           value: 2m
