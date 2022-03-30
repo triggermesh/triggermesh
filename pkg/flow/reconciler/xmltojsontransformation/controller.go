@@ -28,7 +28,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/xmltojsontransformation"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/xmltojsontransformation"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code

@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -31,9 +32,9 @@ func (*Transformation) GetGroupVersionKind() schema.GroupVersionKind {
 // GetConditionSet implements duckv1.KRShaped.
 func (t *Transformation) GetConditionSet() apis.ConditionSet {
 	if t.Spec.Sink.Ref != nil || t.Spec.Sink.URI != nil {
-		return eventSenderConditionSet
+		return v1alpha1.EventSenderConditionSet
 	}
-	return targetConditionSet
+	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -42,10 +43,10 @@ func (t *Transformation) GetStatus() *duckv1.Status {
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *Transformation) GetStatusManager() *StatusManager {
-	return &StatusManager{
+func (t *Transformation) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
 		ConditionSet: t.GetConditionSet(),
-		TargetStatus: &t.Status,
+		Status:       &t.Status,
 	}
 }
 

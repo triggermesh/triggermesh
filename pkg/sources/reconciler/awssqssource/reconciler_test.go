@@ -35,13 +35,14 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/sqs"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/awssqssource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
-	eventtesting "github.com/triggermesh/triggermesh/pkg/sources/testing/event"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
+	eventtesting "github.com/triggermesh/triggermesh/pkg/testing/event"
 )
 
 // adapterCfg is used in every instance of Reconciler defined in reconciler tests.
@@ -233,7 +234,7 @@ func saName(name string) resource.ServiceAccountOption {
 
 /* Events */
 
-func createServiceAccountEvent(src v1alpha1.Reconcilable) string {
+func createServiceAccountEvent(src commonv1alpha1.Reconcilable) string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
 		"Created ServiceAccount %q due to the creation of a AWSSQSSource object",
 		common.ServiceAccountName(src))

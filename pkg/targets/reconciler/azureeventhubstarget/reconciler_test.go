@@ -25,11 +25,12 @@ import (
 	"knative.dev/pkg/logging"
 	rt "knative.dev/pkg/reconciler/testing"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/azureeventhubstarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 )
 
 func TestReconcile(t *testing.T) {
@@ -72,7 +73,7 @@ func newTarget() *v1alpha1.AzureEventHubsTarget {
 			},
 			Auth: v1alpha1.AzureAuth{
 				SASToken: &v1alpha1.AzureSASToken{
-					ConnectionString: v1alpha1.ValueFromField{
+					ConnectionString: commonv1alpha1.ValueFromField{
 						Value: "foo",
 					},
 				},

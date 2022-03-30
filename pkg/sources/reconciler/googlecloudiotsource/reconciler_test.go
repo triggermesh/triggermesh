@@ -29,13 +29,14 @@ import (
 	gpubsub "cloud.google.com/go/pubsub"
 	gcloudiot "google.golang.org/api/cloudiot/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudiotsource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 	iot "github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/iot"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
 )
 
 func TestReconcileSource(t *testing.T) {
@@ -80,7 +81,7 @@ func newEventSource() *v1alpha1.GoogleCloudIoTSource {
 			PubSub: v1alpha1.GoogleCloudIoTSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
-			ServiceAccountKey: v1alpha1.ValueFromField{
+			ServiceAccountKey: commonv1alpha1.ValueFromField{
 				Value: "{}",
 			},
 		},

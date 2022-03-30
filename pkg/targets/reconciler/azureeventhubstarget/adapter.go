@@ -24,12 +24,14 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
+	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common/resource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const (
@@ -50,7 +52,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
 	typedTrg := trg.(*v1alpha1.AzureEventHubsTarget)
 
 	var envs []corev1.EnvVar
@@ -74,7 +76,7 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 		})
 	}
 
-	return common.NewAdapterKnService(trg,
+	return common.NewAdapterKnService(trg, nil,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVar(common.EnvHubNamespace, typedTrg.Spec.EventHubID.Namespace),
 		resource.EnvVar(common.EnvHubName, typedTrg.Spec.EventHubID.EventHub),
@@ -85,7 +87,7 @@ func (r *Reconciler) BuildAdapter(trg v1alpha1.Reconcilable) *servingv1.Service 
 }
 
 // RBACOwners implements common.AdapterServiceBuilder.
-func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+func (r *Reconciler) RBACOwners(trg commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
 	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)

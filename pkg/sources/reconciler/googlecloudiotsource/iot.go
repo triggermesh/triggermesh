@@ -26,9 +26,10 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 // Ensures that the IoT Registry has the topic associated.
@@ -39,7 +40,7 @@ func ensureTopicAssociated(ctx context.Context, cli *gcloudiot.Service, topicRes
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
 	status := &src.Status
 
 	registryName := src.Spec.Registry.String()
@@ -88,7 +89,7 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gcloudiot
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudIoTSource)
 
 	registryName := src.Spec.Registry.String()
 

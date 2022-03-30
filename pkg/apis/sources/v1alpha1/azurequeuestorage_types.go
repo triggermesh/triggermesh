@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,21 +33,23 @@ type AzureQueueStorageSource struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   AzureQueueStorageSourceSpec `json:"spec,omitempty"`
-	Status EventSourceStatus           `json:"status,omitempty"`
+	Status v1alpha1.Status             `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*AzureQueueStorageSource)(nil)
+	_ v1alpha1.Reconcilable = (*AzureQueueStorageSource)(nil)
+	_ v1alpha1.EventSource  = (*AzureQueueStorageSource)(nil)
+	_ v1alpha1.EventSender  = (*AzureQueueStorageSource)(nil)
 )
 
 // AzureQueueStorageSourceSpec defines the desired state of the event source.
 type AzureQueueStorageSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	AccountName string         `json:"accountName"`
-	QueueName   string         `json:"queueName"`
-	AccountKey  ValueFromField `json:"accountKey"`
+	AccountName string                  `json:"accountName"`
+	QueueName   string                  `json:"queueName"`
+	AccountKey  v1alpha1.ValueFromField `json:"accountKey"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

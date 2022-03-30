@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,14 +32,14 @@ type TwilioTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   TwilioTargetSpec `json:"spec"`
-	Status TargetStatus     `json:"status,omitempty"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*TwilioTarget)(nil)
-	_ targets.IntegrationTarget = (*TwilioTarget)(nil)
-	_ targets.EventSource       = (*TwilioTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*TwilioTarget)(nil)
+	_ v1alpha1.EventReceiver = (*TwilioTarget)(nil)
+	_ v1alpha1.EventSource   = (*TwilioTarget)(nil)
 )
 
 // TwilioTargetSpec holds the desired state of the TwilioTarget.

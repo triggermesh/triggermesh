@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,14 +32,14 @@ type ZendeskTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   ZendeskTargetSpec `json:"spec"`
-	Status TargetStatus      `json:"status,omitempty"`
+	Status v1alpha1.Status   `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*ZendeskTarget)(nil)
-	_ targets.IntegrationTarget = (*ZendeskTarget)(nil)
-	_ targets.EventSource       = (*ZendeskTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*ZendeskTarget)(nil)
+	_ v1alpha1.EventReceiver = (*ZendeskTarget)(nil)
+	_ v1alpha1.EventSource   = (*ZendeskTarget)(nil)
 )
 
 // ZendeskTargetSpec holds the desired state of the ZendeskTarget.

@@ -17,8 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -30,14 +31,14 @@ type JiraTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   JiraTargetSpec `json:"spec"`
-	Status TargetStatus   `json:"status,omitempty"`
+	Spec   JiraTargetSpec  `json:"spec"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable        = (*JiraTarget)(nil)
-	_ targets.EventSource = (*JiraTarget)(nil)
+	_ v1alpha1.Reconcilable = (*JiraTarget)(nil)
+	_ v1alpha1.EventSource  = (*JiraTarget)(nil)
 )
 
 // JiraTargetSpec holds the desired state of the JiraTarget.

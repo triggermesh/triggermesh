@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -36,7 +38,9 @@ type AzureEventGridSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*AzureEventGridSource)(nil)
+	_ v1alpha1.Reconcilable = (*AzureEventGridSource)(nil)
+	_ v1alpha1.EventSource  = (*AzureEventGridSource)(nil)
+	_ v1alpha1.EventSender  = (*AzureEventGridSource)(nil)
 )
 
 // AzureEventGridSourceSpec defines the desired state of the event source.
@@ -96,7 +100,7 @@ type AzureEventGridSourceDestinationEventHubs struct {
 
 // AzureEventGridSourceStatus defines the observed state of the event source.
 type AzureEventGridSourceStatus struct {
-	EventSourceStatus `json:",inline"`
+	v1alpha1.Status `json:",inline"`
 
 	// Resource ID of the Event Grid subscription that is currently
 	// registered for the user-provided scope.

@@ -18,8 +18,16 @@ package v1alpha1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+)
+
+// Supported event types
+const (
+	SplitterGenericEventType = "io.triggermesh.routing.splitter"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
@@ -27,37 +35,42 @@ func (*Splitter) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("Splitter")
 }
 
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *Splitter) GetConditionSet() apis.ConditionSet {
-	return routerConditionSet
+// GetConditionSet implements duckv1.KRShaped.
+func (*Splitter) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
 }
 
-// IsMultiTenant implements MultiTenant.
-func (*Splitter) IsMultiTenant() bool {
-	return true
+// GetStatus implements duckv1.KRShaped.
+func (s *Splitter) GetStatus() *duckv1.Status {
+	return &s.Status.Status
 }
 
-// Supported event types
-const (
-	SplitterGenericEventType = "io.triggermesh.routing.splitter"
-)
+// GetStatusManager implements Reconcilable.
+func (s *Splitter) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
+	}
+}
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (*Splitter) GetEventTypes() []string {
 	return []string{
 		SplitterGenericEventType,
 	}
 }
 
-// GetSink implements Reconcilable.
+// AsEventSource implements EventSource.
+func (s *Splitter) AsEventSource() string {
+	return "splitter/" + s.Name
+}
+
+// GetSink implements EventSender.
 func (s *Splitter) GetSink() *duckv1.Destination {
 	return s.Spec.Sink
 }
 
-// GetStatusManager implements Reconcilable.
-func (s *Splitter) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet: s.GetConditionSet(),
-		RouterStatus: &s.Status,
-	}
+// IsMultiTenant implements MultiTenant.
+func (*Splitter) IsMultiTenant() bool {
+	return true
 }

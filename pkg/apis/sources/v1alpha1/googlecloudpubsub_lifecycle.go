@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -35,23 +37,23 @@ func (s *GoogleCloudPubSubSource) GetConditionSet() apis.ConditionSet {
 
 // GetStatus implements duckv1.KRShaped.
 func (s *GoogleCloudPubSubSource) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+	return &s.Status.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *GoogleCloudPubSubSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *GoogleCloudPubSubSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+func (s *GoogleCloudPubSubSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status.Status,
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *GoogleCloudPubSubSource) AsEventSource() string {
 	return s.Spec.Topic.String()
 }
@@ -76,7 +78,7 @@ const (
 
 // googleCloudPubSubSourceConditionSet is a set of conditions for
 // GoogleCloudPubSubSource objects.
-var googleCloudPubSubSourceConditionSet = NewEventSourceConditionSet(
+var googleCloudPubSubSourceConditionSet = v1alpha1.NewConditionSet(
 	GoogleCloudPubSubConditionSubscribed,
 )
 

@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,14 +32,14 @@ type IBMMQTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   IBMMQTargetSpec `json:"spec"`
-	Status TargetStatus    `json:"status,omitempty"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*IBMMQTarget)(nil)
-	_ targets.IntegrationTarget = (*IBMMQTarget)(nil)
-	_ targets.EventSource       = (*IBMMQTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*IBMMQTarget)(nil)
+	_ v1alpha1.EventReceiver = (*IBMMQTarget)(nil)
+	_ v1alpha1.EventSource   = (*IBMMQTarget)(nil)
 )
 
 // IBMMQTargetSpec holds the desired state of the event target.
@@ -68,9 +68,9 @@ type MQReplyOptions struct {
 
 // Credentials holds the auth details.
 type Credentials struct {
-	User     ValueFromField `json:"username,omitempty"`
-	Password ValueFromField `json:"password,omitempty"`
-	TLS      *TLSSpec       `json:"tls,omitempty"`
+	User     v1alpha1.ValueFromField `json:"username,omitempty"`
+	Password v1alpha1.ValueFromField `json:"password,omitempty"`
+	TLS      *TLSSpec                `json:"tls,omitempty"`
 }
 
 // TLSSpec holds the IBM MQ TLS authentication parameters.
@@ -83,8 +83,8 @@ type TLSSpec struct {
 
 // Keystore represents Key Database components.
 type Keystore struct {
-	KeyDatabase   ValueFromField `json:"keyDatabase"`
-	PasswordStash ValueFromField `json:"passwordStash"`
+	KeyDatabase   v1alpha1.ValueFromField `json:"keyDatabase"`
+	PasswordStash v1alpha1.ValueFromField `json:"passwordStash"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

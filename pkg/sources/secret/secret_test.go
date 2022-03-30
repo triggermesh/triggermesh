@@ -27,7 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 func TestGetter(t *testing.T) {
@@ -36,19 +36,19 @@ func TestGetter(t *testing.T) {
 	testCases := []struct {
 		name        string
 		initSecrets []*corev1.Secret
-		input       []v1alpha1.ValueFromField
+		input       []commonv1alpha1.ValueFromField
 		expect      Secrets
 		getRequests int
 	}{
 		{
 			name:        "No input parameter",
-			input:       []v1alpha1.ValueFromField{},
+			input:       []commonv1alpha1.ValueFromField{},
 			expect:      nil,
 			getRequests: 0,
 		},
 		{
 			name: "All from value",
-			input: []v1alpha1.ValueFromField{
+			input: []commonv1alpha1.ValueFromField{
 				{
 					Value: "value1",
 				},
@@ -69,7 +69,7 @@ func TestGetter(t *testing.T) {
 					"key": "value from secret",
 				}),
 			},
-			input: []v1alpha1.ValueFromField{
+			input: []commonv1alpha1.ValueFromField{
 				{
 					Value: "direct value",
 				},
@@ -96,7 +96,7 @@ func TestGetter(t *testing.T) {
 					"key2": "value2",
 				}),
 			},
-			input: []v1alpha1.ValueFromField{
+			input: []commonv1alpha1.ValueFromField{
 				{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
@@ -130,7 +130,7 @@ func TestGetter(t *testing.T) {
 					"key2": "value2",
 				}),
 			},
-			input: []v1alpha1.ValueFromField{
+			input: []commonv1alpha1.ValueFromField{
 				{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{

@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,12 +33,12 @@ type XMLToJSONTransformation struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   XMLToJSONTransformationSpec `json:"spec,omitempty"`
-	Status TargetStatus                `json:"status,omitempty"`
+	Status v1alpha1.Status             `json:"status,omitempty"`
 }
 
 var (
-	_ Reconcilable = (*XMLToJSONTransformation)(nil)
-	_ EventSender  = (*XMLToJSONTransformation)(nil)
+	_ v1alpha1.Reconcilable = (*XMLToJSONTransformation)(nil)
+	_ v1alpha1.EventSender  = (*XMLToJSONTransformation)(nil)
 )
 
 // XMLToJSONTransformationSpec holds the desired state of the XMLToJSONTransformation (from the client).

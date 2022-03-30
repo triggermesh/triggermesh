@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -30,26 +32,21 @@ import (
 // Filter is an addressable object that filters incoming events according
 // to provided Common Language Expression
 type Filter struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the Filter (from the client).
-	// +optional
-	Spec FilterSpec `json:"spec,omitempty"`
-
-	// Status communicates the observed state of the Filter (from the controller).
-	// +optional
-	Status RouterStatus `json:"status,omitempty"`
+	Spec   FilterSpec      `json:"spec,omitempty"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 var (
-	// Check that Filter can be validated and defaulted.
 	_ apis.Validatable = (*Filter)(nil)
 	_ apis.Defaultable = (*Filter)(nil)
 
-	_ Reconcilable = (*Filter)(nil)
-	_ multiTenant  = (*Filter)(nil)
+	_ v1alpha1.Reconcilable = (*Filter)(nil)
+	_ v1alpha1.EventSender  = (*Filter)(nil)
+	_ v1alpha1.EventSource  = (*Filter)(nil)
+	_ v1alpha1.MultiTenant  = (*Filter)(nil)
 )
 
 // FilterSpec contains CEL expression string and the destination sink
@@ -68,14 +65,4 @@ type FilterList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []Filter `json:"items"`
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (f *Filter) GetStatus() *duckv1.Status {
-	return &f.Status.Status
-}
-
-// AsEventSource implements Reconcilable.
-func (f *Filter) AsEventSource() string {
-	return "filter/" + f.Name
 }

@@ -44,10 +44,11 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/auth"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 )
 
 const (
@@ -69,7 +70,7 @@ func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
 	status := &src.Status
 
 	// initialize clients
@@ -210,7 +211,7 @@ func (r *Reconciler) ensureNoDiagnosticSettings(ctx context.Context) reconciler.
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureActivityLogsSource)
 
 	_, diagSettingsCli, err := r.cg.Get(src)
 	switch {

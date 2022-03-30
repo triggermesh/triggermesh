@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -42,13 +42,13 @@ type LogzMetricsTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   LogzMetricsTargetSpec `json:"spec"`
-	Status TargetStatus          `json:"status,omitempty"`
+	Status v1alpha1.Status       `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*LogzMetricsTarget)(nil)
-	_ targets.IntegrationTarget = (*LogzMetricsTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*LogzMetricsTarget)(nil)
+	_ v1alpha1.EventReceiver = (*LogzMetricsTarget)(nil)
 )
 
 // LogzMetricsTargetSpec holds the desired state of the LogzMetricsTarget.

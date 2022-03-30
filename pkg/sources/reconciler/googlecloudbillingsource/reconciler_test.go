@@ -29,13 +29,14 @@ import (
 	gbilling "cloud.google.com/go/billing/budgets/apiv1"
 	gpubsub "cloud.google.com/go/pubsub"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudbillingsource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/billing"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
 )
 
 func TestReconcileSource(t *testing.T) {
@@ -76,7 +77,7 @@ func newEventSource() *v1alpha1.GoogleCloudBillingSource {
 			PubSub: v1alpha1.GoogleCloudBillingSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
-			ServiceAccountKey: v1alpha1.ValueFromField{
+			ServiceAccountKey: commonv1alpha1.ValueFromField{
 				Value: "{}",
 			},
 		},

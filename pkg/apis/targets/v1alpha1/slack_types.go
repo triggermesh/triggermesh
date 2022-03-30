@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,7 +32,7 @@ type SlackTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   SlackTargetSpec `json:"spec"`
-	Status TargetStatus    `json:"status,omitempty"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 // SlackTargetSpec defines the spec for the Slack Taret.
@@ -43,9 +43,9 @@ type SlackTargetSpec struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*SlackTarget)(nil)
-	_ targets.IntegrationTarget = (*SlackTarget)(nil)
-	_ targets.EventSource       = (*SlackTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*SlackTarget)(nil)
+	_ v1alpha1.EventReceiver = (*SlackTarget)(nil)
+	_ v1alpha1.EventSource   = (*SlackTarget)(nil)
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -28,7 +28,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/googlecloudstoragetarget"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlecloudstoragetarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -59,6 +59,7 @@ func NewController(
 	r.base = common.NewGenericServiceReconciler(
 		ctx,
 		typ.GetGroupVersionKind(),
+		impl.Tracker,
 		impl.EnqueueControllerOf,
 	)
 

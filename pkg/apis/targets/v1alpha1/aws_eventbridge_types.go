@@ -16,7 +16,11 @@ limitations under the License.
 
 package v1alpha1
 
-import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+)
 
 // +genclient
 // +genreconciler
@@ -28,12 +32,12 @@ type AWSEventBridgeTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   AWSEventBridgeTargetSpec `json:"spec"`
-	Status TargetStatus             `json:"status,omitempty"`
+	Status v1alpha1.Status          `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable = (*AWSEventBridgeTarget)(nil)
+	_ v1alpha1.Reconcilable = (*AWSEventBridgeTarget)(nil)
 )
 
 // AWSEventBridgeTargetSpec holds the desired state of the event target.

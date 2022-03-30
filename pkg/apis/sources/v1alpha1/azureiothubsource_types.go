@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -30,13 +32,15 @@ type AzureIOTHubSource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AzureIOTHubSourceSpec   `json:"spec,omitempty"`
-	Status AzureIOTHubSourceStatus `json:"status,omitempty"`
+	Spec   AzureIOTHubSourceSpec `json:"spec,omitempty"`
+	Status v1alpha1.Status       `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*AzureIOTHubSource)(nil)
+	_ v1alpha1.Reconcilable = (*AzureIOTHubSource)(nil)
+	_ v1alpha1.EventSource  = (*AzureIOTHubSource)(nil)
+	_ v1alpha1.EventSender  = (*AzureIOTHubSource)(nil)
 )
 
 // AzureIOTHubSourceSpec defines the desired state of the event source.
@@ -45,11 +49,6 @@ type AzureIOTHubSourceSpec struct {
 
 	// AzureAuth contains multiple authentication methods for Azure services.
 	Auth AzureAuth `json:"auth,omitempty"`
-}
-
-// AzureIOTHubSourceStatus defines the observed state of the event source.
-type AzureIOTHubSourceStatus struct {
-	EventSourceStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

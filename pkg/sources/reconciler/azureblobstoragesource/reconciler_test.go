@@ -39,14 +39,15 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureblobstoragesource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/storage"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
-	eventtesting "github.com/triggermesh/triggermesh/pkg/sources/testing/event"
+	eventtesting "github.com/triggermesh/triggermesh/pkg/testing/event"
 )
 
 // adapterCfg is used in every instance of Reconciler defined in reconciler tests.
@@ -106,13 +107,13 @@ func newEventSource() *v1alpha1.AzureBlobStorageSource {
 			},
 			Auth: v1alpha1.AzureAuth{
 				ServicePrincipal: &v1alpha1.AzureServicePrincipal{
-					TenantID: v1alpha1.ValueFromField{
+					TenantID: commonv1alpha1.ValueFromField{
 						Value: "00000000-0000-0000-0000-000000000000",
 					},
-					ClientID: v1alpha1.ValueFromField{
+					ClientID: commonv1alpha1.ValueFromField{
 						Value: "00000000-0000-0000-0000-000000000000",
 					},
-					ClientSecret: v1alpha1.ValueFromField{
+					ClientSecret: commonv1alpha1.ValueFromField{
 						Value: "some_secret",
 					},
 				},

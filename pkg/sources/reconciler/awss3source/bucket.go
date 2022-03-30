@@ -37,14 +37,15 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/sqs"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 )
 
 // ensureNotificationsEnabled ensures that event notifications are enabled in
 // the S3 bucket.
 func (r *Reconciler) ensureNotificationsEnabled(ctx context.Context, cli s3iface.S3API, queueARN string) error {
-	src := v1alpha1.ReconcilableFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	status := &typedSrc.Status
@@ -94,7 +95,7 @@ func (r *Reconciler) ensureNotificationsEnabled(ctx context.Context, cli s3iface
 // ensureNotificationsDisabled ensures that event notifications are disabled in
 // the S3 bucket.
 func (r *Reconciler) ensureNotificationsDisabled(ctx context.Context, cli s3iface.S3API) error {
-	src := v1alpha1.ReconcilableFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	bucketARN := typedSrc.Spec.ARN

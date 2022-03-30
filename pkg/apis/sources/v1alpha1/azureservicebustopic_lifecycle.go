@@ -22,6 +22,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 )
 
@@ -37,23 +38,23 @@ func (s *AzureServiceBusTopicSource) GetConditionSet() apis.ConditionSet {
 
 // GetStatus implements duckv1.KRShaped.
 func (s *AzureServiceBusTopicSource) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+	return &s.Status.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AzureServiceBusTopicSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AzureServiceBusTopicSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+func (s *AzureServiceBusTopicSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status.Status,
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AzureServiceBusTopicSource) AsEventSource() string {
 	return s.Spec.TopicID.String()
 }
@@ -73,7 +74,7 @@ const (
 
 // azureServiceBusTopicSourceConditionSet is a set of conditions for
 // AzureServiceBusTopicSource objects.
-var azureServiceBusTopicSourceConditionSet = NewEventSourceConditionSet(
+var azureServiceBusTopicSourceConditionSet = v1alpha1.NewConditionSet(
 	AzureServiceBusTopicConditionSubscribed,
 )
 

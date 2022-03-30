@@ -16,33 +16,8 @@ limitations under the License.
 
 package v1alpha1
 
-import (
-	"knative.dev/pkg/apis"
-)
-
-// Status conditions
-const (
-	// ConditionReady has status True when the source is ready to send events.
-	ConditionReady = apis.ConditionReady
-	// ConditionSinkProvided has status True when the source has been configured with a sink target.
-	ConditionSinkProvided apis.ConditionType = "SinkProvided"
-	// ConditionDeployed has status True when the source's adapter is up and running.
-	ConditionDeployed apis.ConditionType = "Deployed"
-)
-
 // Reasons for status conditions
 const (
-	// ReasonSinkNotFound is set on a SinkProvided condition when a sink does not exist.
-	ReasonSinkNotFound = "SinkNotFound"
-	// ReasonSinkEmpty is set on a SinkProvided condition when a sink URI is empty.
-	ReasonSinkEmpty = "EmptySinkURI"
-
-	// ReasonRBACNotBound is set on a Deployed condition when an adapter's
-	// ServiceAccount cannot be bound.
-	ReasonRBACNotBound = "RBACNotBound"
-	// ReasonUnavailable is set on a Deployed condition when an adapter is unavailable.
-	ReasonUnavailable = "AdapterUnavailable"
-
 	// ReasonFailedSync is set on a status condition when some external resource can not be reconciled.
 	ReasonFailedSync = "FailedSync"
 )

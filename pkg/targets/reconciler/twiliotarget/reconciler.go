@@ -21,10 +21,11 @@ import (
 
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/twiliotarget"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
@@ -41,7 +42,7 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.TwilioTarget) reconciler.Event {
 	// inject target into context for usage in reconciliation logic
-	ctx = v1alpha1.WithReconcilable(ctx, trg)
+	ctx = commonv1alpha1.WithReconcilable(ctx, trg)
 
 	return r.base.ReconcileAdapter(ctx, r)
 }

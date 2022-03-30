@@ -21,10 +21,11 @@ import (
 
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	splitterreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/splitter"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements addressableservicereconciler.Interface for
@@ -40,8 +41,8 @@ var _ splitterreconciler.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Splitter) reconciler.Event {
-	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithReconcilable(ctx, o)
+	// inject router into context for usage in reconciliation logic
+	ctx = commonv1alpha1.WithReconcilable(ctx, o)
 
 	return r.base.ReconcileAdapter(ctx, r)
 }

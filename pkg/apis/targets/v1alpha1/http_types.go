@@ -18,8 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"knative.dev/pkg/apis"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,13 +32,13 @@ type HTTPTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   HTTPTargetSpec `json:"spec"`
-	Status TargetStatus   `json:"status,omitempty"`
+	Spec   HTTPTargetSpec  `json:"spec"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable = (*HTTPTarget)(nil)
+	_ v1alpha1.Reconcilable = (*HTTPTarget)(nil)
 )
 
 // HTTPTargetSpec holds the desired state of the HTTPTarget.

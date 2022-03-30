@@ -22,7 +22,7 @@ import (
 	"knative.dev/eventing/pkg/adapter/v2"
 	rt "knative.dev/pkg/reconciler/testing"
 
-	"github.com/triggermesh/triggermesh/pkg/sources/testing/structs"
+	"github.com/triggermesh/triggermesh/pkg/testing/structs"
 )
 
 // TestControllerConstructor tests that a controller constructor meets our requirements.
