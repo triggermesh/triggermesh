@@ -54,6 +54,7 @@ jobs:
           environment:
             TEST_OUTPUT_DIR: /tmp/test-results/
             COVER_OUTPUT_DIR: /tmp/cover-results/
+            DW_HOME: /tmp/dw
       - store_test_results:
           path: /tmp/test-results/
       - store_artifacts:

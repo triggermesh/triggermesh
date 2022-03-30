@@ -18,10 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -37,12 +35,9 @@ type DataWeaveTransformation struct {
 	Status TargetStatus                `json:"status,omitempty"`
 }
 
-// Check the interfaces DataWeaveTransformation should be implementing.
 var (
-	_ runtime.Object     = (*DataWeaveTransformation)(nil)
-	_ kmeta.OwnerRefable = (*DataWeaveTransformation)(nil)
-	_ duckv1.KRShaped    = (*DataWeaveTransformation)(nil)
-	_ kmeta.OwnerRefable = (*DataWeaveTransformation)(nil)
+	_ Reconcilable = (*DataWeaveTransformation)(nil)
+	_ EventSender  = (*DataWeaveTransformation)(nil)
 )
 
 // DataWeaveTransformationSpec holds the desired state of the DataWeaveTransformation.

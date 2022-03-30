@@ -47,14 +47,14 @@ var (
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
+		&DataWeaveTransformation{},
+		&DataWeaveTransformationList{},
 		&JQTransformation{},
 		&JQTransformationList{},
 		&Synchronizer{},
 		&SynchronizerList{},
 		&Transformation{},
 		&TransformationList{},
-		&DataWeaveTransformation{},
-		&DataWeaveTransformationList{},
 		&XMLToJSONTransformation{},
 		&XMLToJSONTransformationList{},
 		&XSLTTransformation{},

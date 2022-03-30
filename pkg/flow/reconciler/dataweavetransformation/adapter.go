@@ -95,33 +95,3 @@ func (r *Reconciler) RBACOwners(trg v1alpha1.Reconcilable) ([]kmeta.OwnerRefable
 
 	return ownerRefables, nil
 }
-
-// old
-// func makeAppEnv(o *v1alpha1.DataWeaveTransformation, sink *apis.URL) ([]corev1.EnvVar, error) {
-// 	env := []corev1.EnvVar{
-// 		{
-// 			Name:  common.EnvBridgeID,
-// 			Value: common.GetStatefulBridgeID(o),
-// 		},
-
-// 		*o.Spec.DwSpell.ToEnvironmentVariable(envDWSPELL),
-// 	}
-
-// 	env = append(env, corev1.EnvVar{
-// 		Name:  envIncomingContentType,
-// 		Value: o.Spec.IncomingContentType,
-// 	})
-
-// 	env = append(env, corev1.EnvVar{
-// 		Name:  envOutputContentType,
-// 		Value: o.Spec.OutputContentType,
-// 	})
-
-// 	if sink != nil {
-// 		env = append(env, corev1.EnvVar{
-// 			Name:  envSink,
-// 			Value: sink.String(),
-// 		})
-// 	}
-// 	return env, nil
-// }

@@ -81,6 +81,11 @@ func (l *Listers) IndexerFor(obj runtime.Object) cache.Indexer {
 	return l.sorter.IndexerForObjectType(obj)
 }
 
+// GetDataWeaveTransformationLister returns a Lister for DataWeaveTransformation objects.
+func (l *Listers) GetDataWeaveTransformationLister() flowlisters.DataWeaveTransformationLister {
+	return flowlisters.NewDataWeaveTransformationLister(l.IndexerFor(&flowv1alpha1.DataWeaveTransformation{}))
+}
+
 // GetFlowObjects returns objects from the flow API.
 func (l *Listers) GetFlowObjects() []runtime.Object {
 	return l.sorter.ObjectsForSchemeFunc(fakeflowclient.AddToScheme)
@@ -119,11 +124,6 @@ func (l *Listers) GetJQTransformationLister() flowlisters.JQTransformationLister
 // GetSynchronizerLister returns a Lister for Synchronizer objects.
 func (l *Listers) GetSynchronizerLister() flowlisters.SynchronizerLister {
 	return flowlisters.NewSynchronizerLister(l.IndexerFor(&flowv1alpha1.Synchronizer{}))
-}
-
-// GetDataWeaveTransformationLister returns a Lister for DataWeaveTransformation objects.
-func (l *Listers) GetDataWeaveTransformationLister() flowlisters.DataWeaveTransformationLister {
-	return flowlisters.NewDataWeaveTransformationLister(l.IndexerFor(&flowv1alpha1.DataWeaveTransformation{}))
 }
 
 // GetTransformationLister returns a Lister for Transformation objects.
