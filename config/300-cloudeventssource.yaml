@@ -57,7 +57,7 @@ spec:
                     description: HTTP basic authentication parameters.
                     type: object
                     properties:
-                      user:
+                      username:
                         description: User name for HTTP Basic authentication.
                         type: string
                       password:
@@ -84,26 +84,42 @@ spec:
                         - required: [value]
                         - required: [valueFromSecret]
                     required:
-                    - user
+                    - username
                     - password
 
                   token:
-                    description: API Token at HTTP header.
+                    description: Authentication API Token at HTTP header.
                     type: object
                     properties:
                       header:
                         description: HTTP header name informing the token.
                         type: string
-                      values:
-                        description: HTTP token valid values. A request containing any of
-                          these values will be accepted.
-                        type: array
-                        items:
-                          type: string
-                          minLength: 1
+                      value:
+                        description: HTTP authentication token.
+                        type: object
+                          properties:
+                            value:
+                              description: Literal value of the token.
+                              type: string
+                            valueFromSecret:
+                              description: A reference to a Kubernetes Secret object containing the token.
+                              type: object
+                              properties:
+                                name:
+                                  description: Name of the Secret object.
+                                  type: string
+                                key:
+                                  description: Key from the Secret object.
+                                  type: string
+                              required:
+                              - name
+                              - key
+                          oneOf:
+                          - required: [value]
+                          - required: [valueFromSecret]
                     required:
                     - header
-                    - values
+                    - value
 
               path:
                 description: Path where incoming CloudEvents will be accepted.
@@ -113,15 +129,11 @@ spec:
                 description: Rate limiter parameters.
                 type: object
                 properties:
-                  requests:
+                  requestsPerSecond:
                     description: Number of requests accepted per time duration.
                     type: integer
-                  duration:
-                    description: Slidding time window duration where requests will be counted. Expressed as a
-                      duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
-                    type: string
                 required:
-                - requests
+                - requestsPerSecond
                 - duration
 
               ceOverrides:

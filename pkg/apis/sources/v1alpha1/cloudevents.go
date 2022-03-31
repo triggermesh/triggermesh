@@ -42,6 +42,32 @@ var (
 // CloudEventsSourceSpec defines the desired state of the event source.
 type CloudEventsSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
+
+	// Credentials to connect to this source.
+	// +optional
+	Credentials *HTTPCredentials `json:"credentials,omitempty"`
+
+	// Path under which request are accepted
+	// +optional
+	Path *string `json:"path,omitempty"`
+}
+
+// HTTPCredentials to be used when receiving requests.
+type HTTPCredentials struct {
+	BasicAuth *HTTPBasicAuth `json:"basicAuth,omitempty"`
+	Token     *HTTPToken     `json:"token,omitempty"`
+}
+
+// HTTPBasicAuth credentialsn
+type HTTPBasicAuth struct {
+	Username string         `json:"username"`
+	Password ValueFromField `json:"password"`
+}
+
+// HTTPToken credentials.
+type HTTPToken struct {
+	Header string         `json:"header"`
+	Value  ValueFromField `json:"value"`
 }
 
 // CloudEventsSourceStatus defines the observed state of the event source.
