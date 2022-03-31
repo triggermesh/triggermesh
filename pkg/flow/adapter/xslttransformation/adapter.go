@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime"
 
 	xslt "github.com/wamuir/go-xslt"
 	"go.uber.org/zap"
@@ -78,6 +79,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		if err != nil {
 			logger.Panicf("XSLT validation error: %v", err)
 		}
+
+		runtime.SetFinalizer(adapter.defaultXSLT, (*xslt.Stylesheet).Close)
 	}
 
 	return adapter
@@ -115,6 +118,7 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
+		defer style.Close()
 
 	case isXML:
 		xmlin = event.DataEncoded
