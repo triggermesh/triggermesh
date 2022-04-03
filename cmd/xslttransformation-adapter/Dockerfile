@@ -40,13 +40,13 @@ COPY --from=builder \
     /usr/lib/x86_64-linux-gnu/libxslt.so.1 \
     /usr/lib/x86_64-linux-gnu/libexslt.so.0 \
     /usr/lib/x86_64-linux-gnu/libicuuc.so.67 \
-    /usr/lib/x86_64-linux-gnu/libgcrypt.so.20 \
-    /lib/x86_64-linux-gnu/libgpg-error.so.0 \
     /lib/x86_64-linux-gnu/libz.so.1 \
     /lib/x86_64-linux-gnu/liblzma.so.5 \
+    /usr/lib/x86_64-linux-gnu/libgcrypt.so.20 \
     /usr/lib/x86_64-linux-gnu/libicudata.so.67 \
     /usr/lib/x86_64-linux-gnu/libstdc++.so.6 \
     /lib/x86_64-linux-gnu/libgcc_s.so.1 \
+    /lib/x86_64-linux-gnu/libgpg-error.so.0 \
     /usr/lib/x86_64-linux-gnu/
 
 COPY --from=builder /xslttransformation-adapter /
