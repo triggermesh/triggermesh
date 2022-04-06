@@ -21,6 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/labels"
 	"knative.dev/eventing/pkg/reconciler/source"
+	network "knative.dev/networking/pkg"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
@@ -46,6 +47,8 @@ var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
 	return common.NewAdapterKnService(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
+
+		resource.Label(network.VisibilityLabelKey, "public"),
 
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
