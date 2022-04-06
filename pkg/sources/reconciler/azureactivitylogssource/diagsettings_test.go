@@ -35,6 +35,7 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	clients "github.com/triggermesh/triggermesh/pkg/sources/client/azure/insights"
 )
@@ -155,7 +156,7 @@ func TestEnsureDiagnosticSettings(t *testing.T) {
 				},
 			}
 
-			ctx := v1alpha1.WithReconcilable(testContext(t), src)
+			ctx := commonv1alpha1.WithReconcilable(testContext(t), src)
 
 			returnedErr := make(chan error)
 			go func() {

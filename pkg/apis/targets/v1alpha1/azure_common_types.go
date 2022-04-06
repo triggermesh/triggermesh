@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // AzureAuth contains multiple authentication methods for Azure services.
@@ -40,16 +42,16 @@ type AzureAuth struct {
 
 // AzureServicePrincipal represents an AAD Service Principal.
 type AzureServicePrincipal struct {
-	TenantID     ValueFromField `json:"tenantID"`
-	ClientID     ValueFromField `json:"clientID"`
-	ClientSecret ValueFromField `json:"clientSecret"`
+	TenantID     v1alpha1.ValueFromField `json:"tenantID"`
+	ClientID     v1alpha1.ValueFromField `json:"clientID"`
+	ClientSecret v1alpha1.ValueFromField `json:"clientSecret"`
 }
 
 // AzureSASToken represents an Azure SAS token.
 type AzureSASToken struct {
-	KeyName          ValueFromField `json:"keyName"`
-	KeyValue         ValueFromField `json:"keyValue"`
-	ConnectionString ValueFromField `json:"connectionString"`
+	KeyName          v1alpha1.ValueFromField `json:"keyName"`
+	KeyValue         v1alpha1.ValueFromField `json:"keyValue"`
+	ConnectionString v1alpha1.ValueFromField `json:"connectionString"`
 }
 
 // EventHubResourceID represents a resource ID for an Event Hubs instance or namespace.

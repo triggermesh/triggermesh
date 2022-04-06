@@ -18,8 +18,16 @@ package v1alpha1
 
 import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+)
+
+// Supported event types
+const (
+	FilterGenericEventType = "io.triggermesh.routing.filter"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
@@ -27,34 +35,39 @@ func (*Filter) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("Filter")
 }
 
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (f *Filter) GetConditionSet() apis.ConditionSet {
-	return routerConditionSet
+// GetStatus implements duckv1.KRShaped.
+func (f *Filter) GetStatus() *duckv1.Status {
+	return &f.Status.Status
 }
 
-// Supported event types
-const (
-	FilterGenericEventType = "io.triggermesh.routing.filter"
-)
+// GetConditionSet implements duckv1.KRShaped.
+func (*Filter) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
+}
 
-// GetEventTypes implements Reconcilable.
+// GetStatusManager implements Reconcilable.
+func (f *Filter) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: f.GetConditionSet(),
+		Status:       &f.Status,
+	}
+}
+
+// GetEventTypes implements EventSource.
 func (*Filter) GetEventTypes() []string {
 	return []string{
 		FilterGenericEventType,
 	}
 }
 
-// GetSink implements Reconcilable.
-func (f *Filter) GetSink() *duckv1.Destination {
-	return f.Spec.Sink
+// AsEventSource implements EventSource.
+func (f *Filter) AsEventSource() string {
+	return "filter/" + f.Name
 }
 
-// GetStatusManager implements Reconcilable.
-func (f *Filter) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet: f.GetConditionSet(),
-		RouterStatus: &f.Status,
-	}
+// GetSink implements EventSender.
+func (f *Filter) GetSink() *duckv1.Destination {
+	return f.Spec.Sink
 }
 
 // IsMultiTenant implements MultiTenant.

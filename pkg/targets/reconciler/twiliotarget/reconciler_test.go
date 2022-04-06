@@ -28,8 +28,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/twiliotarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/targets/reconciler/testing"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 )
 
 func TestReconcile(t *testing.T) {

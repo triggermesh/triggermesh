@@ -21,6 +21,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -38,7 +39,7 @@ type AWSS3Source struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*AWSS3Source)(nil)
+	_ v1alpha1.Reconcilable = (*AWSS3Source)(nil)
 )
 
 // AWSS3SourceSpec defines the desired state of the event source.
@@ -91,8 +92,8 @@ type AWSS3SourceDestinationSQS struct {
 
 // AWSS3SourceStatus defines the observed state of the event source.
 type AWSS3SourceStatus struct {
-	EventSourceStatus `json:",inline"`
-	QueueARN          *apis.ARN `json:"queueARN,omitempty"`
+	v1alpha1.Status `json:",inline"`
+	QueueARN        *apis.ARN `json:"queueARN,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -27,11 +27,12 @@ import (
 	"knative.dev/pkg/logging"
 	rt "knative.dev/pkg/reconciler/testing"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/ocimetricssource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 )
 
 func TestReconcileSource(t *testing.T) {
@@ -72,7 +73,7 @@ func newEventSource() *v1alpha1.OCIMetricsSource {
 
 	src := &v1alpha1.OCIMetricsSource{
 		Spec: v1alpha1.OCIMetricsSourceSpec{
-			OracleAPIPrivateKey: v1alpha1.ValueFromField{
+			OracleAPIPrivateKey: commonv1alpha1.ValueFromField{
 				ValueFromSecret: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "test-private-secret",
@@ -80,7 +81,7 @@ func newEventSource() *v1alpha1.OCIMetricsSource {
 					Key: "keyId",
 				},
 			},
-			OracleAPIPrivateKeyPassphrase: v1alpha1.ValueFromField{
+			OracleAPIPrivateKeyPassphrase: commonv1alpha1.ValueFromField{
 				ValueFromSecret: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "test-private-secret-passphrase",
@@ -88,7 +89,7 @@ func newEventSource() *v1alpha1.OCIMetricsSource {
 					Key: "passphrase",
 				},
 			},
-			OracleAPIPrivateKeyFingerprint: v1alpha1.ValueFromField{
+			OracleAPIPrivateKeyFingerprint: commonv1alpha1.ValueFromField{
 				ValueFromSecret: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: "test-private-secret-fingerprint",

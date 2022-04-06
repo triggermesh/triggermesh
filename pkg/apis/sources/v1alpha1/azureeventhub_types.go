@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,12 +33,14 @@ type AzureEventHubSource struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   AzureEventHubSourceSpec `json:"spec,omitempty"`
-	Status EventSourceStatus       `json:"status,omitempty"`
+	Status v1alpha1.Status         `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*AzureEventHubSource)(nil)
+	_ v1alpha1.Reconcilable = (*AzureEventHubSource)(nil)
+	_ v1alpha1.EventSource  = (*AzureEventHubSource)(nil)
+	_ v1alpha1.EventSender  = (*AzureEventHubSource)(nil)
 )
 
 // AzureEventHubSourceSpec defines the desired state of the event source.

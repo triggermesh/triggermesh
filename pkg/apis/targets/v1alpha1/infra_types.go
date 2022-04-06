@@ -18,6 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -30,12 +32,12 @@ type InfraTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   InfraTargetSpec `json:"spec"`
-	Status TargetStatus    `json:"status,omitempty"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable = (*InfraTarget)(nil)
+	_ v1alpha1.Reconcilable = (*InfraTarget)(nil)
 )
 
 // InfraTargetSpec holds the desired state of the InfraTarget.

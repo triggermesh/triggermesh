@@ -25,6 +25,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/s3"
 )
 
@@ -40,19 +41,19 @@ func (s *AWSS3Source) GetConditionSet() apis.ConditionSet {
 
 // GetStatus implements duckv1.KRShaped.
 func (s *AWSS3Source) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+	return &s.Status.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AWSS3Source) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AWSS3Source) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+func (s *AWSS3Source) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status.Status,
 	}
 }
 
@@ -66,7 +67,7 @@ const (
 	AWSS3TestEventType                     = "testevent"
 )
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (s *AWSS3Source) GetEventTypes() []string {
 	selectedTypes := make(map[string]struct{})
 	for _, t := range s.Spec.EventTypes {
@@ -99,7 +100,7 @@ func s3EventTypeFromSpecEventType(specEventType string) string {
 	return strings.ToLower(strings.SplitN(strings.TrimPrefix(specEventType, "s3:"), ":", 2)[0])
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AWSS3Source) AsEventSource() string {
 	return s3.RealBucketARN(s.Spec.ARN)
 }
@@ -122,7 +123,7 @@ const (
 )
 
 // awsS3SourceConditionSet is a set of conditions for AWSS3Source objects.
-var awsS3SourceConditionSet = NewEventSourceConditionSet(
+var awsS3SourceConditionSet = v1alpha1.NewConditionSet(
 	AWSS3ConditionSubscribed,
 )
 

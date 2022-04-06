@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -36,7 +38,9 @@ type AzureServiceBusTopicSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*AzureServiceBusTopicSource)(nil)
+	_ v1alpha1.Reconcilable = (*AzureServiceBusTopicSource)(nil)
+	_ v1alpha1.EventSource  = (*AzureServiceBusTopicSource)(nil)
+	_ v1alpha1.EventSender  = (*AzureServiceBusTopicSource)(nil)
 )
 
 // AzureServiceBusTopicSourceSpec defines the desired state of the event source.
@@ -56,7 +60,7 @@ type AzureServiceBusTopicSourceSpec struct {
 
 // AzureServiceBusTopicSourceStatus defines the observed state of the event source.
 type AzureServiceBusTopicSourceStatus struct {
-	EventSourceStatus `json:",inline"`
+	v1alpha1.Status `json:",inline"`
 
 	// Resource ID of the Service Bus Subscription that is currently used
 	// by the event source for consuming events from the configured Service

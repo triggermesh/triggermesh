@@ -21,6 +21,8 @@ import (
 
 	pkgapis "knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -30,7 +32,7 @@ func (*TwilioSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (s *TwilioSource) GetConditionSet() pkgapis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -38,20 +40,20 @@ func (s *TwilioSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *TwilioSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *TwilioSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+func (s *TwilioSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *TwilioSource) AsEventSource() string {
 	return TwilioSourceName(s.Namespace, s.Name)
 }
@@ -67,7 +69,7 @@ const (
 	TwilioSourceGenericEventType = "com.triggermesh.twilio.sms"
 )
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (s *TwilioSource) GetEventTypes() []string {
 	return []string{
 		TwilioSourceGenericEventType,

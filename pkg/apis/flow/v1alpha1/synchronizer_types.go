@@ -22,6 +22,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -34,13 +35,13 @@ type Synchronizer struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   SynchronizerSpec `json:"spec"`
-	Status TargetStatus     `json:"status,omitempty"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
 // Check the interfaces Synchronizer should be implementing.
 var (
-	_ Reconcilable = (*Synchronizer)(nil)
-	_ EventSender  = (*Synchronizer)(nil)
+	_ v1alpha1.Reconcilable = (*Synchronizer)(nil)
+	_ v1alpha1.EventSender  = (*Synchronizer)(nil)
 )
 
 // SynchronizerSpec holds the desired state of the Synchronizer.

@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,12 +33,14 @@ type WebhookSource struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   WebhookSourceSpec `json:"spec,omitempty"`
-	Status EventSourceStatus `json:"status,omitempty"`
+	Status v1alpha1.Status   `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*WebhookSource)(nil)
+	_ v1alpha1.Reconcilable = (*WebhookSource)(nil)
+	_ v1alpha1.EventSource  = (*WebhookSource)(nil)
+	_ v1alpha1.EventSender  = (*WebhookSource)(nil)
 )
 
 // WebhookSourceSpec defines the desired state of the event source.
@@ -63,7 +67,7 @@ type WebhookSourceSpec struct {
 
 	// Password HTTP clients must set to authenticate with the webhook using HTTP Basic authentication.
 	// +optional
-	BasicAuthPassword *ValueFromField `json:"basicAuthPassword,omitempty"`
+	BasicAuthPassword *v1alpha1.ValueFromField `json:"basicAuthPassword,omitempty"`
 
 	// Specifies the CORS Origin to use in pre-flight headers.
 	// +optional

@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	corev1 "k8s.io/api/core/v1"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
@@ -29,41 +28,6 @@ import (
 type SecretValueFromSource struct {
 	// The Secret key to select from.
 	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
-}
-
-// ValueFromField is a struct field that can have its value either defined
-// explicitly or sourced from another entity.
-type ValueFromField struct {
-	// Optional: no more than one of the following may be specified.
-
-	// Field value.
-	// +optional
-	Value string `json:"value,omitempty"`
-	// Field value from a Kubernetes Secret.
-	// +optional
-	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
-}
-
-// TargetStatus defines the observed state of an event target.
-type TargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
-}
-
-// CloudEventStatus contains attributes that target types can embed to declare
-// the event types they accept and emit.
-type CloudEventStatus struct {
-	// AcceptedEventTypes are the CloudEvent types that a target can process.
-	// +optional
-	AcceptedEventTypes []string `json:"acceptedEventTypes,omitempty"`
-
-	// ResponseAttributes are the CloudEvent attributes contained in the responses returned by a target.
-	// NOTE: the json tag *must* be exactly `ceAttributes` to satisfy Knative's Source duck type.
-	// +optional
-	ResponseAttributes []duckv1.CloudEventAttributes `json:"ceAttributes,omitempty"`
 }
 
 // EventOptions modifies CloudEvents management at Targets.

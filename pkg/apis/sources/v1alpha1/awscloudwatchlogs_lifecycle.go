@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -30,7 +32,7 @@ func (*AWSCloudWatchLogsSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*AWSCloudWatchLogsSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -38,16 +40,16 @@ func (s *AWSCloudWatchLogsSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AWSCloudWatchLogsSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AWSCloudWatchLogsSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+func (s *AWSCloudWatchLogsSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
@@ -56,14 +58,14 @@ const (
 	AWSCloudWatchLogsGenericEventType = "log"
 )
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (s *AWSCloudWatchLogsSource) GetEventTypes() []string {
 	return []string{
 		AWSEventType(s.Spec.ARN.Service, AWSCloudWatchLogsGenericEventType),
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AWSCloudWatchLogsSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }

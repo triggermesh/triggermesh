@@ -21,6 +21,8 @@ import (
 
 	pkgapis "knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -30,7 +32,7 @@ func (*OCIMetricsSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*OCIMetricsSource) GetConditionSet() pkgapis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -38,20 +40,20 @@ func (s *OCIMetricsSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *OCIMetricsSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *OCIMetricsSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+func (s *OCIMetricsSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *OCIMetricsSource) AsEventSource() string {
 	return OCIGenerateEventSource(s.Namespace, s.Name)
 }
@@ -66,7 +68,7 @@ const (
 	OCIMetricsGenericEventType = "com.oracle.cloud.monitoring"
 )
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (*OCIMetricsSource) GetEventTypes() []string {
 	return []string{
 		OCIMetricsGenericEventType,

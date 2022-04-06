@@ -30,8 +30,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/googlecloudsourcerepositoriessource"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudsourcerepositoriessource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	repositories "github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/repositories"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 )
 
 // the resync period ensures we regularly re-check the state of Google Cloud resources.

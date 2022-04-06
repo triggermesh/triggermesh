@@ -29,7 +29,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	filterinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/filter"
 	filterreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/filter"
-	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // the resync period ensures we regularly re-check the state of Routers.

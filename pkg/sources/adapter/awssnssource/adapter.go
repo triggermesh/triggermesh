@@ -37,13 +37,13 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/client"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/awssnssource"
+	"github.com/triggermesh/triggermesh/pkg/mturl"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/awssnssource/handler"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/awssnssource/probe"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/awssnssource/status"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/env"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/router"
 	snsclient "github.com/triggermesh/triggermesh/pkg/sources/client/sns"
-	"github.com/triggermesh/triggermesh/pkg/sources/routing"
 )
 
 // adapter implements the source's adapter.
@@ -168,13 +168,13 @@ func (a *adapter) RegisterHandlerFor(ctx context.Context, src *v1alpha1.AWSSNSSo
 
 	h := handler.New(src, a.logger, a.ceClient, snsCli)
 
-	a.router.RegisterPath(routing.URLPath(src), h)
+	a.router.RegisterPath(mturl.URLPath(src), h)
 	return nil
 }
 
 // DeregisterHandlerFor implements MTAdapter.
 func (a *adapter) DeregisterHandlerFor(ctx context.Context, src *v1alpha1.AWSSNSSource) error {
-	a.router.DeregisterPath(routing.URLPath(src))
+	a.router.DeregisterPath(mturl.URLPath(src))
 	return nil
 }
 

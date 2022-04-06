@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	corev1 "k8s.io/api/core/v1"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
@@ -39,23 +38,6 @@ type ValueFromField struct {
 	// Field value from a Kubernetes ConfigMap.
 	// +optional
 	ValueFromConfigMap *corev1.ConfigMapKeySelector `json:"valueFromConfigMap,omitempty"`
-}
-
-// TargetStatus defines the observed state of an event target.
-type TargetStatus struct {
-	duckv1.SourceStatus  `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
-}
-
-// CloudEventStatus contains attributes that target types can embed to declare
-// the event types they accept.
-type CloudEventStatus struct {
-	// AcceptedEventTypes are the CloudEvent types that a target can process.
-	// +optional
-	AcceptedEventTypes []string `json:"acceptedEventTypes,omitempty"`
 }
 
 // EventOptions modifies CloudEvents management at Targets.

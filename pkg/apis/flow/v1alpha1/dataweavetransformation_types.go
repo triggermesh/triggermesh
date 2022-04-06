@@ -18,8 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,12 +33,12 @@ type DataWeaveTransformation struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   DataWeaveTransformationSpec `json:"spec"`
-	Status TargetStatus                `json:"status,omitempty"`
+	Status v1alpha1.Status             `json:"status,omitempty"`
 }
 
 var (
-	_ Reconcilable = (*DataWeaveTransformation)(nil)
-	_ EventSender  = (*DataWeaveTransformation)(nil)
+	_ v1alpha1.Reconcilable = (*DataWeaveTransformation)(nil)
+	_ v1alpha1.EventSender  = (*DataWeaveTransformation)(nil)
 )
 
 // DataWeaveTransformationSpec holds the desired state of the DataWeaveTransformation.

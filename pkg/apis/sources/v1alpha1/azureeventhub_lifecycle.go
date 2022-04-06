@@ -22,6 +22,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 )
 
@@ -32,7 +33,7 @@ func (s *AzureEventHubSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (s *AzureEventHubSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -40,20 +41,20 @@ func (s *AzureEventHubSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AzureEventHubSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AzureEventHubSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+func (s *AzureEventHubSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AzureEventHubSource) AsEventSource() string {
 	return s.Spec.EventHubID.String()
 }

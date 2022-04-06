@@ -30,10 +30,11 @@ import (
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/storage"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 )
 
 // We don't know the pricing tier of the Event Hubs namespace, so we default to
@@ -54,7 +55,7 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 		return "", nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
 	status := &src.Status
 
 	if userProvidedHub := src.Spec.Endpoint.EventHubs.HubName; userProvidedHub != nil {
@@ -138,7 +139,7 @@ func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) *v1al
 // Required permissions:
 //  - Microsoft.EventHub/namespaces/eventhubs/delete
 func ensureNoEventHub(ctx context.Context, cli storage.EventHubsClient) error {
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
 
 	if userProvidedHub := src.Spec.Endpoint.EventHubs.HubName; userProvidedHub != nil {
 		// do not delete Event Hubs managed by the user

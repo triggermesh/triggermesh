@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,13 +32,13 @@ type AWSComprehendTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   AWSComprehendTargetSpec `json:"spec"`
-	Status TargetStatus            `json:"status,omitempty"`
+	Status v1alpha1.Status         `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable        = (*AWSComprehendTarget)(nil)
-	_ targets.EventSource = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.Reconcilable = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.EventSource  = (*AWSComprehendTarget)(nil)
 )
 
 // AWSComprehendTargetSpec holds the desired state of the event target.

@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,14 +32,14 @@ type AWSS3Target struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   AWSS3TargetSpec `json:"spec"`
-	Status TargetStatus    `json:"status,omitempty"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*AWSS3Target)(nil)
-	_ targets.IntegrationTarget = (*AWSS3Target)(nil)
-	_ targets.EventSource       = (*AWSS3Target)(nil)
+	_ v1alpha1.Reconcilable  = (*AWSS3Target)(nil)
+	_ v1alpha1.EventReceiver = (*AWSS3Target)(nil)
+	_ v1alpha1.EventSource   = (*AWSS3Target)(nil)
 )
 
 // AWSS3TargetSpec holds the desired state of the even target.

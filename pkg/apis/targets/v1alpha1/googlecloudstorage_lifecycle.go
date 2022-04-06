@@ -20,9 +20,11 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"knative.dev/pkg/apis"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Managed event types
@@ -39,7 +41,7 @@ func (*GoogleCloudStorageTarget) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*GoogleCloudStorageTarget) GetConditionSet() apis.ConditionSet {
-	return targetConditionSet
+	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -48,10 +50,10 @@ func (t *GoogleCloudStorageTarget) GetStatus() *duckv1.Status {
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *GoogleCloudStorageTarget) GetStatusManager() *StatusManager {
-	return &StatusManager{
+func (t *GoogleCloudStorageTarget) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
 		ConditionSet: t.GetConditionSet(),
-		TargetStatus: &t.Status,
+		Status:       &t.Status,
 	}
 }
 

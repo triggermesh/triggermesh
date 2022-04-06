@@ -23,6 +23,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Accepted event types
@@ -46,7 +48,7 @@ func (*HasuraTarget) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*HasuraTarget) GetConditionSet() apis.ConditionSet {
-	return targetConditionSet
+	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -55,10 +57,10 @@ func (t *HasuraTarget) GetStatus() *duckv1.Status {
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *HasuraTarget) GetStatusManager() *StatusManager {
-	return &StatusManager{
+func (t *HasuraTarget) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
 		ConditionSet: t.GetConditionSet(),
-		TargetStatus: &t.Status,
+		Status:       &t.Status,
 	}
 }
 

@@ -27,9 +27,10 @@ import (
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const (
@@ -54,7 +55,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
 	typedSrc := src.(*v1alpha1.WebhookSource)
 
 	return common.NewAdapterKnService(src, sinkURI,
@@ -66,7 +67,7 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.Reconcilable, sinkURI *apis.URL) 
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
 	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)

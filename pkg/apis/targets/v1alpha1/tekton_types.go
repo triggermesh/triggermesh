@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,7 +32,7 @@ type TektonTarget struct {
 	metav1.ObjectMeta `json:"metadata"`
 
 	Spec   TektonTargetSpec `json:"spec"`
-	Status TargetStatus     `json:"status,omitempty"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
 // TektonTargetSpec holds the desired state of event target.
@@ -52,9 +52,9 @@ type TektonTargetReapPolicy struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*TektonTarget)(nil)
-	_ targets.IntegrationTarget = (*TektonTarget)(nil)
-	_ targets.EventSource       = (*TektonTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*TektonTarget)(nil)
+	_ v1alpha1.EventReceiver = (*TektonTarget)(nil)
+	_ v1alpha1.EventSource   = (*TektonTarget)(nil)
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

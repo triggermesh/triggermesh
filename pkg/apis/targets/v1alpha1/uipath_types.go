@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,14 +32,14 @@ type UiPathTarget struct { //nolint:stylecheck
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   UiPathTargetSpec `json:"spec,omitempty"`
-	Status TargetStatus     `json:"status,omitempty"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*UiPathTarget)(nil)
-	_ targets.IntegrationTarget = (*UiPathTarget)(nil)
-	_ targets.EventSource       = (*UiPathTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*UiPathTarget)(nil)
+	_ v1alpha1.EventReceiver = (*UiPathTarget)(nil)
+	_ v1alpha1.EventSource   = (*UiPathTarget)(nil)
 )
 
 // UiPathTargetSpec defines the desired state of the event target.

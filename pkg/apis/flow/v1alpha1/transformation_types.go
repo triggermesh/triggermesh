@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -34,15 +36,15 @@ type Transformation struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   TransformationSpec `json:"spec,omitempty"`
-	Status TargetStatus       `json:"status,omitempty"`
+	Status v1alpha1.Status    `json:"status,omitempty"`
 }
 
 var (
 	_ apis.Validatable = (*Transformation)(nil)
 	_ apis.Defaultable = (*Transformation)(nil)
 
-	_ Reconcilable = (*Transformation)(nil)
-	_ EventSender  = (*Transformation)(nil)
+	_ v1alpha1.Reconcilable = (*Transformation)(nil)
+	_ v1alpha1.EventSender  = (*Transformation)(nil)
 )
 
 // TransformationSpec holds the desired state of the Transformation (from the client).

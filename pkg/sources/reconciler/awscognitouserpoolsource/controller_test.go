@@ -19,7 +19,7 @@ package awscognitouserpoolsource
 import (
 	"testing"
 
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 
 	// Link fake informers accessed by our controller
 	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/awscognitouserpoolsource/fake"

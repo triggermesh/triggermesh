@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -31,9 +33,9 @@ func (*JQTransformation) GetGroupVersionKind() schema.GroupVersionKind {
 // GetConditionSet implements duckv1.KRShaped.
 func (t *JQTransformation) GetConditionSet() apis.ConditionSet {
 	if t.Spec.Sink.Ref != nil || t.Spec.Sink.URI != nil {
-		return eventSenderConditionSet
+		return v1alpha1.EventSenderConditionSet
 	}
-	return targetConditionSet
+	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -42,10 +44,10 @@ func (t *JQTransformation) GetStatus() *duckv1.Status {
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *JQTransformation) GetStatusManager() *StatusManager {
-	return &StatusManager{
+func (t *JQTransformation) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
 		ConditionSet: t.GetConditionSet(),
-		TargetStatus: &t.Status,
+		Status:       &t.Status,
 	}
 }
 

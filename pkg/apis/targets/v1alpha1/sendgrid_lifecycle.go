@@ -23,6 +23,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Accepted event types
@@ -40,7 +42,7 @@ func (*SendGridTarget) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*SendGridTarget) GetConditionSet() apis.ConditionSet {
-	return targetConditionSet
+	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -49,10 +51,10 @@ func (t *SendGridTarget) GetStatus() *duckv1.Status {
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *SendGridTarget) GetStatusManager() *StatusManager {
-	return &StatusManager{
+func (t *SendGridTarget) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
 		ConditionSet: t.GetConditionSet(),
-		TargetStatus: &t.Status,
+		Status:       &t.Status,
 	}
 }
 

@@ -41,10 +41,11 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/storage"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 )
 
 const crudTimeout = time.Second * 15
@@ -64,7 +65,7 @@ func ensureEventSubscription(ctx context.Context, cli storage.EventSubscriptions
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureBlobStorageSource)
 
 	status := &typedSrc.Status
@@ -159,7 +160,7 @@ func ensureNoEventSubscription(ctx context.Context, cli storage.EventSubscriptio
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureBlobStorageSource)
 
 	stAccID := typedSrc.Spec.StorageAccountID.String()

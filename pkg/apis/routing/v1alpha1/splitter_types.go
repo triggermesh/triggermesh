@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -30,26 +32,21 @@ import (
 // Splitter is an addressable object that splits incoming events according
 // to provided specification.
 type Splitter struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the Splitter (from the client).
-	// +optional
-	Spec SplitterSpec `json:"spec,omitempty"`
-
-	// Status communicates the observed state of the Splitter (from the controller).
-	// +optional
-	Status RouterStatus `json:"status,omitempty"`
+	Spec   SplitterSpec    `json:"spec,omitempty"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
 var (
-	// Check that Splitter can be validated and defaulted.
 	_ apis.Validatable = (*Splitter)(nil)
 	_ apis.Defaultable = (*Splitter)(nil)
 
-	_ Reconcilable = (*Splitter)(nil)
-	_ multiTenant  = (*Splitter)(nil)
+	_ v1alpha1.Reconcilable = (*Splitter)(nil)
+	_ v1alpha1.EventSender  = (*Splitter)(nil)
+	_ v1alpha1.EventSource  = (*Splitter)(nil)
+	_ v1alpha1.MultiTenant  = (*Splitter)(nil)
 )
 
 // SplitterSpec holds the desired state of the Splitter.
@@ -74,14 +71,4 @@ type SplitterList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []Splitter `json:"items"`
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *Splitter) GetStatus() *duckv1.Status {
-	return &s.Status.Status
-}
-
-// AsEventSource implements Reconcilable.
-func (s *Splitter) AsEventSource() string {
-	return "splitter/" + s.Name
 }

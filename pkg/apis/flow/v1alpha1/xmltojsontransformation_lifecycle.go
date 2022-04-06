@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Managed event types
@@ -36,9 +38,9 @@ func (*XMLToJSONTransformation) GetGroupVersionKind() schema.GroupVersionKind {
 // GetConditionSet implements duckv1.KRShaped.
 func (t *XMLToJSONTransformation) GetConditionSet() apis.ConditionSet {
 	if t.Spec.Sink.Ref != nil || t.Spec.Sink.URI != nil {
-		return eventSenderConditionSet
+		return v1alpha1.EventSenderConditionSet
 	}
-	return targetConditionSet
+	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -47,10 +49,10 @@ func (t *XMLToJSONTransformation) GetStatus() *duckv1.Status {
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *XMLToJSONTransformation) GetStatusManager() *StatusManager {
-	return &StatusManager{
+func (t *XMLToJSONTransformation) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
 		ConditionSet: t.GetConditionSet(),
-		TargetStatus: &t.Status,
+		Status:       &t.Status,
 	}
 }
 

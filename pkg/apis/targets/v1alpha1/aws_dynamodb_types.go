@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,13 +32,13 @@ type AWSDynamoDBTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   AWSDynamoDBTargetSpec `json:"spec"`
-	Status TargetStatus          `json:"status,omitempty"`
+	Status v1alpha1.Status       `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable        = (*AWSDynamoDBTarget)(nil)
-	_ targets.EventSource = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.Reconcilable = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.EventSource  = (*AWSDynamoDBTarget)(nil)
 )
 
 // AWSDynamoDBTargetSpec holds the desired state of the event target.

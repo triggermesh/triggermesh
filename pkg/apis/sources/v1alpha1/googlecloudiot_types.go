@@ -25,6 +25,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -42,7 +44,9 @@ type GoogleCloudIoTSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*GoogleCloudIoTSource)(nil)
+	_ v1alpha1.Reconcilable = (*GoogleCloudIoTSource)(nil)
+	_ v1alpha1.EventSource  = (*GoogleCloudIoTSource)(nil)
+	_ v1alpha1.EventSender  = (*GoogleCloudIoTSource)(nil)
 )
 
 // GoogleCloudIoTSourceSpec defines the desired state of the event source.
@@ -57,7 +61,7 @@ type GoogleCloudIoTSourceSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-	ServiceAccountKey ValueFromField `json:"serviceAccountKey"`
+	ServiceAccountKey v1alpha1.ValueFromField `json:"serviceAccountKey"`
 }
 
 // GoogleCloudIoTSourcePubSubSpec defines the attributes related to the
@@ -88,7 +92,7 @@ type GoogleCloudIoTSourcePubSubSpec struct {
 
 // GoogleCloudIoTSourceStatus defines the observed state of the event source.
 type GoogleCloudIoTSourceStatus struct {
-	EventSourceStatus `json:",inline"`
+	v1alpha1.Status `json:",inline"`
 
 	// Resource name of the target Pub/Sub topic.
 	Topic *GCloudResourceName `json:"topic,omitempty"`

@@ -22,6 +22,8 @@ comma := ,
 null  :=
 space := $(null) $(null)
 
+# Additionally to $(API_GROUPS), generate deepcopy methods for selected shared Go types inside pkg/apis/common/...
+deepcopy: private api-import-paths += $(PKG)/pkg/apis/common/v1alpha1
 deepcopy:
 	@echo "+ Generating deepcopy funcs for $(API_GROUPS)"
 	@go run k8s.io/code-generator/cmd/deepcopy-gen \

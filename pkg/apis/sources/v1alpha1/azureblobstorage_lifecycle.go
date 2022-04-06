@@ -23,6 +23,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -37,23 +39,23 @@ func (s *AzureBlobStorageSource) GetConditionSet() apis.ConditionSet {
 
 // GetStatus implements duckv1.KRShaped.
 func (s *AzureBlobStorageSource) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+	return &s.Status.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AzureBlobStorageSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AzureBlobStorageSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+func (s *AzureBlobStorageSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status.Status,
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AzureBlobStorageSource) AsEventSource() string {
 	return s.Spec.StorageAccountID.String()
 }
@@ -106,7 +108,7 @@ const (
 
 // azureBlobStorageSourceConditionSet is a set of conditions for
 // AzureBlobStorageSource objects.
-var azureBlobStorageSourceConditionSet = NewEventSourceConditionSet(
+var azureBlobStorageSourceConditionSet = v1alpha1.NewConditionSet(
 	AzureBlobStorageConditionSubscribed,
 )
 

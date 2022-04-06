@@ -23,6 +23,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -32,7 +34,7 @@ func (*AWSCloudWatchSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*AWSCloudWatchSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -40,16 +42,16 @@ func (s *AWSCloudWatchSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AWSCloudWatchSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AWSCloudWatchSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+func (s *AWSCloudWatchSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
@@ -63,7 +65,7 @@ const (
 // https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatch.html#amazoncloudwatch-resources-for-iam-policies
 const ServiceCloudWatch = "cloudwatch"
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (*AWSCloudWatchSource) GetEventTypes() []string {
 	return []string{
 		AWSEventType(ServiceCloudWatch, AWSCloudWatchMetricEventType),
@@ -71,7 +73,7 @@ func (*AWSCloudWatchSource) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AWSCloudWatchSource) AsEventSource() string {
 	return AWSCloudWatchSourceName(s.Namespace, s.Name)
 }

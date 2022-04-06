@@ -36,11 +36,12 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/eventgrid"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 )
 
 const (
@@ -74,7 +75,7 @@ func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 		return nil, nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
 	status := &typedSrc.Status
@@ -221,7 +222,7 @@ func ensureNoSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 		return fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
 	rgName := sysTopicResID.ResourceGroup

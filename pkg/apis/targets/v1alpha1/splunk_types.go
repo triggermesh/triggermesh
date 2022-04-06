@@ -18,8 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"knative.dev/pkg/apis"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,12 +33,12 @@ type SplunkTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   SplunkTargetSpec `json:"spec,omitempty"`
-	Status TargetStatus     `json:"status,omitempty"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable = (*SplunkTarget)(nil)
+	_ v1alpha1.Reconcilable = (*SplunkTarget)(nil)
 )
 
 // SplunkTargetSpec defines the desired state of the event target.
@@ -48,7 +49,7 @@ type SplunkTargetSpec struct {
 	Endpoint apis.URL `json:"endpoint"`
 	// Token for authenticating requests against the HEC.
 	// see https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#About_Event_Collector_tokens
-	Token ValueFromField `json:"token"`
+	Token v1alpha1.ValueFromField `json:"token"`
 	// Name of the index to send events to.
 	// When undefined, events are sent to the default index defined in the HEC token's configuration.
 	// +optional

@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -30,7 +32,7 @@ func (s *AWSCodeCommitSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (s *AWSCodeCommitSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -38,20 +40,20 @@ func (s *AWSCodeCommitSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AWSCodeCommitSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AWSCodeCommitSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+func (s *AWSCodeCommitSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (s *AWSCodeCommitSource) GetEventTypes() []string {
 	types := make([]string, len(s.Spec.EventTypes))
 
@@ -62,7 +64,7 @@ func (s *AWSCodeCommitSource) GetEventTypes() []string {
 	return types
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AWSCodeCommitSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }

@@ -24,7 +24,8 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -34,7 +35,7 @@ func (s *AWSSQSSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (s *AWSSQSSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -42,16 +43,16 @@ func (s *AWSSQSSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AWSSQSSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AWSSQSSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+func (s *AWSSQSSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
@@ -60,14 +61,14 @@ const (
 	AWSSQSGenericEventType = "message"
 )
 
-// GetEventTypes implements Reconcilable.
+// GetEventTypes implements EventSource.
 func (s *AWSSQSSource) GetEventTypes() []string {
 	return []string{
 		AWSEventType(s.Spec.ARN.Service, AWSSQSGenericEventType),
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AWSSQSSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }

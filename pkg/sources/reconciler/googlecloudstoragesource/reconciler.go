@@ -35,12 +35,13 @@ import (
 	grpccodes "google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudstoragesource"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/storage"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
 )
 
 // Reconciler implements controller.Reconciler for the event source type.
@@ -64,7 +65,7 @@ var _ reconcilerv1alpha1.Finalizer = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudStorageSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithReconcilable(ctx, o)
+	ctx = commonv1alpha1.WithReconcilable(ctx, o)
 
 	pubsubCli, storageCli, err := r.cg.Get(o)
 	switch {
@@ -94,7 +95,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudS
 // FinalizeKind is called when the resource is deleted.
 func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudStorageSource) reconciler.Event {
 	// inject source into context for usage in finalization logic
-	ctx = v1alpha1.WithReconcilable(ctx, o)
+	ctx = commonv1alpha1.WithReconcilable(ctx, o)
 
 	pubsubCli, storageCli, err := r.cg.Get(o)
 	switch {

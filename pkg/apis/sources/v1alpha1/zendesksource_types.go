@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -36,8 +38,8 @@ type ZendeskSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ Reconcilable = (*ZendeskSource)(nil)
-	_ multiTenant  = (*ZendeskSource)(nil)
+	_ v1alpha1.Reconcilable = (*ZendeskSource)(nil)
+	_ v1alpha1.MultiTenant  = (*ZendeskSource)(nil)
 )
 
 // ZendeskSourceSpec defines the desired state of the event source.
@@ -51,7 +53,7 @@ type ZendeskSourceSpec struct {
 
 	// Token identifies the API token used for creating the proper credentials to interface with Zendesk
 	// allowing the source to auto-register the webhook to authenticate callbacks.
-	Token ValueFromField `json:"token,omitempty"`
+	Token v1alpha1.ValueFromField `json:"token,omitempty"`
 
 	// Email identifies the email used for creating the proper credentials to interface with Zendesk
 	// allowing the source to auto-register the webhook to authenticate callbacks.
@@ -59,7 +61,7 @@ type ZendeskSourceSpec struct {
 
 	// WebhookPassword used for basic authentication for events sent from Zendesk
 	// to the adapter.
-	WebhookPassword ValueFromField `json:"webhookPassword,omitempty"`
+	WebhookPassword v1alpha1.ValueFromField `json:"webhookPassword,omitempty"`
 
 	// WebhookUsername used for basic authentication for events sent from Zendesk
 	// to the adapter.
@@ -71,7 +73,7 @@ type ZendeskSourceSpec struct {
 
 // ZendeskSourceStatus defines the observed state of the event source.
 type ZendeskSourceStatus struct {
-	EventSourceStatus `json:",inline"`
+	v1alpha1.Status `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

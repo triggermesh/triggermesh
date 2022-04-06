@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,14 +32,14 @@ type SendGridTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   SendGridTargetSpec `json:"spec"`
-	Status TargetStatus       `json:"status,omitempty"`
+	Status v1alpha1.Status    `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*SendGridTarget)(nil)
-	_ targets.IntegrationTarget = (*SendGridTarget)(nil)
-	_ targets.EventSource       = (*SendGridTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*SendGridTarget)(nil)
+	_ v1alpha1.EventReceiver = (*SendGridTarget)(nil)
+	_ v1alpha1.EventSource   = (*SendGridTarget)(nil)
 )
 
 // SendGridTargetSpec holds the desired state of the SendGridTarget.

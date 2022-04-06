@@ -31,8 +31,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/awssnssource"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/awssnssource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/sns"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
 )
 
 // the resync period ensures we regularly re-check the state of SNS subscriptions.

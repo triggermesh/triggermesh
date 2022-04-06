@@ -28,7 +28,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/azureservicebusqueuesource"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureservicebusqueuesource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code

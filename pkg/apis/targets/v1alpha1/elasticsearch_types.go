@@ -17,8 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -32,14 +33,14 @@ type ElasticsearchTarget struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   ElasticsearchTargetSpec `json:"spec"`
-	Status TargetStatus            `json:"status,omitempty"`
+	Status v1alpha1.Status         `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ Reconcilable              = (*ElasticsearchTarget)(nil)
-	_ targets.IntegrationTarget = (*ElasticsearchTarget)(nil)
-	_ targets.EventSource       = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.EventReceiver = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.EventSource   = (*ElasticsearchTarget)(nil)
 )
 
 // ElasticsearchTargetSpec holds the desired state of the ElasticsearchTarget.

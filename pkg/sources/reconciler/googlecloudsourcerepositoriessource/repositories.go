@@ -26,9 +26,10 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 // Ensures that the Repo has the topic associated.
@@ -40,7 +41,7 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicR
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 	status := &src.Status
 
 	repoName := src.Spec.Repository.String()
@@ -89,7 +90,7 @@ func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcere
 		return nil
 	}
 
-	src := v1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 
 	repoName := src.Spec.Repository.String()
 

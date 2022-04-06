@@ -21,6 +21,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -33,7 +35,7 @@ type XSLTTransformation struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   XSLTTransformationSpec `json:"spec"`
-	Status TargetStatus           `json:"status,omitempty"`
+	Status v1alpha1.Status        `json:"status,omitempty"`
 }
 
 // Check the interfaces XSLTTransformation should be implementing.
@@ -41,8 +43,8 @@ var (
 	_ apis.Validatable = (*XSLTTransformation)(nil)
 	_ apis.Defaultable = (*XSLTTransformation)(nil)
 
-	_ Reconcilable = (*XSLTTransformation)(nil)
-	_ EventSender  = (*XSLTTransformation)(nil)
+	_ v1alpha1.Reconcilable = (*XSLTTransformation)(nil)
+	_ v1alpha1.EventSender  = (*XSLTTransformation)(nil)
 )
 
 // XSLTTransformationSpec holds the desired state of the XSLTTransformation.

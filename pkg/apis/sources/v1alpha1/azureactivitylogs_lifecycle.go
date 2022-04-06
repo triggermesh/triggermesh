@@ -22,6 +22,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 )
 
@@ -37,23 +38,23 @@ func (s *AzureActivityLogsSource) GetConditionSet() apis.ConditionSet {
 
 // GetStatus implements duckv1.KRShaped.
 func (s *AzureActivityLogsSource) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+	return &s.Status.Status.Status
 }
 
-// GetSink implements Reconcilable.
+// GetSink implements EventSender.
 func (s *AzureActivityLogsSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
 // GetStatusManager implements Reconcilable.
-func (s *AzureActivityLogsSource) GetStatusManager() *StatusManager {
-	return &StatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+func (s *AzureActivityLogsSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status.Status,
 	}
 }
 
-// AsEventSource implements Reconcilable.
+// AsEventSource implements EventSource.
 func (s *AzureActivityLogsSource) AsEventSource() string {
 	subsID := &AzureResourceID{
 		SubscriptionID: s.Spec.SubscriptionID,
@@ -83,7 +84,7 @@ const (
 
 // azureActivityLogsSourceConditionSet is a set of conditions for
 // AzureActivityLogsSource objects.
-var azureActivityLogsSourceConditionSet = NewEventSourceConditionSet(
+var azureActivityLogsSourceConditionSet = v1alpha1.NewConditionSet(
 	AzureActivityLogsConditionSubscribed,
 )
 
