@@ -87,7 +87,7 @@ var _ = Describe("Webhook source", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 			})
 
-			By("creating an WebhookSource object", func() {
+			By("creating a WebhookSource object", func() {
 				src, err := createSource(srcClient, ns, "test-", sink,
 					withEventType(eventType),
 					withEventSource(eventSource),
