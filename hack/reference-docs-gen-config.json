@@ -9,11 +9,11 @@
     "externalPackages": [
         {
             "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/apis/meta/v1\\.Duration$",
-            "docsURLTemplate": "https://godoc.org/k8s.io/apimachinery/pkg/apis/meta/v1#Duration"
+            "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#Duration"
         },
         {
             "typeMatchPrefix": "^k8s\\.io/apimachinery/pkg/types.UID$",
-            "docsURLTemplate": "https://godoc.org/k8s.io/apimachinery/pkg/types#UID"
+            "docsURLTemplate": "https://pkg.go.dev/k8s.io/apimachinery/pkg/types#UID"
         },
         {
             "typeMatchPrefix": "^k8s\\.io/(api|apimachinery/pkg/apis)/",
@@ -34,6 +34,14 @@
         {
             "typeMatchPrefix": "^knative\\.dev/networking/pkg/apis/networking",
             "docsURLTemplate": "https://pkg.go.dev/knative.dev/networking/pkg/apis/networking#{{.TypeIdentifier}}"
+        },
+        {
+            "typeMatchPrefix": "^github\\.com/triggermesh/triggermesh/pkg/apis/common",
+            "docsURLTemplate": "https://pkg.go.dev/github.com/triggermesh/triggermesh/pkg/apis/common/{{arrIndex .PackageSegments -1}}#{{.TypeIdentifier}}"
+        },
+        {
+            "typeMatchPrefix": "^github\\.com/triggermesh/triggermesh/pkg/apis",
+            "docsURLTemplate": "https://pkg.go.dev/github.com/triggermesh/triggermesh/pkg/apis#{{.TypeIdentifier}}"
         },
         {
             "typeMatchPrefix": "^time\\.Duration$",
