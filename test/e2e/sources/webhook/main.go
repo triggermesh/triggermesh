@@ -101,7 +101,7 @@ var _ = Describe("Webhook source", func() {
 			})
 		})
 
-		When("an HTTP request is received", func() {
+		When("an HTTP request is sent to the source's endpoint", func() {
 			BeforeEach(func() {
 				http.PostJSONRequestWithRetries(5*time.Second, 1*time.Minute, srcURL.String(), testPayload)
 			})

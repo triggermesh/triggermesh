@@ -30,34 +30,34 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
 
-// PostJSONRequest send an arbitraty JSON payload to an endpoint.
+// PostJSONRequest send an arbitrary JSON payload to an endpoint.
 func PostJSONRequest(url string, payload interface{}) {
 	p, err := json.Encode(context.Background(), payload)
 	if err != nil {
-		framework.FailfWithOffset(2, "Error JSON encoding payload: %s", err)
+		framework.FailfWithOffset(2, "Error encoding payload to JSON: %s", err)
 	}
 
 	res, err := http.Post(url, "application/json", bytes.NewBuffer(p))
 	if err != nil {
-		framework.FailfWithOffset(2, "Error Posting to %s: %s", url, err)
+		framework.FailfWithOffset(2, "Error POSTing to %s: %s", url, err)
 	}
 
 	if res.StatusCode >= 400 {
-		framework.FailfWithOffset(2, "Posting to %s returned error code %d", url, res.StatusCode)
+		framework.FailfWithOffset(2, "POSTing to %s returned error code %d", url, res.StatusCode)
 	}
 }
 
-// PostJSONRequestWithRetries send an arbitraty JSON payload to an endpoint.
+// PostJSONRequestWithRetries send an arbitrary JSON payload to an endpoint.
 func PostJSONRequestWithRetries(interval, timeout time.Duration, url string, payload interface{}) {
 	if err := wait.Poll(interval, timeout, postJSONRequestSucceed(url, payload)); err != nil {
-		framework.FailfWithOffset(2, "Error Posting to %s: %s", url, err)
+		framework.FailfWithOffset(2, "Error POSTing to %s: %s", url, err)
 	}
 }
 
 func postJSONRequestSucceed(url string, payload interface{}) wait.ConditionFunc {
 	p, err := json.Encode(context.Background(), payload)
 	if err != nil {
-		framework.FailfWithOffset(2, "Error JSON encoding payload: %s", err)
+		framework.FailfWithOffset(2, "Error encoding payload to JSON: %s", err)
 	}
 	return func() (bool, error) {
 		res, err := http.Post(url, "application/json", bytes.NewBuffer(p))
@@ -65,7 +65,7 @@ func postJSONRequestSucceed(url string, payload interface{}) wait.ConditionFunc 
 			return false, nil
 		}
 		if res.StatusCode >= 400 {
-			return false, fmt.Errorf("posting to %s returned error code %d", url, res.StatusCode)
+			return false, fmt.Errorf("POSTing to %s returned error code %d", url, res.StatusCode)
 		}
 		return true, nil
 	}
