@@ -144,8 +144,8 @@ var _ = Describe("XMLToJSON Transformation", func() {
 	})
 
 	Context("a Transformation is deployed without a sink", func() {
-		var brokerURL *url.URL
-		var responseDisplayDeplName string
+		var entrypointURL *url.URL
+		var repliesDisplayDeplName string
 
 		BeforeEach(func() {
 			var transDst *duckv1.Destination
@@ -163,42 +163,45 @@ var _ = Describe("XMLToJSON Transformation", func() {
 						Name:       trans.GetName(),
 					},
 				}
-				_ = transDst
 			})
 
 			By("creating a response intercepter", func() {
-				// TODO: create a helper that deploys a pre-configured
-				// Broker/Triggers/Event-Display bundle for intercepting event responses.
-				//
-				// When a message enters the Broker, it must be forwarded to the Transformation
-				// using a Trigger, and the response should be forwarded to the Event-Display
-				// using another Trigger.
-
-				// TODO: brokerURL is to be set to the actual URL of the Broker, so that we can
-				// pass to it RunEventSender().
-				brokerURL = &url.URL{}
-				_ = brokerURL
-
-				// TODO: responseDisplayDeplName is to be set to the name of the Deployment where event
-				// responses are sent, so that we can pass it to readReceivedEvents().
-				responseDisplayDeplName = ""
-				_ = responseDisplayDeplName
+				entrypointURL, repliesDisplayDeplName = bridges.SetupSubscriberWithReplyTo(
+					f.KubeClient, f.DynamicClient, ns, transDst)
 			})
 		})
 
 		When("a XML payload is sent", func() {
+			var sentEvent *cloudevents.Event
 
 			BeforeEach(func() {
+				sentEvent = newXMLHelloEvent(f)
 
-				// TODO: send an event to brokerURL
-
+				job := e2ece.RunEventSender(f.KubeClient, ns, entrypointURL.String(), sentEvent)
+				apps.WaitForCompletion(f.KubeClient, job)
 			})
 
 			It("transforms the payload to JSON and replies with the transformed data", func() {
+				const receiveTimeout = 10 * time.Second
+				const pollInterval = 500 * time.Millisecond
 
-				// TODO: repeat the assertions performed in the "a sink is set as destination"
-				// Context, but against responseDisplayDeplName.
+				var receivedEvents []cloudevents.Event
 
+				readReceivedEvents := readReceivedEvents(f.KubeClient, ns, repliesDisplayDeplName, &receivedEvents)
+
+				Eventually(readReceivedEvents, receiveTimeout, pollInterval).ShouldNot(BeEmpty())
+				Expect(receivedEvents).To(HaveLen(1))
+
+				gotEvent := receivedEvents[0]
+
+				Expect(gotEvent.Data()).To(Equal([]byte(expectJSONData)))
+				Expect(gotEvent.DataContentType()).To(Equal(cloudevents.ApplicationJSON))
+
+				Expect(gotEvent.ID()).To(Equal(sentEvent.ID()))
+				Expect(gotEvent.Type()).To(Equal(sentEvent.Type()))
+				Expect(gotEvent.Source()).To(Equal(sentEvent.Source()))
+				Expect(gotEvent.Extensions()[e2ece.E2ECeExtension]).
+					To(Equal(sentEvent.Extensions()[e2ece.E2ECeExtension]))
 			})
 		})
 	})

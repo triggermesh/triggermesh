@@ -157,7 +157,7 @@ func (l *Listers) GetAWSCloudWatchSourceLister() sourceslistersv1alpha1.AWSCloud
 	return sourceslistersv1alpha1.NewAWSCloudWatchSourceLister(l.IndexerFor(&sourcesv1alpha1.AWSCloudWatchSource{}))
 }
 
-// GetAWSCloudWatchLogsSourceLister returns a Lister for AWSCloudWatchSource objects.
+// GetAWSCloudWatchLogsSourceLister returns a Lister for AWSCloudWatchLogsSource objects.
 func (l *Listers) GetAWSCloudWatchLogsSourceLister() sourceslistersv1alpha1.AWSCloudWatchLogsSourceLister {
 	return sourceslistersv1alpha1.NewAWSCloudWatchLogsSourceLister(l.IndexerFor(&sourcesv1alpha1.AWSCloudWatchLogsSource{}))
 }
