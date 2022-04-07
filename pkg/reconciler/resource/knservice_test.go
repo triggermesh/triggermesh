@@ -46,6 +46,7 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		SecretMount("test-volume", "/path/to/file.ext", "test-secret", "someKey"),
+		VisibilityClusterLocal,
 	)
 
 	expectKsvc := &servingv1.Service{
@@ -53,8 +54,9 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 			Namespace: tNs,
 			Name:      tName,
 			Labels: map[string]string{
-				"test.label/1": "val1",
-				"test.label/2": "val2",
+				"test.label/1":                      "val1",
+				"test.label/2":                      "val2",
+				"networking.knative.dev/visibility": "cluster-local",
 			},
 		},
 		Spec: servingv1.ServiceSpec{

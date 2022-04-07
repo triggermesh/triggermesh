@@ -26,11 +26,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
-	network "knative.dev/networking/pkg"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	"knative.dev/pkg/system"
-	"knative.dev/serving/pkg/apis/serving"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
@@ -197,7 +195,7 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 	app := ComponentName(rcl)
 
 	objectOptions := []resource.ObjectOption{
-		resource.Label(network.VisibilityLabelKey, serving.VisibilityClusterLocal),
+		resource.VisibilityClusterLocal,
 
 		resource.Label(appNameLabel, app),
 		resource.Label(appComponentLabel, componentAdapter),
