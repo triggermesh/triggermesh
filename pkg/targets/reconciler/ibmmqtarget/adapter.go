@@ -18,6 +18,7 @@ package ibmmqtarget
 
 import (
 	"fmt"
+	"path"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
@@ -102,8 +103,14 @@ func makeTargetAdapterKService(target *v1alpha1.IBMMQTarget, cfg *adapterConfig)
 			}...)
 		}
 
-		keystoreMount = resources.SecretMount("key-database", KeystoreMountPath, target.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret)
-		passwdStashMount = resources.SecretMount("db-password", PasswdStashMountPath, target.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret)
+		keystoreMount = resources.SecretMount("key-database", KeystoreMountPath,
+			target.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Name,
+			resources.WithMountSubPath(path.Base(KeystoreMountPath)),
+			resources.WithVolumeSecretItem(target.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key, path.Base(KeystoreMountPath)))
+		passwdStashMount = resources.SecretMount("db-password", PasswdStashMountPath,
+			target.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
+			resources.WithMountSubPath(path.Base(PasswdStashMountPath)),
+			resources.WithVolumeSecretItem(target.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key, path.Base(PasswdStashMountPath)))
 	}
 
 	return resources.MakeKService(target.Namespace, name, cfg.Image,

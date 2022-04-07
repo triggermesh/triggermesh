@@ -18,6 +18,7 @@ package ibmmqsource
 
 import (
 	"fmt"
+	"path"
 	"strconv"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -96,8 +97,15 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 			}...)
 		}
 
-		keystoreMount = resource.SecretMount("key-database", KeystoreMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret)
-		passwdStashMount = resource.SecretMount("db-password", PasswdStashMountPath, typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret)
+		keystoreMount = resource.SecretMount("key-database", KeystoreMountPath,
+			typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Name,
+			resource.WithMountSubPath(path.Base(KeystoreMountPath)),
+			resource.WithVolumeSecretItem(typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key, path.Base(KeystoreMountPath)))
+		passwdStashMount = resource.SecretMount("db-password", PasswdStashMountPath,
+			typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
+			resource.WithMountSubPath(path.Base(PasswdStashMountPath)),
+			resource.WithVolumeSecretItem(typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key, path.Base(PasswdStashMountPath)))
+
 	}
 
 	return common.NewAdapterDeployment(src, sinkURI,

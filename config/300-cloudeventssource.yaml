@@ -53,54 +53,52 @@ spec:
                 type: object
                 properties:
 
-                  basicAuth:
-                    description: HTTP basic authentication parameters.
-                    type: object
-                    properties:
-                      username:
-                        description: User name for HTTP Basic authentication.
-                        type: string
-                      password:
-                        description: Password for HTTP Basic authentication.
-                        type: object
-                        properties:
-                          value:
-                            description: Literal value of the password.
-                            type: string
-                          valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the password.
-                            type: object
-                            properties:
-                              name:
-                                description: Name of the Secret object.
-                                type: string
-                              key:
-                                description: Key from the Secret object.
-                                type: string
-                            required:
-                            - name
-                            - key
-                        oneOf:
-                        - required: [value]
-                        - required: [valueFromSecret]
-                    required:
-                    - username
-                    - password
-
-                  token:
-                    description: Authentication API Token at HTTP header.
-                    type: object
-                    properties:
-                      header:
-                        description: HTTP header name informing the token.
-                        type: string
-                      value:
-                        description: HTTP authentication token.
-                        type: object
+                  basicAuths:
+                    description: Array of HTTP basic authentication parameters, all present usernames and
+                      passwords are considered valid.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          description: User name for HTTP Basic authentication.
+                          type: string
+                        password:
+                          description: Password for HTTP Basic authentication.
+                          type: object
                           properties:
-                            value:
-                              description: Literal value of the token.
-                              type: string
+                            valueFromSecret:
+                              description: A reference to a Kubernetes Secret object containing the password.
+                              type: object
+                              properties:
+                                name:
+                                  description: Name of the Secret object.
+                                  type: string
+                                key:
+                                  description: Key from the Secret object.
+                                  type: string
+                              required:
+                              - name
+                              - key
+                          required: [valueFromSecret]
+                      required:
+                      - username
+                      - password
+
+                  tokens:
+                    description: Array of API Authentication tokens at HTTP header.
+                      All present header/value tuples are considered valid.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        header:
+                          description: HTTP header name informing the token.
+                          type: string
+                        value:
+                          description: HTTP authentication token.
+                          type: object
+                          properties:
                             valueFromSecret:
                               description: A reference to a Kubernetes Secret object containing the token.
                               type: object
@@ -114,19 +112,21 @@ spec:
                               required:
                               - name
                               - key
-                          oneOf:
-                          - required: [value]
-                          - required: [valueFromSecret]
-                    required:
-                    - header
-                    - value
+                          required: [valueFromSecret]
+                      required:
+                      - header
+                      - value
+                anyOf:
+                - required: [basicAuths]
+                - required: [tokens]
 
               path:
                 description: Path where incoming CloudEvents will be accepted.
                 type: string
 
               rateLimiter:
-                description: Rate limiter parameters.
+                description: Rate limiter provides a mechanism to reject incoming requests
+                  when a threshold is trespassed, informing the caller to retry later.
                 type: object
                 properties:
                   requestsPerSecond:
@@ -134,7 +134,6 @@ spec:
                     type: integer
                 required:
                 - requestsPerSecond
-                - duration
 
               ceOverrides:
                 description: Defines overrides/additions to incoming CloudEvents attributes.

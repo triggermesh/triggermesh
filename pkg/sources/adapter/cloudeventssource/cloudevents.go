@@ -23,12 +23,14 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/cloudevents/sdk-go/v2/protocol"
 	"go.uber.org/zap"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
 type cloudEventsHandler struct {
-	username        string
-	password        string
-	corsAllowOrigin string
+	basicAuths []v1alpha1.HTTPBasicAuth
+	tokens     []v1alpha1.HTTPToken
+	// corsAllowOrigin string
 
 	ceServer cloudevents.Client
 	ceClient cloudevents.Client

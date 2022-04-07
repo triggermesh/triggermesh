@@ -17,8 +17,6 @@ limitations under the License.
 package resource
 
 import (
-	"path"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -269,43 +267,64 @@ func firstContainer(object interface{}) *corev1.Container {
 	return &(*containers)[0]
 }
 
+// SecretMountOption is an option function to customize secret volume mounts.
+type SecretMountOption func(v *corev1.Volume, vm *corev1.VolumeMount)
+
+// WithMountSubPath modifies a secret volume mount to use a subpath.
+func WithMountSubPath(subpath string) SecretMountOption {
+	return func(_ *corev1.Volume, vm *corev1.VolumeMount) {
+		vm.SubPath = subpath
+	}
+}
+
+// WithVolumeSecretItem modifies a secret volume to add a
+// selected key and path.
+func WithVolumeSecretItem(key, path string) SecretMountOption {
+	return func(v *corev1.Volume, _ *corev1.VolumeMount) {
+		v.VolumeSource.Secret.Items = append(
+			v.VolumeSource.Secret.Items,
+			corev1.KeyToPath{
+				Key:  key,
+				Path: path,
+			},
+		)
+	}
+}
+
 // SecretMount returns a build option that adds a volume mount to a service or deployment.
-func SecretMount(name string, target string, secret *corev1.SecretKeySelector) ObjectOption {
+func SecretMount(name, mountPath, secretName string, opts ...SecretMountOption) KsvcOpts {
 	return func(object interface{}) {
-		volumeMount := corev1.VolumeMount{
+		vm := corev1.VolumeMount{
 			Name:      name,
 			ReadOnly:  true,
-			MountPath: target,
-			SubPath:   path.Base(target),
+			MountPath: mountPath,
 		}
-		volume := corev1.Volume{
+
+		v := corev1.Volume{
 			Name: name,
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName: secret.Name,
-					Items: []corev1.KeyToPath{
-						{
-							Key:  secret.Key,
-							Path: path.Base(target),
-						},
-					},
+					SecretName: secretName,
 				},
 			},
+		}
+
+		for _, opt := range opts {
+			opt(&v, &vm)
 		}
 
 		switch o := object.(type) {
 		case *servingv1.Service:
 			o.Spec.ConfigurationSpec.Template.Spec.Containers[0].VolumeMounts = append(
-				o.Spec.ConfigurationSpec.Template.Spec.Containers[0].VolumeMounts, volumeMount,
-			)
+				o.Spec.ConfigurationSpec.Template.Spec.Containers[0].VolumeMounts, vm)
+
 			o.Spec.ConfigurationSpec.Template.Spec.Volumes = append(
-				o.Spec.ConfigurationSpec.Template.Spec.Volumes, volume,
-			)
+				o.Spec.ConfigurationSpec.Template.Spec.Volumes, v)
+
 		case *appsv1.Deployment:
 			o.Spec.Template.Spec.Containers[0].VolumeMounts = append(
-				o.Spec.Template.Spec.Containers[0].VolumeMounts, volumeMount,
-			)
-			o.Spec.Template.Spec.Volumes = append(o.Spec.Template.Spec.Volumes, volume)
+				o.Spec.Template.Spec.Containers[0].VolumeMounts, vm)
+			o.Spec.Template.Spec.Volumes = append(o.Spec.Template.Spec.Volumes, v)
 		}
 	}
 }

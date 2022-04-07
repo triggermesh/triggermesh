@@ -17,6 +17,7 @@ limitations under the License.
 package cloudeventssource
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -28,8 +29,9 @@ func NewEnvConfig() adapter.EnvConfigAccessor {
 type envAccessor struct {
 	adapter.EnvConfig
 
-	EventSource       string `envconfig:"CLOUDEVENTS_RATE"`
-	BasicAuthUsername string `envconfig:"CLOUDEVENTS_BASICAUTH_USERNAME"`
-	BasicAuthPassword string `envconfig:"CLOUDEVENTS_BASICAUTH_PASSWORD"`
-	CORSAllowOrigin   string `envconfig:"CLOUDEVENTS_CORS_ALLOW_ORIGIN"`
+	Path           string                   `envconfig:"CLOUDEVENTS_PATH"`
+	RateLimiterRPS int64                    `envconfig:"CLOUDEVENTS_RATELIMITER_RPS"`
+	BasicAuths     []v1alpha1.HTTPBasicAuth `envconfig:"CLOUDEVENTS_BASICAUTH_CREDENTIALS"`
+	Tokens         []v1alpha1.HTTPToken     `envconfig:"CLOUDEVENTS_TOKEN_CREDENTIALS"`
+	// CORSAllowOrigin string                   `envconfig:"CLOUDEVENTS_CORS_ALLOW_ORIGIN"`
 }

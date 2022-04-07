@@ -38,15 +38,22 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 	// TODO add basic auth middleware
 	// cehttp.WithMiddleware(/* add basic authentication */),
 
+	// TODO add token middleware
+	// cehttp.WithMiddleware(/* add basic authentication */),
 	)
+
+	logger.Infof("DEBUG DELETEME RateLimiter %v", env.RateLimiterRPS)
+	logger.Infof("DEBUG DELETEME BasicAuths %v", env.BasicAuths)
+	logger.Infof("DEBUG DELETEME Tokens %v", env.Tokens)
+
 	if err != nil {
 		logger.Panicw("error creating CloudEvents client", zap.Error(err))
 	}
 
 	return &cloudEventsHandler{
-		username:        env.BasicAuthUsername,
-		password:        env.BasicAuthPassword,
-		corsAllowOrigin: env.CORSAllowOrigin,
+		basicAuths: env.BasicAuths,
+		tokens:     env.Tokens,
+		// corsAllowOrigin: env.CORSAllowOrigin,
 
 		ceClient: ceClient,
 		ceServer: ceServer,

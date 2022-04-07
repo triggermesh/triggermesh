@@ -50,12 +50,16 @@ type CloudEventsSourceSpec struct {
 	// Path under which request are accepted
 	// +optional
 	Path *string `json:"path,omitempty"`
+
+	// Rate limiter parameters
+	// +optional
+	RateLimiter *RateLimiter `json:"rateLimiter,omitempty"`
 }
 
 // HTTPCredentials to be used when receiving requests.
 type HTTPCredentials struct {
-	BasicAuth *HTTPBasicAuth `json:"basicAuth,omitempty"`
-	Token     *HTTPToken     `json:"token,omitempty"`
+	BasicAuths []HTTPBasicAuth `json:"basicAuths,omitempty"`
+	Tokens     []HTTPToken     `json:"tokens,omitempty"`
 }
 
 // HTTPBasicAuth credentialsn
@@ -68,6 +72,12 @@ type HTTPBasicAuth struct {
 type HTTPToken struct {
 	Header string         `json:"header"`
 	Value  ValueFromField `json:"value"`
+}
+
+// RateLimiter provides a mechanism to reject incoming requests
+// when a threshold is trespassed, informing the caller to retry later.
+type RateLimiter struct {
+	RequestsPerSecond int64 `json:"requestsPerSecond"`
 }
 
 // CloudEventsSourceStatus defines the observed state of the event source.
