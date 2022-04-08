@@ -42,6 +42,7 @@ jobs:
     - name: KinD Cluster
       uses: container-tools/kind-action@v1
       with:
+        knative_eventing: v1.0.0
         knative_serving: v1.0.0
         knative_kourier: v1.0.0
         # ko loads images directly into KinD's container runtime when
