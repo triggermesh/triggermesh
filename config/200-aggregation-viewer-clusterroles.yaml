@@ -1,0 +1,199 @@
+# Copyright 2022 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# All sources used at TriggerMesh
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-sources-viewer
+  labels:
+    rbac.triggermesh.io/sources-viewer: "true"
+rules:
+- apiGroups:
+  - sources.knative.dev
+  - sources.eventing.knative.dev
+  - sources.eventing.triggermesh.dev
+  - sources.triggermesh.io
+  resources: ["*"]
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# All targets used at TriggerMesh
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-targets-viewer
+  labels:
+    rbac.triggermesh.io/targets-viewer: "true"
+rules:
+- apiGroups:
+  - targets.triggermesh.io
+  resources: ["*"]
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# All extension objects used at TriggerMesh
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-extensions-viewer
+  labels:
+    rbac.triggermesh.io/extensions-viewer: "true"
+rules:
+- apiGroups:
+  - extensions.triggermesh.io
+  resources: ["*"]
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# All Knative eventing objects used at TriggerMesh
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-knative-viewer
+  labels:
+    rbac.triggermesh.io/knative-viewer: "true"
+rules:
+- apiGroups:
+  - serving.knative.dev
+  - eventing.knative.dev
+  - messaging.knative.dev
+  - messaging.triggermesh.dev
+  resources:
+  - brokers
+  - channels
+  - configurations
+  - revisions
+  - routes
+  - triggers
+  - subscriptions
+  - services
+  - kinesischannels
+  - inmemorychannels
+  - clusterchannelprovisioners
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# All Tekton elements that serve as basis for building pipelines
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-tekton-viewer
+  labels:
+    rbac.triggermesh.io/tekton-viewer: "true"
+rules:
+- apiGroups:
+  - tekton.dev
+  resources:
+  - pipelineresources
+  - pipelineruns
+  - pipelines
+  - taskruns
+  - tasks
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# Kubernetes objects for TriggerMesh users
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-kubernetes-viewer
+  labels:
+    rbac.triggermesh.io/kubernetes-viewer: "true"
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  - services
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# TriggerMesh bridges object
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-flow-viewer
+  labels:
+    rbac.triggermesh.io/flow-viewer: "true"
+rules:
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - bridges
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# TriggerMesh transformation object
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: transformation-viewer
+  labels:
+    rbac.triggermesh.io/transformation-viewer: "true"
+rules:
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - "*"
+  verbs:
+  - get
+  - list
+  - watch
