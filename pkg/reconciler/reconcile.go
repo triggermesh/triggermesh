@@ -194,6 +194,11 @@ func (r *GenericDeploymentReconciler) getOrCreateAdapter(ctx context.Context, de
 func (r *GenericDeploymentReconciler) syncAdapterDeployment(ctx context.Context,
 	currentAdapter, desiredAdapter *appsv1.Deployment) (*appsv1.Deployment, error) {
 
+	// We may have found an existing adapter object that is owned by the
+	// component instance, but under a different name, e.g. created by an
+	// older version of TriggerMesh.
+	desiredAdapter.Name = currentAdapter.Name
+
 	if semantic.Semantic.DeepEqual(desiredAdapter, currentAdapter) {
 		return currentAdapter, nil
 	}
@@ -343,6 +348,11 @@ func (r *GenericServiceReconciler) getOrCreateAdapter(ctx context.Context, desir
 // against its current state in the running cluster.
 func (r *GenericServiceReconciler) syncAdapterService(ctx context.Context,
 	currentAdapter, desiredAdapter *servingv1.Service) (*servingv1.Service, error) {
+
+	// We may have found an existing adapter object that is owned by the
+	// component instance, but under a different name, e.g. created by an
+	// older version of TriggerMesh.
+	desiredAdapter.Name = currentAdapter.Name
 
 	if semantic.Semantic.DeepEqual(desiredAdapter, currentAdapter) {
 		return currentAdapter, nil

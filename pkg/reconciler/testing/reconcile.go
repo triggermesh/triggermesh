@@ -210,6 +210,34 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, rcl v1alpha1.Reconcilable, ad
 			},
 		},
 		{
+			Name: "Everything is up-to-date",
+			Key:  tKey,
+			Ctx:  skipCtx,
+			Objects: []runtime.Object{
+				newAddressable(),
+				newComponentInstance(withSink, deployed(a)),
+				newServiceAccount(),
+				newRoleBinding(),
+				newAdapter(ready),
+			},
+			WantUpdates: nil,
+			WantEvents:  nil,
+		},
+		{
+			Name: "Adapter exists under a different name",
+			Key:  tKey,
+			Ctx:  skipCtx,
+			Objects: []runtime.Object{
+				newAddressable(),
+				newComponentInstance(withSink, deployed(a)),
+				newServiceAccount(),
+				newRoleBinding(),
+				newAdapter(ready, rename),
+			},
+			WantUpdates: nil,
+			WantEvents:  nil,
+		},
+		{
 			Name: "Switch from sink to replies",
 			Key:  tKey,
 			Ctx:  skipCtx,
@@ -640,13 +668,23 @@ func notReady(object runtime.Object) {
 	}
 }
 
-// bumpImage adds a static suffix to the Deployment's image.
+// bumpImage adds a static suffix to the adapter's image.
 func bumpImage(object runtime.Object) {
 	switch o := object.(type) {
 	case *appsv1.Deployment:
 		o.Spec.Template.Spec.Containers[0].Image += "-test"
 	case *servingv1.Service:
 		o.Spec.Template.Spec.Containers[0].Image += "-test"
+	}
+}
+
+// rename changes the name of the adapter.
+func rename(object runtime.Object) {
+	switch o := object.(type) {
+	case *appsv1.Deployment:
+		o.Name += "-oldname"
+	case *servingv1.Service:
+		o.Name += "-oldname"
 	}
 }
 
