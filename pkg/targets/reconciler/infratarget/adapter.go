@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,22 +17,24 @@ limitations under the License.
 package infratarget
 
 import (
+	"fmt"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
+	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	pkgreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const (
-	adapterName = "infratarget"
-
 	envInfraScriptCode         = "INFRA_SCRIPT_CODE"
 	envInfraScriptTimeout      = "INFRA_SCRIPT_TIMEOUT"
 	envInfraStateHeadersPolicy = "INFRA_STATE_HEADERS_POLICY"
@@ -44,33 +46,27 @@ const (
 // Public fields are automatically populated by envconfig.
 type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	obsConfig source.ConfigAccessor
 	// Container image
 	Image string `default:"gcr.io/triggermesh/infratarget-adapter"`
 }
 
-// makeAdapterKnService returns a Knative Service object for the target's adapter.
-func makeAdapterKnService(o *v1alpha1.InfraTarget, cfg *adapterConfig) *servingv1.Service {
-	envApp := makeCommonAppEnv(o)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	genericLabels := pkgreconciler.MakeGenericLabels(adapterName, o.Name)
-	ksvcLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
-	podLabels := pkgreconciler.PropagateCommonLabels(o, genericLabels)
-	name := kmeta.ChildName(adapterName+"-", o.Name)
-	envSvc := pkgreconciler.MakeServiceEnv(o.Name, o.Namespace)
-	envObs := pkgreconciler.MakeObsEnv(cfg.configs)
-	envs := append(envSvc, append(envApp, envObs...)...)
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.InfraTarget)
 
-	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcOwner(o),
-		resources.KsvcPodEnvVars(envs))
+	return common.NewAdapterKnService(trg, nil,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	)
 }
 
-func makeCommonAppEnv(o *v1alpha1.InfraTarget) []corev1.EnvVar {
-	env := []corev1.EnvVar{}
+func makeAppEnv(o *v1alpha1.InfraTarget) []corev1.EnvVar {
+	var env []corev1.EnvVar
 
 	if o.Spec.Script != nil {
 		env = append(env, corev1.EnvVar{
@@ -111,4 +107,19 @@ func makeCommonAppEnv(o *v1alpha1.InfraTarget) []corev1.EnvVar {
 	}
 
 	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

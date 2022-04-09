@@ -97,13 +97,18 @@
     "permissions": [
       {
         "actions": [
-          "Microsoft.EventGrid/eventSubscriptions/delete",
-          "Microsoft.EventGrid/eventSubscriptions/read",
-          "Microsoft.EventGrid/eventSubscriptions/write",
+          "Microsoft.EventGrid/systemTopics/eventSubscriptions/delete",
+          "Microsoft.EventGrid/systemTopics/eventSubscriptions/read",
+          "Microsoft.EventGrid/systemTopics/eventSubscriptions/write",
+          "Microsoft.EventGrid/systemTopics/delete",
+          "Microsoft.EventGrid/systemTopics/read",
+          "Microsoft.EventGrid/systemTopics/write",
           "Microsoft.EventHub/namespaces/eventhubs/delete",
           "Microsoft.EventHub/namespaces/eventhubs/write",
           "Microsoft.EventHub/namespaces/eventhubs/read",
-          "Microsoft.EventHub/namespaces/eventhubs/consumergroups/read"
+          "Microsoft.EventHub/namespaces/eventhubs/consumergroups/read",
+          "Microsoft.Resources/subscriptions/resourceGroups/read",
+          "Microsoft.Resources/subscriptions/resourceGroups/write"
         ],
         "dataActions": [
           "Microsoft.EventHub/namespaces/messages/receive/action"

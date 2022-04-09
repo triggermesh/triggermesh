@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import (
 	"knative.dev/eventing/pkg/adapter/v2"
 	rt "knative.dev/pkg/reconciler/testing"
 
-	"github.com/triggermesh/triggermesh/pkg/sources/testing/structs"
+	"github.com/triggermesh/triggermesh/pkg/testing/structs"
 )
 
 // TestControllerConstructor tests that a controller constructor meets our requirements.

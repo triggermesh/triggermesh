@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -33,12 +34,14 @@ type AWSCodeCommitSource struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   AWSCodeCommitSourceSpec `json:"spec,omitempty"`
-	Status EventSourceStatus       `json:"status,omitempty"`
+	Status v1alpha1.Status         `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.Reconcilable = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.EventSource  = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.EventSender  = (*AWSCodeCommitSource)(nil)
 )
 
 // AWSCodeCommitSourceSpec defines the desired state of the event source.

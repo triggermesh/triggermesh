@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,33 +19,30 @@ package httptarget
 import (
 	"context"
 
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/reconciler"
 
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/httptarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
-type reconciler struct {
-	// adapter properties
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
 
-	// Knative Service reconciler
-	ksvcr libreconciler.KServiceReconciler
+	trgLister func(namespace string) listersv1alpha1.HTTPTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.HTTPTarget) pkgreconciler.Event {
-	o.Status.InitializeConditions()
-	o.Status.ObservedGeneration = o.Generation
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.HTTPTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = commonv1alpha1.WithReconcilable(ctx, trg)
 
-	adapter, event := r.ksvcr.ReconcileKService(ctx, o, makeAdapterKnService(o, r.adapterCfg))
-
-	o.Status.PropagateAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

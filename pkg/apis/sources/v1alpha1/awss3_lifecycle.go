@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/s3"
 )
 
@@ -40,19 +41,19 @@ func (s *AWSS3Source) GetConditionSet() apis.ConditionSet {
 
 // GetStatus implements duckv1.KRShaped.
 func (s *AWSS3Source) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+	return &s.Status.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements EventSender.
 func (s *AWSS3Source) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSS3Source) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+// GetStatusManager implements Reconcilable.
+func (s *AWSS3Source) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status.Status,
 	}
 }
 
@@ -122,7 +123,7 @@ const (
 )
 
 // awsS3SourceConditionSet is a set of conditions for AWSS3Source objects.
-var awsS3SourceConditionSet = NewEventSourceConditionSet(
+var awsS3SourceConditionSet = v1alpha1.NewConditionSet(
 	AWSS3ConditionSubscribed,
 )
 

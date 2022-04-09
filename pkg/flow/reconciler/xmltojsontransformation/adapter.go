@@ -17,20 +17,23 @@ limitations under the License.
 package xmltojsontransformation
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/flow/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/resources"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const (
-	adapterName            = "xmltojsontransformation"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -40,35 +43,28 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"XMLTOJSONTRANSFORMATION_IMAGE" default:"gcr.io/triggermesh/xmltojsontransformation-adapter"`
+	Image string `default:"gcr.io/triggermesh/xmltojsontransformation-adapter"`
 }
 
-// makeAdapterKService generates (but does not insert into K8s) the Synchronizer Adapter KService.
-func makeAdapterKService(o *v1alpha1.XMLToJSONTransformation, cfg *adapterConfig, sink *apis.URL) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", o.Name)
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
-	envSvc := libreconciler.MakeServiceEnv(name, o.Namespace)
-	envApp := makeAppEnv(o, sink)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	return resources.MakeKService(o.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(o),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.XMLToJSONTransformation)
+
+	return common.NewAdapterKnService(trg, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	)
 }
 
-func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink *apis.URL) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.XMLToJSONTransformation) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		},
 	}
 
@@ -79,13 +75,20 @@ func makeAppEnv(o *v1alpha1.XMLToJSONTransformation, sink *apis.URL) []corev1.En
 		})
 	}
 
-	if sink != nil {
-		env = append(env, corev1.EnvVar{
-			Name:  "K_SINK",
-			Value: sink.String(),
-		})
+	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}
 
-	return env
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
 
+	return ownerRefables, nil
 }

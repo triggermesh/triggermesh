@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package azureeventgridsource
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"hash/crc32"
 	"strconv"
@@ -31,10 +30,11 @@ import (
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/eventgrid"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 )
 
 // We don't know the pricing tier of the Event Hubs namespace, so we default to
@@ -55,7 +55,7 @@ func ensureEventHub(ctx context.Context, cli eventgrid.EventHubsClient) (string 
 		return "", nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureEventGridSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureEventGridSource)
 	status := &src.Status
 
 	if userProvidedHub := src.Spec.Endpoint.EventHubs.HubName; userProvidedHub != nil {
@@ -108,7 +108,7 @@ func ensureEventHub(ctx context.Context, cli eventgrid.EventHubsClient) (string 
 		return "", fmt.Errorf("%w", failGetEventHubEvent(scope, err))
 	}
 
-	eventHubResID, err := parseEventHubResID(*res.ID)
+	eventHubResID, err := parseResourceID(*res.ID)
 	if err != nil {
 		return "", fmt.Errorf("converting resource ID string to structured resource ID: %w", err)
 	}
@@ -136,7 +136,7 @@ func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) *v1al
 // Required permissions:
 //  - Microsoft.EventHub/namespaces/eventhubs/delete
 func ensureNoEventHub(ctx context.Context, cli eventgrid.EventHubsClient) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AzureEventGridSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureEventGridSource)
 
 	if userProvidedHub := src.Spec.Endpoint.EventHubs.HubName; userProvidedHub != nil {
 		// do not delete Event Hubs managed by the user
@@ -181,19 +181,6 @@ func ensureNoEventHub(ctx context.Context, cli eventgrid.EventHubsClient) error 
 func makeEventHubName(src *v1alpha1.AzureEventGridSource) string {
 	nsNameChecksum := crc32.ChecksumIEEE([]byte(src.Namespace + "/" + src.Name))
 	return "io.triggermesh.azureeventgridsources-" + strconv.FormatUint(uint64(nsNameChecksum), 10)
-}
-
-// parseEventHubResID parses the given Event Hub resource ID string to a
-// structured resource ID.
-func parseEventHubResID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
-	resID := &v1alpha1.AzureResourceID{}
-
-	err := json.Unmarshal([]byte(strconv.Quote(resIDStr)), resID)
-	if err != nil {
-		return nil, fmt.Errorf("deserializing resource ID string: %w", err)
-	}
-
-	return resID, nil
 }
 
 // failGetEventHubEvent returns a reconciler event which indicates that an

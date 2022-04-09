@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-
 	"knative.dev/pkg/apis"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -34,15 +32,13 @@ type SplunkTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SplunkTargetSpec   `json:"spec,omitempty"`
-	Status SplunkTargetStatus `json:"status,omitempty"`
+	Spec   SplunkTargetSpec `json:"spec,omitempty"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*SplunkTarget)(nil)
-	_ kmeta.OwnerRefable = (*SplunkTarget)(nil)
-	_ duckv1.KRShaped    = (*SplunkTarget)(nil)
+	_ v1alpha1.Reconcilable = (*SplunkTarget)(nil)
 )
 
 // SplunkTargetSpec defines the desired state of the event target.
@@ -53,7 +49,7 @@ type SplunkTargetSpec struct {
 	Endpoint apis.URL `json:"endpoint"`
 	// Token for authenticating requests against the HEC.
 	// see https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#About_Event_Collector_tokens
-	Token ValueFromField `json:"token"`
+	Token v1alpha1.ValueFromField `json:"token"`
 	// Name of the index to send events to.
 	// When undefined, events are sent to the default index defined in the HEC token's configuration.
 	// +optional
@@ -63,12 +59,6 @@ type SplunkTargetSpec struct {
 	// chain and host name when communicating over TLS.
 	// +optional
 	SkipTLSVerify *bool `json:"skipTLSVerify,omitempty"`
-}
-
-// SplunkTargetStatus defines the observed state of the event target.
-type SplunkTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

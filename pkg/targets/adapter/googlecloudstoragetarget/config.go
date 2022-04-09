@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	Credentials string `envconfig:"GOOGLE_STORAGE_CREDENTIALS_JSON" required:"true"`
+	Credentials string `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
 
 	BucketName string `envconfig:"GOOGLE_STORAGE_BUCKET_NAME" required:"true"`
 

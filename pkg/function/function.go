@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 
 	"go.uber.org/zap"
@@ -48,10 +49,12 @@ import (
 )
 
 const (
-	adapterName         = "klrfunction"
+	adapterName         = "function"
 	klrEntrypoint       = "/opt/aws-custom-runtime"
 	functionNameLabel   = "extensions.triggermesh.io/function"
 	ceDefaultTypePrefix = "io.triggermesh.function."
+
+	metricsPrometheusPortKsvc uint16 = 9092
 )
 
 // Reconciler implements addressableservicereconciler.Interface for
@@ -76,12 +79,6 @@ type Reconciler struct {
 
 // Check that our Reconciler implements Interface
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
-
-// newReconciledNormal makes a new reconciler event with event type Normal, and
-// reason AddressableServiceReconciled.
-func newReconciledNormal(namespace, name string) reconciler.Event {
-	return reconciler.NewEvent(corev1.EventTypeNormal, "FunctionReconciled", "Function reconciled: \"%s/%s\"", namespace, name)
-}
 
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Function) reconciler.Event {
@@ -151,7 +148,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Function) re
 	}
 
 	logger.Debug("Function reconciled")
-	return newReconciledNormal(o.Namespace, o.Name)
+	return nil
 }
 
 func (r *Reconciler) resolveSink(ctx context.Context, f *v1alpha1.Function) (*apis.URL, error) {
@@ -230,10 +227,14 @@ func (r *Reconciler) reconcileKnService(ctx context.Context, f *v1alpha1.Functio
 
 	ksvcLabels[functionNameLabel] = f.Name
 
-	expectedKsvc := resources.NewKnService(f.Name+"-"+rand.String(6), f.Namespace,
+	expectedKsvc := resources.NewKnService(fmt.Sprintf("function-%s-%s", f.Name, rand.String(6)), f.Namespace,
 		resources.KnSvcImage(image),
 		resources.KnSvcMountCm(cm.Name, filename),
 		resources.KnSvcEntrypoint(klrEntrypoint),
+		resources.KnSvcEnvVar(resources.EnvName, f.Name),
+		resources.KnSvcEnvVar(resources.EnvNamespace, f.Namespace),
+		resources.KnSvcEnvVar(resources.EnvComponent, adapterName),
+		resources.KnSvcEnvVar(resources.EnvMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
 		resources.KnSvcEnvVar(eventStoreEnv, f.Spec.EventStore.URI),
 		resources.KnSvcEnvVar("K_SINK", sink.String()),
 		resources.KnSvcEnvVar("_HANDLER", handler),

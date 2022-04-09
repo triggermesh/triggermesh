@@ -19,19 +19,19 @@ package synchronizer
 import (
 	"testing"
 
-	. "github.com/triggermesh/triggermesh/pkg/flow/reconciler/testing"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 
 	// Link fake informers accessed by our controller
 	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/flow/v1alpha1/synchronizer/fake"
 	_ "knative.dev/pkg/client/injection/ducks/duck/v1/addressable/fake"
-	_ "knative.dev/pkg/client/injection/kube/informers/core/v1/service/fake"
-	_ "knative.dev/pkg/injection/clients/dynamicclient/fake"
+	_ "knative.dev/pkg/client/injection/kube/informers/core/v1/serviceaccount/fake"
+	_ "knative.dev/pkg/client/injection/kube/informers/rbac/v1/rolebinding/fake"
 	_ "knative.dev/serving/pkg/client/injection/informers/serving/v1/service/fake"
 )
 
 func TestNewController(t *testing.T) {
 	t.Run("No failure", func(t *testing.T) {
-		TestControllerConstructor(t, NewController, WithInformerNumber(3))
+		TestControllerConstructor(t, NewController)
 	})
 
 	t.Run("Failure cases", func(t *testing.T) {

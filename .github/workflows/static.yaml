@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -24,16 +24,14 @@ jobs:
     # Therefore, this step should remain the first one that is executed after
     # the Go setup, in case other steps are added to this job in the future.
     - name: Lint Go code
-      uses: golangci/golangci-lint-action@v2
-      with:
-        skip-go-installation: true
+      uses: golangci/golangci-lint-action@v3
 
   lint-config:
     name: Configuration Linting
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -41,7 +39,7 @@ jobs:
         go-version: '1.17'
 
     - name: Go caches
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cache/go-build

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Managed event types
@@ -34,6 +35,29 @@ const (
 
 	EventTypeDatadogResponse = "io.triggermesh.datadog.response"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*DatadogTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("DatadogTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*DatadogTarget) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *DatadogTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *DatadogTarget) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		Status:       &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*DatadogTarget) AcceptedEventTypes() []string {
@@ -51,72 +75,8 @@ func (*DatadogTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *DatadogTarget) AsEventSource() string {
-	kind := strings.ToLower(s.GetGroupVersionKind().Kind)
-	return "io.triggermesh." + kind + "." + s.Namespace + "." + s.Name
-}
-
-// GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *DatadogTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("DatadogTarget")
-}
-
-// DatadogCondSet is the group of possible conditions
-var DatadogCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *DatadogTargetStatus) InitializeConditions() {
-	DatadogCondSet.Manage(s).InitializeConditions()
-}
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionDeployed should be marked as true or false.
-func (s *DatadogTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		DatadogCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		DatadogCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	DatadogCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
-
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *DatadogTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	DatadogCondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *DatadogTargetStatus) IsReady() bool {
-	return DatadogCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *DatadogTarget) GetConditionSet() apis.ConditionSet {
-	return DatadogCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *DatadogTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *DatadogTarget) AsEventSource() string {
+	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }

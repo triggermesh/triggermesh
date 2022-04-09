@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import (
 	"github.com/cloudevents/sdk-go/v2/binding"
 	"github.com/cloudevents/sdk-go/v2/event"
 	cehttp "github.com/cloudevents/sdk-go/v2/protocol/http"
+
 	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
@@ -35,6 +36,7 @@ import (
 	"knative.dev/pkg/injection"
 	"knative.dev/pkg/logging"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/filter"
 	routinglisters "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
@@ -154,7 +156,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	h.send(ctx, writer, request.Header, f.Status.SinkURI.String(), event)
 }
 
-func updateAttributes(fs routingv1alpha1.RouterStatus, event *event.Event) *event.Event {
+func updateAttributes(fs commonv1alpha1.Status, event *event.Event) *event.Event {
 	if len(fs.CloudEventAttributes) == 1 {
 		event.SetType(fs.CloudEventAttributes[0].Type)
 		event.SetSource(fs.CloudEventAttributes[0].Source)

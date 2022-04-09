@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,11 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -34,21 +32,15 @@ type ElasticsearchTarget struct {
 	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the ElasticsearchTarget (from the client).
-	Spec ElasticsearchTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the ElasticsearchTarget (from the controller).
-	// +optional
-	Status ElasticsearchTargetStatus `json:"status,omitempty"`
+	Spec   ElasticsearchTargetSpec `json:"spec"`
+	Status v1alpha1.Status         `json:"status,omitempty"`
 }
 
-// Check the interfaces ElasticsearchTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*ElasticsearchTarget)(nil)
-	_ kmeta.OwnerRefable        = (*ElasticsearchTarget)(nil)
-	_ targets.IntegrationTarget = (*ElasticsearchTarget)(nil)
-	_ targets.EventSource       = (*ElasticsearchTarget)(nil)
-	_ duckv1.KRShaped           = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.EventReceiver = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.EventSource   = (*ElasticsearchTarget)(nil)
 )
 
 // ElasticsearchTargetSpec holds the desired state of the ElasticsearchTarget.
@@ -85,19 +77,6 @@ type Connection struct {
 
 	// When informed supersedes username and password.
 	APIKey *SecretValueFromSource `json:"apiKey,omitempty"`
-}
-
-// ElasticsearchTargetStatus communicates the observed state of the ElasticsearchTarget (from the controller).
-type ElasticsearchTargetStatus struct {
-	// inherits duck/v1beta1 Status, which currently provides:
-	// * ObservedGeneration - the 'Generation' of the Service that was last
-	//   processed by the controller.
-	// * Conditions - the latest available observations of a resource's current
-	//   state.
-	duckv1.Status `json:",inline"`
-
-	// AddressStatus fulfills the Addressable contract.
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

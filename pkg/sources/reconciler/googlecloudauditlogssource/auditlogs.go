@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,9 +28,10 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 const (
@@ -58,7 +59,7 @@ func reconcileSink(ctx context.Context, lacli *logadmin.Client, pscli *pubsub.Cl
 // - logging.sinks.get
 // - logging.sinks.create
 func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *v1alpha1.GCloudResourceName) (*logadmin.Sink, error) {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
 	sinkID := generateSinkID(src)
@@ -111,7 +112,7 @@ func ensureSinkCreated(ctx context.Context, cli *logadmin.Client, topicResName *
 // - pubsub.topics.setIamPolicy
 // - pubsub.topics.publish
 func ensureSinkIsPublisher(ctx context.Context, sink *logadmin.Sink, cli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
 	topicIam := cli.Topic(topicResName.Resource).IAM()
@@ -145,7 +146,7 @@ func (r *Reconciler) ensureNoSink(ctx context.Context, cli *logadmin.Client) err
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := &src.Status
 
 	sink := status.AuditLogsSink

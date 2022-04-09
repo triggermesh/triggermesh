@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
@@ -30,13 +31,15 @@ type CloudEventsSource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   CloudEventsSourceSpec   `json:"spec,omitempty"`
-	Status CloudEventsSourceStatus `json:"status,omitempty"`
+	Spec   CloudEventsSourceSpec `json:"spec,omitempty"`
+	Status v1alpha1.Status       `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*CloudEventsSource)(nil)
+	_ v1alpha1.Reconcilable = (*CloudEventsSource)(nil)
+	_ v1alpha1.EventSource  = (*CloudEventsSource)(nil)
+	_ v1alpha1.EventSender  = (*CloudEventsSource)(nil)
 )
 
 // CloudEventsSourceSpec defines the desired state of the event source.
@@ -64,25 +67,20 @@ type HTTPCredentials struct {
 
 // HTTPBasicAuth credentialsn
 type HTTPBasicAuth struct {
-	Username string         `json:"username"`
-	Password ValueFromField `json:"password"`
+	Username string                  `json:"username"`
+	Password v1alpha1.ValueFromField `json:"password"`
 }
 
 // HTTPToken credentials.
 type HTTPToken struct {
-	Header string         `json:"header"`
-	Value  ValueFromField `json:"value"`
+	Header string                  `json:"header"`
+	Value  v1alpha1.ValueFromField `json:"value"`
 }
 
 // RateLimiter provides a mechanism to reject incoming requests
 // when a threshold is trespassed, informing the caller to retry later.
 type RateLimiter struct {
 	RequestsPerSecond int64 `json:"requestsPerSecond"`
-}
-
-// CloudEventsSourceStatus defines the observed state of the event source.
-type CloudEventsSourceStatus struct {
-	EventSourceStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

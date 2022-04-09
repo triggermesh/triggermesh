@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,53 +19,30 @@ package slacktarget
 import (
 	"context"
 
-	"knative.dev/eventing/pkg/reconciler/source"
-	"knative.dev/pkg/logging"
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/reconciler"
 
-	slack "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/slacktarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/slacktarget"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
-// reconciler reconciles the target adapter object
-type reconciler struct {
-	TargetAdapterImage string `envconfig:"SLACK_ADAPTER_IMAGE" default:"gcr.io/triggermesh/slacktarget-adapter"`
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
+	adapterCfg *adapterConfig
 
-	ksvcr libreconciler.KServiceReconciler
-
-	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	trgLister func(namespace string) listersv1alpha1.SlackTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilers.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *slack.SlackTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	// NOTE(antoineco): such events aren't currently returned by the adapter.
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.SlackTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = commonv1alpha1.WithReconcilable(ctx, trg)
 
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, MakeTargetAdapterKService(&TargetAdapterArgs{
-		Image:   r.TargetAdapterImage,
-		Configs: r.configs,
-		Target:  trg,
-	}))
-
-	if event != nil {
-		logging.FromContext(ctx).Debugf("returning because an event was raised reconciling adapter KService")
-		if adapter == nil {
-			trg.Status.MarkNoKService("ServicePending", event.Error())
-		} else {
-			trg.Status.PropagateKServiceAvailability(adapter)
-		}
-		return event
-	}
-
-	trg.Status.PropagateKServiceAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

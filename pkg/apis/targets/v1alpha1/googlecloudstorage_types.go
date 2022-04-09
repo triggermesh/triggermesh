@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
-
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -35,17 +31,15 @@ type GoogleCloudStorageTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GoogleCloudStorageTargetSpec   `json:"spec"`
-	Status GoogleCloudStorageTargetStatus `json:"status,omitempty"`
+	Spec   GoogleCloudStorageTargetSpec `json:"spec"`
+	Status v1alpha1.Status              `json:"status,omitempty"`
 }
 
-// Check the interfaces GoogleCloudStorageTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*GoogleCloudStorageTarget)(nil)
-	_ kmeta.OwnerRefable        = (*GoogleCloudStorageTarget)(nil)
-	_ targets.IntegrationTarget = (*GoogleCloudStorageTarget)(nil)
-	_ targets.EventSource       = (*GoogleCloudStorageTarget)(nil)
-	_ duckv1.KRShaped           = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventReceiver = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventSource   = (*GoogleCloudStorageTarget)(nil)
 )
 
 // GoogleCloudStorageTargetSpec holds the desired state of the GoogleCloudStorageTarget.
@@ -63,15 +57,6 @@ type GoogleCloudStorageTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-}
-
-// GoogleCloudStorageTargetStatus communicates the observed state of the GoogleCloudStorageTarget (from the controller).
-type GoogleCloudStorageTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

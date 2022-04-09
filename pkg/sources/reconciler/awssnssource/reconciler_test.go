@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,15 +40,16 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/sns"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/awssnssource"
+	"github.com/triggermesh/triggermesh/pkg/mturl"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 	snsclient "github.com/triggermesh/triggermesh/pkg/sources/client/sns"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
-	"github.com/triggermesh/triggermesh/pkg/sources/routing"
-	eventtesting "github.com/triggermesh/triggermesh/pkg/sources/testing/event"
+	eventtesting "github.com/triggermesh/triggermesh/pkg/testing/event"
 )
 
 // adapterCfg is used in every instance of Reconciler defined in reconciler tests.
@@ -338,7 +339,7 @@ func newReconciledSource(opts ...sourceOption) *v1alpha1.AWSSNSSource {
 	status := src.GetStatusManager()
 	status.MarkSink(tSinkURI)
 	status.PropagateServiceAvailability(newReconciledAdapter())
-	status.SetRoute(routing.URLPath(src))
+	status.SetRoute(mturl.URLPath(src))
 
 	for _, opt := range opts {
 		opt(src)
@@ -392,7 +393,7 @@ func newReconciledAdapter() *servingv1.Service {
 	common.OwnByServiceAccount(adapter, NewServiceAccount(newEventSource())())
 
 	adapter.Status.SetConditions(apis.Conditions{{
-		Type:   v1alpha1.ConditionReady,
+		Type:   commonv1alpha1.ConditionReady,
 		Status: corev1.ConditionTrue,
 	}})
 	adapter.Status.URL = tAdapterURI

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
-
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -35,20 +31,15 @@ type AWSS3Target struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the AWSS3Target (from the client).
-	Spec AWSS3TargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the AWSS3Target (from the controller).
-	Status AWSS3TargetStatus `json:"status,omitempty"`
+	Spec   AWSS3TargetSpec `json:"spec"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
-// Check the interfaces AWSS3Target should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*AWSS3Target)(nil)
-	_ kmeta.OwnerRefable        = (*AWSS3Target)(nil)
-	_ targets.IntegrationTarget = (*AWSS3Target)(nil)
-	_ targets.EventSource       = (*AWSS3Target)(nil)
-	_ duckv1.KRShaped           = (*AWSS3Target)(nil)
+	_ v1alpha1.Reconcilable  = (*AWSS3Target)(nil)
+	_ v1alpha1.EventReceiver = (*AWSS3Target)(nil)
+	_ v1alpha1.EventSource   = (*AWSS3Target)(nil)
 )
 
 // AWSS3TargetSpec holds the desired state of the even target.
@@ -67,13 +58,6 @@ type AWSS3TargetSpec struct {
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
-}
-
-// AWSS3TargetStatus communicates the observed state of the event target.
-type AWSS3TargetStatus struct {
-	AWSTargetStatus `json:",inline"`
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

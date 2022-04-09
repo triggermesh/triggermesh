@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
 
-	"knative.dev/pkg/kmeta"
-
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -35,19 +31,14 @@ type AWSDynamoDBTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the AWSDynamoDBTarget (from the client).
-	Spec AWSDynamoDBTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the AWSDynamoDBTarget (from the controller).
-	Status AWSDynamoDBTargetStatus `json:"status,omitempty"`
+	Spec   AWSDynamoDBTargetSpec `json:"spec"`
+	Status v1alpha1.Status       `json:"status,omitempty"`
 }
 
-// Check the interfaces AWSDynamoDBTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object      = (*AWSDynamoDBTarget)(nil)
-	_ kmeta.OwnerRefable  = (*AWSDynamoDBTarget)(nil)
-	_ targets.EventSource = (*AWSDynamoDBTarget)(nil)
-	_ duckv1.KRShaped     = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.Reconcilable = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.EventSource  = (*AWSDynamoDBTarget)(nil)
 )
 
 // AWSDynamoDBTargetSpec holds the desired state of the event target.
@@ -61,13 +52,6 @@ type AWSDynamoDBTargetSpec struct {
 	// Table ARN
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazondynamodb.html#amazondynamodb-resources-for-iam-policies
 	ARN string `json:"arn"`
-}
-
-// AWSDynamoDBTargetStatus communicates the observed state of the event target.
-type AWSDynamoDBTargetStatus struct {
-	AWSTargetStatus `json:",inline"`
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

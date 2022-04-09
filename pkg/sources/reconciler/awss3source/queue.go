@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -32,17 +32,18 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/iam"
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/s3"
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/sqs"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
 )
 
 // ensureQueue ensures the existence of a SQS queue for sending S3 event
 // notifications.
 func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, error) {
-	src := v1alpha1.SourceFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	status := &typedSrc.Status
@@ -114,7 +115,7 @@ func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, erro
 // ensureNoQueue ensures that the SQS queue created for sending S3 event
 // notifications is deleted.
 func ensureNoQueue(ctx context.Context, cli sqsiface.SQSAPI) error {
-	src := v1alpha1.SourceFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	if dest := typedSrc.Spec.Destination; dest != nil {

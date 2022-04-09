@@ -19,6 +19,7 @@ package cloudeventssource
 import (
 	"encoding/json"
 	"fmt"
+	"path"
 	"path/filepath"
 	"strconv"
 
@@ -31,11 +32,11 @@ import (
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 	"github.com/triggermesh/triggermesh/pkg/sources/cloudevents"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const (
@@ -58,17 +59,16 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
 	typedSrc := src.(*v1alpha1.CloudEventsSource)
 
 	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
 
 	// Add mount secrets for each BasicAuth and Token element.
-	secretArrayNamePrefix := "basicauths"
-	secretBasePath := "/opt"
 	options := []resource.ObjectOption{
 		resource.Image(r.adapterCfg.Image),
 
+		resource.VisibilityPublic,
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
@@ -80,21 +80,24 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	// key/mounted-file pair is added to the environment variable.
 	kvs := []KeyMountedValue{}
 
+	secretArrayNamePrefix := "basicauths"
+	secretBasePath := "/opt"
+	secretFileName := "cesource"
+
 	for i, ba := range typedSrc.Spec.Credentials.BasicAuths {
 		if ba.Password.ValueFromSecret != nil {
 			secretName := fmt.Sprintf("%s%d", secretArrayNamePrefix, i)
 			secretPath := filepath.Join(secretBasePath, secretName)
 
-			// passwdStashMount = resources.SecretMount("db-password", PasswdStashMountPath,
-			// 	target.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
-			// 	resources.WithMountSubPath(path.Base(PasswdStashMountPath)),
-			// 	resources.WithVolumeSecretItem(target.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key, path.Base(PasswdStashMountPath)))
-
-			options = append(options, resource.SecretMount(secretName, secretPath, secretName))
+			options = append(options, resource.SecretMount(
+				secretName,
+				secretPath,
+				ba.Password.ValueFromSecret.Name,
+				resource.WithVolumeSecretItem(ba.Password.ValueFromSecret.Key, secretFileName)))
 
 			kvs = append(kvs, KeyMountedValue{
 				Key:              ba.Username,
-				MountedValueFile: secretPath,
+				MountedValueFile: path.Join(secretPath, secretFileName),
 			})
 		}
 	}
@@ -102,15 +105,41 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 	if len(kvs) != 0 {
 		s, _ := json.Marshal(kvs)
 		options = append(options, resource.EnvVar(envCloudEventsBasicAuthCredentials, string(s)))
+
+		// empty kvs for re-using at tokens
+		kvs = kvs[:0]
 	}
 
-	// add to options as env
+	secretArrayNamePrefix = "tokens"
+
+	for i, t := range typedSrc.Spec.Credentials.Tokens {
+		if t.Value.ValueFromSecret != nil {
+			secretName := fmt.Sprintf("%s%d", secretArrayNamePrefix, i)
+			secretPath := filepath.Join(secretBasePath, secretName)
+
+			options = append(options, resource.SecretMount(
+				secretName,
+				secretPath,
+				t.Value.ValueFromSecret.Name,
+				resource.WithVolumeSecretItem(t.Value.ValueFromSecret.Key, secretFileName)))
+
+			kvs = append(kvs, KeyMountedValue{
+				Key:              t.Header,
+				MountedValueFile: path.Join(secretPath, secretFileName),
+			})
+		}
+	}
+
+	if len(kvs) != 0 {
+		s, _ := json.Marshal(kvs)
+		options = append(options, resource.EnvVar(envCloudEventsTokenCredentials, string(s)))
+	}
 
 	return common.NewAdapterKnService(src, sinkURI, options...)
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error) {
+func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
 	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
@@ -129,12 +158,19 @@ type KeyMountedValue struct {
 	MountedValueFile string
 }
 
+func (kmv *KeyMountedValue) Decode(value string) error {
+	if err := json.Unmarshal([]byte(value), kmv); err != nil {
+		return err
+	}
+	return nil
+}
+
 // makeAppEnv creates the environment variables specific to this adapter component.
 func makeAppEnv(o *v1alpha1.CloudEventsSource) []corev1.EnvVar {
 	envs := []corev1.EnvVar{
 		{
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
+			Name:  common.EnvBridgeID,
+			Value: common.GetStatefulBridgeID(o),
 		},
 	}
 
@@ -154,28 +190,6 @@ func makeAppEnv(o *v1alpha1.CloudEventsSource) []corev1.EnvVar {
 
 	if o.Spec.Credentials == nil {
 		return envs
-	}
-
-	// if len(o.Spec.Credentials.BasicAuths) != 0 {
-
-	// 	ba, _ := json.Marshal(o.Spec.Credentials.BasicAuths)
-
-	// 	envs = append(envs, corev1.EnvVar{
-	// 		Name:  envCloudEventsBasicAuthCredentials,
-	// 		Value: string(ba),
-	// 	})
-	// }
-
-	if len(o.Spec.Credentials.Tokens) != 0 {
-		tk, err := json.Marshal(o.Spec.Credentials.Tokens)
-		if err != nil {
-			return nil
-		}
-
-		envs = append(envs, corev1.EnvVar{
-			Name:  envCloudEventsTokenCredentials,
-			Value: string(tk),
-		})
 	}
 
 	return envs

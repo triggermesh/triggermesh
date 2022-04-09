@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,12 +24,13 @@ import (
 
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/awss3source"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	s3client "github.com/triggermesh/triggermesh/pkg/sources/client/s3"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
 )
 
 // Reconciler implements controller.Reconciler for the event source type.
@@ -53,7 +54,7 @@ var _ reconcilerv1alpha1.Finalizer = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Source) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, src)
+	ctx = commonv1alpha1.WithReconcilable(ctx, src)
 
 	s3Client, sqsClient, err := r.s3Cg.Get(src)
 	if err != nil {
@@ -67,7 +68,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Sourc
 		return fmt.Errorf("failed to reconcile SQS queue: %w", err)
 	}
 
-	if err := r.base.ReconcileSource(ctx, r); err != nil {
+	if err := r.base.ReconcileAdapter(ctx, r); err != nil {
 		return fmt.Errorf("failed to reconcile SQS event source adapter: %w", err)
 	}
 
@@ -77,7 +78,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Sourc
 // FinalizeKind is called when the resource is deleted.
 func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSS3Source) reconciler.Event {
 	// inject source into context for usage in finalization logic
-	ctx = v1alpha1.WithSource(ctx, src)
+	ctx = commonv1alpha1.WithReconcilable(ctx, src)
 
 	s3Client, sqsClient, err := r.s3Cg.Get(src)
 	switch {
@@ -104,6 +105,6 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSS3Source
 
 // sourceID returns an ID that identifies the given source instance in AWS
 // resources or resources tags.
-func sourceID(src v1alpha1.EventSource) string {
+func sourceID(src commonv1alpha1.Reconcilable) string {
 	return "io.triggermesh.awss3sources." + src.GetNamespace() + "." + src.GetName()
 }

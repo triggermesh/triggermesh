@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,13 +38,14 @@ import (
 	"knative.dev/pkg/reconciler"
 	rt "knative.dev/pkg/reconciler/testing"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/zendesksource"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/router"
 	adaptesting "github.com/triggermesh/triggermesh/pkg/sources/adapter/testing"
 	"github.com/triggermesh/triggermesh/pkg/sources/secret"
-	eventtesting "github.com/triggermesh/triggermesh/pkg/sources/testing/event"
+	eventtesting "github.com/triggermesh/triggermesh/pkg/testing/event"
 )
 
 func TestReconcile(t *testing.T) {
@@ -173,7 +174,7 @@ func newEventSource(opts ...sourceOption) *v1alpha1.ZendeskSource {
 			Name:      tName,
 		},
 		Status: v1alpha1.ZendeskSourceStatus{
-			EventSourceStatus: v1alpha1.EventSourceStatus{
+			Status: commonv1alpha1.Status{
 				SourceStatus: duckv1.SourceStatus{
 					SinkURI: tSinkURI,
 				},
@@ -225,7 +226,7 @@ type mockedSecretGetter struct {
 var _ secret.Getter = (*mockedSecretGetter)(nil)
 
 // Get implements secret.Getter.
-func (sg *mockedSecretGetter) Get(refs ...v1alpha1.ValueFromField) (secret.Secrets, error) {
+func (sg *mockedSecretGetter) Get(refs ...commonv1alpha1.ValueFromField) (secret.Secrets, error) {
 	if sg.fail {
 		return nil, assert.AnError
 	}

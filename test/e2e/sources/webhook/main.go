@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ var _ = Describe("Webhook source", func() {
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 			})
 
-			By("creating an WebhookSource object", func() {
+			By("creating a WebhookSource object", func() {
 				src, err := createSource(srcClient, ns, "test-", sink,
 					withEventType(eventType),
 					withEventSource(eventSource),
@@ -101,7 +101,7 @@ var _ = Describe("Webhook source", func() {
 			})
 		})
 
-		When("an HTTP request is received", func() {
+		When("an HTTP request is sent to the source's endpoint", func() {
 			BeforeEach(func() {
 				http.PostJSONRequestWithRetries(5*time.Second, 1*time.Minute, srcURL.String(), testPayload)
 			})

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,24 +17,22 @@ limitations under the License.
 package splunktarget
 
 import (
+	"fmt"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
-	network "knative.dev/networking/pkg"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
-	"knative.dev/serving/pkg/apis/serving"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
-
-const adapterName = "splunktarget"
 
 const (
 	envHECEndpoint   = "SPLUNK_HEC_ENDPOINT"
@@ -47,19 +45,26 @@ const (
 // Public fields are automatically populated by envconfig.
 type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
-	configs source.ConfigAccessor
+	obsConfig source.ConfigAccessor
 	// Container image
 	Image string `default:"gcr.io/triggermesh/splunktarget-adapter"`
 }
 
-// makeAdapterKnService returns a Knative Service object for the target's adapter.
-func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *servingv1.Service {
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, o.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(o, genericLabels)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	ksvcLabels[network.VisibilityLabelKey] = serving.VisibilityClusterLocal
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.SplunkTarget)
 
+	return common.NewAdapterKnService(trg, nil,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	)
+}
+
+func makeAppEnv(o *v1alpha1.SplunkTarget) []corev1.EnvVar {
 	hecURL := apis.URL{
 		Scheme: o.Spec.Endpoint.Scheme,
 		Host:   o.Spec.Endpoint.Host,
@@ -67,36 +72,12 @@ func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *serving
 
 	env := []corev1.EnvVar{
 		{
-			Name:  resources.EnvName,
-			Value: o.Name,
-		}, {
-			Name:  resources.EnvNamespace,
-			Value: o.Namespace,
-		}, {
-			Name:  resources.EnvMetricsDomain,
-			Value: resources.DefaultMetricsDomain,
-		}, {
 			Name:  envHECEndpoint,
 			Value: hecURL.String(),
 		},
 	}
 
-	tokenEnvVar := corev1.EnvVar{
-		Name:  envHECToken,
-		Value: o.Spec.Token.Value,
-	}
-	if tokenFromSecret := o.Spec.Token.ValueFromSecret; tokenFromSecret != nil {
-		tokenEnvVar.Value = ""
-		tokenEnvVar.ValueFrom = &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{
-					Name: tokenFromSecret.Name,
-				},
-				Key: tokenFromSecret.Key,
-			},
-		}
-	}
-	env = append(env, tokenEnvVar)
+	env = common.MaybeAppendValueFromEnvVar(env, envHECToken, o.Spec.Token)
 
 	if idx := o.Spec.Index; idx != nil && *idx != "" {
 		env = append(env, corev1.EnvVar{
@@ -112,46 +93,20 @@ func makeAdapterKnService(o *v1alpha1.SplunkTarget, cfg *adapterConfig) *serving
 		})
 	}
 
-	env = append(env, cfg.configs.ToEnvVars()...)
+	return env
+}
 
-	// FIXME(antoineco): default metrics port 9090 overlaps with queue-proxy
-	// Requires fix from https://github.com/knative/pkg/pull/1411:
-	// {
-	//	Name: "METRICS_PROMETHEUS_PORT",
-	//	Value: "9092",
-	// }
-	env = append(env, corev1.EnvVar{
-		Name:  source.EnvMetricsCfg,
-		Value: "",
-	})
-
-	svc := &servingv1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: o.Namespace,
-			Name:      kmeta.ChildName(adapterName+"-", o.Name),
-			Labels:    ksvcLabels,
-			OwnerReferences: []metav1.OwnerReference{
-				*kmeta.NewControllerRef(o),
-			},
-		},
-		Spec: servingv1.ServiceSpec{
-			ConfigurationSpec: servingv1.ConfigurationSpec{
-				Template: servingv1.RevisionTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: podLabels,
-					},
-					Spec: servingv1.RevisionSpec{
-						PodSpec: corev1.PodSpec{
-							Containers: []corev1.Container{{
-								Image: cfg.Image,
-								Env:   env,
-							}},
-						},
-					},
-				},
-			},
-		},
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}
 
-	return svc
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

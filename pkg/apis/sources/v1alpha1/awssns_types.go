@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -38,8 +39,8 @@ type AWSSNSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AWSSNSSource)(nil)
-	_ multiTenant = (*AWSSNSSource)(nil)
+	_ v1alpha1.Reconcilable = (*AWSSNSSource)(nil)
+	_ v1alpha1.MultiTenant  = (*AWSSNSSource)(nil)
 )
 
 // AWSSNSSourceSpec defines the desired state of the event source.
@@ -63,8 +64,8 @@ type AWSSNSSourceSpec struct {
 
 // AWSSNSSourceStatus defines the observed state of the event source.
 type AWSSNSSourceStatus struct {
-	EventSourceStatus `json:",inline"`
-	SubscriptionARN   *string `json:"subscriptionARN,omitempty"`
+	v1alpha1.Status `json:",inline"`
+	SubscriptionARN *string `json:"subscriptionARN,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

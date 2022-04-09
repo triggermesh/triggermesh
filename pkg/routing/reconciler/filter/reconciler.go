@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,18 +21,19 @@ import (
 
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	filterreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/filter"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements addressableservicereconciler.Interface for
 // AddressableService resources.
 type Reconciler struct {
-	base         common.GenericServiceReconciler
-	filterLister func(namespace string) listersv1alpha1.FilterNamespaceLister
-	adapterCfg   *adapterConfig
+	base       common.GenericServiceReconciler
+	rtrLister  func(namespace string) listersv1alpha1.FilterNamespaceLister
+	adapterCfg *adapterConfig
 }
 
 // Check that our Reconciler implements Interface
@@ -41,7 +42,7 @@ var _ filterreconciler.Interface = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.Filter) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithRouter(ctx, o)
+	ctx = commonv1alpha1.WithReconcilable(ctx, o)
 
 	return r.base.ReconcileAdapter(ctx, r)
 }

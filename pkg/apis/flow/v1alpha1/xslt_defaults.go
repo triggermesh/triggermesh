@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import (
 )
 
 // SetDefaults implements apis.Defaultable
-func (o *XSLTTransformation) SetDefaults(ctx context.Context) {
-	if o != nil {
-		o.Spec.SetDefaults(ctx)
+func (t *XSLTTransformation) SetDefaults(ctx context.Context) {
+	if t != nil {
+		t.Spec.SetDefaults(ctx)
 	}
 }
 

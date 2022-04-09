@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,10 +36,11 @@ import (
 	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/servicebustopics"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
 )
 
 const crudTimeout = time.Second * 15
@@ -53,7 +54,7 @@ func ensureSubscription(ctx context.Context, cli servicebustopics.SubscriptionsC
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureServiceBusTopicSource)
 
 	status := &typedSrc.Status
@@ -130,7 +131,7 @@ func ensureNoSubscription(ctx context.Context, cli servicebustopics.Subscription
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AzureServiceBusTopicSource)
 
 	topic := typedSrc.Spec.TopicID.String()
@@ -243,7 +244,7 @@ func isDenied(err error) bool {
 // doesn't give us a lot of characters for indicating what component owns the
 // Subscription. Therefore, we compute the CRC32 checksum of the source's
 // name/namespace (8 characters) and make it part of the name.
-func subscriptionName(src v1alpha1.EventSource) string {
+func subscriptionName(src commonv1alpha1.Reconcilable) string {
 	nsNameChecksum := crc32.ChecksumIEEE([]byte(src.GetNamespace() + "/" + src.GetName()))
 	return "io.triggermesh.azureservicebussources-" + strconv.FormatUint(uint64(nsNameChecksum), 10)
 }

@@ -1,4 +1,4 @@
-# Copyright 2021 TriggerMesh Inc.
+# Copyright 2022 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -148,6 +148,7 @@ rules:
   - alibabaosstargets
   - awscomprehendtargets
   - awsdynamodbtargets
+  - awseventbridgetargets
   - awskinesistargets
   - awslambdatargets
   - awss3targets
@@ -188,6 +189,7 @@ rules:
   - alibabaosstargets/status
   - awscomprehendtargets/status
   - awsdynamodbtargets/status
+  - awseventbridgetargets/status
   - awskinesistargets/status
   - awslambdatargets/status
   - awss3targets/status
@@ -223,6 +225,8 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
+  - dataweavetransformations
+  - jqtransformations
   - synchronizers
   - transformations
   - xmltojsontransformations
@@ -235,6 +239,8 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
+  - dataweavetransformations/status
+  - jqtransformations/status
   - synchronizers/status
   - transformations/status
   - xmltojsontransformations/status
@@ -325,6 +331,7 @@ rules:
   - alibabaosstargets/finalizers
   - awscomprehendtargets/finalizers
   - awsdynamodbtargets/finalizers
+  - awseventbridgetargets/finalizers
   - awskinesistargets/finalizers
   - awslambdatargets/finalizers
   - awss3targets/finalizers
@@ -360,6 +367,8 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
+  - dataweavetransformations/finalizers
+  - jqtransformations/finalizers
   - synchronizers/finalizers
   - transformations/finalizers
   - xmltojsontransformations/finalizers
@@ -806,6 +815,7 @@ rules:
   - alibabaosstargets
   - awscomprehendtargets
   - awsdynamodbtargets
+  - awseventbridgetargets
   - awskinesistargets
   - awslambdatargets
   - awss3targets
@@ -843,6 +853,8 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
+  - dataweavetransformations
+  - jqtransformations
   - synchronizers
   - transformations
   - xmltojsontransformations

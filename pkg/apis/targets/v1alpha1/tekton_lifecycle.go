@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,29 +23,9 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
-
-// TektonCondSet is the group of possible conditions
-var TektonCondSet = apis.NewLivingConditionSet(
-	ConditionServiceReady,
-)
-
-// GetCondition returns the condition currently associated with the given type, or nil.
-func (s *TektonTargetStatus) GetCondition(t apis.ConditionType) *apis.Condition {
-	return TektonCondSet.Manage(s).GetCondition(t)
-}
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *TektonTargetStatus) InitializeConditions() {
-	TektonCondSet.Manage(s).InitializeConditions()
-	s.Address = &duckv1.Addressable{}
-}
-
-// GetGroupVersionKind returns the GroupVersionKind.
-func (*TektonTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("TektonTarget")
-}
 
 // Accepted event types
 const (
@@ -54,6 +34,29 @@ const (
 	// EventTypeTektonReap event to trigger reaping of completed runs
 	EventTypeTektonReap = "io.triggermesh.tekton.reap"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*TektonTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("TektonTarget")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*TektonTarget) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *TektonTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *TektonTarget) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		Status:       &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*TektonTarget) AcceptedEventTypes() []string {
@@ -70,43 +73,8 @@ func (*TektonTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
+// AsEventSource implements EventSource.
 func (t *TektonTarget) AsEventSource() string {
 	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
 	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
-}
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionServiceReady should be marked as true or false.
-func (s *TektonTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc.IsReady() && ksvc.Status.Address != nil && ksvc.Status.Address.URL != nil && !ksvc.Status.Address.URL.IsEmpty() {
-		s.Address.URL = ksvc.Status.Address.URL
-		TektonCondSet.Manage(s).MarkTrue(ConditionServiceReady)
-		return
-	} else if ksvc == nil {
-		s.MarkNoKService(ReasonUnavailable, "Adapter service unknown: ksvc is not available")
-	} else {
-		s.MarkNoKService(ReasonUnavailable, "Adapter service \"%s/%s\" is unavailable", ksvc.Namespace, ksvc.Name)
-	}
-	s.Address.URL = nil
-}
-
-// MarkNoKService sets the condition that the service is not ready
-func (s *TektonTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	TektonCondSet.Manage(s).MarkFalse(ConditionServiceReady, reason, messageFormat, messageA...)
-}
-
-// IsReady returns true if the resource is ready overall.
-func (s *TektonTargetStatus) IsReady() bool {
-	return TektonCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (*TektonTarget) GetConditionSet() apis.ConditionSet {
-	return TektonCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (t *TektonTarget) GetStatus() *duckv1.Status {
-	return &t.Status.Status
 }

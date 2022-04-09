@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ import (
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const (
@@ -60,60 +60,44 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"IBMMQSOURCE_ADAPTER_IMAGE" default:"gcr.io/triggermesh/ibmmqsource-adapter"`
+	Image string `default:"gcr.io/triggermesh/ibmmqsource-adapter"`
 }
 
 // Verify that Reconciler implements common.AdapterDeploymentBuilder.
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.IBMMQSource)
-	appEnv := makeAppEnv(typedSrc)
-	appEnv = common.MaybeAppendValueFromEnvVar(appEnv, envUser, typedSrc.Spec.Auth.User)
-	appEnv = common.MaybeAppendValueFromEnvVar(appEnv, envPassword, typedSrc.Spec.Auth.Password)
 
-	keystoreMount := func(interface{}) {}
-	passwdStashMount := func(interface{}) {}
+	keystoreMount := resource.ObjectOption(func(interface{}) {})
+	passwdStashMount := resource.ObjectOption(func(interface{}) {})
 
 	if typedSrc.Spec.Auth.TLS != nil {
-		appEnv = append(appEnv, []corev1.EnvVar{
-			{
-				Name:  envTLSCipher,
-				Value: typedSrc.Spec.Auth.TLS.Cipher,
-			},
-			{
-				Name:  envTLSClientAuth,
-				Value: fmt.Sprintf("%t", typedSrc.Spec.Auth.TLS.ClientAuthRequired),
-			},
-		}...)
-
-		if typedSrc.Spec.Auth.TLS.CertLabel != nil {
-			appEnv = append(appEnv, []corev1.EnvVar{
-				{
-					Name:  envTLSCertLabel,
-					Value: *typedSrc.Spec.Auth.TLS.CertLabel,
-				},
-			}...)
-		}
-
-		keystoreMount = resource.SecretMount("key-database", KeystoreMountPath,
+		keystoreMount = resource.SecretMount(
+			"key-database",
+			KeystoreMountPath,
 			typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Name,
 			resource.WithMountSubPath(path.Base(KeystoreMountPath)),
-			resource.WithVolumeSecretItem(typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key, path.Base(KeystoreMountPath)))
-		passwdStashMount = resource.SecretMount("db-password", PasswdStashMountPath,
+			resource.WithVolumeSecretItem(
+				typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key,
+				path.Base(KeystoreMountPath)))
+		passwdStashMount = resource.SecretMount(
+			"db-password",
+			PasswdStashMountPath,
 			typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
 			resource.WithMountSubPath(path.Base(PasswdStashMountPath)),
-			resource.WithVolumeSecretItem(typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key, path.Base(PasswdStashMountPath)))
-
+			resource.WithVolumeSecretItem(
+				typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key,
+				path.Base(PasswdStashMountPath)))
 	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVars(appEnv...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
+
+		resource.EnvVars(makeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+
 		keystoreMount,
 		passwdStashMount,
 	)
@@ -121,10 +105,6 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 
 func makeAppEnv(o *v1alpha1.IBMMQSource) []corev1.EnvVar {
 	env := []corev1.EnvVar{
-		{
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
-		},
 		{
 			Name:  envConnectionName,
 			Value: o.Spec.ConnectionName,
@@ -159,11 +139,36 @@ func makeAppEnv(o *v1alpha1.IBMMQSource) []corev1.EnvVar {
 		},
 	}
 
+	env = common.MaybeAppendValueFromEnvVar(env, envUser, o.Spec.Auth.User)
+	env = common.MaybeAppendValueFromEnvVar(env, envPassword, o.Spec.Auth.Password)
+
+	if o.Spec.Auth.TLS != nil {
+		env = append(env, []corev1.EnvVar{
+			{
+				Name:  envTLSCipher,
+				Value: o.Spec.Auth.TLS.Cipher,
+			},
+			{
+				Name:  envTLSClientAuth,
+				Value: strconv.FormatBool(o.Spec.Auth.TLS.ClientAuthRequired),
+			},
+		}...)
+
+		if o.Spec.Auth.TLS.CertLabel != nil {
+			env = append(env, []corev1.EnvVar{
+				{
+					Name:  envTLSCertLabel,
+					Value: *o.Spec.Auth.TLS.CertLabel,
+				},
+			}...)
+		}
+	}
+
 	return env
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error) {
+func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
 	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)

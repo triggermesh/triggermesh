@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Managed event types
@@ -38,35 +40,30 @@ func (*IBMMQSource) GetEventTypes() []string {
 }
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *IBMMQSource) GetGroupVersionKind() schema.GroupVersionKind {
+func (*IBMMQSource) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("IBMMQSource")
 }
 
-// IBMMQSourceCondSet is the group of possible conditions
-var IBMMQSourceCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *IBMMQSource) GetConditionSet() apis.ConditionSet {
-	return IBMMQSourceCondSet
+// GetConditionSet implements duckv1.KRShaped.
+func (*IBMMQSource) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
 }
 
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
+// GetStatus implements duckv1.KRShaped.
 func (s *IBMMQSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements EventSender.
 func (s *IBMMQSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *IBMMQSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+// GetStatusManager implements Reconcilable.
+func (s *IBMMQSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 

@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -30,7 +31,7 @@ func (*CloudEventsSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*CloudEventsSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -44,10 +45,10 @@ func (s *CloudEventsSource) GetSink() *duckv1.Destination {
 }
 
 // GetStatusManager implements EventSource.
-func (s *CloudEventsSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status.EventSourceStatus,
+func (s *CloudEventsSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 

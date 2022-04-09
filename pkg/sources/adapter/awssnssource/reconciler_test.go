@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sns"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/awssnssource"
@@ -50,7 +51,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/router"
 	adaptesting "github.com/triggermesh/triggermesh/pkg/sources/adapter/testing"
 	snsclient "github.com/triggermesh/triggermesh/pkg/sources/client/sns"
-	eventtesting "github.com/triggermesh/triggermesh/pkg/sources/testing/event"
+	eventtesting "github.com/triggermesh/triggermesh/pkg/testing/event"
 )
 
 func TestReconcile(t *testing.T) {
@@ -208,7 +209,7 @@ func newEventSource(opts ...sourceOption) *v1alpha1.AWSSNSSource {
 			Name:      tName,
 		},
 		Status: v1alpha1.AWSSNSSourceStatus{
-			EventSourceStatus: v1alpha1.EventSourceStatus{
+			Status: commonv1alpha1.Status{
 				SourceStatus: duckv1.SourceStatus{
 					SinkURI: tSinkURI,
 				},

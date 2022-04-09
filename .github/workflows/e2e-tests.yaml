@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -30,7 +30,7 @@ jobs:
         go-version: '1.17'
 
     - name: Go caches
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cache/go-build
@@ -62,9 +62,9 @@ jobs:
     - name: MetalLB load-balancer
       # Based on https://kind.sigs.k8s.io/docs/user/loadbalancer/
       run: |
-        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
         kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
-        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
         kubectl -n metallb-system wait --timeout=1m --for=condition=Available deployments.apps/controller
 
         cat <<'EOM' | kubectl create -f-
@@ -89,7 +89,7 @@ jobs:
         kubectl -n knative-serving wait --timeout=1m --for=condition=Complete jobs.batch/default-domain
 
     - name: Install ko
-      run: go install github.com/google/ko@v0.9.3
+      run: go install github.com/google/ko@v0.11.1
 
     - name: Deploy TriggerMesh
       env:

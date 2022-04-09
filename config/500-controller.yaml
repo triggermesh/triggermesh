@@ -104,38 +104,40 @@ spec:
         - name: ZENDESKSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesksource-adapter
         # Target adapters
-        - name: ALIBABAOSS_ADAPTER_IMAGE
+        - name: ALIBABAOSSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/alibabaosstarget-adapter
-        - name: AWS_COMPREHEND_ADAPTER_IMAGE
+        - name: AWSCOMPREHENDTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehendtarget-adapter
-        - name: AWS_DYNAMODB_ADAPTER_IMAGE
+        - name: AWSDYNAMODBTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbtarget-adapter
-        - name: AWS_KINESIS_ADAPTER_IMAGE
+        - name: AWSEVENTBRIDGETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awseventbridgetarget-adapter
+        - name: AWSKINESISTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awskinesistarget-adapter
-        - name: AWS_LAMBDA_ADAPTER_IMAGE
+        - name: AWSLAMBDATARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awslambdatarget-adapter
-        - name: AWS_S3_ADAPTER_IMAGE
+        - name: AWSS3TARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awss3target-adapter
-        - name: AWS_SNS_ADAPTER_IMAGE
+        - name: AWSSNSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssnstarget-adapter
-        - name: AWS_SQS_ADAPTER_IMAGE
+        - name: AWSSQSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssqstarget-adapter
-        - name: AZURE_EVENTHUBS_ADAPTER_IMAGE
+        - name: AZUREEVENTHUBSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubstarget-adapter
-        - name: CONFLUENT_ADAPTER_IMAGE
+        - name: CONFLUENTTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/confluenttarget-adapter
         - name: DATADOGTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/datadogtarget-adapter
-        - name: ELASTICSEARCH_ADAPTER_IMAGE
+        - name: ELASTICSEARCHTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearchtarget-adapter
-        - name: GOOGLESHEET_ADAPTER_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
-        - name: GOOGLECLOUDFIRESTORE_ADAPTER_IMAGE
+        - name: GOOGLECLOUDFIRESTORETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestoretarget-adapter
-        - name: GOOGLECLOUDSTORAGE_ADAPTER_IMAGE
+        - name: GOOGLECLOUDSTORAGETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter
-        - name: GOOGLECLOUDWORKFLOWS_ADAPTER_IMAGE
+        - name: GOOGLECLOUDWORKFLOWSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflowstarget-adapter
+        - name: GOOGLESHEETTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
         - name: HASURATARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/hasuratarget-adapter
         - name: HTTPTARGET_IMAGE
@@ -148,33 +150,33 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/logztarget-adapter
         - name: OPENTELEMETRYTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/opentelemetrytarget-adapter
-        - name: ORACLE_ADAPTER_IMAGE
+        - name: ORACLETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/oracletarget-adapter
         - name: SALESFORCETARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/salesforcetarget-adapter
-        - name: SENDGRID_ADAPTER_IMAGE
+        - name: SENDGRIDTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/sendgridtarget-adapter
-        - name: SLACK_ADAPTER_IMAGE
+        - name: SLACKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter
         - name: SPLUNKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
-        - name: TEKTON_ADAPTER_IMAGE
+        - name: TEKTONTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
-        - name: TWILIO_ADAPTER_IMAGE
+        - name: TWILIOTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
-        - name: UIPATH_ADAPTER_IMAGE
+        - name: UIPATHTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
-        - name: ZENDESK_ADAPTER_IMAGE
+        - name: ZENDESKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
         # Flow adapters
+        - name: JQTRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
+        - name: SYNCHRONIZER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         - name: TRANSFORMER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         - name: XMLTOJSONTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
-        - name: XSLTTRANSFORMATION_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/xslttransformation-adapter
-        - name: SYNCHRONIZER_ADAPTER_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
         # Routing adapters
         - name: FILTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter
@@ -182,19 +184,23 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/splitter-adapter
         # Function Runtimes
         - name: RUNTIME_KLR_PYTHON
-          value: gcr.io/triggermesh/knative-lambda-python37:v1.12.0
+          value: gcr.io/triggermesh/knative-lambda-python37:v1.15.3
         - name: RUNTIME_KLR_NODE
-          value: gcr.io/triggermesh/knative-lambda-node10:v1.12.0
+          value: gcr.io/triggermesh/knative-lambda-node10:v1.15.3
         - name: RUNTIME_KLR_RUBY
-          value: gcr.io/triggermesh/knative-lambda-ruby25:v1.12.0
+          value: gcr.io/triggermesh/knative-lambda-ruby25:v1.15.3
         # Type-specific options
-        - name: TEKTON_REAPING_INTERVAL
+        - name: TEKTONTARGET_REAPING_INTERVAL
           value: 2m
         # Custom build adapters
-        - name: IBMMQSOURCE_ADAPTER_IMAGE
+        - name: DATAWEAVETRANSFORMATION_IMAGE
+          value: gcr.io/triggermesh/dataweavetransformation-adapter:latest
+        - name: IBMMQSOURCE_IMAGE
           value: gcr.io/triggermesh/ibmmqsource-adapter:latest
-        - name: IBMMQTARGET_ADAPTER_IMAGE
+        - name: IBMMQTARGET_IMAGE
           value: gcr.io/triggermesh/ibmmqtarget-adapter:latest
+        - name: XSLTTRANSFORMATION_IMAGE
+          value: gcr.io/triggermesh/xslttransformation-adapter:latest
 
         securityContext:
           allowPrivilegeEscalation: false

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,9 +29,11 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 // ensureNotificationConfig ensures the existence of a notification
@@ -46,7 +48,7 @@ func ensureNotificationConfig(ctx context.Context, cli *storage.Client,
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
 	status := &src.Status
 
 	desiredNotif := &storage.Notification{
@@ -110,7 +112,7 @@ func ensureNoNotificationConfig(ctx context.Context, cli *storage.Client) error 
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudStorageSource)
 	status := &src.Status
 
 	notifID := status.NotificationID

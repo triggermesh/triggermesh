@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,22 +20,15 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	"k8s.io/client-go/tools/cache"
 
 	"knative.dev/eventing/pkg/reconciler/source"
-	k8sclient "knative.dev/pkg/client/injection/kube/client"
-	serviceaccountinformerv1 "knative.dev/pkg/client/injection/kube/informers/core/v1/serviceaccount"
-	rolebindinginformerv1 "knative.dev/pkg/client/injection/kube/informers/rbac/v1/rolebinding"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
-	kserviceclient "knative.dev/serving/pkg/client/injection/client"
-	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/tektontarget"
-	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/tektontarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/tektontarget"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -45,35 +38,32 @@ func NewController(
 	cmw configmap.Watcher,
 ) *controller.Impl {
 
+	typ := (*v1alpha1.TektonTarget)(nil)
+	app := common.ComponentName(typ)
+
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
 	adapterCfg := &adapterConfig{
-		obsConfig: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
+		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
+	envconfig.MustProcess(app, adapterCfg)
 
-	envconfig.MustProcess("", adapterCfg)
+	informer := informerv1alpha1.Get(ctx)
 
-	targetInformer := informerv1alpha1.Get(ctx)
-	serviceInformer := kserviceinformer.Get(ctx)
-
-	r := &reconciler{
-		logger:       logging.FromContext(ctx),
-		ksvcr:        libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:           libreconciler.NewValueGetter(k8sclient.Get(ctx)),
-		adapterCfg:   adapterCfg,
-		saClient:     k8sclient.Get(ctx).CoreV1().ServiceAccounts,
-		rbClient:     k8sclient.Get(ctx).RbacV1().RoleBindings,
-		targetLister: targetInformer.Lister().TektonTargets,
-		saLister:     serviceaccountinformerv1.Get(ctx).Lister().ServiceAccounts,
-		rbLister:     rolebindinginformerv1.Get(ctx).Lister().RoleBindings,
+	r := &Reconciler{
+		adapterCfg: adapterCfg,
+		trgLister:  informer.Lister().TektonTargets,
 	}
+	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	impl := tektontarget.NewImpl(ctx, r)
+	r.base = common.NewGenericServiceReconciler(
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.Tracker,
+		impl.EnqueueControllerOf,
+	)
 
-	targetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
-
-	serviceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGK(v1alpha1.Kind("TektonTarget")),
-		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
-	})
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	// Spawn a thread to reap stale Tekton run objects
 	go reaperThread(ctx, r)

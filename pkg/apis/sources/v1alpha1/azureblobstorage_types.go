@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -36,7 +38,9 @@ type AzureBlobStorageSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*AzureBlobStorageSource)(nil)
+	_ v1alpha1.Reconcilable = (*AzureBlobStorageSource)(nil)
+	_ v1alpha1.EventSource  = (*AzureBlobStorageSource)(nil)
+	_ v1alpha1.EventSender  = (*AzureBlobStorageSource)(nil)
 )
 
 // AzureBlobStorageSourceSpec defines the desired state of the event source.
@@ -76,7 +80,7 @@ type AzureBlobStorageSourceSpec struct {
 
 // AzureBlobStorageSourceStatus defines the observed state of the event source.
 type AzureBlobStorageSourceStatus struct {
-	EventSourceStatus `json:",inline"`
+	v1alpha1.Status `json:",inline"`
 
 	// Resource ID of the Event Hubs instance that is currently receiving
 	// events from the Azure Event Grid subscription.

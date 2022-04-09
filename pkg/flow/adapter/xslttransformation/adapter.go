@@ -1,3 +1,5 @@
+//go:build !noclibs
+
 /*
 Copyright 2022 TriggerMesh Inc.
 
@@ -20,12 +22,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"runtime"
 
-	"github.com/jbowtie/gokogiri/xml"
-	"github.com/jbowtie/ratago/xslt"
+	xslt "github.com/wamuir/go-xslt"
+	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"go.uber.org/zap"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
@@ -73,12 +75,12 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	if env.XSLT != "" {
-		style, err := parseXSLT(env.XSLT)
+		adapter.defaultXSLT, err = xslt.NewStylesheet([]byte(env.XSLT))
 		if err != nil {
-			logger.Panicf("Non valid XSLT document: %v", err)
+			logger.Panicf("XSLT validation error: %v", err)
 		}
 
-		adapter.defaultXSLT = style
+		runtime.SetFinalizer(adapter.defaultXSLT, (*xslt.Stylesheet).Close)
 	}
 
 	return adapter
@@ -100,8 +102,8 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 
 	isXML := event.DataMediaType() == cloudevents.ApplicationXML
 
-	style := a.defaultXSLT
-	var xmlin *xml.XmlDocument
+	var style *xslt.Stylesheet
+	var xmlin []byte
 	var err error
 
 	switch {
@@ -111,39 +113,31 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
 
-		style, err = parseXSLT(req.XSLT)
+		xmlin = []byte(req.XML)
+		style, err = xslt.NewStylesheet([]byte(req.XSLT))
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 		}
-
-		xmlin, err = parseXML(req.XML)
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
-		}
+		defer style.Close()
 
 	case isXML:
-		xmlin, err = parseXML(string(event.DataEncoded))
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
-		}
+		xmlin = event.DataEncoded
+		style = a.defaultXSLT
 
 	default:
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("unexpected type or media-type for the incoming event"), nil)
 	}
 
-	output, err := style.Process(xmlin, xslt.StylesheetOptions{
-		IndentOutput: true,
-		Parameters:   nil})
-
+	res, err := style.Transform(xmlin)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-			fmt.Errorf("eror processing XML with XSLT: %v", err), nil)
+			fmt.Errorf("error processing XML with XSLT: %v", err), nil)
 	}
 
 	if a.sink != "" {
 		event.SetType(event.Type() + ".response")
-		if err := event.SetData(cloudevents.ApplicationXML, []byte(output)); err != nil {
+		if err := event.SetData(cloudevents.ApplicationXML, res); err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
 
@@ -153,18 +147,5 @@ func (a *xsltTransformAdapter) dispatch(ctx context.Context, event cloudevents.E
 		return nil, cloudevents.ResultACK
 	}
 
-	return a.replier.Ok(&event, []byte(output), targetce.ResponseWithDataContentType(cloudevents.ApplicationXML))
-}
-
-func parseXML(in string) (*xml.XmlDocument, error) {
-	return xml.Parse([]byte(in), xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
-}
-
-func parseXSLT(in string) (*xslt.Stylesheet, error) {
-	doc, err := parseXML(in)
-	if err != nil {
-		return nil, err
-	}
-
-	return xslt.ParseStylesheet(doc, "")
+	return a.replier.Ok(&event, res, targetce.ResponseWithDataContentType(cloudevents.ApplicationXML))
 }

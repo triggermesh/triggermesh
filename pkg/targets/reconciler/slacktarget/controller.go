@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,15 +24,11 @@ import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	kserviceclient "knative.dev/serving/pkg/client/injection/client"
-	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
-
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	slacktargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/slacktarget"
-	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/slacktarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/slacktarget"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/slacktarget"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -41,24 +37,33 @@ func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
-	serviceInformer := kserviceinformer.Get(ctx)
 
-	r := &reconciler{
-		ksvcr:   libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		configs: source.WatchConfigurations(ctx, targetPrefix, cmw, source.WithLogging, source.WithMetrics),
+	typ := (*v1alpha1.SlackTarget)(nil)
+	app := common.ComponentName(typ)
+
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
+	adapterCfg := &adapterConfig{
+		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
+	envconfig.MustProcess(app, adapterCfg)
 
-	envconfig.MustProcess("", r)
+	informer := informerv1alpha1.Get(ctx)
 
-	impl := slacktarget.NewImpl(ctx, r)
+	r := &Reconciler{
+		adapterCfg: adapterCfg,
+		trgLister:  informer.Lister().SlackTargets,
+	}
+	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	slackTargetInformer := slacktargetinformer.Get(ctx)
-	slackTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+	r.base = common.NewGenericServiceReconciler(
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.Tracker,
+		impl.EnqueueControllerOf,
+	)
 
-	serviceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGK(v1alpha1.Kind("SlackTarget")),
-		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
-	})
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	return impl
 }

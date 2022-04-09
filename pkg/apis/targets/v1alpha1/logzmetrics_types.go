@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
-
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -45,17 +41,14 @@ type LogzMetricsTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   LogzMetricsTargetSpec   `json:"spec"`
-	Status LogzMetricsTargetStatus `json:"status,omitempty"`
+	Spec   LogzMetricsTargetSpec `json:"spec"`
+	Status v1alpha1.Status       `json:"status,omitempty"`
 }
 
-// Check the interfaces LogzMetricsTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*LogzMetricsTarget)(nil)
-	_ kmeta.OwnerRefable        = (*LogzMetricsTarget)(nil)
-	_ targets.IntegrationTarget = (*LogzMetricsTarget)(nil)
-	_ targets.EventSource       = (*LogzMetricsTarget)(nil)
-	_ duckv1.KRShaped           = (*LogzMetricsTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*LogzMetricsTarget)(nil)
+	_ v1alpha1.EventReceiver = (*LogzMetricsTarget)(nil)
 )
 
 // LogzMetricsTargetSpec holds the desired state of the LogzMetricsTarget.
@@ -121,13 +114,6 @@ type Instrument struct {
 	// - Int64.
 	// - Float64.
 	Number NumberKind `json:"number"`
-}
-
-// LogzMetricsTargetStatus communicates the observed state of the LogzMetricsTarget from the controller.
-type LogzMetricsTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-	CloudEventStatus     `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

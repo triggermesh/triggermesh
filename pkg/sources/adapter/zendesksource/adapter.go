@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/mturl"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/env"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/router"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/zendesksource/handler"
-	"github.com/triggermesh/triggermesh/pkg/sources/routing"
 	"github.com/triggermesh/triggermesh/pkg/sources/secret"
 )
 
@@ -149,12 +149,12 @@ func (a *adapter) RegisterHandlerFor(ctx context.Context, src *v1alpha1.ZendeskS
 
 	h := handler.New(src, a.logger, a.ceClient, username, passw)
 
-	a.router.RegisterPath(routing.URLPath(src), h)
+	a.router.RegisterPath(mturl.URLPath(src), h)
 	return nil
 }
 
 // DeregisterHandlerFor implements MTAdapter.
 func (a *adapter) DeregisterHandlerFor(ctx context.Context, src *v1alpha1.ZendeskSource) error {
-	a.router.DeregisterPath(routing.URLPath(src))
+	a.router.DeregisterPath(mturl.URLPath(src))
 	return nil
 }

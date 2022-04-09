@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@ import (
 
 	gpubsub "cloud.google.com/go/pubsub"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudpubsubsource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/pubsub"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
 )
 
 func TestReconcileSource(t *testing.T) {
@@ -74,7 +75,7 @@ func newEventSource() *v1alpha1.GoogleCloudPubSubSource {
 				Collection: pubsubCollectionTopics,
 				Resource:   "my-topic",
 			},
-			ServiceAccountKey: v1alpha1.ValueFromField{
+			ServiceAccountKey: commonv1alpha1.ValueFromField{
 				Value: "{}",
 			},
 		},

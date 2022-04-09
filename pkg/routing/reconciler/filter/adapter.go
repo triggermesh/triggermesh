@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,17 +20,18 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/labels"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/common/resource"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
-// adapterConfig contains properties used to configure the source's adapter.
+// adapterConfig contains properties used to configure the router's adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
@@ -44,23 +45,23 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.Router, _ *apis.URL) *servingv1.Service {
-	return common.NewMTAdapterKnService(src,
+func (r *Reconciler) BuildAdapter(rtr commonv1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
+	return common.NewMTAdapterKnService(rtr,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }
 
 // RBACOwners implements common.AdapterServiceBuilder.
-func (r *Reconciler) RBACOwners(namespace string) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.filterLister(namespace).List(labels.Everything())
+func (r *Reconciler) RBACOwners(rtr commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	rtrs, err := r.rtrLister(rtr.GetNamespace()).List(labels.Everything())
 	if err != nil {
 		return nil, fmt.Errorf("listing objects from cache: %w", err)
 	}
 
-	ownerRefables := make([]kmeta.OwnerRefable, len(srcs))
-	for i := range srcs {
-		ownerRefables[i] = srcs[i]
+	ownerRefables := make([]kmeta.OwnerRefable, len(rtrs))
+	for i := range rtrs {
+		ownerRefables[i] = rtrs[i]
 	}
 
 	return ownerRefables, nil

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 	DefaultCollection string `envconfig:"GOOGLE_FIRESTORE_DEFAULT_COLLECTION" required:"true"`
-	Credentials       string `envconfig:"GOOGLE_CREDENTIALS_JSON" required:"true"`
+	Credentials       string `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
 	ProjectID         string `envconfig:"GOOGLE_FIRESTORE_PROJECT_ID" required:"true"`
 	DiscardCEContext  bool   `envconfig:"DISCARD_CE_CONTEXT"`
 	// CloudEvents responses parametrization

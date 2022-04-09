@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"knative.dev/pkg/apis"
+	pkgapis "knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
-	tmapis "github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -35,12 +36,14 @@ type HTTPPollerSource struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   HTTPPollerSourceSpec `json:"spec,omitempty"`
-	Status EventSourceStatus    `json:"status,omitempty"`
+	Status v1alpha1.Status      `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*HTTPPollerSource)(nil)
+	_ v1alpha1.Reconcilable = (*HTTPPollerSource)(nil)
+	_ v1alpha1.EventSource  = (*HTTPPollerSource)(nil)
+	_ v1alpha1.EventSender  = (*HTTPPollerSource)(nil)
 )
 
 // HTTPPollerSourceSpec defines the desired state of the event source.
@@ -62,7 +65,7 @@ type HTTPPollerSourceSpec struct {
 	EventSource *string `json:"eventSource,omitempty"`
 
 	// HTTP/S URL of the endpoint to poll data from.
-	Endpoint apis.URL `json:"endpoint"`
+	Endpoint pkgapis.URL `json:"endpoint"`
 
 	// HTTP request method to use in requests to the specified 'endpoint'.
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
@@ -84,7 +87,7 @@ type HTTPPollerSourceSpec struct {
 
 	// Password to set in HTTP requests that require HTTP Basic authentication.
 	// +optional
-	BasicAuthPassword *ValueFromField `json:"basicAuthPassword,omitempty"`
+	BasicAuthPassword *v1alpha1.ValueFromField `json:"basicAuthPassword,omitempty"`
 
 	// HTTP headers to include in HTTP requests.
 	// +optional
@@ -92,7 +95,7 @@ type HTTPPollerSourceSpec struct {
 
 	// Duration which defines how often the HTTP/S endpoint should be polled.
 	// Expressed as a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
-	Interval tmapis.Duration `json:"interval"`
+	Interval apis.Duration `json:"interval"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

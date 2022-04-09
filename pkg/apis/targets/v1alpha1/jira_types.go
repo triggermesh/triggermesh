@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,10 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -33,15 +31,14 @@ type JiraTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   JiraTargetSpec   `json:"spec"`
-	Status JiraTargetStatus `json:"status,omitempty"`
+	Spec   JiraTargetSpec  `json:"spec"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
-// Check the interfaces JiraTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*JiraTarget)(nil)
-	_ kmeta.OwnerRefable = (*JiraTarget)(nil)
-	_ duckv1.KRShaped    = (*JiraTarget)(nil)
+	_ v1alpha1.Reconcilable = (*JiraTarget)(nil)
+	_ v1alpha1.EventSource  = (*JiraTarget)(nil)
 )
 
 // JiraTargetSpec holds the desired state of the JiraTarget.
@@ -59,12 +56,6 @@ type JiraAuth struct {
 	User string `json:"user"`
 	// Jira API token bound to the user.
 	Token SecretValueFromSource `json:"token"`
-}
-
-// JiraTargetStatus communicates the observed state of the JiraTarget (from the controller).
-type JiraTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -36,7 +38,9 @@ type GoogleCloudPubSubSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.Reconcilable = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.EventSource  = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.EventSender  = (*GoogleCloudPubSubSource)(nil)
 )
 
 // GoogleCloudPubSubSourceSpec defines the desired state of the event source.
@@ -58,13 +62,13 @@ type GoogleCloudPubSubSourceSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-	ServiceAccountKey ValueFromField `json:"serviceAccountKey"`
+	ServiceAccountKey v1alpha1.ValueFromField `json:"serviceAccountKey"`
 }
 
 // GoogleCloudPubSubSourceStatus defines the observed state of the event source.
 type GoogleCloudPubSubSourceStatus struct {
-	EventSourceStatus `json:",inline"`
-	Subscription      *GCloudResourceName `json:"subscription,omitempty"`
+	v1alpha1.Status `json:",inline"`
+	Subscription    *GCloudResourceName `json:"subscription,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

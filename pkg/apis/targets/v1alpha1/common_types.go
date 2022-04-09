@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,11 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"fmt"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
-	corev1 "k8s.io/api/core/v1"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
 /* Provide common structs that are used by the targets such as secret definitions */
@@ -30,32 +28,6 @@ import (
 type SecretValueFromSource struct {
 	// The Secret key to select from.
 	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
-}
-
-// ValueFromField is a struct field that can have its value either defined
-// explicitly or sourced from another entity.
-type ValueFromField struct {
-	// Optional: no more than one of the following may be specified.
-
-	// Field value.
-	// +optional
-	Value string `json:"value,omitempty"`
-	// Field value from a Kubernetes Secret.
-	// +optional
-	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
-}
-
-// CloudEventStatus contains attributes that target types can embed to declare
-// the event types they accept and emit.
-type CloudEventStatus struct {
-	// AcceptedEventTypes are the CloudEvent types that a target can process.
-	// +optional
-	AcceptedEventTypes []string `json:"acceptedEventTypes,omitempty"`
-
-	// ResponseAttributes are the CloudEvent attributes contained in the responses returned by a target.
-	// NOTE: the json tag *must* be exactly `ceAttributes` to satisfy Knative's Source duck type.
-	// +optional
-	ResponseAttributes []duckv1.CloudEventAttributes `json:"ceAttributes,omitempty"`
 }
 
 // EventOptions modifies CloudEvents management at Targets.
@@ -70,9 +42,3 @@ type EventOptions struct {
 	// +optional
 	PayloadPolicy *cloudevents.PayloadPolicy `json:"payloadPolicy,omitempty"`
 }
-
-// EnvKeyValue is a list of keys/values that can be serialized to a format
-// compatible with kelseyhightower/envconfig.
-type EnvKeyValue map[string]string
-
-var _ fmt.Stringer = (EnvKeyValue)(nil)

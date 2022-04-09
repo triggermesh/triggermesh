@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,20 +20,23 @@ import (
 	"context"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	k8sclient "knative.dev/pkg/client/injection/kube/client"
 
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+
+	"knative.dev/pkg/apis"
+	k8sclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
 // reaperThread Run at a set interval to trigger each namespace's reaping functionality
-func reaperThread(ctx context.Context, r *reconciler) {
+func reaperThread(ctx context.Context, r *Reconciler) {
 	interval, _ := time.ParseDuration(r.adapterCfg.ReapingInterval)
 	poll := time.NewTicker(interval)
 	log := logging.FromContext(ctx)
@@ -46,7 +49,7 @@ func reaperThread(ctx context.Context, r *reconciler) {
 	for {
 		<-poll.C // Used to wait for the poll timer
 		log.Debug("Executing reaping")
-		nsl, err := k8sclient.Get(ctx).CoreV1().Namespaces().List(ctx, v1.ListOptions{})
+		nsl, err := k8sclient.Get(ctx).CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 		if err != nil {
 			log.Errorw("Unable to list Kubernetes namespaces", zap.Error(err))
 			continue
@@ -54,7 +57,7 @@ func reaperThread(ctx context.Context, r *reconciler) {
 
 		// search for tektontargets across all namespaces
 		for _, ns := range nsl.Items {
-			targets, err := r.targetLister(ns.Name).List(labels.Everything())
+			targets, err := r.trgLister(ns.Name).List(labels.Everything())
 			if err != nil {
 				log.Errorw("Unable to list TektonTarget objects", zap.Error(err), zap.String("namespace", ns.Name))
 				continue
@@ -62,8 +65,8 @@ func reaperThread(ctx context.Context, r *reconciler) {
 
 			for _, t := range targets {
 				// Abort if the target isn't ready
-				if !t.Status.IsReady() || t.Status.Address == nil ||
-					t.Status.Address.URL == nil || t.Status.Address.URL.IsEmpty() {
+				if !t.Status.GetCondition(apis.ConditionReady).IsTrue() ||
+					t.Status.Address == nil || t.Status.Address.URL.IsEmpty() {
 					continue
 				}
 

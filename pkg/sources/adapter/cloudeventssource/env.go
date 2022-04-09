@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@ limitations under the License.
 package cloudeventssource
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"encoding/json"
+
+	cereconciler "github.com/triggermesh/triggermesh/pkg/sources/reconciler/cloudeventssource"
 	"knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -26,12 +28,23 @@ func NewEnvConfig() adapter.EnvConfigAccessor {
 	return &envAccessor{}
 }
 
+// KeyMountedValues contains a set of file mounted values
+// by their name.
+type KeyMountedValues []cereconciler.KeyMountedValue
+
+// Decode an array of KeyMountedValues
+func (is *KeyMountedValues) Decode(value string) error {
+	if err := json.Unmarshal([]byte(value), is); err != nil {
+		return err
+	}
+	return nil
+}
+
 type envAccessor struct {
 	adapter.EnvConfig
 
-	Path           string                   `envconfig:"CLOUDEVENTS_PATH"`
-	RateLimiterRPS int64                    `envconfig:"CLOUDEVENTS_RATELIMITER_RPS"`
-	BasicAuths     []v1alpha1.HTTPBasicAuth `envconfig:"CLOUDEVENTS_BASICAUTH_CREDENTIALS"`
-	Tokens         []v1alpha1.HTTPToken     `envconfig:"CLOUDEVENTS_TOKEN_CREDENTIALS"`
-	// CORSAllowOrigin string                   `envconfig:"CLOUDEVENTS_CORS_ALLOW_ORIGIN"`
+	Path           string           `envconfig:"CLOUDEVENTS_PATH"`
+	RateLimiterRPS int64            `envconfig:"CLOUDEVENTS_RATELIMITER_RPS"`
+	BasicAuths     KeyMountedValues `envconfig:"CLOUDEVENTS_BASICAUTH_CREDENTIALS"`
+	Tokens         KeyMountedValues `envconfig:"CLOUDEVENTS_TOKEN_CREDENTIALS"`
 }

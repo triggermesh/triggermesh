@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,11 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,30 +28,18 @@ import (
 
 // GoogleSheetTarget is the Schema for an GoogleSheet Target.
 type GoogleSheetTarget struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the GoogleSheetTarget (from the client).
-	Spec GoogleSheetTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the GoogleSheetTarget (from the controller).
-	// +optional
-	Status GoogleSheetTargetStatus `json:"status,omitempty"`
+	Spec   GoogleSheetTargetSpec `json:"spec"`
+	Status v1alpha1.Status       `json:"status,omitempty"`
 }
 
-// Check the interfaces GoogleSheetTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*GoogleSheetTarget)(nil)
-	_ kmeta.OwnerRefable        = (*GoogleSheetTarget)(nil)
-	_ targets.IntegrationTarget = (*GoogleSheetTarget)(nil)
-	_ targets.EventSource       = (*GoogleSheetTarget)(nil)
-	_ duckv1.KRShaped           = (*GoogleSheetTarget)(nil)
-)
-
-const (
-	// GoogleSheetTargetEventType is the GoogleSheetTarget CloudEvent type.
-	GoogleSheetTargetEventType = "dev.knative.source.GoogleSheet"
+	_ v1alpha1.Reconcilable  = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventReceiver = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventSource   = (*GoogleSheetTarget)(nil)
 )
 
 // GoogleSheetTargetSpec holds the desired state of the GoogleSheetTarget.
@@ -67,22 +52,6 @@ type GoogleSheetTargetSpec struct {
 
 	// DefaultPrefix is a pre-defined prefix for the individual sheets.
 	DefaultPrefix string `json:"defaultPrefix"`
-}
-
-// GoogleSheetTargetStatus communicates the observed state of the GoogleSheetTarget (from the controller).
-type GoogleSheetTargetStatus struct {
-	// inherits duck/v1beta1 Status, which currently provides:
-	// * ObservedGeneration - the 'Generation' of the Service that was last
-	//   processed by the controller.
-	// * Conditions - the latest available observations of a resource's current
-	//   state.
-	duckv1.Status `json:",inline"`
-
-	// AddressStatus fulfills the Addressable contract.
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
@@ -52,10 +53,10 @@ func TestCredentials(t *testing.T) {
 		{
 			name: "Both from value",
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
+				AccessKeyID: commonv1alpha1.ValueFromField{
 					Value: accessKeyIDVal,
 				},
-				SecretAccessKey: v1alpha1.ValueFromField{
+				SecretAccessKey: commonv1alpha1.ValueFromField{
 					Value: secretAccessKeyVal,
 				},
 			},
@@ -73,10 +74,10 @@ func TestCredentials(t *testing.T) {
 				}),
 			},
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
+				AccessKeyID: commonv1alpha1.ValueFromField{
 					Value: accessKeyIDVal,
 				},
-				SecretAccessKey: v1alpha1.ValueFromField{
+				SecretAccessKey: commonv1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -100,7 +101,7 @@ func TestCredentials(t *testing.T) {
 				}),
 			},
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
+				AccessKeyID: commonv1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -108,7 +109,7 @@ func TestCredentials(t *testing.T) {
 						Key: accessKeyIDKey,
 					},
 				},
-				SecretAccessKey: v1alpha1.ValueFromField{
+				SecretAccessKey: commonv1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -134,7 +135,7 @@ func TestCredentials(t *testing.T) {
 				}),
 			},
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: v1alpha1.ValueFromField{
+				AccessKeyID: commonv1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -142,7 +143,7 @@ func TestCredentials(t *testing.T) {
 						Key: accessKeyIDKey,
 					},
 				},
-				SecretAccessKey: v1alpha1.ValueFromField{
+				SecretAccessKey: commonv1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret2",

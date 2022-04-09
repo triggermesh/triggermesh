@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import (
 
 type FlowV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	DataWeaveTransformationsGetter
+	JQTransformationsGetter
 	SynchronizersGetter
 	TransformationsGetter
 	XMLToJSONTransformationsGetter
@@ -35,6 +37,14 @@ type FlowV1alpha1Interface interface {
 // FlowV1alpha1Client is used to interact with features provided by the flow.triggermesh.io group.
 type FlowV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *FlowV1alpha1Client) DataWeaveTransformations(namespace string) DataWeaveTransformationInterface {
+	return newDataWeaveTransformations(c, namespace)
+}
+
+func (c *FlowV1alpha1Client) JQTransformations(namespace string) JQTransformationInterface {
+	return newJQTransformations(c, namespace)
 }
 
 func (c *FlowV1alpha1Client) Synchronizers(namespace string) SynchronizerInterface {

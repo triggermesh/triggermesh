@@ -38,13 +38,23 @@ jobs:
       - run:
           # XSLTTransformation needs libxml2.
           name: Install libxml2
-          command: sudo apt-get update && sudo apt-get install -y libxml2-dev
+          command: sudo apt-get update && sudo apt install -y libxml2-dev libxslt1-dev liblzma-dev zlib1g-dev
+      - run:
+          # DataWeaveTransformation needs dw cli
+          name: Install DataWeave CLI
+          command: |
+            mkdir /tmp/dw
+            curl -sSLO https://github.com/mulesoft-labs/data-weave-cli/releases/download/v$DW_VERSION/dw-$DW_VERSION-Linux
+            unzip -p dw-$DW_VERSION-Linux 'bin/dw' > dw && chmod +x dw && mv dw $(go env GOPATH)/bin/
+          environment:
+            DW_VERSION: 1.0.19
       - run:
           name: Run test/cover
-          command: make cover
+          command: WITH_DEPENDENCIES=true make cover
           environment:
             TEST_OUTPUT_DIR: /tmp/test-results/
             COVER_OUTPUT_DIR: /tmp/cover-results/
+            DW_HOME: /tmp/dw
       - store_test_results:
           path: /tmp/test-results/
       - store_artifacts:
@@ -123,11 +133,7 @@ jobs:
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Installing ko
-          command: go install github.com/google/ko@v0.9.3
-      - run:
-          # XSLTTransformation needs libxml2.
-          name: Install libxml2
-          command: sudo apt-get update && sudo apt-get install -y libxml2-dev
+          command: go install github.com/google/ko@v0.11.1
       - setup_remote_docker:
           version: 20.10.11
           docker_layer_caching: true
@@ -218,6 +224,14 @@ jobs:
             PRE_RELEASE=${CIRCLE_TAG/${CIRCLE_TAG%-rc[0-9]*}/}
             github-release delete -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} 2>/dev/null ||:
             ./hack/release-notes.sh ${CIRCLE_TAG} | github-release release ${PRE_RELEASE:+-p} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -d -
+
+            # wait for github to report the release before attaching the artifacts
+            max_tries=5
+            for _ in $(seq 1 ${max_tries}); do
+              github-release info -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} >/dev/null && break
+              sleep 1
+            done
+
             for f in $(find /tmp/workspace/dist/ -type f); do
               github-release upload -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -t ${CIRCLE_TAG} -n $(basename ${f}) -f ${f}
             done

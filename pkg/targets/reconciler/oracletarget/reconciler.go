@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,62 +19,30 @@ package oracletarget
 import (
 	"context"
 
-	"go.uber.org/zap"
+	"knative.dev/pkg/reconciler"
 
-	oraclev1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-
-	reconcilers "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/oracletarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	pkgreconciler "knative.dev/pkg/reconciler"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/oracletarget"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
-// Reconciler reconciles the target adapter object
-type reconciler struct {
-	logger *zap.SugaredLogger
-	ksvcr  libreconciler.KServiceReconciler
-	vg     libreconciler.ValueGetter
-
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
+
+	trgLister func(namespace string) listersv1alpha1.OracleTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilers.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *oraclev1alpha1.OracleTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.OracleTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = commonv1alpha1.WithReconcilable(ctx, trg)
 
-	if trg.Spec.OracleAPIPrivateKey.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleAPIPrivateKey.SecretKeyRef)
-		if err != nil {
-			trg.Status.MarkNoSecrets("OracleApiPrivateKeySecretNotFound", "%s", err)
-			return err
-		}
-	}
-	if trg.Spec.OracleAPIPrivateKeyPassphrase.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleAPIPrivateKeyPassphrase.SecretKeyRef)
-		if err != nil {
-			trg.Status.MarkNoSecrets("OracleApiPrivateKeyPassphraseNotFound", "%s", err)
-			return err
-		}
-	}
-	if trg.Spec.OracleAPIPrivateKeyFingerprint.SecretKeyRef != nil {
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.OracleAPIPrivateKeyFingerprint.SecretKeyRef)
-		if err != nil {
-			trg.Status.MarkNoSecrets("OracleApiPrivateKeyFingerprintNotFound", "%s", err)
-			return err
-		}
-	}
-	trg.Status.MarkSecrets()
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
-
-	if adapter != nil {
-		trg.Status.PropagateKServiceAvailability(adapter)
-	} else {
-		trg.Status.MarkNoKService("ServicePending", event.Error())
-	}
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

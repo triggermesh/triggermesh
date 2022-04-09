@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ import (
 	"knative.dev/pkg/logging"
 	rt "knative.dev/pkg/reconciler/testing"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureservicebusqueuesource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	. "github.com/triggermesh/triggermesh/pkg/sources/reconciler/testing"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 )
 
 func TestReconcileSource(t *testing.T) {
@@ -74,7 +75,7 @@ func newEventSource() *v1alpha1.AzureServiceBusQueueSource {
 			},
 			Auth: v1alpha1.AzureAuth{
 				SASToken: &v1alpha1.AzureSASToken{
-					ConnectionString: v1alpha1.ValueFromField{
+					ConnectionString: commonv1alpha1.ValueFromField{
 						Value: "connectionString",
 					},
 				},

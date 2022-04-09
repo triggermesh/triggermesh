@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,6 +33,14 @@ type AWSDynamoDBTargetListerExpansion interface{}
 // AWSDynamoDBTargetNamespaceListerExpansion allows custom methods to be added to
 // AWSDynamoDBTargetNamespaceLister.
 type AWSDynamoDBTargetNamespaceListerExpansion interface{}
+
+// AWSEventBridgeTargetListerExpansion allows custom methods to be added to
+// AWSEventBridgeTargetLister.
+type AWSEventBridgeTargetListerExpansion interface{}
+
+// AWSEventBridgeTargetNamespaceListerExpansion allows custom methods to be added to
+// AWSEventBridgeTargetNamespaceLister.
+type AWSEventBridgeTargetNamespaceListerExpansion interface{}
 
 // AWSKinesisTargetListerExpansion allows custom methods to be added to
 // AWSKinesisTargetLister.

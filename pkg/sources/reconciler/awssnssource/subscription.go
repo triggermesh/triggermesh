@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,9 +37,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 // ensureSubscribed ensures the source's HTTP(S) endpoint is subscribed to the
@@ -49,10 +50,10 @@ func (r *Reconciler) ensureSubscribed(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AWSSNSSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AWSSNSSource)
 	status := &src.Status
 
-	isDeployed := status.GetCondition(v1alpha1.ConditionDeployed).IsTrue()
+	isDeployed := status.GetCondition(commonv1alpha1.ConditionDeployed).IsTrue()
 
 	// skip this cycle if the URL couldn't yet be determined
 	if !isDeployed {
@@ -147,7 +148,7 @@ func (r *Reconciler) ensureUnsubscribed(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.AWSSNSSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AWSSNSSource)
 	status := src.Status
 
 	snsClient, err := r.snsCg.Get(src)

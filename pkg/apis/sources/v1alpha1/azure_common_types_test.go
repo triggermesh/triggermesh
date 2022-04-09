@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -51,6 +51,18 @@ func TestStringerAzureResourceID(t *testing.T) {
 			ResourceName:     "rn",
 		},
 		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn",
+	}, {
+		name: "Valid resource ID (subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn",
 	}, {
 		name: "Valid resource ID (namespace)",
 		input: AzureResourceID{
@@ -150,6 +162,19 @@ func TestMarshalAzureResourceID(t *testing.T) {
 		expectOutput      string
 		expectErrContains string
 	}{{
+		name: "All fields are filled in (subscription)",
+		input: AzureResourceID{
+			SubscriptionID: "s",
+		},
+		expectOutput: `"/subscriptions/s"`,
+	}, {
+		name: "All fields are filled in (resource group)",
+		input: AzureResourceID{
+			SubscriptionID: "s",
+			ResourceGroup:  "rg",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg"`,
+	}, {
 		name: "All fields are filled in (resource)",
 		input: AzureResourceID{
 			SubscriptionID:   "s",
@@ -159,6 +184,18 @@ func TestMarshalAzureResourceID(t *testing.T) {
 			ResourceName:     "rn",
 		},
 		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn"`,
+	}, {
+		name: "All fields are filled in (subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn"`,
 	}, {
 		name: "All fields are filled in (namespace)",
 		input: AzureResourceID{
@@ -263,6 +300,19 @@ func TestUnmarshalAzureResourceID(t *testing.T) {
 		expectOutput      AzureResourceID
 		expectErrContains string
 	}{{
+		name:  "Valid resource ID format (subscription)",
+		input: `"/subscriptions/s"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID: "s",
+		},
+	}, {
+		name:  "Valid resource ID format (resource group)",
+		input: `"/subscriptions/s/resourceGroups/rg"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID: "s",
+			ResourceGroup:  "rg",
+		},
+	}, {
 		name:  "Valid resource ID format (resource)",
 		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn"`,
 		expectOutput: AzureResourceID{
@@ -273,14 +323,40 @@ func TestUnmarshalAzureResourceID(t *testing.T) {
 			ResourceName:     "rn",
 		},
 	}, {
-		name:  "Valid resource ID format (resource group)",
-		input: `"/subscriptions/s/resourceGroups/rg"`,
+		name:  "Valid resource ID format (subresource)",
+		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn"`,
 		expectOutput: AzureResourceID{
 			SubscriptionID:   "s",
 			ResourceGroup:    "rg",
-			ResourceProvider: "",
-			ResourceType:     "",
-			ResourceName:     "",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+	}, {
+		name:  "Valid resource ID format (namespaced resource)",
+		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+	}, {
+		name:  "Valid resource ID format (namespaced subresource)",
+		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
 		},
 	}, {
 		name:              "Some required fields are empty",

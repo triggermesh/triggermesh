@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,20 +17,23 @@ limitations under the License.
 package logztarget
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
+	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const (
-	adapterName = "logztarget"
-
 	envShippingToken       = "LOGZ_SHIPPING_TOKEN"
 	envLogsListenerURL     = "LOGZ_LISTENER_URL"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
@@ -42,49 +45,57 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"LOGZTARGET_IMAGE" default:"gcr.io/triggermesh/logztarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/logztarget-adapter"`
 }
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.LogzTarget, cfg *adapterConfig) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	genericLabels := libreconciler.MakeGenericLabels(adapterName, target.Name)
-	ksvcLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	podLabels := libreconciler.PropagateCommonLabels(target, genericLabels)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(&target.Spec)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
+// Verify that Reconciler implements common.AdapterServiceBuilder.
+var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
+// BuildAdapter implements common.AdapterServiceBuilder.
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
+	typedTrg := trg.(*v1alpha1.LogzTarget)
+
+	return common.NewAdapterKnService(trg, nil,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	)
 }
 
-func makeAppEnv(spec *v1alpha1.LogzTargetSpec) []corev1.EnvVar {
+func makeAppEnv(o *v1alpha1.LogzTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name: envShippingToken,
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: spec.ShippingToken.SecretKeyRef,
+				SecretKeyRef: o.Spec.ShippingToken.SecretKeyRef,
 			},
 		}, {
 			Name:  envLogsListenerURL,
-			Value: string(spec.LogsListenerURL),
+			Value: o.Spec.LogsListenerURL,
 		},
 	}
 
-	if spec.EventOptions != nil && spec.EventOptions.PayloadPolicy != nil {
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  envEventsPayloadPolicy,
-			Value: string(*spec.EventOptions.PayloadPolicy),
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
 		})
 	}
-	return env
 
+	return env
+}
+
+// RBACOwners implements common.AdapterServiceBuilder.
+func (r *Reconciler) RBACOwners(trg commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		return nil, fmt.Errorf("listing objects from cache: %w", err)
+	}
+
+	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
+	for i := range trgs {
+		ownerRefables[i] = trgs[i]
+	}
+
+	return ownerRefables, nil
 }

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,42 +18,31 @@ package logzmetricstarget
 
 import (
 	"context"
-	"fmt"
 
-	"knative.dev/pkg/controller"
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"knative.dev/pkg/reconciler"
 
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/logzmetricstarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
-type reconciler struct {
-	// adapter properties
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
 
-	// Knative Service reconciler
-	ksvcr libreconciler.KServiceReconciler
+	trgLister func(namespace string) listersv1alpha1.LogzMetricsTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcilerv1alpha1.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.LogzMetricsTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.LogzMetricsTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = commonv1alpha1.WithReconcilable(ctx, trg)
 
-	ksvc, err := makeTargetAdapterKService(trg, r.adapterCfg)
-	if err != nil {
-		trg.Status.MarkNotDeployed(v1alpha1.LogzMetricsReasonWrongSpec, "Cannot create adapter from spec")
-		return controller.NewPermanentError(fmt.Errorf("could not make the desired knative service adapter based on the spec: %w", err))
-	}
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, ksvc)
-	trg.Status.PropagateAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,12 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Accepted event types
@@ -26,6 +30,35 @@ const (
 	// EventTypeAWSS3Put represents a task to put an object in S3.
 	EventTypeAWSS3Put = "io.triggermesh.awss3.object.put"
 )
+
+// Returned event types
+const (
+	// EventTypeAWSS3Result contains the result of the processing of an S3 event.
+	EventTypeAWSS3Result = "io.triggermesh.targets.aws.s3.result"
+)
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*AWSS3Target) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AWSS3Target")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*AWSS3Target) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
+}
+
+// GetStatus implements duckv1.KRShaped.
+func (t *AWSS3Target) GetStatus() *duckv1.Status {
+	return &t.Status.Status
+}
+
+// GetStatusManager implements Reconcilable.
+func (t *AWSS3Target) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		Status:       &t.Status,
+	}
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*AWSS3Target) AcceptedEventTypes() []string {
@@ -35,12 +68,6 @@ func (*AWSS3Target) AcceptedEventTypes() []string {
 	}
 }
 
-// Returned event types
-const (
-	// EventTypeAWSS3Result contains the result of the processing of an S3 event.
-	EventTypeAWSS3Result = "io.triggermesh.targets.aws.s3.result"
-)
-
 // GetEventTypes implements EventSource.
 func (*AWSS3Target) GetEventTypes() []string {
 	return []string{
@@ -48,17 +75,7 @@ func (*AWSS3Target) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *AWSS3Target) AsEventSource() string {
-	return s.Spec.ARN
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AWSS3Target) GetConditionSet() apis.ConditionSet {
-	return AwsCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AWSS3Target) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// AsEventSource implements EventSource.
+func (t *AWSS3Target) AsEventSource() string {
+	return t.Spec.ARN
 }

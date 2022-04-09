@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,6 +34,10 @@ func (c *FakeTargetsV1alpha1) AWSComprehendTargets(namespace string) v1alpha1.AW
 
 func (c *FakeTargetsV1alpha1) AWSDynamoDBTargets(namespace string) v1alpha1.AWSDynamoDBTargetInterface {
 	return &FakeAWSDynamoDBTargets{c, namespace}
+}
+
+func (c *FakeTargetsV1alpha1) AWSEventBridgeTargets(namespace string) v1alpha1.AWSEventBridgeTargetInterface {
+	return &FakeAWSEventBridgeTargets{c, namespace}
 }
 
 func (c *FakeTargetsV1alpha1) AWSKinesisTargets(namespace string) v1alpha1.AWSKinesisTargetInterface {

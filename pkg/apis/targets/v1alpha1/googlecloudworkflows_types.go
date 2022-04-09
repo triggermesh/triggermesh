@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,12 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -34,17 +31,15 @@ type GoogleCloudWorkflowsTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GoogleCloudWorkflowsTargetSpec   `json:"spec"`
-	Status GoogleCloudWorkflowsTargetStatus `json:"status,omitempty"`
+	Spec   GoogleCloudWorkflowsTargetSpec `json:"spec"`
+	Status v1alpha1.Status                `json:"status,omitempty"`
 }
 
-// Check the interfaces GoogleCloudWorkflowsTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*GoogleCloudWorkflowsTarget)(nil)
-	_ kmeta.OwnerRefable        = (*GoogleCloudWorkflowsTarget)(nil)
-	_ targets.IntegrationTarget = (*GoogleCloudWorkflowsTarget)(nil)
-	_ targets.EventSource       = (*GoogleCloudWorkflowsTarget)(nil)
-	_ duckv1.KRShaped           = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventReceiver = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventSource   = (*GoogleCloudWorkflowsTarget)(nil)
 )
 
 // GoogleCloudWorkflowsTargetSpec holds the desired state of the GoogleCloudWorkflowsTarget.
@@ -54,15 +49,6 @@ type GoogleCloudWorkflowsTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-}
-
-// GoogleCloudWorkflowsTargetStatus communicates the observed state of the GoogleCloudWorkflowsTarget (from the controller).
-type GoogleCloudWorkflowsTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

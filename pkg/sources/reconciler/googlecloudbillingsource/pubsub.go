@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,10 +30,11 @@ import (
 
 	"cloud.google.com/go/pubsub"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 const (
@@ -88,7 +89,7 @@ func ensureNoPubSub(ctx context.Context, cli *pubsub.Client) error {
 // - pubsub.topic.get
 // - pubsub.topics.create
 func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudResourceName, error) {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
 	if userProvided := src.Spec.PubSub.Topic; userProvided != nil {
@@ -186,7 +187,7 @@ func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GClou
 // - pubsub.topics.get
 // - pubsub.topics.delete
 func ensureNoPubSubTopic(ctx context.Context, cli *pubsub.Client) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := src.Status
 
 	if src.Spec.PubSub.Topic != nil {
@@ -251,7 +252,7 @@ func ensureNoPubSubTopic(ctx context.Context, cli *pubsub.Client) error {
 // - pubsub.subscriptions.create
 // - pubsub.topics.attachSubscription
 func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
 	// safeguard, in case the function is called with a bad resource name
@@ -315,7 +316,7 @@ func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResN
 // - pubsub.subscriptions.delete
 // - pubsub.topics.detachSubscription
 func ensureNoPubSubSubscription(ctx context.Context, cli *pubsub.Client) error {
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := src.Status
 
 	subsResName := status.Topic
@@ -387,7 +388,7 @@ func makeSubscriptionResourceName(proj, subsID string) *v1alpha1.GCloudResourceN
 //
 // Resource IDs aren't allowed to start with "goog" and can only contain a
 // limited set of characters.
-func pubsubResourceID(src v1alpha1.EventSource) string {
+func pubsubResourceID(src commonv1alpha1.Reconcilable) string {
 	return src.GetNamespace() + "." + src.GetName() + "~" + sources.GoogleCloudBillingSourceResource.String()
 }
 

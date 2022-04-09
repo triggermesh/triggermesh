@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ type envAccessor struct {
 
 	AWSApiKey           string `envconfig:"AWS_ACCESS_KEY_ID" required:"true"`
 	AWSApiSecret        string `envconfig:"AWS_SECRET_ACCESS_KEY" required:"true"`
-	AwsTargetArn        string `envconfig:"AWS_TARGET_ARN" required:"true"`
+	AwsTargetArn        string `envconfig:"ARN" required:"true"`
 	AwsKinesisPartition string `envconfig:"AWS_KINESIS_PARTITION"`
 
 	DiscardCEContext bool `envconfig:"AWS_DISCARD_CE_CONTEXT"`

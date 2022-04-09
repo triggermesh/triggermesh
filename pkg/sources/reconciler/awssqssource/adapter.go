@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,9 +27,11 @@ import (
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/resource"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler"
 )
 
 const healthPortName = "health"
@@ -47,15 +49,15 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.AWSSQSSource)
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvARN, typedSrc.Spec.ARN.String()),
-		resource.EnvVars(common.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
-		resource.EnvVars(common.MakeAWSEndpointEnvVars(typedSrc.Spec.Endpoint)...),
+		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
+		resource.EnvVars(reconciler.MakeAWSEndpointEnvVars(typedSrc.Spec.Endpoint)...),
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
@@ -78,8 +80,8 @@ func (r *Reconciler) BuildAdapter(src v1alpha1.EventSource, sinkURI *apis.URL) *
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable, error) {
-	if v1alpha1.WantsOwnServiceAccount(src) {
+func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
+	if commonv1alpha1.WantsOwnServiceAccount(src) {
 		return []kmeta.OwnerRefable{src}, nil
 	}
 
@@ -90,7 +92,7 @@ func (r *Reconciler) RBACOwners(src v1alpha1.EventSource) ([]kmeta.OwnerRefable,
 
 	ownerRefables := make([]kmeta.OwnerRefable, 0, len(srcs))
 	for _, src := range srcs {
-		if !v1alpha1.WantsOwnServiceAccount(src) {
+		if !commonv1alpha1.WantsOwnServiceAccount(src) {
 			ownerRefables = append(ownerRefables, src)
 		}
 	}

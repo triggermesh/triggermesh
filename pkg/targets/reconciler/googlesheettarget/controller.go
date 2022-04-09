@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,19 +21,14 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
-	"k8s.io/client-go/tools/cache"
-
 	"knative.dev/eventing/pkg/reconciler/source"
-	kubeclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	kserviceclient "knative.dev/serving/pkg/client/injection/client"
-	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	googlesheetstargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/googlesheettarget"
-	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlesheettarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/googlesheettarget"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlesheettarget"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -43,25 +38,32 @@ func NewController(
 	cmw configmap.Watcher,
 ) *controller.Impl {
 
-	serviceInformer := kserviceinformer.Get(ctx)
+	typ := (*v1alpha1.GoogleSheetTarget)(nil)
+	app := common.ComponentName(typ)
 
-	r := &reconciler{
-		ksvcr:   libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), serviceInformer.Lister()),
-		vg:      libreconciler.NewValueGetter(kubeclient.Get(ctx)),
-		configs: source.WatchConfigurations(ctx, targetPrefix, cmw, source.WithLogging, source.WithMetrics),
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
+	adapterCfg := &adapterConfig{
+		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
+	envconfig.MustProcess(app, adapterCfg)
 
-	envconfig.MustProcess("", r)
+	informer := informerv1alpha1.Get(ctx)
 
-	impl := googlesheettarget.NewImpl(ctx, r)
+	r := &Reconciler{
+		adapterCfg: adapterCfg,
+		trgLister:  informer.Lister().GoogleSheetTargets,
+	}
+	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	googlesheetsTargetInformer := googlesheetstargetinformer.Get(ctx)
-	googlesheetsTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+	r.base = common.NewGenericServiceReconciler(
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.Tracker,
+		impl.EnqueueControllerOf,
+	)
 
-	serviceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGK(v1alpha1.Kind("GoogleSheetTarget")),
-		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
-	})
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	return impl
 }

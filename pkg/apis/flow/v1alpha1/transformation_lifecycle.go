@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,38 +17,40 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	"knative.dev/pkg/apis"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
 )
 
-var condSet = apis.NewLivingConditionSet(
-	TransformationConditionReady,
-)
-
-// GetGroupVersionKind implements kmeta.OwnerRefable
-func (t *Transformation) GetGroupVersionKind() schema.GroupVersionKind {
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (*Transformation) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("Transformation")
 }
 
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
+// GetConditionSet implements duckv1.KRShaped.
 func (t *Transformation) GetConditionSet() apis.ConditionSet {
-	return condSet
+	if t.Spec.Sink.Ref != nil || t.Spec.Sink.URI != nil {
+		return v1alpha1.EventSenderConditionSet
+	}
+	return v1alpha1.DefaultConditionSet
 }
 
-// InitializeConditions sets the initial values to the conditions.
-func (ts *TransformationStatus) InitializeConditions() {
-	condSet.Manage(ts).InitializeConditions()
+// GetStatus implements duckv1.KRShaped.
+func (t *Transformation) GetStatus() *duckv1.Status {
+	return &t.Status.Status
 }
 
-// MarkServiceUnavailable marks Transformation as not ready with ServiceUnavailable reason.
-func (ts *TransformationStatus) MarkServiceUnavailable(name string) {
-	condSet.Manage(ts).MarkFalse(
-		TransformationConditionReady,
-		"ServiceUnavailable",
-		"Service %q is not ready.", name)
+// GetStatusManager implements Reconcilable.
+func (t *Transformation) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		Status:       &t.Status,
+	}
 }
 
-// MarkServiceAvailable sets Transformation condition to ready.
-func (ts *TransformationStatus) MarkServiceAvailable() {
-	condSet.Manage(ts).MarkTrue(TransformationConditionReady)
+// GetSink implements EventSender.
+func (t *Transformation) GetSink() *duckv1.Destination {
+	return &t.Spec.Sink
 }

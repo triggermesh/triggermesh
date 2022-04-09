@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import corev1 "k8s.io/api/core/v1"
 // IsInformed returns if the value is informed in any of the available choices.
 func (v *ValueFromField) IsInformed() bool {
 	if v != nil &&
-		(v.Value != nil && *v.Value != "" ||
+		(v.Value != "" ||
 			v.ValueFromSecret != nil && v.ValueFromSecret.Name != "" && v.ValueFromSecret.Key != "" ||
 			v.ValueFromConfigMap != nil && v.ValueFromConfigMap.Name != "" && v.ValueFromConfigMap.Key != "") {
 		return true
@@ -34,13 +34,14 @@ func (v *ValueFromField) IsInformed() bool {
 // a ValueFromField.
 func (v *ValueFromField) ToEnvironmentVariable(name string) *corev1.EnvVar {
 	env := &corev1.EnvVar{
-		Name: name}
+		Name: name,
+	}
 
 	switch {
 	case v == nil:
 
-	case v.Value != nil && *v.Value != "":
-		env.Value = *v.Value
+	case v.Value != "":
+		env.Value = v.Value
 
 	case v.ValueFromSecret != nil && v.ValueFromSecret.Name != "" && v.ValueFromSecret.Key != "":
 		env.ValueFrom = &corev1.EnvVarSource{

@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,11 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,30 +28,22 @@ import (
 
 // TwilioTarget is the Schema for an Twilio Target.
 type TwilioTarget struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the TwilioTarget (from the client).
-	Spec TwilioTargetSpec `json:"spec"`
-
-	// Status communicates the observed state of the TwilioTarget (from the controller).
-	// +optional
-	Status TwilioTargetStatus `json:"status,omitempty"`
+	Spec   TwilioTargetSpec `json:"spec"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
-// Check the interfaces TwilioTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*TwilioTarget)(nil)
-	_ kmeta.OwnerRefable        = (*TwilioTarget)(nil)
-	_ targets.IntegrationTarget = (*TwilioTarget)(nil)
-	_ targets.EventSource       = (*TwilioTarget)(nil)
-	_ duckv1.KRShaped           = (*TwilioTarget)(nil)
+	_ v1alpha1.Reconcilable  = (*TwilioTarget)(nil)
+	_ v1alpha1.EventReceiver = (*TwilioTarget)(nil)
+	_ v1alpha1.EventSource   = (*TwilioTarget)(nil)
 )
 
 // TwilioTargetSpec holds the desired state of the TwilioTarget.
 type TwilioTargetSpec struct {
-
 	// Twilio account SID
 	AccountSID SecretValueFromSource `json:"sid"`
 
@@ -71,22 +60,6 @@ type TwilioTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-}
-
-// TwilioTargetStatus communicates the observed state of the TwilioTarget (from the controller).
-type TwilioTargetStatus struct {
-	// inherits duck/v1beta1 Status, which currently provides:
-	// * ObservedGeneration - the 'Generation' of the Service that was last
-	//   processed by the controller.
-	// * Conditions - the latest available observations of a resource's current
-	//   state.
-	duckv1.Status `json:",inline"`
-
-	// AddressStatus fulfills the Addressable contract.
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

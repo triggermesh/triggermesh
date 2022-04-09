@@ -1,0 +1,94 @@
+# Copyright 2022 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: Transformation
+metadata:
+  name: parse-transformation
+spec:
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: sockeye
+  data:
+  - operation: parse
+    paths:
+    - key: result[0].data
+      value: JSON
+  - operation: store
+    paths:
+    - key: $control
+      value: result[0].data.control
+    - key: $id
+      value: result[0].id
+    - key: $reason
+      value: result[0].data.reason
+    - key: $time
+      value: result[0].time
+    - key: $containerid
+      value: result[0].data.containerid
+    - key: $category
+      value: result[0].data.category
+    - key: $container
+      value: result[0].data.container
+    - key: $region
+      value: result[0].data.vm_location
+    - key: $image
+      value: result[0].data.image
+
+  - operation: delete
+    paths:
+    - key:
+
+  - operation: add
+    paths:
+    - key: dictionary.name
+      value: empty
+    - key: dictionary.version
+      value: "0.0.1"
+    - key: event.name
+      value: $control
+    - key: event.guid
+      value: $id
+    - key: event.url
+      value: ""
+    - key: event.shortDescription
+      value: $reason
+    - key: event.longDescription
+      value: $reason
+    - key: event.severity
+      value: high
+    - key: event.time
+      value: $time
+    - key: reporter.name
+      value: Aqua Security
+    - key: producer.name
+      value: Aqua Security
+    - key: resource.accountId
+      value: ""
+    - key: resource.platform
+      value: Azure
+    - key: resource.guid
+      value: $containerid
+    - key: resource.type
+      value: $category
+    - key: resource.name
+      value: $container
+    - key: resource.service
+      value: Azure Kubernetes Service
+    - key: resource.region
+      value: $region
+    - key: resource.package
+      value: $image

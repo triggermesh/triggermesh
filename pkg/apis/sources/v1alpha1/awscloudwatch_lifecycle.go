@@ -1,5 +1,5 @@
 /*
-Copyright 2020 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -32,7 +34,7 @@ func (*AWSCloudWatchSource) GetGroupVersionKind() schema.GroupVersionKind {
 
 // GetConditionSet implements duckv1.KRShaped.
 func (*AWSCloudWatchSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -40,16 +42,16 @@ func (s *AWSCloudWatchSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements EventSender.
 func (s *AWSCloudWatchSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AWSCloudWatchSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+// GetStatusManager implements Reconcilable.
+func (s *AWSCloudWatchSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 

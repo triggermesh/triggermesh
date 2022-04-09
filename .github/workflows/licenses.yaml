@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -21,7 +21,7 @@ jobs:
         go-version: '1.17'
 
     - name: Go caches
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cache/go-build
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Go
       uses: actions/setup-go@v2
@@ -64,7 +64,7 @@ jobs:
         go-version: '1.17'
 
     - name: Go caches
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           ~/.cache/go-build
@@ -74,7 +74,7 @@ jobs:
           ${{ github.job }}-${{ runner.os }}-go-
 
     - name: Install go-licenses
-      run: go install github.com/google/go-licenses@latest
+      run: go install github.com/google/go-licenses@v1.0.0
 
     - name: Check third-party licenses
       run: |

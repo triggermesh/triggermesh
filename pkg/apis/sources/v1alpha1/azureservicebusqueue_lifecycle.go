@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import (
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 )
 
@@ -44,7 +45,7 @@ func (s *AzureServiceBusQueueSource) GetGroupVersionKind() schema.GroupVersionKi
 
 // GetConditionSet implements duckv1.KRShaped.
 func (s *AzureServiceBusQueueSource) GetConditionSet() apis.ConditionSet {
-	return eventSourceConditionSet
+	return v1alpha1.EventSenderConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
@@ -52,16 +53,16 @@ func (s *AzureServiceBusQueueSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements EventSender.
 func (s *AzureServiceBusQueueSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
-func (s *AzureServiceBusQueueSource) GetStatusManager() *EventSourceStatusManager {
-	return &EventSourceStatusManager{
-		ConditionSet:      s.GetConditionSet(),
-		EventSourceStatus: &s.Status,
+// GetStatusManager implements Reconcilable.
+func (s *AzureServiceBusQueueSource) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 

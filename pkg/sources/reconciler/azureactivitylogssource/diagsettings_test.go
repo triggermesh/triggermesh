@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/to"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	clients "github.com/triggermesh/triggermesh/pkg/sources/client/azure/insights"
 )
@@ -155,7 +156,7 @@ func TestEnsureDiagnosticSettings(t *testing.T) {
 				},
 			}
 
-			ctx := v1alpha1.WithSource(testContext(t), src)
+			ctx := commonv1alpha1.WithReconcilable(testContext(t), src)
 
 			returnedErr := make(chan error)
 			go func() {

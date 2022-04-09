@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -31,12 +33,14 @@ type SalesforceSource struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   SalesforceSourceSpec `json:"spec,omitempty"`
-	Status EventSourceStatus    `json:"status,omitempty"`
+	Status v1alpha1.Status      `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*SalesforceSource)(nil)
+	_ v1alpha1.Reconcilable = (*SalesforceSource)(nil)
+	_ v1alpha1.EventSource  = (*SalesforceSource)(nil)
+	_ v1alpha1.EventSender  = (*SalesforceSource)(nil)
 )
 
 // SalesforceSourceSpec defines the desired state of the event source.
@@ -62,10 +66,10 @@ type SalesforceSubscription struct {
 
 // SalesforceAuth contains Salesforce credentials.
 type SalesforceAuth struct {
-	ClientID string         `json:"clientID"`
-	Server   string         `json:"server"`
-	User     string         `json:"user"`
-	CertKey  ValueFromField `json:"certKey"`
+	ClientID string                  `json:"clientID"`
+	Server   string                  `json:"server"`
+	User     string                  `json:"user"`
+	CertKey  v1alpha1.ValueFromField `json:"certKey"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

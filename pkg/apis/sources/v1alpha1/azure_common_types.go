@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // AzureAuth contains multiple authentication methods for Azure services.
@@ -40,16 +42,16 @@ type AzureAuth struct {
 
 // AzureServicePrincipal represents an AAD Service Principal.
 type AzureServicePrincipal struct {
-	TenantID     ValueFromField `json:"tenantID"`
-	ClientID     ValueFromField `json:"clientID"`
-	ClientSecret ValueFromField `json:"clientSecret"`
+	TenantID     v1alpha1.ValueFromField `json:"tenantID"`
+	ClientID     v1alpha1.ValueFromField `json:"clientID"`
+	ClientSecret v1alpha1.ValueFromField `json:"clientSecret"`
 }
 
 // AzureSASToken represents an Azure SAS token.
 type AzureSASToken struct {
-	KeyName          ValueFromField `json:"keyName"`
-	KeyValue         ValueFromField `json:"keyValue"`
-	ConnectionString ValueFromField `json:"connectionString"`
+	KeyName          v1alpha1.ValueFromField `json:"keyName"`
+	KeyValue         v1alpha1.ValueFromField `json:"keyValue"`
+	ConnectionString v1alpha1.ValueFromField `json:"connectionString"`
 }
 
 // AzureResourceID represents a resource ID for an Azure resource.
@@ -88,9 +90,10 @@ const (
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/rt/rn
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns
 	azureResourceResourceIDSplitElements = 9
-	// Namespaced resource
+	// Resource with subresource (including namespaced resource)
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn
-	azureNamespacedResourceResourceIDSplitElements = 11
+	azureSubResourceResourceIDSplitElements = 11
 	// Namespaced resource with subresource
 	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn
 	azureNamespacedSubResourceResourceIDSplitElements = 13
@@ -107,7 +110,7 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 	if n := len(sections); n != azureSubscriptionResourceIDSplitElements &&
 		n != azureResourceGroupResourceIDSplitElements &&
 		n != azureResourceResourceIDSplitElements &&
-		n != azureNamespacedResourceResourceIDSplitElements &&
+		n != azureSubResourceResourceIDSplitElements &&
 		n != azureNamespacedSubResourceResourceIDSplitElements {
 
 		return newParseAzureResourceIDError(dataStr)
@@ -119,6 +122,8 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 		resourceProviderIdx = 6
 		resourceTypeIdx     = 7
 		resourceNameIdx     = 8
+		subresourceTypeIdx  = 9
+		subresourceNameIdx  = 10
 		// with namespace
 		namespaceIdx         = 8
 		resourceTypeNsIdx    = 9
@@ -156,17 +161,25 @@ func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 	}
 
 	var namespace string
-	if len(sections) >= azureNamespacedResourceResourceIDSplitElements {
-		namespace = sections[namespaceIdx]
-		resourceType = sections[resourceTypeNsIdx]
-		resourceName = sections[resourceNameNsIdx]
-		if namespace == "" || resourceType == "" || resourceName == "" {
-			return errAzureResourceIDEmptyAttrs
+	var subresourceType string
+	var subresourceName string
+	if len(sections) >= azureSubResourceResourceIDSplitElements {
+		if strings.ToLower(resourceType) == "namespaces" {
+			namespace = sections[namespaceIdx]
+			resourceType = sections[resourceTypeNsIdx]
+			resourceName = sections[resourceNameNsIdx]
+			if namespace == "" || resourceType == "" || resourceName == "" {
+				return errAzureResourceIDEmptyAttrs
+			}
+		} else {
+			subresourceType = sections[subresourceTypeIdx]
+			subresourceName = sections[subresourceNameIdx]
+			if subresourceType == "" || subresourceName == "" {
+				return errAzureResourceIDEmptyAttrs
+			}
 		}
 	}
 
-	var subresourceType string
-	var subresourceName string
 	if len(sections) == azureNamespacedSubResourceResourceIDSplitElements {
 		subresourceType = sections[subresourceTypeNsIdx]
 		subresourceName = sections[subresourceNameNsIdx]

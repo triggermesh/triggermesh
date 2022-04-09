@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -34,12 +36,14 @@ type OCIMetricsSource struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   OCIMetricsSourceSpec `json:"spec,omitempty"`
-	Status EventSourceStatus    `json:"status,omitempty"`
+	Status v1alpha1.Status      `json:"status,omitempty"`
 }
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ EventSource = (*OCIMetricsSource)(nil)
+	_ v1alpha1.Reconcilable = (*OCIMetricsSource)(nil)
+	_ v1alpha1.EventSource  = (*OCIMetricsSource)(nil)
+	_ v1alpha1.EventSender  = (*OCIMetricsSource)(nil)
 )
 
 // OCIMetricsSourceSpec defines the desired state of the event source.
@@ -52,13 +56,13 @@ type OCIMetricsSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
 	// Oracle User API private key
-	OracleAPIPrivateKey ValueFromField `json:"oracleApiPrivateKey"`
+	OracleAPIPrivateKey v1alpha1.ValueFromField `json:"oracleApiPrivateKey"`
 
 	// Oracle User API private key passphrase
-	OracleAPIPrivateKeyPassphrase ValueFromField `json:"oracleApiPrivateKeyPassphrase"`
+	OracleAPIPrivateKeyPassphrase v1alpha1.ValueFromField `json:"oracleApiPrivateKeyPassphrase"`
 
 	// Oracle User API cert fingerprint
-	OracleAPIPrivateKeyFingerprint ValueFromField `json:"oracleApiPrivateKeyFingerprint"`
+	OracleAPIPrivateKeyFingerprint v1alpha1.ValueFromField `json:"oracleApiPrivateKeyFingerprint"`
 
 	// Oracle Tenancy OCID
 	Tenancy string `json:"oracleTenancy"`

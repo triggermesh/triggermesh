@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,60 +19,30 @@ package elasticsearchtarget
 import (
 	"context"
 
-	"go.uber.org/zap"
+	"knative.dev/pkg/reconciler"
 
-	pkgreconciler "knative.dev/pkg/reconciler"
-
-	elasticsearchv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	reconcileres "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/elasticsearchtarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/elasticsearchtarget"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
-// reconciler reconciles the target adapter object
-type reconciler struct {
-	logger *zap.SugaredLogger
-	ksvcr  libreconciler.KServiceReconciler
-	vg     libreconciler.ValueGetter
-
+// Reconciler implements controller.Reconciler for the event target type.
+type Reconciler struct {
+	base       common.GenericServiceReconciler
 	adapterCfg *adapterConfig
+
+	trgLister func(namespace string) listersv1alpha1.ElasticsearchTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
-var _ reconcileres.Interface = (*reconciler)(nil)
+var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *reconciler) ReconcileKind(ctx context.Context, trg *elasticsearchv1alpha1.ElasticsearchTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.ElasticsearchTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = commonv1alpha1.WithReconcilable(ctx, trg)
 
-	switch {
-	case trg.Spec.Connection.APIKey != nil && trg.Spec.Connection.APIKey.SecretKeyRef != nil:
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.Connection.APIKey.SecretKeyRef)
-		if err != nil {
-			trg.Status.MarkNoSecrets("APIKeySecretNotFound", "%s", err)
-			return err
-		}
-
-	case trg.Spec.Connection.Password != nil && trg.Spec.Connection.Password.SecretKeyRef != nil:
-		_, err := r.vg.FromSecret(ctx, trg.Namespace, trg.Spec.Connection.Password.SecretKeyRef)
-		if err != nil {
-			trg.Status.MarkNoSecrets("PasswordSecretNotFound", "%s", err)
-			return err
-		}
-
-	default:
-		// Elasticsearch can be configured without credentials.
-	}
-
-	trg.Status.MarkSecrets()
-
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
-
-	if adapter != nil {
-		trg.Status.PropagateKServiceAvailability(adapter)
-	} else {
-		trg.Status.MarkNoKService("ServicePending", event.Error())
-	}
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }

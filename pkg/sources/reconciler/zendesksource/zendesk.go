@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,9 +36,10 @@ import (
 
 	"github.com/nukosuke/go-zendesk/zendesk"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 	"github.com/triggermesh/triggermesh/pkg/sources/secret"
 )
 
@@ -47,10 +48,10 @@ func (r *Reconciler) ensureZendeskTargetAndTrigger(ctx context.Context) error {
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	status := &src.(*v1alpha1.ZendeskSource).Status
 
-	isDeployed := status.GetCondition(v1alpha1.ConditionDeployed).IsTrue()
+	isDeployed := status.GetCondition(commonv1alpha1.ConditionDeployed).IsTrue()
 	url := status.Address.URL
 
 	// skip this cycle if the URL couldn't yet be determined
@@ -250,7 +251,7 @@ func (r *Reconciler) ensureNoZendeskTargetAndTrigger(ctx context.Context) error 
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx)
+	src := commonv1alpha1.ReconcilableFromContext(ctx)
 
 	title := targetTitle(src)
 

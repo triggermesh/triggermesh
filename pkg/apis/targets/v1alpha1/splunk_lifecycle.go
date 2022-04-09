@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,57 +21,29 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *SplunkTarget) GetGroupVersionKind() schema.GroupVersionKind {
+func (*SplunkTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("SplunkTarget")
 }
 
-var splunkConditionSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *SplunkTargetStatus) InitializeConditions() {
-	splunkConditionSet.Manage(s).InitializeConditions()
+// GetConditionSet implements duckv1.KRShaped.
+func (*SplunkTarget) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
 }
 
-// PropagateAvailability uses the readiness of the provided Knative Service to
-// determine whether the Deployed condition should be marked as true or false.
-func (s *SplunkTargetStatus) PropagateAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		splunkConditionSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
-	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		splunkConditionSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	splunkConditionSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
+// GetStatus implements duckv1.KRShaped.
+func (t *SplunkTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
 }
 
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *SplunkTarget) GetConditionSet() apis.ConditionSet {
-	return splunkConditionSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *SplunkTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// GetStatusManager implements Reconcilable.
+func (t *SplunkTarget) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		Status:       &t.Status,
+	}
 }

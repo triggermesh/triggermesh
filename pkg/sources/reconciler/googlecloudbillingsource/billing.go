@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,9 +26,10 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/event"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common/skip"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 // ensureBudgetNotification ensures the existence of a notification
@@ -41,7 +42,7 @@ func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, to
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
 	budgetRequest := &budgets.GetBudgetRequest{
@@ -103,7 +104,7 @@ func ensureNoBudgetNotification(ctx context.Context, cli *billing.BudgetClient) 
 		return nil
 	}
 
-	src := v1alpha1.SourceFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
+	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudBillingSource)
 	status := &src.Status
 
 	budgetRequest := &budgets.GetBudgetRequest{

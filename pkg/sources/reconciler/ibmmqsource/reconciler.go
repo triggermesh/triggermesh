@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@ import (
 
 	"knative.dev/pkg/reconciler"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/ibmmqsource"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event source type.
@@ -41,6 +42,6 @@ var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 // ReconcileKind implements Interface.ReconcileKind.
 func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.IBMMQSource) reconciler.Event {
 	// inject source into context for usage in reconciliation logic
-	ctx = v1alpha1.WithSource(ctx, src)
-	return r.base.ReconcileSource(ctx, r)
+	ctx = commonv1alpha1.WithReconcilable(ctx, src)
+	return r.base.ReconcileAdapter(ctx, r)
 }

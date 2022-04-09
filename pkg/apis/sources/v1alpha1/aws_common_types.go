@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import (
 	pkgapis "knative.dev/pkg/apis"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // AWSAuth contains multiple authentication methods for AWS services.
@@ -38,8 +39,8 @@ type AWSAuth struct {
 
 // AWSSecurityCredentials represents a set of AWS security credentials.
 type AWSSecurityCredentials struct {
-	AccessKeyID     ValueFromField `json:"accessKeyID"`
-	SecretAccessKey ValueFromField `json:"secretAccessKey"`
+	AccessKeyID     v1alpha1.ValueFromField `json:"accessKeyID"`
+	SecretAccessKey v1alpha1.ValueFromField `json:"secretAccessKey"`
 }
 
 // AWSEndpoint contains parameters which are used to override the destination

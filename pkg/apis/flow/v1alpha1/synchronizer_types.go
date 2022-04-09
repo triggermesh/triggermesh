@@ -18,12 +18,11 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -35,22 +34,23 @@ type Synchronizer struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SynchronizerSpec   `json:"spec"`
-	Status SynchronizerStatus `json:"status,omitempty"`
+	Spec   SynchronizerSpec `json:"spec"`
+	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
 // Check the interfaces Synchronizer should be implementing.
 var (
-	_ runtime.Object     = (*Synchronizer)(nil)
-	_ kmeta.OwnerRefable = (*Synchronizer)(nil)
-	_ duckv1.KRShaped    = (*Synchronizer)(nil)
+	_ v1alpha1.Reconcilable = (*Synchronizer)(nil)
+	_ v1alpha1.EventSender  = (*Synchronizer)(nil)
 )
 
 // SynchronizerSpec holds the desired state of the Synchronizer.
 type SynchronizerSpec struct {
-	CorrelationKey Correlation        `json:"correlationKey"`
-	Response       Response           `json:"response"`
-	Sink           duckv1.Destination `json:"sink"`
+	CorrelationKey Correlation `json:"correlationKey"`
+	Response       Response    `json:"response"`
+
+	// Support sending to an event sink instead of replying.
+	duckv1.SourceSpec `json:",inline"`
 }
 
 // Correlation holds the request-response matching parameters.
@@ -62,12 +62,6 @@ type Correlation struct {
 // Response defines the response handling configuration.
 type Response struct {
 	Timeout apis.Duration `json:"timeout"`
-}
-
-// SynchronizerStatus communicates the observed state of the Synchronizer.
-type SynchronizerStatus struct {
-	duckv1.SourceStatus  `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

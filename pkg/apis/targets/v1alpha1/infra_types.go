@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,10 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
-	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -33,15 +31,13 @@ type InfraTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   InfraTargetSpec   `json:"spec"`
-	Status InfraTargetStatus `json:"status,omitempty"`
+	Spec   InfraTargetSpec `json:"spec"`
+	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
-// Check the interfaces InfraTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object     = (*InfraTarget)(nil)
-	_ kmeta.OwnerRefable = (*InfraTarget)(nil)
-	_ duckv1.KRShaped    = (*InfraTarget)(nil)
+	_ v1alpha1.Reconcilable = (*InfraTarget)(nil)
 )
 
 // InfraTargetSpec holds the desired state of the InfraTarget.
@@ -90,12 +86,6 @@ type InfraTargetState struct {
 	// this component is part of, and should be taken into account
 	// when storing variables in the state store.
 	Bridge *string `json:"bridge,omitempty"`
-}
-
-// InfraTargetStatus communicates the observed state of the InfraTarget (from the controller).
-type InfraTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

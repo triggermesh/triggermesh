@@ -1,5 +1,5 @@
 /*
-Copyright 2021 TriggerMesh Inc.
+Copyright 2022 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,19 +20,15 @@ import (
 	"context"
 
 	"github.com/kelseyhightower/envconfig"
-	"k8s.io/client-go/tools/cache"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
-	kserviceclient "knative.dev/serving/pkg/client/injection/client"
-	kserviceinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
-	uipathtargetinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/uipathtarget"
-	"github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/uipathtarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/uipathtarget"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/uipathtarget"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -42,29 +38,32 @@ func NewController(
 	cmw configmap.Watcher,
 ) *controller.Impl {
 
+	typ := (*v1alpha1.UiPathTarget)(nil)
+	app := common.ComponentName(typ)
+
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
 	adapterCfg := &adapterConfig{
-		obsConfig: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
+		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
+	envconfig.MustProcess(app, adapterCfg)
 
-	envconfig.MustProcess("", adapterCfg)
+	informer := informerv1alpha1.Get(ctx)
 
-	ksvcInformer := kserviceinformer.Get(ctx)
-
-	r := &reconciler{
-		logger:     logging.FromContext(ctx),
-		ksvcr:      libreconciler.NewKServiceReconciler(kserviceclient.Get(ctx), ksvcInformer.Lister()),
+	r := &Reconciler{
 		adapterCfg: adapterCfg,
+		trgLister:  informer.Lister().UiPathTargets,
 	}
+	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	impl := uipathtarget.NewImpl(ctx, r)
+	r.base = common.NewGenericServiceReconciler(
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.Tracker,
+		impl.EnqueueControllerOf,
+	)
 
-	uipathTargetInformer := uipathtargetinformer.Get(ctx)
-	uipathTargetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
-
-	ksvcInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGK(v1alpha1.Kind("UiPathTarget")),
-		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
-	})
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	return impl
 }
