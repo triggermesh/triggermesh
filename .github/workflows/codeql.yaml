@@ -46,7 +46,7 @@ jobs:
 
     # Install C libraries required by the XSLT transformation adapter
     - name: Install C libraries for XSLT transformation
-      run: apt-get install -y --no-install-recommends libxml2-dev libxslt1-dev liblzma-dev zlib1g-dev
+      run: sudo apt-get install -y --no-install-recommends libxml2-dev libxslt1-dev liblzma-dev zlib1g-dev
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
