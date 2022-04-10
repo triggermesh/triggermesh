@@ -129,8 +129,8 @@ jobs:
       run: |
         declare -i e2e_ns_count=-1
 
-        # retry for max 120s (60*2s)
-        for _ in $(seq 1 60); do
+        # allow a grace period of max 300s (150*2s)
+        for _ in $(seq 1 150); do
             e2e_ns_count="$(kubectl get ns -l e2e-framework -o jsonpath='{.items}' | jq '. | length')"
             if ! ((e2e_ns_count)); then
                 break
@@ -142,3 +142,7 @@ jobs:
 
         # flush stderr
         echo >&2
+
+        # Final retrieval of E2E namespaces, gives us a chance to see whether
+        # some of them were still Terminating after the grace period.
+        kubectl get ns -l e2e-framework
