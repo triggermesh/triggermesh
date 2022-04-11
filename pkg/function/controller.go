@@ -18,80 +18,58 @@ package function
 
 import (
 	"context"
-	"os"
-	"strings"
 
-	corev1 "k8s.io/api/core/v1"
+	"github.com/kelseyhightower/envconfig"
 
-	"knative.dev/pkg/client/injection/kube/client"
-	cminformer "knative.dev/pkg/client/injection/kube/informers/core/v1/configmap"
+	"knative.dev/eventing/pkg/reconciler/source"
+	k8sclient "knative.dev/pkg/client/injection/kube/client"
+	cminformerv1 "knative.dev/pkg/client/injection/kube/informers/core/v1/configmap"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
-	"knative.dev/pkg/resolver"
-	"knative.dev/pkg/tracker"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
-	servingv1client "knative.dev/serving/pkg/client/injection/client"
-	knsvcinformer "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/extensions/v1alpha1/function"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/extensions/v1alpha1/function"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
-const (
-	eventStoreEnv    = "EVENTSTORE_URI"
-	runtimeEnvPrefix = "RUNTIME_"
-)
-
-// NewController creates a Reconciler and returns the result of NewImpl.
+// NewController initializes the controller and is called by the generated code
+// Registers event handlers to enqueue events
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
-	logger := logging.FromContext(ctx)
 
-	functionInformer := informerv1alpha1.Get(ctx)
-	knSvcInformer := knsvcinformer.Get(ctx)
-	cmInformer := cminformer.Get(ctx)
+	typ := (*v1alpha1.Function)(nil)
+	app := common.ComponentName(typ)
+
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
+	adapterCfg := &adapterConfig{
+		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
+	}
+	envconfig.MustProcess(app, adapterCfg)
+
+	informer := informerv1alpha1.Get(ctx)
 
 	r := &Reconciler{
-		coreClientSet:      client.Get(ctx),
-		cmLister:           cmInformer.Lister(),
-		knServingClientSet: servingv1client.Get(ctx),
-		knServiceLister:    knSvcInformer.Lister(),
+		adapterCfg: adapterCfg,
+		fnLister:   informer.Lister().Functions,
+		cmLister:   cminformerv1.Get(ctx).Lister().ConfigMaps,
+		cmCli:      k8sclient.Get(ctx).CoreV1().ConfigMaps,
 	}
-
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.Tracker = tracker.New(impl.EnqueueKey, controller.GetTrackerLease(ctx))
-	r.sinkResolver = resolver.NewURIResolverFromTracker(ctx, impl.Tracker)
-	r.runtimes = make(map[string]string)
-	for _, e := range os.Environ() {
-		if !strings.HasPrefix(e, runtimeEnvPrefix) {
-			continue
-		}
-		e = strings.TrimPrefix(e, runtimeEnvPrefix)
-		runtimePairs := strings.SplitN(e, "=", 2)
-		r.runtimes[runtimePairs[0]] = runtimePairs[1]
-	}
+	r.base = common.NewGenericServiceReconciler(
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.Tracker,
+		impl.EnqueueControllerOf,
+	)
 
-	logger.Info("Setting up event handlers.")
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
-	functionInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
-
-	knSvcInformer.Informer().AddEventHandler(controller.HandleAll(
-		controller.EnsureTypeMeta(
-			r.Tracker.OnChanged,
-			servingv1.SchemeGroupVersion.WithKind("Service"),
-		),
-	))
-
-	cmInformer.Informer().AddEventHandler(controller.HandleAll(
-		controller.EnsureTypeMeta(
-			r.Tracker.OnChanged,
-			corev1.SchemeGroupVersion.WithKind("ConfigMap"),
-		),
-	))
+	r.tracker = impl.Tracker
 
 	return impl
 }

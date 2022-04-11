@@ -34,6 +34,7 @@ func TestNewContainer(t *testing.T) {
 		Port("health", 8081),
 		EnvVars(makeEnvVars(2, "MULTI_ENV", "val")...),
 		EnvVar("TEST_ENV2", "val2"),
+		EntrypointCommand("test", "--verbose"),
 		Probe("/health", "health"),
 		StartupProbe("/initialized", "health"),
 		EnvVarFromSecret("TEST_ENV3", "test-secret", "someKey"),
@@ -43,8 +44,9 @@ func TestNewContainer(t *testing.T) {
 	)
 
 	expectCont := &corev1.Container{
-		Name:  tName,
-		Image: tImg,
+		Name:    tName,
+		Image:   tImg,
+		Command: []string{"test", "--verbose"},
 		Ports: []corev1.ContainerPort{{
 			Name:          "h2c",
 			ContainerPort: 8080,

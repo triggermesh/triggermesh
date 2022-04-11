@@ -14,13 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package resource
 
 import (
-	"context"
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// SetDefaults implements apis.Defaultable
-func (f *Function) SetDefaults(ctx context.Context) {
-	// Nothing to default.
+func TestNewConfigmap(t *testing.T) {
+	cmap := NewConfigMap(tNs, tName,
+		Data("test.txt", "Lorem ipsum dolor sit amet"),
+	)
+
+	expectCmap := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: tNs,
+			Name:      tName,
+		},
+		Data: map[string]string{
+			"test.txt": "Lorem ipsum dolor sit amet",
+		},
+	}
+
+	if d := cmp.Diff(expectCmap, cmap); d != "" {
+		t.Errorf("Unexpected diff: (-:expect, +:got) %s", d)
+	}
 }
