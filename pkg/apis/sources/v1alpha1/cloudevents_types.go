@@ -53,10 +53,6 @@ type CloudEventsSourceSpec struct {
 	// Path under which request are accepted
 	// +optional
 	Path *string `json:"path,omitempty"`
-
-	// Rate limiter parameters
-	// +optional
-	RateLimiter *RateLimiter `json:"rateLimiter,omitempty"`
 }
 
 // HTTPCredentials to be used when receiving requests.
@@ -77,15 +73,9 @@ type HTTPToken struct {
 	Value  v1alpha1.ValueFromField `json:"value"`
 }
 
-// RateLimiter provides a mechanism to reject incoming requests
-// when a threshold is trespassed, informing the caller to retry later.
-type RateLimiter struct {
-	RequestsPerSecond int64 `json:"requestsPerSecond"`
-}
-
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudIoTSourceList contains a list of event sources.
+// CloudEventsSourceList contains a list of event sources.
 type CloudEventsSourceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

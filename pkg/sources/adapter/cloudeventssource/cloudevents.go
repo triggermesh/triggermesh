@@ -112,3 +112,32 @@ func (h *cloudEventsHandler) handleBasicAuthentication(next http.Handler) http.H
 
 	})
 }
+
+func (h *cloudEventsHandler) handleTokenAuthentication(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for _, kv := range h.tokens {
+			token := r.Header.Get(kv.Key)
+			if token == "" {
+				continue
+			}
+
+			t, err := h.cfw.GetContent(kv.MountedValueFile)
+			if err != nil {
+				h.logger.Errorw(
+					fmt.Sprintf("could not retrieve token for header %q", kv.Key),
+					zap.Error(err))
+				continue
+			}
+
+			tokenHash := sha256.Sum256([]byte(token))
+			expectedTokenHash := sha256.Sum256(t)
+
+			if subtle.ConstantTimeCompare(tokenHash[:], expectedTokenHash[:]) == 1 {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+	})
+}

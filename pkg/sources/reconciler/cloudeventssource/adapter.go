@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
-	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -41,7 +40,6 @@ import (
 
 const (
 	envCloudEventsPath                 = "CLOUDEVENTS_PATH"
-	envCloudEventsRateLimiterRPS       = "CLOUDEVENTS_RATELIMITER_RPS"
 	envCloudEventsBasicAuthCredentials = "CLOUDEVENTS_BASICAUTH_CREDENTIALS"
 	envCloudEventsTokenCredentials     = "CLOUDEVENTS_TOKEN_CREDENTIALS"
 )
@@ -178,13 +176,6 @@ func makeAppEnv(o *v1alpha1.CloudEventsSource) []corev1.EnvVar {
 		envs = append(envs, corev1.EnvVar{
 			Name:  envCloudEventsPath,
 			Value: *o.Spec.Path,
-		})
-	}
-
-	if o.Spec.RateLimiter != nil {
-		envs = append(envs, corev1.EnvVar{
-			Name:  envCloudEventsRateLimiterRPS,
-			Value: strconv.FormatInt(o.Spec.RateLimiter.RequestsPerSecond, 10),
 		})
 	}
 

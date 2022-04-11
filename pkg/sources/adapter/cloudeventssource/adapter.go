@@ -59,16 +59,19 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 	}
 
 	// prepare CE server options
+	options := []cehttp.Option{}
 
-	ceServer, err := cloudevents.NewClientHTTP(
-		cehttp.WithPath(env.Path),
-		cehttp.WithMiddleware(ceh.handleBasicAuthentication),
-		// TODO add token auth middleware
-		// cehttp.WithMiddleware( /* add basic authentication */ ),
+	if env.Path != "" {
+		options = append(options, cehttp.WithPath(env.Path))
+	}
+	if len(env.BasicAuths) != 0 {
+		options = append(options, cehttp.WithMiddleware(ceh.handleBasicAuthentication))
+	}
+	if len(env.Tokens) != 0 {
+		options = append(options, cehttp.WithMiddleware(ceh.handleTokenAuthentication))
+	}
 
-		// TODO rate liming
-		// cehttp.WithRateLimiter( /* TODO */ ),
-	)
+	ceServer, err := cloudevents.NewClientHTTP(options...)
 	if err != nil {
 		logger.Panicw("error creating CloudEvents client", zap.Error(err))
 	}

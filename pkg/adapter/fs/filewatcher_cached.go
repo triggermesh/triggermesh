@@ -25,6 +25,8 @@ import (
 	"go.uber.org/zap"
 )
 
+// CachedFileWatcher is a FileWatcher that caches and tracks the contents
+// of watched files.
 type CachedFileWatcher struct {
 	cw           *FileWatcher
 	watchedFiles map[string][]byte
@@ -33,7 +35,7 @@ type CachedFileWatcher struct {
 	logger *zap.SugaredLogger
 }
 
-// NewCached createse a new FileWatcher object that register files
+// NewCachedFileWatcher creates a new FileWatcher object that register files
 // and calls back when they change.
 func NewCachedFileWatcher(logger *zap.SugaredLogger) (*CachedFileWatcher, error) {
 	cw, err := NewWatcher(logger)
@@ -74,6 +76,7 @@ func (ccw *CachedFileWatcher) callback(path string) WatchCallback {
 	}
 }
 
+// Add a file path to be watched.
 func (ccw *CachedFileWatcher) Add(path string) error {
 	if err := ccw.cw.Add(path, ccw.callback(path)); err != nil {
 		return err
@@ -91,6 +94,7 @@ func (ccw *CachedFileWatcher) Add(path string) error {
 	return nil
 }
 
+// GetContent of watched file.
 func (ccw *CachedFileWatcher) GetContent(path string) ([]byte, error) {
 	ccw.m.Lock()
 	defer ccw.m.Unlock()

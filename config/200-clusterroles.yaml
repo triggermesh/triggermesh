@@ -124,7 +124,6 @@ rules:
   - azureservicebusqueuesources/status
   - azureservicebustopicsources/status
   - cloudeventssources/status
-  - cloudeventssources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
   - googlecloudiotsources/status
