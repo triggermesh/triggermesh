@@ -25,6 +25,17 @@ jobs:
     # the Go setup, in case other steps are added to this job in the future.
     - name: Lint Go code
       uses: golangci/golangci-lint-action@v3
+      with:
+        # (hack) By default, errors are reported to the GitHub commit view only
+        # (or the "Files changed" tab on PRs). We also want errors to be logged
+        # with line numbers to the execution logs of the workflow.
+        #
+        # The args below result in the following flags being passed to the
+        # linter command, which works, quite surprisingly:
+        #   --out-format=github-actions --out-format=colored-line-number
+        #
+        # Ref. https://github.com/golangci/golangci-lint-action/issues/119#issuecomment-981090648
+        args: "--out-${NO_FUTURE}format=colored-line-number"
 
   lint-config:
     name: Configuration Linting
