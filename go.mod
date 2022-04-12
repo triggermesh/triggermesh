@@ -23,7 +23,7 @@ require (
 	cloud.google.com/go/workflows v1.3.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.17
-	github.com/Azure/azure-sdk-for-go v63.0.0+incompatible
+	github.com/Azure/azure-sdk-for-go v63.2.0+incompatible
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.13.2
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v0.3.6
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1
@@ -67,7 +67,7 @@ require (
 	github.com/wamuir/go-xslt v0.1.4
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.29.0
-	go.opentelemetry.io/otel v1.6.1
+	go.opentelemetry.io/otel v1.6.3
 	go.opentelemetry.io/otel/metric v0.27.0
 	go.opentelemetry.io/otel/sdk/metric v0.27.0
 	go.uber.org/zap v1.21.0
@@ -198,7 +198,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	go.opentelemetry.io/otel/internal/metric v0.27.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
-	go.opentelemetry.io/otel/trace v1.6.1 // indirect
+	go.opentelemetry.io/otel/trace v1.6.3 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
