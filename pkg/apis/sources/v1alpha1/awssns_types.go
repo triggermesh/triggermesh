@@ -41,6 +41,8 @@ type AWSSNSSource struct {
 var (
 	_ v1alpha1.Reconcilable = (*AWSSNSSource)(nil)
 	_ v1alpha1.MultiTenant  = (*AWSSNSSource)(nil)
+	_ v1alpha1.EventSource  = (*AWSSNSSource)(nil)
+	_ v1alpha1.EventSender  = (*AWSSNSSource)(nil)
 )
 
 // AWSSNSSourceSpec defines the desired state of the event source.
