@@ -41,6 +41,8 @@ type AWSSQSSource struct {
 var (
 	_ v1alpha1.Reconcilable           = (*AWSSQSSource)(nil)
 	_ v1alpha1.ServiceAccountProvider = (*AWSSQSSource)(nil)
+	_ v1alpha1.EventSource            = (*AWSSQSSource)(nil)
+	_ v1alpha1.EventSender            = (*AWSSQSSource)(nil)
 )
 
 // AWSSQSSourceSpec defines the desired state of the event source.

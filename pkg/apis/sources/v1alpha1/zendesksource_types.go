@@ -40,6 +40,8 @@ type ZendeskSource struct {
 var (
 	_ v1alpha1.Reconcilable = (*ZendeskSource)(nil)
 	_ v1alpha1.MultiTenant  = (*ZendeskSource)(nil)
+	_ v1alpha1.EventSource  = (*ZendeskSource)(nil)
+	_ v1alpha1.EventSender  = (*ZendeskSource)(nil)
 )
 
 // ZendeskSourceSpec defines the desired state of the event source.
