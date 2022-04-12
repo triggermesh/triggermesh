@@ -89,6 +89,15 @@ var eq = conversion.EqualitiesOrDie(
 
 		return (conversion.Equalities{}).DeepDerivative(a.Handler, b.Handler)
 	},
+	// Needed because DeepDerivative compares EnvVar.Value string fields
+	// without considering EnvVar as a whole. If an EnvVar is specified, we
+	// consider its value to be intentional and force the comparison.
+	func(a, b corev1.EnvVar) bool {
+		if a.Name != b.Name || a.Value != b.Value {
+			return false
+		}
+		return (conversion.Equalities{}).DeepDerivative(a.ValueFrom, b.ValueFrom)
+	},
 )
 
 // deploymentEqual returns whether two Deployments are semantically equivalent.
