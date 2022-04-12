@@ -109,7 +109,7 @@ var _ = Describe("Azure ServiceBusTopic", func() {
 				BeforeEach(func() {
 					err = topicSender.SendMessage(ctx, &sv.Message{
 						Body: []byte("hello world"),
-					})
+					}, nil)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -290,10 +290,7 @@ func readReceivedEvents(c clientset.Interface, namespace, eventDisplayName strin
 
 // createTopic will create a servicebus topic and a sender using the given name
 func createTopic(ctx context.Context, name string, client *sv.Client, adminClient *svadmin.Client) *sv.Sender {
-
-	// Create Topic
-	_, err := adminClient.CreateTopic(ctx, name, nil, nil)
-	if err != nil {
+	if _, err := adminClient.CreateTopic(ctx, name, nil); err != nil {
 		framework.FailfWithOffset(2, "Error creating topic: %s", err)
 		return nil
 	}
