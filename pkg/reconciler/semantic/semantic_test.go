@@ -44,6 +44,10 @@ func TestDeploymentEqual(t *testing.T) {
 
 	require.GreaterOrEqual(t, len(current.Labels), 2,
 		"Test suite requires a reference object with at least 2 labels to run properly")
+	require.True(t, len(current.Spec.Template.Spec.Containers) > 0 &&
+		len(current.Spec.Template.Spec.Containers[0].Env) > 0 &&
+		current.Spec.Template.Spec.Containers[0].Env[0].Value != "",
+		"Test suite requires a reference object with a Container that has at least 1 EnvVar to run properly")
 
 	assert.True(t, deploymentEqual(nil, nil), "Two nil elements should be equal")
 
@@ -93,6 +97,14 @@ func TestDeploymentEqual(t *testing.T) {
 					desired.Labels[k+"test"] = "test"
 					break // adding one is enough
 				}
+				return desired
+			},
+			false,
+		},
+		"not equal when EnvVar desired value is empty": {
+			func() *appsv1.Deployment {
+				desired := current.DeepCopy()
+				desired.Spec.Template.Spec.Containers[0].Env[0].Value = ""
 				return desired
 			},
 			false,

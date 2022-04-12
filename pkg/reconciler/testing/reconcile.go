@@ -267,6 +267,26 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, rcl v1alpha1.Reconcilable, ad
 
 				return nil
 			}(),
+			WantUpdates: func() []clientgotesting.UpdateActionImpl {
+				// only types that implement EventSender and that are
+				// not multi-tenant have a populated K_SINK env var
+				if _, isEventSender := rcl.(v1alpha1.EventSender); isEventSender && !v1alpha1.IsMultiTenant(rcl) {
+					return []clientgotesting.UpdateActionImpl{{
+						Object: newAdapter(ready, noSinkEnv),
+					}}
+				}
+
+				return nil
+			}(),
+			WantEvents: func() []string {
+				// see WantUpdates
+				if _, isEventSender := rcl.(v1alpha1.EventSender); isEventSender && !v1alpha1.IsMultiTenant(rcl) {
+					return []string{
+						updateAdapterEvent(n, k),
+					}
+				}
+				return nil
+			}(),
 		},
 
 		// Errors
@@ -685,6 +705,27 @@ func rename(object runtime.Object) {
 		o.Name += "-oldname"
 	case *servingv1.Service:
 		o.Name += "-oldname"
+	}
+}
+
+// noSinkEnv sets the K_SINK env var to an empty value.
+// This mimics the behaviour of (pkg/reconciler).NewAdapter helpers when they
+// receive an empty sink URI.
+func noSinkEnv(object runtime.Object) {
+	var envs []corev1.EnvVar
+
+	switch o := object.(type) {
+	case *appsv1.Deployment:
+		envs = o.Spec.Template.Spec.Containers[0].Env
+	case *servingv1.Service:
+		envs = o.Spec.Template.Spec.Containers[0].Env
+	}
+
+	for i := range envs {
+		if envs[i].Name == "K_SINK" {
+			envs[i].Value = ""
+			return
+		}
 	}
 }
 
