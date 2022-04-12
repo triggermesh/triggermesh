@@ -87,3 +87,18 @@ func Labels(ls labels.Set) ObjectOption {
 		}
 	}
 }
+
+// Annotation sets the value of an API object's annotation.
+func Annotation(key, val string) ObjectOption {
+	return func(object interface{}) {
+		meta := object.(metav1.Object)
+
+		annots := meta.GetAnnotations()
+
+		if annots == nil {
+			annots = make(labels.Set, 1)
+			meta.SetAnnotations(annots)
+		}
+		annots[key] = val
+	}
+}

@@ -134,6 +134,19 @@ spec:
           status:
             type: object
             properties:
+              configMap:
+                description: Identity of the ConfigMap containing the code of the Function.
+                type: object
+                properties:
+                  name:
+                    description: Name of the ConfigMap.
+                    type: string
+                  resourceVersion:
+                    description: Observed revision of the ConfigMap.
+                    type: string
+                required:
+                - name
+                - resourceVersion
               observedGeneration:
                 type: integer
                 format: int64

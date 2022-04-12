@@ -234,6 +234,23 @@ func setResources(res *corev1.ResourceList, cpu, mem resource.Quantity) {
 	(*res)[corev1.ResourceMemory] = mem
 }
 
+// EntrypointCommand overrides the entrypoint command of a Container or
+// PodSpecable's first container.
+func EntrypointCommand(cmdAndArgs ...string) ObjectOption {
+	return func(object interface{}) {
+		var cmd *[]string
+
+		switch o := object.(type) {
+		case *corev1.Container:
+			cmd = &o.Command
+		case *appsv1.Deployment, *servingv1.Service:
+			cmd = &firstContainer(o).Command
+		}
+
+		*cmd = cmdAndArgs
+	}
+}
+
 // TerminationErrorToLogs sets the TerminationMessagePolicy of a container to
 // FallbackToLogsOnError.
 func TerminationErrorToLogs(object interface{}) {

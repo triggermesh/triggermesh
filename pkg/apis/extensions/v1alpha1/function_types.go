@@ -18,9 +18,9 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // +genclient
@@ -29,38 +29,32 @@ import (
 
 // Function is an addressable object that executes function code.
 type Function struct {
-	metav1.TypeMeta `json:",inline"`
-	// +optional
+	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec holds the desired state of the Function (from the client).
-	// +optional
-	Spec FunctionSpec `json:"spec,omitempty"`
-
-	// Status communicates the observed state of the Function (from the controller).
-	// +optional
+	Spec   FunctionSpec   `json:"spec,omitempty"`
 	Status FunctionStatus `json:"status,omitempty"`
 }
 
 var (
-	// Check that Function can be validated and defaulted.
-	_ apis.Validatable   = (*Function)(nil)
-	_ apis.Defaultable   = (*Function)(nil)
-	_ kmeta.OwnerRefable = (*Function)(nil)
-	// Check that the type conforms to the duck Knative Resource shape.
-	_ duckv1.KRShaped = (*Function)(nil)
+	_ v1alpha1.Reconcilable = (*Function)(nil)
+	_ v1alpha1.EventSource  = (*Function)(nil)
+	_ v1alpha1.EventSender  = (*Function)(nil)
 )
 
 // FunctionSpec holds the desired state of the Function Specification
 type FunctionSpec struct {
-	Runtime             string                      `json:"runtime"`
-	Entrypoint          string                      `json:"entrypoint"`
-	Public              bool                        `json:"public,omitempty"`
-	Code                string                      `json:"code"`
-	ResponseIsEvent     bool                        `json:"responseIsEvent,omitempty"`
-	EventStore          EventStoreConnection        `json:"eventStore,omitempty"`
-	CloudEventOverrides *duckv1.CloudEventOverrides `json:"ceOverrides"`
-	Sink                *duckv1.Destination         `json:"sink"`
+	Runtime         string               `json:"runtime"`
+	Entrypoint      string               `json:"entrypoint"`
+	Public          bool                 `json:"public,omitempty"`
+	Code            string               `json:"code"`
+	ResponseIsEvent bool                 `json:"responseIsEvent,omitempty"`
+	EventStore      EventStoreConnection `json:"eventStore,omitempty"`
+
+	// Support sending to an event sink instead of replying,
+	// as well as setting the CloudEvents 'type' and 'source' attributes
+	// using CloudEventOverrides (hack).
+	duckv1.SourceSpec `json:",inline"`
 }
 
 // EventStoreConnection contains the data to connect to
@@ -70,13 +64,17 @@ type EventStoreConnection struct {
 	URI string `json:"uri"`
 }
 
-// FunctionStatus communicates the observed state of the Function (from the controller).
+// FunctionStatus defines the observed state of the Function.
 type FunctionStatus struct {
-	duckv1.SourceStatus `json:",inline"`
+	v1alpha1.Status `json:",inline"`
+	ConfigMap       *FunctionConfigMapIdentity `json:"configMap,omitempty"`
+}
 
-	// Address holds the information needed to connect this Function up to receive events.
-	// +optional
-	Address *duckv1.Addressable `json:"address,omitempty"`
+// FunctionConfigMapIdentity represents the identity of the ConfigMap
+// containing the code of a Function.
+type FunctionConfigMapIdentity struct {
+	Name            string `json:"name"`
+	ResourceVersion string `json:"resourceVersion"`
 }
 
 // FunctionList is a list of Function resources
@@ -87,9 +85,4 @@ type FunctionList struct {
 	metav1.ListMeta `json:"metadata"`
 
 	Items []Function `json:"items"`
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (f *Function) GetStatus() *duckv1.Status {
-	return &f.Status.Status
 }

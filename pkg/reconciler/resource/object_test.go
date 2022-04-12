@@ -52,11 +52,13 @@ func TestMetaObjectOptions(t *testing.T) {
 	objMeta := NewKnService(tNs, tName,
 		Label("test.label/2", "val2"),
 		Controller(owner1),
+		Annotation("test.annot/2", "val2"),
 		Labels(labels.Set{
 			"test.label/3": "val3",
 			"test.label/4": "val4",
 		}),
 		Label("test.label/1", "val1"),
+		Annotation("test.annot/1", "val1"),
 		Owners(owner2, owner3),
 	).ObjectMeta
 
@@ -73,6 +75,10 @@ func TestMetaObjectOptions(t *testing.T) {
 			"test.label/2": "val2",
 			"test.label/3": "val3",
 			"test.label/4": "val4",
+		},
+		Annotations: map[string]string{
+			"test.annot/1": "val1",
+			"test.annot/2": "val2",
 		},
 	}
 

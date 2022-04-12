@@ -17,7 +17,7 @@ limitations under the License.
 package resource
 
 import (
-	"path"
+	"path/filepath"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -92,7 +92,7 @@ func SecretMount(name, target, secretName, secretKey string) ObjectOption {
 					Items: []corev1.KeyToPath{
 						{
 							Key:  secretKey,
-							Path: path.Base(target),
+							Path: filepath.Base(target),
 						},
 					},
 				},
@@ -110,7 +110,52 @@ func SecretMount(name, target, secretName, secretKey string) ObjectOption {
 			Name:      name,
 			ReadOnly:  true,
 			MountPath: target,
-			SubPath:   path.Base(target),
+			SubPath:   filepath.Base(target),
+		})
+	}
+}
+
+// ConfigMapMount adds a ConfigMap volume and a corresponding mount to a PodSpecable.
+func ConfigMapMount(name, target, cmName, cmKey string) ObjectOption {
+	return func(object interface{}) {
+		var vols *[]corev1.Volume
+
+		switch o := object.(type) {
+		case *appsv1.Deployment:
+			vols = &o.Spec.Template.Spec.Volumes
+		case *servingv1.Service:
+			vols = &o.Spec.Template.Spec.Volumes
+		}
+
+		*vols = append(*vols, corev1.Volume{
+			Name: name,
+			VolumeSource: corev1.VolumeSource{
+				ConfigMap: &corev1.ConfigMapVolumeSource{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: cmName,
+					},
+					Items: []corev1.KeyToPath{
+						{
+							Key:  cmKey,
+							Path: filepath.Base(target),
+						},
+					},
+				},
+			},
+		})
+
+		var volMounts *[]corev1.VolumeMount
+
+		switch o := object.(type) {
+		case *appsv1.Deployment, *servingv1.Service:
+			volMounts = &firstContainer(o).VolumeMounts
+		}
+
+		*volMounts = append(*volMounts, corev1.VolumeMount{
+			Name:      name,
+			ReadOnly:  true,
+			MountPath: target,
+			SubPath:   filepath.Base(target),
 		})
 	}
 }

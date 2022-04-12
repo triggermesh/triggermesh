@@ -45,7 +45,8 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		ServiceAccount("god-mode"),
 		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
-		SecretMount("test-volume", "/path/to/file.ext", "test-secret", "someKey"),
+		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
+		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
 		VisibilityClusterLocal,
 	)
 
@@ -117,25 +118,49 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 										corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
 									},
 								},
-								VolumeMounts: []corev1.VolumeMount{{
-									Name:      "test-volume",
-									MountPath: "/path/to/file.ext",
-									SubPath:   "file.ext",
-									ReadOnly:  true,
-								}},
-							}},
-							Volumes: []corev1.Volume{{
-								Name: "test-volume",
-								VolumeSource: corev1.VolumeSource{
-									Secret: &corev1.SecretVolumeSource{
-										SecretName: "test-secret",
-										Items: []corev1.KeyToPath{{
-											Key:  "someKey",
-											Path: "file.ext",
-										}},
+								VolumeMounts: []corev1.VolumeMount{
+									{
+										Name:      "test-vol1",
+										MountPath: "/path/to/file.ext",
+										SubPath:   "file.ext",
+										ReadOnly:  true,
+									},
+									{
+										Name:      "test-vol2",
+										MountPath: "/path/to/file.ext",
+										SubPath:   "file.ext",
+										ReadOnly:  true,
 									},
 								},
 							}},
+							Volumes: []corev1.Volume{
+								{
+									Name: "test-vol1",
+									VolumeSource: corev1.VolumeSource{
+										Secret: &corev1.SecretVolumeSource{
+											SecretName: "test-secret",
+											Items: []corev1.KeyToPath{{
+												Key:  "someKey",
+												Path: "file.ext",
+											}},
+										},
+									},
+								},
+								{
+									Name: "test-vol2",
+									VolumeSource: corev1.VolumeSource{
+										ConfigMap: &corev1.ConfigMapVolumeSource{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-cmap",
+											},
+											Items: []corev1.KeyToPath{{
+												Key:  "someKey",
+												Path: "file.ext",
+											}},
+										},
+									},
+								},
+							},
 						},
 					},
 				},
