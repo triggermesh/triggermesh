@@ -166,7 +166,11 @@ var _ = Describe("Azure Activity Logs source", func() {
 				})
 			})
 
-			Specify("the source generates an event", func() {
+			// NOTE(antoineco): Occasionally, Azure seems to not generate the activity related to the above
+			// action at all. We tolerate a certain degree of flakiness in this test spec because the
+			// reliability of the Azure infrastructure is out of our control.
+			// Ref. https://github.com/triggermesh/triggermesh/issues/511
+			Specify("the source generates an event", FlakeAttempts(3), func() {
 				// A latency of ~5 min is expected between the moment an activity is generated, and that
 				// activity is sent to the configured destination (Event Hubs).
 				const receiveTimeout = 10 * time.Minute
