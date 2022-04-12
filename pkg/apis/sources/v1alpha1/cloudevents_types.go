@@ -38,7 +38,6 @@ type CloudEventsSource struct {
 // Check the interfaces the event source should be implementing.
 var (
 	_ v1alpha1.Reconcilable = (*CloudEventsSource)(nil)
-	_ v1alpha1.EventSource  = (*CloudEventsSource)(nil)
 	_ v1alpha1.EventSender  = (*CloudEventsSource)(nil)
 )
 

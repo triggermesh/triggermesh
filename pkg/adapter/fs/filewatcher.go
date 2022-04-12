@@ -22,10 +22,9 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"go.uber.org/zap"
-	"knative.dev/pkg/logging"
 )
 
-// WatchCallback is called when a wathced file
+// WatchCallback is called when a watched file
 // is updated.
 type WatchCallback func()
 
@@ -88,7 +87,7 @@ func (cw *FileWatcher) Start(ctx context.Context) {
 					cw.m.RLock()
 					cbs, ok := cw.watchedFiles[e.Name]
 					if !ok {
-						cw.logger.Warnf("received a notification for a non watched file")
+						cw.logger.Warnf("Received a notification for a non watched file")
 					}
 
 					for _, cb := range cbs {
@@ -101,11 +100,11 @@ func (cw *FileWatcher) Start(ctx context.Context) {
 						// watcher error channel finished
 						return
 					}
-					cw.logger.Error("error watching files", zap.Error(err))
+					cw.logger.Error("Error watching files", zap.Error(err))
 
 				case <-ctx.Done():
 					//
-					logging.FromContext(ctx).Info("exiting file watcher process")
+					cw.logger.Info("Exiting file watcher process")
 					return
 				}
 			}

@@ -45,9 +45,7 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		ServiceAccount("god-mode"),
 		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
-		SecretMount("test-volume", "/path/to/file.ext", "test-secret",
-			WithMountSubPath("file.ext"),
-			WithVolumeSecretItem("someKey", "file.ext")),
+		SecretMount("test-volume", "/path/to/file.ext", "test-secret", "someKey"),
 		VisibilityClusterLocal,
 	)
 

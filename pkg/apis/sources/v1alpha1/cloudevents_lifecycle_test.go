@@ -68,18 +68,6 @@ func TestCloudEventsSourceGetStatusManager(t *testing.T) {
 	assert.Equal(t, sm, *r.GetStatusManager(), "unexpected Status().ConditionSet")
 }
 
-func TestCloudEventsSourceAsEventSource(t *testing.T) {
-	expectedEventSource := ""
-	s := CloudEventsSource{}
-	assert.Equal(t, expectedEventSource, s.AsEventSource(), "unexpected CE source attribute")
-}
-
-func TestCloudEventsSourceGetEventTypes(t *testing.T) {
-	expectedEventTypes := []string{}
-	s := CloudEventsSource{}
-	assert.Equal(t, expectedEventTypes, s.GetEventTypes(), "unexpected CE event types")
-}
-
 func TestCloudEventsSourceGetGroupVersionKind(t *testing.T) {
 	s := CloudEventsSource{}
 	gvk := s.GetGroupVersionKind()

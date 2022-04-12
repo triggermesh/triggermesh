@@ -66,17 +66,23 @@ func (h *cloudEventsHandler) Start(ctx context.Context) error {
 }
 
 func (h *cloudEventsHandler) handle(ctx context.Context, e event.Event) protocol.Result {
-	if result := h.ceClient.Send(ctx, e); !cloudevents.IsACK(result) {
-		h.logger.Errorw("could not send CloudEvent", zap.Error(result))
+	err := e.Validate()
+	if err != nil {
+		h.logger.Errorw("Incoming CloudEvent is not valid", zap.Error(err))
 		return protocol.ResultNACK
 	}
 
-	return protocol.ResultACK
+	result := h.ceClient.Send(ctx, e)
+	if !cloudevents.IsACK(result) {
+		h.logger.Errorw("Could not send CloudEvent", zap.Error(result))
+	}
+
+	return result
 }
 
 // code based on VMware's VEBA's webhook:
 // https://github.com/vmware-samples/vcenter-event-broker-appliance/blob/e91e4bd8a17dad6ce4fe370c42a15694c03dac88/vmware-event-router/internal/provider/webhook/webhook.go#L167-L189
-func (h *cloudEventsHandler) handleBasicAuthentication(next http.Handler) http.Handler {
+func (h *cloudEventsHandler) handleAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		username, password, ok := r.BasicAuth()
 
@@ -89,7 +95,7 @@ func (h *cloudEventsHandler) handleBasicAuthentication(next http.Handler) http.H
 				p, err := h.cfw.GetContent(kv.MountedValueFile)
 				if err != nil {
 					h.logger.Errorw(
-						fmt.Sprintf("could not retrieve password for user %q", kv.Key),
+						fmt.Sprintf("Could not retrieve password for user %q", kv.Key),
 						zap.Error(err))
 					continue
 				}
@@ -105,16 +111,12 @@ func (h *cloudEventsHandler) handleBasicAuthentication(next http.Handler) http.H
 					return
 				}
 			}
+
+			w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
 		}
 
-		w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-
-	})
-}
-
-func (h *cloudEventsHandler) handleTokenAuthentication(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		for _, kv := range h.tokens {
 			token := r.Header.Get(kv.Key)
 			if token == "" {
@@ -124,7 +126,7 @@ func (h *cloudEventsHandler) handleTokenAuthentication(next http.Handler) http.H
 			t, err := h.cfw.GetContent(kv.MountedValueFile)
 			if err != nil {
 				h.logger.Errorw(
-					fmt.Sprintf("could not retrieve token for header %q", kv.Key),
+					fmt.Sprintf("Could not retrieve token for header %q", kv.Key),
 					zap.Error(err))
 				continue
 			}

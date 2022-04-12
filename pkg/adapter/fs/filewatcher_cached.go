@@ -71,7 +71,7 @@ func (ccw *CachedFileWatcher) updateContentFromFile(path string) error {
 func (ccw *CachedFileWatcher) callback(path string) WatchCallback {
 	return func() {
 		if err := ccw.updateContentFromFile(path); err != nil {
-			ccw.logger.Error("could not read watched file", zap.Error(err))
+			ccw.logger.Error("Could not read watched file", zap.Error(err))
 		}
 	}
 }
@@ -84,7 +84,7 @@ func (ccw *CachedFileWatcher) Add(path string) error {
 
 	if _, ok := ccw.watchedFiles[path]; !ok {
 		if err := ccw.updateContentFromFile(path); err != nil {
-			ccw.logger.Errorw("could not get content from file", zap.Error(err))
+			ccw.logger.Errorw("Could not get content from file", zap.Error(err))
 			// initialize to be able to distinguish paths not being watched
 			// and those being watched but not available.
 			ccw.watchedFiles[path] = nil

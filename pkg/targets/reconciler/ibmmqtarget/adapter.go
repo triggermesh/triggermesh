@@ -18,7 +18,6 @@ package ibmmqtarget
 
 import (
 	"fmt"
-	"path"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
@@ -79,18 +78,15 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 			"key-database",
 			KeystoreMountPath,
 			typedTrg.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Name,
-			resource.WithMountSubPath(path.Base(KeystoreMountPath)),
-			resource.WithVolumeSecretItem(
-				typedTrg.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key,
-				path.Base(KeystoreMountPath)))
+			typedTrg.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key,
+		)
+
 		passwdStashMount = resource.SecretMount(
 			"db-password",
 			PasswdStashMountPath,
 			typedTrg.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
-			resource.WithMountSubPath(path.Base(PasswdStashMountPath)),
-			resource.WithVolumeSecretItem(
-				typedTrg.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key,
-				path.Base(PasswdStashMountPath)))
+			typedTrg.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key,
+		)
 	}
 
 	return common.NewAdapterKnService(trg, nil,

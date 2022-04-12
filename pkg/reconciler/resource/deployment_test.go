@@ -48,9 +48,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
 		TerminationErrorToLogs,
-		SecretMount("test-volume", "/path/to/file.ext", "test-secret",
-			WithMountSubPath("file.ext"),
-			WithVolumeSecretItem("someKey", "file.ext")),
+		SecretMount("test-volume", "/path/to/file.ext", "test-secret", "someKey"),
 	)
 
 	expectDepl := &appsv1.Deployment{
