@@ -58,6 +58,11 @@ func (s *GoogleCloudPubSubSource) AsEventSource() string {
 	return s.Spec.Topic.String()
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *GoogleCloudPubSubSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Supported event types
 const (
 	GoogleCloudPubSubGenericEventType = "com.google.cloud.pubsub.message"

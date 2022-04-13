@@ -44,9 +44,10 @@ type SalesforceTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*SalesforceTarget)(nil)
-	_ v1alpha1.EventReceiver = (*SalesforceTarget)(nil)
-	_ v1alpha1.EventSource   = (*SalesforceTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*SalesforceTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*SalesforceTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*SalesforceTarget)(nil)
+	_ v1alpha1.EventSource         = (*SalesforceTarget)(nil)
 )
 
 // SalesforceTargetSpec holds the desired state of the SalesforceTarget.
@@ -61,6 +62,10 @@ type SalesforceTargetSpec struct {
 	// EventOptions for targets
 	// +optional
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // SalesforceAuth contains OAuth JWT information to interact with the

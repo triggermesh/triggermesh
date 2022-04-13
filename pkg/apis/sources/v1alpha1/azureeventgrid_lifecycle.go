@@ -84,6 +84,11 @@ func (s *AzureEventGridSource) GetEventTypes() []string {
 	return eventTypes
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *AzureEventGridSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Status conditions
 const (
 	// AzureEventGridConditionSubscribed has status True when an event subscription exists for the source.

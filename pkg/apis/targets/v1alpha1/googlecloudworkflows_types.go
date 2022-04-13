@@ -37,9 +37,10 @@ type GoogleCloudWorkflowsTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*GoogleCloudWorkflowsTarget)(nil)
-	_ v1alpha1.EventReceiver = (*GoogleCloudWorkflowsTarget)(nil)
-	_ v1alpha1.EventSource   = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventSource         = (*GoogleCloudWorkflowsTarget)(nil)
 )
 
 // GoogleCloudWorkflowsTargetSpec holds the desired state of the GoogleCloudWorkflowsTarget.
@@ -49,6 +50,10 @@ type GoogleCloudWorkflowsTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

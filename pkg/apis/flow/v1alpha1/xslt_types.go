@@ -43,8 +43,9 @@ var (
 	_ apis.Validatable = (*XSLTTransformation)(nil)
 	_ apis.Defaultable = (*XSLTTransformation)(nil)
 
-	_ v1alpha1.Reconcilable = (*XSLTTransformation)(nil)
-	_ v1alpha1.EventSender  = (*XSLTTransformation)(nil)
+	_ v1alpha1.Reconcilable        = (*XSLTTransformation)(nil)
+	_ v1alpha1.AdapterConfigurable = (*XSLTTransformation)(nil)
+	_ v1alpha1.EventSender         = (*XSLTTransformation)(nil)
 )
 
 // XSLTTransformationSpec holds the desired state of the XSLTTransformation.
@@ -60,6 +61,10 @@ type XSLTTransformationSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

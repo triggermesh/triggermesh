@@ -79,3 +79,8 @@ func (*AWSS3Target) GetEventTypes() []string {
 func (t *AWSS3Target) AsEventSource() string {
 	return t.Spec.ARN
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *AWSS3Target) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

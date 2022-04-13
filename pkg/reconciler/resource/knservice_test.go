@@ -29,6 +29,8 @@ import (
 )
 
 func TestNewServiceWithDefaultContainer(t *testing.T) {
+	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
+
 	ksvc := NewKnService(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Port("health", 8081),
@@ -43,8 +45,8 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		EnvVar("TEST_ENV2", "val2"),
 		Label("test.label/2", "val2"),
 		ServiceAccount("god-mode"),
-		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
-		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
+		Requests(&cpuRes, &memRes),
+		Limits(&cpuRes, nil),
 		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
 		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
 		VisibilityClusterLocal,
@@ -114,8 +116,7 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 										corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
 									},
 									Limits: corev1.ResourceList{
-										corev1.ResourceCPU:    *resource.NewMilliQuantity(250, resource.DecimalSI),
-										corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
+										corev1.ResourceCPU: *resource.NewMilliQuantity(250, resource.DecimalSI),
 									},
 								},
 								VolumeMounts: []corev1.VolumeMount{

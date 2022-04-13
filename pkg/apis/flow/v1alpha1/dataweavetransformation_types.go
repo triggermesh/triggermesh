@@ -37,8 +37,9 @@ type DataWeaveTransformation struct {
 }
 
 var (
-	_ v1alpha1.Reconcilable = (*DataWeaveTransformation)(nil)
-	_ v1alpha1.EventSender  = (*DataWeaveTransformation)(nil)
+	_ v1alpha1.Reconcilable        = (*DataWeaveTransformation)(nil)
+	_ v1alpha1.AdapterConfigurable = (*DataWeaveTransformation)(nil)
+	_ v1alpha1.EventSender         = (*DataWeaveTransformation)(nil)
 )
 
 // DataWeaveTransformationSpec holds the desired state of the DataWeaveTransformation.
@@ -54,6 +55,10 @@ type DataWeaveTransformationSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

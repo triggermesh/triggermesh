@@ -38,9 +38,10 @@ type AzureServiceBusTopicSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AzureServiceBusTopicSource)(nil)
-	_ v1alpha1.EventSource  = (*AzureServiceBusTopicSource)(nil)
-	_ v1alpha1.EventSender  = (*AzureServiceBusTopicSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureServiceBusTopicSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureServiceBusTopicSource)(nil)
+	_ v1alpha1.EventSource         = (*AzureServiceBusTopicSource)(nil)
+	_ v1alpha1.EventSender         = (*AzureServiceBusTopicSource)(nil)
 )
 
 // AzureServiceBusTopicSourceSpec defines the desired state of the event source.
@@ -56,6 +57,10 @@ type AzureServiceBusTopicSourceSpec struct {
 	// Authentication method to interact with the Azure REST API.
 	// This event source only supports the ServicePrincipal authentication.
 	Auth AzureAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // AzureServiceBusTopicSourceStatus defines the observed state of the event source.

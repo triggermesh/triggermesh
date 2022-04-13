@@ -37,9 +37,10 @@ type Function struct {
 }
 
 var (
-	_ v1alpha1.Reconcilable = (*Function)(nil)
-	_ v1alpha1.EventSource  = (*Function)(nil)
-	_ v1alpha1.EventSender  = (*Function)(nil)
+	_ v1alpha1.Reconcilable        = (*Function)(nil)
+	_ v1alpha1.AdapterConfigurable = (*Function)(nil)
+	_ v1alpha1.EventSource         = (*Function)(nil)
+	_ v1alpha1.EventSender         = (*Function)(nil)
 )
 
 // FunctionSpec holds the desired state of the Function Specification
@@ -55,6 +56,10 @@ type FunctionSpec struct {
 	// as well as setting the CloudEvents 'type' and 'source' attributes
 	// using CloudEventOverrides (hack).
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // EventStoreConnection contains the data to connect to

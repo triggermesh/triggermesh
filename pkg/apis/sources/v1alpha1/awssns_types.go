@@ -39,10 +39,11 @@ type AWSSNSSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSSNSSource)(nil)
-	_ v1alpha1.MultiTenant  = (*AWSSNSSource)(nil)
-	_ v1alpha1.EventSource  = (*AWSSNSSource)(nil)
-	_ v1alpha1.EventSender  = (*AWSSNSSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSSNSSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSSNSSource)(nil)
+	_ v1alpha1.MultiTenant         = (*AWSSNSSource)(nil)
+	_ v1alpha1.EventSource         = (*AWSSNSSource)(nil)
+	_ v1alpha1.EventSender         = (*AWSSNSSource)(nil)
 )
 
 // AWSSNSSourceSpec defines the desired state of the event source.
@@ -62,6 +63,10 @@ type AWSSNSSourceSpec struct {
 
 	// Authentication method to interact with the Amazon SNS API.
 	Auth AWSAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // AWSSNSSourceStatus defines the observed state of the event source.

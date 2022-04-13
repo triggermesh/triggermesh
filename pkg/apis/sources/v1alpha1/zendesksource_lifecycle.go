@@ -63,6 +63,11 @@ func (*ZendeskSource) IsMultiTenant() bool {
 	return true
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *ZendeskSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Supported event types
 const (
 	// ZendeskTicketCreatedEventType is generated upon creation of a Ticket.

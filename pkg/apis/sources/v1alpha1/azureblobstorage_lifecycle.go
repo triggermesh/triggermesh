@@ -60,6 +60,11 @@ func (s *AzureBlobStorageSource) AsEventSource() string {
 	return s.Spec.StorageAccountID.String()
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *AzureBlobStorageSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Default event types.
 // This list is non-exhaustive, see AzureBlobStorageSourceSpec.
 const (

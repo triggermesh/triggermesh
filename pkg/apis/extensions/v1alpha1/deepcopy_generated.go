@@ -22,6 +22,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -123,6 +124,11 @@ func (in *FunctionSpec) DeepCopyInto(out *FunctionSpec) {
 	*out = *in
 	out.EventStore = in.EventStore
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

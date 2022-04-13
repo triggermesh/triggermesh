@@ -92,3 +92,8 @@ func (s *AWSSQSSource) ServiceAccountOptions() []resource.ServiceAccountOption {
 
 	return saOpts
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AWSSQSSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

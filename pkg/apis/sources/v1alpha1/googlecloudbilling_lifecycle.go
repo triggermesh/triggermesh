@@ -58,6 +58,11 @@ func (s *GoogleCloudBillingSource) AsEventSource() string {
 	return s.Spec.BudgetID
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *GoogleCloudBillingSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Supported event types
 const (
 	GoogleCloudBillingGenericEventType = "com.google.cloud.billing.notification"

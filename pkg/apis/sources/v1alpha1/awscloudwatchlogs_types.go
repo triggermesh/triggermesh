@@ -39,9 +39,10 @@ type AWSCloudWatchLogsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSCloudWatchLogsSource)(nil)
-	_ v1alpha1.EventSource  = (*AWSCloudWatchLogsSource)(nil)
-	_ v1alpha1.EventSender  = (*AWSCloudWatchLogsSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSCloudWatchLogsSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSCloudWatchLogsSource)(nil)
+	_ v1alpha1.EventSource         = (*AWSCloudWatchLogsSource)(nil)
+	_ v1alpha1.EventSender         = (*AWSCloudWatchLogsSource)(nil)
 )
 
 // AWSCloudWatchLogsSourceSpec defines the desired state of the event source.
@@ -62,6 +63,10 @@ type AWSCloudWatchLogsSourceSpec struct {
 
 	// Authentication method to interact with the Amazon CloudWatch Logs API.
 	Auth AWSAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

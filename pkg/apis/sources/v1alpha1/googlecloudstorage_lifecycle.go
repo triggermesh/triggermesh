@@ -58,6 +58,11 @@ func (s *GoogleCloudStorageSource) AsEventSource() string {
 	return "gs://" + s.Spec.Bucket
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *GoogleCloudStorageSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Supported event types
 const (
 	GoogleCloudStorageGenericEventType = "com.google.cloud.storage.notification"

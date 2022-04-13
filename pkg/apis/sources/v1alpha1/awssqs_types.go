@@ -40,6 +40,7 @@ type AWSSQSSource struct {
 // Check the interfaces the event source should be implementing.
 var (
 	_ v1alpha1.Reconcilable           = (*AWSSQSSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSSQSSource)(nil)
 	_ v1alpha1.ServiceAccountProvider = (*AWSSQSSource)(nil)
 	_ v1alpha1.EventSource            = (*AWSSQSSource)(nil)
 	_ v1alpha1.EventSender            = (*AWSSQSSource)(nil)
@@ -63,6 +64,10 @@ type AWSSQSSourceSpec struct {
 	// Customizations of the AWS REST API endpoint.
 	// +optional
 	Endpoint *AWSEndpoint `json:"endpoint,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // AWSSQSSourceReceiveOptions defines options that control the behavior of

@@ -70,6 +70,11 @@ func (*GoogleCloudAuditLogsSource) GetEventTypes() []string {
 	}
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *GoogleCloudAuditLogsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Status conditions
 const (
 	// GoogleCloudAuditLogsConditionSubscribed has status True when the source has subscribed to a topic.

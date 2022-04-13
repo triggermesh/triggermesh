@@ -38,9 +38,10 @@ type SlackSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*SlackSource)(nil)
-	_ v1alpha1.EventSource  = (*SlackSource)(nil)
-	_ v1alpha1.EventSender  = (*SlackSource)(nil)
+	_ v1alpha1.Reconcilable        = (*SlackSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*SlackSource)(nil)
+	_ v1alpha1.EventSource         = (*SlackSource)(nil)
+	_ v1alpha1.EventSender         = (*SlackSource)(nil)
 )
 
 // SlackSourceSpec defines the desired state of the event source.
@@ -63,6 +64,10 @@ type SlackSourceSpec struct {
 	// applications shared an endpoint. See: https://api.slack.com/events-api
 	// +optional
 	AppID *string `json:"appID,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

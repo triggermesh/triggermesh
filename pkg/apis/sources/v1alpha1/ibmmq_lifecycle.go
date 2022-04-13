@@ -71,3 +71,8 @@ func (s *IBMMQSource) GetStatusManager() *v1alpha1.StatusManager {
 func (s *IBMMQSource) AsEventSource() string {
 	return fmt.Sprintf("%s/%s", s.Spec.ConnectionName, strings.ToLower(s.Spec.ChannelName))
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *IBMMQSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

@@ -40,8 +40,9 @@ type Synchronizer struct {
 
 // Check the interfaces Synchronizer should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*Synchronizer)(nil)
-	_ v1alpha1.EventSender  = (*Synchronizer)(nil)
+	_ v1alpha1.Reconcilable        = (*Synchronizer)(nil)
+	_ v1alpha1.AdapterConfigurable = (*Synchronizer)(nil)
+	_ v1alpha1.EventSender         = (*Synchronizer)(nil)
 )
 
 // SynchronizerSpec holds the desired state of the Synchronizer.
@@ -51,6 +52,10 @@ type SynchronizerSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // Correlation holds the request-response matching parameters.

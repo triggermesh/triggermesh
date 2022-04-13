@@ -31,27 +31,32 @@ func (*Synchronizer) GetGroupVersionKind() schema.GroupVersionKind {
 }
 
 // GetConditionSet implements duckv1.KRShaped.
-func (t *Synchronizer) GetConditionSet() apis.ConditionSet {
-	if t.Spec.Sink.Ref != nil || t.Spec.Sink.URI != nil {
+func (s *Synchronizer) GetConditionSet() apis.ConditionSet {
+	if s.Spec.Sink.Ref != nil || s.Spec.Sink.URI != nil {
 		return v1alpha1.EventSenderConditionSet
 	}
 	return v1alpha1.DefaultConditionSet
 }
 
 // GetStatus implements duckv1.KRShaped.
-func (t *Synchronizer) GetStatus() *duckv1.Status {
-	return &t.Status.Status
+func (s *Synchronizer) GetStatus() *duckv1.Status {
+	return &s.Status.Status
 }
 
 // GetStatusManager implements Reconcilable.
-func (t *Synchronizer) GetStatusManager() *v1alpha1.StatusManager {
+func (s *Synchronizer) GetStatusManager() *v1alpha1.StatusManager {
 	return &v1alpha1.StatusManager{
-		ConditionSet: t.GetConditionSet(),
-		Status:       &t.Status,
+		ConditionSet: s.GetConditionSet(),
+		Status:       &s.Status,
 	}
 }
 
 // GetSink implements EventSender.
-func (t *Synchronizer) GetSink() *duckv1.Destination {
-	return &t.Spec.Sink
+func (s *Synchronizer) GetSink() *duckv1.Destination {
+	return &s.Spec.Sink
+}
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *Synchronizer) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
 }

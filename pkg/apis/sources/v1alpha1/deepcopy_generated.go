@@ -126,6 +126,11 @@ func (in *AWSCloudWatchLogsSourceSpec) DeepCopyInto(out *AWSCloudWatchLogsSource
 		**out = **in
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -297,6 +302,11 @@ func (in *AWSCloudWatchSourceSpec) DeepCopyInto(out *AWSCloudWatchSourceSpec) {
 		}
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -382,6 +392,11 @@ func (in *AWSCodeCommitSourceSpec) DeepCopyInto(out *AWSCodeCommitSourceSpec) {
 		copy(*out, *in)
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -462,6 +477,11 @@ func (in *AWSCognitoIdentitySourceSpec) DeepCopyInto(out *AWSCognitoIdentitySour
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -542,6 +562,11 @@ func (in *AWSCognitoUserPoolSourceSpec) DeepCopyInto(out *AWSCognitoUserPoolSour
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -622,6 +647,11 @@ func (in *AWSDynamoDBSourceSpec) DeepCopyInto(out *AWSDynamoDBSourceSpec) {
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -723,6 +753,11 @@ func (in *AWSKinesisSourceSpec) DeepCopyInto(out *AWSKinesisSourceSpec) {
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.ARN = in.ARN
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -808,6 +843,11 @@ func (in *AWSPerformanceInsightsSourceSpec) DeepCopyInto(out *AWSPerformanceInsi
 		copy(*out, *in)
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -936,6 +976,11 @@ func (in *AWSS3SourceSpec) DeepCopyInto(out *AWSS3SourceSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1053,6 +1098,11 @@ func (in *AWSSNSSourceSpec) DeepCopyInto(out *AWSSNSSourceSpec) {
 		}
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1184,6 +1234,11 @@ func (in *AWSSQSSourceSpec) DeepCopyInto(out *AWSSQSSourceSpec) {
 	if in.Endpoint != nil {
 		in, out := &in.Endpoint, &out.Endpoint
 		*out = new(AWSEndpoint)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
 		(*in).DeepCopyInto(*out)
 	}
 	return
@@ -1333,6 +1388,11 @@ func (in *AzureActivityLogsSourceSpec) DeepCopyInto(out *AzureActivityLogsSource
 		copy(*out, *in)
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1462,6 +1522,11 @@ func (in *AzureBlobStorageSourceSpec) DeepCopyInto(out *AzureBlobStorageSourceSp
 	}
 	in.Endpoint.DeepCopyInto(&out.Endpoint)
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1609,6 +1674,11 @@ func (in *AzureEventGridSourceSpec) DeepCopyInto(out *AzureEventGridSourceSpec) 
 	}
 	in.Endpoint.DeepCopyInto(&out.Endpoint)
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1716,6 +1786,11 @@ func (in *AzureEventHubSourceSpec) DeepCopyInto(out *AzureEventHubSourceSpec) {
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.EventHubID = in.EventHubID
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1795,6 +1870,11 @@ func (in *AzureIOTHubSourceSpec) DeepCopyInto(out *AzureIOTHubSourceSpec) {
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1874,6 +1954,11 @@ func (in *AzureQueueStorageSourceSpec) DeepCopyInto(out *AzureQueueStorageSource
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	in.AccountKey.DeepCopyInto(&out.AccountKey)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -1989,6 +2074,11 @@ func (in *AzureServiceBusQueueSourceSpec) DeepCopyInto(out *AzureServiceBusQueue
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.QueueID = in.QueueID
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -2069,6 +2159,11 @@ func (in *AzureServiceBusTopicSourceSpec) DeepCopyInto(out *AzureServiceBusTopic
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.TopicID = in.TopicID
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -2292,6 +2387,11 @@ func (in *GoogleCloudAuditLogsSourceSpec) DeepCopyInto(out *GoogleCloudAuditLogs
 	}
 	in.PubSub.DeepCopyInto(&out.PubSub)
 	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -2430,6 +2530,11 @@ func (in *GoogleCloudBillingSourceSpec) DeepCopyInto(out *GoogleCloudBillingSour
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	in.PubSub.DeepCopyInto(&out.PubSub)
 	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -2564,6 +2669,11 @@ func (in *GoogleCloudIoTSourceSpec) DeepCopyInto(out *GoogleCloudIoTSourceSpec) 
 	out.Registry = in.Registry
 	in.PubSub.DeepCopyInto(&out.PubSub)
 	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -2676,6 +2786,11 @@ func (in *GoogleCloudPubSubSourceSpec) DeepCopyInto(out *GoogleCloudPubSubSource
 		**out = **in
 	}
 	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -2805,6 +2920,11 @@ func (in *GoogleCloudSourceRepositoriesSourceSpec) DeepCopyInto(out *GoogleCloud
 	out.Repository = in.Repository
 	in.PubSub.DeepCopyInto(&out.PubSub)
 	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -2943,6 +3063,11 @@ func (in *GoogleCloudStorageSourceSpec) DeepCopyInto(out *GoogleCloudStorageSour
 		copy(*out, *in)
 	}
 	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3086,6 +3211,11 @@ func (in *HTTPPollerSourceSpec) DeepCopyInto(out *HTTPPollerSourceSpec) {
 			(*out)[key] = val
 		}
 	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3166,6 +3296,11 @@ func (in *IBMMQSourceSpec) DeepCopyInto(out *IBMMQSourceSpec) {
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.Delivery = in.Delivery
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3320,6 +3455,11 @@ func (in *OCIMetricsSourceSpec) DeepCopyInto(out *OCIMetricsSourceSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3422,6 +3562,11 @@ func (in *SalesforceSourceSpec) DeepCopyInto(out *SalesforceSourceSpec) {
 		**out = **in
 	}
 	in.Subscription.DeepCopyInto(&out.Subscription)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3531,6 +3676,11 @@ func (in *SlackSourceSpec) DeepCopyInto(out *SlackSourceSpec) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3631,6 +3781,11 @@ func (in *TwilioSourceList) DeepCopyObject() runtime.Object {
 func (in *TwilioSourceSpec) DeepCopyInto(out *TwilioSourceSpec) {
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3729,6 +3884,11 @@ func (in *WebhookSourceSpec) DeepCopyInto(out *WebhookSourceSpec) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -3809,6 +3969,11 @@ func (in *ZendeskSourceSpec) DeepCopyInto(out *ZendeskSourceSpec) {
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	in.Token.DeepCopyInto(&out.Token)
 	in.WebhookPassword.DeepCopyInto(&out.WebhookPassword)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

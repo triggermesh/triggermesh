@@ -70,3 +70,8 @@ func (s *AzureEventHubSource) GetEventTypes() []string {
 		AzureEventType(sources.AzureServiceEventHub, AzureEventHubGenericEventType),
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AzureEventHubSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

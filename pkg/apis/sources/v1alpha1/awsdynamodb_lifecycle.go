@@ -69,3 +69,8 @@ func (s *AWSDynamoDBSource) GetEventTypes() []string {
 func (s *AWSDynamoDBSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AWSDynamoDBSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

@@ -58,6 +58,11 @@ func (s *GoogleCloudSourceRepositoriesSource) AsEventSource() string {
 	return s.Spec.Repository.String()
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *GoogleCloudSourceRepositoriesSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Supported event types
 const (
 	GoogleCloudSourceRepoGenericEventType = "com.google.cloud.sourcerepo.notification"

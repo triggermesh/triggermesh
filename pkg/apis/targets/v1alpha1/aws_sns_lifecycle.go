@@ -47,3 +47,8 @@ func (t *AWSSNSTarget) GetStatusManager() *v1alpha1.StatusManager {
 		Status:       &t.Status,
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *AWSSNSTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

@@ -75,3 +75,8 @@ func (s *TwilioSource) GetEventTypes() []string {
 		TwilioSourceGenericEventType,
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *TwilioSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

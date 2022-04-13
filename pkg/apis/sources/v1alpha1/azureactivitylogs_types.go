@@ -38,9 +38,10 @@ type AzureActivityLogsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AzureActivityLogsSource)(nil)
-	_ v1alpha1.EventSource  = (*AzureActivityLogsSource)(nil)
-	_ v1alpha1.EventSender  = (*AzureActivityLogsSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureActivityLogsSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureActivityLogsSource)(nil)
+	_ v1alpha1.EventSource         = (*AzureActivityLogsSource)(nil)
+	_ v1alpha1.EventSender         = (*AzureActivityLogsSource)(nil)
 )
 
 // AzureActivityLogsSourceSpec defines the desired state of the event source.
@@ -65,6 +66,10 @@ type AzureActivityLogsSourceSpec struct {
 	// Authentication method to interact with the Azure Monitor REST API.
 	// This event source only supports the ServicePrincipal authentication.
 	Auth AzureAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // AzureActivityLogsSourceDestination contains possible intermediate

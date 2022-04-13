@@ -41,9 +41,10 @@ type HTTPPollerSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*HTTPPollerSource)(nil)
-	_ v1alpha1.EventSource  = (*HTTPPollerSource)(nil)
-	_ v1alpha1.EventSender  = (*HTTPPollerSource)(nil)
+	_ v1alpha1.Reconcilable        = (*HTTPPollerSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*HTTPPollerSource)(nil)
+	_ v1alpha1.EventSource         = (*HTTPPollerSource)(nil)
+	_ v1alpha1.EventSender         = (*HTTPPollerSource)(nil)
 )
 
 // HTTPPollerSourceSpec defines the desired state of the event source.
@@ -96,6 +97,10 @@ type HTTPPollerSourceSpec struct {
 	// Duration which defines how often the HTTP/S endpoint should be polled.
 	// Expressed as a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
 	Interval apis.Duration `json:"interval"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

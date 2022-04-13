@@ -84,3 +84,8 @@ func AWSCloudWatchSourceName(ns, name string) string {
 	kind := strings.ToLower((*AWSCloudWatchSource)(nil).GetGroupVersionKind().Kind)
 	return "io.triggermesh." + kind + "." + ns + "." + name
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AWSCloudWatchSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

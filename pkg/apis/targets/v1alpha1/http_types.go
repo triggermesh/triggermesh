@@ -38,7 +38,8 @@ type HTTPTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*HTTPTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*HTTPTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*HTTPTarget)(nil)
 )
 
 // HTTPTargetSpec holds the desired state of the HTTPTarget.
@@ -87,6 +88,10 @@ type HTTPTargetSpec struct {
 	// OAuthScopes used for OAuth2 authentication.
 	// +optional
 	OAuthScopes *[]string `json:"oauthScopes,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // HTTPEventResponse for reply events context.

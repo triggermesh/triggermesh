@@ -37,9 +37,10 @@ type GoogleCloudStorageTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*GoogleCloudStorageTarget)(nil)
-	_ v1alpha1.EventReceiver = (*GoogleCloudStorageTarget)(nil)
-	_ v1alpha1.EventSource   = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventSource         = (*GoogleCloudStorageTarget)(nil)
 )
 
 // GoogleCloudStorageTargetSpec holds the desired state of the GoogleCloudStorageTarget.
@@ -57,6 +58,10 @@ type GoogleCloudStorageTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

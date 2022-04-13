@@ -78,6 +78,11 @@ func (f *Function) GetSink() *duckv1.Destination {
 	return &f.Spec.Sink
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (f *Function) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return f.Spec.AdapterOverrides
+}
+
 // Status conditions
 const (
 	// FunctionConditionConfigMapReady has status True when the ConfigMap

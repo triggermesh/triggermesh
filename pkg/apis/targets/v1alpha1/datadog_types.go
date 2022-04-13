@@ -37,9 +37,10 @@ type DatadogTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*DatadogTarget)(nil)
-	_ v1alpha1.EventReceiver = (*DatadogTarget)(nil)
-	_ v1alpha1.EventSource   = (*DatadogTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*DatadogTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*DatadogTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*DatadogTarget)(nil)
+	_ v1alpha1.EventSource         = (*DatadogTarget)(nil)
 )
 
 // DatadogTargetSpec holds the desired state of the DatadogTarget.
@@ -53,6 +54,10 @@ type DatadogTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

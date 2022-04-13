@@ -37,8 +37,9 @@ type JiraTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*JiraTarget)(nil)
-	_ v1alpha1.EventSource  = (*JiraTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*JiraTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*JiraTarget)(nil)
+	_ v1alpha1.EventSource         = (*JiraTarget)(nil)
 )
 
 // JiraTargetSpec holds the desired state of the JiraTarget.
@@ -48,6 +49,10 @@ type JiraTargetSpec struct {
 
 	// URL for Jira service.
 	URL string `json:"url"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // JiraAuth contains Jira credentials.

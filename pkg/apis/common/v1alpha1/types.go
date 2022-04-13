@@ -32,3 +32,14 @@ type ValueFromField struct {
 	// +optional
 	ValueFromSecret *corev1.SecretKeySelector `json:"valueFromSecret,omitempty"`
 }
+
+// AdapterOverrides are applied on top of the default adapter parameters.
+//
+// +k8s:deepcopy-gen=true
+type AdapterOverrides struct {
+	// Public value indicates if the adapter backed by a Kn Service should have
+	// its network visibility scope set to public. Default scope is cluster-local.
+	Public *bool `json:"public,omitempty"`
+	// Resources limits and requirements applied on adapter container.
+	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+}

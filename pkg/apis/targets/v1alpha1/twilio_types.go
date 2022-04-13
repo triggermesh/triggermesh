@@ -37,9 +37,10 @@ type TwilioTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*TwilioTarget)(nil)
-	_ v1alpha1.EventReceiver = (*TwilioTarget)(nil)
-	_ v1alpha1.EventSource   = (*TwilioTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*TwilioTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*TwilioTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*TwilioTarget)(nil)
+	_ v1alpha1.EventSource         = (*TwilioTarget)(nil)
 )
 
 // TwilioTargetSpec holds the desired state of the TwilioTarget.
@@ -60,6 +61,10 @@ type TwilioTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

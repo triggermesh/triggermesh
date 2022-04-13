@@ -39,9 +39,10 @@ type AWSCloudWatchSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSCloudWatchSource)(nil)
-	_ v1alpha1.EventSource  = (*AWSCloudWatchSource)(nil)
-	_ v1alpha1.EventSender  = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.EventSource         = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.EventSender         = (*AWSCloudWatchSource)(nil)
 )
 
 // AWSCloudWatchSourceSpec defines the desired state of the event source.
@@ -67,6 +68,10 @@ type AWSCloudWatchSourceSpec struct {
 
 	// Authentication method to interact with the Amazon CloudWatch API.
 	Auth AWSAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // AWSCloudWatchMetricQuery represents a CloudWatch MetricDataQuery.

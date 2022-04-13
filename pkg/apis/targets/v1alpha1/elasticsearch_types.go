@@ -38,9 +38,10 @@ type ElasticsearchTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*ElasticsearchTarget)(nil)
-	_ v1alpha1.EventReceiver = (*ElasticsearchTarget)(nil)
-	_ v1alpha1.EventSource   = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*ElasticsearchTarget)(nil)
+	_ v1alpha1.EventSource         = (*ElasticsearchTarget)(nil)
 )
 
 // ElasticsearchTargetSpec holds the desired state of the ElasticsearchTarget.
@@ -59,6 +60,10 @@ type ElasticsearchTargetSpec struct {
 
 	// EventOptions for targets.
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // Connection contains connection and configuration parameters

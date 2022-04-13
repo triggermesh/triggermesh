@@ -47,13 +47,13 @@ type LogzMetricsTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*LogzMetricsTarget)(nil)
-	_ v1alpha1.EventReceiver = (*LogzMetricsTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*LogzMetricsTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*LogzMetricsTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*LogzMetricsTarget)(nil)
 )
 
 // LogzMetricsTargetSpec holds the desired state of the LogzMetricsTarget.
 type LogzMetricsTargetSpec struct {
-
 	// Connection information for LogzMetrics.
 	Connection LogzMetricsConnection `json:"connection"`
 
@@ -64,6 +64,10 @@ type LogzMetricsTargetSpec struct {
 	// EventOptions for targets
 	// +optional
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // LogzMetricsConnection contains the information to connect to a Logz tenant to push metrics.

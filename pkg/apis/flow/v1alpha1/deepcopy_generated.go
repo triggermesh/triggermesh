@@ -22,6 +22,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	cloudevents "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	v1 "k8s.io/api/core/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -109,6 +110,11 @@ func (in *DataWeaveTransformationSpec) DeepCopyInto(out *DataWeaveTransformation
 	*out = *in
 	in.DwSpell.DeepCopyInto(&out.DwSpell)
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -213,6 +219,11 @@ func (in *JQTransformationSpec) DeepCopyInto(out *JQTransformationSpec) {
 		(*in).DeepCopyInto(*out)
 	}
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -343,6 +354,11 @@ func (in *SynchronizerSpec) DeepCopyInto(out *SynchronizerSpec) {
 	out.CorrelationKey = in.CorrelationKey
 	out.Response = in.Response
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -456,6 +472,11 @@ func (in *TransformationSpec) DeepCopyInto(out *TransformationSpec) {
 		}
 	}
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -565,6 +586,11 @@ func (in *XMLToJSONTransformationSpec) DeepCopyInto(out *XMLToJSONTransformation
 		(*in).DeepCopyInto(*out)
 	}
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -653,6 +679,11 @@ func (in *XSLTTransformationSpec) DeepCopyInto(out *XSLTTransformationSpec) {
 		**out = **in
 	}
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 

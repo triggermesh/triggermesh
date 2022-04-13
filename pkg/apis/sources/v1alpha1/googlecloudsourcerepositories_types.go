@@ -38,9 +38,10 @@ type GoogleCloudSourceRepositoriesSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*GoogleCloudSourceRepositoriesSource)(nil)
-	_ v1alpha1.EventSource  = (*GoogleCloudSourceRepositoriesSource)(nil)
-	_ v1alpha1.EventSender  = (*GoogleCloudSourceRepositoriesSource)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleCloudSourceRepositoriesSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleCloudSourceRepositoriesSource)(nil)
+	_ v1alpha1.EventSource         = (*GoogleCloudSourceRepositoriesSource)(nil)
+	_ v1alpha1.EventSender         = (*GoogleCloudSourceRepositoriesSource)(nil)
 )
 
 // GoogleCloudSourceRepositoriesSourceSpec defines the desired state of the event source.
@@ -56,6 +57,10 @@ type GoogleCloudSourceRepositoriesSourceSpec struct {
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	ServiceAccountKey v1alpha1.ValueFromField `json:"serviceAccountKey"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // GoogleCloudSourceRepositoriesSourcePubSubSpec defines the attributes related to the
