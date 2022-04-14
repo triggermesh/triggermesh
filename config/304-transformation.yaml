@@ -46,7 +46,8 @@ spec:
       status: {}
     schema:
       openAPIV3Schema:
-        description: TriggerMesh CloudEvents transformation engine.
+        description: TriggerMesh CloudEvents transformation engine. Allows to declaratively perform data transformations
+          on CloudEvents.
         type: object
         properties:
           spec:

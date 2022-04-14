@@ -29,8 +29,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Transformation is a Knative abstraction that encapsulates the interface by which Knative
-// components express a desire to have a particular image cached.
+// Transformation allows to declaratively perform data transformations on CloudEvents.
 type Transformation struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
