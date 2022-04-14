@@ -40,7 +40,7 @@ var (
 	_ v1alpha1.Reconcilable = (*InfraTarget)(nil)
 )
 
-// InfraTargetSpec holds the desired state of the InfraTarget.
+// InfraTargetSpec defines the desired state of the event target.
 type InfraTargetSpec struct {
 	// Script to be executed at every request.
 	Script *InfraTargetScript `json:"script,omitempty"`
@@ -90,7 +90,7 @@ type InfraTargetState struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// InfraTargetList is a list of InfraTarget resources
+// InfraTargetList is a list of event target instances.
 type InfraTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

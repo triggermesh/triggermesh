@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSource   = (*GoogleSheetTarget)(nil)
 )
 
-// GoogleSheetTargetSpec holds the desired state of the GoogleSheetTarget.
+// GoogleSheetTargetSpec defines the desired state of the event target.
 type GoogleSheetTargetSpec struct {
 	// GoogleSheet credential JSON for auth
 	GoogleServiceAccount SecretValueFromSource `json:"googleServiceAccount"`
@@ -56,7 +56,7 @@ type GoogleSheetTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleSheetTargetList is a list of GoogleSheetTarget resources
+// GoogleSheetTargetList is a list of event target instances.
 type GoogleSheetTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

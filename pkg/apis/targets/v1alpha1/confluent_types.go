@@ -40,7 +40,7 @@ var (
 	_ v1alpha1.Reconcilable = (*ConfluentTarget)(nil)
 )
 
-// ConfluentTargetSpec holds the desired state of the ConfluentTarget.
+// ConfluentTargetSpec defines the desired state of the event target.
 type ConfluentTargetSpec struct {
 	// SASLUsername Confluent account User
 	SASLUsername string `json:"username"`
@@ -76,7 +76,7 @@ type ConfluentTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ConfluentTargetList is a list of ConfluentTarget resources
+// ConfluentTargetList is a list of event target instances.
 type ConfluentTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSource   = (*AzureEventHubsTarget)(nil)
 )
 
-// AzureEventHubsTargetSpec holds the desired state of the AzureEventHubsTarget.
+// AzureEventHubsTargetSpec defines the desired state of the event target.
 type AzureEventHubsTargetSpec struct {
 	// Authentication method to interact with the Azure Event Hubs API.
 	Auth AzureAuth `json:"auth"`
@@ -61,7 +61,7 @@ type AzureEventHubsTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AzureEventHubsTargetList is a list of AzureEventHubsTarget resources
+// AzureEventHubsTargetList is a list of event target instances.
 type AzureEventHubsTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSource   = (*GoogleCloudStorageTarget)(nil)
 )
 
-// GoogleCloudStorageTargetSpec holds the desired state of the GoogleCloudStorageTarget.
+// GoogleCloudStorageTargetSpec defines the desired state of the event target.
 type GoogleCloudStorageTargetSpec struct {
 	// Credentials represents how Google Storage credentials should be provided in the secret
 	Credentials SecretValueFromSource `json:"credentialsJson"`
@@ -61,7 +61,7 @@ type GoogleCloudStorageTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudStorageTargetList is a list of GoogleCloudStorageTarget resources
+// GoogleCloudStorageTargetList is a list of event target instances.
 type GoogleCloudStorageTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSource   = (*AlibabaOSSTarget)(nil)
 )
 
-// AlibabaOSSTargetSpec holds the desired state of the AlibabaOSSTarget.
+// AlibabaOSSTargetSpec defines the desired state of the event target.
 type AlibabaOSSTargetSpec struct {
 	// Alibaba SDK access key id as registered. For more information on how to
 	// create an access key pair, please refer to
@@ -66,7 +66,7 @@ type AlibabaOSSTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AlibabaOSSTargetList is a list of AlibabaOSSTarget resources
+// AlibabaOSSTargetList is a list of event target instances.
 type AlibabaOSSTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

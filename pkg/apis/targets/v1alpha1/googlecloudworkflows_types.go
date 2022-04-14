@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSource   = (*GoogleCloudWorkflowsTarget)(nil)
 )
 
-// GoogleCloudWorkflowsTargetSpec holds the desired state of the GoogleCloudWorkflowsTarget.
+// GoogleCloudWorkflowsTargetSpec defines the desired state of the event target.
 type GoogleCloudWorkflowsTargetSpec struct {
 	// GoogleCloudWorkflowsApiKey represents how GoogleCloudWorkflows credentials should be provided in the secret
 	Credentials SecretValueFromSource `json:"credentialsJson"`
@@ -53,7 +53,7 @@ type GoogleCloudWorkflowsTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudWorkflowsTargetList is a list of GoogleCloudWorkflowsTarget resources
+// GoogleCloudWorkflowsTargetList is a list of event target instances.
 type GoogleCloudWorkflowsTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -41,7 +41,7 @@ var (
 	_ v1alpha1.EventSource  = (*AWSComprehendTarget)(nil)
 )
 
-// AWSComprehendTargetSpec holds the desired state of the event target.
+// AWSComprehendTargetSpec defines the desired state of the event target.
 type AWSComprehendTargetSpec struct {
 	// AWS account Key.
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -61,7 +61,7 @@ type AWSComprehendTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSComprehendTargetList is a list of AWSComprehendTarget resources
+// AWSComprehendTargetList is a list of event target instances.
 type AWSComprehendTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

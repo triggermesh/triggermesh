@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSource   = (*GoogleCloudFirestoreTarget)(nil)
 )
 
-// GoogleCloudFirestoreTargetSpec holds the desired state of the GoogleCloudFirestoreTarget.
+// GoogleCloudFirestoreTargetSpec defines the desired state of the event target.
 type GoogleCloudFirestoreTargetSpec struct {
 
 	// Credentials represents how Google Firestore credentials should be provided in the secret
@@ -65,7 +65,7 @@ type GoogleCloudFirestoreTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudFirestoreTargetList is a list of GoogleCloudFirestoreTarget resources
+// GoogleCloudFirestoreTargetList is a list of event target instances.
 type GoogleCloudFirestoreTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

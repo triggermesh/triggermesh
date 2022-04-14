@@ -41,7 +41,7 @@ var (
 	_ v1alpha1.EventSource  = (*AWSDynamoDBTarget)(nil)
 )
 
-// AWSDynamoDBTargetSpec holds the desired state of the event target.
+// AWSDynamoDBTargetSpec defines the desired state of the event target.
 type AWSDynamoDBTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -56,7 +56,7 @@ type AWSDynamoDBTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSDynamoDBTargetList is a list of AWSDynamoDBTarget resources
+// AWSDynamoDBTargetList is a list of event target instances.
 type AWSDynamoDBTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

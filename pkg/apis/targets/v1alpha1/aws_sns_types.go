@@ -40,7 +40,7 @@ var (
 	_ v1alpha1.Reconcilable = (*AWSSNSTarget)(nil)
 )
 
-// AWSSNSTargetSpec holds the desired state of the event target.
+// AWSSNSTargetSpec defines the desired state of the event target.
 type AWSSNSTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -60,7 +60,7 @@ type AWSSNSTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSSNSTargetList is a list of AWSSNSTarget resources
+// AWSSNSTargetList is a list of event target instances.
 type AWSSNSTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -62,7 +62,7 @@ type UiPathTargetSpec struct { //nolint:stylecheck
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// UiPathTargetList contains a list of event targets.
+// UiPathTargetList is a list of event target instances.
 type UiPathTargetList struct { //nolint:stylecheck
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
