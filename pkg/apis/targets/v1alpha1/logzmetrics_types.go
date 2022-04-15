@@ -52,7 +52,7 @@ var (
 	_ v1alpha1.EventReceiver       = (*LogzMetricsTarget)(nil)
 )
 
-// LogzMetricsTargetSpec holds the desired state of the LogzMetricsTarget.
+// LogzMetricsTargetSpec defines the desired state of the event target.
 type LogzMetricsTargetSpec struct {
 	// Connection information for LogzMetrics.
 	Connection LogzMetricsConnection `json:"connection"`
@@ -122,7 +122,7 @@ type Instrument struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// LogzMetricsTargetList is a list of LogzMetricsTarget resources.
+// LogzMetricsTargetList is a list of event target instances.
 type LogzMetricsTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

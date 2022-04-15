@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSender         = (*DataWeaveTransformation)(nil)
 )
 
-// DataWeaveTransformationSpec holds the desired state of the DataWeaveTransformation.
+// DataWeaveTransformationSpec defines the desired state of the component.
 type DataWeaveTransformationSpec struct {
 	// DataWeave spell that will be used by default for transformation.
 	DwSpell ValueFromField `json:"dw_spell"`
@@ -63,7 +63,7 @@ type DataWeaveTransformationSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// DataWeaveTransformationList is a list of DataWeaveTransformation resources
+// DataWeaveTransformationList is a list of component instances.
 type DataWeaveTransformationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -43,7 +43,7 @@ var (
 	_ v1alpha1.EventSource         = (*IBMMQTarget)(nil)
 )
 
-// IBMMQTargetSpec holds the desired state of the event target.
+// IBMMQTargetSpec defines the desired state of the event target.
 type IBMMQTargetSpec struct {
 	ConnectionName string `json:"connectionName"`
 	QueueManager   string `json:"queueManager"`
@@ -78,7 +78,7 @@ type Credentials struct {
 	TLS      *TLSSpec                `json:"tls,omitempty"`
 }
 
-// TLSSpec holds the IBM MQ TLS authentication parameters.
+// TLSSpec defines the desired state of the event target.
 type TLSSpec struct {
 	Cipher             string   `json:"cipher"`
 	ClientAuthRequired bool     `json:"clientAuthRequired"`

@@ -47,7 +47,7 @@ var (
 	_ v1alpha1.EventSender         = (*Transformation)(nil)
 )
 
-// TransformationSpec holds the desired state of the Transformation (from the client).
+// TransformationSpec defines the desired state of the component.
 type TransformationSpec struct {
 	// Context contains Transformations that must be applied on CE Context
 	Context []Transform `json:"context,omitempty"`
@@ -76,7 +76,7 @@ type Path struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TransformationList is a list of Transformation resources
+// TransformationList is a list of component instances.
 type TransformationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

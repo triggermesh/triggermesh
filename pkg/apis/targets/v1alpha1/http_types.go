@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.AdapterConfigurable = (*HTTPTarget)(nil)
 )
 
-// HTTPTargetSpec holds the desired state of the HTTPTarget.
+// HTTPTargetSpec defines the desired state of the event target.
 type HTTPTargetSpec struct {
 	// Response data to be used at replies.
 	Response HTTPEventResponse `json:"response"`
@@ -105,7 +105,7 @@ type HTTPEventResponse struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// HTTPTargetList is a list of HTTPTarget resources
+// HTTPTargetList is a list of event target instances.
 type HTTPTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

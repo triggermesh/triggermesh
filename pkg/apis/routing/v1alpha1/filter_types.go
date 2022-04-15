@@ -50,7 +50,7 @@ var (
 	_ v1alpha1.MultiTenant         = (*Filter)(nil)
 )
 
-// FilterSpec contains CEL expression string and the destination sink
+// FilterSpec defines the desired state of the component.
 type FilterSpec struct {
 	Expression string `json:"expression"`
 
@@ -62,9 +62,9 @@ type FilterSpec struct {
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
-// FilterList is a list of Filter resources
-//
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// FilterList is a list of component instances.
 type FilterList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

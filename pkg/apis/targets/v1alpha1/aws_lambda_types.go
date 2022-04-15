@@ -41,7 +41,7 @@ var (
 	_ v1alpha1.AdapterConfigurable = (*AWSLambdaTarget)(nil)
 )
 
-// AWSLambdaTargetSpec holds the desired state of the event target.
+// AWSLambdaTargetSpec defines the desired state of the event target.
 type AWSLambdaTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -65,7 +65,7 @@ type AWSLambdaTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSLambdaTargetList is a list of AWSLambdaTarget resources
+// AWSLambdaTargetList is a list of event target instances.
 type AWSLambdaTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

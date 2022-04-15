@@ -41,7 +41,7 @@ var (
 	_ v1alpha1.AdapterConfigurable = (*AWSKinesisTarget)(nil)
 )
 
-// AWSKinesisTargetSpec holds the desired state of the event target.
+// AWSKinesisTargetSpec defines the desired state of the event target.
 type AWSKinesisTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -68,7 +68,7 @@ type AWSKinesisTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSKinesisTargetList is a list of AWSKinesisTarget resources
+// AWSKinesisTargetList is a list of event target instances.
 type AWSKinesisTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

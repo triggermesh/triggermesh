@@ -45,7 +45,7 @@ var (
 	_ v1alpha1.EventSender         = (*Synchronizer)(nil)
 )
 
-// SynchronizerSpec holds the desired state of the Synchronizer.
+// SynchronizerSpec defines the desired state of the component.
 type SynchronizerSpec struct {
 	CorrelationKey Correlation `json:"correlationKey"`
 	Response       Response    `json:"response"`
@@ -71,7 +71,7 @@ type Response struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SynchronizerList is a list of Synchronizer instances.
+// SynchronizerList is a list of component instances.
 type SynchronizerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

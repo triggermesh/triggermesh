@@ -44,7 +44,7 @@ var (
 	_ v1alpha1.EventSender         = (*IBMMQSource)(nil)
 )
 
-// IBMMQSourceSpec holds the desired state of the event source.
+// IBMMQSourceSpec defines the desired state of the event source.
 type IBMMQSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 

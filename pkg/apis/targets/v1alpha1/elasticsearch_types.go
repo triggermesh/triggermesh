@@ -44,7 +44,7 @@ var (
 	_ v1alpha1.EventSource         = (*ElasticsearchTarget)(nil)
 )
 
-// ElasticsearchTargetSpec holds the desired state of the ElasticsearchTarget.
+// ElasticsearchTargetSpec defines the desired state of the event target.
 type ElasticsearchTargetSpec struct {
 	// Connection information to elasticsearch.
 	// +optional
@@ -86,7 +86,7 @@ type Connection struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ElasticsearchTargetList is a list of ElasticsearchTarget resources
+// ElasticsearchTargetList is a list of event target instances.
 type ElasticsearchTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

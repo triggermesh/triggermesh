@@ -43,7 +43,7 @@ var (
 	_ v1alpha1.EventSource         = (*TwilioTarget)(nil)
 )
 
-// TwilioTargetSpec holds the desired state of the TwilioTarget.
+// TwilioTargetSpec defines the desired state of the event target.
 type TwilioTargetSpec struct {
 	// Twilio account SID
 	AccountSID SecretValueFromSource `json:"sid"`
@@ -69,7 +69,7 @@ type TwilioTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TwilioTargetList is a list of TwilioTarget resources
+// TwilioTargetList is a list of event target instances.
 type TwilioTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

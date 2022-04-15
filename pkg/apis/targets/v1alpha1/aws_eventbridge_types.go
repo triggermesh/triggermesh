@@ -41,7 +41,7 @@ var (
 	_ v1alpha1.AdapterConfigurable = (*AWSEventBridgeTarget)(nil)
 )
 
-// AWSEventBridgeTargetSpec holds the desired state of the event target.
+// AWSEventBridgeTargetSpec defines the desired state of the event target.
 type AWSEventBridgeTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -65,7 +65,7 @@ type AWSEventBridgeTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSEventBridgeTargetList is a list of AWSEventBridgeTarget resources
+// AWSEventBridgeTargetList is a list of event target instances.
 type AWSEventBridgeTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

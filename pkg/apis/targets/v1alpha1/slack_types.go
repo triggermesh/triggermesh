@@ -35,7 +35,7 @@ type SlackTarget struct {
 	Status v1alpha1.Status `json:"status,omitempty"`
 }
 
-// SlackTargetSpec defines the spec for the Slack Taret.
+// SlackTargetSpec defines the desired state of the event target.
 type SlackTargetSpec struct {
 	// Token for Slack App
 	Token SecretValueFromSource `json:"token"`
@@ -55,7 +55,7 @@ var (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SlackTargetList is a list of event targets.
+// SlackTargetList is a list of event target instances.
 type SlackTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

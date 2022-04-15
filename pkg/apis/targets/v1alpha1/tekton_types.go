@@ -35,7 +35,7 @@ type TektonTarget struct {
 	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
-// TektonTargetSpec holds the desired state of event target.
+// TektonTargetSpec defines the desired state of the event target.
 type TektonTargetSpec struct {
 	// ReapPolicy dictates the reaping policy to be applied for the target
 	// +optional
@@ -64,7 +64,7 @@ var (
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TektonTargetList is a list of event targets.
+// TektonTargetList is a list of event target instances.
 type TektonTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

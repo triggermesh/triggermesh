@@ -50,7 +50,7 @@ var (
 	_ v1alpha1.EventSource         = (*SalesforceTarget)(nil)
 )
 
-// SalesforceTargetSpec holds the desired state of the SalesforceTarget.
+// SalesforceTargetSpec defines the desired state of the event target.
 type SalesforceTargetSpec struct {
 	// Authentication information to interact with the Salesforce API.
 	Auth SalesforceAuth `json:"auth"`
@@ -84,7 +84,7 @@ type SalesforceAuth struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SalesforceTargetList is a list of SalesforceTarget resources
+// SalesforceTargetList is a list of event target instances.
 type SalesforceTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

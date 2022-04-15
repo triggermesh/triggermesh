@@ -43,7 +43,7 @@ var (
 	_ v1alpha1.EventSource         = (*ZendeskTarget)(nil)
 )
 
-// ZendeskTargetSpec holds the desired state of the ZendeskTarget.
+// ZendeskTargetSpec defines the desired state of the event target.
 type ZendeskTargetSpec struct {
 	// Token contains the Zendesk account Token.
 	Token SecretValueFromSource `json:"token"`
@@ -65,7 +65,7 @@ type ZendeskTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ZendeskTargetList is a list of ZendeskTarget resources
+// ZendeskTargetList is a list of event target instances.
 type ZendeskTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -43,7 +43,7 @@ var (
 	_ v1alpha1.EventSource         = (*SendGridTarget)(nil)
 )
 
-// SendGridTargetSpec holds the desired state of the SendGridTarget.
+// SendGridTargetSpec defines the desired state of the event target.
 type SendGridTargetSpec struct {
 	// APIKey for account
 	APIKey SecretValueFromSource `json:"apiKey"`
@@ -82,7 +82,7 @@ type SendGridTargetSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SendGridTargetList is a list of SendGridTarget resources
+// SendGridTargetList is a list of event target instances.
 type SendGridTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

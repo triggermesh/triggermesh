@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSource         = (*JiraTarget)(nil)
 )
 
-// JiraTargetSpec holds the desired state of the JiraTarget.
+// JiraTargetSpec defines the desired state of the event target.
 type JiraTargetSpec struct {
 	// Authentication to interact with the Salesforce API.
 	Auth JiraAuth `json:"auth"`
@@ -65,7 +65,7 @@ type JiraAuth struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// JiraTargetList is a list of JiraTarget resources
+// JiraTargetList is a list of event target instances.
 type JiraTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

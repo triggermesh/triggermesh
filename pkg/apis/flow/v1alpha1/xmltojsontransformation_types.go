@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSender         = (*XMLToJSONTransformation)(nil)
 )
 
-// XMLToJSONTransformationSpec holds the desired state of the XMLToJSONTransformation (from the client).
+// XMLToJSONTransformationSpec defines the desired state of the component.
 type XMLToJSONTransformationSpec struct {
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
@@ -57,7 +57,7 @@ type XMLToJSONTransformationSpec struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// XMLToJSONTransformationList is a list of XMLToJSONTransformation resources
+// XMLToJSONTransformationList is a list of component instances.
 type XMLToJSONTransformationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

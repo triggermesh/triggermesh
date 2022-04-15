@@ -42,7 +42,7 @@ var (
 	_ v1alpha1.EventSender         = (*JQTransformation)(nil)
 )
 
-// JQTransformationSpec holds the desired state of the JQTransformation (from the client).
+// JQTransformationSpec defines the desired state of the component.
 type JQTransformationSpec struct {
 	// The query that gets passed to the JQ library
 	Query string `json:"query"`
@@ -58,15 +58,9 @@ type JQTransformationSpec struct {
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
-// JQTransformationStatus communicates the observed state of the JQTransformation (from the controller).
-type JQTransformationStatus struct {
-	duckv1.SourceStatus  `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-}
-
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// JQTransformationList is a list of JQTransformation resources
+// JQTransformationList is a list of component instances.
 type JQTransformationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
