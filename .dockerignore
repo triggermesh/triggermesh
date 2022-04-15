@@ -1,7 +1,10 @@
 # Top level files and directories
+#
+# (!) The '.git' directory is purposely not excluded because the Go toolchain
+#     relies on its contents to embed VCS info into binaries.
+#
 /.assets/
 /.circleci/
-/.git/
 /.github/
 /docs/
 /hack/
@@ -15,10 +18,6 @@
 /CODEOWNERS
 /README.md
 /kustomization.yaml
-
-# Files copied to KO_DATA_PATH directory
-!/.git/HEAD
-!/.git/refs/
 
 # Patterns
 **/config/
