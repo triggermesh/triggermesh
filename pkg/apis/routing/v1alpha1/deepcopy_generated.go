@@ -22,6 +22,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	v1 "knative.dev/pkg/apis/duck/v1"
 )
@@ -118,6 +119,11 @@ func (in *FilterSpec) DeepCopyInto(out *FilterSpec) {
 		*out = new(v1.Destination)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
@@ -199,6 +205,11 @@ func (in *SplitterSpec) DeepCopyInto(out *SplitterSpec) {
 	if in.Sink != nil {
 		in, out := &in.Sink, &out.Sink
 		*out = new(v1.Destination)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
 		(*in).DeepCopyInto(*out)
 	}
 	return

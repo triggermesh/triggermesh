@@ -37,9 +37,10 @@ type AWSS3Target struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*AWSS3Target)(nil)
-	_ v1alpha1.EventReceiver = (*AWSS3Target)(nil)
-	_ v1alpha1.EventSource   = (*AWSS3Target)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSS3Target)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSS3Target)(nil)
+	_ v1alpha1.EventReceiver       = (*AWSS3Target)(nil)
+	_ v1alpha1.EventSource         = (*AWSS3Target)(nil)
 )
 
 // AWSS3TargetSpec holds the desired state of the even target.
@@ -58,6 +59,10 @@ type AWSS3TargetSpec struct {
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

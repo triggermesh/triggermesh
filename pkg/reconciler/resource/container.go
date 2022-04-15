@@ -201,14 +201,14 @@ func StartupProbe(path, port string) ObjectOption {
 }
 
 // Requests sets the CPU and memory requests of a Container or PodSpecable's first container.
-func Requests(cpu, mem resource.Quantity) ObjectOption {
+func Requests(cpu, mem *resource.Quantity) ObjectOption {
 	return func(object interface{}) {
 		setResources(&resourcesFrom(object).Requests, cpu, mem)
 	}
 }
 
 // Limits sets the CPU and memory limits of a Container or PodSpecable's first container.
-func Limits(cpu, mem resource.Quantity) ObjectOption {
+func Limits(cpu, mem *resource.Quantity) ObjectOption {
 	return func(object interface{}) {
 		setResources(&resourcesFrom(object).Limits, cpu, mem)
 	}
@@ -225,13 +225,17 @@ func resourcesFrom(object interface{}) (resources *corev1.ResourceRequirements) 
 	return
 }
 
-func setResources(res *corev1.ResourceList, cpu, mem resource.Quantity) {
+func setResources(res *corev1.ResourceList, cpu, mem *resource.Quantity) {
 	if *res == nil {
 		*res = make(corev1.ResourceList, 2)
 	}
 
-	(*res)[corev1.ResourceCPU] = cpu
-	(*res)[corev1.ResourceMemory] = mem
+	if cpu != nil {
+		(*res)[corev1.ResourceCPU] = *cpu
+	}
+	if mem != nil {
+		(*res)[corev1.ResourceMemory] = *mem
+	}
 }
 
 // EntrypointCommand overrides the entrypoint command of a Container or

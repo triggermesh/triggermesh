@@ -37,8 +37,9 @@ type XMLToJSONTransformation struct {
 }
 
 var (
-	_ v1alpha1.Reconcilable = (*XMLToJSONTransformation)(nil)
-	_ v1alpha1.EventSender  = (*XMLToJSONTransformation)(nil)
+	_ v1alpha1.Reconcilable        = (*XMLToJSONTransformation)(nil)
+	_ v1alpha1.AdapterConfigurable = (*XMLToJSONTransformation)(nil)
+	_ v1alpha1.EventSender         = (*XMLToJSONTransformation)(nil)
 )
 
 // XMLToJSONTransformationSpec holds the desired state of the XMLToJSONTransformation (from the client).
@@ -48,6 +49,10 @@ type XMLToJSONTransformationSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

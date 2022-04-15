@@ -37,8 +37,9 @@ type JQTransformation struct {
 }
 
 var (
-	_ v1alpha1.Reconcilable = (*JQTransformation)(nil)
-	_ v1alpha1.EventSender  = (*JQTransformation)(nil)
+	_ v1alpha1.Reconcilable        = (*JQTransformation)(nil)
+	_ v1alpha1.AdapterConfigurable = (*JQTransformation)(nil)
+	_ v1alpha1.EventSender         = (*JQTransformation)(nil)
 )
 
 // JQTransformationSpec holds the desired state of the JQTransformation (from the client).
@@ -51,6 +52,10 @@ type JQTransformationSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // JQTransformationStatus communicates the observed state of the JQTransformation (from the controller).

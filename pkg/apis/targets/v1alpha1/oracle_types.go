@@ -37,7 +37,8 @@ type OracleTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*OracleTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*OracleTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*OracleTarget)(nil)
 )
 
 // OracleTargetSpec holds the desired state of the event target.
@@ -61,6 +62,10 @@ type OracleTargetSpec struct {
 	Region string `json:"oracleRegion"`
 
 	OracleFunctionSpec *OracleFunctionSpecSpec `json:"function,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // OracleFunctionSpecSpec holds the Oracle Cloud ID of the function to invoke.

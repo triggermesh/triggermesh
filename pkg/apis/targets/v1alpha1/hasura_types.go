@@ -37,9 +37,10 @@ type HasuraTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*HasuraTarget)(nil)
-	_ v1alpha1.EventReceiver = (*HasuraTarget)(nil)
-	_ v1alpha1.EventSource   = (*HasuraTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*HasuraTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*HasuraTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*HasuraTarget)(nil)
+	_ v1alpha1.EventSource         = (*HasuraTarget)(nil)
 )
 
 // HasuraTargetSpec defines the desired state of the event target.
@@ -58,6 +59,9 @@ type HasuraTargetSpec struct {
 	// A predefined list of queries that an event can specify in the io.triggermesh.graphql.query event type.
 	// +optional
 	Queries map[string]string `json:"queries,omitempty"`
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

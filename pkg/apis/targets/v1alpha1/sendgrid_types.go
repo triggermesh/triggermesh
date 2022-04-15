@@ -37,14 +37,14 @@ type SendGridTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*SendGridTarget)(nil)
-	_ v1alpha1.EventReceiver = (*SendGridTarget)(nil)
-	_ v1alpha1.EventSource   = (*SendGridTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*SendGridTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*SendGridTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*SendGridTarget)(nil)
+	_ v1alpha1.EventSource         = (*SendGridTarget)(nil)
 )
 
 // SendGridTargetSpec holds the desired state of the SendGridTarget.
 type SendGridTargetSpec struct {
-
 	// APIKey for account
 	APIKey SecretValueFromSource `json:"apiKey"`
 
@@ -74,6 +74,10 @@ type SendGridTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

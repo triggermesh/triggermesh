@@ -40,6 +40,10 @@ type TektonTargetSpec struct {
 	// ReapPolicy dictates the reaping policy to be applied for the target
 	// +optional
 	ReapPolicy *TektonTargetReapPolicy `json:"reapPolicy,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // TektonTargetReapPolicy defines desired Repeating Policy.
@@ -52,9 +56,10 @@ type TektonTargetReapPolicy struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*TektonTarget)(nil)
-	_ v1alpha1.EventReceiver = (*TektonTarget)(nil)
-	_ v1alpha1.EventSource   = (*TektonTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*TektonTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*TektonTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*TektonTarget)(nil)
+	_ v1alpha1.EventSource         = (*TektonTarget)(nil)
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

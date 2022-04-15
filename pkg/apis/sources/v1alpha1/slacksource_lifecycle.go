@@ -69,3 +69,8 @@ func (*SlackSource) GetEventTypes() []string {
 		SlackGenericEventType,
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *SlackSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

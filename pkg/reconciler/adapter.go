@@ -23,6 +23,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
+	kres "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
@@ -146,6 +147,12 @@ func commonAdapterDeploymentOptions(rcl v1alpha1.Reconcilable) []resource.Object
 		}
 	}
 
+	if cfbl, canConfigureAdapter := rcl.(v1alpha1.AdapterConfigurable); canConfigureAdapter {
+		if overrides := cfbl.GetAdapterOverrides(); overrides != nil {
+			objectOptions = append(objectOptions, adapterOverrideOptions(overrides)...)
+		}
+	}
+
 	return objectOptions
 }
 
@@ -218,6 +225,12 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 		if value, exists := parentLabels[key]; exists {
 			objectOptions = append(objectOptions, resource.Label(key, value))
 			objectOptions = append(objectOptions, resource.PodLabel(key, value))
+		}
+	}
+
+	if cfbl, canConfigureAdapter := rcl.(v1alpha1.AdapterConfigurable); canConfigureAdapter {
+		if overrides := cfbl.GetAdapterOverrides(); overrides != nil {
+			objectOptions = append(objectOptions, adapterOverrideOptions(overrides)...)
 		}
 	}
 
@@ -308,4 +321,42 @@ func MaybeAppendValueFromEnvVar(envs []corev1.EnvVar, key string, valueFrom v1al
 	}
 
 	return envs
+}
+
+// adapterOverrideOptions applies adapter override parameters depending on
+// deployment type.
+func adapterOverrideOptions(overrides *v1alpha1.AdapterOverrides) []resource.ObjectOption {
+	var opts []resource.ObjectOption
+
+	opts = append(opts, func(object interface{}) {
+		if _, ok := object.(*servingv1.Service); ok {
+			if public := overrides.Public; public != nil && *public {
+				resource.VisibilityPublic(object)
+			} else {
+				resource.VisibilityClusterLocal(object)
+			}
+		}
+	})
+
+	if overrides.Resources != nil {
+		opts = append(opts, resource.Requests(toQuantity(overrides.Resources.Requests)))
+		opts = append(opts, resource.Limits(toQuantity(overrides.Resources.Limits)))
+	}
+
+	return opts
+}
+
+// toQuantity converts corev1.ResourceList to separate CPU and Memory quantities.
+func toQuantity(resources corev1.ResourceList) (*kres.Quantity, *kres.Quantity) {
+	var cpu, memory *kres.Quantity
+
+	for k, v := range resources {
+		switch k {
+		case corev1.ResourceCPU:
+			cpu = &v
+		case corev1.ResourceMemory:
+			memory = &v
+		}
+	}
+	return cpu, memory
 }

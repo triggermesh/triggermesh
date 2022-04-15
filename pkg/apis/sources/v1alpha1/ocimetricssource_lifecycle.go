@@ -74,3 +74,8 @@ func (*OCIMetricsSource) GetEventTypes() []string {
 		OCIMetricsGenericEventType,
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *OCIMetricsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

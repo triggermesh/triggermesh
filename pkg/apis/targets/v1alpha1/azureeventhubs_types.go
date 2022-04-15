@@ -37,9 +37,10 @@ type AzureEventHubsTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*AzureEventHubsTarget)(nil)
-	_ v1alpha1.EventReceiver = (*AzureEventHubsTarget)(nil)
-	_ v1alpha1.EventSource   = (*AzureEventHubsTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureEventHubsTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureEventHubsTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*AzureEventHubsTarget)(nil)
+	_ v1alpha1.EventSource         = (*AzureEventHubsTarget)(nil)
 )
 
 // AzureEventHubsTargetSpec holds the desired state of the AzureEventHubsTarget.
@@ -57,6 +58,10 @@ type AzureEventHubsTargetSpec struct {
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
 	DiscardCEContext bool `json:"discardCloudEventContext"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

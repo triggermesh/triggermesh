@@ -59,3 +59,8 @@ func (*LogzMetricsTarget) AcceptedEventTypes() []string {
 		EventTypeOpenTelemetryMetricsPush,
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *LogzMetricsTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

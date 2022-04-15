@@ -37,7 +37,8 @@ type InfraTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*InfraTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*InfraTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*InfraTarget)(nil)
 )
 
 // InfraTargetSpec holds the desired state of the InfraTarget.
@@ -50,6 +51,10 @@ type InfraTargetSpec struct {
 
 	// TypeLoopProtection protect against infinite loops when the cloudevent type does not change.
 	TypeLoopProtection *bool `json:"typeLoopProtection,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // InfraTargetScript holds the script options

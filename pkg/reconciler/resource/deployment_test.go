@@ -29,6 +29,8 @@ import (
 )
 
 func TestNewDeploymentWithDefaultContainer(t *testing.T) {
+	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
+
 	depl := NewDeployment(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Selector("test.selector/1", "val1"),
@@ -45,8 +47,8 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		EnvVar("TEST_ENV2", "val2"),
 		Label("test.label/2", "val2"),
 		ServiceAccount("god-mode"),
-		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
-		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
+		Requests(&cpuRes, &memRes),
+		Limits(&cpuRes, nil),
 		TerminationErrorToLogs,
 		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
 		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
@@ -126,8 +128,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 								corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
 							},
 							Limits: corev1.ResourceList{
-								corev1.ResourceCPU:    *resource.NewMilliQuantity(250, resource.DecimalSI),
-								corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
+								corev1.ResourceCPU: *resource.NewMilliQuantity(250, resource.DecimalSI),
 							},
 						},
 						TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,

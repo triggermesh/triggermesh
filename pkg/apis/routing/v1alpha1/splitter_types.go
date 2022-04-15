@@ -43,10 +43,11 @@ var (
 	_ apis.Validatable = (*Splitter)(nil)
 	_ apis.Defaultable = (*Splitter)(nil)
 
-	_ v1alpha1.Reconcilable = (*Splitter)(nil)
-	_ v1alpha1.EventSender  = (*Splitter)(nil)
-	_ v1alpha1.EventSource  = (*Splitter)(nil)
-	_ v1alpha1.MultiTenant  = (*Splitter)(nil)
+	_ v1alpha1.Reconcilable        = (*Splitter)(nil)
+	_ v1alpha1.AdapterConfigurable = (*Splitter)(nil)
+	_ v1alpha1.EventSender         = (*Splitter)(nil)
+	_ v1alpha1.EventSource         = (*Splitter)(nil)
+	_ v1alpha1.MultiTenant         = (*Splitter)(nil)
 )
 
 // SplitterSpec holds the desired state of the Splitter.
@@ -54,6 +55,10 @@ type SplitterSpec struct {
 	Path      string              `json:"path"`
 	CEContext CloudEventContext   `json:"ceContext"`
 	Sink      *duckv1.Destination `json:"sink"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // CloudEventContext declares context attributes that will be propagated to resulting events.

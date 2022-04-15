@@ -105,6 +105,11 @@ func (s *AWSS3Source) AsEventSource() string {
 	return s3.RealBucketARN(s.Spec.ARN)
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *AWSS3Source) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Status conditions
 const (
 	// AWSS3ConditionSubscribed has status True when event notifications

@@ -69,12 +69,12 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		// CPU throttling can be observed below a limit of 1,
 		// although the CPU usage under load remains below 400m.
 		resource.Requests(
-			*kr.NewMilliQuantity(90, kr.DecimalSI),     // 90m
-			*kr.NewQuantity(1024*1024*30, kr.BinarySI), // 30Mi
+			kr.NewMilliQuantity(90, kr.DecimalSI),     // 90m
+			kr.NewQuantity(1024*1024*30, kr.BinarySI), // 30Mi
 		),
 		resource.Limits(
-			*kr.NewMilliQuantity(1000, kr.DecimalSI),   // 1
-			*kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
+			kr.NewMilliQuantity(1000, kr.DecimalSI),   // 1
+			kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
 		),
 	)
 }

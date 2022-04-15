@@ -38,9 +38,10 @@ type SalesforceSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*SalesforceSource)(nil)
-	_ v1alpha1.EventSource  = (*SalesforceSource)(nil)
-	_ v1alpha1.EventSender  = (*SalesforceSource)(nil)
+	_ v1alpha1.Reconcilable        = (*SalesforceSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*SalesforceSource)(nil)
+	_ v1alpha1.EventSource         = (*SalesforceSource)(nil)
+	_ v1alpha1.EventSender         = (*SalesforceSource)(nil)
 )
 
 // SalesforceSourceSpec defines the desired state of the event source.
@@ -56,6 +57,10 @@ type SalesforceSourceSpec struct {
 
 	// Subscription to a Salesforce channel
 	Subscription SalesforceSubscription `json:"subscription"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // SalesforceSubscription to connect to.

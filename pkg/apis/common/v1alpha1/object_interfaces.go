@@ -41,6 +41,13 @@ type Reconcilable interface {
 	GetStatusManager() *StatusManager
 }
 
+// AdapterConfigurable is implemented by types that can override the default
+// configuration of their receive adapter.
+type AdapterConfigurable interface {
+	// GetAdapterOverrides returns the adapter overrides.
+	GetAdapterOverrides() *AdapterOverrides
+}
+
 // EventSource is implemented by types that emit events, either by sending them
 // to a sink or by replying to incoming event requests.
 type EventSource interface {

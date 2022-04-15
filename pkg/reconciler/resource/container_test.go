@@ -27,6 +27,8 @@ import (
 )
 
 func TestNewContainer(t *testing.T) {
+	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
+
 	cont := NewContainer(tName,
 		Port("h2c", 8080),
 		Image(tImg),
@@ -38,8 +40,8 @@ func TestNewContainer(t *testing.T) {
 		Probe("/health", "health"),
 		StartupProbe("/initialized", "health"),
 		EnvVarFromSecret("TEST_ENV3", "test-secret", "someKey"),
-		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
-		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
+		Requests(&cpuRes, &memRes),
+		Limits(&cpuRes, nil),
 		TerminationErrorToLogs,
 	)
 
@@ -101,8 +103,7 @@ func TestNewContainer(t *testing.T) {
 				corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
 			},
 			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:    *resource.NewMilliQuantity(250, resource.DecimalSI),
-				corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
+				corev1.ResourceCPU: *resource.NewMilliQuantity(250, resource.DecimalSI),
 			},
 		},
 		TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,

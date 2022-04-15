@@ -74,3 +74,8 @@ func (f *Filter) GetSink() *duckv1.Destination {
 func (*Filter) IsMultiTenant() bool {
 	return true
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (f *Filter) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return f.Spec.AdapterOverrides
+}

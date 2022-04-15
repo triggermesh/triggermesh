@@ -38,9 +38,10 @@ type AzureIOTHubSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AzureIOTHubSource)(nil)
-	_ v1alpha1.EventSource  = (*AzureIOTHubSource)(nil)
-	_ v1alpha1.EventSender  = (*AzureIOTHubSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureIOTHubSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureIOTHubSource)(nil)
+	_ v1alpha1.EventSource         = (*AzureIOTHubSource)(nil)
+	_ v1alpha1.EventSender         = (*AzureIOTHubSource)(nil)
 )
 
 // AzureIOTHubSourceSpec defines the desired state of the event source.
@@ -49,6 +50,10 @@ type AzureIOTHubSourceSpec struct {
 
 	// AzureAuth contains multiple authentication methods for Azure services.
 	Auth AzureAuth `json:"auth,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

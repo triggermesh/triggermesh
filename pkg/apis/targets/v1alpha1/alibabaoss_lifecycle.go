@@ -71,3 +71,8 @@ func (*AlibabaOSSTarget) GetEventTypes() []string {
 func (t *AlibabaOSSTarget) AsEventSource() string {
 	return "https://" + t.Spec.Bucket + "." + t.Spec.Endpoint
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *AlibabaOSSTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

@@ -38,10 +38,11 @@ type ZendeskSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*ZendeskSource)(nil)
-	_ v1alpha1.MultiTenant  = (*ZendeskSource)(nil)
-	_ v1alpha1.EventSource  = (*ZendeskSource)(nil)
-	_ v1alpha1.EventSender  = (*ZendeskSource)(nil)
+	_ v1alpha1.Reconcilable        = (*ZendeskSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*ZendeskSource)(nil)
+	_ v1alpha1.MultiTenant         = (*ZendeskSource)(nil)
+	_ v1alpha1.EventSource         = (*ZendeskSource)(nil)
+	_ v1alpha1.EventSender         = (*ZendeskSource)(nil)
 )
 
 // ZendeskSourceSpec defines the desired state of the event source.
@@ -71,6 +72,10 @@ type ZendeskSourceSpec struct {
 
 	// Subdomain identifies Zendesk subdomain
 	Subdomain string `json:"subdomain,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // ZendeskSourceStatus defines the observed state of the event source.

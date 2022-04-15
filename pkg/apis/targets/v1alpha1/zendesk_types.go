@@ -37,9 +37,10 @@ type ZendeskTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*ZendeskTarget)(nil)
-	_ v1alpha1.EventReceiver = (*ZendeskTarget)(nil)
-	_ v1alpha1.EventSource   = (*ZendeskTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*ZendeskTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*ZendeskTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*ZendeskTarget)(nil)
+	_ v1alpha1.EventSource         = (*ZendeskTarget)(nil)
 )
 
 // ZendeskTargetSpec holds the desired state of the ZendeskTarget.
@@ -56,6 +57,10 @@ type ZendeskTargetSpec struct {
 	// Subject a static subject assignemnt for every ticket.
 	// +optional
 	Subject string `json:"subject,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

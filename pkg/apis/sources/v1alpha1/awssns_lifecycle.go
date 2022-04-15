@@ -75,6 +75,11 @@ func (*AWSSNSSource) IsMultiTenant() bool {
 	return true
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *AWSSNSSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Status conditions
 const (
 	// AWSSNSConditionSubscribed has status True when the event source's HTTP(S) endpoint has been subscribed to the

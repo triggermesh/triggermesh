@@ -76,3 +76,8 @@ func (s *AzureIOTHubSource) AsEventSource() string {
 func AzureIOTHubSourceName(namespace, name string) string {
 	return "io.triggermesh.azureiothubsource/" + namespace + "/" + name
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AzureIOTHubSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

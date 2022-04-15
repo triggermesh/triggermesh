@@ -37,9 +37,10 @@ type GoogleSheetTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*GoogleSheetTarget)(nil)
-	_ v1alpha1.EventReceiver = (*GoogleSheetTarget)(nil)
-	_ v1alpha1.EventSource   = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventSource         = (*GoogleSheetTarget)(nil)
 )
 
 // GoogleSheetTargetSpec holds the desired state of the GoogleSheetTarget.
@@ -52,6 +53,10 @@ type GoogleSheetTargetSpec struct {
 
 	// DefaultPrefix is a pre-defined prefix for the individual sheets.
 	DefaultPrefix string `json:"defaultPrefix"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

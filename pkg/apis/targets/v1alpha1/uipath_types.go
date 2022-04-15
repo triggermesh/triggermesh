@@ -37,9 +37,10 @@ type UiPathTarget struct { //nolint:stylecheck
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*UiPathTarget)(nil)
-	_ v1alpha1.EventReceiver = (*UiPathTarget)(nil)
-	_ v1alpha1.EventSource   = (*UiPathTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*UiPathTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*UiPathTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*UiPathTarget)(nil)
+	_ v1alpha1.EventSource         = (*UiPathTarget)(nil)
 )
 
 // UiPathTargetSpec defines the desired state of the event target.
@@ -58,6 +59,9 @@ type UiPathTargetSpec struct { //nolint:stylecheck
 	ClientID string `json:"clientID"`
 	// OrganizationUnitID is the organization unit within the tenant that the UiPath proccess will run under.
 	OrganizationUnitID string `json:"organizationUnitID"`
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

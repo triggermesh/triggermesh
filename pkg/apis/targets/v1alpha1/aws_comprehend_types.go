@@ -37,8 +37,9 @@ type AWSComprehendTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSComprehendTarget)(nil)
-	_ v1alpha1.EventSource  = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.EventSource         = (*AWSComprehendTarget)(nil)
 )
 
 // AWSComprehendTargetSpec holds the desired state of the event target.
@@ -57,6 +58,10 @@ type AWSComprehendTargetSpec struct {
 
 	// Language code to use to interact with Comprehend. The supported list can be found at: https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html
 	Language string `json:"language"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

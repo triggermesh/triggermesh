@@ -39,13 +39,18 @@ type SlackTarget struct {
 type SlackTargetSpec struct {
 	// Token for Slack App
 	Token SecretValueFromSource `json:"token"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*SlackTarget)(nil)
-	_ v1alpha1.EventReceiver = (*SlackTarget)(nil)
-	_ v1alpha1.EventSource   = (*SlackTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*SlackTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*SlackTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*SlackTarget)(nil)
+	_ v1alpha1.EventSource         = (*SlackTarget)(nil)
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

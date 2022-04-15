@@ -42,8 +42,9 @@ var (
 	_ apis.Validatable = (*Transformation)(nil)
 	_ apis.Defaultable = (*Transformation)(nil)
 
-	_ v1alpha1.Reconcilable = (*Transformation)(nil)
-	_ v1alpha1.EventSender  = (*Transformation)(nil)
+	_ v1alpha1.Reconcilable        = (*Transformation)(nil)
+	_ v1alpha1.AdapterConfigurable = (*Transformation)(nil)
+	_ v1alpha1.EventSender         = (*Transformation)(nil)
 )
 
 // TransformationSpec holds the desired state of the Transformation (from the client).
@@ -55,6 +56,10 @@ type TransformationSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // Transform describes transformation schemes for different CE types.
