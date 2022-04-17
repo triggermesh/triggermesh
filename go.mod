@@ -62,6 +62,7 @@ require (
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
+	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.7.1
 	github.com/tektoncd/pipeline v0.32.1
 	github.com/tidwall/gjson v1.14.0

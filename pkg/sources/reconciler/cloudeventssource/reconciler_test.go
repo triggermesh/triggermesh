@@ -92,6 +92,9 @@ func newEventSource() *v1alpha1.CloudEventsSource {
 				},
 			},
 			Path: &path,
+			RateLimiter: &v1alpha1.RateLimiter{
+				RequestsPerSecond: 1000,
+			},
 		},
 	}
 

@@ -28,6 +28,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/adapter/fs"
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/cloudeventssource/ratelimiter"
 )
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
@@ -49,7 +50,6 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 	}
 
 	ceh := &cloudEventsHandler{
-		// corsAllowOrigin: env.CORSAllowOrigin,
 		basicAuths: env.BasicAuths,
 		tokens:     env.Tokens,
 
@@ -66,6 +66,14 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 	}
 	if len(env.BasicAuths) != 0 || len(env.Tokens) != 0 {
 		options = append(options, cehttp.WithMiddleware(ceh.handleAuthentication))
+	}
+
+	if env.RequestsPerSecond != 0 {
+		rl, err := ratelimiter.New(env.RequestsPerSecond)
+		if err != nil {
+			logger.Panicw("Could not create rate limiter", zap.Error(err))
+		}
+		options = append(options, cehttp.WithRateLimiter(rl))
 	}
 
 	ceServer, err := cloudevents.NewClientHTTP(options...)

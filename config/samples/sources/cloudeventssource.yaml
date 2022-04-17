@@ -24,6 +24,36 @@ kind: CloudEventsSource
 metadata:
   name: sample
 spec:
+  credentials:
+    basicAuths:
+    - username: user1
+      password:
+        valueFromSecret:
+          name: password1
+          key: password
+    - username: user2
+      password:
+        valueFromSecret:
+          name: password2
+          key: password
+
+    tokens:
+    - header: header1
+      value:
+        valueFromSecret:
+          name: token1
+          key: token
+    - header: header2
+      value:
+        valueFromSecret:
+          name: token2
+          key: token
+
+  path: /mypath
+
+  rateLimiter:
+    requestsPerSecond: 1000
+
   sink:
     ref:
       apiVersion: eventing.knative.dev/v1

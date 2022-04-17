@@ -49,7 +49,6 @@ import (
 )
 
 type cloudEventsHandler struct {
-	// corsAllowOrigin string
 	basicAuths KeyMountedValues
 	tokens     KeyMountedValues
 

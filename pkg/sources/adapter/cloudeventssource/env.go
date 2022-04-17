@@ -43,7 +43,8 @@ func (is *KeyMountedValues) Decode(value string) error {
 type envAccessor struct {
 	adapter.EnvConfig
 
-	Path       string           `envconfig:"CLOUDEVENTS_PATH"`
-	BasicAuths KeyMountedValues `envconfig:"CLOUDEVENTS_BASICAUTH_CREDENTIALS"`
-	Tokens     KeyMountedValues `envconfig:"CLOUDEVENTS_TOKEN_CREDENTIALS"`
+	Path              string           `envconfig:"CLOUDEVENTS_PATH"`
+	BasicAuths        KeyMountedValues `envconfig:"CLOUDEVENTS_BASICAUTH_CREDENTIALS"`
+	Tokens            KeyMountedValues `envconfig:"CLOUDEVENTS_TOKEN_CREDENTIALS"`
+	RequestsPerSecond uint64           `envconfig:"CLOUDEVENTS_RATELIMITER_RPS"`
 }

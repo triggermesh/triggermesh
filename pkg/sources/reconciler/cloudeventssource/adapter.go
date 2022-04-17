@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -42,6 +43,7 @@ const (
 	envCloudEventsPath                 = "CLOUDEVENTS_PATH"
 	envCloudEventsBasicAuthCredentials = "CLOUDEVENTS_BASICAUTH_CREDENTIALS"
 	envCloudEventsTokenCredentials     = "CLOUDEVENTS_TOKEN_CREDENTIALS"
+	envCloudEventsRateLimiterRPS       = "CLOUDEVENTS_RATELIMITER_RPS"
 )
 
 // adapterConfig contains properties used to configure the source's adapter.
@@ -180,8 +182,11 @@ func makeAppEnv(o *v1alpha1.CloudEventsSource) []corev1.EnvVar {
 		})
 	}
 
-	if o.Spec.Credentials == nil {
-		return envs
+	if o.Spec.RateLimiter != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envCloudEventsRateLimiterRPS,
+			Value: strconv.Itoa(o.Spec.RateLimiter.RequestsPerSecond),
+		})
 	}
 
 	return envs

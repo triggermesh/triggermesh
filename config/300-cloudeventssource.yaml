@@ -124,6 +124,17 @@ spec:
                 description: Path where incoming CloudEvents will be accepted.
                 type: string
 
+              rateLimiter:
+                description: Rate limiter provides a mechanism to reject incoming requests
+                  when a threshold is trespassed, informing the caller to retry later.
+                type: object
+                properties:
+                  requestsPerSecond:
+                    description: Number of requests accepted per time duration.
+                    type: integer
+                required:
+                - requestsPerSecond
+
               ceOverrides:
                 description: Defines overrides/additions to incoming CloudEvents attributes.
                 type: object

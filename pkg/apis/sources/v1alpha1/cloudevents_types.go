@@ -52,6 +52,12 @@ type CloudEventsSourceSpec struct {
 	// Path under which request are accepted
 	// +optional
 	Path *string `json:"path,omitempty"`
+
+	// RateLimiter for incoming events per adapter instance.
+	// A single CloudEventsSource object can create multiple adapter instances,
+	// the rate limiting configuration being applied to each of them individually.
+	// +optional
+	RateLimiter *RateLimiter `json:"rateLimiter,omitempty"`
 }
 
 // HTTPCredentials to be used when receiving requests.
@@ -60,7 +66,7 @@ type HTTPCredentials struct {
 	Tokens     []HTTPToken     `json:"tokens,omitempty"`
 }
 
-// HTTPBasicAuth credentialsn
+// HTTPBasicAuth credentials.
 type HTTPBasicAuth struct {
 	Username string                  `json:"username"`
 	Password v1alpha1.ValueFromField `json:"password"`
@@ -70,6 +76,13 @@ type HTTPBasicAuth struct {
 type HTTPToken struct {
 	Header string                  `json:"header"`
 	Value  v1alpha1.ValueFromField `json:"value"`
+}
+
+// RateLimiter parameters.
+type RateLimiter struct {
+	// RequestsPerSecond is used to limit the number of requests that a
+	// single instance of the CloudEventsSource adapter can accept.
+	RequestsPerSecond int `json:"requestsPerSecond"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

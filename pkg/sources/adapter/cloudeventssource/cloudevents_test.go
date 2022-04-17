@@ -133,7 +133,6 @@ func TestCloudEventsSource(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestCloudEventsSourceAuthentication(t *testing.T) {
