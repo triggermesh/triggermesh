@@ -48,8 +48,9 @@ RUN go build -o /xslttransformation-adapter ./cmd/xslttransformation-adapter
 
 FROM gcr.io/distroless/base-debian11:nonroot
 
-# Ensure the /kodata entries are present
-COPY --from=builder /go/triggermesh/.git/ /kodata/
+# Ensure the /kodata entries used by Knative to augment the logger with the
+# current VCS revision are present.
+COPY --from=builder /go/triggermesh/.git/HEAD /go/triggermesh/.git/refs/ /kodata/
 ENV KO_DATA_PATH=/kodata
 
 # (!) COPY follows symlinks
