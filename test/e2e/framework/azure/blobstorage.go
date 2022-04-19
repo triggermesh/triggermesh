@@ -51,7 +51,10 @@ func CreateBlobContainer(ctx context.Context, rg, saName, subscriptionID, name s
 		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
 	}
 
-	client := armstorage.NewBlobContainersClient(subscriptionID, cred, nil)
+	client, err := armstorage.NewBlobContainersClient(subscriptionID, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to create Blob containers client: %s", err)
+	}
 
 	resp, err := client.Create(ctx, rg, saName, name, armstorage.BlobContainer{}, nil)
 	if err != nil {

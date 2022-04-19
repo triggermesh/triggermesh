@@ -26,10 +26,10 @@ require (
 	github.com/Azure/azure-sdk-for-go v63.3.0+incompatible
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.14.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v0.4.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.3.1
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.3.1
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.3.1
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.4.1
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub v0.5.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v0.5.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v0.5.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v0.5.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.3.0
 	github.com/Azure/azure-storage-queue-go v0.0.0-20191125232315-636801874cdd
 	github.com/Azure/go-autorest/autorest v0.11.26

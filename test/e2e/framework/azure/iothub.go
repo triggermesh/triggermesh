@@ -44,7 +44,10 @@ func CreateIOTHubComponents(ctx context.Context, subscriptionID, rg, region, nam
 	}
 
 	// Create the new iothub
-	iothubClient := armiothub.NewResourceClient(subscriptionID, cred, nil)
+	iothubClient, err := armiothub.NewResourceClient(subscriptionID, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to create IoT Hub resource client: %s", err)
+	}
 
 	hub, err := iothubClient.BeginCreateOrUpdate(ctx, rg, name, armiothub.Description{
 		Location: &region,

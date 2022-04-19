@@ -35,7 +35,10 @@ func CreateStorageAccountsClient(subscriptionID string) *armstorage.AccountsClie
 		framework.FailfWithOffset(3, "unable to authenticate: %s", err)
 	}
 
-	saClient := armstorage.NewAccountsClient(subscriptionID, cred, nil)
+	saClient, err := armstorage.NewAccountsClient(subscriptionID, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(3, "Failed to create Storage Accounts client: %s", err)
+	}
 
 	return saClient
 }

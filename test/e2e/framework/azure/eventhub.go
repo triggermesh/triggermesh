@@ -43,8 +43,15 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 		framework.FailfWithOffset(1, "Unable to authenticate: %s", err)
 	}
 
-	nsClient := armeventhub.NewNamespacesClient(subscriptionID, cred, nil)
-	ehClient := armeventhub.NewEventHubsClient(subscriptionID, cred, nil)
+	nsClient, err := armeventhub.NewNamespacesClient(subscriptionID, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(1, "Failed to create Event Hubs namespaces client: %s", err)
+	}
+
+	ehClient, err := armeventhub.NewEventHubsClient(subscriptionID, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(1, "Failed to create Event Hubs client: %s", err)
+	}
 
 	// create the eventhubs namespace
 	nsResp, err := nsClient.BeginCreateOrUpdate(ctx, rg, name, armeventhub.EHNamespace{
