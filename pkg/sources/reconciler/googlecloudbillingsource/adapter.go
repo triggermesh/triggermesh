@@ -17,11 +17,8 @@ limitations under the License.
 package googlecloudbillingsource
 
 import (
-	"fmt"
-
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -77,15 +74,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
 func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
-	if err != nil {
-		return nil, fmt.Errorf("listing objects from cache: %w", err)
-	}
-
-	ownerRefables := make([]kmeta.OwnerRefable, len(srcs))
-	for i := range srcs {
-		ownerRefables[i] = srcs[i]
-	}
-
-	return ownerRefables, nil
+	return common.RBACOwners[*v1alpha1.GoogleCloudBillingSource](r.srcLister(src.GetNamespace()))
 }

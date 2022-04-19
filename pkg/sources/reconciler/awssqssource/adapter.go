@@ -17,11 +17,8 @@ limitations under the License.
 package awssqssource
 
 import (
-	"fmt"
-
 	appsv1 "k8s.io/api/apps/v1"
 	kr "k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
@@ -85,17 +82,5 @@ func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerR
 		return []kmeta.OwnerRefable{src}, nil
 	}
 
-	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
-	if err != nil {
-		return nil, fmt.Errorf("listing objects from cache: %w", err)
-	}
-
-	ownerRefables := make([]kmeta.OwnerRefable, 0, len(srcs))
-	for _, src := range srcs {
-		if !commonv1alpha1.WantsOwnServiceAccount(src) {
-			ownerRefables = append(ownerRefables, src)
-		}
-	}
-
-	return ownerRefables, nil
+	return common.RBACOwners[*v1alpha1.AWSSQSSource](r.srcLister(src.GetNamespace()))
 }
