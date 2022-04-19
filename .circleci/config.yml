@@ -9,7 +9,7 @@ jobs:
   gomod-cache:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     steps:
       - checkout
       - go/mod-download-cached
@@ -17,7 +17,7 @@ jobs:
   test:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     steps:
       - checkout
       - go/load-cache
@@ -75,7 +75,7 @@ jobs:
   gen-apidocs:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     parameters:
       committer_name:
         type: string
@@ -116,7 +116,7 @@ jobs:
   publish-image:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     resource_class: xlarge
     steps:
       - checkout
@@ -133,7 +133,7 @@ jobs:
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Installing ko
-          command: go install github.com/google/ko@v0.11.1
+          command: go install github.com/google/ko@v0.11.2
       - setup_remote_docker:
           version: 20.10.11
           docker_layer_caching: true
@@ -169,7 +169,7 @@ jobs:
     description: Patches target cluster configuration
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     parameters:
       cluster:
         type: string
@@ -221,7 +221,7 @@ jobs:
   release:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     steps:
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:

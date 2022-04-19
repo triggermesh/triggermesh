@@ -27,7 +27,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: '1.17'
+        go-version: '1.18'
 
     - name: Go caches
       uses: actions/cache@v3
@@ -90,7 +90,7 @@ jobs:
         kubectl -n knative-serving wait --timeout=1m --for=condition=Complete jobs.batch/default-domain
 
     - name: Install ko
-      run: go install github.com/google/ko@v0.11.1
+      run: go install github.com/google/ko@v0.11.2
 
     - name: Deploy TriggerMesh
       env:
