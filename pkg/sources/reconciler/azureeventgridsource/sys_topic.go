@@ -32,9 +32,9 @@ import (
 
 	azureeventgrid "github.com/Azure/azure-sdk-for-go/profiles/latest/eventgrid/mgmt/eventgrid"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
@@ -112,7 +112,7 @@ func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 
 			for t, v := range systemTopicResourceTags(typedSrc) {
 				v := v
-				sysTopic.Tags[t] = &v
+				sysTopic.Tags[t] = v
 			}
 
 			rgName := sysTopicResID.ResourceGroup
@@ -231,7 +231,7 @@ func ensureNoSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
 	defer cancel()
 
-	eventSubs, err := eventSubsCli.ListBySystemTopic(restCtx, rgName, sysTopicName, "", to.Int32Ptr(1))
+	eventSubs, err := eventSubsCli.ListBySystemTopic(restCtx, rgName, sysTopicName, "", to.Ptr[int32](1))
 	switch {
 	case isNotFound(err):
 		event.Warn(ctx, ReasonSystemTopicFinalized, "System topic not found, skipping finalization")
@@ -337,11 +337,11 @@ func findSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 
 // systemTopicResourceTags returns a set of Azure resource tags containing
 // information from the given source instance to set on an Event Grid system topic.
-func systemTopicResourceTags(src *v1alpha1.AzureEventGridSource) map[string]string {
-	return map[string]string{
-		eventgridTagOwnerResource:  sources.AzureEventGridSourceResource.String(),
-		eventgridTagOwnerNamespace: src.Namespace,
-		eventgridTagOwnerName:      src.Name,
+func systemTopicResourceTags(src *v1alpha1.AzureEventGridSource) map[string]*string {
+	return map[string]*string{
+		eventgridTagOwnerResource:  to.Ptr(sources.AzureEventGridSourceResource.String()),
+		eventgridTagOwnerNamespace: &src.Namespace,
+		eventgridTagOwnerName:      &src.Name,
 	}
 }
 
@@ -349,7 +349,7 @@ func systemTopicResourceTags(src *v1alpha1.AzureEventGridSource) map[string]stri
 // given source.
 func assertSystemTopicOwnership(st *azureeventgrid.SystemTopic, src *v1alpha1.AzureEventGridSource) bool {
 	for k, v := range systemTopicResourceTags(src) {
-		if t, exists := st.Tags[k]; !exists || t == nil || *t != v {
+		if t, exists := st.Tags[k]; !exists || t == nil || *t != *v {
 			return false
 		}
 	}
@@ -387,11 +387,11 @@ func newSystemTopic(ctx context.Context, autorestCli autorest.Client, providersC
 
 	st := &azureeventgrid.SystemTopic{
 		SystemTopicProperties: &azureeventgrid.SystemTopicProperties{
-			Source:    to.StringPtr(src.Spec.Scope.String()),
+			Source:    to.Ptr(src.Spec.Scope.String()),
 			TopicType: &topicType.typ,
 		},
 		Location: &region,
-		Tags:     *to.StringMapPtr(systemTopicResourceTags(src)),
+		Tags:     systemTopicResourceTags(src),
 	}
 
 	return st, nil
@@ -489,7 +489,7 @@ func ensureDefaultResourceGroup(ctx context.Context, cli eventgrid.ResourceGroup
 	}
 
 	_, err = cli.CreateOrUpdate(ctx, defaultResourceGroupName, resources.Group{
-		Location: to.StringPtr(defaultResourceGroupRegion),
+		Location: to.Ptr(defaultResourceGroupRegion),
 	})
 	if err != nil {
 		return fmt.Errorf("creating default resource group %q: %w", defaultResourceGroupName, err)

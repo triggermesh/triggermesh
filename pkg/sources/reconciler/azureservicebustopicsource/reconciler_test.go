@@ -35,8 +35,8 @@ import (
 	rt "knative.dev/pkg/reconciler/testing"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/servicebus/mgmt/servicebus"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
@@ -377,7 +377,7 @@ func (c *mockedSubscriptionsClient) CreateOrUpdate(ctx context.Context, resource
 	c.calledCreateUpdate = true
 
 	return servicebus.SBSubscription{
-		ID: to.StringPtr(tSubscriptionID.String()),
+		ID: to.Ptr(tSubscriptionID.String()),
 	}, nil
 }
 
@@ -404,7 +404,7 @@ const mockSubscriptionsDataKey = "subs"
 // TableRow data.
 func makeMockSubscriptions() map[string]interface{} {
 	sub := servicebus.SBSubscription{
-		ID: to.StringPtr(tSubscriptionID.String()),
+		ID: to.Ptr(tSubscriptionID.String()),
 	}
 
 	// key format expected by mocked client impl

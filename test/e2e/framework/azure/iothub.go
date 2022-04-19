@@ -29,9 +29,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
@@ -51,13 +51,13 @@ func CreateIOTHubComponents(ctx context.Context, subscriptionID, rg, region, nam
 
 	hub, err := iothubClient.BeginCreateOrUpdate(ctx, rg, name, armiothub.Description{
 		Location: &region,
-		Tags:     map[string]*string{E2EInstanceTagKey: to.StringPtr(name)},
+		Tags:     map[string]*string{E2EInstanceTagKey: &name},
 		SKU: &armiothub.SKUInfo{
-			Name:     armiothub.IotHubSKUB1.ToPtr(),
-			Capacity: to.Int64Ptr(1),
+			Name:     to.Ptr(armiothub.IotHubSKUB1),
+			Capacity: to.Ptr[int64](1),
 		},
 		Identity: &armiothub.ArmIdentity{
-			Type: armiothub.ResourceIdentityTypeNone.ToPtr(),
+			Type: to.Ptr(armiothub.ResourceIdentityTypeNone),
 		},
 	}, nil)
 	if err != nil {

@@ -32,8 +32,8 @@ import (
 	logtesting "knative.dev/pkg/logging/testing"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/monitor/mgmt/insights"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -149,7 +149,7 @@ func TestEnsureDiagnosticSettings(t *testing.T) {
 						EventHubs: v1alpha1.AzureActivityLogsSourceDestinationEventHubs{
 							NamespaceID: tEventHubNamespaceID,
 							HubName:     &tEventHubID.ResourceName,
-							SASPolicy:   to.StringPtr(tEventHubsSASPolicy),
+							SASPolicy:   to.Ptr(tEventHubsSASPolicy),
 						},
 					},
 					Categories: tc.categories,
@@ -203,7 +203,7 @@ func makePayload(cats ...logCategoryTuple) *insights.DiagnosticSettingsResource 
 
 	return &insights.DiagnosticSettingsResource{
 		DiagnosticSettings: &insights.DiagnosticSettings{
-			EventHubAuthorizationRuleID: to.StringPtr(tEventHubsSASPolicyID),
+			EventHubAuthorizationRuleID: to.Ptr(tEventHubsSASPolicyID),
 			EventHubName:                &tEventHubID.ResourceName,
 			Logs:                        &logs,
 		},
@@ -252,18 +252,18 @@ func existingDiagSettingsMockClients(rr requestRecorder) (clients.EventCategorie
 			rr: rr,
 			getResp: &insights.DiagnosticSettingsResource{
 				DiagnosticSettings: &insights.DiagnosticSettings{
-					EventHubAuthorizationRuleID: to.StringPtr(tEventHubsSASPolicyID),
+					EventHubAuthorizationRuleID: to.Ptr(tEventHubsSASPolicyID),
 					EventHubName:                &tEventHubID.ResourceName,
 					// assume all categories are selected for simplicity
 					Logs: &[]insights.LogSettings{{
-						Category: to.StringPtr("FakeLogCategoryA"),
-						Enabled:  to.BoolPtr(true),
+						Category: to.Ptr("FakeLogCategoryA"),
+						Enabled:  to.Ptr(true),
 					}, {
-						Category: to.StringPtr("FakeLogCategoryB"),
-						Enabled:  to.BoolPtr(true),
+						Category: to.Ptr("FakeLogCategoryB"),
+						Enabled:  to.Ptr(true),
 					}, {
-						Category: to.StringPtr("FakeLogCategoryC"),
-						Enabled:  to.BoolPtr(true),
+						Category: to.Ptr("FakeLogCategoryC"),
+						Enabled:  to.Ptr(true),
 					}},
 				},
 			},

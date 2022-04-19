@@ -39,10 +39,10 @@ import (
 	"knative.dev/pkg/reconciler"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/2020-09-01/monitor/mgmt/insights"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/adal"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -162,7 +162,7 @@ func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 
 	desiredDiagSettings := insights.DiagnosticSettingsResource{
 		DiagnosticSettings: &insights.DiagnosticSettings{
-			EventHubAuthorizationRuleID: to.StringPtr(sasPolicyResourceID(&nsID, sasPolName)),
+			EventHubAuthorizationRuleID: to.Ptr(sasPolicyResourceID(&nsID, sasPolName)),
 			EventHubName:                eventHubName,
 			Logs:                        &logSettings,
 		},
@@ -319,7 +319,7 @@ func initLogSettings(desiredCategories, availCategories stringSet) []insights.Lo
 
 		logSettings = append(logSettings,
 			insights.LogSettings{
-				Category: to.StringPtr(cat),
+				Category: to.Ptr(cat),
 				Enabled:  &enable,
 			},
 		)

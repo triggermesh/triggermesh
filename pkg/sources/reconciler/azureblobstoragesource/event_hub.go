@@ -28,7 +28,7 @@ import (
 	"knative.dev/pkg/reconciler"
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub"
-	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -81,8 +81,8 @@ func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*
 	case isNotFound(err):
 		eventHubProps := eventhub.Model{
 			Properties: &eventhub.Properties{
-				PartitionCount:         to.Int64Ptr(defaultPartitionCount),
-				MessageRetentionInDays: to.Int64Ptr(defaultMessageRetentionDays),
+				PartitionCount:         to.Ptr[int64](defaultPartitionCount),
+				MessageRetentionInDays: to.Ptr[int64](defaultMessageRetentionDays),
 			},
 		}
 
