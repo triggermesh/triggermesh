@@ -74,10 +74,14 @@ func UploadBlob(ctx context.Context, containerName, saName, name, data string) {
 	url := "https://" + saName + AzureBlobStorageURL + containerName
 	containerClient, err := azblob.NewContainerClient(url, cred, nil)
 	if err != nil {
-		framework.FailfWithOffset(2, "Unable to obtain blob client: %s", err)
+		framework.FailfWithOffset(2, "Failed to create Blob container client: %s", err)
 	}
 
-	blobClient := containerClient.NewBlockBlobClient(name)
+	blobClient, err := containerClient.NewBlockBlobClient(name)
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to create Blob block client: %s", err)
+	}
+
 	rs := ReadSeekCloser(strings.NewReader(data))
 
 	_, err = blobClient.Upload(ctx, rs, nil)
@@ -99,9 +103,12 @@ func DeleteBlob(ctx context.Context, containerName, saName, name string) {
 		framework.FailfWithOffset(2, "Unable to obtain blob client: %s", err)
 	}
 
-	blobClient := containerClient.NewBlockBlobClient(name)
-	_, err = blobClient.Delete(ctx, nil)
+	blobClient, err := containerClient.NewBlockBlobClient(name)
 	if err != nil {
+		framework.FailfWithOffset(2, "Failed to create Blob block client: %s", err)
+	}
+
+	if _, err := blobClient.Delete(ctx, nil); err != nil {
 		framework.FailfWithOffset(2, "Unable to delete blob: %s", err)
 	}
 }
