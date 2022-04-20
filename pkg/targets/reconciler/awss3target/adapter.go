@@ -17,11 +17,9 @@ limitations under the License.
 package awss3target
 
 import (
-	"fmt"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
@@ -83,15 +81,5 @@ func makeAppEnv(o *v1alpha1.AWSS3Target) []corev1.EnvVar {
 
 // RBACOwners implements common.AdapterServiceBuilder.
 func (r *Reconciler) RBACOwners(trg commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	trgs, err := r.trgLister(trg.GetNamespace()).List(labels.Everything())
-	if err != nil {
-		return nil, fmt.Errorf("listing objects from cache: %w", err)
-	}
-
-	ownerRefables := make([]kmeta.OwnerRefable, len(trgs))
-	for i := range trgs {
-		ownerRefables[i] = trgs[i]
-	}
-
-	return ownerRefables, nil
+	return common.RBACOwners[*v1alpha1.AWSS3Target](r.trgLister(trg.GetNamespace()))
 }

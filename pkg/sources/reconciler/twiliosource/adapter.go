@@ -17,15 +17,13 @@ limitations under the License.
 package twiliosource
 
 import (
-	"fmt"
-
-	"k8s.io/apimachinery/pkg/labels"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
@@ -57,15 +55,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
 func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
-	if err != nil {
-		return nil, fmt.Errorf("listing objects from cache: %w", err)
-	}
-
-	ownerRefables := make([]kmeta.OwnerRefable, len(srcs))
-	for i := range srcs {
-		ownerRefables[i] = srcs[i]
-	}
-
-	return ownerRefables, nil
+	return common.RBACOwners[*v1alpha1.TwilioSource](r.srcLister(src.GetNamespace()))
 }
