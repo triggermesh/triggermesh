@@ -29,7 +29,7 @@ import (
 	"knative.dev/pkg/reconciler"
 
 	azureeventgrid "github.com/Azure/azure-sdk-for-go/profiles/latest/eventgrid/mgmt/eventgrid"
-	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -149,17 +149,17 @@ func newEventSubscription(eventHubResID string, eventTypes []string) azureeventg
 			Destination: azureeventgrid.EventHubEventSubscriptionDestination{
 				EndpointType: azureeventgrid.EndpointTypeEventHub,
 				EventHubEventSubscriptionDestinationProperties: &azureeventgrid.EventHubEventSubscriptionDestinationProperties{
-					ResourceID: to.StringPtr(eventHubResID),
+					ResourceID: to.Ptr(eventHubResID),
 				},
 			},
 			Filter: &azureeventgrid.EventSubscriptionFilter{
-				IncludedEventTypes: to.StringSlicePtr(eventTypes),
-				SubjectBeginsWith:  to.StringPtr(""), // *
-				SubjectEndsWith:    to.StringPtr(""), // *
+				IncludedEventTypes: to.Ptr(eventTypes),
+				SubjectBeginsWith:  to.Ptr(""), // *
+				SubjectEndsWith:    to.Ptr(""), // *
 			},
 			RetryPolicy: &azureeventgrid.RetryPolicy{
-				MaxDeliveryAttempts:      to.Int32Ptr(defaultMaxDeliveryAttempts), // *
-				EventTimeToLiveInMinutes: to.Int32Ptr(defaultEventTTL),            // *
+				MaxDeliveryAttempts:      to.Ptr[int32](defaultMaxDeliveryAttempts), // *
+				EventTimeToLiveInMinutes: to.Ptr[int32](defaultEventTTL),            // *
 			},
 			EventDeliverySchema: azureeventgrid.EventDeliverySchemaCloudEventSchemaV10,
 		},

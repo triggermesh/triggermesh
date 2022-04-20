@@ -26,7 +26,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	azureeventgrid "github.com/Azure/azure-sdk-for-go/profiles/latest/eventgrid/mgmt/eventgrid"
-	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 )
 
 func TestEqualEventSubscription(t *testing.T) {
@@ -36,22 +36,22 @@ func TestEqualEventSubscription(t *testing.T) {
 	}{
 		"Equal when only ignored fields differ": {
 			x: azureeventgrid.EventSubscription{
-				ID:   to.StringPtr("x-id"),
-				Name: to.StringPtr("x-name"),
-				Type: to.StringPtr("x-type"),
+				ID:   to.Ptr("x-id"),
+				Name: to.Ptr("x-name"),
+				Type: to.Ptr("x-type"),
 
 				EventSubscriptionProperties: &azureeventgrid.EventSubscriptionProperties{
-					Topic:             to.StringPtr("x-topic"),
+					Topic:             to.Ptr("x-topic"),
 					ProvisioningState: "x-provisioningstate",
 				},
 			},
 			y: azureeventgrid.EventSubscription{
-				ID:   to.StringPtr("y-id"),
-				Name: to.StringPtr("y-name"),
-				Type: to.StringPtr("y-type"),
+				ID:   to.Ptr("y-id"),
+				Name: to.Ptr("y-name"),
+				Type: to.Ptr("y-type"),
 
 				EventSubscriptionProperties: &azureeventgrid.EventSubscriptionProperties{
-					Topic:             to.StringPtr("y-topic"),
+					Topic:             to.Ptr("y-topic"),
 					ProvisioningState: "y-provisioningstate",
 				},
 			},
@@ -127,6 +127,6 @@ func makeEventSubscriptionDestination(eventHubID string) azureeventgrid.EventHub
 // matching the given event types.
 func makeEventSubscriptionEventFilter(eventTypes []string) *azureeventgrid.EventSubscriptionFilter {
 	return &azureeventgrid.EventSubscriptionFilter{
-		IncludedEventTypes: to.StringSlicePtr(eventTypes),
+		IncludedEventTypes: &eventTypes,
 	}
 }

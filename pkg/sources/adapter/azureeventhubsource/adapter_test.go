@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
-	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	loggingtesting "knative.dev/pkg/logging/testing"
@@ -59,10 +59,10 @@ func TestHandleMessage(t *testing.T) {
 			event := eventhub.Event{
 				Data: tc.eventData,
 				SystemProperties: &eventhub.SystemProperties{
-					SequenceNumber: to.Int64Ptr(1),
+					SequenceNumber: to.Ptr[int64](1),
 				},
 				ID:           "someMessageID",
-				PartitionKey: to.StringPtr("partition1"),
+				PartitionKey: to.Ptr("partition1"),
 			}
 
 			a := &adapter{

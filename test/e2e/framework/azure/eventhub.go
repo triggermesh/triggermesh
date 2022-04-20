@@ -21,10 +21,9 @@ import (
 	"time"
 
 	eventhubs "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub"
-
-	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
@@ -43,20 +42,27 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 		framework.FailfWithOffset(1, "Unable to authenticate: %s", err)
 	}
 
-	nsClient := armeventhub.NewNamespacesClient(subscriptionID, cred, nil)
-	ehClient := armeventhub.NewEventHubsClient(subscriptionID, cred, nil)
+	nsClient, err := armeventhub.NewNamespacesClient(subscriptionID, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(1, "Failed to create Event Hubs namespaces client: %s", err)
+	}
+
+	ehClient, err := armeventhub.NewEventHubsClient(subscriptionID, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(1, "Failed to create Event Hubs client: %s", err)
+	}
 
 	// create the eventhubs namespace
 	nsResp, err := nsClient.BeginCreateOrUpdate(ctx, rg, name, armeventhub.EHNamespace{
 		Location: &region,
-		Tags:     map[string]*string{E2EInstanceTagKey: to.StringPtr(name)},
+		Tags:     map[string]*string{E2EInstanceTagKey: to.Ptr(name)},
 		Identity: &armeventhub.Identity{
-			Type: armeventhub.ManagedServiceIdentityTypeNone.ToPtr(),
+			Type: to.Ptr(armeventhub.ManagedServiceIdentityTypeNone),
 		},
 		SKU: &armeventhub.SKU{
-			Name:     armeventhub.SKUNameBasic.ToPtr(),
-			Capacity: to.Int32Ptr(1),
-			Tier:     armeventhub.SKUTierBasic.ToPtr(),
+			Name:     to.Ptr(armeventhub.SKUNameBasic),
+			Capacity: to.Ptr[int32](1),
+			Tier:     to.Ptr(armeventhub.SKUTierBasic),
 		},
 	}, nil)
 
@@ -64,16 +70,15 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 		framework.FailfWithOffset(1, "Unable to create eventhub namespace: %s", err)
 	}
 
-	_, err = nsResp.PollUntilDone(ctx, time.Second*30)
-	if err != nil {
+	if _, err = nsResp.PollUntilDone(ctx, time.Second*30); err != nil {
 		framework.FailfWithOffset(1, "Unable to create eventhub namespace: %s", err)
 	}
 
 	if !omitHub {
 		ehResp, err := ehClient.CreateOrUpdate(ctx, rg, name, name, armeventhub.Eventhub{
 			Properties: &armeventhub.Properties{
-				MessageRetentionInDays: to.Int64Ptr(1),
-				PartitionCount:         to.Int64Ptr(2),
+				MessageRetentionInDays: to.Ptr[int64](1),
+				PartitionCount:         to.Ptr[int64](2),
 			},
 		}, nil)
 
