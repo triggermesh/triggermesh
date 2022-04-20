@@ -26,7 +26,7 @@ import (
 )
 
 func TestRateLimiter(t *testing.T) {
-	ctx := context.TODO()
+	ctx := context.Background()
 
 	// allow no more than 1 request per second.
 	rl, err := New(1)

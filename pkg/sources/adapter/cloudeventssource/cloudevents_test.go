@@ -40,21 +40,21 @@ import (
 	"testing"
 	"time"
 
-	zapt "go.uber.org/zap/zaptest"
-
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cloudeventst "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/triggermesh/triggermesh/pkg/adapter/fs"
+	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
+	loggingtesting "knative.dev/pkg/logging/testing"
+
+	fakefs "github.com/triggermesh/triggermesh/pkg/adapter/fs/fake"
 )
 
 const (
-	// path to secret fixtures.
-	secret1Path = "../../../../test/fixtures/secrets/secret1"
-	secret2Path = "../../../../test/fixtures/secrets/secret2"
+	// fake path to secrets.
+	tSecret1Path = "/test/secret1"
+	tSecret2Path = "/test/secret2"
 
-	// values for secrets in the fixtures above.
+	// fake value for secrets.
 	tSecret1 = "secret1"
 	tSecret2 = "secret2"
 
@@ -63,22 +63,22 @@ const (
 )
 
 var (
-	basicAuths KeyMountedValues = KeyMountedValues{
+	basicAuths = KeyMountedValues{
 		{
 			Key:              tUser,
-			MountedValueFile: secret1Path,
+			MountedValueFile: tSecret1Path,
 		},
 	}
-	tokens KeyMountedValues = KeyMountedValues{
+	tokens = KeyMountedValues{
 		{
 			Key:              tToken,
-			MountedValueFile: secret2Path,
+			MountedValueFile: tSecret2Path,
 		},
 	}
 )
 
 func TestCloudEventsSource(t *testing.T) {
-	logger := zapt.NewLogger(t).Sugar()
+	logger := loggingtesting.TestLogger(t)
 
 	successCE := cloudevents.NewEvent(cloudevents.VersionV1)
 	successCE.SetType("type")
@@ -104,10 +104,8 @@ func TestCloudEventsSource(t *testing.T) {
 
 	for name, c := range tc {
 		t.Run(name, func(t *testing.T) {
-			cfw, err := fs.NewCachedFileWatcher(logger)
-			require.NoError(t, err, "Could not create CachedFileWatcher")
-
-			ceClient, chOut := cloudeventst.NewMockSenderClient(t, 1)
+			cfw := fakefs.NewCachedFileWatcher()
+			ceClient := adaptertest.NewTestClient()
 
 			handler := &cloudEventsHandler{
 				cfw:      cfw,
@@ -115,28 +113,23 @@ func TestCloudEventsSource(t *testing.T) {
 				logger:   logger,
 			}
 
-			res := handler.handle(context.TODO(), c.cloudEvent)
+			res := handler.handle(context.Background(), c.cloudEvent)
 			if c.expectError {
-				require.False(t, cloudevents.IsACK(res), "Expected error handling CloudEvent did not happen")
 				require.True(t, cloudevents.IsNACK(res), "Expected error handling CloudEvent did not happen")
 				return
 			} else {
 				require.True(t, cloudevents.IsACK(res), "Unexpected error handling CloudEvent")
 			}
 
-			select {
-			case event := <-chOut:
-				assert.Equal(t, c.cloudEvent, event, "event Data does not match")
-
-			case <-time.After(1 * time.Second):
-				assert.Fail(t, "expected cloud event was not sent")
-			}
+			events := ceClient.Sent()
+			require.Equal(t, 1, len(events), "Unexpected number of events produced")
+			require.Equal(t, c.cloudEvent, events[0], "Event Data does not match")
 		})
 	}
 }
 
 func TestCloudEventsSourceAuthentication(t *testing.T) {
-	logger := zapt.NewLogger(t).Sugar()
+	logger := loggingtesting.TestLogger(t)
 
 	tc := map[string]struct {
 		requestUsername string
@@ -179,13 +172,13 @@ func TestCloudEventsSourceAuthentication(t *testing.T) {
 
 	for name, c := range tc {
 		t.Run(name, func(t *testing.T) {
+			cfw := fakefs.NewCachedFileWatcher()
 
-			cfw, err := fs.NewCachedFileWatcher(logger)
-			require.NoError(t, err, "Could not create CachedFileWatcher")
-
-			for _, path := range []string{secret1Path, secret2Path} {
+			for path, content := range map[string]string{tSecret1Path: tSecret1, tSecret2Path: tSecret2} {
 				err := cfw.Add(path)
 				require.NoError(t, err, "Could not set watch on secret path %s", path)
+				err = cfw.SetContent(path, []byte(content))
+				require.NoError(t, err, "Could not set content on secret path %s", path)
 			}
 
 			handler := &cloudEventsHandler{

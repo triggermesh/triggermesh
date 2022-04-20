@@ -52,7 +52,7 @@ type cloudEventsHandler struct {
 	basicAuths KeyMountedValues
 	tokens     KeyMountedValues
 
-	cfw      *fs.CachedFileWatcher
+	cfw      fs.CachedFileWatcher
 	ceServer cloudevents.Client
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger

@@ -27,7 +27,16 @@ import (
 
 // CachedFileWatcher is a FileWatcher that caches and tracks the contents
 // of watched files.
-type CachedFileWatcher struct {
+type CachedFileWatcher interface {
+	// Start the FileWatcher process.
+	Start(ctx context.Context)
+	// Add a file path to be watched.
+	Add(path string) error
+	// GetContent of watched file.
+	GetContent(path string) ([]byte, error)
+}
+
+type cachedFileWatcher struct {
 	cw           *FileWatcher
 	watchedFiles map[string][]byte
 
@@ -37,13 +46,13 @@ type CachedFileWatcher struct {
 
 // NewCachedFileWatcher creates a new FileWatcher object that register files
 // and calls back when they change.
-func NewCachedFileWatcher(logger *zap.SugaredLogger) (*CachedFileWatcher, error) {
+func NewCachedFileWatcher(logger *zap.SugaredLogger) (CachedFileWatcher, error) {
 	cw, err := NewWatcher(logger)
 	if err != nil {
 		return nil, err
 	}
 
-	return &CachedFileWatcher{
+	return &cachedFileWatcher{
 		watchedFiles: make(map[string][]byte),
 		cw:           cw,
 		logger:       logger,
@@ -51,11 +60,11 @@ func NewCachedFileWatcher(logger *zap.SugaredLogger) (*CachedFileWatcher, error)
 }
 
 // Start the FileWatcher process.
-func (ccw *CachedFileWatcher) Start(ctx context.Context) {
+func (ccw *cachedFileWatcher) Start(ctx context.Context) {
 	ccw.cw.Start(ctx)
 }
 
-func (ccw *CachedFileWatcher) updateContentFromFile(path string) error {
+func (ccw *cachedFileWatcher) updateContentFromFile(path string) error {
 	ccw.m.Lock()
 	defer ccw.m.Unlock()
 
@@ -68,7 +77,7 @@ func (ccw *CachedFileWatcher) updateContentFromFile(path string) error {
 	return nil
 }
 
-func (ccw *CachedFileWatcher) callback(path string) WatchCallback {
+func (ccw *cachedFileWatcher) callback(path string) WatchCallback {
 	return func() {
 		if err := ccw.updateContentFromFile(path); err != nil {
 			ccw.logger.Error("Could not read watched file", zap.Error(err))
@@ -77,11 +86,13 @@ func (ccw *CachedFileWatcher) callback(path string) WatchCallback {
 }
 
 // Add a file path to be watched.
-func (ccw *CachedFileWatcher) Add(path string) error {
+func (ccw *cachedFileWatcher) Add(path string) error {
 	if err := ccw.cw.Add(path, ccw.callback(path)); err != nil {
 		return err
 	}
 
+	ccw.m.Lock()
+	defer ccw.m.Unlock()
 	if _, ok := ccw.watchedFiles[path]; !ok {
 		if err := ccw.updateContentFromFile(path); err != nil {
 			ccw.logger.Errorw("Could not get content from file", zap.Error(err))
@@ -95,9 +106,9 @@ func (ccw *CachedFileWatcher) Add(path string) error {
 }
 
 // GetContent of watched file.
-func (ccw *CachedFileWatcher) GetContent(path string) ([]byte, error) {
-	ccw.m.Lock()
-	defer ccw.m.Unlock()
+func (ccw *cachedFileWatcher) GetContent(path string) ([]byte, error) {
+	ccw.m.RLock()
+	defer ccw.m.RUnlock()
 
 	content, ok := ccw.watchedFiles[path]
 	if !ok {
