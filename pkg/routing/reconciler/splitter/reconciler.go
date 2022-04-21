@@ -24,15 +24,13 @@ import (
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	splitterreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/splitter"
-	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements addressableservicereconciler.Interface for
 // AddressableService resources.
 type Reconciler struct {
-	base       common.GenericServiceReconciler
-	rtrLister  func(namespace string) listersv1alpha1.SplitterNamespaceLister
+	base       common.GenericServiceReconciler[*v1alpha1.Splitter]
 	adapterCfg *adapterConfig
 }
 
