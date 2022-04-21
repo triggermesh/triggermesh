@@ -23,7 +23,6 @@ import (
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	"knative.dev/pkg/kmeta"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -70,9 +69,4 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.Port(healthPortName, 8080),
 		resource.StartupProbe("/health", healthPortName),
 	)
-}
-
-// RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	return common.RBACOwners[*v1alpha1.AWSCloudWatchLogsSource](r.srcLister(src.GetNamespace()))
 }
