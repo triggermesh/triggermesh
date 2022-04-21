@@ -59,7 +59,6 @@ func NewController(
 	r := &Reconciler{
 		adapterCfg:   adapterCfg,
 		secretClient: kubeclient.Get(ctx).CoreV1().Secrets,
-		srcLister:    informer.Lister().ZendeskSources,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
@@ -70,6 +69,9 @@ func NewController(
 		typ,
 		impl.Tracker,
 		common.EnqueueObjectsInNamespaceOf(informer.Informer(), impl.FilteredGlobalResync, logger),
+		func(namespace string) common.Lister[*v1alpha1.ZendeskSource] {
+			return informer.Lister().ZendeskSources(namespace)
+		},
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)
