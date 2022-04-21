@@ -61,6 +61,9 @@ func NewController(
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		func(namespace string) common.Lister[*v1alpha1.TektonTarget] {
+			return informer.Lister().TektonTargets(namespace)
+		},
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
