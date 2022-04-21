@@ -54,7 +54,6 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		fnLister:   informer.Lister().Functions,
 		cmLister:   cminformerv1.Get(ctx).Lister().ConfigMaps,
 		cmCli:      k8sclient.Get(ctx).CoreV1().ConfigMaps,
 	}
@@ -65,6 +64,9 @@ func NewController(
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		func(namespace string) common.Lister[*v1alpha1.Function] {
+			return informer.Lister().Functions(namespace)
+		},
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

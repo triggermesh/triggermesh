@@ -27,7 +27,6 @@ import (
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
@@ -113,11 +112,6 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 
 		resource.EntrypointCommand(klrEntrypoint),
 	)
-}
-
-// RBACOwners implements common.AdapterServiceBuilder.
-func (r *Reconciler) RBACOwners(fn commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	return common.RBACOwners[*v1alpha1.Function](r.fnLister(fn.GetNamespace()))
 }
 
 // Lambda runtimes require file extensions to match the language,
