@@ -51,23 +51,15 @@ var knativeServingAnnotations = []string{
 	serving.UpdaterAnnotation,
 }
 
-// RBACOwnersLister returns a list of OwnerRefable to be set as a the
-// OwnerReferences metadata attribute of a ServiceAccount.
-type RBACOwnersLister interface {
-	RBACOwners(rcl v1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error)
-}
-
 // AdapterDeploymentBuilder provides all the necessary information for building
-// objects related to a component's adapter backed by a Deployment.
+// a component's adapter backed by a Deployment.
 type AdapterDeploymentBuilder interface {
-	RBACOwnersLister
 	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment
 }
 
-// AdapterServiceBuilder provides all the necessary information for building
-// objects related to a component's adapter backed by a Knative Service.
+// AdapterServiceBuilder provides all the necessary information for building a
+// component's adapter backed by a Knative Service.
 type AdapterServiceBuilder interface {
-	RBACOwnersLister
 	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service
 }
 
@@ -96,9 +88,12 @@ func (r *GenericDeploymentReconciler[T]) ReconcileAdapter(ctx context.Context, a
 
 	desiredAdapter := ab.BuildAdapter(rcl, sinkURI)
 
-	saOwners, err := ab.RBACOwners(rcl)
-	if err != nil {
-		return fmt.Errorf("listing ServiceAccount owners: %w", err)
+	saOwners := []kmeta.OwnerRefable{rcl}
+	if !v1alpha1.WantsOwnServiceAccount(rcl) {
+		var err error
+		if saOwners, err = rbacOwners(r.OwnersLister(rcl.GetNamespace())); err != nil {
+			return fmt.Errorf("listing ServiceAccount owners: %w", err)
+		}
 	}
 
 	if err := r.reconcileAdapter(ctx, desiredAdapter, saOwners); err != nil {
@@ -245,9 +240,12 @@ func (r *GenericServiceReconciler[T]) ReconcileAdapter(ctx context.Context, ab A
 
 	desiredAdapter := ab.BuildAdapter(rcl, sinkURI)
 
-	saOwners, err := ab.RBACOwners(rcl)
-	if err != nil {
-		return fmt.Errorf("listing ServiceAccount owners: %w", err)
+	saOwners := []kmeta.OwnerRefable{rcl}
+	if !v1alpha1.WantsOwnServiceAccount(rcl) {
+		var err error
+		if saOwners, err = rbacOwners(r.OwnersLister(rcl.GetNamespace())); err != nil {
+			return fmt.Errorf("listing ServiceAccount owners: %w", err)
+		}
 	}
 
 	if err := r.reconcileAdapter(ctx, desiredAdapter, saOwners); err != nil {
