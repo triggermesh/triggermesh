@@ -19,11 +19,9 @@ package filter
 import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
@@ -47,9 +45,4 @@ func (r *Reconciler) BuildAdapter(rtr commonv1alpha1.Reconcilable, _ *apis.URL) 
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
-}
-
-// RBACOwners implements common.AdapterServiceBuilder.
-func (r *Reconciler) RBACOwners(rtr commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	return common.RBACOwners[*v1alpha1.Filter](r.rtrLister(rtr.GetNamespace()))
 }
