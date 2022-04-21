@@ -51,10 +51,16 @@ func TestReconcile(t *testing.T) {
 func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
-			base:       NewTestServiceReconciler(ctx, ls),
 			adapterCfg: cfg,
-			trgLister:  ls.GetAWSSQSTargetLister().AWSSQSTargets,
 		}
+
+		r.base = NewTestServiceReconciler(
+			ctx,
+			ls,
+			func(namespace string) common.Lister[*v1alpha1.AWSSQSTarget] {
+				return ls.GetAWSSQSTargetLister().AWSSQSTargets(namespace)
+			},
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetAWSSQSTargetLister(),
