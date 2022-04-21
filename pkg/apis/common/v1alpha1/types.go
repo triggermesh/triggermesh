@@ -42,4 +42,6 @@ type AdapterOverrides struct {
 	Public *bool `json:"public,omitempty"`
 	// Resources limits and requirements applied on adapter container.
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
+	// Pod tolerations.
+	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 }
