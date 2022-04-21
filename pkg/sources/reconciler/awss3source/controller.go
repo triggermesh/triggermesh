@@ -57,7 +57,6 @@ func NewController(
 	r := &Reconciler{
 		s3Cg:       s3.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
 		adapterCfg: adapterCfg,
-		srcLister:  informer.Lister().AWSS3Sources,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
@@ -66,6 +65,9 @@ func NewController(
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		func(namespace string) common.Lister[*v1alpha1.AWSS3Source] {
+			return informer.Lister().AWSS3Sources(namespace)
+		},
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)
