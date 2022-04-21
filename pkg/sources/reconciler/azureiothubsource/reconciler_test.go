@@ -50,10 +50,16 @@ func TestReconcileSource(t *testing.T) {
 func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
-			base:       NewTestDeploymentReconciler(ctx, ls),
 			adapterCfg: cfg,
-			srcLister:  ls.GetAzureIOTHubSourceLister().AzureIOTHubSources,
 		}
+
+		r.base = NewTestDeploymentReconciler(
+			ctx,
+			ls,
+			func(namespace string) common.Lister[*v1alpha1.AzureIOTHubSource] {
+				return ls.GetAzureIOTHubSourceLister().AzureIOTHubSources(namespace)
+			},
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetAzureIOTHubSourceLister(),
