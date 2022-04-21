@@ -24,16 +24,13 @@ import (
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/flow/v1alpha1/transformation"
-	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/flow/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler
+	base       common.GenericServiceReconciler[*v1alpha1.Transformation]
 	adapterCfg *adapterConfig
-
-	trgLister func(namespace string) listersv1alpha1.TransformationNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
