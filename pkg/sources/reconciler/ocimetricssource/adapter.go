@@ -24,7 +24,6 @@ import (
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	"knative.dev/pkg/kmeta"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -67,11 +66,6 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVars(makeOCIMetricsEnvs(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
-}
-
-// RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	return common.RBACOwners[*v1alpha1.OCIMetricsSource](r.srcLister(src.GetNamespace()))
 }
 
 func makeOCIMetricsEnvs(src *v1alpha1.OCIMetricsSource) []corev1.EnvVar {
