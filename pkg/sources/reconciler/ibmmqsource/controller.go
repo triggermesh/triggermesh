@@ -48,11 +48,10 @@ func NewController(
 	envconfig.MustProcess(app, adapterCfg)
 
 	informer := informerv1alpha1.Get(ctx)
+
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		srcLister:  informer.Lister().IBMMQSources,
 	}
-
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
 	r.base = common.NewGenericDeploymentReconciler(
@@ -60,6 +59,9 @@ func NewController(
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		func(namespace string) common.Lister[*v1alpha1.IBMMQSource] {
+			return informer.Lister().IBMMQSources(namespace)
+		},
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
