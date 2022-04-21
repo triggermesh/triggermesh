@@ -23,7 +23,6 @@ import (
 	"knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	"knative.dev/pkg/kmeta"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
@@ -87,11 +86,6 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.Port(healthPortName, 8080),
 		resource.StartupProbe("/health", healthPortName),
 	)
-}
-
-// RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	return common.RBACOwners[*v1alpha1.AzureActivityLogsSource](r.srcLister(src.GetNamespace()))
 }
 
 // makeEventHubID returns the Resource ID of an Event Hubs instance based on
