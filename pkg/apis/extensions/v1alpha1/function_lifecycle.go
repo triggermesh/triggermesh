@@ -55,20 +55,36 @@ func (f *Function) GetStatusManager() *v1alpha1.StatusManager {
 
 // GetEventTypes implements EventSource.
 func (f *Function) GetEventTypes() []string {
-	if typ, ok := f.Spec.CloudEventOverrides.Extensions["type"]; ok {
+	if f.Spec.CloudEventOverrides == nil || len(f.Spec.CloudEventOverrides.Extensions) == 0 {
+		return []string{defaultCEType(f)}
+	}
+
+	if typ := f.Spec.CloudEventOverrides.Extensions["type"]; typ != "" {
 		return []string{typ}
 	}
 
+	return []string{defaultCEType(f)}
+}
+
+func defaultCEType(f *Function) string {
 	const ceDefaultTypePrefix = "io.triggermesh.function."
-	return []string{ceDefaultTypePrefix + f.Spec.Runtime}
+	return ceDefaultTypePrefix + f.Spec.Runtime
 }
 
 // AsEventSource implements EventSource.
 func (f *Function) AsEventSource() string {
-	if source, ok := f.Spec.CloudEventOverrides.Extensions["source"]; ok {
+	if f.Spec.CloudEventOverrides == nil || len(f.Spec.CloudEventOverrides.Extensions) == 0 {
+		return defaultCESource(f)
+	}
+
+	if source := f.Spec.CloudEventOverrides.Extensions["source"]; source != "" {
 		return source
 	}
 
+	return defaultCESource(f)
+}
+
+func defaultCESource(f *Function) string {
 	kind := strings.ToLower(f.GetGroupVersionKind().Kind)
 	return "io.triggermesh." + kind + "." + f.Namespace + "." + f.Name
 }
