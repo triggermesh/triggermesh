@@ -31,7 +31,6 @@ import (
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/googlecloudpubsubsource"
-	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/gcloud/pubsub"
@@ -42,10 +41,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Google Cloud APIs
 	cg pubsub.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.GoogleCloudPubSubSourceNamespaceLister
-
-	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	// Pub/Sub adapter
+	base       common.GenericDeploymentReconciler[*v1alpha1.GoogleCloudPubSubSource]
 	adapterCfg *adapterConfig
 }
 
