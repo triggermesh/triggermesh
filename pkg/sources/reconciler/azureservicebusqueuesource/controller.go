@@ -37,27 +37,33 @@ func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
+
 	typ := (*v1alpha1.AzureServiceBusQueueSource)(nil)
 	app := common.ComponentName(typ)
+
 	adapterCfg := &adapterConfig{
 		configs: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
 	}
-
 	envconfig.MustProcess(app, adapterCfg)
+
 	informer := informerv1alpha1.Get(ctx)
+
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		srcLister:  informer.Lister().AzureServiceBusQueueSources,
 	}
-
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
+
 	r.base = common.NewGenericDeploymentReconciler(
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		func(namespace string) common.Lister[*v1alpha1.AzureServiceBusQueueSource] {
+			return informer.Lister().AzureServiceBusQueueSources(namespace)
+		},
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+
 	return impl
 }
