@@ -50,6 +50,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		Requests(&cpuRes, &memRes),
 		Limits(&cpuRes, nil),
 		TerminationErrorToLogs,
+		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
 		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
 		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
 	)
@@ -81,6 +82,9 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 				},
 				Spec: corev1.PodSpec{
 					ServiceAccountName: "god-mode",
+					Tolerations: []corev1.Toleration{{
+						Key: "taint", Operator: "Exists",
+					}},
 					Containers: []corev1.Container{{
 						Name:  defaultContainerName,
 						Image: tImg,

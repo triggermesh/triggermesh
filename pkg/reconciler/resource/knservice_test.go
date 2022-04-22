@@ -47,6 +47,7 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		ServiceAccount("god-mode"),
 		Requests(&cpuRes, &memRes),
 		Limits(&cpuRes, nil),
+		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
 		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
 		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
 		VisibilityClusterLocal,
@@ -74,6 +75,9 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 					Spec: servingv1.RevisionSpec{
 						PodSpec: corev1.PodSpec{
 							ServiceAccountName: "god-mode",
+							Tolerations: []corev1.Toleration{{
+								Key: "taint", Operator: "Exists",
+							}},
 							Containers: []corev1.Container{{
 								Name:  defaultContainerName,
 								Image: tImg,

@@ -344,6 +344,10 @@ func adapterOverrideOptions(overrides *v1alpha1.AdapterOverrides) []resource.Obj
 		opts = append(opts, resource.Limits(toQuantity(overrides.Resources.Limits)))
 	}
 
+	for _, t := range overrides.Tolerations {
+		opts = append(opts, resource.Toleration(t))
+	}
+
 	return opts
 }
 

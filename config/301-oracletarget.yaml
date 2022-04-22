@@ -89,6 +89,31 @@ spec:
                           specified, otherwise to an implementation-defined value. More info:
                           https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                         type: object
+                  tolerations:
+                    description: Pod tolerations, as documented at
+                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          description: Taint key that the toleration applies to.
+                          type: string
+                        operator:
+                          description: Key's relationship to the value.
+                          type: string
+                          enum: [Exists, Equal]
+                        value:
+                          description: Taint value the toleration matches to.
+                          type: string
+                        effect:
+                          description: Taint effect to match.
+                          type: string
+                          enum: [NoSchedule, PreferNoSchedule, NoExecute]
+                        tolerationSeconds:
+                          description: Period of time a toleration of effect NoExecute tolerates the taint.
+                          type: integer
+                          format: int64
               oracleApiPrivateKey:
                 type: object
                 description: Oracle API Private Key to sign each request to the Oracle Cloud.

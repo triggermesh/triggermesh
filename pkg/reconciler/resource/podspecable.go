@@ -72,6 +72,22 @@ func ServiceAccount(sa string) ObjectOption {
 	}
 }
 
+// Toleration sets a Toleration on a PodSpecable.
+func Toleration(t corev1.Toleration) ObjectOption {
+	return func(object interface{}) {
+		var tolerations *[]corev1.Toleration
+
+		switch o := object.(type) {
+		case *appsv1.Deployment:
+			tolerations = &o.Spec.Template.Spec.Tolerations
+		case *servingv1.Service:
+			tolerations = &o.Spec.Template.Spec.Tolerations
+		}
+
+		*tolerations = append(*tolerations, t)
+	}
+}
+
 // SecretMount adds a Secret volume and a corresponding mount to a PodSpecable.
 func SecretMount(name, target, secretName, secretKey string) ObjectOption {
 	return func(object interface{}) {
