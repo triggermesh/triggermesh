@@ -36,6 +36,7 @@ import (
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
 const functionNameLabel = "extensions.triggermesh.io/function"
@@ -50,6 +51,10 @@ const appInstanceLabel = "app.kubernetes.io/instance"
 var configMapGVK = corev1.SchemeGroupVersion.WithKind("ConfigMap")
 
 func (r *Reconciler) reconcileConfigmap(ctx context.Context) error {
+	if skip.Skip(ctx) {
+		return nil
+	}
+
 	f := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.Function)
 	status := &f.Status
 

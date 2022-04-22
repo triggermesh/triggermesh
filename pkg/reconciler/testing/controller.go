@@ -17,6 +17,7 @@ limitations under the License.
 package testing
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ import (
 )
 
 // TestControllerConstructor tests that a controller constructor meets our requirements.
-func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor) {
+func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructor, opts ...ctrlerCtorTestDecorator) {
 	t.Helper()
 
 	defer func() {
@@ -42,9 +43,22 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 
 	ctx, informers := rt.SetupFakeContext(t)
 
-	// expected informers: TriggerMesh component, Adapter (Deployment/KnService), ServiceAccount, RoleBinding
-	if expect, got := 4, len(informers); got != expect {
-		t.Errorf("Expected %d injected informers, got %d", expect, got)
+	// Informers that are always expected:
+	// - TriggerMesh component kind (Source/Target/...)
+	// - Adapter kind (Deployment/Kn Service)
+	// - ServiceAccount
+	// - RoleBinding
+	expectInformers := 4
+
+	for _, opt := range opts {
+		switch t := reflect.TypeOf(opt); {
+		case t == reflect.TypeOf(ExpectExtraInformers(0)):
+			expectInformers += int(opt.(ExpectExtraInformers))
+		}
+	}
+
+	if got := len(informers); got != expectInformers {
+		t.Errorf("Expected %d injected informers, got %d", expectInformers, got)
 	}
 
 	// updateAdapterMetricsConfig panics when METRICS_DOMAIN is unset
@@ -110,3 +124,7 @@ func TestControllerConstructorFailures(t *testing.T, ctor injection.ControllerCo
 		})
 	}
 }
+
+type ctrlerCtorTestDecorator interface{}
+
+type ExpectExtraInformers int
