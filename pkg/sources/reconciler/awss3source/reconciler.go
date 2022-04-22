@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/pkg/reconciler"
@@ -38,7 +39,7 @@ type Reconciler struct {
 	s3Cg s3client.ClientGetter
 
 	// SQS adapter
-	base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source]
+	base       common.GenericAdapterReconciler[*v1alpha1.AWSS3Source, *appsv1.Deployment]
 	adapterCfg *adapterConfig
 }
 

@@ -25,6 +25,7 @@ import (
 
 	"knative.dev/pkg/reconciler"
 	"knative.dev/pkg/tracker"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
@@ -34,7 +35,7 @@ import (
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler[*v1alpha1.Function]
+	base       common.GenericAdapterReconciler[*v1alpha1.Function, *servingv1.Service]
 	adapterCfg *adapterConfig
 
 	cmLister func(namespace string) corev1listers.ConfigMapNamespaceLister

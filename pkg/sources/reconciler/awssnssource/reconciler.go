@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"knative.dev/pkg/reconciler"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -31,7 +32,7 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler[*v1alpha1.AWSSNSSource]
+	base       common.GenericAdapterReconciler[*v1alpha1.AWSSNSSource, *servingv1.Service]
 	adapterCfg *adapterConfig
 
 	// SNS client interface to interact with the SNS API

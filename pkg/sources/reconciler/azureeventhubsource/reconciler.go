@@ -19,6 +19,8 @@ package azureeventhubsource
 import (
 	"context"
 
+	appsv1 "k8s.io/api/apps/v1"
+
 	"knative.dev/pkg/reconciler"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
@@ -29,7 +31,7 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base       common.GenericDeploymentReconciler[*v1alpha1.AzureEventHubSource]
+	base       common.GenericAdapterReconciler[*v1alpha1.AzureEventHubSource, *appsv1.Deployment]
 	adapterCfg *adapterConfig
 }
 

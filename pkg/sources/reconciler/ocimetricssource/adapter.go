@@ -54,7 +54,7 @@ type adapterConfig struct {
 }
 
 // Verify that Reconciler implements common.AdapterDeploymentBuilder.
-var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
+var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {

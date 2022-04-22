@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -42,7 +43,7 @@ type Reconciler struct {
 	cg pubsub.ClientGetter
 
 	// Pub/Sub adapter
-	base       common.GenericDeploymentReconciler[*v1alpha1.GoogleCloudPubSubSource]
+	base       common.GenericAdapterReconciler[*v1alpha1.GoogleCloudPubSubSource, *appsv1.Deployment]
 	adapterCfg *adapterConfig
 }
 

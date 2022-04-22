@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 
+	appsv1 "k8s.io/api/apps/v1"
+
 	"knative.dev/pkg/reconciler"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
@@ -35,7 +37,7 @@ type Reconciler struct {
 	cg insights.ClientGetter
 
 	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler[*v1alpha1.AzureActivityLogsSource]
+	base       common.GenericAdapterReconciler[*v1alpha1.AzureActivityLogsSource, *appsv1.Deployment]
 	adapterCfg *adapterConfig
 }
 

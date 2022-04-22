@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"knative.dev/pkg/reconciler"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
@@ -30,7 +31,7 @@ import (
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler[*v1alpha1.TektonTarget]
+	base       common.GenericAdapterReconciler[*v1alpha1.TektonTarget, *servingv1.Service]
 	adapterCfg *adapterConfig
 
 	trgLister func(namespace string) listersv1alpha1.TektonTargetNamespaceLister
