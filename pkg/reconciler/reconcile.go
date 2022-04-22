@@ -38,7 +38,6 @@ import (
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/mturl"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/semantic"
@@ -51,20 +50,14 @@ var knativeServingAnnotations = []string{
 	serving.UpdaterAnnotation,
 }
 
-// AdapterDeploymentBuilder provides all the necessary information for building
-// a component's adapter backed by a Deployment.
-type AdapterDeploymentBuilder interface {
-	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment
-}
-
-// AdapterServiceBuilder provides all the necessary information for building a
-// component's adapter backed by a Knative Service.
-type AdapterServiceBuilder interface {
-	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service
+// AdapterBuilder provides all the necessary information for building a
+// component's adapter.
+type AdapterBuilder[A metav1.Object] interface {
+	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) A
 }
 
 // ReconcileAdapter reconciles a receive adapter for a component instance.
-func (r *GenericDeploymentReconciler[T]) ReconcileAdapter(ctx context.Context, ab AdapterDeploymentBuilder) reconciler.Event {
+func (r *GenericAdapterReconciler[T, A]) ReconcileAdapter(ctx context.Context, ab AdapterBuilder[A]) reconciler.Event {
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
 	rcl.GetStatusManager().CloudEventAttributes = nil
@@ -103,7 +96,7 @@ func (r *GenericDeploymentReconciler[T]) ReconcileAdapter(ctx context.Context, a
 }
 
 // resolveSinkURL resolves the URL of a sink reference.
-func (r *GenericDeploymentReconciler[T]) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
+func (r *GenericAdapterReconciler[T, A]) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
 	// If the current component type does not support sending events to a
@@ -129,8 +122,8 @@ func (r *GenericDeploymentReconciler[T]) resolveSinkURL(ctx context.Context) (*a
 }
 
 // reconcileAdapter reconciles the state of the component's adapter.
-func (r *GenericDeploymentReconciler[T]) reconcileAdapter(ctx context.Context,
-	desiredAdapter *appsv1.Deployment, rbacOwners []kmeta.OwnerRefable) error {
+func (r *GenericAdapterReconciler[T, A]) reconcileAdapter(ctx context.Context,
+	desiredAdapter A, rbacOwners []kmeta.OwnerRefable) error {
 
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
@@ -149,208 +142,60 @@ func (r *GenericDeploymentReconciler[T]) reconcileAdapter(ctx context.Context,
 
 	currentAdapter, err := r.getOrCreateAdapter(ctx, desiredAdapter)
 	if err != nil {
-		rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodClient(rcl.GetNamespace()))
+		switch a := (metav1.Object)(currentAdapter).(type) {
+		case *appsv1.Deployment:
+			rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, a, r.PodClient(rcl.GetNamespace()))
+		case *servingv1.Service:
+			rcl.GetStatusManager().PropagateServiceAvailability(a)
+		}
 		return err
 	}
 
-	currentAdapter, err = r.syncAdapterDeployment(ctx, currentAdapter, desiredAdapter)
+	currentAdapter, err = r.syncAdapter(ctx, currentAdapter, desiredAdapter)
 	if err != nil {
-		return fmt.Errorf("failed to synchronize adapter Deployment: %w", err)
+		return fmt.Errorf("failed to synchronize adapter: %w", err)
 	}
-	rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodClient(rcl.GetNamespace()))
+
+	switch a := (metav1.Object)(currentAdapter).(type) {
+	case *appsv1.Deployment:
+		rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, a, r.PodClient(rcl.GetNamespace()))
+	case *servingv1.Service:
+		rcl.GetStatusManager().PropagateServiceAvailability(a)
+	}
 
 	return nil
 }
 
 // getOrCreateAdapter returns the existing adapter Deployment for a given
 // component instance, or creates it if it is missing.
-func (r *GenericDeploymentReconciler[T]) getOrCreateAdapter(ctx context.Context, desiredAdapter *appsv1.Deployment) (*appsv1.Deployment, error) {
+func (r *GenericAdapterReconciler[T, A]) getOrCreateAdapter(ctx context.Context, desiredAdapter A) (A, error) {
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	adapter, err := findAdapter[T](r, rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
+	adapter, err := r.findAdapter(rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
 	switch {
 	case apierrors.IsNotFound(err):
 		adapter, err = r.Client(rcl.GetNamespace()).Create(ctx, desiredAdapter, metav1.CreateOptions{})
 		if err != nil {
-			return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterCreate,
-				"Failed to create adapter Deployment %q: %s", desiredAdapter.Name, err)
+			return adapter, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterCreate,
+				"Failed to create adapter %T %q: %s", adapter, desiredAdapter.GetName(), err)
 		}
-		event.Normal(ctx, ReasonAdapterCreate, "Created adapter Deployment %q", adapter.GetName())
+		event.Normal(ctx, ReasonAdapterCreate, "Created adapter %T %q", adapter, adapter.GetName())
 
 	case err != nil:
-		return nil, fmt.Errorf("failed to get adapter Deployment from cache: %w", err)
+		var a A
+		return a, fmt.Errorf("failed to get adapter %T from cache: %w", a, err)
 	}
-
-	return adapter.(*appsv1.Deployment), nil
-}
-
-// syncAdapterDeployment synchronizes the desired state of an adapter Deployment
-// against its current state in the running cluster.
-func (r *GenericDeploymentReconciler[T]) syncAdapterDeployment(ctx context.Context,
-	currentAdapter, desiredAdapter *appsv1.Deployment) (*appsv1.Deployment, error) {
-
-	// We may have found an existing adapter object that is owned by the
-	// component instance, but under a different name, e.g. created by an
-	// older version of TriggerMesh.
-	desiredAdapter.Name = currentAdapter.Name
-
-	if semantic.Semantic.DeepEqual(desiredAdapter, currentAdapter) {
-		return currentAdapter, nil
-	}
-
-	// resourceVersion must be returned to the API server unmodified for
-	// optimistic concurrency, as per Kubernetes API conventions
-	desiredAdapter.ResourceVersion = currentAdapter.ResourceVersion
-
-	// (fake Clientset) preserve status to avoid resetting conditions
-	desiredAdapter.Status = currentAdapter.Status
-
-	adapter, err := r.Client(currentAdapter.Namespace).Update(ctx, desiredAdapter, metav1.UpdateOptions{})
-	if err != nil {
-		return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterUpdate,
-			"Failed to update adapter Deployment %q: %s", desiredAdapter.Name, err)
-	}
-	event.Normal(ctx, ReasonAdapterUpdate, "Updated adapter Deployment %q", adapter.Name)
 
 	return adapter, nil
 }
 
-// ReconcileAdapter reconciles a receive adapter for a component instance.
-func (r *GenericServiceReconciler[T]) ReconcileAdapter(ctx context.Context, ab AdapterServiceBuilder) reconciler.Event {
-	rcl := v1alpha1.ReconcilableFromContext(ctx)
-
-	rcl.GetStatusManager().CloudEventAttributes = nil
-	if src, isEventSource := rcl.(v1alpha1.EventSource); isEventSource {
-		rcl.GetStatusManager().CloudEventAttributes = CreateCloudEventAttributes(
-			src.AsEventSource(), src.GetEventTypes())
-	}
-
-	rcl.GetStatusManager().AcceptedEventTypes = nil
-	if rcv, isEventReceiver := rcl.(v1alpha1.EventReceiver); isEventReceiver {
-		rcl.GetStatusManager().AcceptedEventTypes = rcv.AcceptedEventTypes()
-	}
-
-	sinkURI, err := r.resolveSinkURL(ctx)
-	if err != nil {
-		rcl.GetStatusManager().MarkNoSink()
-		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning,
-			ReasonBadSinkURI, "Could not resolve sink URI: %s", err))
-	}
-	rcl.GetStatusManager().MarkSink(sinkURI)
-
-	desiredAdapter := ab.BuildAdapter(rcl, sinkURI)
-
-	saOwners := []kmeta.OwnerRefable{rcl}
-	if !v1alpha1.WantsOwnServiceAccount(rcl) {
-		var err error
-		if saOwners, err = rbacOwners(r.OwnersLister(rcl.GetNamespace())); err != nil {
-			return fmt.Errorf("listing ServiceAccount owners: %w", err)
-		}
-	}
-
-	if err := r.reconcileAdapter(ctx, desiredAdapter, saOwners); err != nil {
-		return fmt.Errorf("failed to reconcile adapter: %w", err)
-	}
-	return nil
-}
-
-// resolveSinkURL resolves the URL of a sink reference.
-func (r *GenericServiceReconciler[T]) resolveSinkURL(ctx context.Context) (*apis.URL, error) {
-	rcl := v1alpha1.ReconcilableFromContext(ctx)
-
-	// If the current component type does not support sending events to a
-	// sink, or if a particular instance does not define a sink Destination
-	// as part of its spec, we return a nil apis.URL that is serializable
-	// to an empty string. This effectively disables the sink feature and
-	// clears any stale SinkProvided status condition.
-	sdr, isEventSender := rcl.(v1alpha1.EventSender)
-	if !isEventSender {
-		return nil, nil
-	}
-
-	sink := sdr.GetSink()
-	if sink.Ref == nil && sink.URI == nil {
-		return nil, nil
-	}
-
-	if sinkRef := sink.Ref; sinkRef != nil && sinkRef.Namespace == "" {
-		sinkRef.Namespace = rcl.GetNamespace()
-	}
-
-	return r.SinkResolver.URIFromDestinationV1(ctx, *sink, rcl)
-}
-
-// reconcileAdapter reconciles the state of the component's adapter.
-func (r *GenericServiceReconciler[T]) reconcileAdapter(ctx context.Context,
-	desiredAdapter *servingv1.Service, rbacOwners []kmeta.OwnerRefable) error {
-
-	rcl := v1alpha1.ReconcilableFromContext(ctx)
-
-	isMultiTenant := v1alpha1.IsMultiTenant(rcl)
-
-	sa, err := r.reconcileRBAC(ctx, rbacOwners)
-	if err != nil {
-		rcl.GetStatusManager().MarkRBACNotBound()
-		return fmt.Errorf("reconciling RBAC objects: %w", err)
-	}
-
-	if isMultiTenant {
-		// delegate ownership to the ServiceAccount in order to cause a
-		// garbage collection once all instances of the given component
-		// type have been deleted from the namespace
-		OwnByServiceAccount(desiredAdapter, sa)
-	}
-
-	currentAdapter, err := r.getOrCreateAdapter(ctx, desiredAdapter)
-	if err != nil {
-		rcl.GetStatusManager().PropagateServiceAvailability(currentAdapter)
-		return err
-	}
-
-	currentAdapter, err = r.syncAdapterService(ctx, currentAdapter, desiredAdapter)
-	if err != nil {
-		return fmt.Errorf("failed to synchronize adapter Service: %w", err)
-	}
-
-	rcl.GetStatusManager().PropagateServiceAvailability(currentAdapter)
-	if isMultiTenant {
-		rcl.GetStatusManager().SetRoute(mturl.URLPath(rcl))
-	}
-
-	return nil
-}
-
-// getOrCreateAdapter returns the existing adapter Service for a given
-// component instance, or creates it if it is missing.
-func (r *GenericServiceReconciler[T]) getOrCreateAdapter(ctx context.Context, desiredAdapter *servingv1.Service) (*servingv1.Service, error) {
-	rcl := v1alpha1.ReconcilableFromContext(ctx)
-
-	adapter, err := findAdapter[T](r, rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
-	switch {
-	case apierrors.IsNotFound(err):
-		adapter, err = r.Client(rcl.GetNamespace()).Create(ctx, desiredAdapter, metav1.CreateOptions{})
-		if err != nil {
-			return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterCreate,
-				"Failed to create adapter Service %q: %s", desiredAdapter.Name, err)
-		}
-		event.Normal(ctx, ReasonAdapterCreate, "Created adapter Service %q", adapter.GetName())
-
-	case err != nil:
-		return nil, fmt.Errorf("failed to get adapter Service from cache: %w", err)
-	}
-
-	return adapter.(*servingv1.Service), nil
-}
-
-// syncAdapterService synchronizes the desired state of an adapter Service
-// against its current state in the running cluster.
-func (r *GenericServiceReconciler[T]) syncAdapterService(ctx context.Context,
-	currentAdapter, desiredAdapter *servingv1.Service) (*servingv1.Service, error) {
-
+// syncAdapter synchronizes the desired state of an adapter against its current
+// state in the running cluster.
+func (r *GenericAdapterReconciler[T, A]) syncAdapter(ctx context.Context, currentAdapter, desiredAdapter A) (A, error) {
 	// We may have found an existing adapter object that is owned by the
 	// component instance, but under a different name, e.g. created by an
 	// older version of TriggerMesh.
-	desiredAdapter.Name = currentAdapter.Name
+	desiredAdapter.SetName(currentAdapter.GetName())
 
 	if semantic.Semantic.DeepEqual(desiredAdapter, currentAdapter) {
 		return currentAdapter, nil
@@ -358,32 +203,30 @@ func (r *GenericServiceReconciler[T]) syncAdapterService(ctx context.Context,
 
 	// resourceVersion must be returned to the API server unmodified for
 	// optimistic concurrency, as per Kubernetes API conventions
-	desiredAdapter.ResourceVersion = currentAdapter.ResourceVersion
-
-	// immutable Knative annotations must be preserved
-	for _, ann := range knativeServingAnnotations {
-		if val, ok := currentAdapter.Annotations[ann]; ok {
-			metav1.SetMetaDataAnnotation(&desiredAdapter.ObjectMeta, ann, val)
-		}
-	}
+	desiredAdapter.SetResourceVersion(currentAdapter.GetResourceVersion())
 
 	// (fake Clientset) preserve status to avoid resetting conditions
-	desiredAdapter.Status = currentAdapter.Status
-
-	adapter, err := r.Client(currentAdapter.Namespace).Update(ctx, desiredAdapter, metav1.UpdateOptions{})
-	if err != nil {
-		return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterUpdate,
-			"Failed to update adapter Service %q: %s", desiredAdapter.Name, err)
+	switch currentAdapter := (metav1.Object)(currentAdapter).(type) {
+	case *appsv1.Deployment:
+		desiredAdapter := (metav1.Object)(desiredAdapter).(*appsv1.Deployment)
+		desiredAdapter.Status = currentAdapter.Status
+	case *servingv1.Service:
+		desiredAdapter := (metav1.Object)(desiredAdapter).(*servingv1.Service)
+		desiredAdapter.Status = currentAdapter.Status
 	}
-	event.Normal(ctx, ReasonAdapterUpdate, "Updated adapter Service %q", adapter.Name)
+
+	adapter, err := r.Client(currentAdapter.GetNamespace()).Update(ctx, desiredAdapter, metav1.UpdateOptions{})
+	if err != nil {
+		return adapter, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedAdapterUpdate,
+			"Failed to update adapter %T %q: %s", adapter, desiredAdapter.GetName(), err)
+	}
+	event.Normal(ctx, ReasonAdapterUpdate, "Updated adapter Deployment %q", adapter.GetName())
 
 	return adapter, nil
 }
 
 // findAdapter returns the adapter object for a given component instance if it exists.
-func findAdapter[T kmeta.OwnerRefable](genericReconciler interface{},
-	rcl v1alpha1.Reconcilable, owner *metav1.OwnerReference) (metav1.Object, error) {
-
+func (r *GenericAdapterReconciler[T, A]) findAdapter(rcl v1alpha1.Reconcilable, owner *metav1.OwnerReference) (A, error) {
 	ls := CommonObjectLabels(rcl)
 
 	if !v1alpha1.IsMultiTenant(rcl) {
@@ -392,34 +235,26 @@ func findAdapter[T kmeta.OwnerRefable](genericReconciler interface{},
 		ls[appInstanceLabel] = rcl.GetName()
 	}
 
+	var a A
+
 	sel := labels.SelectorFromValidatedSet(ls)
 
+	adapters, err := r.Lister(rcl.GetNamespace()).List(sel)
+	if err != nil {
+		return a, err
+	}
+
 	var objs []metav1.Object
+	for _, a := range adapters {
+		objs = append(objs, a)
+	}
+
 	var gr schema.GroupResource
 
-	switch r := genericReconciler.(type) {
-	case *GenericDeploymentReconciler[T]:
-		depls, err := r.Lister(rcl.GetNamespace()).List(sel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, d := range depls {
-			objs = append(objs, d)
-		}
-
+	switch (metav1.Object)(a).(type) {
+	case *appsv1.Deployment:
 		gr = appsv1.Resource("deployment")
-
-	case *GenericServiceReconciler[T]:
-		svcs, err := r.Lister(rcl.GetNamespace()).List(sel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, s := range svcs {
-			objs = append(objs, s)
-		}
-
+	case *servingv1.Service:
 		gr = servingv1.Resource("service")
 	}
 
@@ -427,11 +262,11 @@ func findAdapter[T kmeta.OwnerRefable](genericReconciler interface{},
 		objOwner := metav1.GetControllerOfNoCopy(obj)
 
 		if objOwner.UID == owner.UID {
-			return obj, nil
+			return obj.(A), nil
 		}
 	}
 
-	return nil, newNotFoundForSelector(gr, sel)
+	return a, newNotFoundForSelector(gr, sel)
 }
 
 // newNotFoundForSelector returns an error which indicates that no object of
