@@ -49,7 +49,7 @@ type CloudEventsSourceSpec struct {
 	// +optional
 	Credentials *HTTPCredentials `json:"credentials,omitempty"`
 
-	// Path under which request are accepted
+	// Path under which requests are accepted.
 	// +optional
 	Path *string `json:"path,omitempty"`
 
