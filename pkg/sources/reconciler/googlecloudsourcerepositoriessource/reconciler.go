@@ -81,7 +81,12 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudS
 		return fmt.Errorf("failed to reconcile Pub/Sub resources: %w", err)
 	}
 
-	if err = ensureTopicAssociated(ctx, repoCli, topic); err != nil {
+	var publishServiceAccount string
+	if sa := o.Spec.PublishServiceAccount; sa != nil {
+		publishServiceAccount = *sa
+	}
+
+	if err = ensureTopicAssociated(ctx, repoCli, topic, publishServiceAccount); err != nil {
 		return fmt.Errorf("failed to reconcile Repo notification: %w", err)
 	}
 

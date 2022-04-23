@@ -3017,6 +3017,11 @@ func (in *GoogleCloudSourceRepositoriesSourceSpec) DeepCopyInto(out *GoogleCloud
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.Repository = in.Repository
 	in.PubSub.DeepCopyInto(&out.PubSub)
+	if in.PublishServiceAccount != nil {
+		in, out := &in.PublishServiceAccount, &out.PublishServiceAccount
+		*out = new(string)
+		**out = **in
+	}
 	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides

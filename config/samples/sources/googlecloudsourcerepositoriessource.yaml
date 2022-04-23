@@ -26,6 +26,8 @@ metadata:
 spec:
   repository: projects/my-project/repos/my-repo
 
+  publishServiceAccount: pubsub-publisher@my-project.iam.gserviceaccount.com
+
   serviceAccountKey:
     value: >-
       {
