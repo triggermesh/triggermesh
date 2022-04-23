@@ -64,10 +64,9 @@ func (ccw *cachedFileWatcher) Start(ctx context.Context) {
 	ccw.cw.Start(ctx)
 }
 
+// updateContentFromFile does not locks the watchedFiles map, it is up
+// to the caller to do so.
 func (ccw *cachedFileWatcher) updateContentFromFile(path string) error {
-	ccw.m.Lock()
-	defer ccw.m.Unlock()
-
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return err
@@ -79,6 +78,8 @@ func (ccw *cachedFileWatcher) updateContentFromFile(path string) error {
 
 func (ccw *cachedFileWatcher) callback(path string) WatchCallback {
 	return func() {
+		ccw.m.Lock()
+		defer ccw.m.Unlock()
 		if err := ccw.updateContentFromFile(path); err != nil {
 			ccw.logger.Error("Could not read watched file", zap.Error(err))
 		}

@@ -30,6 +30,10 @@ func (s *CloudEventsSource) Validate(ctx context.Context) *apis.FieldError {
 
 // Validate CloudEventsSource spec
 func (s *CloudEventsSourceSpec) Validate(ctx context.Context) *apis.FieldError {
+	if s.Credentials == nil {
+		return nil
+	}
+
 	return s.Credentials.Validate(ctx).ViaField("credentials")
 }
 
@@ -40,13 +44,6 @@ func (c *HTTPCredentials) Validate(ctx context.Context) *apis.FieldError {
 		if _, err := json.Marshal(c.BasicAuths); err != nil {
 			errs = errs.Also(apis.ErrInvalidValue(
 				"basic authentication parameter cannot be marshaled into JSON", "basicAuths", err.Error()))
-		}
-	}
-
-	if len(c.Tokens) != 0 {
-		if _, err := json.Marshal(c.Tokens); err != nil {
-			errs = errs.Also(apis.ErrInvalidValue(
-				"authentication token parameter cannot be marshaled into JSON", "tokens", err.Error()))
 		}
 	}
 

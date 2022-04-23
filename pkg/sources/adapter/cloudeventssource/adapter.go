@@ -41,7 +41,7 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 		logger.Panicw("Could not create a file watcher", zap.Error(err))
 	}
 
-	for _, as := range append(env.BasicAuths, env.Tokens...) {
+	for _, as := range env.BasicAuths {
 		if err := cfw.Add(as.MountedValueFile); err != nil {
 			logger.Panicw(
 				fmt.Sprintf("Authentication secret at %q could not be watched", as.MountedValueFile),
@@ -51,7 +51,6 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 
 	ceh := &cloudEventsHandler{
 		basicAuths: env.BasicAuths,
-		tokens:     env.Tokens,
 
 		cfw:      cfw,
 		ceClient: ceClient,
@@ -64,7 +63,7 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 	if env.Path != "" {
 		options = append(options, cehttp.WithPath(env.Path))
 	}
-	if len(env.BasicAuths) != 0 || len(env.Tokens) != 0 {
+	if len(env.BasicAuths) != 0 {
 		options = append(options, cehttp.WithMiddleware(ceh.handleAuthentication))
 	}
 

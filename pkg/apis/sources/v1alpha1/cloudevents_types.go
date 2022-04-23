@@ -63,19 +63,12 @@ type CloudEventsSourceSpec struct {
 // HTTPCredentials to be used when receiving requests.
 type HTTPCredentials struct {
 	BasicAuths []HTTPBasicAuth `json:"basicAuths,omitempty"`
-	Tokens     []HTTPToken     `json:"tokens,omitempty"`
 }
 
 // HTTPBasicAuth credentials.
 type HTTPBasicAuth struct {
 	Username string                  `json:"username"`
 	Password v1alpha1.ValueFromField `json:"password"`
-}
-
-// HTTPToken credentials.
-type HTTPToken struct {
-	Header string                  `json:"header"`
-	Value  v1alpha1.ValueFromField `json:"value"`
 }
 
 // RateLimiter parameters.

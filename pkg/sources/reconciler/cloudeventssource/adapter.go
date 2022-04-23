@@ -42,7 +42,6 @@ import (
 const (
 	envCloudEventsPath                 = "CLOUDEVENTS_PATH"
 	envCloudEventsBasicAuthCredentials = "CLOUDEVENTS_BASICAUTH_CREDENTIALS"
-	envCloudEventsTokenCredentials     = "CLOUDEVENTS_TOKEN_CREDENTIALS"
 	envCloudEventsRateLimiterRPS       = "CLOUDEVENTS_RATELIMITER_RPS"
 )
 
@@ -75,65 +74,38 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVars(makeAppEnv(typedSrc)...),
 	}
 
-	// For each BasicAuth credentials a secret is mounted and a tuple
-	// key/mounted-file pair is added to the environment variable.
-	kvs := []KeyMountedValue{}
+	if typedSrc.Spec.Credentials != nil {
+		// For each BasicAuth credentials a secret is mounted and a tuple
+		// key/mounted-file pair is added to the environment variable.
+		kvs := []KeyMountedValue{}
 
-	secretArrayNamePrefix := "basicauths"
-	secretBasePath := "/opt"
-	secretFileName := "cesource"
+		secretArrayNamePrefix := "basicauths"
+		secretBasePath := "/opt"
+		secretFileName := "cesource"
 
-	for i, ba := range typedSrc.Spec.Credentials.BasicAuths {
-		if ba.Password.ValueFromSecret != nil {
-			secretName := fmt.Sprintf("%s%d", secretArrayNamePrefix, i)
-			secretPath := filepath.Join(secretBasePath, secretName)
+		for i, ba := range typedSrc.Spec.Credentials.BasicAuths {
+			if ba.Password.ValueFromSecret != nil {
+				secretName := fmt.Sprintf("%s%d", secretArrayNamePrefix, i)
+				secretPath := filepath.Join(secretBasePath, secretName)
 
-			options = append(options, secretMountAtPath(
-				secretName,
-				secretPath,
-				secretFileName,
-				ba.Password.ValueFromSecret.Name,
-				ba.Password.ValueFromSecret.Key))
+				options = append(options, secretMountAtPath(
+					secretName,
+					secretPath,
+					secretFileName,
+					ba.Password.ValueFromSecret.Name,
+					ba.Password.ValueFromSecret.Key))
 
-			kvs = append(kvs, KeyMountedValue{
-				Key:              ba.Username,
-				MountedValueFile: path.Join(secretPath, secretFileName),
-			})
+				kvs = append(kvs, KeyMountedValue{
+					Key:              ba.Username,
+					MountedValueFile: path.Join(secretPath, secretFileName),
+				})
+			}
 		}
-	}
 
-	if len(kvs) != 0 {
-		s, _ := json.Marshal(kvs)
-		options = append(options, resource.EnvVar(envCloudEventsBasicAuthCredentials, string(s)))
-
-		// empty kvs for re-using at tokens
-		kvs = kvs[:0]
-	}
-
-	secretArrayNamePrefix = "tokens"
-
-	for i, t := range typedSrc.Spec.Credentials.Tokens {
-		if t.Value.ValueFromSecret != nil {
-			secretName := fmt.Sprintf("%s%d", secretArrayNamePrefix, i)
-			secretPath := filepath.Join(secretBasePath, secretName)
-
-			options = append(options, secretMountAtPath(
-				secretName,
-				secretPath,
-				secretFileName,
-				t.Value.ValueFromSecret.Name,
-				t.Value.ValueFromSecret.Key))
-
-			kvs = append(kvs, KeyMountedValue{
-				Key:              t.Header,
-				MountedValueFile: path.Join(secretPath, secretFileName),
-			})
+		if len(kvs) != 0 {
+			s, _ := json.Marshal(kvs)
+			options = append(options, resource.EnvVar(envCloudEventsBasicAuthCredentials, string(s)))
 		}
-	}
-
-	if len(kvs) != 0 {
-		s, _ := json.Marshal(kvs)
-		options = append(options, resource.EnvVar(envCloudEventsTokenCredentials, string(s)))
 	}
 
 	return common.NewAdapterKnService(src, sinkURI, options...)

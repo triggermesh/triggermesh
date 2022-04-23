@@ -80,16 +80,6 @@ func newEventSource() *v1alpha1.CloudEventsSource {
 						},
 					},
 				},
-				Tokens: []v1alpha1.HTTPToken{
-					{
-						Header: "header",
-						Value: commonv1alpha1.ValueFromField{
-							ValueFromSecret: &v1.SecretKeySelector{
-								Key: "key",
-							},
-						},
-					},
-				},
 			},
 			Path: &path,
 			RateLimiter: &v1alpha1.RateLimiter{

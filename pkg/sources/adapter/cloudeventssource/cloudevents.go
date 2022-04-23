@@ -50,7 +50,6 @@ import (
 
 type cloudEventsHandler struct {
 	basicAuths KeyMountedValues
-	tokens     KeyMountedValues
 
 	cfw      fs.CachedFileWatcher
 	ceServer cloudevents.Client
@@ -110,35 +109,9 @@ func (h *cloudEventsHandler) handleAuthentication(next http.Handler) http.Handle
 					return
 				}
 			}
-
-			w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
 		}
 
-		for _, kv := range h.tokens {
-			token := r.Header.Get(kv.Key)
-			if token == "" {
-				continue
-			}
-
-			t, err := h.cfw.GetContent(kv.MountedValueFile)
-			if err != nil {
-				h.logger.Errorw(
-					fmt.Sprintf("Could not retrieve token for header %q", kv.Key),
-					zap.Error(err))
-				continue
-			}
-
-			tokenHash := sha256.Sum256([]byte(token))
-			expectedTokenHash := sha256.Sum256(t)
-
-			if subtle.ConstantTimeCompare(tokenHash[:], expectedTokenHash[:]) == 1 {
-				next.ServeHTTP(w, r)
-				return
-			}
-		}
-
+		w.Header().Set("WWW-Authenticate", `Basic realm="restricted", charset="UTF-8"`)
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 	})
 }

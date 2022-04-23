@@ -37,18 +37,6 @@ spec:
           name: password2
           key: password
 
-    tokens:
-    - header: header1
-      value:
-        valueFromSecret:
-          name: token1
-          key: token
-    - header: header2
-      value:
-        valueFromSecret:
-          name: token2
-          key: token
-
   path: /mypath
 
   rateLimiter:

@@ -85,40 +85,7 @@ spec:
                       - username
                       - password
 
-                  tokens:
-                    description: Array of API Authentication tokens at HTTP header.
-                      All present header/value tuples are considered valid.
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        header:
-                          description: HTTP header name informing the token.
-                          type: string
-                        value:
-                          description: HTTP authentication token.
-                          type: object
-                          properties:
-                            valueFromSecret:
-                              description: A reference to a Kubernetes Secret object containing the token.
-                              type: object
-                              properties:
-                                name:
-                                  description: Name of the Secret object.
-                                  type: string
-                                key:
-                                  description: Key from the Secret object.
-                                  type: string
-                              required:
-                              - name
-                              - key
-                          required: [valueFromSecret]
-                      required:
-                      - header
-                      - value
-                anyOf:
-                - required: [basicAuths]
-                - required: [tokens]
+                required: [basicAuths]
 
               path:
                 description: Path where incoming CloudEvents will be accepted.

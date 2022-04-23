@@ -58,8 +58,7 @@ const (
 	tSecret1 = "secret1"
 	tSecret2 = "secret2"
 
-	tUser  = "user"
-	tToken = "token"
+	tUser = "user"
 )
 
 var (
@@ -67,12 +66,6 @@ var (
 		{
 			Key:              tUser,
 			MountedValueFile: tSecret1Path,
-		},
-	}
-	tokens = KeyMountedValues{
-		{
-			Key:              tToken,
-			MountedValueFile: tSecret2Path,
 		},
 	}
 )
@@ -134,7 +127,6 @@ func TestCloudEventsSourceAuthentication(t *testing.T) {
 	tc := map[string]struct {
 		requestUsername string
 		requestPassword string
-		requestHeaders  map[string]string
 
 		expectCode int
 	}{
@@ -156,18 +148,6 @@ func TestCloudEventsSourceAuthentication(t *testing.T) {
 			requestPassword: tSecret1 + "saltpepper",
 			expectCode:      http.StatusUnauthorized,
 		},
-		"valid Token": {
-			requestHeaders: map[string]string{tToken: tSecret2},
-			expectCode:     http.StatusOK,
-		},
-		"wrong Token, header key is not used for authentication": {
-			requestHeaders: map[string]string{tToken + "saltpepper": tSecret2},
-			expectCode:     http.StatusUnauthorized,
-		},
-		"wrong Token value": {
-			requestHeaders: map[string]string{tToken: tSecret2 + "saltpepper"},
-			expectCode:     http.StatusUnauthorized,
-		},
 	}
 
 	for name, c := range tc {
@@ -183,7 +163,6 @@ func TestCloudEventsSourceAuthentication(t *testing.T) {
 
 			handler := &cloudEventsHandler{
 				basicAuths: basicAuths,
-				tokens:     tokens,
 
 				cfw:    cfw,
 				logger: logger,
@@ -201,10 +180,6 @@ func TestCloudEventsSourceAuthentication(t *testing.T) {
 
 			if c.requestUsername != "" {
 				req.SetBasicAuth(c.requestUsername, c.requestPassword)
-			}
-
-			for k, v := range c.requestHeaders {
-				req.Header.Add(k, v)
 			}
 
 			res, err := http.DefaultClient.Do(req)
