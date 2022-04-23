@@ -60,3 +60,8 @@ func (t *XMLToJSONTransformation) GetStatusManager() *v1alpha1.StatusManager {
 func (t *XMLToJSONTransformation) GetSink() *duckv1.Destination {
 	return &t.Spec.Sink
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *XMLToJSONTransformation) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

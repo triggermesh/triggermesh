@@ -37,12 +37,13 @@ type GoogleSheetTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*GoogleSheetTarget)(nil)
-	_ v1alpha1.EventReceiver = (*GoogleSheetTarget)(nil)
-	_ v1alpha1.EventSource   = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventSource         = (*GoogleSheetTarget)(nil)
 )
 
-// GoogleSheetTargetSpec holds the desired state of the GoogleSheetTarget.
+// GoogleSheetTargetSpec defines the desired state of the event target.
 type GoogleSheetTargetSpec struct {
 	// GoogleSheet credential JSON for auth
 	GoogleServiceAccount SecretValueFromSource `json:"googleServiceAccount"`
@@ -52,11 +53,15 @@ type GoogleSheetTargetSpec struct {
 
 	// DefaultPrefix is a pre-defined prefix for the individual sheets.
 	DefaultPrefix string `json:"defaultPrefix"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleSheetTargetList is a list of GoogleSheetTarget resources
+// GoogleSheetTargetList is a list of event target instances.
 type GoogleSheetTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

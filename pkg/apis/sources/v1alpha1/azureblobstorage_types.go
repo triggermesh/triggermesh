@@ -38,9 +38,10 @@ type AzureBlobStorageSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AzureBlobStorageSource)(nil)
-	_ v1alpha1.EventSource  = (*AzureBlobStorageSource)(nil)
-	_ v1alpha1.EventSender  = (*AzureBlobStorageSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureBlobStorageSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureBlobStorageSource)(nil)
+	_ v1alpha1.EventSource         = (*AzureBlobStorageSource)(nil)
+	_ v1alpha1.EventSender         = (*AzureBlobStorageSource)(nil)
 )
 
 // AzureBlobStorageSourceSpec defines the desired state of the event source.
@@ -76,6 +77,10 @@ type AzureBlobStorageSourceSpec struct {
 	// Authentication method to interact with the Azure REST API.
 	// This event source only supports the ServicePrincipal authentication.
 	Auth AzureAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // AzureBlobStorageSourceStatus defines the observed state of the event source.

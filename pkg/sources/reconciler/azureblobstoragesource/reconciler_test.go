@@ -36,8 +36,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventgrid/mgmt/eventgrid"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
@@ -432,7 +432,7 @@ const mockEventSubscriptionsDataKey = "eventSubs"
 // be used as TableRow data.
 func makeMockEventSubscriptions(inSync bool) map[string]interface{} {
 	sub := newEventSubscription(tEventHubID.String(), newEventSource().GetEventTypes())
-	sub.ID = to.StringPtr("/irrelevant/resource/id")
+	sub.ID = to.Ptr("/irrelevant/resource/id")
 
 	if !inSync {
 		// inject arbitrary change to cause comparison to be false

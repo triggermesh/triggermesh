@@ -35,10 +35,12 @@ import (
 	fakeservingclient "knative.dev/serving/pkg/client/clientset/versioned/fake"
 	servinglistersv1 "knative.dev/serving/pkg/client/listers/serving/v1"
 
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeclient "github.com/triggermesh/triggermesh/pkg/client/generated/clientset/internalclientset/fake"
+	extensionslistersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/extensions/v1alpha1"
 	flowlistersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/flow/v1alpha1"
 	sourceslistersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
 	targetslistersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
@@ -157,7 +159,7 @@ func (l *Listers) GetAWSCloudWatchSourceLister() sourceslistersv1alpha1.AWSCloud
 	return sourceslistersv1alpha1.NewAWSCloudWatchSourceLister(l.IndexerFor(&sourcesv1alpha1.AWSCloudWatchSource{}))
 }
 
-// GetAWSCloudWatchLogsSourceLister returns a Lister for AWSCloudWatchSource objects.
+// GetAWSCloudWatchLogsSourceLister returns a Lister for AWSCloudWatchLogsSource objects.
 func (l *Listers) GetAWSCloudWatchLogsSourceLister() sourceslistersv1alpha1.AWSCloudWatchLogsSourceLister {
 	return sourceslistersv1alpha1.NewAWSCloudWatchLogsSourceLister(l.IndexerFor(&sourcesv1alpha1.AWSCloudWatchLogsSource{}))
 }
@@ -465,4 +467,9 @@ func (l *Listers) GetUiPathTargetLister() targetslistersv1alpha1.UiPathTargetLis
 // GetZendeskTargetLister returns a Lister for ZendeskTarget objects.
 func (l *Listers) GetZendeskTargetLister() targetslistersv1alpha1.ZendeskTargetLister {
 	return targetslistersv1alpha1.NewZendeskTargetLister(l.IndexerFor(&targetsv1alpha1.ZendeskTarget{}))
+}
+
+// GetFunctionLister returns a Lister for Function objects.
+func (l *Listers) GetFunctionLister() extensionslistersv1alpha1.FunctionLister {
+	return extensionslistersv1alpha1.NewFunctionLister(l.IndexerFor(&extensionsv1alpha1.Function{}))
 }

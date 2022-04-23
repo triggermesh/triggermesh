@@ -80,3 +80,8 @@ func (t *DatadogTarget) AsEventSource() string {
 	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
 	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *DatadogTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

@@ -39,9 +39,10 @@ type AWSCodeCommitSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSCodeCommitSource)(nil)
-	_ v1alpha1.EventSource  = (*AWSCodeCommitSource)(nil)
-	_ v1alpha1.EventSender  = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.EventSource         = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.EventSender         = (*AWSCodeCommitSource)(nil)
 )
 
 // AWSCodeCommitSourceSpec defines the desired state of the event source.
@@ -59,6 +60,10 @@ type AWSCodeCommitSourceSpec struct {
 
 	// Authentication method to interact with the Amazon CodeCommit API.
 	Auth AWSAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

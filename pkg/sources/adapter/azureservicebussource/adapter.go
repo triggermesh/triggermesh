@@ -260,13 +260,11 @@ loop:
 					return fmt.Errorf("error transforming message: %w", err)
 				}
 
-				err = a.handleMessage(ctx, msg)
-				if err != nil {
+				if err := a.handleMessage(ctx, msg); err != nil {
 					return fmt.Errorf("error processing message: %w", err)
 				}
 
-				err = a.msgRcvr.CompleteMessage(ctx, m)
-				if err != nil {
+				if err := a.msgRcvr.CompleteMessage(ctx, m, nil); err != nil {
 					return fmt.Errorf("error completing message: %w", err)
 				}
 			}

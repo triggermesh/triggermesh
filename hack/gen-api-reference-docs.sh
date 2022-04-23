@@ -54,12 +54,8 @@ fail() {
 install_go_bin() {
     local pkg
     pkg="$1"
-    (
-        cd "$(mktemp -d)"
-        go mod init tmp
-        go get -u "$pkg"
-        # will be downloaded to "$(go env GOPATH)/bin/$(basename $pkg)"
-    )
+    go install "$pkg"
+    # will be downloaded to "$(go env GOPATH)/bin/$(basename $pkg)"
 }
 
 repo_tarball_url() {
@@ -112,6 +108,10 @@ cleanup() {
     fi
 }
 
+# The 'extglob' flag is used by the Bash parser. Functions are parsed ahead of execution, therefore the flag must be set
+# before the code containing extended globs is parsed.
+# See also https://stackoverflow.com/a/49283991
+shopt -s extglob
 
 main() {
     if [[ -n "${GOPATH:-}" ]]; then
@@ -154,7 +154,7 @@ main() {
 
     mkdir -p "$OUTPUT_DIR/"
 
-    array=(${triggermesh_root}/pkg/apis/*/)
+    array=(${triggermesh_root}/pkg/apis/!(common)/)
     for dir in "${array[@]}"
     do
         local group output

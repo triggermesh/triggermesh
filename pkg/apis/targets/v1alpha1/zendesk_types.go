@@ -37,12 +37,13 @@ type ZendeskTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*ZendeskTarget)(nil)
-	_ v1alpha1.EventReceiver = (*ZendeskTarget)(nil)
-	_ v1alpha1.EventSource   = (*ZendeskTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*ZendeskTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*ZendeskTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*ZendeskTarget)(nil)
+	_ v1alpha1.EventSource         = (*ZendeskTarget)(nil)
 )
 
-// ZendeskTargetSpec holds the desired state of the ZendeskTarget.
+// ZendeskTargetSpec defines the desired state of the event target.
 type ZendeskTargetSpec struct {
 	// Token contains the Zendesk account Token.
 	Token SecretValueFromSource `json:"token"`
@@ -56,11 +57,15 @@ type ZendeskTargetSpec struct {
 	// Subject a static subject assignemnt for every ticket.
 	// +optional
 	Subject string `json:"subject,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// ZendeskTargetList is a list of ZendeskTarget resources
+// ZendeskTargetList is a list of event target instances.
 type ZendeskTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

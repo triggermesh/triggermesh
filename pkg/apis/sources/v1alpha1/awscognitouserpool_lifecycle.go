@@ -69,3 +69,8 @@ func (s *AWSCognitoUserPoolSource) GetEventTypes() []string {
 func (s *AWSCognitoUserPoolSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AWSCognitoUserPoolSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

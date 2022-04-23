@@ -62,6 +62,11 @@ func (s *AzureActivityLogsSource) AsEventSource() string {
 	return subsID.String()
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *AzureActivityLogsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Supported event types
 const (
 	// https://docs.microsoft.com/en-us/azure/azure-monitor/platform/activity-log-schema

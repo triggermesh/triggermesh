@@ -29,8 +29,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Transformation is a Knative abstraction that encapsulates the interface by which Knative
-// components express a desire to have a particular image cached.
+// Transformation allows to declaratively perform data transformations on CloudEvents.
 type Transformation struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -43,11 +42,12 @@ var (
 	_ apis.Validatable = (*Transformation)(nil)
 	_ apis.Defaultable = (*Transformation)(nil)
 
-	_ v1alpha1.Reconcilable = (*Transformation)(nil)
-	_ v1alpha1.EventSender  = (*Transformation)(nil)
+	_ v1alpha1.Reconcilable        = (*Transformation)(nil)
+	_ v1alpha1.AdapterConfigurable = (*Transformation)(nil)
+	_ v1alpha1.EventSender         = (*Transformation)(nil)
 )
 
-// TransformationSpec holds the desired state of the Transformation (from the client).
+// TransformationSpec defines the desired state of the component.
 type TransformationSpec struct {
 	// Context contains Transformations that must be applied on CE Context
 	Context []Transform `json:"context,omitempty"`
@@ -56,6 +56,10 @@ type TransformationSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // Transform describes transformation schemes for different CE types.
@@ -72,7 +76,7 @@ type Path struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TransformationList is a list of Transformation resources
+// TransformationList is a list of component instances.
 type TransformationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

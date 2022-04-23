@@ -44,12 +44,13 @@ type SalesforceTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*SalesforceTarget)(nil)
-	_ v1alpha1.EventReceiver = (*SalesforceTarget)(nil)
-	_ v1alpha1.EventSource   = (*SalesforceTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*SalesforceTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*SalesforceTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*SalesforceTarget)(nil)
+	_ v1alpha1.EventSource         = (*SalesforceTarget)(nil)
 )
 
-// SalesforceTargetSpec holds the desired state of the SalesforceTarget.
+// SalesforceTargetSpec defines the desired state of the event target.
 type SalesforceTargetSpec struct {
 	// Authentication information to interact with the Salesforce API.
 	Auth SalesforceAuth `json:"auth"`
@@ -61,6 +62,10 @@ type SalesforceTargetSpec struct {
 	// EventOptions for targets
 	// +optional
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // SalesforceAuth contains OAuth JWT information to interact with the
@@ -79,7 +84,7 @@ type SalesforceAuth struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SalesforceTargetList is a list of SalesforceTarget resources
+// SalesforceTargetList is a list of event target instances.
 type SalesforceTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

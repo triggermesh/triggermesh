@@ -73,3 +73,8 @@ func (s *HTTPPollerSource) GetEventTypes() []string {
 		s.Spec.EventType,
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *HTTPPollerSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

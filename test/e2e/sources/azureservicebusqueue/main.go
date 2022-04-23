@@ -109,7 +109,7 @@ var _ = Describe("Azure ServiceBusQueue", func() {
 				BeforeEach(func() {
 					err = queueSender.SendMessage(ctx, &sv.Message{
 						Body: []byte("hello world"),
-					})
+					}, nil)
 					Expect(err).ToNot(HaveOccurred())
 				})
 
@@ -290,9 +290,7 @@ func readReceivedEvents(c clientset.Interface, namespace, eventDisplayName strin
 
 // createQueue will create a servicebus queue and a sender using the given name
 func createQueue(ctx context.Context, region string, name string, client *sv.Client, adminClient *svadmin.Client) *sv.Sender {
-	// Create Queue
-	_, err := adminClient.CreateQueue(ctx, name, nil, nil)
-	if err != nil {
+	if _, err := adminClient.CreateQueue(ctx, name, nil); err != nil {
 		framework.FailfWithOffset(2, "Error creating queue: %s", err)
 		return nil
 	}

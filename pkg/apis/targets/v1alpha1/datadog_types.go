@@ -37,12 +37,13 @@ type DatadogTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*DatadogTarget)(nil)
-	_ v1alpha1.EventReceiver = (*DatadogTarget)(nil)
-	_ v1alpha1.EventSource   = (*DatadogTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*DatadogTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*DatadogTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*DatadogTarget)(nil)
+	_ v1alpha1.EventSource         = (*DatadogTarget)(nil)
 )
 
-// DatadogTargetSpec holds the desired state of the DatadogTarget.
+// DatadogTargetSpec defines the desired state of the event target.
 type DatadogTargetSpec struct {
 	// DatadogApiKey represents how Datadog credentials should be provided in the secret
 	DatadogAPIKey SecretValueFromSource `json:"apiKey"`
@@ -53,11 +54,15 @@ type DatadogTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// DatadogTargetList is a list of DatadogTarget resources
+// DatadogTargetList is a list of event target instances.
 type DatadogTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

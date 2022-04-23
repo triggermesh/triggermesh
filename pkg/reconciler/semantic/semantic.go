@@ -23,6 +23,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/conversion"
 
+	network "knative.dev/networking/pkg"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 )
 
@@ -88,6 +89,26 @@ var eq = conversion.EqualitiesOrDie(
 		}
 
 		return (conversion.Equalities{}).DeepDerivative(a.Handler, b.Handler)
+	},
+	// Needed because DeepDerivative compares EnvVar.Value string fields
+	// without considering EnvVar as a whole. If an EnvVar is specified, we
+	// consider its value to be intentional and force the comparison.
+	func(a, b corev1.EnvVar) bool {
+		if a.Name != b.Name || a.Value != b.Value {
+			return false
+		}
+		return (conversion.Equalities{}).DeepDerivative(a.ValueFrom, b.ValueFrom)
+	},
+	// Needed to handle special labels that can be either added or removed by
+	// TriggerMesh reconcilers.
+	func(a, b map[string]string) bool {
+		removableLabels := []string{network.VisibilityLabelKey}
+		for _, l := range removableLabels {
+			if a[l] != b[l] {
+				return false
+			}
+		}
+		return (conversion.Equalities{}).DeepDerivative(a, b)
 	},
 )
 

@@ -39,9 +39,10 @@ type AWSPerformanceInsightsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSPerformanceInsightsSource)(nil)
-	_ v1alpha1.EventSource  = (*AWSPerformanceInsightsSource)(nil)
-	_ v1alpha1.EventSender  = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.EventSource         = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.EventSender         = (*AWSPerformanceInsightsSource)(nil)
 )
 
 // AWSPerformanceInsightsSourceSpec defines the desired state of the event source.
@@ -64,6 +65,10 @@ type AWSPerformanceInsightsSourceSpec struct {
 
 	// Authentication method to interact with the Amazon RDS and Performance Insights APIs.
 	Auth AWSAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

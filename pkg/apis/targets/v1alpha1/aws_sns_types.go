@@ -37,10 +37,11 @@ type AWSSNSTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSSNSTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSSNSTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSSNSTarget)(nil)
 )
 
-// AWSSNSTargetSpec holds the desired state of the event target.
+// AWSSNSTargetSpec defines the desired state of the event target.
 type AWSSNSTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -56,11 +57,15 @@ type AWSSNSTargetSpec struct {
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSSNSTargetList is a list of AWSSNSTarget resources
+// AWSSNSTargetList is a list of event target instances.
 type AWSSNSTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

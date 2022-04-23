@@ -41,9 +41,10 @@ type OCIMetricsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*OCIMetricsSource)(nil)
-	_ v1alpha1.EventSource  = (*OCIMetricsSource)(nil)
-	_ v1alpha1.EventSender  = (*OCIMetricsSource)(nil)
+	_ v1alpha1.Reconcilable        = (*OCIMetricsSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*OCIMetricsSource)(nil)
+	_ v1alpha1.EventSource         = (*OCIMetricsSource)(nil)
+	_ v1alpha1.EventSender         = (*OCIMetricsSource)(nil)
 )
 
 // OCIMetricsSourceSpec defines the desired state of the event source.
@@ -79,6 +80,10 @@ type OCIMetricsSourceSpec struct {
 
 	// Array of metrics
 	Metrics []OCIMetrics `json:"metrics"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // OCIMetrics represents OCI metrics structure.

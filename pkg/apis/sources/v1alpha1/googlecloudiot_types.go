@@ -44,9 +44,10 @@ type GoogleCloudIoTSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*GoogleCloudIoTSource)(nil)
-	_ v1alpha1.EventSource  = (*GoogleCloudIoTSource)(nil)
-	_ v1alpha1.EventSender  = (*GoogleCloudIoTSource)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleCloudIoTSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleCloudIoTSource)(nil)
+	_ v1alpha1.EventSource         = (*GoogleCloudIoTSource)(nil)
+	_ v1alpha1.EventSender         = (*GoogleCloudIoTSource)(nil)
 )
 
 // GoogleCloudIoTSourceSpec defines the desired state of the event source.
@@ -62,6 +63,10 @@ type GoogleCloudIoTSourceSpec struct {
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	ServiceAccountKey v1alpha1.ValueFromField `json:"serviceAccountKey"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // GoogleCloudIoTSourcePubSubSpec defines the attributes related to the

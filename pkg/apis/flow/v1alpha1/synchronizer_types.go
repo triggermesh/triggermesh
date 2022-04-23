@@ -40,17 +40,22 @@ type Synchronizer struct {
 
 // Check the interfaces Synchronizer should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*Synchronizer)(nil)
-	_ v1alpha1.EventSender  = (*Synchronizer)(nil)
+	_ v1alpha1.Reconcilable        = (*Synchronizer)(nil)
+	_ v1alpha1.AdapterConfigurable = (*Synchronizer)(nil)
+	_ v1alpha1.EventSender         = (*Synchronizer)(nil)
 )
 
-// SynchronizerSpec holds the desired state of the Synchronizer.
+// SynchronizerSpec defines the desired state of the component.
 type SynchronizerSpec struct {
 	CorrelationKey Correlation `json:"correlationKey"`
 	Response       Response    `json:"response"`
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // Correlation holds the request-response matching parameters.
@@ -66,7 +71,7 @@ type Response struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SynchronizerList is a list of Synchronizer instances.
+// SynchronizerList is a list of component instances.
 type SynchronizerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

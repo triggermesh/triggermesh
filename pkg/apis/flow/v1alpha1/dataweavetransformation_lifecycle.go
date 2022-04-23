@@ -55,3 +55,8 @@ func (t *DataWeaveTransformation) GetStatusManager() *v1alpha1.StatusManager {
 func (t *DataWeaveTransformation) GetSink() *duckv1.Destination {
 	return &t.Spec.Sink
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *DataWeaveTransformation) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

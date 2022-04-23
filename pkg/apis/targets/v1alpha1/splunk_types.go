@@ -38,7 +38,8 @@ type SplunkTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*SplunkTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*SplunkTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*SplunkTarget)(nil)
 )
 
 // SplunkTargetSpec defines the desired state of the event target.
@@ -59,11 +60,15 @@ type SplunkTargetSpec struct {
 	// chain and host name when communicating over TLS.
 	// +optional
 	SkipTLSVerify *bool `json:"skipTLSVerify,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// SplunkTargetList contains a list of event targets.
+// SplunkTargetList is a list of event target instances.
 type SplunkTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

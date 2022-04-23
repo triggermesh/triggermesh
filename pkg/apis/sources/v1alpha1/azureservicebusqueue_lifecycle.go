@@ -70,3 +70,8 @@ func (s *AzureServiceBusQueueSource) GetStatusManager() *v1alpha1.StatusManager 
 func (s *AzureServiceBusQueueSource) AsEventSource() string {
 	return s.Spec.QueueID.String()
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AzureServiceBusQueueSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

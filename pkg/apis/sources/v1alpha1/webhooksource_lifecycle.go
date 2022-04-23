@@ -73,3 +73,8 @@ func (s *WebhookSource) GetEventTypes() []string {
 		s.Spec.EventType,
 	}
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *WebhookSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

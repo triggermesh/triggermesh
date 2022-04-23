@@ -69,3 +69,8 @@ func (s *AWSPerformanceInsightsSource) GetEventTypes() []string {
 func (s *AWSPerformanceInsightsSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *AWSPerformanceInsightsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

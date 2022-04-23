@@ -37,14 +37,14 @@ type GoogleCloudFirestoreTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*GoogleCloudFirestoreTarget)(nil)
-	_ v1alpha1.EventReceiver = (*GoogleCloudFirestoreTarget)(nil)
-	_ v1alpha1.EventSource   = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.EventSource         = (*GoogleCloudFirestoreTarget)(nil)
 )
 
-// GoogleCloudFirestoreTargetSpec holds the desired state of the GoogleCloudFirestoreTarget.
+// GoogleCloudFirestoreTargetSpec defines the desired state of the event target.
 type GoogleCloudFirestoreTargetSpec struct {
-
 	// Credentials represents how Google Firestore credentials should be provided in the secret
 	Credentials SecretValueFromSource `json:"credentialsJson"`
 
@@ -61,11 +61,15 @@ type GoogleCloudFirestoreTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudFirestoreTargetList is a list of GoogleCloudFirestoreTarget resources
+// GoogleCloudFirestoreTargetList is a list of event target instances.
 type GoogleCloudFirestoreTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -23,7 +23,6 @@ import (
 	sv "github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	svadmin "github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus/admin"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
@@ -43,23 +42,21 @@ func CreateServiceBusNamespaceClient(ctx context.Context, subscriptionID, region
 	return &nsClient
 }
 
-func CreateServiceBusNamespace(ctx context.Context, cli servicebus.NamespacesClient, rgName string, nsName string, region string) error {
+func CreateServiceBusNamespace(ctx context.Context, cli servicebus.NamespacesClient, rgName, nsName, region string) error {
 	// create the servicebus namespace
-	nsFuture, err := cli.CreateOrUpdate(ctx, rgName, nsName, servicebus.SBNamespace{Location: to.StringPtr(region)})
+	nsFuture, err := cli.CreateOrUpdate(ctx, rgName, nsName, servicebus.SBNamespace{Location: &region})
 	if err != nil {
 		framework.FailfWithOffset(3, "unable to create servicebus namespace: %s", err)
 		return err
 	}
 
 	// Wait for the namespace to be created before creating the topic
-	err = nsFuture.WaitForCompletionRef(ctx, cli.Client)
-	if err != nil {
+	if err = nsFuture.WaitForCompletionRef(ctx, cli.Client); err != nil {
 		framework.FailfWithOffset(3, "unable to complete servicebus namespace creation: %s", err)
 		return err
 	}
 
-	_, err = nsFuture.Result(cli)
-	if err != nil {
+	if _, err = nsFuture.Result(cli); err != nil {
 		framework.FailfWithOffset(3, "servicebus namespace creation failed: %s", err)
 		return err
 	}

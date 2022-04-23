@@ -58,6 +58,11 @@ func (s *GoogleCloudIoTSource) AsEventSource() string {
 	return s.Spec.Registry.String()
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *GoogleCloudIoTSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Supported event types
 const (
 	GoogleCloudIoTGenericEventType = "com.google.cloud.iot.message"

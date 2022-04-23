@@ -38,9 +38,10 @@ type WebhookSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*WebhookSource)(nil)
-	_ v1alpha1.EventSource  = (*WebhookSource)(nil)
-	_ v1alpha1.EventSender  = (*WebhookSource)(nil)
+	_ v1alpha1.Reconcilable        = (*WebhookSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*WebhookSource)(nil)
+	_ v1alpha1.EventSource         = (*WebhookSource)(nil)
+	_ v1alpha1.EventSender         = (*WebhookSource)(nil)
 )
 
 // WebhookSourceSpec defines the desired state of the event source.
@@ -72,6 +73,10 @@ type WebhookSourceSpec struct {
 	// Specifies the CORS Origin to use in pre-flight headers.
 	// +optional
 	CORSAllowOrigin *string `json:"corsAllowOrigin,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

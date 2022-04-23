@@ -74,3 +74,8 @@ func (s *Splitter) GetSink() *duckv1.Destination {
 func (*Splitter) IsMultiTenant() bool {
 	return true
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (s *Splitter) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

@@ -19,13 +19,13 @@ package main
 import (
 	"knative.dev/pkg/injection/sharedmain"
 
+	"github.com/triggermesh/triggermesh/pkg/extensions/function"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/dataweavetransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xmltojsontransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/xslttransformation"
-	"github.com/triggermesh/triggermesh/pkg/function"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/filter"
 	"github.com/triggermesh/triggermesh/pkg/routing/reconciler/splitter"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/awscloudwatchlogssource"
@@ -169,13 +169,13 @@ func main() {
 		twiliotarget.NewController,
 		uipathtarget.NewController,
 		zendesktarget.NewController,
-		// transformation
+		// flow
 		jqtransformation.NewController,
 		synchronizer.NewController,
 		transformation.NewController,
 		xmltojsontransformation.NewController,
 		xslttransformation.NewController,
-		// functions
+		// extensions
 		function.NewController,
 		// routing
 		filter.NewController,

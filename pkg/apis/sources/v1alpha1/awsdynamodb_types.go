@@ -39,9 +39,10 @@ type AWSDynamoDBSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSDynamoDBSource)(nil)
-	_ v1alpha1.EventSource  = (*AWSDynamoDBSource)(nil)
-	_ v1alpha1.EventSender  = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.EventSource         = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.EventSender         = (*AWSDynamoDBSource)(nil)
 )
 
 // AWSDynamoDBSourceSpec defines the desired state of the event source.
@@ -54,6 +55,10 @@ type AWSDynamoDBSourceSpec struct {
 
 	// Authentication method to interact with the Amazon DynamoDB API.
 	Auth AWSAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -38,9 +38,10 @@ type AzureQueueStorageSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AzureQueueStorageSource)(nil)
-	_ v1alpha1.EventSource  = (*AzureQueueStorageSource)(nil)
-	_ v1alpha1.EventSender  = (*AzureQueueStorageSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureQueueStorageSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureQueueStorageSource)(nil)
+	_ v1alpha1.EventSource         = (*AzureQueueStorageSource)(nil)
+	_ v1alpha1.EventSender         = (*AzureQueueStorageSource)(nil)
 )
 
 // AzureQueueStorageSourceSpec defines the desired state of the event source.
@@ -50,6 +51,10 @@ type AzureQueueStorageSourceSpec struct {
 	AccountName string                  `json:"accountName"`
 	QueueName   string                  `json:"queueName"`
 	AccountKey  v1alpha1.ValueFromField `json:"accountKey"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

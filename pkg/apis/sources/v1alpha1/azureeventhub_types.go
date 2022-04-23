@@ -38,9 +38,10 @@ type AzureEventHubSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AzureEventHubSource)(nil)
-	_ v1alpha1.EventSource  = (*AzureEventHubSource)(nil)
-	_ v1alpha1.EventSender  = (*AzureEventHubSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureEventHubSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureEventHubSource)(nil)
+	_ v1alpha1.EventSource         = (*AzureEventHubSource)(nil)
+	_ v1alpha1.EventSender         = (*AzureEventHubSource)(nil)
 )
 
 // AzureEventHubSourceSpec defines the desired state of the event source.
@@ -55,6 +56,10 @@ type AzureEventHubSourceSpec struct {
 
 	// Authentication method to interact with the Azure Event Hubs API.
 	Auth AzureAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

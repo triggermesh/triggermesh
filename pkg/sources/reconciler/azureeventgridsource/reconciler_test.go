@@ -40,9 +40,9 @@ import (
 	azureeventgrid "github.com/Azure/azure-sdk-for-go/profiles/latest/eventgrid/mgmt/eventgrid"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/resources/mgmt/resources"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/to"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
@@ -620,7 +620,7 @@ func (c *mockedSystemTopicsClient) ListBySubscriptionComplete(ctx context.Contex
 
 	results := azureeventgrid.SystemTopicsListResult{
 		Value:    &sysTopicsPage1,
-		NextLink: to.StringPtr("page2"),
+		NextLink: to.Ptr("page2"),
 	}
 
 	getNextPage := func(_ context.Context, prev azureeventgrid.SystemTopicsListResult) (azureeventgrid.SystemTopicsListResult, error) {
@@ -648,7 +648,7 @@ func (c *mockedSystemTopicsClient) CreateOrUpdate(ctx context.Context,
 		FutureAPI: (*mockedFuture)(nil),
 		Result: func(azureeventgrid.SystemTopicsClient) (azureeventgrid.SystemTopic, error) {
 			st := systemTopicInfo
-			st.ID = to.StringPtr(tSystemTopicID.String())
+			st.ID = to.Ptr(tSystemTopicID.String())
 			return st, nil
 		},
 	}, nil
@@ -688,14 +688,14 @@ const mockSystemTopicsDataKey = "sysTopics"
 // TableRow data.
 func makeMockSystemTopics(hasOwner bool) map[string]interface{} {
 	st := newMockSystemTopic(tScope.String())
-	st.ID = to.StringPtr(tSystemTopicID.String())
+	st.ID = to.Ptr(tSystemTopicID.String())
 	st.Name = &tSystemTopicID.ResourceName
 
 	if hasOwner {
 		st.Tags = map[string]*string{
-			eventgridTagOwnerResource:  to.StringPtr(sources.AzureEventGridSourceResource.String()),
-			eventgridTagOwnerNamespace: to.StringPtr(newEventSource().Namespace),
-			eventgridTagOwnerName:      to.StringPtr(newEventSource().Name),
+			eventgridTagOwnerResource:  to.Ptr(sources.AzureEventGridSourceResource.String()),
+			eventgridTagOwnerNamespace: to.Ptr(newEventSource().Namespace),
+			eventgridTagOwnerName:      to.Ptr(newEventSource().Name),
 		}
 	}
 
@@ -774,8 +774,8 @@ func (c *mockedProvidersClient) Get(ctx context.Context, resourceProviderNamespa
 	// always "Microsoft.Storage" in tests
 	resourceTypes := []resources.ProviderResourceType{
 		{
-			ResourceType:      to.StringPtr("storageAccounts"),
-			DefaultAPIVersion: to.StringPtr("1970-01-01"),
+			ResourceType:      to.Ptr("storageAccounts"),
+			DefaultAPIVersion: to.Ptr("1970-01-01"),
 		},
 	}
 
@@ -850,7 +850,7 @@ func (c *mockedEventSubscriptionsClient) CreateOrUpdate(ctx context.Context, res
 		FutureAPI: (*mockedFuture)(nil),
 		Result: func(azureeventgrid.SystemTopicEventSubscriptionsClient) (azureeventgrid.EventSubscription, error) {
 			subs := eventSubscriptionInfo
-			subs.ID = to.StringPtr(tEventSubscriptionID.String())
+			subs.ID = to.Ptr(tEventSubscriptionID.String())
 			return subs, nil
 		},
 	}, nil
@@ -890,7 +890,7 @@ const mockEventSubscriptionsDataKey = "eventSubs"
 // be used as TableRow data.
 func makeMockEventSubscriptions(opts ...mockEventSubscriptionsOption) map[string]interface{} {
 	subs := newEventSubscription(tEventHubID.String(), newEventSource().GetEventTypes())
-	subs.ID = to.StringPtr(tEventSubscriptionID.String())
+	subs.ID = to.Ptr(tEventSubscriptionID.String())
 
 	// key format expected by mocked client impl
 	subKey := tEventSubscriptionID.ResourceGroup + "#" + tEventSubscriptionID.ResourceName + "#" + tEventSubscriptionID.SubResourceName

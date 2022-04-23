@@ -9,7 +9,7 @@ jobs:
   gomod-cache:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     steps:
       - checkout
       - go/mod-download-cached
@@ -17,7 +17,7 @@ jobs:
   test:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     steps:
       - checkout
       - go/load-cache
@@ -75,7 +75,7 @@ jobs:
   gen-apidocs:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     parameters:
       committer_name:
         type: string
@@ -116,7 +116,7 @@ jobs:
   publish-image:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     resource_class: xlarge
     steps:
       - checkout
@@ -133,16 +133,31 @@ jobs:
             - go-build-{{ arch }}-{{ checksum "go.sum" }}
       - run:
           name: Installing ko
-          command: go install github.com/google/ko@v0.11.1
+          command: go install github.com/google/ko@v0.11.2
       - setup_remote_docker:
           version: 20.10.11
           docker_layer_caching: true
       - run:
-          name: Publishing container images
-          command: IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
+          name: Publishing container images and creating release manifests
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
             DIST_DIR: /tmp/dist/
+          command: |
+            pushd hack/manifest-cleaner
+            go install .
+            popd
+
+            IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
+
+            declare -a release_files=(
+              triggermesh-crds.yaml
+              triggermesh.yaml
+            )
+
+            for f in "${release_files[@]}"; do
+              manifest-cleaner <"${DIST_DIR}/${f}" >"${DIST_DIR}/${f}.clean"
+              mv "${DIST_DIR}/${f}.clean" "${DIST_DIR}/${f}"
+            done
       - persist_to_workspace:
           root: /tmp/
           paths:
@@ -154,7 +169,7 @@ jobs:
     description: Patches target cluster configuration
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     parameters:
       cluster:
         type: string
@@ -206,7 +221,7 @@ jobs:
   release:
     executor:
       name: go/default
-      tag: '1.17'
+      tag: '1.18'
     steps:
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:

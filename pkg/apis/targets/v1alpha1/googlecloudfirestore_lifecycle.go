@@ -88,3 +88,8 @@ func (t *GoogleCloudFirestoreTarget) AsEventSource() string {
 	kind := strings.ToLower(t.GetGroupVersionKind().Kind)
 	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *GoogleCloudFirestoreTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

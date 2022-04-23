@@ -43,11 +43,12 @@ var (
 	_ apis.Validatable = (*XSLTTransformation)(nil)
 	_ apis.Defaultable = (*XSLTTransformation)(nil)
 
-	_ v1alpha1.Reconcilable = (*XSLTTransformation)(nil)
-	_ v1alpha1.EventSender  = (*XSLTTransformation)(nil)
+	_ v1alpha1.Reconcilable        = (*XSLTTransformation)(nil)
+	_ v1alpha1.AdapterConfigurable = (*XSLTTransformation)(nil)
+	_ v1alpha1.EventSender         = (*XSLTTransformation)(nil)
 )
 
-// XSLTTransformationSpec holds the desired state of the XSLTTransformation.
+// XSLTTransformationSpec defines the desired state of the component.
 type XSLTTransformationSpec struct {
 	// XSLT document that will be used by default for transformation.
 	// Can be omited if the XSLT is informed at each event.
@@ -60,11 +61,15 @@ type XSLTTransformationSpec struct {
 
 	// Support sending to an event sink instead of replying.
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// XSLTTransformationList is a list of XSLTTransformation resources
+// XSLTTransformationList is a list of component instances.
 type XSLTTransformationList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -38,12 +38,13 @@ type IBMMQSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*IBMMQSource)(nil)
-	_ v1alpha1.EventSource  = (*IBMMQSource)(nil)
-	_ v1alpha1.EventSender  = (*IBMMQSource)(nil)
+	_ v1alpha1.Reconcilable        = (*IBMMQSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*IBMMQSource)(nil)
+	_ v1alpha1.EventSource         = (*IBMMQSource)(nil)
+	_ v1alpha1.EventSender         = (*IBMMQSource)(nil)
 )
 
-// IBMMQSourceSpec holds the desired state of the event source.
+// IBMMQSourceSpec defines the desired state of the event source.
 type IBMMQSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
@@ -55,6 +56,10 @@ type IBMMQSourceSpec struct {
 	Delivery Delivery `json:"delivery,omitempty"`
 
 	Auth Credentials `json:"credentials"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // Delivery defines the source's message delivery behavior.

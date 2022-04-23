@@ -37,11 +37,12 @@ type AWSDynamoDBTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSDynamoDBTarget)(nil)
-	_ v1alpha1.EventSource  = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.EventSource         = (*AWSDynamoDBTarget)(nil)
 )
 
-// AWSDynamoDBTargetSpec holds the desired state of the event target.
+// AWSDynamoDBTargetSpec defines the desired state of the event target.
 type AWSDynamoDBTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -52,11 +53,15 @@ type AWSDynamoDBTargetSpec struct {
 	// Table ARN
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazondynamodb.html#amazondynamodb-resources-for-iam-policies
 	ARN string `json:"arn"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSDynamoDBTargetList is a list of AWSDynamoDBTarget resources
+// AWSDynamoDBTargetList is a list of event target instances.
 type AWSDynamoDBTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

@@ -66,6 +66,11 @@ func (*AzureServiceBusTopicSource) GetEventTypes() []string {
 	}
 }
 
+// GetAdapterOverrides implements Reconcilable.
+func (s *AzureServiceBusTopicSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}
+
 // Status conditions
 const (
 	// AzureServiceBusTopicConditionSubscribed has status True when the source has subscribed to a topic.

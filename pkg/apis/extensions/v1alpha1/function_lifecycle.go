@@ -17,75 +17,132 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"strings"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	"knative.dev/pkg/apis"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
-var condSet = apis.NewLivingConditionSet(
-	conditionReady,
-	conditionSinkReady,
-	conditionServiceReady,
-	conditionConfigmapReady,
-)
-
-const (
-	conditionReady = apis.ConditionReady
-
-	conditionSinkReady      apis.ConditionType = "SinkReady"
-	conditionServiceReady   apis.ConditionType = "ServiceReady"
-	conditionConfigmapReady apis.ConditionType = "ConfigmapReady"
-)
-
-// GetGroupVersionKind implements kmeta.OwnerRefable
+// GetGroupVersionKind implements kmeta.OwnerRefable.
 func (*Function) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("Function")
 }
 
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
+// GetConditionSet implements duckv1.KRShaped.
 func (f *Function) GetConditionSet() apis.ConditionSet {
-	return condSet
+	if f.Spec.Sink.Ref != nil || f.Spec.Sink.URI != nil {
+		return funcSenderConditionSet
+	}
+	return functionConditionSet
 }
 
-// InitializeConditions sets the initial values to the conditions.
-func (fs *FunctionStatus) InitializeConditions() {
-	condSet.Manage(fs).InitializeConditions()
+// GetStatus implements duckv1.KRShaped.
+func (f *Function) GetStatus() *duckv1.Status {
+	return &f.Status.Status.Status
 }
 
-// MarkServiceUnavailable updates Function status with Function Service Not Ready condition
-func (fs *FunctionStatus) MarkServiceUnavailable(name string) {
-	condSet.Manage(fs).MarkFalse(
-		conditionServiceReady,
-		"FunctionServiceUnavailable",
-		"Function Service %q is not ready.", name)
+// GetStatusManager implements Reconcilable.
+func (f *Function) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: f.GetConditionSet(),
+		Status:       &f.Status.Status,
+	}
 }
 
-// MarkServiceAvailable updates Function status with Function Service Is Ready condition
-func (fs *FunctionStatus) MarkServiceAvailable() {
-	condSet.Manage(fs).MarkTrue(conditionServiceReady)
+// GetEventTypes implements EventSource.
+func (f *Function) GetEventTypes() []string {
+	if f.Spec.CloudEventOverrides == nil || len(f.Spec.CloudEventOverrides.Extensions) == 0 {
+		return []string{defaultCEType(f)}
+	}
+
+	if typ := f.Spec.CloudEventOverrides.Extensions["type"]; typ != "" {
+		return []string{typ}
+	}
+
+	return []string{defaultCEType(f)}
 }
 
-// MarkSinkUnavailable updates Function status with Sink Not Ready condition
-func (fs *FunctionStatus) MarkSinkUnavailable() {
-	condSet.Manage(fs).MarkFalse(
-		conditionSinkReady,
-		"SinkUnavailable",
-		"Sink is unavailable")
+func defaultCEType(f *Function) string {
+	const ceDefaultTypePrefix = "io.triggermesh.function."
+	return ceDefaultTypePrefix + f.Spec.Runtime
 }
 
-// MarkSinkAvailable updates Function status with Sink Is Ready condition
-func (fs *FunctionStatus) MarkSinkAvailable() {
-	condSet.Manage(fs).MarkTrue(conditionSinkReady)
+// AsEventSource implements EventSource.
+func (f *Function) AsEventSource() string {
+	if f.Spec.CloudEventOverrides == nil || len(f.Spec.CloudEventOverrides.Extensions) == 0 {
+		return defaultCESource(f)
+	}
+
+	if source := f.Spec.CloudEventOverrides.Extensions["source"]; source != "" {
+		return source
+	}
+
+	return defaultCESource(f)
 }
 
-// MarkConfigmapUnavailable updates Function status with Configmap Unavailable condition
-func (fs *FunctionStatus) MarkConfigmapUnavailable(name string) {
-	condSet.Manage(fs).MarkFalse(
-		conditionConfigmapReady,
-		"ConfigmapUnavailable",
-		"Configmap is not ready")
+func defaultCESource(f *Function) string {
+	kind := strings.ToLower(f.GetGroupVersionKind().Kind)
+	return "io.triggermesh." + kind + "." + f.Namespace + "." + f.Name
 }
 
-// MarkConfigmapAvailable updates Function status with Configmap Is Ready condition
-func (fs *FunctionStatus) MarkConfigmapAvailable() {
-	condSet.Manage(fs).MarkTrue(conditionConfigmapReady)
+// GetSink implements EventSender.
+func (f *Function) GetSink() *duckv1.Destination {
+	return &f.Spec.Sink
+}
+
+// GetAdapterOverrides implements Reconcilable.
+func (f *Function) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return f.Spec.AdapterOverrides
+}
+
+// Status conditions
+const (
+	// FunctionConditionConfigMapReady has status True when the ConfigMap
+	// containing the code of the Function was successfully reconciled.
+	FunctionConditionConfigMapReady apis.ConditionType = "ConfigMapReady"
+)
+
+// Reasons for status conditions
+const (
+	// FunctionReasonFailedSync encompasses any type of error occuring while synchronizing a Kubernetes API object.
+	// It is meant to be set on the ConfigMapReady condition.
+	FunctionReasonFailedSync = "FailedSync"
+)
+
+// ConditionSets
+var (
+	// functionConditionSet is used when the component instance is
+	// configured without a sink (reply mode).
+	functionConditionSet = v1alpha1.NewConditionSet(
+		FunctionConditionConfigMapReady,
+	)
+
+	// funcSenderConditionSet is used when the component instance is
+	// configured with a sink (send mode).
+	funcSenderConditionSet = v1alpha1.NewConditionSet(
+		FunctionConditionConfigMapReady,
+		v1alpha1.ConditionSinkProvided,
+	)
+)
+
+// MarkConfigMapAvailable sets the ConfigMapReady condition to True and reports
+// the name and resource version of the code ConfigMap.
+func (s *FunctionStatus) MarkConfigMapAvailable(cmapName, resourceVersion string) {
+	s.ConfigMap = &FunctionConfigMapIdentity{
+		Name:            cmapName,
+		ResourceVersion: resourceVersion,
+	}
+
+	functionConditionSet.Manage(s).MarkTrue(FunctionConditionConfigMapReady)
+}
+
+// MarkConfigMapUnavailable sets the ConfigMapReady condition to False with the
+// given reason and associated message.
+func (s *FunctionStatus) MarkConfigMapUnavailable(reason, msg string) {
+	functionConditionSet.Manage(s).MarkFalse(FunctionConditionConfigMapReady,
+		reason, msg)
 }

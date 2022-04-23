@@ -55,3 +55,8 @@ func (t *JQTransformation) GetStatusManager() *v1alpha1.StatusManager {
 func (t *JQTransformation) GetSink() *duckv1.Destination {
 	return &t.Spec.Sink
 }
+
+// GetAdapterOverrides implements Reconcilable.
+func (t *JQTransformation) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
+}

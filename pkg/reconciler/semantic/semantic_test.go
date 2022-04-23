@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -32,17 +33,21 @@ import (
 )
 
 const (
-	fixtureDeploymentPath     = "../../../../../test/fixtures/deployment.json"
-	fixtureKnServicePath      = "../../../../../test/fixtures/knService.json"
-	fixtureServiceAccountPath = "../../../../../test/fixtures/serviceAccount.json"
+	fixtureDeploymentPath     = "../../../test/fixtures/deployment.json"
+	fixtureKnServicePath      = "../../../test/fixtures/knService.json"
+	fixtureServiceAccountPath = "../../../test/fixtures/serviceAccount.json"
 )
 
 func TestDeploymentEqual(t *testing.T) {
 	current := &appsv1.Deployment{}
 	loadFixture(t, fixtureDeploymentPath, current)
 
-	assert.GreaterOrEqual(t, len(current.Labels), 2,
+	require.GreaterOrEqual(t, len(current.Labels), 2,
 		"Test suite requires a reference object with at least 2 labels to run properly")
+	require.True(t, len(current.Spec.Template.Spec.Containers) > 0 &&
+		len(current.Spec.Template.Spec.Containers[0].Env) > 0 &&
+		current.Spec.Template.Spec.Containers[0].Env[0].Value != "",
+		"Test suite requires a reference object with a Container that has at least 1 EnvVar to run properly")
 
 	assert.True(t, deploymentEqual(nil, nil), "Two nil elements should be equal")
 
@@ -96,6 +101,14 @@ func TestDeploymentEqual(t *testing.T) {
 			},
 			false,
 		},
+		"not equal when EnvVar desired value is empty": {
+			func() *appsv1.Deployment {
+				desired := current.DeepCopy()
+				desired.Spec.Template.Spec.Containers[0].Env[0].Value = ""
+				return desired
+			},
+			false,
+		},
 	}
 
 	for name, tc := range testCases {
@@ -116,7 +129,7 @@ func TestKnServiceEqual(t *testing.T) {
 	current := &servingv1.Service{}
 	loadFixture(t, fixtureKnServicePath, current)
 
-	assert.GreaterOrEqual(t, len(current.Labels), 2,
+	require.GreaterOrEqual(t, len(current.Labels), 2,
 		"Test suite requires a reference object with at least 2 labels to run properly")
 
 	assert.True(t, knServiceEqual(nil, nil), "Two nil elements should be equal")
@@ -191,9 +204,9 @@ func TestServiceAccountEqual(t *testing.T) {
 	current := &corev1.ServiceAccount{}
 	loadFixture(t, fixtureServiceAccountPath, current)
 
-	assert.GreaterOrEqual(t, len(current.Labels), 2,
+	require.GreaterOrEqual(t, len(current.Labels), 2,
 		"Test suite requires a reference object with at least 2 labels to run properly")
-	assert.Nil(t, current.AutomountServiceAccountToken,
+	require.Nil(t, current.AutomountServiceAccountToken,
 		"Test suite requires a reference object with a nil automountServiceAccountTokent attribute to run properly")
 
 	assert.True(t, serviceAccountEqual(nil, nil), "Two nil elements should be equal")

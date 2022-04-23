@@ -37,23 +37,28 @@ type GoogleCloudWorkflowsTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*GoogleCloudWorkflowsTarget)(nil)
-	_ v1alpha1.EventReceiver = (*GoogleCloudWorkflowsTarget)(nil)
-	_ v1alpha1.EventSource   = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventSource         = (*GoogleCloudWorkflowsTarget)(nil)
 )
 
-// GoogleCloudWorkflowsTargetSpec holds the desired state of the GoogleCloudWorkflowsTarget.
+// GoogleCloudWorkflowsTargetSpec defines the desired state of the event target.
 type GoogleCloudWorkflowsTargetSpec struct {
 	// GoogleCloudWorkflowsApiKey represents how GoogleCloudWorkflows credentials should be provided in the secret
 	Credentials SecretValueFromSource `json:"credentialsJson"`
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudWorkflowsTargetList is a list of GoogleCloudWorkflowsTarget resources
+// GoogleCloudWorkflowsTargetList is a list of event target instances.
 type GoogleCloudWorkflowsTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

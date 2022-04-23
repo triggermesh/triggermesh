@@ -17,11 +17,8 @@ limitations under the License.
 package awss3source
 
 import (
-	"fmt"
-
 	appsv1 "k8s.io/api/apps/v1"
 	kr "k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
@@ -76,27 +73,17 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 		// See awssqssource/adapter.go for an justification for these values.
 		resource.Requests(
-			*kr.NewMilliQuantity(90, kr.DecimalSI),     // 90m
-			*kr.NewQuantity(1024*1024*30, kr.BinarySI), // 30Mi
+			kr.NewMilliQuantity(90, kr.DecimalSI),     // 90m
+			kr.NewQuantity(1024*1024*30, kr.BinarySI), // 30Mi
 		),
 		resource.Limits(
-			*kr.NewMilliQuantity(1000, kr.DecimalSI),   // 1
-			*kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
+			kr.NewMilliQuantity(1000, kr.DecimalSI),   // 1
+			kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
 		),
 	)
 }
 
 // RBACOwners implements common.AdapterDeploymentBuilder.
 func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	srcs, err := r.srcLister(src.GetNamespace()).List(labels.Everything())
-	if err != nil {
-		return nil, fmt.Errorf("listing objects from cache: %w", err)
-	}
-
-	ownerRefables := make([]kmeta.OwnerRefable, len(srcs))
-	for i := range srcs {
-		ownerRefables[i] = srcs[i]
-	}
-
-	return ownerRefables, nil
+	return common.RBACOwners[*v1alpha1.AWSS3Source](r.srcLister(src.GetNamespace()))
 }

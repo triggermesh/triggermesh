@@ -37,12 +37,13 @@ type GoogleCloudStorageTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*GoogleCloudStorageTarget)(nil)
-	_ v1alpha1.EventReceiver = (*GoogleCloudStorageTarget)(nil)
-	_ v1alpha1.EventSource   = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventSource         = (*GoogleCloudStorageTarget)(nil)
 )
 
-// GoogleCloudStorageTargetSpec holds the desired state of the GoogleCloudStorageTarget.
+// GoogleCloudStorageTargetSpec defines the desired state of the event target.
 type GoogleCloudStorageTargetSpec struct {
 	// Credentials represents how Google Storage credentials should be provided in the secret
 	Credentials SecretValueFromSource `json:"credentialsJson"`
@@ -57,11 +58,15 @@ type GoogleCloudStorageTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GoogleCloudStorageTargetList is a list of GoogleCloudStorageTarget resources
+// GoogleCloudStorageTargetList is a list of event target instances.
 type GoogleCloudStorageTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

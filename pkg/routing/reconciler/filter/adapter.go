@@ -17,16 +17,13 @@ limitations under the License.
 package filter
 
 import (
-	"fmt"
-
-	"k8s.io/apimachinery/pkg/labels"
-
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
@@ -54,15 +51,5 @@ func (r *Reconciler) BuildAdapter(rtr commonv1alpha1.Reconcilable, _ *apis.URL) 
 
 // RBACOwners implements common.AdapterServiceBuilder.
 func (r *Reconciler) RBACOwners(rtr commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	rtrs, err := r.rtrLister(rtr.GetNamespace()).List(labels.Everything())
-	if err != nil {
-		return nil, fmt.Errorf("listing objects from cache: %w", err)
-	}
-
-	ownerRefables := make([]kmeta.OwnerRefable, len(rtrs))
-	for i := range rtrs {
-		ownerRefables[i] = rtrs[i]
-	}
-
-	return ownerRefables, nil
+	return common.RBACOwners[*v1alpha1.Filter](r.rtrLister(rtr.GetNamespace()))
 }

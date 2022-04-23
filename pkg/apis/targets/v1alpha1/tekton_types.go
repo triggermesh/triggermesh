@@ -35,11 +35,15 @@ type TektonTarget struct {
 	Status v1alpha1.Status  `json:"status,omitempty"`
 }
 
-// TektonTargetSpec holds the desired state of event target.
+// TektonTargetSpec defines the desired state of the event target.
 type TektonTargetSpec struct {
 	// ReapPolicy dictates the reaping policy to be applied for the target
 	// +optional
 	ReapPolicy *TektonTargetReapPolicy `json:"reapPolicy,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // TektonTargetReapPolicy defines desired Repeating Policy.
@@ -52,14 +56,15 @@ type TektonTargetReapPolicy struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*TektonTarget)(nil)
-	_ v1alpha1.EventReceiver = (*TektonTarget)(nil)
-	_ v1alpha1.EventSource   = (*TektonTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*TektonTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*TektonTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*TektonTarget)(nil)
+	_ v1alpha1.EventSource         = (*TektonTarget)(nil)
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TektonTargetList is a list of event targets.
+// TektonTargetList is a list of event target instances.
 type TektonTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

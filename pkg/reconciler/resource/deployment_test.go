@@ -29,6 +29,8 @@ import (
 )
 
 func TestNewDeploymentWithDefaultContainer(t *testing.T) {
+	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
+
 	depl := NewDeployment(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Selector("test.selector/1", "val1"),
@@ -45,10 +47,12 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		EnvVar("TEST_ENV2", "val2"),
 		Label("test.label/2", "val2"),
 		ServiceAccount("god-mode"),
-		Requests(resource.MustParse("250m"), resource.MustParse("100Mi")),
-		Limits(resource.MustParse("250m"), resource.MustParse("100Mi")),
+		Requests(&cpuRes, &memRes),
+		Limits(&cpuRes, nil),
 		TerminationErrorToLogs,
-		SecretMount("test-volume", "/path/to/file.ext", "test-secret", "someKey"),
+		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
+		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
+		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
 	)
 
 	expectDepl := &appsv1.Deployment{
@@ -78,6 +82,9 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 				},
 				Spec: corev1.PodSpec{
 					ServiceAccountName: "god-mode",
+					Tolerations: []corev1.Toleration{{
+						Key: "taint", Operator: "Exists",
+					}},
 					Containers: []corev1.Container{{
 						Name:  defaultContainerName,
 						Image: tImg,
@@ -125,30 +132,53 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 								corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
 							},
 							Limits: corev1.ResourceList{
-								corev1.ResourceCPU:    *resource.NewMilliQuantity(250, resource.DecimalSI),
-								corev1.ResourceMemory: *resource.NewQuantity(1024*1024*100, resource.BinarySI),
+								corev1.ResourceCPU: *resource.NewMilliQuantity(250, resource.DecimalSI),
 							},
 						},
 						TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,
-						VolumeMounts: []corev1.VolumeMount{{
-							Name:      "test-volume",
-							MountPath: "/path/to/file.ext",
-							SubPath:   "file.ext",
-							ReadOnly:  true,
-						}},
-					}},
-					Volumes: []corev1.Volume{{
-						Name: "test-volume",
-						VolumeSource: corev1.VolumeSource{
-							Secret: &corev1.SecretVolumeSource{
-								SecretName: "test-secret",
-								Items: []corev1.KeyToPath{{
-									Key:  "someKey",
-									Path: "file.ext",
-								}},
+						VolumeMounts: []corev1.VolumeMount{
+							{
+								Name:      "test-vol1",
+								MountPath: "/path/to/file.ext",
+								SubPath:   "file.ext",
+								ReadOnly:  true,
+							},
+							{
+								Name:      "test-vol2",
+								MountPath: "/path/to/file.ext",
+								SubPath:   "file.ext",
+								ReadOnly:  true,
 							},
 						},
 					}},
+					Volumes: []corev1.Volume{
+						{
+							Name: "test-vol1",
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: "test-secret",
+									Items: []corev1.KeyToPath{{
+										Key:  "someKey",
+										Path: "file.ext",
+									}},
+								},
+							},
+						},
+						{
+							Name: "test-vol2",
+							VolumeSource: corev1.VolumeSource{
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									LocalObjectReference: corev1.LocalObjectReference{
+										Name: "test-cmap",
+									},
+									Items: []corev1.KeyToPath{{
+										Key:  "someKey",
+										Path: "file.ext",
+									}},
+								},
+							},
+						},
+					},
 				},
 			},
 		},

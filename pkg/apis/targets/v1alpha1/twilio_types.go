@@ -37,12 +37,13 @@ type TwilioTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable  = (*TwilioTarget)(nil)
-	_ v1alpha1.EventReceiver = (*TwilioTarget)(nil)
-	_ v1alpha1.EventSource   = (*TwilioTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*TwilioTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*TwilioTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*TwilioTarget)(nil)
+	_ v1alpha1.EventSource         = (*TwilioTarget)(nil)
 )
 
-// TwilioTargetSpec holds the desired state of the TwilioTarget.
+// TwilioTargetSpec defines the desired state of the event target.
 type TwilioTargetSpec struct {
 	// Twilio account SID
 	AccountSID SecretValueFromSource `json:"sid"`
@@ -60,11 +61,15 @@ type TwilioTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// TwilioTargetList is a list of TwilioTarget resources
+// TwilioTargetList is a list of event target instances.
 type TwilioTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

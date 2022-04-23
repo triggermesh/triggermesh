@@ -39,9 +39,10 @@ type AWSCognitoUserPoolSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSCognitoUserPoolSource)(nil)
-	_ v1alpha1.EventSource  = (*AWSCognitoUserPoolSource)(nil)
-	_ v1alpha1.EventSender  = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.EventSource         = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.EventSender         = (*AWSCognitoUserPoolSource)(nil)
 )
 
 // AWSCognitoUserPoolSourceSpec defines the desired state of the event source.
@@ -54,6 +55,10 @@ type AWSCognitoUserPoolSourceSpec struct {
 
 	// Authentication method to interact with the Amazon Cognito API.
 	Auth AWSAuth `json:"auth"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

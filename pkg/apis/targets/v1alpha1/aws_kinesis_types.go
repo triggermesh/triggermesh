@@ -37,10 +37,11 @@ type AWSKinesisTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSKinesisTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSKinesisTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSKinesisTarget)(nil)
 )
 
-// AWSKinesisTargetSpec holds the desired state of the event target.
+// AWSKinesisTargetSpec defines the desired state of the event target.
 type AWSKinesisTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -59,11 +60,15 @@ type AWSKinesisTargetSpec struct {
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSKinesisTargetList is a list of AWSKinesisTarget resources
+// AWSKinesisTargetList is a list of event target instances.
 type AWSKinesisTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

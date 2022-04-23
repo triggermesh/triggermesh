@@ -37,10 +37,11 @@ type AWSEventBridgeTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*AWSEventBridgeTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AWSEventBridgeTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AWSEventBridgeTarget)(nil)
 )
 
-// AWSEventBridgeTargetSpec holds the desired state of the event target.
+// AWSEventBridgeTargetSpec defines the desired state of the event target.
 type AWSEventBridgeTargetSpec struct {
 	// AWS account Key
 	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
@@ -56,11 +57,15 @@ type AWSEventBridgeTargetSpec struct {
 	// When this property is false (default), the entire CloudEvent payload is included.
 	// When this property is true, only the CloudEvent data is included.
 	DiscardCEContext bool `json:"discardCloudEventContext"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AWSEventBridgeTargetList is a list of AWSEventBridgeTarget resources
+// AWSEventBridgeTargetList is a list of event target instances.
 type AWSEventBridgeTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

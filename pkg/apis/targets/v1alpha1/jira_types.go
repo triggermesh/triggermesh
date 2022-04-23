@@ -37,17 +37,22 @@ type JiraTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*JiraTarget)(nil)
-	_ v1alpha1.EventSource  = (*JiraTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*JiraTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*JiraTarget)(nil)
+	_ v1alpha1.EventSource         = (*JiraTarget)(nil)
 )
 
-// JiraTargetSpec holds the desired state of the JiraTarget.
+// JiraTargetSpec defines the desired state of the event target.
 type JiraTargetSpec struct {
 	// Authentication to interact with the Salesforce API.
 	Auth JiraAuth `json:"auth"`
 
 	// URL for Jira service.
 	URL string `json:"url"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // JiraAuth contains Jira credentials.
@@ -60,7 +65,7 @@ type JiraAuth struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// JiraTargetList is a list of JiraTarget resources
+// JiraTargetList is a list of event target instances.
 type JiraTargetList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`

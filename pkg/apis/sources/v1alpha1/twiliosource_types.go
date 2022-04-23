@@ -38,14 +38,19 @@ type TwilioSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*TwilioSource)(nil)
-	_ v1alpha1.EventSource  = (*TwilioSource)(nil)
-	_ v1alpha1.EventSender  = (*TwilioSource)(nil)
+	_ v1alpha1.Reconcilable        = (*TwilioSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*TwilioSource)(nil)
+	_ v1alpha1.EventSource         = (*TwilioSource)(nil)
+	_ v1alpha1.EventSender         = (*TwilioSource)(nil)
 )
 
 // TwilioSourceSpec defines the desired state of the event source.
 type TwilioSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
