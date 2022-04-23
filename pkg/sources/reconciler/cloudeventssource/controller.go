@@ -50,7 +50,6 @@ func NewController(
 	informer := informerv1alpha1.Get(ctx)
 
 	r := &Reconciler{
-		srcLister:  informer.Lister().CloudEventsSources,
 		adapterCfg: adapterCfg,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
@@ -60,6 +59,9 @@ func NewController(
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		func(namespace string) common.Lister[*v1alpha1.CloudEventsSource] {
+			return informer.Lister().CloudEventsSources(namespace)
+		},
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
