@@ -32,11 +32,13 @@ import (
 
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
+	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
 var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
-	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):          &routingv1alpha1.Filter{},
-	flowv1alpha1.SchemeGroupVersion.WithKind("XSLTTransformation"): &flowv1alpha1.XSLTTransformation{},
+	sourcesv1alpha1.SchemeGroupVersion.WithKind("CloudEventsSource"): &sourcesv1alpha1.CloudEventsSource{},
+	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):            &routingv1alpha1.Filter{},
+	flowv1alpha1.SchemeGroupVersion.WithKind("XSLTTransformation"):   &flowv1alpha1.XSLTTransformation{},
 }
 
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}

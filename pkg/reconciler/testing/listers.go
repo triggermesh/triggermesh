@@ -234,6 +234,11 @@ func (l *Listers) GetAzureServiceBusTopicSourceLister() sourceslistersv1alpha1.A
 	return sourceslistersv1alpha1.NewAzureServiceBusTopicSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureServiceBusTopicSource{}))
 }
 
+// GetCloudEventsSourceLister returns a Lister for CloudEventsSource objects.
+func (l *Listers) GetCloudEventsSourceLister() sourceslistersv1alpha1.CloudEventsSourceLister {
+	return sourceslistersv1alpha1.NewCloudEventsSourceLister(l.IndexerFor(&sourcesv1alpha1.CloudEventsSource{}))
+}
+
 // GetGoogleCloudAuditLogsSourceLister returns a Lister for GoogleCloudAuditLogsSource objects.
 func (l *Listers) GetGoogleCloudAuditLogsSourceLister() sourceslistersv1alpha1.GoogleCloudAuditLogsSourceLister {
 	return sourceslistersv1alpha1.NewGoogleCloudAuditLogsSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudAuditLogsSource{}))

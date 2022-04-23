@@ -45,6 +45,7 @@ type SourcesV1alpha1Interface interface {
 	AzureQueueStorageSourcesGetter
 	AzureServiceBusQueueSourcesGetter
 	AzureServiceBusTopicSourcesGetter
+	CloudEventsSourcesGetter
 	GoogleCloudAuditLogsSourcesGetter
 	GoogleCloudBillingSourcesGetter
 	GoogleCloudIoTSourcesGetter
@@ -140,6 +141,10 @@ func (c *SourcesV1alpha1Client) AzureServiceBusQueueSources(namespace string) Az
 
 func (c *SourcesV1alpha1Client) AzureServiceBusTopicSources(namespace string) AzureServiceBusTopicSourceInterface {
 	return newAzureServiceBusTopicSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) CloudEventsSources(namespace string) CloudEventsSourceInterface {
+	return newCloudEventsSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) GoogleCloudAuditLogsSources(namespace string) GoogleCloudAuditLogsSourceInterface {

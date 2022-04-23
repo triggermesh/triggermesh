@@ -170,6 +170,14 @@ type AzureServiceBusTopicSourceListerExpansion interface{}
 // AzureServiceBusTopicSourceNamespaceLister.
 type AzureServiceBusTopicSourceNamespaceListerExpansion interface{}
 
+// CloudEventsSourceListerExpansion allows custom methods to be added to
+// CloudEventsSourceLister.
+type CloudEventsSourceListerExpansion interface{}
+
+// CloudEventsSourceNamespaceListerExpansion allows custom methods to be added to
+// CloudEventsSourceNamespaceLister.
+type CloudEventsSourceNamespaceListerExpansion interface{}
+
 // GoogleCloudAuditLogsSourceListerExpansion allows custom methods to be added to
 // GoogleCloudAuditLogsSourceLister.
 type GoogleCloudAuditLogsSourceListerExpansion interface{}
