@@ -58,6 +58,11 @@ type AWSSQSSourceSpec struct {
 	// +optional
 	ReceiveOptions *AWSSQSSourceReceiveOptions `json:"receiveOptions,omitempty"`
 
+	// Name of the message processor to use for converting SQS messages to CloudEvents.
+	// Supported values are "default" and "s3".
+	// +optional
+	MessageProcessor *string `json:"messageProcessor,omitempty"`
+
 	// Authentication method to interact with the Amazon SQS API.
 	Auth AWSAuth `json:"auth"`
 

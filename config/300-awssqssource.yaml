@@ -125,6 +125,11 @@ spec:
                       For more details, please refer to the Amazon SQS Developer Guide at
                       https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html.
                     type: string
+              messageProcessor:
+                description: Name of the message processor to use for converting SQS messages to CloudEvents. Supported
+                  values are "default" and "s3".
+                type: string
+                enum: [default, s3]
               auth:
                 description: Authentication method to interact with the Amazon SQS API.
                 type: object

@@ -18,6 +18,7 @@ package awssqssource
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	kr "k8s.io/apimachinery/pkg/api/resource"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -29,6 +30,8 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler"
 )
+
+const envMessageProcessor = "SQS_MESSAGE_PROCESSOR"
 
 const healthPortName = "health"
 
@@ -48,12 +51,16 @@ var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
 	typedSrc := src.(*v1alpha1.AWSSQSSource)
 
+	var optEnvs []corev1.EnvVar
+	optEnvs = maybeSetMessageProcessor(optEnvs, typedSrc)
+
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvARN, typedSrc.Spec.ARN.String()),
 		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
 		resource.EnvVars(reconciler.MakeAWSEndpointEnvVars(typedSrc.Spec.Endpoint)...),
+		resource.EnvVars(optEnvs...),
 		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
 		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
@@ -73,4 +80,17 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 			kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
 		),
 	)
+}
+
+// maybeSetMessageProcessor conditionally sets the envMessageProcessor
+// environment variable.
+func maybeSetMessageProcessor(envs []corev1.EnvVar, src *v1alpha1.AWSSQSSource) []corev1.EnvVar {
+	if mp := src.Spec.MessageProcessor; mp != nil && *mp == "s3" {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envMessageProcessor,
+			Value: *mp,
+		})
+	}
+
+	return envs
 }

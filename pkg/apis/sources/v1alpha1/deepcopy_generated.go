@@ -1230,6 +1230,11 @@ func (in *AWSSQSSourceSpec) DeepCopyInto(out *AWSSQSSourceSpec) {
 		*out = new(AWSSQSSourceReceiveOptions)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.MessageProcessor != nil {
+		in, out := &in.MessageProcessor, &out.MessageProcessor
+		*out = new(string)
+		**out = **in
+	}
 	in.Auth.DeepCopyInto(&out.Auth)
 	if in.Endpoint != nil {
 		in, out := &in.Endpoint, &out.Endpoint
