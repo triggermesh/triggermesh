@@ -39,10 +39,11 @@ type AWSS3Source struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSS3Source)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSS3Source)(nil)
-	_ v1alpha1.EventSource         = (*AWSS3Source)(nil)
-	_ v1alpha1.EventSender         = (*AWSS3Source)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSS3Source)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSS3Source)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSS3Source)(nil)
+	_ v1alpha1.EventSource            = (*AWSS3Source)(nil)
+	_ v1alpha1.EventSender            = (*AWSS3Source)(nil)
 )
 
 // AWSS3SourceSpec defines the desired state of the event source.

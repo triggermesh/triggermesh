@@ -73,12 +73,12 @@ func (s *AWSSQSSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }
 
-// WantsOwnServiceAccount implements serviceAccountProvider.
+// WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *AWSSQSSource) WantsOwnServiceAccount() bool {
 	return s.Spec.Auth.EksIAMRole != nil
 }
 
-// ServiceAccountOptions implements serviceAccountProvider.
+// ServiceAccountOptions implements ServiceAccountProvider.
 func (s *AWSSQSSource) ServiceAccountOptions() []resource.ServiceAccountOption {
 	var saOpts []resource.ServiceAccountOption
 

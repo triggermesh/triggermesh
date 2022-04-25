@@ -20,12 +20,15 @@ import (
 	"sort"
 	"strings"
 
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/s3"
 )
 
@@ -108,6 +111,26 @@ func (s *AWSS3Source) AsEventSource() string {
 // GetAdapterOverrides implements Reconcilable.
 func (s *AWSS3Source) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// WantsOwnServiceAccount implements ServiceAccountProvider.
+func (s *AWSS3Source) WantsOwnServiceAccount() bool {
+	return s.Spec.Auth.EksIAMRole != nil
+}
+
+// ServiceAccountOptions implements ServiceAccountProvider.
+func (s *AWSS3Source) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
+
+	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
+		setIAMRoleAnnotation := func(sa *corev1.ServiceAccount) {
+			metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationEksIAMRole, iamRole.String())
+		}
+
+		saOpts = append(saOpts, setIAMRoleAnnotation)
+	}
+
+	return saOpts
 }
 
 // Status conditions
