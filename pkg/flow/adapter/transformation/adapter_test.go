@@ -37,8 +37,6 @@ var availableTransformations = []v1alpha1.Transform{
 }
 
 func TestStart(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	pipeline, err := newPipeline(availableTransformations)
 	assert.NoError(t, err)
 
@@ -55,6 +53,7 @@ func TestStart(t *testing.T) {
 	}
 
 	errChan := make(chan error)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
 		defer close(errChan)
