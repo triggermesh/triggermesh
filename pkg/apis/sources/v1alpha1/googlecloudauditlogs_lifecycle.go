@@ -70,7 +70,7 @@ func (*GoogleCloudAuditLogsSource) GetEventTypes() []string {
 	}
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *GoogleCloudAuditLogsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

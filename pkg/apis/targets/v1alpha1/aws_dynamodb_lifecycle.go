@@ -66,7 +66,7 @@ func (t *AWSDynamoDBTarget) AsEventSource() string {
 	return t.Spec.ARN
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *AWSDynamoDBTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }

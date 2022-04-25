@@ -66,7 +66,7 @@ func (*AzureServiceBusTopicSource) GetEventTypes() []string {
 	}
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureServiceBusTopicSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

@@ -17,11 +17,12 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -39,12 +40,12 @@ func (s *CloudEventsSource) GetStatus() *duckv1.Status {
 	return &s.Status.Status
 }
 
-// GetSink implements EventSource.
+// GetSink implements EventSender.
 func (s *CloudEventsSource) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetStatusManager implements EventSource.
+// GetStatusManager implements Reconcilable.
 func (s *CloudEventsSource) GetStatusManager() *v1alpha1.StatusManager {
 	return &v1alpha1.StatusManager{
 		ConditionSet: s.GetConditionSet(),

@@ -84,7 +84,7 @@ func (s *AzureEventGridSource) GetEventTypes() []string {
 	return eventTypes
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureEventGridSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

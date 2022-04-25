@@ -105,7 +105,7 @@ func (s *AWSS3Source) AsEventSource() string {
 	return s3.RealBucketARN(s.Spec.ARN)
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AWSS3Source) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

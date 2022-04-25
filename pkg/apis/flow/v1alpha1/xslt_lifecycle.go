@@ -61,7 +61,7 @@ func (t *XSLTTransformation) GetSink() *duckv1.Destination {
 	return &t.Spec.Sink
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *XSLTTransformation) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }

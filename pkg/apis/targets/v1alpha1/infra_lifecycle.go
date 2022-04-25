@@ -48,7 +48,7 @@ func (t *InfraTarget) GetStatusManager() *v1alpha1.StatusManager {
 	}
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *InfraTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }
