@@ -82,11 +82,13 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 		tr.OtherTestData[testClientDataKey] = snsCli
 
 		r := &Reconciler{
-			base:       NewTestServiceReconciler(ctx, ls),
 			adapterCfg: cfg,
-			srcLister:  ls.GetAWSSNSSourceLister().AWSSNSSources,
 			snsCg:      staticClientGetter(snsCli),
 		}
+
+		r.base = NewTestServiceReconciler[*v1alpha1.AWSSNSSource](ctx, ls,
+			ls.GetAWSSNSSourceLister().AWSSNSSources,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetAWSSNSSourceLister(),

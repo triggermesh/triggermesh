@@ -35,10 +35,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler
+	base       common.GenericServiceReconciler[*v1alpha1.Function, listersv1alpha1.FunctionNamespaceLister]
 	adapterCfg *adapterConfig
-
-	fnLister func(namespace string) listersv1alpha1.FunctionNamespaceLister
 
 	cmLister func(namespace string) corev1listers.ConfigMapNamespaceLister
 	cmCli    func(namespace string) typedv1.ConfigMapInterface

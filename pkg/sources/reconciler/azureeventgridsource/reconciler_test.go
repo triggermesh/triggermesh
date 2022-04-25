@@ -96,10 +96,12 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 
 		r := &Reconciler{
 			cg:         staticClientGetter(stCli, prCli, rgCli, esCli, ehCli),
-			base:       NewTestDeploymentReconciler(ctx, ls),
 			adapterCfg: cfg,
-			srcLister:  ls.GetAzureEventGridSourceLister().AzureEventGridSources,
 		}
+
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AzureEventGridSource](ctx, ls,
+			ls.GetAzureEventGridSourceLister().AzureEventGridSources,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetAzureEventGridSourceLister(),

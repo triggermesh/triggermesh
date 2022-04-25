@@ -19,7 +19,7 @@ package main
 import (
 	"knative.dev/pkg/injection/sharedmain"
 
-	"github.com/triggermesh/triggermesh/pkg/extensions/function"
+	"github.com/triggermesh/triggermesh/pkg/extensions/reconciler/function"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/dataweavetransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"

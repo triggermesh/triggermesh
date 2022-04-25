@@ -51,10 +51,12 @@ func TestReconcileSource(t *testing.T) {
 func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
-			base:       NewTestDeploymentReconciler(ctx, ls),
 			adapterCfg: cfg,
-			srcLister:  ls.GetAWSCodeCommitSourceLister().AWSCodeCommitSources,
 		}
+
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AWSCodeCommitSource](ctx, ls,
+			ls.GetAWSCodeCommitSourceLister().AWSCodeCommitSources,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetAWSCodeCommitSourceLister(),

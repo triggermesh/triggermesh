@@ -57,16 +57,16 @@ func NewController(
 
 	r := &Reconciler{
 		cg:         servicebustopics.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
-		srcLister:  informer.Lister().AzureServiceBusTopicSources,
 		adapterCfg: adapterCfg,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericDeploymentReconciler(
+	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.AzureServiceBusTopicSource](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().AzureServiceBusTopicSources,
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)

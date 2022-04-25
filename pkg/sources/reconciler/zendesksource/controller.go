@@ -59,17 +59,17 @@ func NewController(
 	r := &Reconciler{
 		adapterCfg:   adapterCfg,
 		secretClient: kubeclient.Get(ctx).CoreV1().Secrets,
-		srcLister:    informer.Lister().ZendeskSources,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
 	logger := logging.FromContext(ctx)
 
-	r.base = common.NewMTGenericServiceReconciler(
+	r.base = common.NewMTGenericServiceReconciler[*v1alpha1.ZendeskSource](
 		ctx,
 		typ,
 		impl.Tracker,
 		common.EnqueueObjectsInNamespaceOf(informer.Informer(), impl.FilteredGlobalResync, logger),
+		informer.Lister().ZendeskSources,
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)

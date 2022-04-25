@@ -30,10 +30,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler
+	base       common.GenericServiceReconciler[*v1alpha1.WebhookSource, listersv1alpha1.WebhookSourceNamespaceLister]
 	adapterCfg *adapterConfig
-
-	srcLister func(namespace string) listersv1alpha1.WebhookSourceNamespaceLister
 }
 
 // Check that our Reconciler implements Interface

@@ -47,10 +47,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Google Cloud APIs
 	cg billing.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.GoogleCloudBillingSourceNamespaceLister
-
-	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	// Pub/Sub adapter
+	base       common.GenericDeploymentReconciler[*v1alpha1.GoogleCloudBillingSource, listersv1alpha1.GoogleCloudBillingSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

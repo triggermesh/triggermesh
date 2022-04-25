@@ -54,11 +54,13 @@ func TestReconcileSource(t *testing.T) {
 func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
-			base:         NewTestServiceReconciler(ctx, ls),
 			secretClient: fakek8sinjectionclient.Get(ctx).CoreV1().Secrets,
 			adapterCfg:   cfg,
-			srcLister:    ls.GetZendeskSourceLister().ZendeskSources,
 		}
+
+		r.base = NewTestServiceReconciler[*v1alpha1.ZendeskSource](ctx, ls,
+			ls.GetZendeskSourceLister().ZendeskSources,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetZendeskSourceLister(),

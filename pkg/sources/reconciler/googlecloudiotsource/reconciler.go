@@ -47,10 +47,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Google Cloud APIs
 	cg iot.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.GoogleCloudIoTSourceNamespaceLister
-
-	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	// Pub/Sub adapter
+	base       common.GenericDeploymentReconciler[*v1alpha1.GoogleCloudIoTSource, listersv1alpha1.GoogleCloudIoTSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

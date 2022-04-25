@@ -57,16 +57,16 @@ func NewController(
 
 	r := &Reconciler{
 		cg:         auditlogs.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
-		srcLister:  informer.Lister().GoogleCloudAuditLogsSources,
 		adapterCfg: adapterCfg,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericDeploymentReconciler(
+	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.GoogleCloudAuditLogsSource](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().GoogleCloudAuditLogsSources,
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)

@@ -50,15 +50,15 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		srcLister:  informer.Lister().AzureQueueStorageSources,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericDeploymentReconciler(
+	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.AzureQueueStorageSource](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().AzureQueueStorageSources,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

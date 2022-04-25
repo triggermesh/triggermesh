@@ -52,15 +52,15 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		trgLister:  informer.Lister().AWSSNSTargets,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericServiceReconciler(
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.AWSSNSTarget](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().AWSSNSTargets,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

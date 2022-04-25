@@ -30,9 +30,7 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	srcLister func(namespace string) listersv1alpha1.CloudEventsSourceNamespaceLister
-
-	base       common.GenericServiceReconciler
+	base       common.GenericServiceReconciler[*v1alpha1.CloudEventsSource, listersv1alpha1.CloudEventsSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

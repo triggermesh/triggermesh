@@ -42,10 +42,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Google Cloud APIs
 	cg pubsub.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.GoogleCloudPubSubSourceNamespaceLister
-
-	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	// Pub/Sub adapter
+	base       common.GenericDeploymentReconciler[*v1alpha1.GoogleCloudPubSubSource, listersv1alpha1.GoogleCloudPubSubSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

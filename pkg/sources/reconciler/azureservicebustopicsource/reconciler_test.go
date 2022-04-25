@@ -79,10 +79,12 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 
 		r := &Reconciler{
 			cg:         staticClientGetter(subsCli),
-			base:       NewTestDeploymentReconciler(ctx, ls),
 			adapterCfg: cfg,
-			srcLister:  ls.GetAzureServiceBusTopicSourceLister().AzureServiceBusTopicSources,
 		}
+
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AzureServiceBusTopicSource](ctx, ls,
+			ls.GetAzureServiceBusTopicSourceLister().AzureServiceBusTopicSources,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetAzureServiceBusTopicSourceLister(),

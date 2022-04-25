@@ -35,10 +35,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Azure APIs
 	cg insights.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.AzureActivityLogsSourceNamespaceLister
-
 	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.AzureActivityLogsSource, listersv1alpha1.AzureActivityLogsSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

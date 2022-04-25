@@ -30,10 +30,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler
+	base       common.GenericServiceReconciler[*v1alpha1.JiraTarget, listersv1alpha1.JiraTargetNamespaceLister]
 	adapterCfg *adapterConfig
-
-	trgLister func(namespace string) listersv1alpha1.JiraTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface

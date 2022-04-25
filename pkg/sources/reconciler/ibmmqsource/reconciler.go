@@ -22,7 +22,7 @@ import (
 	"knative.dev/pkg/reconciler"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/ibmmqsource"
 	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
@@ -30,10 +30,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.IBMMQSource, listersv1alpha1.IBMMQSourceNamespaceLister]
 	adapterCfg *adapterConfig
-
-	srcLister func(namespace string) listersv1alpha1.IBMMQSourceNamespaceLister
 }
 
 // Check that our Reconciler implements Interface

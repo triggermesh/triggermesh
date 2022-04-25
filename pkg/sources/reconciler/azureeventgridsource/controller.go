@@ -57,16 +57,16 @@ func NewController(
 
 	r := &Reconciler{
 		cg:         eventgrid.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
-		srcLister:  informer.Lister().AzureEventGridSources,
 		adapterCfg: adapterCfg,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericDeploymentReconciler(
+	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.AzureEventGridSource](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().AzureEventGridSources,
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)

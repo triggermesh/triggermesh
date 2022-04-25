@@ -57,10 +57,12 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
 			cg:         staticClientGetter((*gpubsub.Client)(nil), (*gstorage.Client)(nil)),
-			srcLister:  ls.GetGoogleCloudStorageSourceLister().GoogleCloudStorageSources,
-			base:       NewTestDeploymentReconciler(ctx, ls),
 			adapterCfg: cfg,
 		}
+
+		r.base = NewTestDeploymentReconciler[*v1alpha1.GoogleCloudStorageSource](ctx, ls,
+			ls.GetGoogleCloudStorageSourceLister().GoogleCloudStorageSources,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetGoogleCloudStorageSourceLister(),

@@ -57,16 +57,16 @@ func NewController(
 
 	r := &Reconciler{
 		cg:         pubsub.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
-		srcLister:  informer.Lister().GoogleCloudPubSubSources,
 		adapterCfg: adapterCfg,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericDeploymentReconciler(
+	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.GoogleCloudPubSubSource](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().GoogleCloudPubSubSources,
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)

@@ -52,15 +52,15 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		trgLister:  informer.Lister().AWSS3Targets,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericServiceReconciler(
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.AWSS3Target](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().AWSS3Targets,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

@@ -30,10 +30,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.AWSSQSSource, listersv1alpha1.AWSSQSSourceNamespaceLister]
 	adapterCfg *adapterConfig
-
-	srcLister func(namespace string) listersv1alpha1.AWSSQSSourceNamespaceLister
 }
 
 // Check that our Reconciler implements Interface

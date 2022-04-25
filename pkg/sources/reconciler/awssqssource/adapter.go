@@ -22,7 +22,6 @@ import (
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	"knative.dev/pkg/kmeta"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
@@ -74,13 +73,4 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 			kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
 		),
 	)
-}
-
-// RBACOwners implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	if commonv1alpha1.WantsOwnServiceAccount(src) {
-		return []kmeta.OwnerRefable{src}, nil
-	}
-
-	return common.RBACOwners[*v1alpha1.AWSSQSSource](r.srcLister(src.GetNamespace()))
 }

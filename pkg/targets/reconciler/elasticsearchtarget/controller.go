@@ -52,15 +52,15 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		trgLister:  informer.Lister().ElasticsearchTargets,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericServiceReconciler(
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.ElasticsearchTarget](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().ElasticsearchTargets,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

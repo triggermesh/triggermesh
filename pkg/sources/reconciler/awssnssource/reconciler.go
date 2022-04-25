@@ -32,10 +32,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler
+	base       common.GenericServiceReconciler[*v1alpha1.AWSSNSSource, listersv1alpha1.AWSSNSSourceNamespaceLister]
 	adapterCfg *adapterConfig
-
-	srcLister func(namespace string) listersv1alpha1.AWSSNSSourceNamespaceLister
 
 	// SNS client interface to interact with the SNS API
 	snsCg snsclient.ClientGetter

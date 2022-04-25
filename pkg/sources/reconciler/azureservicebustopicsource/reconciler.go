@@ -43,10 +43,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Azure APIs
 	cg servicebustopics.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.AzureServiceBusTopicSourceNamespaceLister
-
 	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.AzureServiceBusTopicSource, listersv1alpha1.AzureServiceBusTopicSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

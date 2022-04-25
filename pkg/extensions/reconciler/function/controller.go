@@ -54,17 +54,17 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		fnLister:   informer.Lister().Functions,
 		cmLister:   cminformerv1.Get(ctx).Lister().ConfigMaps,
 		cmCli:      k8sclient.Get(ctx).CoreV1().ConfigMaps,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericServiceReconciler(
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.Function](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
+		informer.Lister().Functions,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

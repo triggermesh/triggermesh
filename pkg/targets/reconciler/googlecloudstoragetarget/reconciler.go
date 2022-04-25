@@ -30,10 +30,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	base       common.GenericServiceReconciler
+	base       common.GenericServiceReconciler[*v1alpha1.GoogleCloudStorageTarget, listersv1alpha1.GoogleCloudStorageTargetNamespaceLister]
 	adapterCfg *adapterConfig
-
-	trgLister func(namespace string) listersv1alpha1.GoogleCloudStorageTargetNamespaceLister
 }
 
 // Check that our Reconciler implements Interface

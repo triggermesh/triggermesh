@@ -38,10 +38,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with the S3 and SQS APIs
 	s3Cg s3client.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.AWSS3SourceNamespaceLister
-
 	// SQS adapter
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source, listersv1alpha1.AWSS3SourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

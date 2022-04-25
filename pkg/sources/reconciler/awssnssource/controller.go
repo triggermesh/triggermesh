@@ -58,18 +58,18 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		srcLister:  informer.Lister().AWSSNSSources,
 		snsCg:      sns.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
 	logger := logging.FromContext(ctx)
 
-	r.base = common.NewMTGenericServiceReconciler(
+	r.base = common.NewMTGenericServiceReconciler[*v1alpha1.AWSSNSSource](
 		ctx,
 		typ,
 		impl.Tracker,
 		common.EnqueueObjectsInNamespaceOf(informer.Informer(), impl.FilteredGlobalResync, logger),
+		informer.Lister().AWSSNSSources,
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)

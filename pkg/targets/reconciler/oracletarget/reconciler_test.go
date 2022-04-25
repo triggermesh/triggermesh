@@ -49,10 +49,12 @@ func TestReconcile(t *testing.T) {
 func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
-			base:       NewTestServiceReconciler(ctx, ls),
 			adapterCfg: cfg,
-			trgLister:  ls.GetOracleTargetLister().OracleTargets,
 		}
+
+		r.base = NewTestServiceReconciler[*v1alpha1.OracleTarget](ctx, ls,
+			ls.GetOracleTargetLister().OracleTargets,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetOracleTargetLister(),

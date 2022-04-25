@@ -83,10 +83,12 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 
 		r := &Reconciler{
 			cg:         staticClientGetter(esCli, ehCli),
-			base:       NewTestDeploymentReconciler(ctx, ls),
 			adapterCfg: cfg,
-			srcLister:  ls.GetAzureBlobStorageSourceLister().AzureBlobStorageSources,
 		}
+
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AzureBlobStorageSource](ctx, ls,
+			ls.GetAzureBlobStorageSourceLister().AzureBlobStorageSources,
+		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
 			fakeinjectionclient.Get(ctx), ls.GetAzureBlobStorageSourceLister(),

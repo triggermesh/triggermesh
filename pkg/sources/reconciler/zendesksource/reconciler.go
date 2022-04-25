@@ -32,11 +32,9 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base         common.GenericServiceReconciler
+	base         common.GenericServiceReconciler[*v1alpha1.ZendeskSource, listersv1alpha1.ZendeskSourceNamespaceLister]
 	secretClient func(namespace string) coreclientv1.SecretInterface
 	adapterCfg   *adapterConfig
-
-	srcLister func(namespace string) listersv1alpha1.ZendeskSourceNamespaceLister
 }
 
 // Check that our Reconciler implements Interface

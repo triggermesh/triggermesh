@@ -19,11 +19,9 @@ package awssnssource
 import (
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
-	"knative.dev/pkg/kmeta"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
@@ -50,9 +48,4 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, _ *apis.URL) 
 		// NOTE(antoineco): startupProbe isn't yet supported as of Knative 1.2
 		resource.Probe("/health", ""),
 	)
-}
-
-// RBACOwners implements common.AdapterServiceBuilder.
-func (r *Reconciler) RBACOwners(src commonv1alpha1.Reconcilable) ([]kmeta.OwnerRefable, error) {
-	return common.RBACOwners[*v1alpha1.AWSSNSSource](r.srcLister(src.GetNamespace()))
 }

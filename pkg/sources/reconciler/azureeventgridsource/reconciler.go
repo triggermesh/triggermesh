@@ -43,10 +43,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Azure APIs
 	cg eventgrid.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.AzureEventGridSourceNamespaceLister
-
 	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.AzureEventGridSource, listersv1alpha1.AzureEventGridSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

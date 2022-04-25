@@ -43,10 +43,8 @@ type Reconciler struct {
 	// Getter than can obtain clients for interacting with Azure APIs
 	cg storage.ClientGetter
 
-	srcLister func(namespace string) listersv1alpha1.AzureBlobStorageSourceNamespaceLister
-
 	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.AzureBlobStorageSource, listersv1alpha1.AzureBlobStorageSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

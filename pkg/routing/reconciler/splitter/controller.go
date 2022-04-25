@@ -18,7 +18,6 @@ package splitter
 
 import (
 	"context"
-	"time"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
@@ -27,22 +26,19 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
-	splitterinformer "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/splitter"
-	splitterreconciler "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/splitter"
+	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/splitter"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/routing/v1alpha1/splitter"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
-
-// the resync period ensures we regularly re-check the state of Routers.
-const informerResyncPeriod = time.Minute * 5
 
 // NewController creates a Reconciler and returns the result of NewImpl.
 func NewController(
 	ctx context.Context,
 	cmw configmap.Watcher,
 ) *controller.Impl {
+
 	typ := (*v1alpha1.Splitter)(nil)
 	app := common.ComponentName(typ)
-	informer := splitterinformer.Get(ctx)
 
 	// Calling envconfig.Process() with a prefix appends that prefix
 	// (uppercased) to the Go field name, e.g. MYSOURCE_IMAGE.
@@ -51,22 +47,24 @@ func NewController(
 	}
 	envconfig.MustProcess(app, adapterCfg)
 
+	informer := informerv1alpha1.Get(ctx)
+
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		rtrLister:  informer.Lister().Splitters,
 	}
+	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	impl := splitterreconciler.NewImpl(ctx, r)
 	logger := logging.FromContext(ctx)
 
-	r.base = common.NewMTGenericServiceReconciler(
+	r.base = common.NewMTGenericServiceReconciler[*v1alpha1.Splitter](
 		ctx,
 		typ,
 		impl.Tracker,
 		common.EnqueueObjectsInNamespaceOf(informer.Informer(), impl.FilteredGlobalResync, logger),
+		informer.Lister().Splitters,
 	)
 
-	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	return impl
 }

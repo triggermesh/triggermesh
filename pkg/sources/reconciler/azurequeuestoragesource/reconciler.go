@@ -30,10 +30,8 @@ import (
 
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
-	base       common.GenericDeploymentReconciler
+	base       common.GenericDeploymentReconciler[*v1alpha1.AzureQueueStorageSource, listersv1alpha1.AzureQueueStorageSourceNamespaceLister]
 	adapterCfg *adapterConfig
-
-	srcLister func(namespace string) listersv1alpha1.AzureQueueStorageSourceNamespaceLister
 }
 
 // Check that our Reconciler implements Interface
