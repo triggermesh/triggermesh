@@ -167,7 +167,7 @@ func (r *GenericDeploymentReconciler[T]) reconcileAdapter(ctx context.Context,
 func (r *GenericDeploymentReconciler[T]) getOrCreateAdapter(ctx context.Context, desiredAdapter *appsv1.Deployment) (*appsv1.Deployment, error) {
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	adapter, err := findAdapter[T](r, rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
+	adapter, err := r.findAdapter(rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
 	switch {
 	case apierrors.IsNotFound(err):
 		adapter, err = r.Client(rcl.GetNamespace()).Create(ctx, desiredAdapter, metav1.CreateOptions{})
@@ -181,7 +181,7 @@ func (r *GenericDeploymentReconciler[T]) getOrCreateAdapter(ctx context.Context,
 		return nil, fmt.Errorf("failed to get adapter Deployment from cache: %w", err)
 	}
 
-	return adapter.(*appsv1.Deployment), nil
+	return adapter, nil
 }
 
 // syncAdapterDeployment synchronizes the desired state of an adapter Deployment
@@ -213,6 +213,38 @@ func (r *GenericDeploymentReconciler[T]) syncAdapterDeployment(ctx context.Conte
 	event.Normal(ctx, ReasonAdapterUpdate, "Updated adapter Deployment %q", adapter.Name)
 
 	return adapter, nil
+}
+
+// findAdapter returns the adapter Deployment for a given component instance if it exists.
+func (r *GenericDeploymentReconciler[T]) findAdapter(rcl v1alpha1.Reconcilable,
+	owner *metav1.OwnerReference) (*appsv1.Deployment, error) {
+
+	ls := CommonObjectLabels(rcl)
+
+	if !v1alpha1.IsMultiTenant(rcl) {
+		// the combination of standard labels {name,instance} is unique
+		// and immutable for single-tenant components
+		ls[appInstanceLabel] = rcl.GetName()
+	}
+
+	sel := labels.SelectorFromValidatedSet(ls)
+
+	depls, err := r.Lister(rcl.GetNamespace()).List(sel)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, d := range depls {
+		objOwner := metav1.GetControllerOfNoCopy(d)
+
+		if objOwner.UID == owner.UID {
+			return d, nil
+		}
+	}
+
+	gr := appsv1.Resource("deployment")
+
+	return nil, newNotFoundForSelector(gr, sel)
 }
 
 // ReconcileAdapter reconciles a receive adapter for a component instance.
@@ -325,7 +357,7 @@ func (r *GenericServiceReconciler[T]) reconcileAdapter(ctx context.Context,
 func (r *GenericServiceReconciler[T]) getOrCreateAdapter(ctx context.Context, desiredAdapter *servingv1.Service) (*servingv1.Service, error) {
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	adapter, err := findAdapter[T](r, rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
+	adapter, err := r.findAdapter(rcl, metav1.GetControllerOfNoCopy(desiredAdapter))
 	switch {
 	case apierrors.IsNotFound(err):
 		adapter, err = r.Client(rcl.GetNamespace()).Create(ctx, desiredAdapter, metav1.CreateOptions{})
@@ -339,7 +371,7 @@ func (r *GenericServiceReconciler[T]) getOrCreateAdapter(ctx context.Context, de
 		return nil, fmt.Errorf("failed to get adapter Service from cache: %w", err)
 	}
 
-	return adapter.(*servingv1.Service), nil
+	return adapter, nil
 }
 
 // syncAdapterService synchronizes the desired state of an adapter Service
@@ -380,9 +412,9 @@ func (r *GenericServiceReconciler[T]) syncAdapterService(ctx context.Context,
 	return adapter, nil
 }
 
-// findAdapter returns the adapter object for a given component instance if it exists.
-func findAdapter[T kmeta.OwnerRefable](genericReconciler interface{},
-	rcl v1alpha1.Reconcilable, owner *metav1.OwnerReference) (metav1.Object, error) {
+// findAdapter returns the adapter Service for a given component instance if it exists.
+func (r *GenericServiceReconciler[T]) findAdapter(rcl v1alpha1.Reconcilable,
+	owner *metav1.OwnerReference) (*servingv1.Service, error) {
 
 	ls := CommonObjectLabels(rcl)
 
@@ -394,42 +426,20 @@ func findAdapter[T kmeta.OwnerRefable](genericReconciler interface{},
 
 	sel := labels.SelectorFromValidatedSet(ls)
 
-	var objs []metav1.Object
-	var gr schema.GroupResource
-
-	switch r := genericReconciler.(type) {
-	case *GenericDeploymentReconciler[T]:
-		depls, err := r.Lister(rcl.GetNamespace()).List(sel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, d := range depls {
-			objs = append(objs, d)
-		}
-
-		gr = appsv1.Resource("deployment")
-
-	case *GenericServiceReconciler[T]:
-		svcs, err := r.Lister(rcl.GetNamespace()).List(sel)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, s := range svcs {
-			objs = append(objs, s)
-		}
-
-		gr = servingv1.Resource("service")
+	svcs, err := r.Lister(rcl.GetNamespace()).List(sel)
+	if err != nil {
+		return nil, err
 	}
 
-	for _, obj := range objs {
-		objOwner := metav1.GetControllerOfNoCopy(obj)
+	for _, s := range svcs {
+		objOwner := metav1.GetControllerOfNoCopy(s)
 
 		if objOwner.UID == owner.UID {
-			return obj, nil
+			return s, nil
 		}
 	}
+
+	gr := servingv1.Resource("service")
 
 	return nil, newNotFoundForSelector(gr, sel)
 }
