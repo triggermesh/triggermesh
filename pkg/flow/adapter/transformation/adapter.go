@@ -81,59 +81,42 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	trnContext, trnData := []v1alpha1.Transform{}, []v1alpha1.Transform{}
 	err := json.Unmarshal([]byte(env.TransformationContext), &trnContext)
 	if err != nil {
-		log.Fatalf("Cannot unmarshal Context Transformation variable: %v", err)
+		log.Fatalf("Cannot unmarshal context transformation env variable: %v", err)
 	}
 	err = json.Unmarshal([]byte(env.TransformationData), &trnData)
 	if err != nil {
-		log.Fatalf("Cannot unmarshal Data Transformation variable: %v", err)
+		log.Fatalf("Cannot unmarshal data transformation env variable: %v", err)
 	}
 
-	adapter, err := newHandler(trnContext, trnData)
+	contextPl, err := newPipeline(trnContext)
 	if err != nil {
-		log.Fatalf("Cannot create transformation handler: %v", err)
+		log.Fatalf("Cannot create context transformation pipeline: %v", err)
 	}
+
+	dataPl, err := newPipeline(trnData)
+	if err != nil {
+		log.Fatalf("Cannot create data transformation pipeline: %v", err)
+	}
+
+	sharedStorage := storage.New()
+	contextPl.setStorage(sharedStorage)
+	dataPl.setStorage(sharedStorage)
 
 	mt := &pkgadapter.MetricTag{
 		ResourceGroup: flow.TransformationResource.String(),
 		Namespace:     env.GetNamespace(),
 		Name:          env.GetName(),
 	}
-	sr := metrics.MustNewEventProcessingStatsReporter(mt)
-
-	adapter.sr = sr
-	adapter.mt = mt
-	adapter.sink = env.Sink
-
-	return adapter
-}
-
-// newHandler creates Handler instance.
-func newHandler(context, data []v1alpha1.Transform) (*adapter, error) {
-	contextPipeline, err := newPipeline(context)
-	if err != nil {
-		return nil, err
-	}
-
-	dataPipeline, err := newPipeline(data)
-	if err != nil {
-		return nil, err
-	}
-
-	sharedVars := storage.New()
-	contextPipeline.setStorage(sharedVars)
-	dataPipeline.setStorage(sharedVars)
-
-	ceClient, err := cloudevents.NewClientHTTP()
-	if err != nil {
-		return nil, err
-	}
 
 	return &adapter{
-		ContextPipeline: contextPipeline,
-		DataPipeline:    dataPipeline,
+		ContextPipeline: contextPl,
+		DataPipeline:    dataPl,
 
+		mt:     mt,
+		sr:     metrics.MustNewEventProcessingStatsReporter(mt),
+		sink:   env.Sink,
 		client: ceClient,
-	}, nil
+	}
 }
 
 // Start runs CloudEvent receiver and applies transformation Pipeline

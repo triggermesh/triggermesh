@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 )
 
 var availableTransformations = []v1alpha1.Transform{
@@ -35,22 +36,28 @@ var availableTransformations = []v1alpha1.Transform{
 	{Operation: "delete"},
 }
 
-func TestNewHandler(t *testing.T) {
-	_, err := newHandler(availableTransformations, availableTransformations)
-	assert.NoError(t, err)
-}
-
 func TestStart(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-
-	pipeline, err := newHandler(availableTransformations, availableTransformations)
+	pipeline, err := newPipeline(availableTransformations)
 	assert.NoError(t, err)
+
+	pipeline.setStorage(storage.New())
+
+	ceClient, err := cloudevents.NewClientHTTP()
+	assert.NoError(t, err)
+
+	a := &adapter{
+		ContextPipeline: pipeline,
+		DataPipeline:    pipeline,
+
+		client: ceClient,
+	}
 
 	errChan := make(chan error)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
 		defer close(errChan)
-		errChan <- pipeline.Start(ctx)
+		errChan <- a.Start(ctx)
 	}()
 
 	cancel()
@@ -280,10 +287,17 @@ func TestReceiveAndTransform(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			pipeline, err := newHandler([]v1alpha1.Transform{}, tc.data)
+			pipeline, err := newPipeline(tc.data)
 			assert.NoError(t, err)
 
-			transformedEvent, err := pipeline.applyTransformations(tc.originalEvent)
+			pipeline.setStorage(storage.New())
+
+			a := &adapter{
+				DataPipeline:    pipeline,
+				ContextPipeline: pipeline,
+			}
+
+			transformedEvent, err := a.applyTransformations(tc.originalEvent)
 			assert.NoError(t, err)
 
 			assert.Equal(t, tc.expectedEventData, string(transformedEvent.Data()))
