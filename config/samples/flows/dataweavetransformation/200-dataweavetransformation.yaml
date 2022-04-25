@@ -13,7 +13,7 @@
 # limitations under the License.
 
 apiVersion: flow.triggermesh.io/v1alpha1
-kind: DataweaveTransformation
+kind: DataWeaveTransformation
 metadata:
   name: hello-dw
 spec:
