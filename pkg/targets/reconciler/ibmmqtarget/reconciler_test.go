@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.IBMMQTarget] {
-				return ls.GetIBMMQTargetLister().IBMMQTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.IBMMQTarget](ctx, ls,
+			ls.GetIBMMQTargetLister().IBMMQTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

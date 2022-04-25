@@ -60,12 +60,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestDeploymentReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.GoogleCloudSourceRepositoriesSource] {
-				return ls.GetGoogleCloudSourceRepositoriesSourceLister().GoogleCloudSourceRepositoriesSources(namespace)
-			},
+		r.base = NewTestDeploymentReconciler[*v1alpha1.GoogleCloudSourceRepositoriesSource](ctx, ls,
+			ls.GetGoogleCloudSourceRepositoriesSourceLister().GoogleCloudSourceRepositoriesSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

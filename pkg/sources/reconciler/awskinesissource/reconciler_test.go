@@ -54,12 +54,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestDeploymentReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AWSKinesisSource] {
-				return ls.GetAWSKinesisSourceLister().AWSKinesisSources(namespace)
-			},
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AWSKinesisSource](ctx, ls,
+			ls.GetAWSKinesisSourceLister().AWSKinesisSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

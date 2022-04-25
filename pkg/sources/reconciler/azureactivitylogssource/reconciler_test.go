@@ -54,12 +54,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestDeploymentReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AzureActivityLogsSource] {
-				return ls.GetAzureActivityLogsSourceLister().AzureActivityLogsSources(namespace)
-			},
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AzureActivityLogsSource](ctx, ls,
+			ls.GetAzureActivityLogsSourceLister().AzureActivityLogsSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.XMLToJSONTransformation] {
-				return ls.GetXMLToJSONTransformationLister().XMLToJSONTransformations(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.XMLToJSONTransformation](ctx, ls,
+			ls.GetXMLToJSONTransformationLister().XMLToJSONTransformations,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

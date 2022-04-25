@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.HasuraTarget] {
-				return ls.GetHasuraTargetLister().HasuraTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.HasuraTarget](ctx, ls,
+			ls.GetHasuraTargetLister().HasuraTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

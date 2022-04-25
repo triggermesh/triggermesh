@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.UiPathTarget] {
-				return ls.GetUiPathTargetLister().UiPathTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.UiPathTarget](ctx, ls,
+			ls.GetUiPathTargetLister().UiPathTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.JQTransformation] {
-				return ls.GetJQTransformationLister().JQTransformations(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.JQTransformation](ctx, ls,
+			ls.GetJQTransformationLister().JQTransformations,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

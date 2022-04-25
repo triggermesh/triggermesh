@@ -27,6 +27,7 @@ import (
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/awss3source"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	s3client "github.com/triggermesh/triggermesh/pkg/sources/client/s3"
@@ -38,7 +39,7 @@ type Reconciler struct {
 	s3Cg s3client.ClientGetter
 
 	// SQS adapter
-	base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source]
+	base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source, listersv1alpha1.AWSS3SourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

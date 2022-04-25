@@ -53,12 +53,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.SplunkTarget] {
-				return ls.GetSplunkTargetLister().SplunkTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.SplunkTarget](ctx, ls,
+			ls.GetSplunkTargetLister().SplunkTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

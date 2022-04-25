@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.TwilioSource] {
-				return ls.GetTwilioSourceLister().TwilioSources(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.TwilioSource](ctx, ls,
+			ls.GetTwilioSourceLister().TwilioSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

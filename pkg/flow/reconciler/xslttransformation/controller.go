@@ -55,14 +55,12 @@ func NewController(
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericServiceReconciler(
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.XSLTTransformation](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
-		func(namespace string) common.Lister[*v1alpha1.XSLTTransformation] {
-			return informer.Lister().XSLTTransformations(namespace)
-		},
+		informer.Lister().XSLTTransformations,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

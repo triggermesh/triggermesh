@@ -58,12 +58,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg:   cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.ZendeskSource] {
-				return ls.GetZendeskSourceLister().ZendeskSources(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.ZendeskSource](ctx, ls,
+			ls.GetZendeskSourceLister().ZendeskSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

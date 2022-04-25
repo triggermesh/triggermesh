@@ -54,12 +54,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AWSDynamoDBTarget] {
-				return ls.GetAWSDynamoDBTargetLister().AWSDynamoDBTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.AWSDynamoDBTarget](ctx, ls,
+			ls.GetAWSDynamoDBTargetLister().AWSDynamoDBTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

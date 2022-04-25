@@ -53,12 +53,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestDeploymentReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AzureIOTHubSource] {
-				return ls.GetAzureIOTHubSourceLister().AzureIOTHubSources(namespace)
-			},
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AzureIOTHubSource](ctx, ls,
+			ls.GetAzureIOTHubSourceLister().AzureIOTHubSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

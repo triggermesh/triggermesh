@@ -86,12 +86,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			snsCg:      staticClientGetter(snsCli),
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AWSSNSSource] {
-				return ls.GetAWSSNSSourceLister().AWSSNSSources(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.AWSSNSSource](ctx, ls,
+			ls.GetAWSSNSSourceLister().AWSSNSSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

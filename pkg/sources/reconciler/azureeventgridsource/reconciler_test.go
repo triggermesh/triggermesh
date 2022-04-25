@@ -99,12 +99,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestDeploymentReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AzureEventGridSource] {
-				return ls.GetAzureEventGridSourceLister().AzureEventGridSources(namespace)
-			},
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AzureEventGridSource](ctx, ls,
+			ls.GetAzureEventGridSourceLister().AzureEventGridSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

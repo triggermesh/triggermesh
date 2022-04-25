@@ -54,12 +54,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestDeploymentReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AWSCloudWatchSource] {
-				return ls.GetAWSCloudWatchSourceLister().AWSCloudWatchSources(namespace)
-			},
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AWSCloudWatchSource](ctx, ls,
+			ls.GetAWSCloudWatchSourceLister().AWSCloudWatchSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

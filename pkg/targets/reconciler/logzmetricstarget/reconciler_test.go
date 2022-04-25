@@ -53,12 +53,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.LogzMetricsTarget] {
-				return ls.GetLogzMetricsTargetLister().LogzMetricsTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.LogzMetricsTarget](ctx, ls,
+			ls.GetLogzMetricsTargetLister().LogzMetricsTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

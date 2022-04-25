@@ -25,6 +25,7 @@ import (
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureactivitylogssource"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/sources/client/azure/insights"
 )
@@ -35,7 +36,7 @@ type Reconciler struct {
 	cg insights.ClientGetter
 
 	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler[*v1alpha1.AzureActivityLogsSource]
+	base       common.GenericDeploymentReconciler[*v1alpha1.AzureActivityLogsSource, listersv1alpha1.AzureActivityLogsSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 

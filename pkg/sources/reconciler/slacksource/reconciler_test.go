@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.SlackSource] {
-				return ls.GetSlackSourceLister().SlackSources(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.SlackSource](ctx, ls,
+			ls.GetSlackSourceLister().SlackSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

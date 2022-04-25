@@ -54,14 +54,12 @@ func NewController(
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericServiceReconciler(
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.CloudEventsSource](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
-		func(namespace string) common.Lister[*v1alpha1.CloudEventsSource] {
-			return informer.Lister().CloudEventsSources(namespace)
-		},
+		informer.Lister().CloudEventsSources,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

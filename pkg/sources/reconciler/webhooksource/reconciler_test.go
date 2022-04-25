@@ -52,12 +52,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.WebhookSource] {
-				return ls.GetWebhookSourceLister().WebhookSources(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.WebhookSource](ctx, ls,
+			ls.GetWebhookSourceLister().WebhookSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

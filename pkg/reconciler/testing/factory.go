@@ -114,12 +114,12 @@ func MakeFactory(ctor Ctor) rt.Factory {
 
 // NewTestDeploymentReconciler returns a GenericServiceReconciler initialized with
 // test clients.
-func NewTestDeploymentReconciler[T kmeta.OwnerRefable](ctx context.Context,
+func NewTestDeploymentReconciler[T kmeta.OwnerRefable, L common.Lister[T]](ctx context.Context,
 	ls *Listers,
-	ownersLister common.ListerGetter[T],
-) common.GenericDeploymentReconciler[T] {
+	ownersLister common.ListerGetter[T, L],
+) common.GenericDeploymentReconciler[T, L] {
 
-	return common.GenericDeploymentReconciler[T]{
+	return common.GenericDeploymentReconciler[T, L]{
 		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker.New(func(types.NamespacedName) {}, 0)),
 		Lister:                ls.GetDeploymentLister().Deployments,
 		Client:                fakek8sinjectionclient.Get(ctx).AppsV1().Deployments,
@@ -130,12 +130,12 @@ func NewTestDeploymentReconciler[T kmeta.OwnerRefable](ctx context.Context,
 
 // NewTestServiceReconciler returns a GenericServiceReconciler initialized with
 // test clients.
-func NewTestServiceReconciler[T kmeta.OwnerRefable](ctx context.Context,
+func NewTestServiceReconciler[T kmeta.OwnerRefable, L common.Lister[T]](ctx context.Context,
 	ls *Listers,
-	ownersLister common.ListerGetter[T],
-) common.GenericServiceReconciler[T] {
+	ownersLister common.ListerGetter[T, L],
+) common.GenericServiceReconciler[T, L] {
 
-	return common.GenericServiceReconciler[T]{
+	return common.GenericServiceReconciler[T, L]{
 		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker.New(func(types.NamespacedName) {}, 0)),
 		Lister:                ls.GetServiceLister().Services,
 		Client:                fakeservinginjectionclient.Get(ctx).ServingV1().Services,
@@ -144,12 +144,12 @@ func NewTestServiceReconciler[T kmeta.OwnerRefable](ctx context.Context,
 }
 
 // newTestRBACReconciler returns a GenericRBACReconciler initialized with test clients.
-func newTestRBACReconciler[T kmeta.OwnerRefable](ctx context.Context,
+func newTestRBACReconciler[T kmeta.OwnerRefable, L common.Lister[T]](ctx context.Context,
 	ls *Listers,
-	ownersLister common.ListerGetter[T],
-) *common.GenericRBACReconciler[T] {
+	ownersLister common.ListerGetter[T, L],
+) *common.GenericRBACReconciler[T, L] {
 
-	return &common.GenericRBACReconciler[T]{
+	return &common.GenericRBACReconciler[T, L]{
 		SALister:     ls.GetServiceAccountLister().ServiceAccounts,
 		RBLister:     ls.GetRoleBindingLister().RoleBindings,
 		OwnersLister: ownersLister,

@@ -53,12 +53,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AzureEventHubsTarget] {
-				return ls.GetAzureEventHubsTargetLister().AzureEventHubsTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.AzureEventHubsTarget](ctx, ls,
+			ls.GetAzureEventHubsTargetLister().AzureEventHubsTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

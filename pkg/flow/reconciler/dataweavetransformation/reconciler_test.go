@@ -67,12 +67,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.DataWeaveTransformation] {
-				return ls.GetDataWeaveTransformationLister().DataWeaveTransformations(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.DataWeaveTransformation](ctx, ls,
+			ls.GetDataWeaveTransformationLister().DataWeaveTransformations,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

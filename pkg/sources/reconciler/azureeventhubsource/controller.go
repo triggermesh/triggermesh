@@ -54,14 +54,12 @@ func NewController(
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericDeploymentReconciler(
+	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.AzureEventHubSource](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
-		func(namespace string) common.Lister[*v1alpha1.AzureEventHubSource] {
-			return informer.Lister().AzureEventHubSources(namespace)
-		},
+		informer.Lister().AzureEventHubSources,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

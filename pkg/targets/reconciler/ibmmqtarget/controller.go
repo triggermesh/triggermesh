@@ -55,14 +55,12 @@ func NewController(
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericServiceReconciler(
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.IBMMQTarget](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
 		impl.EnqueueControllerOf,
-		func(namespace string) common.Lister[*v1alpha1.IBMMQTarget] {
-			return informer.Lister().IBMMQTargets(namespace)
-		},
+		informer.Lister().IBMMQTargets,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

@@ -54,12 +54,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AWSLambdaTarget] {
-				return ls.GetAWSLambdaTargetLister().AWSLambdaTargets(namespace)
-			},
+		r.base = NewTestServiceReconciler[*v1alpha1.AWSLambdaTarget](ctx, ls,
+			ls.GetAWSLambdaTargetLister().AWSLambdaTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

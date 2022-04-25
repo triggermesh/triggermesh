@@ -56,14 +56,12 @@ func NewController(
 
 	logger := logging.FromContext(ctx)
 
-	r.base = common.NewMTGenericServiceReconciler(
+	r.base = common.NewMTGenericServiceReconciler[*v1alpha1.Filter](
 		ctx,
 		typ,
 		impl.Tracker,
 		common.EnqueueObjectsInNamespaceOf(informer.Informer(), impl.FilteredGlobalResync, logger),
-		func(namespace string) common.Lister[*v1alpha1.Filter] {
-			return informer.Lister().Filters(namespace)
-		},
+		informer.Lister().Filters,
 	)
 
 	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))

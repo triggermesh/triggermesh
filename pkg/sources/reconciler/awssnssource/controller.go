@@ -64,14 +64,12 @@ func NewController(
 
 	logger := logging.FromContext(ctx)
 
-	r.base = common.NewMTGenericServiceReconciler(
+	r.base = common.NewMTGenericServiceReconciler[*v1alpha1.AWSSNSSource](
 		ctx,
 		typ,
 		impl.Tracker,
 		common.EnqueueObjectsInNamespaceOf(informer.Informer(), impl.FilteredGlobalResync, logger),
-		func(namespace string) common.Lister[*v1alpha1.AWSSNSSource] {
-			return informer.Lister().AWSSNSSources(namespace)
-		},
+		informer.Lister().AWSSNSSources,
 	)
 
 	informer.Informer().AddEventHandlerWithResyncPeriod(controller.HandleAll(impl.Enqueue), informerResyncPeriod)

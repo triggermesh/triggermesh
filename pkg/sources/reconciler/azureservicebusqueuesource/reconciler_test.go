@@ -53,12 +53,8 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestDeploymentReconciler(
-			ctx,
-			ls,
-			func(namespace string) common.Lister[*v1alpha1.AzureServiceBusQueueSource] {
-				return ls.GetAzureServiceBusQueueSourceLister().AzureServiceBusQueueSources(namespace)
-			},
+		r.base = NewTestDeploymentReconciler[*v1alpha1.AzureServiceBusQueueSource](ctx, ls,
+			ls.GetAzureServiceBusQueueSourceLister().AzureServiceBusQueueSources,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),

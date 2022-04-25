@@ -31,6 +31,7 @@ import (
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/sources/v1alpha1/azureservicebustopicsource"
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/sources/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 	"github.com/triggermesh/triggermesh/pkg/sources/auth"
@@ -43,7 +44,7 @@ type Reconciler struct {
 	cg servicebustopics.ClientGetter
 
 	// Event Hubs adapter
-	base       common.GenericDeploymentReconciler[*v1alpha1.AzureServiceBusTopicSource]
+	base       common.GenericDeploymentReconciler[*v1alpha1.AzureServiceBusTopicSource, listersv1alpha1.AzureServiceBusTopicSourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 
