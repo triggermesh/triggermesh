@@ -40,12 +40,12 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.2+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.15.1
-	github.com/aws/aws-sdk-go v1.43.41
+	github.com/aws/aws-sdk-go v1.44.0
 	github.com/basgys/goxml2json v1.1.0
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.17.1
-	github.com/fsnotify/fsnotify v1.5.1
+	github.com/fsnotify/fsnotify v1.5.3
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/google/cel-go v0.11.2
 	github.com/google/go-cmp v0.5.7
