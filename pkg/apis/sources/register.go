@@ -176,6 +176,12 @@ var (
 		Resource: "httppollersources",
 	}
 
+	// IBMMQSourceResource respresents an event source for IBM MQ.
+	IBMMQSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "ibmmqsources",
+	}
+
 	// OCIMetricsSourceResource represents an event source for OCI Metrics.
 	OCIMetricsSourceResource = schema.GroupResource{
 		Group:    GroupName,
