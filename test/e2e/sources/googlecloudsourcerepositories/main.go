@@ -131,7 +131,13 @@ var _ = Describe("Google Cloud Repositories source", func() {
 				e2erepo.MustDeleteRepository(repoClient, repoName)
 			})
 
-			Specify("the source generates an event", func() {
+			// PENDING SPEC (not executed)
+			// Re-enable after triggermesh/triggermesh#776 is addressed.
+			//
+			// The Compute Engine default service account, used when no service account email is explicitly
+			// specified in the repository's notification configuration, doesn't have the 'pubsub.topics.publish'
+			// IAM permission (anymore?), therefore notifications are currently not sent to Pub/Sub.
+			XSpecify("the source generates an event", func() {
 
 				const receiveTimeout = 15 * time.Second
 				const pollInterval = 500 * time.Millisecond
