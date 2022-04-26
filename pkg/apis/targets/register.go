@@ -72,6 +72,11 @@ var (
 		Group:    GroupName,
 		Resource: "azureeventhubstargets",
 	}
+	// CloudEventsTargetResource respresents an event target for CloudEvents gateway.
+	CloudEventsTargetResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "cloudeventstargets",
+	}
 	// ConfluentTargetResource respresents an event target for Confluent.
 	ConfluentTargetResource = schema.GroupResource{
 		Group:    GroupName,

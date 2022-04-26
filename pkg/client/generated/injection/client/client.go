@@ -7122,6 +7122,137 @@ func (w *wrapTargetsV1alpha1AzureEventHubsTargetImpl) Watch(ctx context.Context,
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapTargetsV1alpha1) CloudEventsTargets(namespace string) typedtargetsv1alpha1.CloudEventsTargetInterface {
+	return &wrapTargetsV1alpha1CloudEventsTargetImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "targets.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "cloudeventstargets",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapTargetsV1alpha1CloudEventsTargetImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedtargetsv1alpha1.CloudEventsTargetInterface = (*wrapTargetsV1alpha1CloudEventsTargetImpl)(nil)
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.CloudEventsTarget, opts v1.CreateOptions) (*targetsv1alpha1.CloudEventsTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "CloudEventsTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.CloudEventsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.CloudEventsTarget, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.CloudEventsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.CloudEventsTargetList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.CloudEventsTargetList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.CloudEventsTarget, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.CloudEventsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.CloudEventsTarget, opts v1.UpdateOptions) (*targetsv1alpha1.CloudEventsTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "CloudEventsTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.CloudEventsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.CloudEventsTarget, opts v1.UpdateOptions) (*targetsv1alpha1.CloudEventsTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "CloudEventsTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.CloudEventsTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1CloudEventsTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapTargetsV1alpha1) ConfluentTargets(namespace string) typedtargetsv1alpha1.ConfluentTargetInterface {
 	return &wrapTargetsV1alpha1ConfluentTargetImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
