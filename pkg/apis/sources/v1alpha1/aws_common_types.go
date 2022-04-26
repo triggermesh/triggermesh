@@ -29,12 +29,14 @@ type AWSAuth struct {
 	// requests based on a signature composed of an access key ID and a
 	// corresponding secret access key.
 	// See https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+	// +optional
 	Credentials *AWSSecurityCredentials `json:"credentials,omitempty"`
 
 	// (Amazon EKS only) The ARN of an IAM role which can be impersonated
 	// to obtain AWS permissions.
 	// See https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
-	EksIAMRole *apis.ARN `json:"iamRole"`
+	// +optional
+	EksIAMRole *apis.ARN `json:"iamRole,omitempty"`
 }
 
 // AWSSecurityCredentials represents a set of AWS security credentials.
