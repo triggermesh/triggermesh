@@ -23,7 +23,7 @@ require (
 	cloud.google.com/go/workflows v1.3.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.17
-	github.com/Azure/azure-sdk-for-go v63.3.0+incompatible
+	github.com/Azure/azure-sdk-for-go v63.4.0+incompatible
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.23.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v0.14.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus v0.4.0
@@ -77,7 +77,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	google.golang.org/api v0.75.0
 	google.golang.org/genproto v0.0.0-20220414192740-2d67ff6cf2b4
-	google.golang.org/grpc v1.45.0
+	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
 	k8s.io/api v0.22.5
