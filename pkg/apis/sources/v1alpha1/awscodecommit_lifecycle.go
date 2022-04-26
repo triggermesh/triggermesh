@@ -69,7 +69,7 @@ func (s *AWSCodeCommitSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AWSCodeCommitSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

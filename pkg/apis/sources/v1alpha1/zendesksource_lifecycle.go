@@ -63,7 +63,7 @@ func (*ZendeskSource) IsMultiTenant() bool {
 	return true
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *ZendeskSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

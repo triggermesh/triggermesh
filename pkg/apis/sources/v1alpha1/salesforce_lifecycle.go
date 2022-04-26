@@ -67,7 +67,7 @@ func (s *SalesforceSource) GetEventTypes() []string {
 	return []string{"com.salesforce.stream.message"}
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *SalesforceSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

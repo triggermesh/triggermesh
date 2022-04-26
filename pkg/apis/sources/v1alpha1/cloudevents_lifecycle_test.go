@@ -20,8 +20,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+
 	duckv1 "knative.dev/pkg/apis/duck/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 func TestCloudEventsSourceGetStatus(t *testing.T) {

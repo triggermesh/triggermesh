@@ -94,7 +94,7 @@ func (f *Function) GetSink() *duckv1.Destination {
 	return &f.Spec.Sink
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (f *Function) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return f.Spec.AdapterOverrides
 }

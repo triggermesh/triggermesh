@@ -70,7 +70,7 @@ func (s *AWSCloudWatchLogsSource) AsEventSource() string {
 	return s.Spec.ARN.String()
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AWSCloudWatchLogsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

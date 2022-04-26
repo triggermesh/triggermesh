@@ -72,7 +72,7 @@ func (s *IBMMQSource) AsEventSource() string {
 	return fmt.Sprintf("%s/%s", s.Spec.ConnectionName, strings.ToLower(s.Spec.ChannelName))
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *IBMMQSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

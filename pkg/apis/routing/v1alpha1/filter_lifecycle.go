@@ -75,7 +75,7 @@ func (*Filter) IsMultiTenant() bool {
 	return true
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (f *Filter) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return f.Spec.AdapterOverrides
 }

@@ -56,7 +56,7 @@ func (t *JQTransformation) GetSink() *duckv1.Destination {
 	return &t.Spec.Sink
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *JQTransformation) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }

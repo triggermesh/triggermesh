@@ -58,7 +58,7 @@ func (s *GoogleCloudBillingSource) AsEventSource() string {
 	return s.Spec.BudgetID
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *GoogleCloudBillingSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

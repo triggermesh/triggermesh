@@ -48,7 +48,7 @@ func (t *OracleTarget) GetStatusManager() *v1alpha1.StatusManager {
 	}
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *OracleTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }
