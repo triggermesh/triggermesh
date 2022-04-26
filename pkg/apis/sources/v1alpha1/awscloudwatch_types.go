@@ -39,10 +39,11 @@ type AWSCloudWatchSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSCloudWatchSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSCloudWatchSource)(nil)
-	_ v1alpha1.EventSource         = (*AWSCloudWatchSource)(nil)
-	_ v1alpha1.EventSender         = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.EventSource            = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.EventSender            = (*AWSCloudWatchSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSCloudWatchSource)(nil)
 )
 
 // AWSCloudWatchSourceSpec defines the desired state of the event source.

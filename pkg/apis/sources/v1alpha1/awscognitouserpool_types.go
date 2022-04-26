@@ -39,10 +39,11 @@ type AWSCognitoUserPoolSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSCognitoUserPoolSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSCognitoUserPoolSource)(nil)
-	_ v1alpha1.EventSource         = (*AWSCognitoUserPoolSource)(nil)
-	_ v1alpha1.EventSender         = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.EventSource            = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.EventSender            = (*AWSCognitoUserPoolSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSCognitoUserPoolSource)(nil)
 )
 
 // AWSCognitoUserPoolSourceSpec defines the desired state of the event source.

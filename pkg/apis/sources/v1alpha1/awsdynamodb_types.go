@@ -39,10 +39,11 @@ type AWSDynamoDBSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSDynamoDBSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSDynamoDBSource)(nil)
-	_ v1alpha1.EventSource         = (*AWSDynamoDBSource)(nil)
-	_ v1alpha1.EventSender         = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.EventSource            = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.EventSender            = (*AWSDynamoDBSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSDynamoDBSource)(nil)
 )
 
 // AWSDynamoDBSourceSpec defines the desired state of the event source.

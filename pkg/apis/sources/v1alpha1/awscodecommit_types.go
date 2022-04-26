@@ -39,10 +39,11 @@ type AWSCodeCommitSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSCodeCommitSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSCodeCommitSource)(nil)
-	_ v1alpha1.EventSource         = (*AWSCodeCommitSource)(nil)
-	_ v1alpha1.EventSender         = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.EventSource            = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.EventSender            = (*AWSCodeCommitSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSCodeCommitSource)(nil)
 )
 
 // AWSCodeCommitSourceSpec defines the desired state of the event source.

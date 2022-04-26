@@ -25,6 +25,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -88,4 +89,20 @@ func AWSCloudWatchSourceName(ns, name string) string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *AWSCloudWatchSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// WantsOwnServiceAccount implements ServiceAccountProvider.
+func (s *AWSCloudWatchSource) WantsOwnServiceAccount() bool {
+	return s.Spec.Auth.EksIAMRole != nil
+}
+
+// ServiceAccountOptions implements ServiceAccountProvider.
+func (s *AWSCloudWatchSource) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
+
+	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
+		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
+	}
+
+	return saOpts
 }

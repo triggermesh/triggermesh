@@ -41,9 +41,9 @@ type AWSS3Source struct {
 var (
 	_ v1alpha1.Reconcilable           = (*AWSS3Source)(nil)
 	_ v1alpha1.AdapterConfigurable    = (*AWSS3Source)(nil)
-	_ v1alpha1.ServiceAccountProvider = (*AWSS3Source)(nil)
 	_ v1alpha1.EventSource            = (*AWSS3Source)(nil)
 	_ v1alpha1.EventSender            = (*AWSS3Source)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSS3Source)(nil)
 )
 
 // AWSS3SourceSpec defines the desired state of the event source.
@@ -67,11 +67,10 @@ type AWSS3SourceSpec struct {
 	// https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html
 	EventTypes []string `json:"eventTypes"`
 
-	// The destination of notifications originating from the Amazon S3 bucket.
-	//
+	// The intermediate destination of notifications originating from the
+	// Amazon S3 bucket, before they are retrieved by TriggerMesh.
 	// If omitted, an Amazon SQS queue is automatically created and
 	// associated with the bucket.
-	//
 	// +optional
 	Destination *AWSS3SourceDestination `json:"destination,omitempty"`
 
@@ -83,7 +82,8 @@ type AWSS3SourceSpec struct {
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
-// AWSS3SourceDestination contains possible destinations for bucket notifications.
+// AWSS3SourceDestination contains possible intermediate destinations for
+// bucket notifications.
 type AWSS3SourceDestination struct {
 	// Amazon SQS destination.
 	// +optional

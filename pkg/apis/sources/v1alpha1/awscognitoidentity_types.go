@@ -39,10 +39,11 @@ type AWSCognitoIdentitySource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSCognitoIdentitySource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSCognitoIdentitySource)(nil)
-	_ v1alpha1.EventSource         = (*AWSCognitoIdentitySource)(nil)
-	_ v1alpha1.EventSender         = (*AWSCognitoIdentitySource)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSCognitoIdentitySource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSCognitoIdentitySource)(nil)
+	_ v1alpha1.EventSource            = (*AWSCognitoIdentitySource)(nil)
+	_ v1alpha1.EventSender            = (*AWSCognitoIdentitySource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSCognitoIdentitySource)(nil)
 )
 
 // AWSCognitoIdentitySourceSpec defines the desired state of the event source.

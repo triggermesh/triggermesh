@@ -39,10 +39,11 @@ type AWSKinesisSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSKinesisSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSKinesisSource)(nil)
-	_ v1alpha1.EventSource         = (*AWSKinesisSource)(nil)
-	_ v1alpha1.EventSender         = (*AWSKinesisSource)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSKinesisSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSKinesisSource)(nil)
+	_ v1alpha1.EventSource            = (*AWSKinesisSource)(nil)
+	_ v1alpha1.EventSender            = (*AWSKinesisSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSKinesisSource)(nil)
 )
 
 // AWSKinesisSourceSpec defines the desired state of the event source.
