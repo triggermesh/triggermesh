@@ -17,6 +17,7 @@ limitations under the License.
 package awscognitoidentitysource
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -157,7 +158,9 @@ func TestSendCognitoEvent(t *testing.T) {
 	}
 	records := []*cognitosync.Record{}
 
-	err := a.sendCognitoEvent(&dataset, records)
+	ctx := context.Background()
+
+	err := a.sendCognitoEvent(ctx, &dataset, records)
 	assert.NoError(t, err)
 
 	gotEvents := ceClient.Sent()

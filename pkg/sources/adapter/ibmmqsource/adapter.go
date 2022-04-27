@@ -41,15 +41,13 @@ var _ pkgadapter.Adapter = (*ibmmqsourceAdapter)(nil)
 type ibmmqsourceAdapter struct {
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
-
-	mt *pkgadapter.MetricTag
+	mt       *pkgadapter.MetricTag
 
 	mqEnvs *SourceEnvAccessor
 }
 
 // NewAdapter returns adapter implementation
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*SourceEnvAccessor)
 	logger := logging.FromContext(ctx)
 
 	mt := &pkgadapter.MetricTag{
@@ -57,6 +55,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		Namespace:     envAcc.GetNamespace(),
 		Name:          envAcc.GetName(),
 	}
+
+	env := envAcc.(*SourceEnvAccessor)
 
 	return &ibmmqsourceAdapter{
 		ceClient: ceClient,

@@ -24,9 +24,39 @@ const (
 )
 
 var (
+	// DataWeaveTransformationResource respresents a DataWeave transformation.
+	DataWeaveTransformationResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "dataweavetransformations",
+	}
+
+	// JQTransformationResource respresents a JQ transformation.
+	JQTransformationResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "jqtransformations",
+	}
+
+	// SynchronizerResource respresents a Synchronizer.
+	SynchronizerResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "synchronizers",
+	}
+
 	// TransformationResource respresents a Bumblebee transformation.
 	TransformationResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "transformations",
+	}
+
+	// XMLToJSONTransformationResource respresents a XML to JSON transformation.
+	XMLToJSONTransformationResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "xmltojsontansformations",
+	}
+
+	// XSLTTransformationResource respresents a XSLT transformation.
+	XSLTTransformationResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "xslttransformations",
 	}
 )

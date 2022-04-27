@@ -35,6 +35,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
@@ -57,6 +58,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	cgnIdentityClient cognitoidentityprovideriface.CognitoIdentityProviderAPI
 	ceClient          cloudevents.Client
@@ -74,6 +76,12 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSCognitoUserPoolSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	env := envAcc.(*envConfig)
 
 	arn := common.MustParseARN(env.ARN)
@@ -85,6 +93,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		cgnIdentityClient: cognitoidentityprovider.New(cfg),
 		ceClient:          ceClient,
@@ -106,6 +115,8 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	a.logger.Infof("Listening to AWS Cognito User Pool: %s", a.userPoolID)
 
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
 	var latestTimestamp time.Time
 
 	backoff := common.NewBackoff()
@@ -123,7 +134,7 @@ func (a *adapter) Start(ctx context.Context) error {
 		for _, user := range users {
 			// we have new users - reset backoff duration
 			resetBackoff = true
-			err := a.sendCognitoEvent(user)
+			err := a.sendCognitoEvent(ctx, user)
 			if err != nil {
 				a.logger.Errorf("Failed to send cloudevent: %v", err)
 			}
@@ -168,7 +179,7 @@ func filterByTimestamp(users []*cognitoidentityprovider.UserType, latestTimestam
 	return newUsers, newLatestTimestamp
 }
 
-func (a *adapter) sendCognitoEvent(user *cognitoidentityprovider.UserType) error {
+func (a *adapter) sendCognitoEvent(ctx context.Context, user *cognitoidentityprovider.UserType) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetSubject(a.userPoolID)
 	event.SetSource(a.arn.String())
@@ -178,7 +189,7 @@ func (a *adapter) sendCognitoEvent(user *cognitoidentityprovider.UserType) error
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
-	if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 		return result
 	}
 	return nil

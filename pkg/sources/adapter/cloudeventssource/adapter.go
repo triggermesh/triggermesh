@@ -20,21 +20,30 @@ import (
 	"context"
 	"fmt"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cehttp "github.com/cloudevents/sdk-go/v2/protocol/http"
 	"go.uber.org/zap"
 
-	"knative.dev/eventing/pkg/adapter/v2"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	cehttp "github.com/cloudevents/sdk-go/v2/protocol/http"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/adapter/fs"
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/cloudeventssource/ratelimiter"
 )
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
-	env := aEnv.(*envAccessor)
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.CloudEventsSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*envAccessor)
 
 	cfw, err := fs.NewCachedFileWatcher(logger)
 	if err != nil {
@@ -55,6 +64,7 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 		cfw:      cfw,
 		ceClient: ceClient,
 		logger:   logging.FromContext(ctx),
+		mt:       mt,
 	}
 
 	// prepare CE server options
@@ -84,4 +94,4 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 	return ceh
 }
 
-var _ adapter.Adapter = (*cloudEventsHandler)(nil)
+var _ pkgadapter.Adapter = (*cloudEventsHandler)(nil)

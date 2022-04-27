@@ -115,7 +115,9 @@ func TestSendCognitoEvent(t *testing.T) {
 		cgnIdentityClient: mockedCognitoUserPoolClient{},
 	}
 
-	err := a.sendCognitoEvent(&user)
+	ctx := context.Background()
+
+	err := a.sendCognitoEvent(ctx, &user)
 	assert.NoError(t, err)
 
 	events := ceClient.Sent()

@@ -21,13 +21,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"knative.dev/eventing/pkg/adapter/v2"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/google/uuid"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/salesforcesource/auth"
 	sfclient "github.com/triggermesh/triggermesh/pkg/sources/adapter/salesforcesource/client"
 )
@@ -43,6 +45,7 @@ type salesforceAdapter struct {
 
 	dispatcher *eventDispatcher
 	logger     *zap.SugaredLogger
+	mt         *pkgadapter.MetricTag
 }
 
 type eventDispatcher struct {
@@ -52,13 +55,20 @@ type eventDispatcher struct {
 	logger   *zap.SugaredLogger
 }
 
-var _ adapter.Adapter = (*salesforceAdapter)(nil)
+var _ pkgadapter.Adapter = (*salesforceAdapter)(nil)
 var _ sfclient.EventDispatcher = (*eventDispatcher)(nil)
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
-	env := aEnv.(*envAccessor)
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.SalesforceSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*envAccessor)
 
 	source := env.Name
 	if env.SubscriptionChannel[0] != '/' {
@@ -85,6 +95,7 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 
 		dispatcher: dispatcher,
 		logger:     logger,
+		mt:         mt,
 	}
 
 	return adapter
@@ -102,6 +113,8 @@ func (a *salesforceAdapter) Start(ctx context.Context) (err error) {
 	}
 
 	client := sfclient.NewBayeux(a.sfVersion, subs, a.sfAuth, a.dispatcher, http.DefaultClient, a.logger.Named("bayeux"))
+
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
 	return client.Start(ctx)
 }

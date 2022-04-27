@@ -35,6 +35,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
@@ -59,6 +60,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	cwLogsClient cloudwatchlogsiface.CloudWatchLogsAPI
 	ceClient     cloudevents.Client
@@ -79,6 +81,12 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSCloudWatchLogsSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	env := envAcc.(*envConfig)
 
 	a := common.MustParseARN(env.ARN)
@@ -96,6 +104,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		cwLogsClient: cloudwatchlogs.New(cfg),
 		ceClient:     ceClient,
@@ -139,6 +148,8 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	a.logger.Info("Enabling CloudWatchLog")
 
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
 	// Setup polling to retrieve metrics
 	poll := time.NewTicker(a.pollingInterval)
 	defer poll.Stop()
@@ -151,14 +162,14 @@ func (a *adapter) Start(ctx context.Context) error {
 			return nil
 
 		case t := <-poll.C:
-			go a.CollectLogs(priorTime, t)
+			go a.CollectLogs(ctx, priorTime, t)
 			priorTime = &t
 		}
 	}
 }
 
 // CollectLogs receives events from CloudWatch client and sends them to a sink.
-func (a *adapter) CollectLogs(priorTime *time.Time, currentTime time.Time) {
+func (a *adapter) CollectLogs(ctx context.Context, priorTime *time.Time, currentTime time.Time) {
 	a.logger.Debug("Firing logs")
 	startTime := currentTime.Add(-a.pollingInterval).Unix() * 1000
 
@@ -218,7 +229,7 @@ func (a *adapter) CollectLogs(priorTime *time.Time, currentTime time.Time) {
 						return false
 					}
 
-					if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+					if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 						a.logger.Errorf("failed to send event data: %v", err)
 						return false
 					}

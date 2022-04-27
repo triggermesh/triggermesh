@@ -26,13 +26,23 @@ import (
 	"go.uber.org/zap"
 
 	"knative.dev/eventing/pkg/adapter/v2"
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 )
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
-	env := aEnv.(*envAccessor)
+func NewAdapter(ctx context.Context, envAcc adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.HTTPPollerSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*envAccessor)
 
 	t := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: env.SkipVerify},
@@ -74,5 +84,6 @@ func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cl
 
 		ceClient: ceClient,
 		logger:   logging.FromContext(ctx),
+		mt:       mt,
 	}
 }

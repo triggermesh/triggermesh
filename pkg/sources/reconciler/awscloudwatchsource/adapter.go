@@ -76,8 +76,6 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVar(envQueries, queries),
 		resource.EnvVar(envPollingInterval, pollingInterval.String()),
 		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),

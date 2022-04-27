@@ -19,33 +19,47 @@ package ocimetricssource
 import (
 	"context"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"go.uber.org/zap"
-	"knative.dev/eventing/pkg/adapter/v2"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
-var _ adapter.Adapter = (*ociMetricsAdapter)(nil)
+var _ pkgadapter.Adapter = (*ociMetricsAdapter)(nil)
 
 type ociMetricsAdapter struct {
 	handler OCIMetricsAPIHandler
 	logger  *zap.SugaredLogger
+	mt      *pkgadapter.MetricTag
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, aEnv adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
-	env := aEnv.(*envAccessor)
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.OCIMetricsSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*envAccessor)
+
 	return &ociMetricsAdapter{
-		handler: NewOCIMetricsAPIHandler(ceClient, aEnv, v1alpha1.OCIGenerateEventSource(env.Namespace, env.Name), logger.Named("handler")),
+		handler: NewOCIMetricsAPIHandler(ceClient, env, v1alpha1.OCIGenerateEventSource(env.Namespace, env.Name), logger.Named("handler")),
 		logger:  logger,
+		mt:      mt,
 	}
 
 }
 
 // Start implements adapter.Adapter.
 func (o *ociMetricsAdapter) Start(ctx context.Context) error {
+	ctx = pkgadapter.ContextWithMetricTag(ctx, o.mt)
 	return o.handler.Start(ctx)
 }

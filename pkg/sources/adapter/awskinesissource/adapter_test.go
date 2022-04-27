@@ -17,6 +17,7 @@ limitations under the License.
 package awskinesissource
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"testing"
@@ -156,7 +157,9 @@ func TestSendCloudevent(t *testing.T) {
 				PartitionKey:   aws.String("key"),
 			}
 
-			err := a.sendKinesisRecord(&record)
+			ctx := context.Background()
+
+			err := a.sendKinesisRecord(ctx, &record)
 			assert.NoError(t, err)
 
 			gotEvents := ceClient.Sent()

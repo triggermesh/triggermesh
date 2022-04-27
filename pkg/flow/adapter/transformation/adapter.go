@@ -25,7 +25,6 @@ import (
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/kelseyhightower/envconfig"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 
@@ -71,10 +70,13 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 }
 
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	var env envConfig
-	if err := envconfig.Process("", &env); err != nil {
-		log.Fatalf("Failed to process env var: %v", err)
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: flow.TransformationResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
 	}
+
+	env := envAcc.(*envConfig)
 
 	metrics.MustRegisterEventProcessingStatsView()
 
@@ -102,12 +104,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	contextPl.setStorage(sharedStorage)
 	dataPl.setStorage(sharedStorage)
 
-	mt := &pkgadapter.MetricTag{
-		ResourceGroup: flow.TransformationResource.String(),
-		Namespace:     env.GetNamespace(),
-		Name:          env.GetName(),
-	}
-
 	return &adapter{
 		ContextPipeline: contextPl,
 		DataPipeline:    dataPl,
@@ -123,6 +119,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 // on incoming events.
 func (t *adapter) Start(ctx context.Context) error {
 	log.Println("Starting CloudEvent receiver")
+
 	var receiver interface{}
 	receiver = t.receiveAndReply
 	if t.sink != "" {

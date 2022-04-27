@@ -60,8 +60,6 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 		resource.EnvVar(common.EnvARN, queueARN.String()),
 		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVar(envMessageProcessor, "s3"),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 

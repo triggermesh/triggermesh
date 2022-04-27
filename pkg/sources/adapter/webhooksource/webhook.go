@@ -24,8 +24,11 @@ import (
 	"net/http"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 )
 
@@ -43,13 +46,16 @@ type webhookHandler struct {
 
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
 }
 
-// Start implements adapter.Adapter.
+// Start implements pkgadapter.Adapter.
 // Runs the server for receiving HTTP events until ctx gets cancelled.
 func (h *webhookHandler) Start(ctx context.Context) error {
+	ctx = pkgadapter.ContextWithMetricTag(ctx, h.mt)
+
 	m := http.NewServeMux()
-	m.HandleFunc("/", h.handleAll)
+	m.HandleFunc("/", h.handleAll(ctx))
 	m.HandleFunc("/health", healthCheckHandler)
 
 	s := &http.Server{
@@ -96,49 +102,51 @@ func runHandler(ctx context.Context, s *http.Server) error {
 
 // handleAll receives all webhook events at a single resource, it
 // is up to this function to parse event wrapper and dispatch.
-func (h *webhookHandler) handleAll(w http.ResponseWriter, r *http.Request) {
-	if h.corsAllowOrigin != "" {
-		w.Header().Set("Access-Control-Allow-Origin", h.corsAllowOrigin)
-	}
+func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if h.corsAllowOrigin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", h.corsAllowOrigin)
+		}
 
-	if r.Body == nil {
-		h.handleError(errors.New("request without body not supported"), http.StatusBadRequest, w)
-		return
-	}
-
-	if h.username != "" && h.password != "" {
-		us, ps, ok := r.BasicAuth()
-		if !ok {
-			h.handleError(errors.New("wrong authentication header"), http.StatusBadRequest, w)
+		if r.Body == nil {
+			h.handleError(errors.New("request without body not supported"), http.StatusBadRequest, w)
 			return
 		}
-		if us != h.username || ps != h.password {
-			h.handleError(errors.New("credentials are not valid"), http.StatusUnauthorized, w)
+
+		if h.username != "" && h.password != "" {
+			us, ps, ok := r.BasicAuth()
+			if !ok {
+				h.handleError(errors.New("wrong authentication header"), http.StatusBadRequest, w)
+				return
+			}
+			if us != h.username || ps != h.password {
+				h.handleError(errors.New("credentials are not valid"), http.StatusUnauthorized, w)
+				return
+			}
+		}
+
+		defer r.Body.Close()
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			h.handleError(err, http.StatusInternalServerError, w)
 			return
 		}
+
+		event := cloudevents.NewEvent(cloudevents.VersionV1)
+		event.SetType(h.eventType)
+		event.SetSource(h.eventSource)
+
+		if err := event.SetData(r.Header.Get("Content-Type"), body); err != nil {
+			h.handleError(fmt.Errorf("failed to set event data: %w", err), http.StatusInternalServerError, w)
+			return
+		}
+
+		if result := h.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			h.handleError(fmt.Errorf("could not send Cloud Event: %w", result), http.StatusInternalServerError, w)
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
-
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		h.handleError(err, http.StatusInternalServerError, w)
-		return
-	}
-
-	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType(h.eventType)
-	event.SetSource(h.eventSource)
-
-	if err := event.SetData(r.Header.Get("Content-Type"), body); err != nil {
-		h.handleError(fmt.Errorf("failed to set event data: %w", err), http.StatusInternalServerError, w)
-		return
-	}
-
-	if result := h.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
-		h.handleError(fmt.Errorf("could not send Cloud Event: %w", result), http.StatusInternalServerError, w)
-	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func (h *webhookHandler) handleError(err error, code int, w http.ResponseWriter) {

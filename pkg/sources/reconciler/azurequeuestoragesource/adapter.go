@@ -54,8 +54,6 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVar("AZURE_ACCOUNT_NAME", typedSrc.Spec.AccountName),
 		resource.EnvVar("AZURE_QUEUE_NAME", typedSrc.Spec.QueueName),
 		resource.EnvVars(storageQueueEnvs...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	)
 }

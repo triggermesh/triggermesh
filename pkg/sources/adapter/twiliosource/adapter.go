@@ -22,12 +22,14 @@ import (
 	"net/http"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
@@ -41,6 +43,7 @@ type adapter struct {
 	ceClient    cloudevents.Client
 	eventsource string
 	logger      *zap.SugaredLogger
+	mt          *pkgadapter.MetricTag
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -49,11 +52,18 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, env pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.TwilioSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	return &adapter{
 		ceClient:    ceClient,
-		eventsource: v1alpha1.TwilioSourceName(env.GetNamespace(), env.GetName()),
+		eventsource: v1alpha1.TwilioSourceName(envAcc.GetNamespace(), envAcc.GetName()),
 		logger:      logging.FromContext(ctx),
+		mt:          mt,
 	}
 }
 
@@ -62,8 +72,10 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 // Start implements adapter.Adapter.
 // Runs the server for receiving HTTP events until ctx gets cancelled.
 func (h *adapter) Start(ctx context.Context) error {
+	ctx = pkgadapter.ContextWithMetricTag(ctx, h.mt)
+
 	m := http.NewServeMux()
-	m.HandleFunc("/", h.handleRoot)
+	m.HandleFunc("/", h.handleRoot(ctx))
 	m.HandleFunc("/health", healthCheckHandler)
 
 	s := &http.Server{
@@ -108,17 +120,19 @@ func runHandler(ctx context.Context, s *http.Server) error {
 	}
 }
 
-func (h *adapter) handleRoot(w http.ResponseWriter, req *http.Request) {
-	h.logger.Debug("Got request: ", *req)
+func (h *adapter) handleRoot(ctx context.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		h.logger.Debug("Got request: ", *req)
 
-	m := parseFormToMessage(req)
+		m := parseFormToMessage(req)
 
-	if err := h.sendCloudEvent(m); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := h.sendCloudEvent(ctx, m); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
-func (h *adapter) sendCloudEvent(m *Message) error {
+func (h *adapter) sendCloudEvent(ctx context.Context, m *Message) error {
 	h.logger.Debug("Sending CloudEvent")
 
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
@@ -128,7 +142,7 @@ func (h *adapter) sendCloudEvent(m *Message) error {
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
-	if result := h.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+	if result := h.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 		return fmt.Errorf("failed to send CloudEvent: %w", result)
 	}
 	return nil

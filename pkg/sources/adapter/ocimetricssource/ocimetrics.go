@@ -28,7 +28,6 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
-	"knative.dev/eventing/pkg/adapter/v2"
 )
 
 // OCIMetricsAPIHandler handles OCI Metrics.
@@ -50,9 +49,7 @@ type ociMetricsAPIHandler struct {
 }
 
 // NewOCIMetricsAPIHandler returns a new instance of OCIMetricsAPIHandler.
-func NewOCIMetricsAPIHandler(ceClient cloudevents.Client, aEnv adapter.EnvConfigAccessor, eventsource string, logger *zap.SugaredLogger) OCIMetricsAPIHandler {
-	env := aEnv.(*envAccessor)
-
+func NewOCIMetricsAPIHandler(ceClient cloudevents.Client, env *envAccessor, eventsource string, logger *zap.SugaredLogger) OCIMetricsAPIHandler {
 	interval, err := time.ParseDuration(env.PollingFrequency)
 	if err != nil {
 		logger.Panicw("cannot parse polling frequency", zap.Error(err))
@@ -163,7 +160,7 @@ func (o *ociMetricsAPIHandler) collectMetrics(entry v1alpha1.OCIMetrics, startTi
 		o.logger.Errorw("unable to package metrics", zap.Error(err))
 	}
 
-	if result := o.ceClient.Send(context.Background(), *event); !cloudevents.IsACK(result) {
+	if result := o.ceClient.Send(o.context, *event); !cloudevents.IsACK(result) {
 		o.logger.Errorw("unable to send metrics", zap.Error(err))
 	}
 }

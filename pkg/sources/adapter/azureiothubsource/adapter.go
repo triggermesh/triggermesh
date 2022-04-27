@@ -22,8 +22,9 @@ import (
 	"log"
 	"strings"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
@@ -44,6 +45,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
 	ceClient cloudevents.Client
 	source   string
 	c        *iotservice.Client
@@ -59,6 +61,13 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AzureIOTHubSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	env := envAcc.(*envConfig)
 
 	s := strings.Split(env.ConnectionString, ";")
@@ -74,6 +83,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger:   logger,
+		mt:       mt,
 		ceClient: ceClient,
 		c:        c,
 		source:   sbURL[1],
@@ -83,23 +93,27 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Azure IoT Hub Source adapter")
-	log.Fatal(a.c.SubscribeEvents(context.Background(), func(msg *iotservice.Event) error {
-		return a.sendCloudEvent(msg)
-	}))
+
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
+	log.Fatal(a.c.SubscribeEvents(ctx, a.eventHandler(ctx)))
+
 	return nil
 }
 
-func (a *adapter) sendCloudEvent(msg *iotservice.Event) error {
-	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType(v1alpha1.AzureEventType(sources.AzureIOTHub, v1alpha1.AzureIOTHubGenericEventType))
-	event.SetSource(a.source)
-	if err := event.SetData(cloudevents.ApplicationJSON, msg); err != nil {
-		return fmt.Errorf("setting event data: %w", err)
-	}
+func (a *adapter) eventHandler(ctx context.Context) iotservice.EventHandler {
+	return func(msg *iotservice.Event) error {
+		event := cloudevents.NewEvent(cloudevents.VersionV1)
+		event.SetType(v1alpha1.AzureEventType(sources.AzureIOTHub, v1alpha1.AzureIOTHubGenericEventType))
+		event.SetSource(a.source)
+		if err := event.SetData(cloudevents.ApplicationJSON, msg); err != nil {
+			return fmt.Errorf("setting event data: %w", err)
+		}
 
-	if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
-		return fmt.Errorf("sending CloudEvent: %w", result)
-	}
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			return fmt.Errorf("sending CloudEvent: %w", result)
+		}
 
-	return nil
+		return nil
+	}
 }

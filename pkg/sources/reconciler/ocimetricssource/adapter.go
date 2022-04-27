@@ -78,14 +78,6 @@ func makeOCIMetricsEnvs(src *v1alpha1.OCIMetricsSource) []corev1.EnvVar {
 
 	ociEnvs := []corev1.EnvVar{
 		{
-			Name:  common.EnvNamespace,
-			Value: src.GetNamespace(),
-		},
-		{
-			Name:  common.EnvName,
-			Value: src.GetName(),
-		},
-		{
 			Name:  userOCID,
 			Value: src.Spec.User,
 		},
