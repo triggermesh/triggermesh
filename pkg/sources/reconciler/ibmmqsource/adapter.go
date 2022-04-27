@@ -89,6 +89,8 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVars(makeAppEnv(typedSrc)...),
+		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
+		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		keystoreMount,
