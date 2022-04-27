@@ -29,6 +29,7 @@ import (
 const testInput = `
 apiVersion: test/v0
 kind: Test
+# +rbac-check:subresource=fake
 metadata:
   name: test-1
 
@@ -43,6 +44,8 @@ metadata:
 apiVersion: test/v0
 kind: Test
 metadata:
+  # A nested comment
+  #+rbac-check
   name: test-2
 ---
 # Copyright 2022 ACME Corp.
@@ -54,6 +57,7 @@ metadata:
 apiVersion: test/v0
 kind: Test
 metadata:
+  #     +rbac-check:subresource=fake
   name: test-3
 `
 
@@ -71,6 +75,7 @@ metadata:
 apiVersion: test/v0
 kind: Test
 metadata:
+  # A nested comment
   name: test-2
 ---
 apiVersion: test/v0
