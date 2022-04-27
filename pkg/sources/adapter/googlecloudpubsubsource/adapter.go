@@ -30,6 +30,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/option"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
@@ -56,6 +57,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
 	ceClient cloudevents.Client
 	subs     *pubsub.Subscription
 	msgPrcsr MessageProcessor
@@ -71,6 +73,13 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		// TODO(antoineco): This adapter is used by multiple kinds. Set ResourceGroup based on actual kind.
+		ResourceGroup: sources.GoogleCloudPubSubSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
 
 	env := envAcc.(*envConfig)
 
@@ -113,6 +122,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger:   logger,
+		mt:       mt,
 		ceClient: ceClient,
 		subs:     subsCli,
 		msgPrcsr: msgPrcsr,
@@ -124,6 +134,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 // - pubsub.subscriptions.consume
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting message receiver")
+
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
 	if err := a.subs.Receive(ctx, a.handleMessage); err != nil {
 		return fmt.Errorf("during runtime of message receiver: %w", err)

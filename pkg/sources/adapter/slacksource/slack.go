@@ -71,7 +71,7 @@ func (h *slackEventAPIHandler) Start(ctx context.Context) error {
 	h.logger.Info("Starting Slack event handler")
 
 	m := http.NewServeMux()
-	m.HandleFunc("/", h.handleAll)
+	m.HandleFunc("/", h.handleAll(ctx))
 
 	h.srv = &http.Server{
 		Addr:    ":" + strconv.Itoa(h.port),
@@ -93,57 +93,59 @@ func (h *slackEventAPIHandler) Start(ctx context.Context) error {
 
 // handleAll receives all Slack events at a single resource, it
 // is up to this function to parse event wrapper and dispatch.
-func (h *slackEventAPIHandler) handleAll(w http.ResponseWriter, r *http.Request) {
-	if r.Body == nil {
-		h.handleError(errors.New("request without body not supported"), http.StatusBadRequest, w)
-		return
-	}
+func (h *slackEventAPIHandler) handleAll(ctx context.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Body == nil {
+			h.handleError(errors.New("request without body not supported"), http.StatusBadRequest, w)
+			return
+		}
 
-	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		h.handleError(err, http.StatusInternalServerError, w)
-		return
-	}
-
-	if h.signingSecret != "" {
-		err = h.verifySigning(r.Header, body)
+		defer r.Body.Close()
+		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			h.handleError(err, http.StatusUnauthorized, w)
-			return
-		}
-	}
-
-	event := &SlackEventWrapper{}
-	err = json.Unmarshal(body, event)
-	if err != nil {
-		h.handleError(fmt.Errorf("could not unmarshal JSON request: %w", err), http.StatusBadRequest, w)
-		return
-	}
-
-	// There are only 2 documented types to be received from the Events API
-	// - `event_callback`, See: https://api.slack.com/events-api#receiving_events
-	// - `url_verification`, See: https://api.slack.com/events-api#subscriptions
-	switch eventType := sanitizeUserInput(event.Type); eventType {
-	case "event_callback":
-		// All paths that are not managed by this integration and are
-		// not errors need to return 2xx withing 3 seconds to Slack API.
-		// Otherwise the message will be retried.
-		// See: https://api.slack.com/events-api#receiving_events (Responding to Events)
-		if h.appID != "" && event.APIAppID != h.appID {
+			h.handleError(err, http.StatusInternalServerError, w)
 			return
 		}
 
-		h.handleCallback(event, w)
+		if h.signingSecret != "" {
+			err = h.verifySigning(r.Header, body)
+			if err != nil {
+				h.handleError(err, http.StatusUnauthorized, w)
+				return
+			}
+		}
 
-	case "url_verification":
-		// url_verification does not include an appID so there is no way to
-		// filter against it
+		event := &SlackEventWrapper{}
+		err = json.Unmarshal(body, event)
+		if err != nil {
+			h.handleError(fmt.Errorf("could not unmarshal JSON request: %w", err), http.StatusBadRequest, w)
+			return
+		}
 
-		h.handleChallenge(body, w)
+		// There are only 2 documented types to be received from the Events API
+		// - `event_callback`, See: https://api.slack.com/events-api#receiving_events
+		// - `url_verification`, See: https://api.slack.com/events-api#subscriptions
+		switch eventType := sanitizeUserInput(event.Type); eventType {
+		case "event_callback":
+			// All paths that are not managed by this integration and are
+			// not errors need to return 2xx withing 3 seconds to Slack API.
+			// Otherwise the message will be retried.
+			// See: https://api.slack.com/events-api#receiving_events (Responding to Events)
+			if h.appID != "" && event.APIAppID != h.appID {
+				return
+			}
 
-	default:
-		h.logger.Warn("Content not supported: ", strconv.Quote(eventType))
+			h.handleCallback(ctx, event, w)
+
+		case "url_verification":
+			// url_verification does not include an appID so there is no way to
+			// filter against it
+
+			h.handleChallenge(body, w)
+
+		default:
+			h.logger.Warn("Content not supported: ", strconv.Quote(eventType))
+		}
 	}
 }
 
@@ -191,7 +193,7 @@ func (h *slackEventAPIHandler) handleChallenge(body []byte, w http.ResponseWrite
 	}
 }
 
-func (h *slackEventAPIHandler) handleCallback(wrapper *SlackEventWrapper, w http.ResponseWriter) {
+func (h *slackEventAPIHandler) handleCallback(ctx context.Context, wrapper *SlackEventWrapper, w http.ResponseWriter) {
 	h.logger.Info("callback received")
 
 	event, err := cloudEventFromEventWrapper(wrapper)
@@ -200,7 +202,7 @@ func (h *slackEventAPIHandler) handleCallback(wrapper *SlackEventWrapper, w http
 		return
 	}
 
-	if result := h.ceClient.Send(context.Background(), *event); !cloudevents.IsACK(result) {
+	if result := h.ceClient.Send(ctx, *event); !cloudevents.IsACK(result) {
 		h.handleError(err, http.StatusInternalServerError, w)
 	}
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package awscodecommitsource
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -73,7 +74,9 @@ func TestSendPREvent(t *testing.T) {
 	pr := &codecommit.PullRequest{}
 	pr.SetPullRequestId("12345")
 
-	err := a.sendEvent(pr)
+	ctx := context.Background()
+
+	err := a.sendEvent(ctx, pr)
 	assert.NoError(t, err)
 
 	gotEvents := ceClient.Sent()
@@ -96,7 +99,9 @@ func TestSendPushEvent(t *testing.T) {
 	commit := &codecommit.Commit{}
 	commit.SetCommitId("12345")
 
-	err := a.sendEvent(commit)
+	ctx := context.Background()
+
+	err := a.sendEvent(ctx, commit)
 	assert.NoError(t, err)
 
 	gotEvents := ceClient.Sent()
@@ -170,7 +175,9 @@ func TestProcessCommits(t *testing.T) {
 			ceClient: adaptertest.NewTestClient(),
 		}
 
-		err := a.processCommits()
+		ctx := context.Background()
+
+		err := a.processCommits(ctx)
 		if tt.ErrMsg == nil {
 			assert.NoError(t, err)
 		} else {

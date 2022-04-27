@@ -40,10 +40,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"go.uber.org/zap"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/cloudevents/sdk-go/v2/protocol"
-	"go.uber.org/zap"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 
 	"github.com/triggermesh/triggermesh/pkg/adapter/fs"
 )
@@ -55,6 +58,7 @@ type cloudEventsHandler struct {
 	ceServer cloudevents.Client
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
 }
 
 // Start implements adapter.Adapter.

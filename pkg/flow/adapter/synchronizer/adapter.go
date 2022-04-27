@@ -27,6 +27,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -35,6 +36,7 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 type adapter struct {
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
 
 	correlationKey  *correlationKey
 	responseTimeout time.Duration
@@ -46,8 +48,15 @@ type adapter struct {
 
 // NewAdapter returns adapter implementation.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: flow.SynchronizerResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*envAccessor)
 
 	key, err := newCorrelationKey(env.CorrelationKey, env.CorrelationKeyLength)
 	if err != nil {
@@ -55,20 +64,23 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	return &adapter{
-		ceClient:       ceClient,
-		logger:         logger,
-		correlationKey: key,
+		ceClient: ceClient,
+		logger:   logger,
+		mt:       mt,
 
+		correlationKey:  key,
 		responseTimeout: env.ResponseWaitTimeout,
-		sessions:        newStorage(),
-		sinkURL:         env.Sink,
-		bridgeID:        env.BridgeIdentifier,
+
+		sessions: newStorage(),
+		sinkURL:  env.Sink,
+		bridgeID: env.BridgeIdentifier,
 	}
 }
 
 // Returns if stopCh is closed or Send() returns an error.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Synchronizer Adapter")
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 

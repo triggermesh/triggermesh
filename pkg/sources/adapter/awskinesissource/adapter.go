@@ -36,6 +36,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
@@ -58,6 +59,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	knsClient kinesisiface.KinesisAPI
 	ceClient  cloudevents.Client
@@ -75,6 +77,12 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSKinesisSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	env := envAcc.(*envConfig)
 
 	arn := common.MustParseARN(env.ARN)
@@ -86,6 +94,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		knsClient: kinesis.New(cfg),
 		ceClient:  ceClient,
@@ -112,6 +121,8 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	a.logger.Infof("Connected to Kinesis stream: %s", *streamARN)
 
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
 	// Obtain records inputs for different shards
 	inputs := a.getRecordsInputs(myStream.StreamDescription.Shards)
 
@@ -126,7 +137,7 @@ func (a *adapter) Start(ctx context.Context) error {
 
 		for _, record := range records {
 			resetBackoff = true
-			err = a.sendKinesisRecord(record)
+			err = a.sendKinesisRecord(ctx, record)
 			if err != nil {
 				a.logger.Errorw("Failed to send cloudevent", zap.Error(err))
 			}
@@ -196,7 +207,7 @@ func (a *adapter) processInputs(inputs []kinesis.GetRecordsInput) ([]*kinesis.Re
 	return records, utilerrors.NewAggregate(errs)
 }
 
-func (a *adapter) sendKinesisRecord(record *kinesis.Record) error {
+func (a *adapter) sendKinesisRecord(ctx context.Context, record *kinesis.Record) error {
 	a.logger.Infof("Processing record ID: %s", *record.SequenceNumber)
 
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
@@ -208,7 +219,7 @@ func (a *adapter) sendKinesisRecord(record *kinesis.Record) error {
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
-	if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 		return result
 	}
 	return nil

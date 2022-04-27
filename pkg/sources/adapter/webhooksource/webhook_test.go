@@ -17,6 +17,7 @@ limitations under the License.
 package webhooksource
 
 import (
+	"context"
 	"encoding/base64"
 	"io"
 	"net/http"
@@ -25,10 +26,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
+	zapt "go.uber.org/zap/zaptest"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cloudeventst "github.com/cloudevents/sdk-go/v2/client/test"
-	"github.com/stretchr/testify/assert"
-	zapt "go.uber.org/zap/zaptest"
 )
 
 const (
@@ -134,8 +137,11 @@ func TestWebhookEvent(t *testing.T) {
 				req.Header.Add(k, v)
 			}
 
+			ctx := context.Background()
+
+			th := http.HandlerFunc(handler.handleAll(ctx))
+
 			rr := httptest.NewRecorder()
-			th := http.HandlerFunc(handler.handleAll)
 
 			th.ServeHTTP(rr, req)
 

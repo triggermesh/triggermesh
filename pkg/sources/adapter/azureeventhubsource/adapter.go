@@ -80,6 +80,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	runtimeInfo *eventhub.HubRuntimeInformation
 
@@ -97,6 +98,13 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		// TODO(antoineco): This adapter is used by multiple kinds. Set ResourceGroup based on actual kind.
+		ResourceGroup: sources.AzureEventHubSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
 
 	env := envAcc.(*envConfig)
 
@@ -139,6 +147,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		ehClient: hub,
 		ceClient: ceClient,
@@ -160,6 +169,12 @@ func (a *adapter) Start(ctx context.Context) error {
 	a.runtimeInfo = runtimeInfo
 
 	a.logger.Info("Starting Event Hub message receivers for partitions ", runtimeInfo.PartitionIDs)
+
+	// TODO(antoineco): Find a way to inject Prometheus metric tags into
+	// the context.Context that is passed to handleMessage().
+	// Currently, the SDK always passes context.Background(), instead of our ctx:
+	// https://github.com/Azure/azure-event-hubs-go/blob/v3.3.17/receiver.go#L219
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
 	// listen to each partition of the Event Hub
 	for _, partitionID := range runtimeInfo.PartitionIDs {

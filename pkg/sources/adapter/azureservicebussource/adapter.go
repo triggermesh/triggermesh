@@ -38,6 +38,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
 	"github.com/Azure/go-autorest/autorest/azure"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureservicebussource/trace"
 )
@@ -83,6 +84,8 @@ type envConfig struct {
 
 // adapter implements the source's adapter.
 type adapter struct {
+	mt *pkgadapter.MetricTag
+
 	msgRcvr  *azservicebus.Receiver
 	ceClient cloudevents.Client
 
@@ -97,6 +100,11 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		Namespace: envAcc.GetNamespace(),
+		Name:      envAcc.GetName(),
+	}
 
 	env := envAcc.(*envConfig)
 
@@ -114,8 +122,10 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	switch entityID.ResourceType {
 	case resourceTypeQueues:
 		rcvr, err = client.NewReceiverForQueue(entityID.ResourceName, nil)
+		mt.ResourceGroup = sources.AzureServiceBusQueueSourceResource.String()
 	case resourceTypeSubscriptions, resourceTypeTopics:
 		rcvr, err = client.NewReceiverForSubscription(entityID.ResourceName, entityID.SubResourceName, nil)
+		mt.ResourceGroup = sources.AzureServiceBusTopicSourceResource.String()
 	}
 	if err != nil {
 		logger.Panicw("Unable to obtain message receiver for Service Bus entity "+strconv.Quote(strconv.Quote(entityPath(entityID))), zap.Error(err))
@@ -138,6 +148,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	tab.Register(trace.NewNoOpTracerWithLogger(logger))
 
 	return &adapter{
+		mt: mt,
+
 		ceClient: ceClient,
 
 		msgRcvr:  rcvr,
@@ -243,6 +255,8 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 func (a *adapter) Start(ctx context.Context) error {
 	const maxMessages = 100
 	logging.FromContext(ctx).Info("Listening for messages")
+
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
 loop:
 	for {

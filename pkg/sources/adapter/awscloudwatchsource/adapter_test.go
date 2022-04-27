@@ -17,6 +17,7 @@ limitations under the License.
 package awscloudwatchsource
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -162,7 +163,9 @@ func TestCollectMetrics(t *testing.T) {
 		NextToken: nil,
 	}
 
-	a.CollectMetrics(nil, time.Now())
+	ctx := context.Background()
+
+	a.CollectMetrics(ctx, nil, time.Now())
 
 	events := ceClient.Sent()
 	assert.Len(t, events, 1)
@@ -208,7 +211,9 @@ func TestSendMetricEvent(t *testing.T) {
 		NextToken: nil,
 	}
 
-	err := a.SendMetricEvent(&metricOutput)
+	ctx := context.Background()
+
+	err := a.SendMetricEvent(ctx, &metricOutput)
 	assert.NoError(t, err)
 	events := ceClient.Sent()
 	assert.Len(t, events, 1)
@@ -243,7 +248,9 @@ func TestSendMessageEvent(t *testing.T) {
 		NextToken: nil,
 	}
 
-	err := a.SendMetricEvent(&metricOutput)
+	ctx := context.Background()
+
+	err := a.SendMetricEvent(ctx, &metricOutput)
 	assert.NoError(t, err)
 	events := ceClient.Sent()
 	assert.Len(t, events, 1)

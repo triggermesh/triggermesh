@@ -34,6 +34,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
@@ -69,6 +70,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	ccClient codecommitiface.CodeCommitAPI
 	ceClient cloudevents.Client
@@ -87,6 +89,12 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSCodeCommitSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	env := envAcc.(*envConfig)
 
 	arn := common.MustParseARN(env.ARN)
@@ -98,6 +106,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		ccClient: codecommit.New(cfg),
 		ceClient: ceClient,
@@ -155,13 +164,15 @@ func (a *adapter) Start(ctx context.Context) error {
 		a.logger.Errorw("Failed to process pull requests", "error", err)
 	}
 
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
 	backoff := common.NewBackoff()
 
 	err = backoff.Run(ctx.Done(), func(ctx context.Context) (bool, error) {
 		resetBackoff := false
 
 		if strings.Contains(a.gitEvents, pushEventType) {
-			err := a.processCommits()
+			err := a.processCommits(ctx)
 			if err != nil {
 				a.logger.Errorw("Failed to process commits", "error", err)
 				return resetBackoff, nil
@@ -179,7 +190,7 @@ func (a *adapter) Start(ctx context.Context) error {
 
 			for _, pr := range pullRequests {
 				resetBackoff = true
-				err = a.sendEvent(pr)
+				err = a.sendEvent(ctx, pr)
 				if err != nil {
 					a.logger.Errorw("Failed to send PR event", "error", err)
 					return resetBackoff, nil
@@ -193,7 +204,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	return err
 }
 
-func (a *adapter) processCommits() error {
+func (a *adapter) processCommits(ctx context.Context) error {
 	branchInfo, err := a.ccClient.GetBranch(&codecommit.GetBranchInput{
 		BranchName:     &a.branch,
 		RepositoryName: &a.arn.Resource,
@@ -216,7 +227,7 @@ func (a *adapter) processCommits() error {
 
 	lastCommit = *commitOutput.Commit.CommitId
 
-	err = a.sendEvent(commitOutput.Commit)
+	err = a.sendEvent(ctx, commitOutput.Commit)
 	if err != nil {
 		return fmt.Errorf("failed to send push event: %w", err)
 	}
@@ -252,7 +263,7 @@ func (a *adapter) preparePullRequests() ([]*codecommit.PullRequest, error) {
 }
 
 // sendEvent sends an event containing data about a git commit or PR
-func (a *adapter) sendEvent(codeCommitEvent interface{}) error {
+func (a *adapter) sendEvent(ctx context.Context, codeCommitEvent interface{}) error {
 	a.logger.Info("Sending CodeCommit event")
 
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
@@ -273,7 +284,7 @@ func (a *adapter) sendEvent(codeCommitEvent interface{}) error {
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
-	if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 		return result
 	}
 	return nil
