@@ -124,6 +124,17 @@ spec:
                       https://cloud.google.com/pubsub/docs/admin#resource_names
                     type: string
                     pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
+                required: [topic]
+              publishServiceAccount:
+                description: |-
+                  Email address of the service account used for publishing notifications to Pub/Sub. This service
+                  account needs to be in the same project as the repo, and to have the 'pubsub.topics.publish' IAM
+                  permission associated with it. It can (but doesn't have to) be the same service account as the
+                  'serviceAccountKey' attribute.
+
+                  If unspecified, it defaults to the Compute Engine default service account.
+                type: string
+                format: email
               serviceAccountKey:
                 description: Service account key used to authenticate the event source and allow it to interact with
                   Google Cloud APIs. Only the JSON format is supported.

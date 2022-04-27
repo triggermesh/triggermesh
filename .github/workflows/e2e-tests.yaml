@@ -107,6 +107,14 @@ jobs:
     - name: Export KUBECONFIG path
       run: echo "KUBECONFIG=${HOME}/.kube/config" >> $GITHUB_ENV
 
+    # Allows tests to authenticate with Google Cloud using the Google Cloud SDK,
+    # e.g. use 'gcloud' as a Git credential helper to interact with Google
+    # Cloud Source Repositories.
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
+
     - name: Run e2e tests
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}

@@ -54,6 +54,18 @@ type GoogleCloudSourceRepositoriesSourceSpec struct {
 	// Settings related to the Pub/Sub resources associated with the repo events.
 	PubSub GoogleCloudSourceRepositoriesSourcePubSubSpec `json:"pubsub"`
 
+	// Email address of the service account used for publishing
+	// notifications to Pub/Sub. This service account needs to be in the
+	// same project as the repo, and to have the 'pubsub.topics.publish'
+	// IAM permission associated with it. It can (but doesn't have to) be
+	// the same service account as the 'ServiceAccountKey' attribute.
+	//
+	// If unspecified, it defaults to the Compute Engine default service
+	// account.
+	//
+	// +optional
+	PublishServiceAccount *string `json:"publishServiceAccount,omitempty"`
+
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	ServiceAccountKey v1alpha1.ValueFromField `json:"serviceAccountKey"`
