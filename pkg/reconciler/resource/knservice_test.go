@@ -31,6 +31,24 @@ import (
 func TestNewServiceWithDefaultContainer(t *testing.T) {
 	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
 
+	v := corev1.Volume{
+		Name: "some-volume",
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: "some-secret",
+				Items: []corev1.KeyToPath{{
+					Key:  "someKey",
+					Path: "someFile",
+				}},
+			},
+		},
+	}
+
+	vm := corev1.VolumeMount{
+		Name:      "some-volume",
+		MountPath: "/myvol",
+	}
+
 	ksvc := NewKnService(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Port("health", 8081),
@@ -51,6 +69,8 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
 		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
 		VisibilityClusterLocal,
+		Volumes(v),
+		VolumeMounts(vm),
 	)
 
 	expectKsvc := &servingv1.Service{
@@ -136,6 +156,10 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 										SubPath:   "file.ext",
 										ReadOnly:  true,
 									},
+									{
+										Name:      "some-volume",
+										MountPath: "/myvol",
+									},
 								},
 							}},
 							Volumes: []corev1.Volume{
@@ -161,6 +185,18 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 											Items: []corev1.KeyToPath{{
 												Key:  "someKey",
 												Path: "file.ext",
+											}},
+										},
+									},
+								},
+								{
+									Name: "some-volume",
+									VolumeSource: corev1.VolumeSource{
+										Secret: &corev1.SecretVolumeSource{
+											SecretName: "some-secret",
+											Items: []corev1.KeyToPath{{
+												Key:  "someKey",
+												Path: "someFile",
 											}},
 										},
 									},

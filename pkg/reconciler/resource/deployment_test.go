@@ -31,6 +31,24 @@ import (
 func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
 
+	v := corev1.Volume{
+		Name: "some-volume",
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: "some-secret",
+				Items: []corev1.KeyToPath{{
+					Key:  "someKey",
+					Path: "someFile",
+				}},
+			},
+		},
+	}
+
+	vm := corev1.VolumeMount{
+		Name:      "some-volume",
+		MountPath: "/myvol",
+	}
+
 	depl := NewDeployment(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Selector("test.selector/1", "val1"),
@@ -53,6 +71,8 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
 		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
 		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
+		Volumes(v),
+		VolumeMounts(vm),
 	)
 
 	expectDepl := &appsv1.Deployment{
@@ -149,6 +169,10 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 								SubPath:   "file.ext",
 								ReadOnly:  true,
 							},
+							{
+								Name:      "some-volume",
+								MountPath: "/myvol",
+							},
 						},
 					}},
 					Volumes: []corev1.Volume{
@@ -174,6 +198,18 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 									Items: []corev1.KeyToPath{{
 										Key:  "someKey",
 										Path: "file.ext",
+									}},
+								},
+							},
+						},
+						{
+							Name: "some-volume",
+							VolumeSource: corev1.VolumeSource{
+								Secret: &corev1.SecretVolumeSource{
+									SecretName: "some-secret",
+									Items: []corev1.KeyToPath{{
+										Key:  "someKey",
+										Path: "someFile",
 									}},
 								},
 							},

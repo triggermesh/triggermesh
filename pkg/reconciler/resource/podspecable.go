@@ -88,6 +88,22 @@ func Toleration(t corev1.Toleration) ObjectOption {
 	}
 }
 
+// Volumes attaches Volumes to a PodSpecable.
+func Volumes(vs ...corev1.Volume) ObjectOption {
+	return func(object interface{}) {
+		var vols *[]corev1.Volume
+
+		switch o := object.(type) {
+		case *appsv1.Deployment:
+			vols = &o.Spec.Template.Spec.Volumes
+		case *servingv1.Service:
+			vols = &o.Spec.Template.Spec.Volumes
+		}
+
+		*vols = append(*vols, vs...)
+	}
+}
+
 // SecretMount adds a Secret volume and a corresponding mount to a PodSpecable.
 func SecretMount(name, target, secretName, secretKey string) ObjectOption {
 	return func(object interface{}) {

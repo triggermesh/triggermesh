@@ -270,6 +270,22 @@ func TerminationErrorToLogs(object interface{}) {
 	*tmp = corev1.TerminationMessageFallbackToLogsOnError
 }
 
+// VolumeMounts attaches VolumeMounts to a Container.
+func VolumeMounts(vms ...corev1.VolumeMount) ObjectOption {
+	return func(object interface{}) {
+		var volMounts *[]corev1.VolumeMount
+
+		switch o := object.(type) {
+		case *corev1.Container:
+			volMounts = &o.VolumeMounts
+		case *appsv1.Deployment, *servingv1.Service:
+			volMounts = &firstContainer(o).VolumeMounts
+		}
+
+		*volMounts = append(*volMounts, vms...)
+	}
+}
+
 // firstContainer returns a PodSpecable's first Container definition.
 // A new empty Container is injected if the PodSpecable does not contain any.
 func firstContainer(object interface{}) *corev1.Container {

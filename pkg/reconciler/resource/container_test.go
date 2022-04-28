@@ -29,6 +29,11 @@ import (
 func TestNewContainer(t *testing.T) {
 	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
 
+	vm := corev1.VolumeMount{
+		Name:      "some-volume",
+		MountPath: "/myvol",
+	}
+
 	cont := NewContainer(tName,
 		Port("h2c", 8080),
 		Image(tImg),
@@ -43,6 +48,7 @@ func TestNewContainer(t *testing.T) {
 		Requests(&cpuRes, &memRes),
 		Limits(&cpuRes, nil),
 		TerminationErrorToLogs,
+		VolumeMounts(vm),
 	)
 
 	expectCont := &corev1.Container{
@@ -107,6 +113,12 @@ func TestNewContainer(t *testing.T) {
 			},
 		},
 		TerminationMessagePolicy: corev1.TerminationMessageFallbackToLogsOnError,
+		VolumeMounts: []corev1.VolumeMount{
+			{
+				Name:      "some-volume",
+				MountPath: "/myvol",
+			},
+		},
 	}
 
 	if d := cmp.Diff(expectCont, cont); d != "" {
