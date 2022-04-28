@@ -20,7 +20,8 @@ import (
 	"context"
 	"testing"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
@@ -66,7 +67,6 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 
 // newEventSource returns a test source object with a minimal set of pre-filled attributes.
 func newEventSource() *v1alpha1.CloudEventsSource {
-	username := "username"
 	path := "testpath"
 
 	src := &v1alpha1.CloudEventsSource{
@@ -74,9 +74,9 @@ func newEventSource() *v1alpha1.CloudEventsSource {
 			Credentials: &v1alpha1.HTTPCredentials{
 				BasicAuths: []v1alpha1.HTTPBasicAuth{
 					{
-						Username: username,
+						Username: "username",
 						Password: commonv1alpha1.ValueFromField{
-							ValueFromSecret: &v1.SecretKeySelector{
+							ValueFromSecret: &corev1.SecretKeySelector{
 								Key: "key1",
 							},
 						},

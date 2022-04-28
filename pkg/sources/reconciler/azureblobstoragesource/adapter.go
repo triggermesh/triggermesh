@@ -47,7 +47,7 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureBlobStorageSource)
 
 	// the user may or may not provide an Event Hub name in the source's
@@ -79,5 +79,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 		resource.Port(healthPortName, 8080),
 		resource.StartupProbe("/health", healthPortName),
-	)
+	), nil
 }

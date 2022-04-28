@@ -42,7 +42,7 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.GoogleCloudPubSubSource)
 
 	// the user may or may not provide a Pub/Sub subscription ID in the
@@ -62,5 +62,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVar(common.EnvGCloudPubSubSubscription, subsName),
 		resource.EnvVars(authEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	)
+	), nil
 }

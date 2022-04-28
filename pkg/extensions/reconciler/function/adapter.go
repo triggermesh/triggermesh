@@ -55,7 +55,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	f := rcl.(*v1alpha1.Function)
 
 	srcCodePath := filepath.Join("/opt", "source."+fileExtension(f.Spec.Runtime))
@@ -111,7 +111,7 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.ConfigMapMount("code", srcCodePath, cmapName, codeCmapDataKey),
 
 		resource.EntrypointCommand(klrEntrypoint),
-	)
+	), nil
 }
 
 // Lambda runtimes require file extensions to match the language,

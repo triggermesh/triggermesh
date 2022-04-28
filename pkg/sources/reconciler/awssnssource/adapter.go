@@ -39,7 +39,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, _ *apis.URL) (*servingv1.Service, error) {
 	return common.NewMTAdapterKnService(src,
 		resource.Image(r.adapterCfg.Image),
 		resource.VisibilityPublic,
@@ -47,5 +47,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, _ *apis.URL) 
 
 		// NOTE(antoineco): startupProbe isn't yet supported as of Knative 1.2
 		resource.Probe("/health", ""),
-	)
+	), nil
 }

@@ -56,7 +56,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	typedSrc := src.(*v1alpha1.CloudEventsSource)
 
 	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
@@ -100,12 +100,15 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		}
 
 		if len(kvs) != 0 {
-			s, _ := json.Marshal(kvs)
+			s, err := json.Marshal(kvs)
+			if err != nil {
+				return nil, fmt.Errorf("serializing keyMountedValues to JSON: %w", err)
+			}
 			options = append(options, resource.EnvVar(envCloudEventsBasicAuthCredentials, string(s)))
 		}
 	}
 
-	return common.NewAdapterKnService(src, sinkURI, options...)
+	return common.NewAdapterKnService(src, sinkURI, options...), nil
 }
 
 type KeyMountedValue struct {

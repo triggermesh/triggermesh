@@ -18,10 +18,12 @@ package testing
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -84,7 +86,7 @@ func TestReconcileAdapter(t *testing.T, ctor Ctor, rcl v1alpha1.Reconcilable, ad
 	newComponentInstance := componentCtor(rcl)
 	newServiceAccount := NewServiceAccount(rcl)
 	newRoleBinding := NewRoleBinding(newServiceAccount())
-	newAdapter := adapterCtor(adapterBuilder, rcl)
+	newAdapter := mustAdapterCtor(t, adapterBuilder, rcl)
 
 	comp := newComponentInstance()
 	a := newAdapter()
@@ -613,13 +615,14 @@ func deleted(rcl v1alpha1.Reconcilable) {
 
 // adapterCtorWithOptions is a function that returns a runtime object with
 // modifications applied.
-type adapterCtorWithOptions func(...adapterOption) runtime.Object
+type adapterCtorWithOptions func(...adapterOption) (runtime.Object, error)
 
 // adapterCtor creates a copy of the given adapter object and returns a
 // function that can apply options to that object.
 func adapterCtor(adapterBuilder interface{}, rcl v1alpha1.Reconcilable) adapterCtorWithOptions {
-	return func(opts ...adapterOption) runtime.Object {
+	return func(opts ...adapterOption) (runtime.Object, error) {
 		var obj runtime.Object
+		var err error
 
 		var sinkURI *apis.URL
 		if _, isEventSender := rcl.(v1alpha1.EventSender); isEventSender {
@@ -628,9 +631,12 @@ func adapterCtor(adapterBuilder interface{}, rcl v1alpha1.Reconcilable) adapterC
 
 		switch typedAdapterBuilder := adapterBuilder.(type) {
 		case common.AdapterDeploymentBuilder:
-			obj = typedAdapterBuilder.BuildAdapter(rcl, sinkURI)
+			obj, err = typedAdapterBuilder.BuildAdapter(rcl, sinkURI)
 		case common.AdapterServiceBuilder:
-			obj = typedAdapterBuilder.BuildAdapter(rcl, sinkURI)
+			obj, err = typedAdapterBuilder.BuildAdapter(rcl, sinkURI)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("building adapter object using provided Reconcilable: %w", err)
 		}
 
 		// emulate the logic applied by the generic reconciler, which
@@ -644,7 +650,17 @@ func adapterCtor(adapterBuilder interface{}, rcl v1alpha1.Reconcilable) adapterC
 			opt(obj)
 		}
 
-		return obj
+		return obj, nil
+	}
+}
+
+// mustAdapterCtor is a wrapper around adapterCtor that fails the test in case
+// of error.
+func mustAdapterCtor(t *testing.T, adapterBuilder interface{}, rcl v1alpha1.Reconcilable) func(...adapterOption) runtime.Object {
+	return func(opts ...adapterOption) runtime.Object {
+		a, err := adapterCtor(adapterBuilder, rcl)(opts...)
+		require.NoError(t, err)
+		return a
 	}
 }
 

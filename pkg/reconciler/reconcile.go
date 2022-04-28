@@ -54,13 +54,13 @@ var knativeServingAnnotations = []string{
 // AdapterDeploymentBuilder provides all the necessary information for building
 // a component's adapter backed by a Deployment.
 type AdapterDeploymentBuilder interface {
-	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment
+	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error)
 }
 
 // AdapterServiceBuilder provides all the necessary information for building a
 // component's adapter backed by a Knative Service.
 type AdapterServiceBuilder interface {
-	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service
+	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error)
 }
 
 // ReconcileAdapter reconciles a receive adapter for a component instance.
@@ -86,7 +86,11 @@ func (r *GenericDeploymentReconciler[T, L]) ReconcileAdapter(ctx context.Context
 	}
 	rcl.GetStatusManager().MarkSink(sinkURI)
 
-	desiredAdapter := ab.BuildAdapter(rcl, sinkURI)
+	desiredAdapter, err := ab.BuildAdapter(rcl, sinkURI)
+	if err != nil {
+		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning,
+			ReasonInvalidSpec, "Could not generate desired state of adapter Deployment: %s", err))
+	}
 
 	saOwners := []kmeta.OwnerRefable{rcl}
 	if !v1alpha1.WantsOwnServiceAccount(rcl) {
@@ -270,7 +274,11 @@ func (r *GenericServiceReconciler[T, L]) ReconcileAdapter(ctx context.Context, a
 	}
 	rcl.GetStatusManager().MarkSink(sinkURI)
 
-	desiredAdapter := ab.BuildAdapter(rcl, sinkURI)
+	desiredAdapter, err := ab.BuildAdapter(rcl, sinkURI)
+	if err != nil {
+		return controller.NewPermanentError(reconciler.NewEvent(corev1.EventTypeWarning,
+			ReasonInvalidSpec, "Could not generate desired state of adapter Service: %s", err))
+	}
 
 	saOwners := []kmeta.OwnerRefable{rcl}
 	if !v1alpha1.WantsOwnServiceAccount(rcl) {

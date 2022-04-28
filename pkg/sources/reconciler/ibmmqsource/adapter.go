@@ -63,7 +63,7 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.IBMMQSource)
 
 	keystoreMount := resource.ObjectOption(func(interface{}) {})
@@ -93,7 +93,7 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 		keystoreMount,
 		passwdStashMount,
-	)
+	), nil
 }
 
 func makeAppEnv(o *v1alpha1.IBMMQSource) []corev1.EnvVar {
