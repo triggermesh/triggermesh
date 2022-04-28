@@ -43,8 +43,8 @@ var (
 		  }
 	}
 `
-	tIncomingDataType = "application/json"
-	tOutputDataType   = "application/json"
+	tInputDataType  = "application/json"
+	tOutputDataType = "application/json"
 )
 
 func TestReconcile(t *testing.T) {
@@ -81,11 +81,11 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newTarget() *v1alpha1.DataWeaveTransformation {
 	trg := &v1alpha1.DataWeaveTransformation{
 		Spec: v1alpha1.DataWeaveTransformationSpec{
-			DwSpell: v1alpha1.ValueFromField{
+			DwSpell: &v1alpha1.ValueFromField{
 				Value: tDwSpell,
 			},
-			IncomingContentType: tIncomingDataType,
-			OutputContentType:   tOutputDataType,
+			InputContentType:  &tInputDataType,
+			OutputContentType: &tOutputDataType,
 		},
 	}
 

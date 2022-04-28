@@ -114,7 +114,7 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              dw_spell:
+              dwSpell:
                 description: DataWeave spell used to transform incoming CloudEvents.
                 type: object
                 properties:
@@ -147,11 +147,14 @@ spec:
                 - required: [value]
                 - required: [valueFromSecret]
                 - required: [valueFromConfigMap]
-              incoming_content_type:
+              allowPerEventDwSpell:
+                description: Whether the DwSpell informed at the spec can be overriden at each CloudEvent.
+                type: boolean
+              inputContentType:
                 description: Content type for transformation.
                 type: string
                 enum: ['application/json', 'application/xml']
-              output_content_type:
+              outputContentType:
                 description: Content type for transformation output.
                 type: string
                 enum: ['application/json', 'application/xml']
@@ -183,10 +186,9 @@ spec:
                 oneOf:
                 - required: ['ref']
                 - required: ['uri']
-            required:
-            - dw_spell
-            - incoming_content_type
-            - output_content_type
+            anyOf:
+            - required: [dwSpell, inputContentType, outputContentType]
+            - required: [allowPerEventDwSpell]
           status:
             description: Reported status.
             type: object

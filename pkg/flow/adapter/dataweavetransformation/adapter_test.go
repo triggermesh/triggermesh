@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
@@ -197,9 +198,10 @@ output application/json
 
 func TestDataWeaveTransformationEvents(t *testing.T) {
 	testCases := map[string]struct {
-		incomingContentType string
-		outputContentType   string
-		dwSpell             string
+		allowDwSpellOverride bool
+		inputContentType     string
+		outputContentType    string
+		dwSpell              string
 
 		inEvent cloudevents.Event
 
@@ -208,42 +210,89 @@ func TestDataWeaveTransformationEvents(t *testing.T) {
 		expectCategory string
 	}{
 		"transform ok": {
-			incomingContentType: "application/json",
-			outputContentType:   "application/json",
-			dwSpell:             tDwSpell,
-			inEvent:             newCloudEvent(tJSON, cloudevents.ApplicationJSON),
+			inputContentType:  "application/json",
+			outputContentType: "application/json",
+			dwSpell:           tDwSpell,
+			inEvent:           newCloudEvent(tJSON, cloudevents.ApplicationJSON),
+
+			expectEvent:    newCloudEvent(tOutJSON, cloudevents.ApplicationJSON),
+			expectCategory: tSuccessAttribute,
+		},
+		"transform setting override to true but not providing an extra spell, ok": {
+			allowDwSpellOverride: true,
+			inputContentType:     "application/json",
+			outputContentType:    "application/json",
+			dwSpell:              tDwSpell,
+			inEvent:              newCloudEvent(tJSON, cloudevents.ApplicationJSON),
+
+			expectEvent:    newCloudEvent(tOutJSON, cloudevents.ApplicationJSON),
+			expectCategory: tSuccessAttribute,
+		},
+		"transform spell at event, ok": {
+			allowDwSpellOverride: true,
+			inEvent: newCloudEvent(
+				createStructuredRequest(tDwSpell, tJSON, "application/json", "application/json"),
+				cloudevents.ApplicationJSON,
+				cloudEventWithEventType(v1alpha1.EventTypeDataWeaveTransformation)),
 
 			expectEvent:    newCloudEvent(tOutJSON, cloudevents.ApplicationJSON),
 			expectCategory: tSuccessAttribute,
 		},
 		"transform xml ok": {
-			incomingContentType: "application/xml",
-			outputContentType:   "application/json",
-			dwSpell:             tDwSpellAlternative,
-			inEvent:             newCloudEvent(tAlternativeXML, cloudevents.ApplicationXML),
+			inputContentType:  "application/xml",
+			outputContentType: "application/json",
+			dwSpell:           tDwSpellAlternative,
+			inEvent:           newCloudEvent(tAlternativeXML, cloudevents.ApplicationXML),
 
 			expectEvent:    newCloudEvent(tOutAlternativeJSON, cloudevents.ApplicationJSON),
 			expectCategory: tSuccessAttribute,
 		},
 		"malformed incoming event": {
-			incomingContentType: "application/json",
-			outputContentType:   "application/json",
-			dwSpell:             tDwSpell,
-			inEvent:             newCloudEvent(tInvalidJSON, cloudevents.ApplicationJSON),
+			inputContentType:  "application/json",
+			outputContentType: "application/json",
+			dwSpell:           tDwSpell,
+			inEvent:           newCloudEvent(tInvalidJSON, cloudevents.ApplicationJSON),
 
 			expectEvent: newCloudEvent(
-				createErrorResponse(targetce.ErrorCodeRequestParsing, "invalid Json"),
+				createErrorResponse(targetce.ErrorCodeRequestValidation, "invalid Json"),
 				cloudevents.ApplicationJSON),
 			expectCategory: tErrorAttribute,
 		},
 		"unexpected incoming event": {
-			incomingContentType: "application/jsonn",
-			outputContentType:   "application/json",
-			dwSpell:             tDwSpell,
-			inEvent:             newCloudEvent(tInvalidJSON, cloudevents.ApplicationJSON),
+			inputContentType:  "application/json",
+			outputContentType: "application/json",
+			dwSpell:           tDwSpell,
+			inEvent:           newCloudEvent(tInvalidJSON, "application/jsonn"),
 
 			expectEvent: newCloudEvent(
-				createErrorResponse(targetce.ErrorCodeRequestParsing, "unexpected type for the incoming event"),
+				createErrorResponse(targetce.ErrorCodeRequestValidation, "unexpected type for the incoming event"),
+				cloudevents.ApplicationJSON),
+			expectCategory: tErrorAttribute,
+		},
+		"transform spell at event, malformed incoming event": {
+			allowDwSpellOverride: true,
+			inEvent: newCloudEvent(
+				createStructuredRequest(tDwSpell, tInvalidJSON, "application/json", "application/json"),
+				cloudevents.ApplicationJSON,
+				cloudEventWithEventType(v1alpha1.EventTypeDataWeaveTransformation)),
+
+			expectEvent: newCloudEvent(
+				createErrorResponse(targetce.ErrorCodeRequestValidation, "invalid Json"),
+				cloudevents.ApplicationJSON),
+			expectCategory: tErrorAttribute,
+		},
+		"transform spell at event, missing inputData": {
+			allowDwSpellOverride: true,
+			inputContentType:     "application/json",
+			outputContentType:    "application/json",
+			dwSpell:              tDwSpell,
+			inEvent: newCloudEvent(
+				createStructuredRequest(tDwSpell, "", "application/json", "application/json"),
+				cloudevents.ApplicationJSON,
+				cloudEventWithEventType(v1alpha1.EventTypeDataWeaveTransformation)),
+
+			expectEvent: newCloudEvent(
+				createErrorResponse(targetce.ErrorCodeRequestValidation, "inputData not found"),
 				cloudevents.ApplicationJSON),
 			expectCategory: tErrorAttribute,
 		},
@@ -271,10 +320,11 @@ func TestDataWeaveTransformationEvents(t *testing.T) {
 				EnvConfig: adapter.EnvConfig{
 					Component: tCloudEventSource,
 				},
-				DwSpell:             tc.dwSpell,
-				IncomingContentType: tc.incomingContentType,
-				OutputContentType:   tc.outputContentType,
-				BridgeIdentifier:    tBridgeID,
+				AllowDwSpellOverride: tc.allowDwSpellOverride,
+				DwSpell:              tc.dwSpell,
+				InputContentType:     tc.inputContentType,
+				OutputContentType:    tc.outputContentType,
+				BridgeIdentifier:     tBridgeID,
 			}
 
 			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
@@ -304,11 +354,12 @@ func TestDataWeaveTransformationEvents(t *testing.T) {
 
 func TestDataWeaveTransformationToSink(t *testing.T) {
 	testCases := map[string]struct {
-		incomingContentType string
-		outputContentType   string
-		dwSpell             string
-		inEvent             cloudevents.Event
-		expectedEvent       cloudevents.Event
+		allowDwSpellOverride bool
+		incomingContentType  string
+		outputContentType    string
+		dwSpell              string
+		inEvent              cloudevents.Event
+		expectedEvent        cloudevents.Event
 	}{
 		"transform ok": {
 			incomingContentType: "application/json",
@@ -333,11 +384,11 @@ func TestDataWeaveTransformationToSink(t *testing.T) {
 			a := &dataweaveTransformAdapter{
 				logger: logtesting.TestLogger(t),
 
-				ceClient:            ceClient,
-				incomingContentType: tc.incomingContentType,
-				outputContentType:   tc.outputContentType,
-				spell:               tc.dwSpell,
-				sink:                "http://localhost:8080",
+				ceClient:                 ceClient,
+				defaultInputContentType:  &tc.incomingContentType,
+				defaultOutputContentType: &tc.outputContentType,
+				defaultSpell:             &tc.dwSpell,
+				sink:                     "http://localhost:8080",
 			}
 
 			e, r := a.dispatch(ctx, tc.inEvent)
@@ -376,6 +427,23 @@ func cloudEventWithEventType(t string) cloudEventOptions {
 	return func(ce *cloudevents.Event) {
 		ce.SetType(t)
 	}
+}
+
+func createStructuredRequest(spell, inputData, inputContentType, outputContentType string) string {
+	sr := DataWeaveTransformationStructuredRequest{
+		Spell:             spell,
+		InputData:         inputData,
+		InputContentType:  inputContentType,
+		OutputContentType: outputContentType,
+	}
+
+	b, err := json.Marshal(sr)
+	if err != nil {
+		// not expected
+		panic(err)
+	}
+
+	return string(b)
 }
 
 func createErrorResponse(code, description string) string {
