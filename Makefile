@@ -91,7 +91,7 @@ all: codegen build test lint
 # Verify lint and tests
 install-gotestsum:
 ifndef HAS_GOTESTSUM
-	curl -SL https://github.com/gotestyourself/gotestsum/releases/download/v1.7.0/gotestsum_1.7.0_linux_amd64.tar.gz | tar -C $(shell go env GOPATH)/bin -zxf -
+	curl -SL https://github.com/gotestyourself/gotestsum/releases/download/v1.8.0/gotestsum_1.8.0_linux_amd64.tar.gz | tar -C $(shell go env GOPATH)/bin -zxf -
 endif
 
 install-golangci-lint:
