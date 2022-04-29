@@ -1,5 +1,3 @@
-//go:build !noclibs
-
 /*
 Copyright 2022 TriggerMesh Inc.
 

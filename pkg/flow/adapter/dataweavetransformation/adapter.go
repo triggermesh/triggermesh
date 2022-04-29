@@ -37,12 +37,12 @@ import (
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
-var _ pkgadapter.Adapter = (*dataweaveTransformAdapter)(nil)
+const (
+	path     = "/tmp/dw"
+	dwFolder = path + "/custom"
+)
 
-var inputData []byte
-var spell string
-var inputContentType string
-var outputContentType string
+var _ pkgadapter.Adapter = (*dataweaveTransformAdapter)(nil)
 
 type dataweaveTransformAdapter struct {
 	defaultSpell             *string
@@ -116,8 +116,10 @@ func (a *dataweaveTransformAdapter) Start(ctx context.Context) error {
 func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var err error
 	var tmpFile *os.File
-	path := "/tmp/dw"
-	dwFolder := path + "/custom"
+	var inputData []byte
+	var spell string
+	var inputContentType string
+	var outputContentType string
 
 	err = validateContentType(event.DataContentType(), event.Data())
 	if err != nil {
