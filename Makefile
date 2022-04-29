@@ -45,7 +45,7 @@ GOTEST            ?= gotestsum --junitfile $(TEST_OUTPUT_DIR)/$(KREPO)-unit-test
 
 GOMODULE           = github.com/triggermesh/triggermesh
 
-GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/flow/... ./pkg/function/... ./pkg/metrics/... ./pkg/mturl/... ./pkg/reconciler/... ./pkg/routing/... ./pkg/sources/... ./pkg/status/... ./pkg/targets/...
+GOPKGS             = ./cmd/... ./pkg/apis/... ./pkg/extensions/... ./pkg/flow/... ./pkg/metrics/... ./pkg/mturl/... ./pkg/reconciler/... ./pkg/routing/... ./pkg/sources/... ./pkg/status/... ./pkg/targets/...
 GOPKGS_SKIP_TESTS  = $(GOMODULE)/pkg/sources/reconciler/ibmmqsource \
                      $(GOMODULE)/pkg/targets/reconciler/ibmmqtarget \
                      $(GOMODULE)/pkg/sources/adapter/ibmmqsource/mq \
@@ -91,12 +91,12 @@ all: codegen build test lint
 # Verify lint and tests
 install-gotestsum:
 ifndef HAS_GOTESTSUM
-	curl -SL https://github.com/gotestyourself/gotestsum/releases/download/v1.7.0/gotestsum_1.7.0_linux_amd64.tar.gz | tar -C $(shell go env GOPATH)/bin -zxf -
+	curl -SL https://github.com/gotestyourself/gotestsum/releases/download/v1.8.0/gotestsum_1.8.0_linux_amd64.tar.gz | tar -C $(shell go env GOPATH)/bin -zxf -
 endif
 
 install-golangci-lint:
 ifndef HAS_GOLANGCI_LINT
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.41.1
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.45.2
 endif
 
 help: ## Display this help
