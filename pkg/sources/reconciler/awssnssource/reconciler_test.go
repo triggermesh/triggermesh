@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -126,6 +128,9 @@ func adapterBuilder(cfg *adapterConfig) common.AdapterServiceBuilder {
 
 // TestReconcileSubscription contains tests specific to the SNS source.
 func TestReconcileSubscription(t *testing.T) {
+	newReconciledAdapter := mustNewReconciledAdapter(t)
+	newReconciledSource := mustNewReconciledSource(t)
+
 	testCases := rt.TableTest{
 		// Regular lifecycle
 
@@ -329,25 +334,38 @@ type sourceOption func(*v1alpha1.AWSSNSSource)
 
 // newReconciledSource returns a test event source object that is identical to
 // what ReconcileKind generates.
-func newReconciledSource(opts ...sourceOption) *v1alpha1.AWSSNSSource {
+func newReconciledSource(opts ...sourceOption) (*v1alpha1.AWSSNSSource, error) {
 	src := newEventSource()
 
 	// assume the sink URI is resolved
 	src.Spec.Sink.Ref = nil
 	src.Spec.Sink.URI = tSinkURI
 
+	a, err := newReconciledAdapter()
+	if err != nil {
+		return nil, err
+	}
+
 	// assume status conditions are already set to True to ensure
 	// ReconcileKind is a no-op
 	status := src.GetStatusManager()
 	status.MarkSink(tSinkURI)
-	status.PropagateServiceAvailability(newReconciledAdapter())
+	status.PropagateServiceAvailability(a)
 	status.SetRoute(mturl.URLPath(src))
 
 	for _, opt := range opts {
 		opt(src)
 	}
 
-	return src
+	return src, nil
+}
+
+func mustNewReconciledSource(t *testing.T) func(...sourceOption) *v1alpha1.AWSSNSSource {
+	return func(opts ...sourceOption) *v1alpha1.AWSSNSSource {
+		src, err := newReconciledSource(opts...)
+		require.NoError(t, err)
+		return src
+	}
 }
 
 var (
@@ -389,8 +407,13 @@ func newReconciledRoleBinding() *rbacv1.RoleBinding {
 
 // newReconciledAdapter returns a test receive adapter object that is identical
 // to what ReconcileKind generates.
-func newReconciledAdapter() *servingv1.Service {
-	adapter := adapterBuilder(adapterCfg).BuildAdapter(newEventSource(), tSinkURI)
+func newReconciledAdapter() (*servingv1.Service, error) {
+	src := newEventSource()
+
+	adapter, err := adapterBuilder(adapterCfg).BuildAdapter(src, tSinkURI)
+	if err != nil {
+		return nil, fmt.Errorf("building adapter object using provided Reconcilable: %w", err)
+	}
 
 	common.OwnByServiceAccount(adapter, NewServiceAccount(newEventSource())())
 
@@ -400,7 +423,15 @@ func newReconciledAdapter() *servingv1.Service {
 	}})
 	adapter.Status.URL = tAdapterURI
 
-	return adapter
+	return adapter, nil
+}
+
+func mustNewReconciledAdapter(t *testing.T) func() *servingv1.Service {
+	return func() *servingv1.Service {
+		a, err := newReconciledAdapter()
+		require.NoError(t, err)
+		return a
+	}
 }
 
 /* SNS client */
