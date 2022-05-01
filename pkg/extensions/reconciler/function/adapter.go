@@ -88,15 +88,9 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 		responseMode = "event"
 	}
 
-	ksvcVisibility := resource.VisibilityClusterLocal
-	if f.Spec.Public {
-		ksvcVisibility = resource.VisibilityPublic
-	}
-
 	return common.NewAdapterKnService(rcl, sinkURI,
 		resource.Image(lookupRuntimeImage(f.Spec.Runtime)),
 
-		ksvcVisibility,
 		resource.Annotation(codeVersionAnnotation, cmapRev),
 
 		resource.Label(functionNameLabel, f.Name),
