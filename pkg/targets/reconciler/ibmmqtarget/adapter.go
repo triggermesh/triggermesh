@@ -17,6 +17,7 @@ limitations under the License.
 package ibmmqtarget
 
 import (
+	"path/filepath"
 	"strconv"
 
 	corev1 "k8s.io/api/core/v1"
@@ -67,23 +68,26 @@ var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) (*servingv1.Service, error) {
 	typedTrg := trg.(*v1alpha1.IBMMQTarget)
 
-	keystoreMount := resource.ObjectOption(func(interface{}) {})
-	passwdStashMount := resource.ObjectOption(func(interface{}) {})
+	var secretVolumes []corev1.Volume
+	var secretVolMounts []corev1.VolumeMount
 
 	if typedTrg.Spec.Auth.TLS != nil {
-		keystoreMount = resource.SecretMount(
+		keyDBVol, keyDBVolMount := secretVolumeAndMountAtPath(
 			"key-database",
 			KeystoreMountPath,
 			typedTrg.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Name,
 			typedTrg.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key,
 		)
 
-		passwdStashMount = resource.SecretMount(
+		pwStashVol, pwStashVolMount := secretVolumeAndMountAtPath(
 			"db-password",
 			PasswdStashMountPath,
 			typedTrg.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
 			typedTrg.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key,
 		)
+
+		secretVolumes = append(secretVolumes, keyDBVol, pwStashVol)
+		secretVolMounts = append(secretVolMounts, keyDBVolMount, pwStashVolMount)
 	}
 
 	return common.NewAdapterKnService(trg, nil,
@@ -92,8 +96,8 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 		resource.EnvVars(makeAppEnv(typedTrg)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 
-		keystoreMount,
-		passwdStashMount,
+		resource.Volumes(secretVolumes...),
+		resource.VolumeMounts(secretVolMounts...),
 	), nil
 }
 
@@ -171,4 +175,32 @@ func makeAppEnv(o *v1alpha1.IBMMQTarget) []corev1.EnvVar {
 	}
 
 	return env
+}
+
+// secretVolumeAndMountAtPath returns a Secret-based volume and corresponding
+// mount at the given path.
+func secretVolumeAndMountAtPath(name, mountPath, secretName, secretKey string) (corev1.Volume, corev1.VolumeMount) {
+	v := corev1.Volume{
+		Name: name,
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: secretName,
+				Items: []corev1.KeyToPath{
+					{
+						Key:  secretKey,
+						Path: filepath.Base(mountPath),
+					},
+				},
+			},
+		},
+	}
+
+	vm := corev1.VolumeMount{
+		Name:      name,
+		ReadOnly:  true,
+		MountPath: mountPath,
+		SubPath:   filepath.Base(mountPath),
+	}
+
+	return v, vm
 }
