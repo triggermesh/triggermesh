@@ -36,6 +36,7 @@ import (
 )
 
 const codeVersionAnnotation = "extensions.triggermesh.io/codeVersion"
+const codeCmapVolName = "code"
 
 const klrEntrypoint = "/opt/aws-custom-runtime"
 
@@ -58,14 +59,15 @@ var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	f := rcl.(*v1alpha1.Function)
 
-	srcCodePath := filepath.Join("/opt", "source."+fileExtension(f.Spec.Runtime))
-
 	var cmapName string
 	var cmapRev string
 	if codeCmap := f.Status.ConfigMap; codeCmap != nil {
 		cmapName = codeCmap.Name
 		cmapRev = codeCmap.ResourceVersion
 	}
+
+	srcCodePath := filepath.Join("/opt", "source."+fileExtension(f.Spec.Runtime))
+	srcCodeVol, srcCodeVolMount := sourceCodeVolumeAndMount(srcCodePath, cmapName)
 
 	handler := "source." + f.Spec.Entrypoint
 
@@ -108,7 +110,8 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVars(sortedEnvVarsWithPrefix("CE_OVERRIDES_", ceOverrides)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 
-		resource.ConfigMapMount("code", srcCodePath, cmapName, codeCmapDataKey),
+		resource.Volumes(srcCodeVol),
+		resource.VolumeMounts(srcCodeVolMount),
 
 		resource.EntrypointCommand(klrEntrypoint),
 	), nil
@@ -187,4 +190,32 @@ func lookupRuntimeImage(runtime string) string {
 	}
 
 	return ""
+}
+
+// sourceCodeVolumeAndMount returns a ConfigMap-based volume and corresponding
+// mount for the Function's source code.
+func sourceCodeVolumeAndMount(mountPath, cmName string) (corev1.Volume, corev1.VolumeMount) {
+	v := corev1.Volume{
+		Name: codeCmapVolName,
+		VolumeSource: corev1.VolumeSource{
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: cmName,
+				},
+				Items: []corev1.KeyToPath{{
+					Key:  codeCmapDataKey,
+					Path: filepath.Base(mountPath),
+				}},
+			},
+		},
+	}
+
+	vm := corev1.VolumeMount{
+		Name:      codeCmapVolName,
+		ReadOnly:  true,
+		MountPath: mountPath,
+		SubPath:   filepath.Base(mountPath),
+	}
+
+	return v, vm
 }
