@@ -64,7 +64,6 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
-		resource.Port("metrics", 9090),
 
 		resource.StartupProbe("/health", healthPortName),
 

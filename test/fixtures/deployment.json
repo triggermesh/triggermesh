@@ -63,12 +63,20 @@
                     {
                         "env": [
                             {
-                                "name": "NAME",
-                                "value": "sample"
+                                "name": "COMPONENT",
+                                "value": "foo"
+                            },
+                            {
+                                "name": "METRICS_PROMETHEUS_PORT",
+                                "value": "9092"
                             },
                             {
                                 "name": "NAMESPACE",
                                 "value": "dev"
+                            },
+                            {
+                                "name": "NAME",
+                                "value": "sample"
                             },
                             {
                                 "name": "K_SINK",
@@ -93,7 +101,7 @@
                                 "protocol": "TCP"
                             },
                             {
-                                "containerPort": 9090,
+                                "containerPort": 9092,
                                 "name": "metrics",
                                 "protocol": "TCP"
                             }
