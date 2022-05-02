@@ -47,7 +47,6 @@ var (
 type FunctionSpec struct {
 	Runtime         string               `json:"runtime"`
 	Entrypoint      string               `json:"entrypoint"`
-	Public          bool                 `json:"public,omitempty"`
 	Code            string               `json:"code"`
 	ResponseIsEvent bool                 `json:"responseIsEvent,omitempty"`
 	EventStore      EventStoreConnection `json:"eventStore,omitempty"`
