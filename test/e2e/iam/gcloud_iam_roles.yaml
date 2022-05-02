@@ -78,8 +78,8 @@ includedPermissions:
 ---
 
 # Permissions required by the reconciler and receive adapter of the Source Repositories event source.
-name: projects/cebuk-01/roles/CloudRepositoriesEventSource
-title: Cloud Repositories event source
+name: projects/cebuk-01/roles/CloudSourceRepositoriesEventSource
+title: Cloud Source Repositories event source
 description: Role suitable for use with the TriggerMesh event source for Cloud Source Repositories.
 includedPermissions:
 - iam.serviceAccounts.actAs

@@ -85,7 +85,7 @@ func AWSCloudWatchSourceName(ns, name string) string {
 	return "io.triggermesh." + kind + "." + ns + "." + name
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AWSCloudWatchSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

@@ -73,7 +73,7 @@ func (t *AWSEventBridgeTarget) AsEventSource() string {
 	return "io.triggermesh.awseventbridgetargets/" + t.Namespace + "/" + t.Name
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *AWSEventBridgeTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package httppollersource
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -25,9 +26,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
-	"github.com/stretchr/testify/assert"
+
 	logtesting "knative.dev/pkg/logging/testing"
 )
 
@@ -159,7 +162,9 @@ func TestHTTPPollerRequests(t *testing.T) {
 				logger:      logtesting.TestLogger(t),
 			}
 
-			p.dispatch()
+			ctx := context.Background()
+
+			p.dispatch(ctx)
 
 			select {
 			case event := <-chEvent:

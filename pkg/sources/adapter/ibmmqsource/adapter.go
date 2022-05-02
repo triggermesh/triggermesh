@@ -31,6 +31,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/ibmmqsource/mq"
 )
@@ -40,18 +41,27 @@ var _ pkgadapter.Adapter = (*ibmmqsourceAdapter)(nil)
 type ibmmqsourceAdapter struct {
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
 
 	mqEnvs *SourceEnvAccessor
 }
 
 // NewAdapter returns adapter implementation
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*SourceEnvAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.IBMMQSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*SourceEnvAccessor)
 
 	return &ibmmqsourceAdapter{
 		ceClient: ceClient,
 		logger:   logger,
+		mt:       mt,
 		mqEnvs:   env,
 	}
 }
@@ -72,7 +82,9 @@ func (a *ibmmqsourceAdapter) Start(ctx context.Context) error {
 	}
 	defer queue.Close()
 
-	err = queue.RegisterCallback(a.eventHandler(), a.mqEnvs.Delivery, a.logger)
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
+	err = queue.RegisterCallback(a.eventHandler(ctx), a.mqEnvs.Delivery, a.logger)
 	if err != nil {
 		return fmt.Errorf("failed to register callback: %w", err)
 	}
@@ -88,7 +100,7 @@ func (a *ibmmqsourceAdapter) Start(ctx context.Context) error {
 	return nil
 }
 
-func (a *ibmmqsourceAdapter) eventHandler() mq.Handler {
+func (a *ibmmqsourceAdapter) eventHandler(ctx context.Context) mq.Handler {
 	return func(data []byte, correlID string) error {
 		event := cloudevents.NewEvent(cloudevents.VersionV1)
 		event.SetType(v1alpha1.IBMMQSourceEventType)
@@ -104,7 +116,7 @@ func (a *ibmmqsourceAdapter) eventHandler() mq.Handler {
 			a.logger.Errorf("Can't set Cloudevent data: %v", err)
 			return err
 		}
-		if res := a.ceClient.Send(context.Background(), event); cloudevents.IsUndelivered(res) {
+		if res := a.ceClient.Send(ctx, event); cloudevents.IsUndelivered(res) {
 			a.logger.Errorf("Cloudevent is not delivered: %v\n", res)
 			return res
 		}

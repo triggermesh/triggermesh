@@ -60,7 +60,7 @@ func (*LogzMetricsTarget) AcceptedEventTypes() []string {
 	}
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *LogzMetricsTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }

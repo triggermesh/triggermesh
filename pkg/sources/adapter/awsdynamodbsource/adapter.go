@@ -38,6 +38,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
@@ -72,6 +73,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	dyndbClient    dynamodbiface.DynamoDBAPI
 	dyndbStrClient dynamodbstreamsiface.DynamoDBStreamsAPI
@@ -96,6 +98,12 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSDynamoDBSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	env := envAcc.(*envConfig)
 
 	arn := common.MustParseARN(env.ARN)
@@ -106,6 +114,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		dyndbClient:    dynamodb.New(cfg),
 		dyndbStrClient: dynamodbstreams.New(cfg),
@@ -126,6 +135,8 @@ func (a *adapter) Start(ctx context.Context) error {
 	health.MarkReady()
 
 	a.logger.Info("Starting collection of DynamoDB records for table ", a.arn)
+
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
 	t := time.NewTimer(0)
 	defer t.Stop()
@@ -304,7 +315,7 @@ loop:
 			for _, r := range r.Records {
 				a.logger.Debug("Processing record ID: " + *r.EventID)
 
-				if err := a.sendDynamoDBEvent(r); err != nil {
+				if err := a.sendDynamoDBEvent(ctx, r); err != nil {
 					return fmt.Errorf("sending CloudEvent: %w", err)
 				}
 			}
@@ -327,7 +338,7 @@ loop:
 }
 
 // sendDynamoDBEvent sends the given Record as a CloudEvent.
-func (a *adapter) sendDynamoDBEvent(r *dynamodbstreams.Record) error {
+func (a *adapter) sendDynamoDBEvent(ctx context.Context, r *dynamodbstreams.Record) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetType(v1alpha1.AWSEventType(a.arn.Service, v1alpha1.AWSDynamoDBGenericEventType))
 	event.SetSubject(asEventSubject(r))
@@ -338,7 +349,7 @@ func (a *adapter) sendDynamoDBEvent(r *dynamodbstreams.Record) error {
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
-	if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 		return result
 	}
 	return nil

@@ -17,6 +17,7 @@ limitations under the License.
 package awscloudwatchlogssource
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -95,7 +96,9 @@ func TestAdapterCollectLogsBaseCase(t *testing.T) {
 		pollingInterval: duration,
 	}
 
-	a.CollectLogs(nil, now)
+	ctx := context.Background()
+
+	a.CollectLogs(ctx, nil, now)
 	events := ceClient.Sent()
 	assert.Len(t, events, 0)
 }
@@ -144,7 +147,9 @@ func TestAdapterCollectLogs(t *testing.T) {
 		pollingInterval: duration,
 	}
 
-	a.CollectLogs(nil, now)
+	ctx := context.Background()
+
+	a.CollectLogs(ctx, nil, now)
 	events := ceClient.Sent()
 	assert.Len(t, events, 1)
 

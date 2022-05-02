@@ -58,7 +58,7 @@ func (s *GoogleCloudSourceRepositoriesSource) AsEventSource() string {
 	return s.Spec.Repository.String()
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *GoogleCloudSourceRepositoriesSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

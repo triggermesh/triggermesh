@@ -35,6 +35,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
 )
@@ -56,6 +57,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	cgnIdentityClient cognitoidentityiface.CognitoIdentityAPI
 	cgnSyncClient     cognitosynciface.CognitoSyncAPI
@@ -74,6 +76,12 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSCognitoIdentitySourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	env := envAcc.(*envConfig)
 
 	arn := common.MustParseARN(env.ARN)
@@ -85,6 +93,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		cgnIdentityClient: cognitoidentity.New(cfg),
 		cgnSyncClient:     cognitosync.New(cfg),
@@ -98,6 +107,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 // Start implements adapter.Adapter.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Infof("Listening to AWS Cognito stream for Identity: %s", a.identityPoolID)
+
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
 	backoff := common.NewBackoff()
 
@@ -121,7 +132,7 @@ func (a *adapter) Start(ctx context.Context) error {
 				continue
 			}
 
-			err = a.sendCognitoEvent(dataset, records)
+			err = a.sendCognitoEvent(ctx, dataset, records)
 			if err != nil {
 				a.logger.Errorf("SendCloudEvent failed: %v", err)
 			}
@@ -210,7 +221,7 @@ func (a *adapter) getRecords(dataset *cognitosync.Dataset) ([]*cognitosync.Recor
 	return records, nil
 }
 
-func (a *adapter) sendCognitoEvent(dataset *cognitosync.Dataset, records []*cognitosync.Record) error {
+func (a *adapter) sendCognitoEvent(ctx context.Context, dataset *cognitosync.Dataset, records []*cognitosync.Record) error {
 	a.logger.Info("Processing Dataset: ", *dataset.DatasetName)
 
 	data := &CognitoIdentitySyncEvent{
@@ -236,7 +247,7 @@ func (a *adapter) sendCognitoEvent(dataset *cognitosync.Dataset, records []*cogn
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
-	if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 		return result
 	}
 	return nil

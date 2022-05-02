@@ -79,7 +79,7 @@ func (t *TwilioTarget) AsEventSource() string {
 	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *TwilioTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }

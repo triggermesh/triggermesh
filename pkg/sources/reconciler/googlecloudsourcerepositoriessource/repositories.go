@@ -36,7 +36,9 @@ import (
 // Required permissions:
 // - source.repos.updateRepoConfig
 // - iam.serviceAccounts.actAs
-func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicResName *v1alpha1.GCloudResourceName) error {
+func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service,
+	topicResName *v1alpha1.GCloudResourceName, publishServiceAccount string) error {
+
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -50,8 +52,9 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service, topicR
 		Repo: &gsourcerepo.Repo{
 			PubsubConfigs: map[string]gsourcerepo.PubsubConfig{
 				topicResName.String(): {
-					Topic:         topicResName.String(),
-					MessageFormat: "JSON",
+					Topic:               topicResName.String(),
+					MessageFormat:       "JSON",
+					ServiceAccountEmail: publishServiceAccount,
 				},
 			},
 		},

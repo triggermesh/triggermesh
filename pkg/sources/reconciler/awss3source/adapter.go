@@ -48,7 +48,7 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
 	// the user may or may not provide a queue ARN in the source's spec, so
@@ -60,8 +60,6 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 		resource.EnvVar(common.EnvARN, queueARN.String()),
 		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVar(envMessageProcessor, "s3"),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
@@ -79,5 +77,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 			kr.NewMilliQuantity(1000, kr.DecimalSI),   // 1
 			kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
 		),
-	)
+	), nil
 }

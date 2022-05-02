@@ -62,7 +62,7 @@ func (s *AzureActivityLogsSource) AsEventSource() string {
 	return subsID.String()
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureActivityLogsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

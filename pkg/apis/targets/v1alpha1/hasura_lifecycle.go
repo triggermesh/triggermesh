@@ -85,7 +85,7 @@ func (t *HasuraTarget) AsEventSource() string {
 	return "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (t *HasuraTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
 }

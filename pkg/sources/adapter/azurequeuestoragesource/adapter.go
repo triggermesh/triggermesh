@@ -22,13 +22,16 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Azure/azure-storage-queue-go/azqueue"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/Azure/azure-storage-queue-go/azqueue"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 )
 
@@ -57,12 +60,20 @@ type adapter struct {
 	ceClient    cloudevents.Client
 	eventsource string
 	logger      *zap.SugaredLogger
+	mt          *pkgadapter.MetricTag
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envConfig)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AzureQueueStorageSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*envConfig)
 
 	credential, err := azqueue.NewSharedKeyCredential(env.AccountName, env.AccountKey)
 	if err != nil {
@@ -91,6 +102,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		ceClient:    ceClient,
 		eventsource: queueURL.String(),
 		logger:      logging.FromContext(ctx),
+		mt:          mt,
 	}
 }
 
@@ -98,7 +110,12 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 
 // Start implements adapter.Adapter.
 func (h *adapter) Start(ctx context.Context) error {
+	ctx = pkgadapter.ContextWithMetricTag(ctx, h.mt)
+
 	msgCh := make(chan *azqueue.DequeuedMessage, concurrentMsgProcessing)
+
+	h.logger.Info("Starting to process queue events")
+
 	h.processQueueEvents(ctx, msgCh)
 
 	<-ctx.Done()
@@ -108,9 +125,7 @@ func (h *adapter) Start(ctx context.Context) error {
 }
 
 func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.DequeuedMessage) {
-	h.logger.Info("Starting to process queue events")
 	for {
-		ctx := context.TODO()
 		// Create goroutines that can process messages in parallel
 		dmr, err := h.messagesURL.Dequeue(ctx, int32(concurrentMsgProcessing), 24*time.Hour)
 		if err != nil {
@@ -137,7 +152,7 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 				}
 				popReceipt = update.PopReceipt // Performing any operation on a message ID always requires the most recent pop receipt
 
-				err = h.sendCloudEvent(msg)
+				err = h.sendCloudEvent(ctx, msg)
 				if err != nil {
 					h.logger.Error(err)
 					return
@@ -154,7 +169,7 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 	}
 }
 
-func (h *adapter) sendCloudEvent(m *azqueue.DequeuedMessage) error {
+func (h *adapter) sendCloudEvent(ctx context.Context, m *azqueue.DequeuedMessage) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetType(v1alpha1.AzureQueueStorageEventType)
 	event.SetSource(h.eventsource)
@@ -163,7 +178,7 @@ func (h *adapter) sendCloudEvent(m *azqueue.DequeuedMessage) error {
 	}
 
 	h.logger.Debug("Sending CloudEvent: ", event)
-	if result := h.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+	if result := h.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 		return fmt.Errorf("failed to send CloudEvent: %w", result)
 	}
 	return nil

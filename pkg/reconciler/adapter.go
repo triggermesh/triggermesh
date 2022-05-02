@@ -92,6 +92,11 @@ func NewAdapterDeployment(rcl v1alpha1.Reconcilable, sinkURI *apis.URL, opts ...
 		append(commonAdapterDeploymentOptions(rcl), append([]resource.ObjectOption{
 			resource.Controller(rcl),
 
+			// Used to label Prometheus metrics with the component
+			// instance's namespace and name
+			resource.EnvVar(EnvNamespace, rclNs),
+			resource.EnvVar(EnvName, rclName),
+
 			resource.Label(appInstanceLabel, rclName),
 			resource.Selector(appInstanceLabel, rclName),
 
@@ -108,8 +113,10 @@ func NewMTAdapterDeployment(rcl v1alpha1.Reconcilable, opts ...resource.ObjectOp
 
 	return resource.NewDeployment(rclNs, MTAdapterObjectName(rcl),
 		append(commonAdapterDeploymentOptions(rcl), append([]resource.ObjectOption{
+			// makes Informers namespace-scoped in TriggerMesh's adapter shared Main
 			resource.EnvVar(EnvNamespace, rclNs),
-			resource.EnvVar(system.NamespaceEnvKey, rclNs), // required to enable HA
+			// required to enable Knative's HA
+			resource.EnvVar(system.NamespaceEnvKey, rclNs),
 		}, opts...)...)...,
 	)
 }
@@ -171,6 +178,8 @@ func NewAdapterKnService(rcl v1alpha1.Reconcilable, sinkURI *apis.URL, opts ...r
 		append(commonAdapterKnServiceOptions(rcl), append([]resource.ObjectOption{
 			resource.Controller(rcl),
 
+			// Used to label Prometheus metrics with the component
+			// instance's namespace and name
 			resource.EnvVar(EnvNamespace, rclNs),
 			resource.EnvVar(EnvName, rclName),
 
@@ -190,8 +199,10 @@ func NewMTAdapterKnService(rcl v1alpha1.Reconcilable, opts ...resource.ObjectOpt
 
 	return resource.NewKnService(rclNs, MTAdapterObjectName(rcl),
 		append(commonAdapterKnServiceOptions(rcl), append([]resource.ObjectOption{
+			// makes Informers namespace-scoped in TriggerMesh's adapter shared Main
 			resource.EnvVar(EnvNamespace, rclNs),
-			resource.EnvVar(system.NamespaceEnvKey, rclNs), // required to enable HA
+			// required to enable Knative's HA
+			resource.EnvVar(system.NamespaceEnvKey, rclNs),
 		}, opts...)...)...,
 	)
 }

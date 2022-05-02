@@ -115,10 +115,23 @@ var (
 		Resource: "azureeventhubsources",
 	}
 
+	// AzureIOTHubSourceResource respresents an event source for Azure IOT Hub.
+	AzureIOTHubSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azureiothubsources",
+	}
+
 	// AzureQueueStorageSourceResource respresents an event source for Azure Queue Storage.
 	AzureQueueStorageSourceResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "azurequeuestoragesources",
+	}
+
+	// AzureServiceBusQueueSourceResource respresents an event source for
+	// Azure Service Bus Queues.
+	AzureServiceBusQueueSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azureservicebusqueuesources",
 	}
 
 	// AzureServiceBusTopicSourceResource respresents an event source for
@@ -126,6 +139,12 @@ var (
 	AzureServiceBusTopicSourceResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "azureservicebustopicsources",
+	}
+
+	// CloudEventsSourceResource respresents an event source for CloudEvents.
+	CloudEventsSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "cloudeventssources",
 	}
 
 	// GoogleCloudAuditLogsSourceResource respresents an event source for Google
@@ -174,6 +193,12 @@ var (
 	HTTPPollerSourceResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "httppollersources",
+	}
+
+	// IBMMQSourceResource respresents an event source for IBM MQ.
+	IBMMQSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "ibmmqsources",
 	}
 
 	// OCIMetricsSourceResource represents an event source for OCI Metrics.

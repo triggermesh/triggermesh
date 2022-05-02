@@ -18,6 +18,7 @@ package awscloudwatchsource
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -55,12 +56,15 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AWSCloudWatchSource)
 
 	var queries string
 	if qs := typedSrc.Spec.MetricQueries; len(qs) > 0 {
-		q, _ := json.Marshal(qs)
+		q, err := json.Marshal(qs)
+		if err != nil {
+			return nil, fmt.Errorf("serializing spec.metricQueries to JSON: %w", err)
+		}
 		queries = string(q)
 	}
 
@@ -76,11 +80,9 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVar(envQueries, queries),
 		resource.EnvVar(envPollingInterval, pollingInterval.String()),
 		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
-		resource.EnvVar(common.EnvNamespace, src.GetNamespace()),
-		resource.EnvVar(common.EnvName, src.GetName()),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
 		resource.StartupProbe("/health", healthPortName),
-	)
+	), nil
 }

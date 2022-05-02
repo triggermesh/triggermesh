@@ -31,6 +31,24 @@ import (
 func TestNewServiceWithDefaultContainer(t *testing.T) {
 	cpuRes, memRes := resource.MustParse("250m"), resource.MustParse("100Mi")
 
+	v := corev1.Volume{
+		Name: "some-volume",
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: "some-secret",
+				Items: []corev1.KeyToPath{{
+					Key:  "someKey",
+					Path: "someFile",
+				}},
+			},
+		},
+	}
+
+	vm := corev1.VolumeMount{
+		Name:      "some-volume",
+		MountPath: "/myvol",
+	}
+
 	ksvc := NewKnService(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Port("health", 8081),
@@ -48,9 +66,9 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		Requests(&cpuRes, &memRes),
 		Limits(&cpuRes, nil),
 		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
-		SecretMount("test-vol1", "/path/to/file.ext", "test-secret", "someKey"),
-		ConfigMapMount("test-vol2", "/path/to/file.ext", "test-cmap", "someKey"),
 		VisibilityClusterLocal,
+		Volumes(v),
+		VolumeMounts(vm),
 	)
 
 	expectKsvc := &servingv1.Service{
@@ -123,48 +141,22 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 										corev1.ResourceCPU: *resource.NewMilliQuantity(250, resource.DecimalSI),
 									},
 								},
-								VolumeMounts: []corev1.VolumeMount{
-									{
-										Name:      "test-vol1",
-										MountPath: "/path/to/file.ext",
-										SubPath:   "file.ext",
-										ReadOnly:  true,
-									},
-									{
-										Name:      "test-vol2",
-										MountPath: "/path/to/file.ext",
-										SubPath:   "file.ext",
-										ReadOnly:  true,
-									},
-								},
+								VolumeMounts: []corev1.VolumeMount{{
+									Name:      "some-volume",
+									MountPath: "/myvol",
+								}},
 							}},
-							Volumes: []corev1.Volume{
-								{
-									Name: "test-vol1",
-									VolumeSource: corev1.VolumeSource{
-										Secret: &corev1.SecretVolumeSource{
-											SecretName: "test-secret",
-											Items: []corev1.KeyToPath{{
-												Key:  "someKey",
-												Path: "file.ext",
-											}},
-										},
+							Volumes: []corev1.Volume{{
+								Name: "some-volume",
+								VolumeSource: corev1.VolumeSource{
+									Secret: &corev1.SecretVolumeSource{
+										SecretName: "some-secret",
+										Items: []corev1.KeyToPath{{
+											Key:  "someKey",
+											Path: "someFile",
+										}},
 									},
-								},
-								{
-									Name: "test-vol2",
-									VolumeSource: corev1.VolumeSource{
-										ConfigMap: &corev1.ConfigMapVolumeSource{
-											LocalObjectReference: corev1.LocalObjectReference{
-												Name: "test-cmap",
-											},
-											Items: []corev1.KeyToPath{{
-												Key:  "someKey",
-												Path: "file.ext",
-											}},
-										},
-									},
-								},
+								}},
 							},
 						},
 					},

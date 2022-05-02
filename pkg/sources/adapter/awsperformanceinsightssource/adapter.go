@@ -35,6 +35,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
@@ -61,6 +62,7 @@ type envConfig struct {
 // adapter implements the source's adapter.
 type adapter struct {
 	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	pIClient *pi.PI
 	ceClient cloudevents.Client
@@ -84,8 +86,13 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	var err error
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSPerformanceInsightsSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
 
 	env := envAcc.(*envConfig)
 
@@ -129,6 +136,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger: logger,
+		mt:     mt,
 
 		pIClient: pi.New(cfg),
 		ceClient: ceClient,
@@ -153,6 +161,8 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	a.logger.Info("Enabling AWS Performance Insights Source")
 
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
 	// Setup polling to retrieve metrics
 	poll := time.NewTicker(a.pollingInterval)
 	defer poll.Stop()
@@ -166,13 +176,13 @@ func (a *adapter) Start(ctx context.Context) error {
 			return nil
 
 		case t := <-poll.C:
-			go a.PollMetrics(priorTime, t)
+			go a.PollMetrics(ctx, priorTime, t)
 			priorTime = t
 		}
 	}
 }
 
-func (a *adapter) PollMetrics(priorTime time.Time, currentTime time.Time) {
+func (a *adapter) PollMetrics(ctx context.Context, priorTime time.Time, currentTime time.Time) {
 	rmi := &pi.GetResourceMetricsInput{
 		EndTime:       aws.Time(time.Now()),
 		StartTime:     aws.Time(priorTime),
@@ -206,7 +216,7 @@ func (a *adapter) PollMetrics(priorTime time.Time, currentTime time.Time) {
 					return
 				}
 
-				if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+				if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 					a.logger.Errorf("failed to send event data: %v", err)
 					return
 				}

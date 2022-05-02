@@ -26,11 +26,14 @@ import (
 	"os"
 	"os/exec"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -44,13 +47,21 @@ type dataweaveTransformAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
 	sink     string
 }
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: flow.DataWeaveTransformationResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	env := envAcc.(*envAccessor)
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -68,6 +79,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:             replier,
 		ceClient:            ceClient,
 		logger:              logger,
+		mt:                  mt,
 		sink:                env.Sink,
 	}
 
@@ -78,6 +90,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 // or the context is cancelled.
 func (a *dataweaveTransformAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting DataWeave transformer")
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 

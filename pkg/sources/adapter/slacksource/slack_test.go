@@ -17,6 +17,7 @@ limitations under the License.
 package slacksource
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -24,9 +25,11 @@ import (
 	"testing"
 	"time"
 
-	cloudeventst "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
+
 	zapt "go.uber.org/zap/zaptest"
+
+	cloudeventst "github.com/cloudevents/sdk-go/v2/client/test"
 )
 
 func TestSlackEvent(t *testing.T) {
@@ -260,8 +263,11 @@ func TestSlackEvent(t *testing.T) {
 				req.Header.Add(k, v)
 			}
 
+			ctx := context.Background()
+
+			th := http.HandlerFunc(handler.handleAll(ctx))
+
 			rr := httptest.NewRecorder()
-			th := http.HandlerFunc(handler.handleAll)
 
 			th.ServeHTTP(rr, req)
 

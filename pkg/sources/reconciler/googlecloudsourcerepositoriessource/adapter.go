@@ -36,7 +36,7 @@ import (
 type adapterConfig struct {
 	// Container image
 	// Uses the adapter for Google Cloud Pub/Sub instead of a source-specific image.
-	Image string `envconfig:"GOOGLECLOUDPUBSUBSOURCE_IMAGE" default:"gcr.io/triggermesh-private/googlecloudpubsubsource-adapter"`
+	Image string `envconfig:"GOOGLECLOUDPUBSUBSOURCE_IMAGE" default:"gcr.io/triggermesh/googlecloudpubsubsource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
@@ -45,7 +45,7 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.GoogleCloudSourceRepositoriesSource)
 
 	// we rely on the source's status to persist the ID of the Pub/Sub subscription
@@ -68,5 +68,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVar(common.EnvCEType, v1alpha1.GoogleCloudSourceRepoGenericEventType),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	)
+	), nil
 }

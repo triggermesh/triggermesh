@@ -17,16 +17,16 @@ limitations under the License.
 package webhooksource
 
 import (
-	"knative.dev/eventing/pkg/adapter/v2"
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
-func NewEnvConfig() adapter.EnvConfigAccessor {
+func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 	return &envAccessor{}
 }
 
 type envAccessor struct {
-	adapter.EnvConfig
+	pkgadapter.EnvConfig
 
 	EventType         string `envconfig:"WEBHOOK_EVENT_TYPE" required:"true"`
 	EventSource       string `envconfig:"WEBHOOK_EVENT_SOURCE" required:"true"`

@@ -18,6 +18,7 @@ package googlecloudsourcerepositories
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
@@ -60,7 +61,7 @@ const (
 	sourceResource = "googlecloudsourcerepositoriessources"
 )
 
-var _ = Describe("Google Cloud Repositories source", func() {
+var _ = Describe("Google Cloud Source Repositories source", func() {
 	f := framework.New("googlecloudsourcerepositoriessource")
 
 	var ns string
@@ -68,6 +69,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 	var srcClient dynamic.ResourceInterface
 
 	var repoName string
+	var repoURL string
 	var serviceaccountKey string
 
 	var sink *duckv1.Destination
@@ -97,7 +99,9 @@ var _ = Describe("Google Cloud Repositories source", func() {
 			})
 
 			By("creating a source repository", func() {
-				repoName = e2erepo.CreateRepository(repoClient, gcloudProject, f).Name
+				repo := e2erepo.CreateRepository(repoClient, gcloudProject, f)
+				repoName = repo.Name
+				repoURL = repo.Url
 
 				DeferCleanup(func() {
 					By("deleting the source repository "+repoName, func() {
@@ -109,6 +113,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 			By("creating a GoogleCloudSourceRepositoriesSource object", func() {
 				src, err = createSource(srcClient, ns, "test-", sink,
 					withRepository(repoName),
+					withPublishServiceAccount(emailFromServiceAccountKey(serviceaccountKey)),
 					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).ToNot(HaveOccurred())
@@ -120,19 +125,10 @@ var _ = Describe("Google Cloud Repositories source", func() {
 		When("an event occurs in the repository", func() {
 
 			BeforeEach(func() {
-				// There are 2 ways to produce a notification to Pub/Sub:
-				//  - perform a Git push to the source repository
-				//  - delete the source repository
-				//
-				// The latter is simpler to execute inside a test suite since it doesn't require a
-				// configured Git client.
-				//
-				// https://cloud.google.com/source-repositories/docs/pubsub-notifications#event_types
-				e2erepo.MustDeleteRepository(repoClient, repoName)
+				e2erepo.InitRepoAndCommit(repoURL)
 			})
 
 			Specify("the source generates an event", func() {
-
 				const receiveTimeout = 15 * time.Second
 				const pollInterval = 500 * time.Millisecond
 
@@ -147,6 +143,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 
 				Expect(e.Type()).To(Equal("com.google.cloud.sourcerepo.notification"))
 				Expect(e.Source()).To(Equal(repoName))
+				Expect(e.Extensions()["pubsubmsgeventtype"]).To(Equal("RefUpdate"))
 			})
 		})
 	})
@@ -176,7 +173,7 @@ var _ = Describe("Google Cloud Repositories source", func() {
 		Specify("the API server rejects the creation of that object", func() {
 
 			By("setting an invalid repository", func() {
-				invalidRepoName := "projects/fake-project/repos//"
+				const invalidRepoName = "projects/fake-project/repos//"
 
 				_, err := createSource(srcClient, ns, "test-invalid-repository-", sink,
 					withRepository(invalidRepoName),
@@ -192,6 +189,19 @@ var _ = Describe("Google Cloud Repositories source", func() {
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.repository: Required value"))
+			})
+
+			By("setting an invalid publish service account", func() {
+				const invalidServiceAccountEmail = "not-an-email"
+
+				_, err := createSource(srcClient, ns, "test-invalid-sa-", sink,
+					withRepository(repoName),
+					withPublishServiceAccount(invalidServiceAccountEmail),
+					withServiceAccountKey(serviceaccountKey),
+				)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring(
+					"spec.publishServiceAccount in body must be of type email: "))
 			})
 
 			By("setting empty credentials", func() {
@@ -238,6 +248,14 @@ func withRepository(repo string) sourceOption {
 	}
 }
 
+func withPublishServiceAccount(saEmail string) sourceOption {
+	return func(src *unstructured.Unstructured) {
+		if err := unstructured.SetNestedField(src.Object, saEmail, "spec", "publishServiceAccount"); err != nil {
+			framework.FailfWithOffset(3, "Failed to set spec.publishServiceAccount field: %s", err)
+		}
+	}
+}
+
 func withServiceAccountKey(key string) sourceOption {
 	svcAccKeyMap := make(map[string]interface{})
 	if key != "" {
@@ -266,4 +284,19 @@ func readReceivedEvents(c clientset.Interface, namespace, eventDisplayDeplName s
 		*receivedEvents = ev
 		return ev
 	}
+}
+
+// emailFromServiceAccountKey returns the value of the client_email attribute
+// from the given service account key JSON.
+func emailFromServiceAccountKey(saKeyJSON string) string {
+	type serviceAccountKey struct {
+		ClientEmail string `json:"client_email"`
+	}
+
+	saKey := &serviceAccountKey{}
+	if err := json.Unmarshal([]byte(saKeyJSON), saKey); err != nil {
+		framework.FailfWithOffset(2, "Failed to deserialize service account key from JSON: %s", err)
+	}
+
+	return saKey.ClientEmail
 }

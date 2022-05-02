@@ -47,7 +47,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	typedTrg := trg.(*v1alpha1.Transformation)
 
 	var trnContext string
@@ -65,5 +65,5 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVar(envTransformationCtx, trnContext),
 		resource.EnvVar(envTransformationData, trnData),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
-	)
+	), nil
 }

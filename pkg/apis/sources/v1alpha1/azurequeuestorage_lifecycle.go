@@ -74,7 +74,7 @@ func (s *AzureQueueStorageSource) GetEventTypes() []string {
 	return []string{AzureQueueStorageEventType}
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureQueueStorageSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }

@@ -175,7 +175,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
         - name: SYNCHRONIZER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
-        - name: TRANSFORMER_IMAGE
+        - name: TRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         - name: XMLTOJSONTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter

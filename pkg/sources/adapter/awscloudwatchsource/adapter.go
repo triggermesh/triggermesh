@@ -34,6 +34,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
@@ -57,7 +58,9 @@ type envConfig struct {
 
 // adapter implements the source's adapter.
 type adapter struct {
-	logger      *zap.SugaredLogger
+	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
+
 	eventsource string
 
 	cwClient cloudwatchiface.CloudWatchAPI
@@ -74,8 +77,13 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	var err error
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: sources.AWSCloudWatchSourceResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
 
 	eventsource := v1alpha1.AWSCloudWatchSourceName(envAcc.GetNamespace(), envAcc.GetName())
 
@@ -97,6 +105,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &adapter{
 		logger:      logger,
+		mt:          mt,
 		eventsource: eventsource,
 
 		cwClient: cloudwatch.New(cfg),
@@ -175,6 +184,8 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	a.logger.Info("Enabling CloudWatch")
 
+	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
+
 	// Setup polling to retrieve metrics
 	poll := time.NewTicker(a.pollingInterval)
 	defer poll.Stop()
@@ -187,13 +198,13 @@ func (a *adapter) Start(ctx context.Context) error {
 			return nil
 
 		case t := <-poll.C:
-			go a.CollectMetrics(priorTime, t)
+			go a.CollectMetrics(ctx, priorTime, t)
 			priorTime = &t
 		}
 	}
 }
 
-func (a *adapter) CollectMetrics(priorTime *time.Time, currentTime time.Time) {
+func (a *adapter) CollectMetrics(ctx context.Context, priorTime *time.Time, currentTime time.Time) {
 	a.logger.Debug("Firing metrics")
 	startInterval := currentTime.Add(-a.pollingInterval)
 
@@ -208,7 +219,7 @@ func (a *adapter) CollectMetrics(priorTime *time.Time, currentTime time.Time) {
 	}
 
 	err := a.cwClient.GetMetricDataPages(&metricInput, func(output *cloudwatch.GetMetricDataOutput, b bool) bool {
-		err := a.SendMetricEvent(output)
+		err := a.SendMetricEvent(ctx, output)
 		if err != nil {
 			a.logger.Errorf("error sending metrics: %v", zap.Error(err))
 			return false
@@ -223,7 +234,7 @@ func (a *adapter) CollectMetrics(priorTime *time.Time, currentTime time.Time) {
 	}
 }
 
-func (a *adapter) SendMetricEvent(metricOutput *cloudwatch.GetMetricDataOutput) error {
+func (a *adapter) SendMetricEvent(ctx context.Context, metricOutput *cloudwatch.GetMetricDataOutput) error {
 	// multiple messages or messages and metric data, and insure the CloudEvent
 	// ID is common.
 
@@ -237,7 +248,7 @@ func (a *adapter) SendMetricEvent(metricOutput *cloudwatch.GetMetricDataOutput) 
 			return fmt.Errorf("failed to set event data: %w", err)
 		}
 
-		if result := a.ceClient.Send(context.Background(), event); !cloudevents.IsACK(result) {
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 			return result
 		}
 	}

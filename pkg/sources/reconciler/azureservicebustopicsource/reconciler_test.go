@@ -18,8 +18,11 @@ package azureservicebustopicsource
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -28,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	clientgotesting "k8s.io/client-go/testing"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/controller"
@@ -132,6 +136,9 @@ func adapterBuilder(cfg *adapterConfig) common.AdapterDeploymentBuilder {
 
 // TestReconcileSubscription contains tests specific to the Azure Event Grid source.
 func TestReconcileSubscription(t *testing.T) {
+	newReconciledAdapter := mustNewReconciledAdapter(t)
+	newReconciledSource := mustNewReconciledSource(t)
+
 	testCases := rt.TableTest{
 		// Regular lifecycle
 
@@ -268,24 +275,37 @@ type sourceOption func(*v1alpha1.AzureServiceBusTopicSource)
 
 // newReconciledSource returns a test event source object that is identical to
 // what ReconcileKind generates.
-func newReconciledSource(opts ...sourceOption) *v1alpha1.AzureServiceBusTopicSource {
+func newReconciledSource(opts ...sourceOption) (*v1alpha1.AzureServiceBusTopicSource, error) {
 	src := newEventSource()
 
 	// assume the sink URI is resolved
 	src.Spec.Sink.Ref = nil
 	src.Spec.Sink.URI = tSinkURI
 
+	a, err := newReconciledAdapter()
+	if err != nil {
+		return nil, err
+	}
+
 	// assume status conditions are already set to True to ensure
 	// ReconcileKind is a no-op
 	status := src.GetStatusManager()
 	status.MarkSink(tSinkURI)
-	status.PropagateDeploymentAvailability(context.Background(), newReconciledAdapter(), nil)
+	status.PropagateDeploymentAvailability(context.Background(), a, nil)
 
 	for _, opt := range opts {
 		opt(src)
 	}
 
-	return src
+	return src, nil
+}
+
+func mustNewReconciledSource(t *testing.T) func(...sourceOption) *v1alpha1.AzureServiceBusTopicSource {
+	return func(opts ...sourceOption) *v1alpha1.AzureServiceBusTopicSource {
+		src, err := newReconciledSource(opts...)
+		require.NoError(t, err)
+		return src
+	}
 }
 
 // subscribed sets the Subscribed status condition to True and reports the
@@ -315,21 +335,32 @@ func newReconciledRoleBinding() *rbacv1.RoleBinding {
 
 // newReconciledAdapter returns a test receive adapter object that is identical
 // to what ReconcileKind generates.
-func newReconciledAdapter() *appsv1.Deployment {
+func newReconciledAdapter() (*appsv1.Deployment, error) {
 	// hack: we need to pass a source which has status.subscriptionID
 	// already set for the deployment to contain a
 	// SERVICEBUS_SUBSCRIPTION_RESOURCE_ID env var with the expected value
 	src := newEventSource()
 	src.Status.SubscriptionID = &tSubscriptionID
 
-	adapter := adapterBuilder(adapterCfg).BuildAdapter(src, tSinkURI)
+	adapter, err := adapterBuilder(adapterCfg).BuildAdapter(src, tSinkURI)
+	if err != nil {
+		return nil, fmt.Errorf("building adapter object using provided Reconcilable: %w", err)
+	}
 
 	adapter.Status.Conditions = []appsv1.DeploymentCondition{{
 		Type:   appsv1.DeploymentAvailable,
 		Status: corev1.ConditionTrue,
 	}}
 
-	return adapter
+	return adapter, nil
+}
+
+func mustNewReconciledAdapter(t *testing.T) func() *appsv1.Deployment {
+	return func() *appsv1.Deployment {
+		a, err := newReconciledAdapter()
+		require.NoError(t, err)
+		return a
+	}
 }
 
 /* Azure clients */

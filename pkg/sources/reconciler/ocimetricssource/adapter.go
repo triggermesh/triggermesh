@@ -18,6 +18,7 @@ package ocimetricssource
 
 import (
 	"encoding/json"
+	"fmt"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -57,34 +58,30 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.OCIMetricsSource)
+
+	m, err := json.Marshal(typedSrc.Spec.Metrics)
+	if err != nil {
+		return nil, fmt.Errorf("serializing spec.metrics to JSON: %w", err)
+	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
+		resource.EnvVar(metrics, string(m)),
 		resource.EnvVars(makeOCIMetricsEnvs(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	)
+	), nil
 }
 
 func makeOCIMetricsEnvs(src *v1alpha1.OCIMetricsSource) []corev1.EnvVar {
-	m, _ := json.Marshal(src.Spec.Metrics)
-
 	frequency := defaultPollingFrequency
 	if src.Spec.PollingFrequency != nil {
 		frequency = *src.Spec.PollingFrequency
 	}
 
 	ociEnvs := []corev1.EnvVar{
-		{
-			Name:  common.EnvNamespace,
-			Value: src.GetNamespace(),
-		},
-		{
-			Name:  common.EnvName,
-			Value: src.GetName(),
-		},
 		{
 			Name:  userOCID,
 			Value: src.Spec.User,
@@ -101,10 +98,7 @@ func makeOCIMetricsEnvs(src *v1alpha1.OCIMetricsSource) []corev1.EnvVar {
 			Name:  pollingFrequency,
 			Value: frequency,
 		},
-		{
-			Name:  metrics,
-			Value: string(m),
-		}}
+	}
 
 	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleAPIKey, src.Spec.OracleAPIPrivateKey)
 	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleAPIKeyPassphrase, src.Spec.OracleAPIPrivateKeyPassphrase)

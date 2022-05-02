@@ -57,7 +57,7 @@ type adapterConfig struct {
 }
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.HTTPPollerSource)
 
 	return common.NewAdapterDeployment(src, sinkURI,
@@ -65,7 +65,7 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 		resource.EnvVars(makeHTTPPollerEnvs(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	)
+	), nil
 }
 
 func makeHTTPPollerEnvs(src *v1alpha1.HTTPPollerSource) []corev1.EnvVar {

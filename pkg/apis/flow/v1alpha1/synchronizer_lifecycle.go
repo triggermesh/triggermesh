@@ -56,7 +56,7 @@ func (s *Synchronizer) GetSink() *duckv1.Destination {
 	return &s.Spec.Sink
 }
 
-// GetAdapterOverrides implements Reconcilable.
+// GetAdapterOverrides implements AdapterConfigurable.
 func (s *Synchronizer) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }
