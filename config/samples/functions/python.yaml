@@ -19,6 +19,8 @@ metadata:
 spec:
   runtime: python
   responseIsEvent: true
+  adapterOverrides:
+    public: true
   ceOverrides:
     extensions:
       type: io.triggermesh.python.sample
