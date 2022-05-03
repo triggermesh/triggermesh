@@ -39,13 +39,15 @@ import (
 const (
 	metricsPrometheusPortName = "metrics"
 
-	metricsPrometheusPort uint16 = 9090
-
-	// TCP port used to expose metrics via the Prometheus metrics exporter in
-	// components backed by a Knative Service.
-	// It is necessary to override Knative's default value of "9090" because this
-	// port is already reserved by the "queue-proxy" container in Knative Services.
-	metricsPrometheusPortKsvc uint16 = 9092
+	// TCP port used to expose metrics via the Prometheus metrics exporter
+	// in TriggerMesh components.
+	//
+	// It is necessary to override Knative's default value of "9090"
+	// because this port is already reserved by the "queue-proxy" container
+	// in Knative Services.
+	// For consistency, we use the same port in components that aren't
+	// backed by a Knative Service.
+	metricsPrometheusPort uint16 = 9092
 )
 
 // ComponentName returns the component name for the given object.
@@ -142,6 +144,7 @@ func commonAdapterDeploymentOptions(rcl v1alpha1.Reconcilable) []resource.Object
 		resource.ServiceAccount(ServiceAccountName(rcl)),
 
 		resource.EnvVar(envComponent, app),
+		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPort), 10)),
 
 		resource.Port(metricsPrometheusPortName, int32(metricsPrometheusPort)),
 	}
@@ -228,7 +231,7 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 		resource.ServiceAccount(MTAdapterObjectName(rcl)),
 
 		resource.EnvVar(envComponent, app),
-		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPortKsvc), 10)),
+		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPort), 10)),
 	}
 
 	parentLabels := rcl.GetLabels()
