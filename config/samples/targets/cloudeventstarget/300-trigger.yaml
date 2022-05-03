@@ -23,4 +23,3 @@ spec:
       apiVersion: targets.triggermesh.io/v1alpha1
       kind: CloudEventsTarget
       name: export-cloudevents-auth
-
