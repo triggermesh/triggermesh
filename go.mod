@@ -18,7 +18,7 @@ require (
 	cloud.google.com/go/billing v1.2.0
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.4.2
-	cloud.google.com/go/pubsub v1.20.0
+	cloud.google.com/go/pubsub v1.21.0
 	cloud.google.com/go/storage v1.22.0
 	cloud.google.com/go/workflows v1.3.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
@@ -211,7 +211,7 @@ require (
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
+	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
