@@ -73,7 +73,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, listenC
 var _ pkgadapter.Adapter = (*ceAdapter)(nil)
 
 type ceAdapter struct {
-	fileWatcher  *fs.FileWatcher
+	fileWatcher  fs.FileWatcher
 	senderClient cloudevents.Client
 	listenClient cloudevents.Client
 
@@ -136,9 +136,10 @@ func (a *ceAdapter) dispatch(ctx context.Context, event cloudevents.Event) cloud
 	// client has not been built.
 	if a.senderClient == nil {
 		err := fmt.Errorf("CloudEvents client not intialized. Please, make sure that authentication secret is available")
-		a.logger.Errorw("Failed to send event", err)
+		a.logger.Errorw("Failed to send event", zap.Error(err))
 		return err
 	}
+
 	r := a.senderClient.Send(ctx, event)
 	if cloudevents.IsNACK(r) {
 		a.logger.Errorw("Could not send event to destination", zap.Error(r))

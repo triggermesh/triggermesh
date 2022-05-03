@@ -51,7 +51,7 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) (*servingv1.Service, error) {
 	typedTrg := trg.(*v1alpha1.CloudEventsTarget)
 
 	options := []resource.ObjectOption{
@@ -65,21 +65,26 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 		secretPath := "/opt/basicauths"
 		secretFileName := "cesource"
 
+		options = append(options, resource.EnvVar(envCloudEventsBasicAuthUsername, typedTrg.Spec.Credentials.BasicAuth.Username))
+
 		if typedTrg.Spec.Credentials.BasicAuth.Password.ValueFromSecret != nil {
+			v, vm := secretVolumeAndMountAtPath(
+				secretName,
+				secretPath,
+				secretFileName,
+				typedTrg.Spec.Credentials.BasicAuth.Password.ValueFromSecret.Name,
+				typedTrg.Spec.Credentials.BasicAuth.Password.ValueFromSecret.Key,
+			)
+
 			options = append(options,
-				secretMountAtPath(
-					secretName,
-					secretPath,
-					secretFileName,
-					typedTrg.Spec.Credentials.BasicAuth.Password.ValueFromSecret.Name,
-					typedTrg.Spec.Credentials.BasicAuth.Password.ValueFromSecret.Key),
-				resource.EnvVar(envCloudEventsBasicAuthUsername, typedTrg.Spec.Credentials.BasicAuth.Username),
+				resource.Volumes(v),
+				resource.VolumeMounts(vm),
 				resource.EnvVar(envCloudEventsBasicAuthPasswordPath, path.Join(secretPath, secretFileName)),
 			)
 		}
 	}
 
-	return common.NewAdapterKnService(trg, nil, options...)
+	return common.NewAdapterKnService(trg, nil, options...), nil
 }
 
 func makeAppEnv(o *v1alpha1.CloudEventsTarget) []corev1.EnvVar {
@@ -97,60 +102,30 @@ func makeAppEnv(o *v1alpha1.CloudEventsTarget) []corev1.EnvVar {
 		})
 	}
 
-	// if o.Spec.BasicAuthUsername != nil {
-	// 	env = append(env, corev1.EnvVar{
-	// 		Name:  envHTTPBasicAuthUsername,
-	// 		Value: *o.Spec.BasicAuthUsername,
-	// 	})
-	// }
-
-	// if o.Spec.BasicAuthPassword.SecretKeyRef != nil {
-	// 	env = append(env, corev1.EnvVar{
-	// 		Name: envHTTPBasicAuthPassword,
-	// 		ValueFrom: &corev1.EnvVarSource{
-	// 			SecretKeyRef: o.Spec.BasicAuthPassword.SecretKeyRef,
-	// 		},
-	// 	})
-	// }
-
 	return env
 }
 
-// secretMountAtPath returns a build option for a service that adds a
-// secret based volume and mount a key at a path.
-func secretMountAtPath(name, mountPath, mountFile, secretName, secretKey string) resource.ObjectOption {
-	return func(object interface{}) {
-		ksvc, ok := object.(*servingv1.Service)
-		if !ok {
-			return
-		}
-
-		ksvc.Spec.Template.Spec.Volumes = append(
-			ksvc.Spec.Template.Spec.Volumes,
-			corev1.Volume{
-				Name: name,
-				VolumeSource: corev1.VolumeSource{
-					Secret: &corev1.SecretVolumeSource{
-						SecretName: secretName,
-						Items: []corev1.KeyToPath{{
-							Key:  secretKey,
-							Path: mountFile,
-						}},
-					},
-				},
-			})
-
-		if len(ksvc.Spec.Template.Spec.Containers) == 0 {
-			ksvc.Spec.Template.Spec.Containers = make([]corev1.Container, 1)
-		}
-
-		ksvc.Spec.Template.Spec.Containers[0].VolumeMounts = append(
-			ksvc.Spec.Template.Spec.Containers[0].VolumeMounts,
-			corev1.VolumeMount{
-				Name:      name,
-				ReadOnly:  true,
-				MountPath: mountPath,
+// secretVolumeAndMountAtPath returns a Secret-based volume and corresponding
+// mount at the given path.
+func secretVolumeAndMountAtPath(name, mountPath, mountFile, secretName, secretKey string) (corev1.Volume, corev1.VolumeMount) {
+	v := corev1.Volume{
+		Name: name,
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: secretName,
+				Items: []corev1.KeyToPath{{
+					Key:  secretKey,
+					Path: mountFile,
+				}},
 			},
-		)
+		},
 	}
+
+	vm := corev1.VolumeMount{
+		Name:      name,
+		ReadOnly:  true,
+		MountPath: mountPath,
+	}
+
+	return v, vm
 }

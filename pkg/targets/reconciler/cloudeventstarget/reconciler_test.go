@@ -20,12 +20,15 @@ import (
 	"context"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
 	rt "knative.dev/pkg/reconciler/testing"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/cloudeventstarget"
@@ -65,11 +68,24 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 
 // newTarget returns a populated target object.
 func newTarget() *v1alpha1.CloudEventsTarget {
+	path := "testpath"
+
 	trg := &v1alpha1.CloudEventsTarget{
 		Spec: v1alpha1.CloudEventsTargetSpec{
 			Endpoint: apis.URL{
 				Scheme: "http",
 				Host:   "example.com",
+			},
+			Path: &path,
+			Credentials: &v1alpha1.CloudEventsCredentials{
+				BasicAuth: v1alpha1.HTTPBasicAuth{
+					Username: "username",
+					Password: commonv1alpha1.ValueFromField{
+						ValueFromSecret: &corev1.SecretKeySelector{
+							Key: "key1",
+						},
+					},
+				},
 			},
 		},
 	}
