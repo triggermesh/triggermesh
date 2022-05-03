@@ -48,7 +48,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.3
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/google/cel-go v0.11.2
-	github.com/google/go-cmp v0.5.7
+	github.com/google/go-cmp v0.5.8
 	github.com/google/uuid v1.3.0
 	github.com/ibm-messaging/mq-golang/v5 v5.2.5
 	github.com/itchyny/gojq v0.12.7
