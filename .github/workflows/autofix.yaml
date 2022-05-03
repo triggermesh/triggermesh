@@ -1,0 +1,61 @@
+name: Fix Generated Files
+
+on:
+  workflow_run:
+    workflows:
+      - Generated Files
+      - OSS Licenses
+    types:
+      - completed
+
+jobs:
+
+  autofix:
+    name: Generate and commit
+    runs-on: ubuntu-latest
+
+    if: ${{ github.actor == 'dependabot[bot]' && github.event.workflow_run.conclusion == 'failure' }}
+
+    # We want to avoid concurrent runs of this job, because they would end up committing
+    # the same changes to the same branch in parallel, and ultimately fail.
+    concurrency:
+      group: ${{ github.event.workflow_run.head_branch }}
+      cancel-in-progress: true
+
+    steps:
+    - name: Impersonate TriggerMesh bot
+      uses: tibdex/github-app-token@v1
+      id: generate-token
+      with:
+        app_id: ${{ secrets.TMBOT_APP_ID }}
+        private_key: ${{ secrets.TMBOT_APP_PRIVATE_KEY }}
+
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.workflow_run.head_branch }}
+        token: ${{ steps.generate-token.outputs.token }}
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.18'
+
+    - name: Go caches
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/go/pkg/mod
+        key: ${{ github.job }}-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ github.job }}-${{ runner.os }}-go-
+
+    - name: Tidy Go modules
+      run: go mod tidy
+
+    - name: Vendor third-party licenses
+      run: |
+        go install github.com/google/go-licenses@v1.0.0
+        go-licenses save ./ --save_path LICENSES/vendor/ --force
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9

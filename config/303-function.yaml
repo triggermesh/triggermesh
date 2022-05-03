@@ -126,9 +126,6 @@ spec:
               entrypoint:
                 description: Function name to use as an entrypoint.
                 type: string
-              public:
-                description: Should the function be publicly available.
-                type: boolean
               responseIsEvent:
                 description: Whether function responds with CE payload only or with full event.
                 type: boolean

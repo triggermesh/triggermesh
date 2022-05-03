@@ -18,7 +18,6 @@ metadata:
   name: inline-ruby-function
 spec:
   runtime: ruby
-  public: true
   ceOverrides:
     extensions:
       type: io.triggermesh.ruby.sample

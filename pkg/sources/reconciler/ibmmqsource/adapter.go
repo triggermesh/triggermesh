@@ -17,6 +17,7 @@ limitations under the License.
 package ibmmqsource
 
 import (
+	"path/filepath"
 	"strconv"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -63,26 +64,29 @@ type adapterConfig struct {
 var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *appsv1.Deployment {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.IBMMQSource)
 
-	keystoreMount := resource.ObjectOption(func(interface{}) {})
-	passwdStashMount := resource.ObjectOption(func(interface{}) {})
+	var secretVolumes []corev1.Volume
+	var secretVolMounts []corev1.VolumeMount
 
 	if typedSrc.Spec.Auth.TLS != nil {
-		keystoreMount = resource.SecretMount(
+		keyDBVol, keyDBVolMount := secretVolumeAndMountAtPath(
 			"key-database",
 			KeystoreMountPath,
 			typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Name,
 			typedSrc.Spec.Auth.TLS.KeyRepository.KeyDatabase.ValueFromSecret.Key,
 		)
 
-		passwdStashMount = resource.SecretMount(
+		pwStashVol, pwStashVolMount := secretVolumeAndMountAtPath(
 			"db-password",
 			PasswdStashMountPath,
 			typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Name,
 			typedSrc.Spec.Auth.TLS.KeyRepository.PasswordStash.ValueFromSecret.Key,
 		)
+
+		secretVolumes = append(secretVolumes, keyDBVol, pwStashVol)
+		secretVolMounts = append(secretVolMounts, keyDBVolMount, pwStashVolMount)
 	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
@@ -91,9 +95,9 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVars(makeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
-		keystoreMount,
-		passwdStashMount,
-	)
+		resource.Volumes(secretVolumes...),
+		resource.VolumeMounts(secretVolMounts...),
+	), nil
 }
 
 func makeAppEnv(o *v1alpha1.IBMMQSource) []corev1.EnvVar {
@@ -158,4 +162,32 @@ func makeAppEnv(o *v1alpha1.IBMMQSource) []corev1.EnvVar {
 	}
 
 	return env
+}
+
+// secretVolumeAndMountAtPath returns a Secret-based volume and corresponding
+// mount at the given path.
+func secretVolumeAndMountAtPath(name, mountPath, secretName, secretKey string) (corev1.Volume, corev1.VolumeMount) {
+	v := corev1.Volume{
+		Name: name,
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: secretName,
+				Items: []corev1.KeyToPath{
+					{
+						Key:  secretKey,
+						Path: filepath.Base(mountPath),
+					},
+				},
+			},
+		},
+	}
+
+	vm := corev1.VolumeMount{
+		Name:      name,
+		ReadOnly:  true,
+		MountPath: mountPath,
+		SubPath:   filepath.Base(mountPath),
+	}
+
+	return v, vm
 }

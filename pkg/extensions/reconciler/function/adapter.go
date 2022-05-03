@@ -36,6 +36,7 @@ import (
 )
 
 const codeVersionAnnotation = "extensions.triggermesh.io/codeVersion"
+const codeCmapVolName = "code"
 
 const klrEntrypoint = "/opt/aws-custom-runtime"
 
@@ -55,10 +56,8 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	f := rcl.(*v1alpha1.Function)
-
-	srcCodePath := filepath.Join("/opt", "source."+fileExtension(f.Spec.Runtime))
 
 	var cmapName string
 	var cmapRev string
@@ -66,6 +65,9 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 		cmapName = codeCmap.Name
 		cmapRev = codeCmap.ResourceVersion
 	}
+
+	srcCodePath := filepath.Join("/opt", "source."+fileExtension(f.Spec.Runtime))
+	srcCodeVol, srcCodeVolMount := sourceCodeVolumeAndMount(srcCodePath, cmapName)
 
 	handler := "source." + f.Spec.Entrypoint
 
@@ -88,15 +90,9 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 		responseMode = "event"
 	}
 
-	ksvcVisibility := resource.VisibilityClusterLocal
-	if f.Spec.Public {
-		ksvcVisibility = resource.VisibilityPublic
-	}
-
 	return common.NewAdapterKnService(rcl, sinkURI,
 		resource.Image(lookupRuntimeImage(f.Spec.Runtime)),
 
-		ksvcVisibility,
 		resource.Annotation(codeVersionAnnotation, cmapRev),
 
 		resource.Label(functionNameLabel, f.Name),
@@ -108,10 +104,11 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.EnvVars(sortedEnvVarsWithPrefix("CE_OVERRIDES_", ceOverrides)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 
-		resource.ConfigMapMount("code", srcCodePath, cmapName, codeCmapDataKey),
+		resource.Volumes(srcCodeVol),
+		resource.VolumeMounts(srcCodeVolMount),
 
 		resource.EntrypointCommand(klrEntrypoint),
-	)
+	), nil
 }
 
 // Lambda runtimes require file extensions to match the language,
@@ -187,4 +184,32 @@ func lookupRuntimeImage(runtime string) string {
 	}
 
 	return ""
+}
+
+// sourceCodeVolumeAndMount returns a ConfigMap-based volume and corresponding
+// mount for the Function's source code.
+func sourceCodeVolumeAndMount(mountPath, cmName string) (corev1.Volume, corev1.VolumeMount) {
+	v := corev1.Volume{
+		Name: codeCmapVolName,
+		VolumeSource: corev1.VolumeSource{
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: cmName,
+				},
+				Items: []corev1.KeyToPath{{
+					Key:  codeCmapDataKey,
+					Path: filepath.Base(mountPath),
+				}},
+			},
+		},
+	}
+
+	vm := corev1.VolumeMount{
+		Name:      codeCmapVolName,
+		ReadOnly:  true,
+		MountPath: mountPath,
+		SubPath:   filepath.Base(mountPath),
+	}
+
+	return v, vm
 }

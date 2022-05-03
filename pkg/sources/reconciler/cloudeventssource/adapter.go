@@ -56,41 +56,38 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterDeploymentBuilder.
-func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	typedSrc := src.(*v1alpha1.CloudEventsSource)
 
-	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
-
-	options := []resource.ObjectOption{
-		resource.Image(r.adapterCfg.Image),
-
-		resource.VisibilityPublic,
-
-		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
-		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-		resource.EnvVars(makeAppEnv(typedSrc)...),
-	}
+	var authVolumes []corev1.Volume
+	var authVolumeMounts []corev1.VolumeMount
+	var authEnvs []corev1.EnvVar
 
 	if typedSrc.Spec.Credentials != nil {
 		// For each BasicAuth credentials a secret is mounted and a tuple
 		// key/mounted-file pair is added to the environment variable.
 		kvs := []KeyMountedValue{}
 
-		secretArrayNamePrefix := "basicauths"
-		secretBasePath := "/opt"
-		secretFileName := "cesource"
+		const (
+			secretArrayNamePrefix = "basicauths"
+			secretBasePath        = "/opt"
+			secretFileName        = "cesource"
+		)
 
 		for i, ba := range typedSrc.Spec.Credentials.BasicAuths {
 			if ba.Password.ValueFromSecret != nil {
 				secretName := fmt.Sprintf("%s%d", secretArrayNamePrefix, i)
 				secretPath := filepath.Join(secretBasePath, secretName)
 
-				options = append(options, secretMountAtPath(
+				v, vm := secretVolumeAndMountAtPath(
 					secretName,
 					secretPath,
 					secretFileName,
 					ba.Password.ValueFromSecret.Name,
-					ba.Password.ValueFromSecret.Key))
+					ba.Password.ValueFromSecret.Key,
+				)
+				authVolumes = append(authVolumes, v)
+				authVolumeMounts = append(authVolumeMounts, vm)
 
 				kvs = append(kvs, KeyMountedValue{
 					Key:              ba.Username,
@@ -99,13 +96,34 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 			}
 		}
 
-		if len(kvs) != 0 {
-			s, _ := json.Marshal(kvs)
-			options = append(options, resource.EnvVar(envCloudEventsBasicAuthCredentials, string(s)))
+		if len(kvs) > 0 {
+			s, err := json.Marshal(kvs)
+			if err != nil {
+				return nil, fmt.Errorf("serializing keyMountedValues to JSON: %w", err)
+			}
+
+			authEnvs = append(authEnvs, corev1.EnvVar{
+				Name:  envCloudEventsBasicAuthCredentials,
+				Value: string(s),
+			})
 		}
 	}
 
-	return common.NewAdapterKnService(src, sinkURI, options...)
+	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
+
+	return common.NewAdapterKnService(src, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+
+		resource.VisibilityPublic,
+
+		resource.Volumes(authVolumes...),
+		resource.VolumeMounts(authVolumeMounts...),
+		resource.EnvVars(authEnvs...),
+
+		resource.EnvVars(makeAppEnv(typedSrc)...),
+		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
+		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+	), nil
 }
 
 type KeyMountedValue struct {
@@ -146,41 +164,27 @@ func makeAppEnv(o *v1alpha1.CloudEventsSource) []corev1.EnvVar {
 	return envs
 }
 
-// secretMountAtPath returns a build option for a service that adds a
-// secret based volume and mount a key at a path.
-func secretMountAtPath(name, mountPath, mountFile, secretName, secretKey string) resource.ObjectOption {
-	return func(object interface{}) {
-		ksvc, ok := object.(*servingv1.Service)
-		if !ok {
-			return
-		}
-
-		ksvc.Spec.Template.Spec.Volumes = append(
-			ksvc.Spec.Template.Spec.Volumes,
-			corev1.Volume{
-				Name: name,
-				VolumeSource: corev1.VolumeSource{
-					Secret: &corev1.SecretVolumeSource{
-						SecretName: secretName,
-						Items: []corev1.KeyToPath{{
-							Key:  secretKey,
-							Path: mountFile,
-						}},
-					},
-				},
-			})
-
-		if len(ksvc.Spec.Template.Spec.Containers) == 0 {
-			ksvc.Spec.Template.Spec.Containers = make([]corev1.Container, 1)
-		}
-
-		ksvc.Spec.Template.Spec.Containers[0].VolumeMounts = append(
-			ksvc.Spec.Template.Spec.Containers[0].VolumeMounts,
-			corev1.VolumeMount{
-				Name:      name,
-				ReadOnly:  true,
-				MountPath: mountPath,
+// secretVolumeAndMountAtPath returns a Secret-based volume and corresponding
+// mount at the given path.
+func secretVolumeAndMountAtPath(name, mountPath, mountFile, secretName, secretKey string) (corev1.Volume, corev1.VolumeMount) {
+	v := corev1.Volume{
+		Name: name,
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: secretName,
+				Items: []corev1.KeyToPath{{
+					Key:  secretKey,
+					Path: mountFile,
+				}},
 			},
-		)
+		},
 	}
+
+	vm := corev1.VolumeMount{
+		Name:      name,
+		ReadOnly:  true,
+		MountPath: mountPath,
+	}
+
+	return v, vm
 }

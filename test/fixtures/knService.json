@@ -49,6 +49,22 @@
                     {
                         "env": [
                             {
+                                "name": "COMPONENT",
+                                "value": "foo"
+                            },
+                            {
+                                "name": "METRICS_PROMETHEUS_PORT",
+                                "value": "9092"
+                            },
+                            {
+                                "name": "NAMESPACE",
+                                "value": "dev"
+                            },
+                            {
+                                "name": "NAME",
+                                "value": "sample"
+                            },
+                            {
                                 "name": "K_LOGGING_CONFIG",
                                 "value": "{\"zap-logger-config\":\"{\\n  \\\"level\\\": \\\"info\\\",\\n  \\\"development\\\": false,\\n  \\\"outputPaths\\\": [\\\"stdout\\\"],\\n  \\\"errorOutputPaths\\\": [\\\"stderr\\\"],\\n  \\\"encoding\\\": \\\"json\\\",\\n  \\\"encoderConfig\\\": {\\n    \\\"timeKey\\\": \\\"ts\\\",\\n    \\\"levelKey\\\": \\\"level\\\",\\n    \\\"nameKey\\\": \\\"logger\\\",\\n    \\\"callerKey\\\": \\\"caller\\\",\\n    \\\"messageKey\\\": \\\"msg\\\",\\n    \\\"stacktraceKey\\\": \\\"stacktrace\\\",\\n    \\\"lineEnding\\\": \\\"\\\",\\n    \\\"levelEncoder\\\": \\\"\\\",\\n    \\\"timeEncoder\\\": \\\"iso8601\\\",\\n    \\\"durationEncoder\\\": \\\"\\\",\\n    \\\"callerEncoder\\\": \\\"\\\"\\n  }\\n}\"}"
                             },

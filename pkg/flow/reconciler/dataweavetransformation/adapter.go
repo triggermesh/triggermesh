@@ -51,14 +51,14 @@ type adapterConfig struct {
 var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterServiceBuilder.
-func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis.URL) *servingv1.Service {
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	typedTrg := trg.(*v1alpha1.DataWeaveTransformation)
 
 	return common.NewAdapterKnService(trg, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(makeAppEnv(typedTrg)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
-	)
+	), nil
 }
 
 func makeAppEnv(o *v1alpha1.DataWeaveTransformation) []corev1.EnvVar {

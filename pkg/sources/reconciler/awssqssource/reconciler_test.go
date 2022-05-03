@@ -18,7 +18,10 @@ package awssqssource
 
 import (
 	"context"
+	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -99,6 +102,9 @@ func adapterBuilder(cfg *adapterConfig) common.AdapterDeploymentBuilder {
 
 // TestReconcileWithIAMRoleAuth contains tests specific to the SQS source.
 func TestReconcileWithIAMRoleAuth(t *testing.T) {
+	newReconciledAdapter := mustNewReconciledAdapter(t)
+	newReconciledSource := mustNewReconciledSource(t)
+
 	// We use a source which configuration is known to return
 	// "WantsOwnServiceAccount() == true" in all the tests below.
 	// This has an influence on the ServiceAccount that is going to be
@@ -106,7 +112,7 @@ func TestReconcileWithIAMRoleAuth(t *testing.T) {
 	s := newReconciledSource(iamRole)
 
 	sa := common.ServiceAccountName(s)
-	n := adapterBuilder(adapterCfg).BuildAdapter(s, tSinkURI).Name
+	n := newReconciledAdapter().Name
 
 	testCases := rt.TableTest{
 		{
@@ -155,7 +161,7 @@ var (
 
 // newReconciledSource returns a test event source object that is identical to
 // what ReconcileKind generates.
-func newReconciledSource(opts ...sourceOption) *v1alpha1.AWSSQSSource {
+func newReconciledSource(opts ...sourceOption) (*v1alpha1.AWSSQSSource, error) {
 	src := newEventSource()
 
 	// assume the sink URI is resolved, so we don't have to include the
@@ -163,17 +169,30 @@ func newReconciledSource(opts ...sourceOption) *v1alpha1.AWSSQSSource {
 	src.Spec.Sink.Ref = nil
 	src.Spec.Sink.URI = tSinkURI
 
+	a, err := newReconciledAdapter()
+	if err != nil {
+		return nil, err
+	}
+
 	// assume status conditions are already set to True to ensure
 	// ReconcileKind is a no-op
 	status := src.GetStatusManager()
 	status.MarkSink(tSinkURI)
-	status.PropagateDeploymentAvailability(context.Background(), newReconciledAdapter(), nil)
+	status.PropagateDeploymentAvailability(context.Background(), a, nil)
 
 	for _, opt := range opts {
 		opt(src)
 	}
 
-	return src
+	return src, nil
+}
+
+func mustNewReconciledSource(t *testing.T) func(...sourceOption) *v1alpha1.AWSSQSSource {
+	return func(opts ...sourceOption) *v1alpha1.AWSSQSSource {
+		src, err := newReconciledSource(opts...)
+		require.NoError(t, err)
+		return src
+	}
 }
 
 // sourceOption is a functional option for an event source.
@@ -186,8 +205,13 @@ func iamRole(src *v1alpha1.AWSSQSSource) {
 
 // newReconciledAdapter returns a test receive adapter object that is identical
 // to what ReconcileKind generates.
-func newReconciledAdapter(opts ...adapterOption) *appsv1.Deployment {
-	adapter := adapterBuilder(adapterCfg).BuildAdapter(newEventSource(), tSinkURI)
+func newReconciledAdapter(opts ...adapterOption) (*appsv1.Deployment, error) {
+	src := newEventSource()
+
+	adapter, err := adapterBuilder(adapterCfg).BuildAdapter(src, tSinkURI)
+	if err != nil {
+		return nil, fmt.Errorf("building adapter object using provided Reconcilable: %w", err)
+	}
 
 	adapter.Status = appsv1.DeploymentStatus{
 		Conditions: []appsv1.DeploymentCondition{{
@@ -200,7 +224,15 @@ func newReconciledAdapter(opts ...adapterOption) *appsv1.Deployment {
 		opt(adapter)
 	}
 
-	return adapter
+	return adapter, nil
+}
+
+func mustNewReconciledAdapter(t *testing.T) func(opts ...adapterOption) *appsv1.Deployment {
+	return func(opts ...adapterOption) *appsv1.Deployment {
+		a, err := newReconciledAdapter(opts...)
+		require.NoError(t, err)
+		return a
+	}
 }
 
 // adapterOption is a functional option for a Deployment object.
