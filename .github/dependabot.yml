@@ -1,7 +1,7 @@
 # Dependabot configuration
 #
 # For more information, please refer to:
-#   https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically
+#   https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
 
 version: 2
 
@@ -18,6 +18,10 @@ updates:
   # The version of Kubernetes module imports needs to be consistent across all
   # modules. Besides, that version is determined by the current Knative version.
   - dependency-name: k8s.io/*
+  # Temporary. We can't update OpenTelemetry's metric modules until
+  # triggermesh/triggermesh#592 is addressed.
+  - dependency-name: go.opentelemetry.io/otel/metric
+  - dependency-name: go.opentelemetry.io/otel/sdk/metric
 
 # Maintain dependencies for GitHub Actions
 - package-ecosystem: github-actions
