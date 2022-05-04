@@ -14,7 +14,7 @@ jobs:
     name: Generate and commit
     runs-on: ubuntu-latest
 
-    if: ${{ github.actor == 'dependabot[bot]' && github.event.workflow_run.conclusion == 'failure' }}
+    if: github.actor == 'dependabot[bot]' && github.event.workflow_run.conclusion == 'failure'
 
     # We want to avoid concurrent runs of this job, because they would end up committing
     # the same changes to the same branch in parallel, and ultimately fail.
