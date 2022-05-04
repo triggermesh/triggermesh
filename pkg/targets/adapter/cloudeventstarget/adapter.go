@@ -168,5 +168,7 @@ func (a *ceAdapter) dispatch(ctx context.Context, event cloudevents.Event) cloud
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		a.logger.Errorw("Could not send event to destination", zap.Error(r))
 	}
+
+	a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	return r
 }

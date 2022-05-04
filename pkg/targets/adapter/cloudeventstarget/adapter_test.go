@@ -23,16 +23,25 @@ import (
 	"testing"
 	"time"
 
+	// Essential. Initializes a Prometheus metrics exporter for tests.
+	_ "knative.dev/pkg/metrics/testing"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	loggingtesting "knative.dev/pkg/logging/testing"
+	"knative.dev/pkg/metrics/metricstest"
 
 	fakefs "github.com/triggermesh/triggermesh/pkg/adapter/fs/fake"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
+)
+
+const (
+	tNs   = "test-ns"
+	tName = "test"
 )
 
 func TestCloudEventsDispatch(t *testing.T) {
@@ -79,11 +88,20 @@ func TestCloudEventsDispatch(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
+			resetMetrics(t)
+
+			metricTags := map[string]string{
+				"resource_group": targets.CloudEventsTargetResource.String(),
+				"namespace_name": tNs,
+				"name":           tName,
+				"event_source":   tc.ce.Source(),
+				"event_type":     tc.ce.Type(),
+			}
 
 			mt := &pkgadapter.MetricTag{
 				ResourceGroup: targets.CloudEventsTargetResource.String(),
-				Namespace:     "ns-test",
-				Name:          "name-test",
+				Namespace:     tNs,
+				Name:          tName,
 			}
 
 			adapter := &ceAdapter{
@@ -108,18 +126,63 @@ func TestCloudEventsDispatch(t *testing.T) {
 
 			res := adapter.dispatch(ctx, tc.ce)
 
+			metricstest.CheckDistributionCount(t,
+				"event_processing_latencies",
+				metricTags,
+				1,
+			)
+
 			switch {
 			case tc.expectedError:
 				assert.True(t, cloudevents.IsNACK(res), "dispatch result was %q", res.Error())
 
+				metricTags["user_managed"] = "true"
+				metricstest.CheckCountData(t,
+					"event_processing_error_count",
+					metricTags,
+					1,
+				)
+
 			case !tc.senderReady:
 				assert.Error(t, res, "Adapter sender not ready should lead to an error")
+
+				metricTags["user_managed"] = "true"
+				metricstest.CheckCountData(t,
+					"event_processing_error_count",
+					metricTags,
+					1,
+				)
 
 			default:
 				ceSent := ceClientSender.Sent()
 				require.Equal(t, 1, len(ceSent), "Produced an unexpected number of CloudEvents")
 				assert.Equal(t, tc.ce, ceSent[0], "CloudEvent received does not match produced")
+
+				metricstest.CheckCountData(t,
+					"event_processing_success_count",
+					metricTags,
+					1,
+				)
 			}
 		})
 	}
+}
+
+// OpenCensus metrics carry global state that need to be reset between unit tests.
+func resetMetrics(t *testing.T) {
+	t.Helper()
+
+	metricstest.Unregister(
+		"event_processing_success_count",
+		"event_processing_error_count",
+		"event_processing_latencies",
+	)
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	metricstest.AssertNoMetric(t,
+		"event_processing_success_count",
+		"event_processing_error_count",
+		"event_processing_latencies",
+	)
 }
