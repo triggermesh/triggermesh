@@ -28,11 +28,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/Azure/go-autorest/autorest/to"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+	"knative.dev/pkg/ptr"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
@@ -102,7 +102,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	if env.OutputContentType != "" {
 		adapter.defaultOutputContentType = &env.OutputContentType
 	} else {
-		adapter.defaultOutputContentType = to.StringPtr("application/json")
+		adapter.defaultOutputContentType = ptr.String("application/json")
 	}
 
 	return adapter
