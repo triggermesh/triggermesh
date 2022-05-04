@@ -28,6 +28,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/Azure/go-autorest/autorest/to"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
@@ -100,6 +101,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 	if env.OutputContentType != "" {
 		adapter.defaultOutputContentType = &env.OutputContentType
+	} else {
+		adapter.defaultOutputContentType = to.StringPtr("application/json")
 	}
 
 	return adapter
@@ -115,17 +118,19 @@ func (a *dataweaveTransformAdapter) Start(ctx context.Context) error {
 
 func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var err error
-	var tmpFile *os.File
-	var inputData []byte
-	var spell string
-	var inputContentType string
-	var outputContentType string
+	var sout bytes.Buffer
+	var serr bytes.Buffer
 
 	err = validateContentType(event.DataContentType(), event.Data())
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New(err.Error()), nil)
 	}
+
+	inputData := event.Data()
+	spell := a.defaultSpell
+	inputContentType := a.defaultInputContentType
+	outputContentType := a.defaultOutputContentType
 
 	req := &DataWeaveTransformationStructuredRequest{}
 	if err := event.DataAs(req); err != nil {
@@ -137,11 +142,6 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 			errors.New("it is not allowed to override Spell per CloudEvent"), nil)
 	}
 
-	if a.defaultSpell == nil && req.Spell == "" {
-		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-			errors.New("no default Spell or in request found"), nil)
-	}
-
 	if req.InputContentType != "" || req.OutputContentType != "" || req.Spell != "" {
 		if req.InputData == "" {
 			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
@@ -149,87 +149,73 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 		}
 	}
 
-	// Check for spellOverride to be enabled and all the parameters to be present.
-	if a.spellOverride && req.InputData != "" && req.InputContentType != "" && req.OutputContentType != "" && req.Spell != "" {
-		inputData = []byte(req.InputData)
-		spell = req.Spell
-		inputContentType = req.InputContentType
-		outputContentType = req.OutputContentType
+	if a.spellOverride {
+		if req.InputContentType != "" {
+			inputContentType = &req.InputContentType
+		}
 
-		// In the case that it receives the inputData in a dict instead of directly,
-		// it will use the default parameters present in the yaml and the inputData.
-	} else {
+		if req.OutputContentType != "" {
+			outputContentType = &req.OutputContentType
+		}
+
 		if req.InputData != "" {
 			inputData = []byte(req.InputData)
-		} else {
-			inputData = event.Data()
 		}
-		if a.defaultSpell != nil && a.defaultInputContentType != nil && a.defaultOutputContentType != nil {
-			spell = *a.defaultSpell
-			inputContentType = *a.defaultInputContentType
-			outputContentType = *a.defaultOutputContentType
+
+		if req.Spell != "" {
+			spell = &req.Spell
 		}
 	}
 
-	err = validateContentType(inputContentType, inputData)
-	if err != nil {
+	if inputContentType != nil && outputContentType != nil && inputData != nil && spell != nil {
+		err = validateContentType(*inputContentType, inputData)
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+				errors.New(err.Error()), nil)
+		}
+
+		errs := registerAndPopulateSpell(*spell, dwFolder)
+		if errs != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the spell")
+		}
+
+		cmd := exec.Command("dw", "--local-spell", dwFolder)
+		cmd.Env = append(cmd.Env, "DW_HOME="+path)
+		cmd.Env = append(cmd.Env, "DW_DEFAULT_INPUT_MIMETYPE="+*inputContentType)
+
+		cmd.Stdout = &sout
+		cmd.Stdin = bytes.NewReader([]byte(inputData))
+		cmd.Stderr = &serr
+
+		err = cmd.Run()
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
+		}
+
+		err = os.RemoveAll(dwFolder)
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the folder")
+		}
+
+		cleaned := bytes.Trim(sout.Bytes(), "Running local spell")
+		if err := event.SetData(*outputContentType, cleaned); err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+
+		event.SetType(event.Type() + ".response")
+		a.logger.Infof("responding with transformed event: %v", event.Type())
+		if a.sink != "" {
+			if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+				a.logger.Errorf("Error sending event to sink: %v", result)
+			}
+			return nil, cloudevents.ResultACK
+		}
+
+		return &event, cloudevents.ResultACK
+	} else {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-			errors.New(err.Error()), nil)
+			errors.New("parameters not found"), nil)
 	}
-
-	switch inputContentType {
-	case "application/json":
-		tmpFile, err = ioutil.TempFile(path, "*.json")
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the json file")
-		}
-
-	case "application/xml":
-		tmpFile, err = ioutil.TempFile(path, "*.xml")
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the xml file")
-		}
-	}
-
-	errs := registerAndPopulateSpell(spell, dwFolder)
-	if errs != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the spell")
-	}
-
-	if _, err := tmpFile.Write(inputData); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "writing to the file")
-	}
-
-	out, err := exec.Command("dw", "-i", "payload", tmpFile.Name(), "--local-spell", dwFolder).Output()
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
-	}
-
-	err = os.Remove(tmpFile.Name())
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the file")
-	}
-
-	err = os.RemoveAll(dwFolder)
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the folder")
-	}
-
-	cleaned := bytes.Trim(out, "Running local spell")
-	if err := event.SetData(outputContentType, cleaned); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
-	}
-
-	event.SetType(event.Type() + ".response")
-	a.logger.Infof("responding with transformed event: %v", event.Type())
-	if a.sink != "" {
-		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-			a.logger.Errorf("Error sending event to sink: %v", result)
-		}
-		return nil, cloudevents.ResultACK
-	}
-
-	return &event, cloudevents.ResultACK
 }
 
 // registerAndPopulateSpell create the DataWeave spell and populate.

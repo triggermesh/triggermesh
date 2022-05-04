@@ -45,6 +45,7 @@ var (
 // DataWeaveTransformationSpec defines the desired state of the component.
 type DataWeaveTransformationSpec struct {
 	// DataWeave spell that will be used by default for transformation.
+	// +optional
 	DwSpell *ValueFromField `json:"dwSpell,omitempty"`
 
 	// Whether the default DwSpell can be overriden at each event
@@ -52,9 +53,11 @@ type DataWeaveTransformationSpec struct {
 	AllowPerEventDwSpell *bool `json:"allowPerEventDwSpell,omitempty"`
 
 	// Content type for the incoming transformation.
+	// +optional
 	InputContentType *string `json:"inputContentType,omitempty"`
 
 	// Content type for transformation Output.
+	// +optional
 	OutputContentType *string `json:"outputContentType,omitempty"`
 
 	// Support sending to an event sink instead of replying.
