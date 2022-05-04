@@ -60,7 +60,7 @@ type CloudEventsTargetSpec struct {
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
-// CloudEventsCredentials to be used when sending  requests.
+// CloudEventsCredentials to be used when sending requests.
 type CloudEventsCredentials struct {
 	BasicAuth HTTPBasicAuth `json:"basicAuth,omitempty"`
 }
