@@ -55,11 +55,11 @@ func (cw *fakeFileWatcher) Add(path string, cb fs.WatchCallback) error {
 	return nil
 }
 
-func (ccw *fakeFileWatcher) DoCallback(path string) error {
-	ccw.m.RLock()
-	defer ccw.m.RUnlock()
+func (cw *fakeFileWatcher) DoCallback(path string) error {
+	cw.m.RLock()
+	defer cw.m.RUnlock()
 
-	cbs, ok := ccw.watchedFiles[path]
+	cbs, ok := cw.watchedFiles[path]
 	if !ok {
 		return fmt.Errorf("path %q is not being watched", path)
 	}
