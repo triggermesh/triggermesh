@@ -50,6 +50,9 @@ jobs:
         # use for a container registry.
         registry: 'false'
 
+    - name: Smoke test Eventing webhook
+      run: .github/workflows/scripts/smoke-test-eventing.sh
+
     - name: Read KinD network subnet
       id: kind-subnet
       run: |
@@ -68,7 +71,7 @@ jobs:
         kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
         kubectl -n metallb-system wait --timeout=1m --for=condition=Available deployments.apps/controller
 
-        cat <<'EOM' | kubectl create -f-
+        kubectl create -f - <<'EOM'
         apiVersion: v1
         kind: ConfigMap
         metadata:
