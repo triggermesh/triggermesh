@@ -26,10 +26,13 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	loggingtesting "knative.dev/pkg/logging/testing"
 
 	fakefs "github.com/triggermesh/triggermesh/pkg/adapter/fs/fake"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 func TestCloudEventsDispatch(t *testing.T) {
@@ -76,11 +79,19 @@ func TestCloudEventsDispatch(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
+
+			mt := &pkgadapter.MetricTag{
+				ResourceGroup: targets.CloudEventsTargetResource.String(),
+				Namespace:     "ns-test",
+				Name:          "name-test",
+			}
+
 			adapter := &ceAdapter{
 				fileWatcher:  fakefs.NewFileWatcher(),
 				listenClient: adaptertest.NewTestClient(),
 				logger:       logger,
 				m:            sync.RWMutex{},
+				sr:           metrics.MustNewEventProcessingStatsReporter(mt),
 			}
 
 			var ceClientSender *adaptertest.TestCloudEventsClient = nil

@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"os"
 	"sync"
+	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cehttp "github.com/cloudevents/sdk-go/v2/protocol/http"
@@ -31,6 +32,9 @@ import (
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // NewTarget adapter implementation
@@ -47,10 +51,19 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, listenC
 		logger.Panicw("Could not create a file watcher", zap.Error(err))
 	}
 
+	metrics.MustRegisterEventProcessingStatsView()
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.CloudEventsTargetResource.String(),
+		Namespace:     env.GetNamespace(),
+		Name:          env.GetName(),
+	}
+
 	ceAdapter := &ceAdapter{
 		listenClient: listenClient,
 		logger:       logging.FromContext(ctx),
 		m:            sync.RWMutex{},
+		sr:           metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 
 	ceClientUpdater := ceAdapter.senderClientUpdater(env.URL, env.BasicAuthPasswordPath, env.BasicAuthUsername)
@@ -79,6 +92,7 @@ type ceAdapter struct {
 
 	logger *zap.SugaredLogger
 	m      sync.RWMutex
+	sr     *metrics.EventProcessingStatsReporter
 }
 
 func (a *ceAdapter) senderClientUpdater(url, path, username string) fs.WatchCallback {
@@ -131,17 +145,27 @@ func (a *ceAdapter) Start(ctx context.Context) error {
 }
 
 func (a *ceAdapter) dispatch(ctx context.Context, event cloudevents.Event) cloudevents.Result {
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
+	start := time.Now()
+	defer func() {
+		a.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
+	}()
+
 	// When using authentication sender client is initialized using the file watcher.
 	// This check fails if the authentication secrets are not yet present and the
 	// client has not been built.
 	if a.senderClient == nil {
 		err := fmt.Errorf("CloudEvents client not intialized. Please, make sure that authentication secret is available")
 		a.logger.Errorw("Failed to send event", zap.Error(err))
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return err
 	}
 
 	r := a.senderClient.Send(ctx, event)
 	if cloudevents.IsNACK(r) {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		a.logger.Errorw("Could not send event to destination", zap.Error(r))
 	}
 	return r
