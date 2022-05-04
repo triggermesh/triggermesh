@@ -60,11 +60,24 @@ jobs:
           ${{ github.job }}-${{ runner.os }}-go-
 
     - name: Lint Kubernetes manifests
+      id: yamllint
       uses: ibiqlik/action-yamllint@v3
       with:
         file_or_dir: config/
         config_file: .github/workflows/config/yamllint-k8s.yaml
         format: github
+
+    # (hack) By default, errors are reported to the GitHub commit view only (or
+    # the "Files changed" tab on PRs).
+    # In case errors were found, run the linter a second time but don't direct
+    # the output to GitHub, so that they are also visible in the execution logs
+    # of the workflow, with line numbers.
+    - name: Lint Kubernetes manifests (debug)
+      if: failure() && steps.yamllint.outcome == 'failure'
+      uses: ibiqlik/action-yamllint@v3
+      with:
+        file_or_dir: config/
+        config_file: .github/workflows/config/yamllint-k8s.yaml
 
     - name: RBAC rules consistency
       run: |
