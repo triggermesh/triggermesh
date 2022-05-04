@@ -82,7 +82,7 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 
 	options = append(options,
 		resource.EnvVars(makeAppEnv(typedTrg)...),
-		// make sure that a non optional parameters is located as the last element
+		// make sure that a non optional parameter is located as the last element
 		// to avoid derivative compoarisons issues when the environemnt variables
 		// tail element is removed.
 		resource.Image(r.adapterCfg.Image),
