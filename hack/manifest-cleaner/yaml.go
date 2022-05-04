@@ -17,10 +17,12 @@ limitations under the License.
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
 	"regexp"
+	"strings"
 
 	"github.com/dprotaso/go-yit"
 	"gopkg.in/yaml.v3"
@@ -122,4 +124,89 @@ func nullDocument(n *yaml.Node) bool {
 		return false
 	}
 	return len(n.Content) == 0 || n.Content[0].Tag == "!!null"
+}
+
+const rbacCheckTag = "rbac-check"
+
+// filterOutRBACCheckTags returns the given list of YAML nodes with all nested
+// rbac-check tags filtered out.
+func filterOutRBACCheckTags(docs []*yaml.Node) []*yaml.Node {
+	it := nodesWithRBACCheckTag(docs...)
+
+	for node, ok := it(); ok; node, ok = it() {
+		*node = *removeRBACCHeckTags(node)
+	}
+
+	return docs
+}
+
+// nodesWithRBACCheckTag returns an iterator which visits all sub-nodes tagged
+// with '+rbac-check'.
+func nodesWithRBACCheckTag(docs ...*yaml.Node) yit.Iterator {
+	return yit.FromNodes(docs...).
+		RecurseNodes().
+		Filter(withRBACCheckTag)
+}
+
+// withRBACCheckTag is a yit.Predicate which matches on nodes tagged with '+rbac-check'.
+func withRBACCheckTag(node *yaml.Node) bool {
+	if node.HeadComment == "" {
+		return false
+	}
+
+	r := bufio.NewReader(strings.NewReader(node.HeadComment))
+	for {
+		line, err := r.ReadString('\n')
+
+		if isRBACCheckTagLine(line) {
+			return true
+		}
+
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			// erroring while reading a string buffer is unlikely,
+			// so we panic instead of returning the error to
+			// simplify error handling in callers
+			panic(fmt.Errorf("reading line from Reader: %w", err))
+		}
+	}
+
+	return false
+}
+
+// removeRBACCHeckTags returns the given YAML node with '+rbac-check' tags
+// removed from its head comment.
+func removeRBACCHeckTags(node *yaml.Node) *yaml.Node {
+	var b strings.Builder
+
+	r := bufio.NewReader(strings.NewReader(node.HeadComment))
+	for {
+		line, err := r.ReadString('\n')
+
+		if !isRBACCheckTagLine(line) {
+			b.WriteString(line)
+		}
+
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			// erroring while reading a string buffer is unlikely,
+			// so we panic instead of returning the error to
+			// simplify error handling in callers
+			panic(fmt.Errorf("reading line from Reader: %w", err))
+		}
+	}
+
+	node.HeadComment = strings.TrimRight(b.String(), "\n")
+
+	return node
+}
+
+// isRBACCheckTagLine returns whether the given line is identified as a
+// '+rbac-check' tag.
+func isRBACCheckTagLine(line string) bool {
+	return strings.HasPrefix(strings.TrimLeft(strings.TrimPrefix(line, "#"), " "), "+"+rbacCheckTag)
 }
