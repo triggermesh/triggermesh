@@ -45,7 +45,7 @@ func TestCloudEventsDispatch(t *testing.T) {
 	eventRight.SetTime(time.Now())
 
 	// Using the event type `unit.sendFail` makes the event fail when being sent.
-	// See:  https://github.com/knative/eventing/blob/ec36c8637ddef2333fdc80bff8a963ffcfcc5059/pkg/adapter/v2/test/test_client.go#L67-L95
+	// See: https://github.com/knative/eventing/blob/ec36c8637ddef2333fdc80bff8a963ffcfcc5059/pkg/adapter/v2/test/test_client.go#L67-L95
 	eventWrong := cloudevents.NewEvent(cloudevents.VersionV1)
 	eventWrong.SetType("unit.sendFail")
 	eventWrong.SetSource("source")
