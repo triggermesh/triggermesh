@@ -167,55 +167,55 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 		}
 	}
 
-	if inputContentType != nil && outputContentType != nil && inputData != nil && spell != nil {
-		err = validateContentType(*inputContentType, inputData)
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
-				errors.New(err.Error()), nil)
-		}
-
-		errs := registerAndPopulateSpell(*spell, dwFolder)
-		if errs != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the spell")
-		}
-
-		cmd := exec.Command("dw", "--local-spell", dwFolder)
-		cmd.Env = append(cmd.Env, "DW_HOME="+path)
-		cmd.Env = append(cmd.Env, "DW_DEFAULT_INPUT_MIMETYPE="+*inputContentType)
-
-		cmd.Stdout = &sout
-		cmd.Stdin = bytes.NewReader([]byte(inputData))
-		cmd.Stderr = &serr
-
-		err = cmd.Run()
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
-		}
-
-		err = os.RemoveAll(dwFolder)
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the folder")
-		}
-
-		cleaned := bytes.Trim(sout.Bytes(), "Running local spell")
-		if err := event.SetData(*outputContentType, cleaned); err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
-		}
-
-		event.SetType(event.Type() + ".response")
-		a.logger.Infof("responding with transformed event: %v", event.Type())
-		if a.sink != "" {
-			if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-				a.logger.Errorf("Error sending event to sink: %v", result)
-			}
-			return nil, cloudevents.ResultACK
-		}
-
-		return &event, cloudevents.ResultACK
-	} else {
+	if inputContentType == nil || outputContentType == nil || inputData == nil || spell == nil {
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("parameters not found"), nil)
 	}
+
+	err = validateContentType(*inputContentType, inputData)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			errors.New(err.Error()), nil)
+	}
+
+	errs := registerAndPopulateSpell(*spell, dwFolder)
+	if errs != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the spell")
+	}
+
+	cmd := exec.Command("dw", "--local-spell", dwFolder)
+	cmd.Env = append(cmd.Env, "DW_HOME="+path)
+	cmd.Env = append(cmd.Env, "DW_DEFAULT_INPUT_MIMETYPE="+*inputContentType)
+
+	cmd.Stdout = &sout
+	cmd.Stdin = bytes.NewReader([]byte(inputData))
+	cmd.Stderr = &serr
+
+	err = cmd.Run()
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
+	}
+
+	err = os.RemoveAll(dwFolder)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the folder")
+	}
+
+	cleaned := bytes.Trim(sout.Bytes(), "Running local spell")
+	if err := event.SetData(*outputContentType, cleaned); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+	}
+
+	event.SetType(event.Type() + ".response")
+	a.logger.Infof("responding with transformed event: %v", event.Type())
+	if a.sink != "" {
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			a.logger.Errorf("Error sending event to sink: %v", result)
+		}
+		return nil, cloudevents.ResultACK
+	}
+
+	return &event, cloudevents.ResultACK
 }
 
 // registerAndPopulateSpell create the DataWeave spell and populate.
