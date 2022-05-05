@@ -152,7 +152,7 @@ spec:
                   - s3:Replication:OperationReplicatedAfterThreshold
               destination:
                 description: The intermediate destination of notifications originating from the Amazon S3 bucket, before
-                  they are retrieved by TriggerMesh. If omitted, an Amazon SQS queue is automatically created and
+                  they are retrieved by this event source. If omitted, an Amazon SQS queue is automatically created and
                   associated with the bucket.
                 type: object
                 properties:

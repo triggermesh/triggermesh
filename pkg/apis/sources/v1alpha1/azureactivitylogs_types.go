@@ -52,7 +52,7 @@ type AzureActivityLogsSourceSpec struct {
 	SubscriptionID string `json:"subscriptionID"`
 
 	// The intermediate destination of activity logs, before they are
-	// retrieved by TriggerMesh.
+	// retrieved by this event source.
 	Destination AzureActivityLogsSourceDestination `json:"destination"`
 
 	// Categories of Activity Logs to collect.

@@ -115,7 +115,8 @@ spec:
                 format: guid
                 pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
               destination:
-                description: The intermediate destination of activity logs, before they are retrieved by TriggerMesh.
+                description: The intermediate destination of activity logs, before they are retrieved by this event
+                  source.
                 type: object
                 properties:
                   eventHubs:

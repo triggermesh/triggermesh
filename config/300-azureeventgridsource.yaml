@@ -133,7 +133,7 @@ spec:
                   type: string
               endpoint:
                 description: The intermediate destination of events subscribed via Event Grid, before they are retrieved
-                  by TriggerMesh.
+                  by this event source.
                 type: object
                 properties:
                   eventHubs:
