@@ -39,10 +39,11 @@ type AWSPerformanceInsightsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSPerformanceInsightsSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSPerformanceInsightsSource)(nil)
-	_ v1alpha1.EventSource         = (*AWSPerformanceInsightsSource)(nil)
-	_ v1alpha1.EventSender         = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.EventSource            = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.EventSender            = (*AWSPerformanceInsightsSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSPerformanceInsightsSource)(nil)
 )
 
 // AWSPerformanceInsightsSourceSpec defines the desired state of the event source.

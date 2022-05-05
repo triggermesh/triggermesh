@@ -20,8 +20,6 @@ import (
 	"sort"
 	"strings"
 
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -123,11 +121,7 @@ func (s *AWSS3Source) ServiceAccountOptions() []resource.ServiceAccountOption {
 	var saOpts []resource.ServiceAccountOption
 
 	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
-		setIAMRoleAnnotation := func(sa *corev1.ServiceAccount) {
-			metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationEksIAMRole, iamRole.String())
-		}
-
-		saOpts = append(saOpts, setIAMRoleAnnotation)
+		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
 	}
 
 	return saOpts
