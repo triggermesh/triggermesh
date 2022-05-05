@@ -79,7 +79,7 @@ func newEventSource() *v1alpha1.GoogleCloudSourceRepositoriesSource {
 				Collection: "repos",
 				Resource:   "my-repo",
 			},
-			PubSub: v1alpha1.GoogleCloudSourceRepositoriesSourcePubSubSpec{
+			PubSub: v1alpha1.GoogleCloudSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
 			ServiceAccountKey: commonv1alpha1.ValueFromField{

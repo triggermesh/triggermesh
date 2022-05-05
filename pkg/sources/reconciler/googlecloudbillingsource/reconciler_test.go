@@ -76,7 +76,7 @@ func newEventSource() *v1alpha1.GoogleCloudBillingSource {
 		Spec: v1alpha1.GoogleCloudBillingSourceSpec{
 			BillingAccountID: "my-billing-account-id",
 			BudgetID:         "my-budget-id",
-			PubSub: v1alpha1.GoogleCloudBillingSourcePubSubSpec{
+			PubSub: v1alpha1.GoogleCloudSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
 			ServiceAccountKey: commonv1alpha1.ValueFromField{

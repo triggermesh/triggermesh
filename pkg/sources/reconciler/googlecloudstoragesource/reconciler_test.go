@@ -75,7 +75,7 @@ func newEventSource() *v1alpha1.GoogleCloudStorageSource {
 	src := &v1alpha1.GoogleCloudStorageSource{
 		Spec: v1alpha1.GoogleCloudStorageSourceSpec{
 			Bucket: "my-bucket",
-			PubSub: v1alpha1.GoogleCloudStorageSourcePubSubSpec{
+			PubSub: v1alpha1.GoogleCloudSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
 			ServiceAccountKey: commonv1alpha1.ValueFromField{

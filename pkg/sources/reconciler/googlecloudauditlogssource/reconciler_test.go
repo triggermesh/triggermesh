@@ -76,7 +76,7 @@ func newEventSource() *v1alpha1.GoogleCloudAuditLogsSource {
 		Spec: v1alpha1.GoogleCloudAuditLogsSourceSpec{
 			ServiceName: "my-service",
 			MethodName:  "my-method",
-			PubSub: v1alpha1.GoogleCloudAuditLogsSourcePubSubSpec{
+			PubSub: v1alpha1.GoogleCloudSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
 			ServiceAccountKey: commonv1alpha1.ValueFromField{
