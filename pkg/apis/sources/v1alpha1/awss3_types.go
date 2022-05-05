@@ -68,7 +68,7 @@ type AWSS3SourceSpec struct {
 	EventTypes []string `json:"eventTypes"`
 
 	// The intermediate destination of notifications originating from the
-	// Amazon S3 bucket, before they are retrieved by TriggerMesh.
+	// Amazon S3 bucket, before they are retrieved by this event source.
 	// If omitted, an Amazon SQS queue is automatically created and
 	// associated with the bucket.
 	// +optional

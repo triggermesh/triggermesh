@@ -71,7 +71,7 @@ type AzureEventGridSourceSpec struct {
 	EventTypes []string `json:"eventTypes,omitempty"`
 
 	// The intermediate destination of events subscribed via Event Grid,
-	// before they are retrieved by TriggerMesh.
+	// before they are retrieved by this event source.
 	Endpoint AzureEventGridSourceEndpoint `json:"endpoint"`
 
 	// Authentication method to interact with the Azure REST API.

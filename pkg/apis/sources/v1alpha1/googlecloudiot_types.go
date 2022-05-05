@@ -75,9 +75,10 @@ type GoogleCloudIoTSourcePubSubSpec struct {
 	// Optional: no more than one of the following may be specified.
 
 	// Full resource name of the Pub/Sub topic where change notifications
-	// originating from the configured IoT Registry are sent to. If not supplied,
-	// a topic is created on behalf of the user, in the GCP project
-	// referenced by the Project attribute.
+	// originating from the configured IoT Registry are sent to, before
+	// being retrieved by this event source. If not supplied, a topic is
+	// created on behalf of the user, in the GCP project referenced by the
+	// Project attribute.
 	//
 	// The expected format is described at https://cloud.google.com/pubsub/docs/admin#resource_names:
 	//   "projects/{project_name}/topics/{topic_name}"
