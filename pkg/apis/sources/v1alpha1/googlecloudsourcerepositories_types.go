@@ -52,7 +52,7 @@ type GoogleCloudSourceRepositoriesSourceSpec struct {
 	Repository GCloudResourceName `json:"repository"`
 
 	// Settings related to the Pub/Sub resources associated with the repo events.
-	PubSub GoogleCloudSourceRepositoriesSourcePubSubSpec `json:"pubsub"`
+	PubSub GoogleCloudSourcePubSubSpec `json:"pubsub"`
 
 	// Email address of the service account used for publishing
 	// notifications to Pub/Sub. This service account needs to be in the
@@ -73,33 +73,6 @@ type GoogleCloudSourceRepositoriesSourceSpec struct {
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
-}
-
-// GoogleCloudSourceRepositoriesSourcePubSubSpec defines the attributes related to the
-// configuration of Pub/Sub resources.
-type GoogleCloudSourceRepositoriesSourcePubSubSpec struct {
-	// Optional: no more than one of the following may be specified.
-
-	// Full resource name of the Pub/Sub topic where change notifications
-	// originating from the configured sink are sent to, before being
-	// retrieved by this event source. If not supplied, a topic is created
-	// on behalf of the user, in the GCP project referenced by the Project
-	// attribute.
-	//
-	// The expected format is described at https://cloud.google.com/pubsub/docs/admin#resource_names:
-	//   "projects/{project_name}/topics/{topic_name}"
-	//
-	// +optional
-	Topic *GCloudResourceName `json:"topic,omitempty"`
-
-	// Name of the GCP project where Pub/Sub resources associated with the
-	// Cloud repo are to be created.
-	//
-	// Mutually exclusive with Topic which, if supplied, already contains
-	// the project name.
-	//
-	// +optional
-	Project *string `json:"project,omitempty"`
 }
 
 // GoogleCloudSourceRepositoriesSourceStatus defines the observed state of the event source.

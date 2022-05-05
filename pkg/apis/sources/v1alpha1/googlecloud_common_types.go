@@ -135,3 +135,30 @@ func (e *errParseGCloudResourceName) Error() string {
 	return fmt.Sprintf("Resource name %q does not match expected format %q",
 		e.gotInput, gcloudResourceNameFormat)
 }
+
+// GoogleCloudSourcePubSubSpec defines the attributes related to the
+// configuration of Pub/Sub resources.
+type GoogleCloudSourcePubSubSpec struct {
+	// Optional: no more than one of the following may be specified.
+
+	// Full resource name of the Pub/Sub topic where messages/notifications
+	// originating from the configured Google Cloud resource are sent to,
+	// before being retrieved by this event source. If not supplied, a
+	// topic is created on behalf of the user, in the GCP project
+	// referenced by the Project attribute.
+	//
+	// The expected format is described at https://cloud.google.com/pubsub/docs/admin#resource_names:
+	//   "projects/{project_name}/topics/{topic_name}"
+	//
+	// +optional
+	Topic *GCloudResourceName `json:"topic,omitempty"`
+
+	// Name of the GCP project where Pub/Sub resources associated with the
+	// configured Google Cloud resource are to be created.
+	//
+	// Mutually exclusive with Topic which, if supplied, already contains
+	// the project name.
+	//
+	// +optional
+	Project *string `json:"project,omitempty"`
+}

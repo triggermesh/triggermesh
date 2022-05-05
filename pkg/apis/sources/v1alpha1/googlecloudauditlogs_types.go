@@ -68,7 +68,7 @@ type GoogleCloudAuditLogsSourceSpec struct {
 	ResourceName *string `json:"resourceName,omitempty"`
 
 	// Settings related to the Pub/Sub resources associated with the Audit Logs event sink.
-	PubSub GoogleCloudAuditLogsSourcePubSubSpec `json:"pubsub"`
+	PubSub GoogleCloudSourcePubSubSpec `json:"pubsub"`
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
@@ -77,33 +77,6 @@ type GoogleCloudAuditLogsSourceSpec struct {
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
-}
-
-// GoogleCloudAuditLogsSourcePubSubSpec defines the attributes related to the
-// configuration of Pub/Sub resources.
-type GoogleCloudAuditLogsSourcePubSubSpec struct {
-	// Optional: no more than one of the following may be specified.
-
-	// Full resource name of the Pub/Sub topic where change notifications
-	// originating from the configured sink are sent to, before being
-	// retrieved by this event source. If not supplied, a topic is created
-	// on behalf of the user, in the GCP project referenced by the Project
-	// attribute.
-	//
-	// The expected format is described at https://cloud.google.com/pubsub/docs/admin#resource_names:
-	//   "projects/{project_name}/topics/{topic_name}"
-	//
-	// +optional
-	Topic *GCloudResourceName `json:"topic,omitempty"`
-
-	// Name of the GCP project where Pub/Sub resources associated with the
-	// Cloud Audit log are to be created.
-	//
-	// Mutually exclusive with Topic which, if supplied, already contains
-	// the project name.
-	//
-	// +optional
-	Project *string `json:"project,omitempty"`
 }
 
 // GoogleCloudAuditLogsSourceStatus defines the observed state of the event source.

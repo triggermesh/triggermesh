@@ -80,7 +80,7 @@ func newEventSource() *v1alpha1.GoogleCloudIoTSource {
 				Collection: "registries",
 				Resource:   "my-registry",
 			},
-			PubSub: v1alpha1.GoogleCloudIoTSourcePubSubSpec{
+			PubSub: v1alpha1.GoogleCloudSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
 			ServiceAccountKey: commonv1alpha1.ValueFromField{
