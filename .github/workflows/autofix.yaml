@@ -5,8 +5,8 @@ on:
     workflows:
       - Generated Files
       - OSS Licenses
-    types:
-      - completed
+    types: [ completed ]
+    branches: [ dependabot/go_modules/** ]
 
 jobs:
 
