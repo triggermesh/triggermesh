@@ -37,7 +37,7 @@ type CachedFileWatcher interface {
 }
 
 type cachedFileWatcher struct {
-	cw           *FileWatcher
+	cw           FileWatcher
 	watchedFiles map[string][]byte
 
 	m      sync.RWMutex

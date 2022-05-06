@@ -62,6 +62,7 @@ resources:
 - config/301-awssnstarget.yaml
 - config/301-awssqstarget.yaml
 - config/301-azureeventhubstarget.yaml
+- config/301-cloudeventstarget.yaml
 - config/301-confluenttarget.yaml
 - config/301-datadogtarget.yaml
 - config/301-elasticsearchtarget.yaml

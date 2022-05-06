@@ -98,6 +98,14 @@ type AzureEventHubsTargetListerExpansion interface{}
 // AzureEventHubsTargetNamespaceLister.
 type AzureEventHubsTargetNamespaceListerExpansion interface{}
 
+// CloudEventsTargetListerExpansion allows custom methods to be added to
+// CloudEventsTargetLister.
+type CloudEventsTargetListerExpansion interface{}
+
+// CloudEventsTargetNamespaceListerExpansion allows custom methods to be added to
+// CloudEventsTargetNamespaceLister.
+type CloudEventsTargetNamespaceListerExpansion interface{}
+
 // ConfluentTargetListerExpansion allows custom methods to be added to
 // ConfluentTargetLister.
 type ConfluentTargetListerExpansion interface{}

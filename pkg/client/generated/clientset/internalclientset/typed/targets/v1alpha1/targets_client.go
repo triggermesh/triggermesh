@@ -36,6 +36,7 @@ type TargetsV1alpha1Interface interface {
 	AWSSQSTargetsGetter
 	AlibabaOSSTargetsGetter
 	AzureEventHubsTargetsGetter
+	CloudEventsTargetsGetter
 	ConfluentTargetsGetter
 	DatadogTargetsGetter
 	ElasticsearchTargetsGetter
@@ -104,6 +105,10 @@ func (c *TargetsV1alpha1Client) AlibabaOSSTargets(namespace string) AlibabaOSSTa
 
 func (c *TargetsV1alpha1Client) AzureEventHubsTargets(namespace string) AzureEventHubsTargetInterface {
 	return newAzureEventHubsTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) CloudEventsTargets(namespace string) CloudEventsTargetInterface {
+	return newCloudEventsTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) ConfluentTargets(namespace string) ConfluentTargetInterface {

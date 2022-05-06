@@ -29,7 +29,12 @@ import (
 type WatchCallback func()
 
 // FileWatcher object tracks changes to files.
-type FileWatcher struct {
+type FileWatcher interface {
+	Add(path string, cb WatchCallback) error
+	Start(ctx context.Context)
+}
+
+type fileWatcher struct {
 	watcher      *fsnotify.Watcher
 	watchedFiles map[string][]WatchCallback
 
@@ -40,13 +45,13 @@ type FileWatcher struct {
 
 // NewWatcher creates a new FileWatcher object that register files
 // and calls back when they change.
-func NewWatcher(logger *zap.SugaredLogger) (*FileWatcher, error) {
+func NewWatcher(logger *zap.SugaredLogger) (FileWatcher, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
 	}
 
-	return &FileWatcher{
+	return &fileWatcher{
 		watcher:      watcher,
 		watchedFiles: make(map[string][]WatchCallback),
 		logger:       logger,
@@ -54,7 +59,7 @@ func NewWatcher(logger *zap.SugaredLogger) (*FileWatcher, error) {
 }
 
 // Add path/callback tuple to the  FileWatcher.
-func (cw *FileWatcher) Add(path string, cb WatchCallback) error {
+func (cw *fileWatcher) Add(path string, cb WatchCallback) error {
 	cw.m.Lock()
 	defer cw.m.Unlock()
 
@@ -71,7 +76,7 @@ func (cw *FileWatcher) Add(path string, cb WatchCallback) error {
 }
 
 // Start the FileWatcher process.
-func (cw *FileWatcher) Start(ctx context.Context) {
+func (cw *fileWatcher) Start(ctx context.Context) {
 	cw.start.Do(func() {
 		// Do not block, exit on context done.
 		go func() {
