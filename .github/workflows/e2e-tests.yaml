@@ -50,9 +50,6 @@ jobs:
         # use for a container registry.
         registry: 'false'
 
-    - name: Smoke test Eventing webhook
-      run: .github/workflows/scripts/smoke-test-eventing.sh
-
     - name: Read KinD network subnet
       id: kind-subnet
       run: |
