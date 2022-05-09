@@ -32,17 +32,24 @@ import (
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+	"knative.dev/pkg/ptr"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
+const (
+	path     = "/tmp/dw"
+	dwFolder = path + "/custom"
+)
+
 var _ pkgadapter.Adapter = (*dataweaveTransformAdapter)(nil)
 
 type dataweaveTransformAdapter struct {
-	spell               string
-	incomingContentType string
-	outputContentType   string
+	defaultSpell             *string
+	defaultInputContentType  *string
+	defaultOutputContentType *string
+	spellOverride            bool
 
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
@@ -63,6 +70,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
+	if err := env.validate(); err != nil {
+		logger.Panicf("Configuration error: %v", err)
+	}
+
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
 		targetce.ReplierWithStaticDataContentType(cloudevents.ApplicationXML),
@@ -73,14 +84,25 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	adapter := &dataweaveTransformAdapter{
-		spell:               env.DwSpell,
-		incomingContentType: env.IncomingContentType,
-		outputContentType:   env.OutputContentType,
-		replier:             replier,
-		ceClient:            ceClient,
-		logger:              logger,
-		mt:                  mt,
-		sink:                env.Sink,
+		spellOverride: env.AllowDwSpellOverride,
+
+		replier:  replier,
+		ceClient: ceClient,
+		logger:   logger,
+		mt:       mt,
+		sink:     env.Sink,
+	}
+
+	if env.DwSpell != "" {
+		adapter.defaultSpell = &env.DwSpell
+	}
+	if env.InputContentType != "" {
+		adapter.defaultInputContentType = &env.InputContentType
+	}
+	if env.OutputContentType != "" {
+		adapter.defaultOutputContentType = &env.OutputContentType
+	} else {
+		adapter.defaultOutputContentType = ptr.String("application/json")
 	}
 
 	return adapter
@@ -96,51 +118,82 @@ func (a *dataweaveTransformAdapter) Start(ctx context.Context) error {
 
 func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	var err error
-	var tmpfile *os.File
-	path := "/tmp/dw"
-	dwFolder := path + "/custom"
+	var sout bytes.Buffer
+	var serr bytes.Buffer
 
-	switch a.incomingContentType {
-	case "application/json":
-		if !isValidJSON(event.Data()) {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing,
-				errors.New("invalid Json"), nil)
-		}
-		tmpfile, err = ioutil.TempFile(path, "*.json")
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the json file")
-		}
-	case "application/xml":
-		if !isValidXML(event.Data()) {
-			return a.replier.Error(&event, targetce.ErrorCodeRequestParsing,
-				errors.New("invalid XML"), nil)
-		}
-		tmpfile, err = ioutil.TempFile(path, "*.xml")
-		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the xml file")
-		}
-	default:
-		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing,
-			errors.New("unexpected type for the incoming event"), nil)
+	err = validateContentType(event.DataContentType(), event.Data())
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			errors.New(err.Error()), nil)
 	}
 
-	errs := registerAndPopulateSpell(a.spell, dwFolder)
+	inputData := event.Data()
+	spell := a.defaultSpell
+	inputContentType := a.defaultInputContentType
+	outputContentType := a.defaultOutputContentType
+
+	req := &DataWeaveTransformationStructuredRequest{}
+	if err := event.DataAs(req); err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
+	}
+
+	if !a.spellOverride && req.Spell != "" {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			errors.New("it is not allowed to override Spell per CloudEvent"), nil)
+	}
+
+	if req.InputContentType != "" || req.OutputContentType != "" || req.Spell != "" {
+		if req.InputData == "" {
+			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+				errors.New("inputData not found"), nil)
+		}
+	}
+
+	if a.spellOverride {
+		if req.InputContentType != "" {
+			inputContentType = &req.InputContentType
+		}
+
+		if req.OutputContentType != "" {
+			outputContentType = &req.OutputContentType
+		}
+
+		if req.InputData != "" {
+			inputData = []byte(req.InputData)
+		}
+
+		if req.Spell != "" {
+			spell = &req.Spell
+		}
+	}
+
+	if inputContentType == nil || outputContentType == nil || inputData == nil || spell == nil {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			errors.New("parameters not found"), nil)
+	}
+
+	err = validateContentType(*inputContentType, inputData)
+	if err != nil {
+		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
+			errors.New(err.Error()), nil)
+	}
+
+	errs := registerAndPopulateSpell(*spell, dwFolder)
 	if errs != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the spell")
 	}
 
-	if _, err := tmpfile.Write(event.Data()); err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "writing to the file")
-	}
+	cmd := exec.Command("dw", "--local-spell", dwFolder)
+	cmd.Env = append(cmd.Env, "DW_HOME="+path)
+	cmd.Env = append(cmd.Env, "DW_DEFAULT_INPUT_MIMETYPE="+*inputContentType)
 
-	out, err := exec.Command("dw", "-i", "payload", tmpfile.Name(), "--local-spell", dwFolder).Output()
+	cmd.Stdout = &sout
+	cmd.Stdin = bytes.NewReader([]byte(inputData))
+	cmd.Stderr = &serr
+
+	err = cmd.Run()
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
-	}
-
-	err = os.Remove(tmpfile.Name())
-	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the file")
 	}
 
 	err = os.RemoveAll(dwFolder)
@@ -148,8 +201,8 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the folder")
 	}
 
-	cleaned := bytes.Trim(out, "Running local spell")
-	if err := event.SetData(a.outputContentType, cleaned); err != nil {
+	cleaned := bytes.Trim(sout.Bytes(), "Running local spell")
+	if err := event.SetData(*outputContentType, cleaned); err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
@@ -184,4 +237,20 @@ func isValidXML(data []byte) bool {
 
 func isValidJSON(data []byte) bool {
 	return json.Unmarshal(data, new(interface{})) == nil
+}
+
+func validateContentType(contentType string, data []byte) error {
+	switch contentType {
+	case "application/json":
+		if !isValidJSON(data) {
+			return errors.New("invalid Json")
+		}
+	case "application/xml":
+		if !isValidXML(data) {
+			return errors.New("invalid XML")
+		}
+	default:
+		return errors.New("unexpected type for the incoming event")
+	}
+	return nil
 }

@@ -17,7 +17,8 @@ kind: DataWeaveTransformation
 metadata:
   name: hello-dw
 spec:
-  dw_spell:
+  allowPerEventDwSpell: true
+  dwSpell:
     value: |-
       %dw 2.0
       output application/json
@@ -27,8 +28,8 @@ spec:
             (upper(key)): value
             }
       }
-  incoming_content_type: application/json
-  output_content_type: application/json
+  inputContentType: application/json
+  outputContentType: application/json
   sink:
     ref:
       apiVersion: serving.knative.dev/v1

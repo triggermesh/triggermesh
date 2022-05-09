@@ -25,6 +25,11 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
+// Managed event types
+const (
+	EventTypeDataWeaveTransformation = "io.triggermesh.dataweave.transform"
+)
+
 // GetGroupVersionKind implements kmeta.OwnerRefable.
 func (*DataWeaveTransformation) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("DataWeaveTransformation")

@@ -17,6 +17,8 @@ limitations under the License.
 package dataweavetransformation
 
 import (
+	"strconv"
+
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -30,9 +32,10 @@ import (
 )
 
 const (
-	envDWSPELL             = "DATAWEAVETRANSFORMATION_DWSPELL"
-	envIncomingContentType = "DATAWEAVETRANSFORMATION_INCOMING_CONTENT_TYPE"
-	envOutputContentType   = "DATAWEAVETRANSFORMATION_OUTPUT_CONTENT_TYPE"
+	envDWSPELL            = "DATAWEAVETRANSFORMATION_DWSPELL"
+	envInputContentType   = "DATAWEAVETRANSFORMATION_INPUT_CONTENT_TYPE"
+	envOutputContentType  = "DATAWEAVETRANSFORMATION_OUTPUT_CONTENT_TYPE"
+	envAllowSpellOverride = "DATAWEAVETRANSFORMATION_ALLOW_SPELL_OVERRIDE"
 )
 
 // adapterConfig contains properties used to configure the component's adapter.
@@ -65,14 +68,26 @@ func makeAppEnv(o *v1alpha1.DataWeaveTransformation) []corev1.EnvVar {
 			Name:  common.EnvBridgeID,
 			Value: common.GetStatefulBridgeID(o),
 		},
-		{
-			Name:  envIncomingContentType,
-			Value: o.Spec.IncomingContentType,
-		},
-		{
+	}
+
+	if o.Spec.AllowPerEventDwSpell != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envAllowSpellOverride,
+			Value: strconv.FormatBool(*o.Spec.AllowPerEventDwSpell),
+		})
+	}
+
+	if o.Spec.InputContentType != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envInputContentType,
+			Value: *o.Spec.InputContentType,
+		})
+	}
+	if o.Spec.OutputContentType != nil {
+		env = append(env, corev1.EnvVar{
 			Name:  envOutputContentType,
-			Value: o.Spec.OutputContentType,
-		},
+			Value: *o.Spec.OutputContentType,
+		})
 	}
 
 	return env
