@@ -17,7 +17,7 @@ rules:
   # Long words, such as URLs, tokens and some identifiers, are non-breakable
   # and should not trigger errors.
   line-length:
-    max: 120
+    max: 300
     allow-non-breakable-inline-mappings: true
 
   # Our manifests don't include directives, so we don't use the "---" marker to
