@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -35,6 +36,7 @@ import (
 	"knative.dev/pkg/ptr"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -54,8 +56,10 @@ type dataweaveTransformAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
-	mt       *pkgadapter.MetricTag
 	sink     string
+
+	mt *pkgadapter.MetricTag
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // NewTarget adapter implementation
@@ -89,8 +93,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
-		mt:       mt,
 		sink:     env.Sink,
+		mt:       mt,
+		sr:       metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 
 	if env.DwSpell != "" {
@@ -121,8 +126,17 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 	var sout bytes.Buffer
 	var serr bytes.Buffer
 
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
+	start := time.Now()
+	defer func() {
+		a.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
+	}()
+
 	err = validateContentType(event.DataContentType(), event.Data())
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New(err.Error()), nil)
 	}
@@ -134,16 +148,19 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 
 	req := &DataWeaveTransformationStructuredRequest{}
 	if err := event.DataAs(req); err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
 	if !a.spellOverride && req.Spell != "" {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("it is not allowed to override Spell per CloudEvent"), nil)
 	}
 
 	if req.InputContentType != "" || req.OutputContentType != "" || req.Spell != "" {
 		if req.InputData == "" {
+			a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 			return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 				errors.New("inputData not found"), nil)
 		}
@@ -168,18 +185,21 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 	}
 
 	if inputContentType == nil || outputContentType == nil || inputData == nil || spell == nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New("parameters not found"), nil)
 	}
 
 	err = validateContentType(*inputContentType, inputData)
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeRequestValidation,
 			errors.New(err.Error()), nil)
 	}
 
 	errs := registerAndPopulateSpell(*spell, dwFolder)
 	if errs != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating the spell")
 	}
 
@@ -193,16 +213,19 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 
 	err = cmd.Run()
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
 	}
 
 	err = os.RemoveAll(dwFolder)
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the folder")
 	}
 
 	cleaned := bytes.Trim(sout.Bytes(), "Running local spell")
 	if err := event.SetData(*outputContentType, cleaned); err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
@@ -210,11 +233,14 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 	a.logger.Infof("responding with transformed event: %v", event.Type())
 	if a.sink != "" {
 		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 			a.logger.Errorf("Error sending event to sink: %v", result)
 		}
+		a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 		return nil, cloudevents.ResultACK
 	}
 
+	a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	return &event, cloudevents.ResultACK
 }
 
