@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	"knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
@@ -381,6 +382,8 @@ func TestDataWeaveTransformationToSink(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
 			ctx := context.Background()
 
+			mt := &adapter.MetricTag{}
+
 			a := &dataweaveTransformAdapter{
 				logger: logtesting.TestLogger(t),
 
@@ -389,6 +392,8 @@ func TestDataWeaveTransformationToSink(t *testing.T) {
 				defaultOutputContentType: &tc.outputContentType,
 				defaultSpell:             &tc.dwSpell,
 				sink:                     "http://localhost:8080",
+				mt:                       mt,
+				sr:                       metrics.MustNewEventProcessingStatsReporter(mt),
 			}
 
 			e, r := a.dispatch(ctx, tc.inEvent)

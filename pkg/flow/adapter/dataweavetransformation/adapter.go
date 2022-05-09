@@ -236,6 +236,7 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 			a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 			a.logger.Errorf("Error sending event to sink: %v", result)
 		}
+		a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 		return nil, cloudevents.ResultACK
 	}
 
