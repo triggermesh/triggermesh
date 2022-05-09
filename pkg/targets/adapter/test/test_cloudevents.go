@@ -116,9 +116,7 @@ func (c *FakeCloudEventsClient) Sent() []cloudevents.Event {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	r := make([]cloudevents.Event, len(c.sent))
-	for i := range c.sent {
-		r[i] = c.sent[i]
-	}
+	copy(r, c.sent)
 	return r
 }
 

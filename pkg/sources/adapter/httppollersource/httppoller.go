@@ -28,8 +28,6 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
-
-	"knative.dev/eventing/pkg/adapter/v2"
 )
 
 type httpPoller struct {
@@ -45,7 +43,7 @@ type httpPoller struct {
 	mt          *pkgadapter.MetricTag
 }
 
-var _ adapter.Adapter = (*httpPoller)(nil)
+var _ pkgadapter.Adapter = (*httpPoller)(nil)
 
 // Start implements adapter.Adapter.
 // Runs the server for receiving HTTP events until ctx gets cancelled.

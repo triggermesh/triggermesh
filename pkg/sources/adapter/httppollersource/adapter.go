@@ -25,7 +25,6 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
 
-	"knative.dev/eventing/pkg/adapter/v2"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
@@ -33,7 +32,7 @@ import (
 )
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
-func NewAdapter(ctx context.Context, envAcc adapter.EnvConfigAccessor, ceClient cloudevents.Client) adapter.Adapter {
+func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
 	mt := &pkgadapter.MetricTag{
