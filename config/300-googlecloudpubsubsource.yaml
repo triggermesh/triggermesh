@@ -57,8 +57,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -68,8 +67,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -78,14 +76,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -109,19 +105,18 @@ spec:
                           type: integer
                           format: int64
               topic:
-                description: Full resource name of the Pub/Sub topic to subscribe to, in the format
-                  "projects/{project_name}/topics/{topic_name}".
+                description: Full resource name of the Pub/Sub topic to subscribe to, in the format "projects/{project_name}/topics/{topic_name}".
                 type: string
                 pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
               subscriptionID:
-                description: ID of the subscription to use to pull messages from the topic. If supplied, this
-                  subscription must 1) exist and 2) belong to the provided topic. Otherwise, a pull subscription to that
-                  topic is created on behalf of the user.
+                description: ID of the subscription to use to pull messages from the topic. If supplied, this subscription
+                  must 1) exist and 2) belong to the provided topic. Otherwise, a pull subscription to that topic is created
+                  on behalf of the user.
                 type: string
                 pattern: ^[a-zA-Z][\w-.~%+]{2,254}$
               serviceAccountKey:
-                description: Service account key used to authenticate the event source and allow it to interact with
-                  Google Cloud APIs. Only the JSON format is supported.
+                description: Service account key used to authenticate the event source and allow it to interact with Google
+                  Cloud APIs. Only the JSON format is supported.
                 type: object
                 properties:
                   value:
@@ -177,8 +172,8 @@ spec:
             type: object
             properties:
               subscription:
-                description: Resource name of the Pub/Sub subscription currently used by the event source for pulling
-                  messages from the topic.
+                description: Resource name of the Pub/Sub subscription currently used by the event source for pulling messages
+                  from the topic.
                 type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.

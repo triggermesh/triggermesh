@@ -17,7 +17,7 @@ kind: CustomResourceDefinition
 metadata:
   name: filters.routing.triggermesh.io
   labels:
-    triggermesh.io/crd-install: "true"
+    triggermesh.io/crd-install: 'true'
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
@@ -64,8 +64,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -75,8 +74,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -85,14 +83,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -119,8 +115,7 @@ spec:
                 description: Google CEL-like expression string.
                 type: string
               sink:
-                description: Sink is a reference to an object that will resolve to
-                    a uri to use as the sink.
+                description: Sink is a reference to an object that will resolve to a uri to use as the sink.
                 type: object
                 oneOf:
                 - required: [ref]
@@ -134,23 +129,18 @@ spec:
                         description: API version of the referent.
                         type: string
                       kind:
-                        description: 'Kind of the referent. More info:
-                          https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
                         type: string
                       name:
-                        description: 'Name of the referent. More info:
-                          https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
                         type: string
                       namespace:
-                        description: 'Namespace of the referent. More info:
-                          https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
                           This is optional field, it gets defaulted to the object holding it if left out.'
                         type: string
                   uri:
-                    description: URI can be an absolute URL(non-empty scheme and
-                      non-empty host) pointing to the target or a relative URI.
-                      Relative URIs will be resolved using the base URI retrieved
-                      from Ref.
+                    description: URI can be an absolute URL(non-empty scheme and non-empty host) pointing to the target or
+                      a relative URI. Relative URIs will be resolved using the base URI retrieved from Ref.
                     type: string
           status:
             type: object

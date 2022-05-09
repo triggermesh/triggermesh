@@ -63,8 +63,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -74,8 +73,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -84,14 +82,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -116,18 +112,16 @@ spec:
                           format: int64
               endpoint:
                 type: string
-                description: The domain name used to access the OSS.
-                  For more information, please refer to the region and endpoint guide at
-                  https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db.
+                description: The domain name used to access the OSS. For more information, please refer to the region and
+                  endpoint guide at https://www.alibabacloud.com/help/doc-detail/31837.htm?spm=a2c63.p38356.879954.8.23bc7d91ARN6Hy#concept-zt4-cvy-5db.
                 pattern: ^oss-([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{1,3}$
               bucket:
                 type: string
                 description: The unique container to store objects in OSS.
               accessKeySecret:
                 type: object
-                description: Alibaba SDK access key secret as registered.
-                  For more information on how to create an access key pair, please refer to
-                  https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
+                description: Alibaba SDK access key secret as registered. For more information on how to create an access
+                  key pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
                 properties:
                   secretKeyRef:
                     type: object
@@ -138,9 +132,8 @@ spec:
                         type: string
               accessKeyID:
                 type: object
-                description: Alibaba SDK access key id as registered.
-                  For more information on how to create an access key pair, please refer to
-                  https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
+                description: Alibaba SDK access key id as registered. For more information on how to create an access key
+                  pair, please refer to https://www.alibabacloud.com/help/doc-detail/53045.htm?spm=a2c63.p38356.879954.9.23bc7d91ARN6Hy#task968.
                 properties:
                   secretKeyRef:
                     type: object
@@ -151,8 +144,7 @@ spec:
                         type: string
               eventOptions:
                 type: object
-                description: 'When should this target generate a response event for processing: always, on error, or
-                  never.'
+                description: 'When should this target generate a response event for processing: always, on error, or never.'
                 properties:
                   payloadPolicy:
                     type: string

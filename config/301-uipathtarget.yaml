@@ -64,8 +64,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -75,8 +74,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -85,14 +83,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -116,8 +112,8 @@ spec:
                           type: integer
                           format: int64
               userKey:
-                description: UiPath user refresh token to support OAuth based authentication. For additional details,
-                  refer to https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps.
+                description: UiPath user refresh token to support OAuth based authentication. For additional details, refer
+                  to https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps.
                 type: object
                 properties:
                   secretKeyRef:
@@ -128,27 +124,23 @@ spec:
                       name:
                         type: string
               robotName:
-                description: Robot to invoke. For additional details, refer to
-                  https://docs.uipath.com/orchestrator/docs/about-robots.
+                description: Robot to invoke. For additional details, refer to https://docs.uipath.com/orchestrator/docs/about-robots.
                 type: string
               processName:
-                description: UiProccess encompassing the robot. For additional details, refer to
-                  https://docs.uipath.com/orchestrator/docs/about-processes
+                description: UiProccess encompassing the robot. For additional details, refer to https://docs.uipath.com/orchestrator/docs/about-processes
                 type: string
               tenantName:
-                description: UiPath tenant name. For additional details, refer to
-                  https://docs.uipath.com/orchestrator/docs/about-tenants.
+                description: UiPath tenant name. For additional details, refer to https://docs.uipath.com/orchestrator/docs/about-tenants.
                 type: string
               accountLogicalName:
                 description: The unique site URL used to identify the UiPath tenant.
                 type: string
               clientID:
-                description: OAuth ClientID registered by UiPath to identify the target. For details on registering a
-                  new client, please see https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps.
+                description: OAuth ClientID registered by UiPath to identify the target. For details on registering a new
+                  client, please see https://docs.uipath.com/orchestrator/reference/using-oauth-for-external-apps.
                 type: string
               organizationUnitID:
-                description: A grouping of orchestrator components within a tenant. For additional details, please see
-                  https://docs.uipath.com/orchestrator/docs/about-organization-units.
+                description: A grouping of orchestrator components within a tenant. For additional details, please see https://docs.uipath.com/orchestrator/docs/about-organization-units.
                 type: string
             required:
             - organizationUnitID

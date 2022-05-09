@@ -55,8 +55,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -66,8 +65,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -76,14 +74,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -110,31 +106,27 @@ spec:
                 description: IBM MQ server URI, e.g. ibm-mq.default.svc.cluster.local(1414).
                 type: string
               channelName:
-                description: The name of IBM MQ Channel to listen to events on. For more information,
-                  please refer to the IBM MQ documentation at
-                  https://www.ibm.com/docs/en/ibm-mq/9.2?topic=types-channels.
+                description: The name of IBM MQ Channel to listen to events on. For more information, please refer to the
+                  IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=types-channels.
                 type: string
               queueManager:
-                description: IBM MQ Queue Manager name. For more information, please refer to the IBM MQ
-                  documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=types-mq-queue-managers.
+                description: IBM MQ Queue Manager name. For more information, please refer to the IBM MQ documentation at
+                  https://www.ibm.com/docs/en/ibm-mq/9.2?topic=types-mq-queue-managers.
                 type: string
               queueName:
-                description: IBM MQ Queue name. For more information, please refer to the IBM MQ
-                  documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=types-queues.
+                description: IBM MQ Queue name. For more information, please refer to the IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=types-queues.
                 type: string
               delivery:
                 description: Events delivery parameters.
                 type: object
                 properties:
                   deadLetterQueueManager:
-                    description: The name of the Dead Letter Queue Manager. For more information,
-                      please refer to the IBM MQ documentation at
-                      https://www.ibm.com/docs/en/ibm-mq/9.2?topic=components-dead-letter-queues
+                    description: The name of the Dead Letter Queue Manager. For more information, please refer to the IBM
+                      MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=components-dead-letter-queues
                     type: string
                   deadLetterQueue:
-                    description: The name of the Dead Letter Queue. For more information,
-                      please refer to the IBM MQ documentation at
-                      https://www.ibm.com/docs/en/ibm-mq/9.2?topic=components-dead-letter-queues
+                    description: The name of the Dead Letter Queue. For more information, please refer to the IBM MQ documentation
+                      at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=components-dead-letter-queues
                     type: string
                   backoffDelay:
                     description: Delay between delivery retries for failed messages.
@@ -172,14 +164,13 @@ spec:
                 - required: [ref]
                 - required: [uri]
               credentials:
-                description: IBM MQ server connection authentication parameters. For more information about
-                  authentication, please refer to the IBM MQ documentation at
-                  https://www.ibm.com/docs/en/ibm-mq/9.0?topic=mechanisms-connection-authentication.
+                description: IBM MQ server connection authentication parameters. For more information about authentication,
+                  please refer to the IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.0?topic=mechanisms-connection-authentication.
                 type: object
                 properties:
                   username:
-                    description: IBM MQ user identifier for client application. For more information, please refer
-                      to the IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=application-user-ids.
+                    description: IBM MQ user identifier for client application. For more information, please refer to the
+                      IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=application-user-ids.
                     type: object
                     properties:
                       value:
@@ -197,8 +188,8 @@ spec:
                         - name
                         - key
                   password:
-                    description: IBM MQ client application password. For more information, please refer to the
-                      IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mq-mqcsp-password-protection.
+                    description: IBM MQ client application password. For more information, please refer to the IBM MQ documentation
+                      at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mq-mqcsp-password-protection.
                     type: object
                     properties:
                       value:
@@ -219,29 +210,25 @@ spec:
                     - required: [value]
                     - required: [valueFromSecret]
                   tls:
-                    description: TLS configuration for IBM MQ client. For more information, please refer to the IBM MQ
-                      documentation at
-                      https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mechanisms-tls-security-protocols-in-mq.
+                    description: TLS configuration for IBM MQ client. For more information, please refer to the IBM MQ documentation
+                      at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mechanisms-tls-security-protocols-in-mq.
                     type: object
                     properties:
                       cipher:
-                        description: Message encryption and authentication algorithm.
-                          For more information, please refer to the IBM MQ documentation at
-                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=tls-cipherspecs-ciphersuites.
+                        description: Message encryption and authentication algorithm. For more information, please refer to
+                          the IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=tls-cipherspecs-ciphersuites.
                         type: string
                       clientAuthRequired:
-                        description: Parameter to specify whether TLS client authentication is required. For more
-                          information, please refer to the IBM MQ documentation at
-                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=fields-sslclientauth-mqlong.
+                        description: Parameter to specify whether TLS client authentication is required. For more information,
+                          please refer to the IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=fields-sslclientauth-mqlong.
                         type: boolean
                       certLabel:
-                        description: Unique identifier representing a digital certificate stored in a key repository.
-                          For more information, please refer to the IBM MQ documentation at
-                          https://www.ibm.com/docs/en/ibm-mq/9.2?topic=repository-digital-certificate-labels-understanding-requirements.
+                        description: Unique identifier representing a digital certificate stored in a key repository. For
+                          more information, please refer to the IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=repository-digital-certificate-labels-understanding-requirements.
                         type: string
                       keyRepository:
-                        description: Key repository for (m)TLS connection. For more information, please refer to the
-                          IBM MQ documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mq-ssltls-key-repository.
+                        description: Key repository for (m)TLS connection. For more information, please refer to the IBM MQ
+                          documentation at https://www.ibm.com/docs/en/ibm-mq/9.2?topic=mq-ssltls-key-repository.
                         type: object
                         properties:
                           keyDatabase:

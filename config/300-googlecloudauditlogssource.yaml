@@ -57,8 +57,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -68,8 +67,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -78,14 +76,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -113,41 +109,39 @@ spec:
                 type: string
                 pattern: ^[a-z\d][a-z\d\-\.]*[a-z\d]$
               methodName:
-                description: The name of the service method or operation. For API calls, this should be the name of the
-                  API method. For example, "google.pubsub.v1.Publisher.CreateTopic".
+                description: The name of the service method or operation. For API calls, this should be the name of the API
+                  method. For example, "google.pubsub.v1.Publisher.CreateTopic".
                 type: string
                 pattern: ^[A-Za-z\d][A-Za-z\d\-\.]*[A-Za-z\d]$
               resourceName:
-                description: The resource or collection that is the target of the operation. The name is a scheme-less
-                  URI, not including the API service name.
-                  https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog
+                description: The resource or collection that is the target of the operation. The name is a scheme-less URI,
+                  not including the API service name. https://cloud.google.com/logging/docs/reference/audit/auditlog/rest/Shared.Types/AuditLog
                 type: string
                 pattern: ^[a-z\d][a-z\d\-\.\/]*[a-z\d]$
               pubsub:
-                description: Attributes related to the configuration of Pub/Sub resources associated with the Cloud
-                  Audit Log.
+                description: Attributes related to the configuration of Pub/Sub resources associated with the Cloud Audit
+                  Log.
                 type: object
                 properties:
                   topic:
-                    description: Full resource name of the Pub/Sub topic where change notifications originating from the
-                      configured audit logs sink are sent to, before being retrieved by this event source. If not
-                      supplied, a topic is created on behalf of the user, in the GCP project referenced by the 'project'
-                      attribute. The expected format is described at
-                      https://cloud.google.com/pubsub/docs/admin#resource_names
+                    description: Full resource name of the Pub/Sub topic where change notifications originating from the configured
+                      audit logs sink are sent to, before being retrieved by this event source. If not supplied, a topic is
+                      created on behalf of the user, in the GCP project referenced by the 'project' attribute. The expected
+                      format is described at https://cloud.google.com/pubsub/docs/admin#resource_names
                     type: string
                     pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
                   project:
-                    description: Name of the GCP project where Pub/Sub resources associated with the Cloud Audit
-                      log sink are to be created. Mutually exclusive with 'topic' which, if supplied, already contains
-                      the project name.
+                    description: Name of the GCP project where Pub/Sub resources associated with the Cloud Audit log sink
+                      are to be created. Mutually exclusive with 'topic' which, if supplied, already contains the project
+                      name.
                     type: string
                     pattern: ^[a-z][a-z0-9-]{3,29}$
                 oneOf:
                 - required: [project]
                 - required: [topic]
               serviceAccountKey:
-                description: Service account key used to authenticate the event source and allow it to interact with
-                  Google Cloud APIs. Only the JSON format is supported.
+                description: Service account key used to authenticate the event source and allow it to interact with Google
+                  Cloud APIs. Only the JSON format is supported.
                 type: object
                 properties:
                   value:
@@ -211,8 +205,8 @@ spec:
                 description: Resource name of the Pub/Sub topic where audit logs are currently sent to.
                 type: string
               subscription:
-                description: Resource name of the Pub/Sub subscription currently used by the event source for pulling
-                  audit logs.
+                description: Resource name of the Pub/Sub subscription currently used by the event source for pulling audit
+                  logs.
                 type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.

@@ -63,8 +63,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -74,8 +73,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -84,14 +82,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -153,18 +149,18 @@ spec:
               inputContentType:
                 description: Content type for transformation.
                 type: string
-                enum: ['application/json', 'application/xml']
+                enum: [application/json, application/xml]
               outputContentType:
                 description: Content type for transformation output.
                 type: string
-                enum: ['application/json', 'application/xml']
+                enum: [application/json, application/xml]
               sink:
                 description: The destination of events transformed by this component.
                 type: object
                 properties:
                   ref:
-                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
-                     If left empty, the events will be sent back to the sender/source.
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events. If
+                      left empty, the events will be sent back to the sender/source.
                     type: object
                     properties:
                       apiVersion:
@@ -184,8 +180,8 @@ spec:
                     type: string
                     format: uri
                 oneOf:
-                - required: ['ref']
-                - required: ['uri']
+                - required: [ref]
+                - required: [uri]
             anyOf:
             - required: [dwSpell, inputContentType, outputContentType]
             - required: [allowPerEventDwSpell]

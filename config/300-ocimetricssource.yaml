@@ -17,10 +17,10 @@ kind: CustomResourceDefinition
 metadata:
   name: ocimetricssources.sources.triggermesh.io
   labels:
-    eventing.knative.dev/source: "true"
-    duck.knative.dev/source: "true"
-    knative.dev/crd-install: "true"
-    triggermesh.io/crd-install: "true"
+    eventing.knative.dev/source: 'true'
+    duck.knative.dev/source: 'true'
+    knative.dev/crd-install: 'true'
+    triggermesh.io/crd-install: 'true'
   annotations:
     registry.knative.dev/eventTypes: |
       [
@@ -57,8 +57,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -68,8 +67,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -78,14 +76,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -193,15 +189,13 @@ spec:
                       description: Used as the event source for the metric.
                       type: string
                     metricsNamespace:
-                      description: Type of metrics to pull from such as oci_computeagent, oci_apigateway, oci_vnc, or
-                        oci_compute_infrastructure_health.
+                      description: Type of metrics to pull from such as oci_computeagent, oci_apigateway, oci_vnc, or oci_compute_infrastructure_health.
                       type: string
                     metricsQuery:
                       description: Metrics query to send based off of OCI Monitoring Query Language.
                       type: string
                     oracleCompartment:
-                      description: OCID of the target compartment (if not specified, default to the value of
-                        'oracleTenancy').
+                      description: OCID of the target compartment (if not specified, default to the value of 'oracleTenancy').
                       type: string
                   required:
                   - name

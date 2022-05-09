@@ -58,8 +58,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -69,8 +68,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -79,14 +77,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -110,20 +106,18 @@ spec:
                           type: integer
                           format: int64
               region:
-                description: Code of the AWS region to source metrics from. Available region codes are documented in the
-                  AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
+                description: Code of the AWS region to source metrics from. Available region codes are documented in the AWS
+                  General Reference at https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
                 type: string
                 pattern: ^[a-z]{2}(-gov)?-[a-z]+-\d$
               pollingInterval:
-                description: Duration which defines how often metrics should be pulled from Amazon CloudWatch. Expressed
-                  as a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
-                  Defaults to 5m
+                description: Duration which defines how often metrics should be pulled from Amazon CloudWatch. Expressed as
+                  a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration. Defaults to 5m
                 type: string
               metricQueries:
-                description: List of queries that determine what metrics will be sourced from Amazon CloudWatch.
-                  Each item represents an individual MetricDataQuery. For more information, please refer to the
-                  CloudWatch API reference at
-                  https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html
+                description: List of queries that determine what metrics will be sourced from Amazon CloudWatch. Each item
+                  represents an individual MetricDataQuery. For more information, please refer to the CloudWatch API reference
+                  at https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html
                 type: array
                 items:
                   type: object
@@ -136,8 +130,8 @@ spec:
                       description: Math expression to be performed on the metric data. Mutually exclusive with 'metric'.
                       type: string
                     metric:
-                      description: Representation of a metric with statistics, period, and units, but no math
-                        expression. Mutually exclusive with 'expression'.
+                      description: Representation of a metric with statistics, period, and units, but no math expression.
+                        Mutually exclusive with 'expression'.
                       type: object
                       properties:
                         period:
@@ -179,9 +173,8 @@ spec:
                 type: object
                 properties:
                   credentials:
-                    description: Security credentials authentication. For more information about AWS security
-                      credentials, please refer to the AWS General Reference at
-                      https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
+                    description: Security credentials authentication. For more information about AWS security credentials,
+                      please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
                     type: object
                     properties:
                       accessKeyID:
@@ -228,10 +221,9 @@ spec:
                         - required: [value]
                         - required: [valueFromSecret]
                   iamRole:
-                    description: (Amazon EKS only) The ARN of an IAM role which can be impersonated to obtain AWS
-                      permissions. For more information about IAM roles for service accounts, please refer to the Amazon
-                      EKS User Guide at
-                      https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+                    description: (Amazon EKS only) The ARN of an IAM role which can be impersonated to obtain AWS permissions.
+                      For more information about IAM roles for service accounts, please refer to the Amazon EKS User Guide
+                      at https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
                     type: string
                     pattern: ^arn:aws(-cn|-us-gov)?:iam::\d{12}:role\/.+$
                 oneOf:

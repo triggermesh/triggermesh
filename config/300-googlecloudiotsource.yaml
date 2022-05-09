@@ -57,8 +57,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -68,8 +67,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -78,14 +76,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -113,20 +109,19 @@ spec:
                 type: string
                 pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/locations\/[a-z][a-z0-9-]{3,29}\/registries\/[a-zA-Z][\w-.~%+]{2,254}$
               pubsub:
-                description: Attributes related to the configuration of Pub/Sub resources associated with the Cloud
-                  IoT Registry.
+                description: Attributes related to the configuration of Pub/Sub resources associated with the Cloud IoT Registry.
                 type: object
                 properties:
                   topic:
-                    description: Full resource name of the Pub/Sub topic where messages originating from the configured
-                      IoT Registry are sent to, before being retrieved by this event source. If not supplied, a topic is
-                      created on behalf of the user, in the GCP project referenced by the 'project' attribute. The
-                      expected format is described at https://cloud.google.com/pubsub/docs/admin#resource_names.
+                    description: Full resource name of the Pub/Sub topic where messages originating from the configured IoT
+                      Registry are sent to, before being retrieved by this event source. If not supplied, a topic is created
+                      on behalf of the user, in the GCP project referenced by the 'project' attribute. The expected format
+                      is described at https://cloud.google.com/pubsub/docs/admin#resource_names.
                     type: string
                     pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
               serviceAccountKey:
-                description: Service account key used to authenticate the event source and allow it to interact with
-                  Google Cloud APIs. Only the JSON format is supported.
+                description: Service account key used to authenticate the event source and allow it to interact with Google
+                  Cloud APIs. Only the JSON format is supported.
                 type: object
                 properties:
                   value:
@@ -185,8 +180,8 @@ spec:
                 description: Resource name of the Pub/Sub topic where IoT messages are currently sent to.
                 type: string
               subscription:
-                description: Resource name of the Pub/Sub subscription currently used by the event source for pulling
-                  events from the IoT Registry.
+                description: Resource name of the Pub/Sub subscription currently used by the event source for pulling events
+                  from the IoT Registry.
                 type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.

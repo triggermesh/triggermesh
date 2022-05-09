@@ -54,8 +54,8 @@ spec:
                 properties:
 
                   basicAuths:
-                    description: Array of HTTP basic authentication parameters, all present usernames and
-                      passwords are considered valid.
+                    description: Array of HTTP basic authentication parameters, all present usernames and passwords are considered
+                      valid.
                     type: array
                     items:
                       type: object
@@ -92,8 +92,8 @@ spec:
                 type: string
 
               rateLimiter:
-                description: Rate limiter provides a mechanism to reject incoming requests
-                  when a threshold is trespassed, informing the caller to retry later.
+                description: Rate limiter provides a mechanism to reject incoming requests when a threshold is trespassed,
+                  informing the caller to retry later.
                 type: object
                 properties:
                   requestsPerSecond:

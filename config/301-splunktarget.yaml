@@ -58,8 +58,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -69,8 +68,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -79,14 +77,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -111,15 +107,13 @@ spec:
                           format: int64
               endpoint:
                 type: string
-                description: URL of the HTTP Event Collector (HEC). Only the scheme, hostname, and port (optionally) are
-                  evaluated, the URL path is trimmed if present. See
-                  https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#Enable_HTTP_Event_Collector.
+                description: URL of the HTTP Event Collector (HEC). Only the scheme, hostname, and port (optionally) are evaluated,
+                  the URL path is trimmed if present. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#Enable_HTTP_Event_Collector.
                 format: url
                 pattern: ^https?:\/\/.+$
               token:
                 type: object
-                description: Token for authenticating requests against the HEC. See
-                  https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#About_Event_Collector_tokens.
+                description: Token for authenticating requests against the HEC. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#About_Event_Collector_tokens.
                 properties:
                   value:
                     type: string
@@ -137,12 +131,11 @@ spec:
                 - required: [valueFromSecret]
               index:
                 type: string
-                description: Name of the index to send events to. When undefined, events are sent to the default index
-                  defined in the HEC token's configuration.
+                description: Name of the index to send events to. When undefined, events are sent to the default index defined
+                  in the HEC token's configuration.
                 pattern: ^[\w-]+$
               skipTLSVerify:
-                description: Control whether the target should verify the SSL/TLS certificate used by the event
-                  collector.
+                description: Control whether the target should verify the SSL/TLS certificate used by the event collector.
                 type: boolean
             required:
             - endpoint
