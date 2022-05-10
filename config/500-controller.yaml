@@ -42,7 +42,10 @@ spec:
         resources:
           requests:
             cpu: 50m
-            memory: 20Mi
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 300Mi
 
         env:
         - name: SYSTEM_NAMESPACE

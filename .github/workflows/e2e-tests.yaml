@@ -96,8 +96,11 @@ jobs:
       env:
         KO_DOCKER_REPO: kind.local
       run: |
-        ko apply -f ./config/namespace/
-        ko apply -f ./config/
+        yq -i 'del(.spec.template.spec.containers[]?.resources)' config/500-controller.yaml
+
+        ko apply -f config/namespace/
+        ko apply -f config/
+
         kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-controller
         kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-webhook
 
