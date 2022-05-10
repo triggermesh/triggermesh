@@ -63,8 +63,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -74,8 +73,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -84,14 +82,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -116,9 +112,8 @@ spec:
                           format: int64
               oracleApiPrivateKey:
                 type: object
-                description: Oracle API Private Key to sign each request to the Oracle Cloud.
-                  For details on how to create a private keypair for Oracle Cloud, refer to
-                  https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
+                description: Oracle API Private Key to sign each request to the Oracle Cloud. For details on how to create
+                  a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
                 properties:
                   secretKeyRef:
                     type: object
@@ -129,9 +124,8 @@ spec:
                         type: string
               oracleApiPrivateKeyPassphrase:
                 type: object
-                description: Passphrase to unlock the private key used to sign each request to the Oracle Cloud.
-                  For details on how to create a private keypair for Oracle Cloud, refer to
-                  https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
+                description: Passphrase to unlock the private key used to sign each request to the Oracle Cloud. For details
+                  on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
                 properties:
                   secretKeyRef:
                     type: object
@@ -142,10 +136,8 @@ spec:
                         type: string
               oracleApiPrivateKeyFingerprint:
                 type: object
-                description: MD5 fingerprint to identify the keypair associated with the key used to sign each request
-                  to the Oracle Cloud.
-                  For details on how to create a private keypair for Oracle Cloud, refer to
-                  https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
+                description: MD5 fingerprint to identify the keypair associated with the key used to sign each request to
+                  the Oracle Cloud. For details on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
                 properties:
                   secretKeyRef:
                     type: object
@@ -155,16 +147,14 @@ spec:
                       name:
                         type: string
               oracleTenancy:
-                description: The Oracle Cloud ID (OCID) of the tenant containing the service to be used on the Oracle
-                  Cloud.
+                description: The Oracle Cloud ID (OCID) of the tenant containing the service to be used on the Oracle Cloud.
                 type: string
               oracleUser:
-                description: The Oracle Cloud ID (OCID) of the user who owns the key used to interact with the Oracle
-                  Cloud.
+                description: The Oracle Cloud ID (OCID) of the user who owns the key used to interact with the Oracle Cloud.
                 type: string
               oracleRegion:
-                description: The Oracle Cloud region containing the service being executed. A full list of supported
-                  regions can be found at https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm.
+                description: The Oracle Cloud region containing the service being executed. A full list of supported regions
+                  can be found at https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm.
                 type: string
               function:
                 type: object

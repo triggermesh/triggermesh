@@ -62,8 +62,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -73,8 +72,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -83,14 +81,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -127,8 +123,7 @@ spec:
                 # https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
                 pattern: ^arn:aws(-cn|-us-gov)?:s3:([a-z]{2}(-gov)?-[a-z]+-\d)?:(\d{12})?:[0-9a-z][0-9a-z.-]{2,62}$
               eventTypes:
-                description: List of event types that the source should subscribe to. Accepted values are listed at
-                  https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html.
+                description: List of event types that the source should subscribe to. Accepted values are listed at https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html.
                 type: array
                 items:
                   type: string
@@ -151,20 +146,18 @@ spec:
                   - s3:Replication:OperationMissedThreshold
                   - s3:Replication:OperationReplicatedAfterThreshold
               destination:
-                description: The intermediate destination of notifications originating from the Amazon S3 bucket, before
-                  they are retrieved by this event source. If omitted, an Amazon SQS queue is automatically created and
-                  associated with the bucket.
+                description: The intermediate destination of notifications originating from the Amazon S3 bucket, before they
+                  are retrieved by this event source. If omitted, an Amazon SQS queue is automatically created and associated
+                  with the bucket.
                 type: object
                 properties:
                   sqs:
-                    description: Properties of an Amazon SQS queue to use as intermediate destination for bucket
-                      notifications.
+                    description: Properties of an Amazon SQS queue to use as intermediate destination for bucket notifications.
                     type: object
                     properties:
                       queueARN:
-                        description: ARN of the Amazon SQS queue that should be receiving bucket notifications. The
-                          expected format is documented at
-                          https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies.
+                        description: ARN of the Amazon SQS queue that should be receiving bucket notifications. The expected
+                          format is documented at https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies.
                         type: string
                         pattern: ^arn:aws(-cn|-us-gov)?:sqs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
                     required:
@@ -174,9 +167,8 @@ spec:
                 type: object
                 properties:
                   credentials:
-                    description: Security credentials authentication. For more information about AWS security
-                      credentials, please refer to the AWS General Reference at
-                      https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
+                    description: Security credentials authentication. For more information about AWS security credentials,
+                      please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
                     type: object
                     properties:
                       accessKeyID:
@@ -274,8 +266,7 @@ spec:
             type: object
             properties:
               queueARN:
-                description: ARN of the Amazon SQS queue that is currently receiving notifications from the Amazon S3
-                  bucket.
+                description: ARN of the Amazon SQS queue that is currently receiving notifications from the Amazon S3 bucket.
                 type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.

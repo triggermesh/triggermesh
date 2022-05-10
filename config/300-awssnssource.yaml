@@ -57,8 +57,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -68,8 +67,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -78,14 +76,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -109,13 +105,12 @@ spec:
                           type: integer
                           format: int64
               arn:
-                description: ARN of the Amazon SNS topic to consume messages from. The expected format is documented at
-                  https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsns.html#amazonsns-resources-for-iam-policies
+                description: ARN of the Amazon SNS topic to consume messages from. The expected format is documented at https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsns.html#amazonsns-resources-for-iam-policies
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:sns:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               subscriptionAttributes:
-                description: Attributes to set on the Amazon SNS Subscription that is used for receiving messages from
-                  the SNS topic.
+                description: Attributes to set on the Amazon SNS Subscription that is used for receiving messages from the
+                  SNS topic.
                 type: object
                 properties:
                   DeliveryPolicy:
@@ -143,9 +138,8 @@ spec:
                 type: object
                 properties:
                   credentials:
-                    description: Security credentials authentication. For more information about AWS security
-                      credentials, please refer to the AWS General Reference at
-                      https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
+                    description: Security credentials authentication. For more information about AWS security credentials,
+                      please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
                     type: object
                     properties:
                       accessKeyID:
@@ -226,8 +220,8 @@ spec:
             type: object
             properties:
               subscriptionARN:
-                description: ARN of the Amazon SNS subscription that is currently used for receiving messages from the
-                  SNS topic.
+                description: ARN of the Amazon SNS subscription that is currently used for receiving messages from the SNS
+                  topic.
                 type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.

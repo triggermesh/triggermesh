@@ -59,8 +59,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -70,8 +69,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -80,14 +78,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -142,18 +138,17 @@ spec:
                   type: string
                   minLength: 1
               securityProtocol:
-                description: Encryption protocol to use for connecting to Confluent Kafka. This can be "Plaintext",
-                  "SslPlaintext", "SaslSsl", or "Ssl". Additional information can be found at
-                  https://docs.confluent.io/platform/current/connect/security.html.
+                description: Encryption protocol to use for connecting to Confluent Kafka. This can be "Plaintext", "SslPlaintext",
+                  "SaslSsl", or "Ssl". Additional information can be found at https://docs.confluent.io/platform/current/connect/security.html.
                 type: string
               saslMechanism:
-                description: When using the "saslSsl" securityProtocol attribute, indicate which
-                  mechanism to use. This can be "Gssapi", "OAuthBearer", "Plain", "ScramSha256", and "ScramSha512".
+                description: When using the "saslSsl" securityProtocol attribute, indicate which mechanism to use. This can
+                  be "Gssapi", "OAuthBearer", "Plain", "ScramSha256", and "ScramSha512".
                 type: string
               discardCloudEventContext:
-                description: Whether to omit CloudEvent context attributes in messages sent to Kafka.
-                  When this property is false (default), the entire CloudEvent payload is included.
-                  When this property is true, only the CloudEvent data is included.
+                description: Whether to omit CloudEvent context attributes in messages sent to Kafka. When this property is
+                  false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
+                  data is included.
                 type: boolean
             required:
             - username

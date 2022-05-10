@@ -64,8 +64,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -75,8 +74,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -85,14 +83,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -117,9 +113,8 @@ spec:
                           format: int64
               awsApiKey:
                 type: object
-                description: API Key to interact with the Amazon S3 API. For more information about AWS
-                  security credentials, please refer to the AWS General Reference at
-                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                description: API Key to interact with the Amazon S3 API. For more information about AWS security credentials,
+                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     description: A reference to a Kubernetes Secret object containing the access key ID.
@@ -131,9 +126,8 @@ spec:
                         type: string
               awsApiSecret:
                 type: object
-                description: API Secret to interact with the Amazon S3 API. For more information about AWS
-                  security credentials, please refer to the AWS General Reference at
-                  https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                description: API Secret to interact with the Amazon S3 API. For more information about AWS security credentials,
+                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
                 properties:
                   secretKeyRef:
                     description: A reference to a Kubernetes Secret object containing the secret access key.
@@ -145,13 +139,12 @@ spec:
                         type: string
               arn:
                 type: string
-                description: ARN of the S3 bucket that will receive events. The expected format is documented at
-                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
+                description: ARN of the S3 bucket that will receive events. The expected format is documented at https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazons3.html
                 pattern: ^arn:aws(-cn|-us-gov)?:s3:::[0-9a-z][0-9a-z.-]{2,62}$
               discardCloudEventContext:
-                description: Whether to omit CloudEvent context attributes in objects created in S3.
-                  When this property is false (default), the entire CloudEvent payload is included.
-                  When this property is true, only the CloudEvent data is included.
+                description: Whether to omit CloudEvent context attributes in objects created in S3. When this property is
+                  false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
+                  data is included.
                 type: boolean
             required:
             - arn

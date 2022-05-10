@@ -65,8 +65,7 @@ spec:
                     description: Adapter visibility scope.
                     type: boolean
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -76,8 +75,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -86,14 +84,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -125,18 +121,17 @@ spec:
                 type: string
                 pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}\/event[Hh]ubs\/[a-zA-Z0-9][\w.-]{0,49}$
               discardCloudEventContext:
-                description: Whether to omit CloudEvent context attributes in objects created in Azure Event Hub.
-                  When this property is false (default), the entire CloudEvent payload is included.
-                  When this property is true, only the CloudEvent data is included.
+                description: Whether to omit CloudEvent context attributes in objects created in Azure Event Hub. When this
+                  property is false (default), the entire CloudEvent payload is included. When this property is true, only
+                  the CloudEvent data is included.
                 type: boolean
               auth:
                 description: Authentication method to interact with the Azure Event Hubs REST API.
                 type: object
                 properties:
                   sasToken:
-                    description: An Azure shared access signature (SAS) token. For more information about SAS tokens,
-                      please refer to the Azure Storage documentation at
-                      https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview.
+                    description: An Azure shared access signature (SAS) token. For more information about SAS tokens, please
+                      refer to the Azure Storage documentation at https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview.
                     type: object
                     properties:
                       keyName:
@@ -182,8 +177,8 @@ spec:
                         - required: [value]
                         - required: [valueFromSecret]
                       connectionString:
-                        description: Connection string containing both the resource URI of the Event Hubs instance, and
-                          the SAS token. Mutually exclusive with 'keyName' and 'keyValue'.
+                        description: Connection string containing both the resource URI of the Event Hubs instance, and the
+                          SAS token. Mutually exclusive with 'keyName' and 'keyValue'.
                         type: object
                         properties:
                           value:
@@ -210,9 +205,8 @@ spec:
                     - required:
                       - connectionString
                   servicePrincipal:
-                    description: Credentials of an Azure Service Principal. For more information about service
-                      principals, please refer to the Azure Active Directory documentation at
-                      https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals.
+                    description: Credentials of an Azure Service Principal. For more information about service principals,
+                      please refer to the Azure Active Directory documentation at https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals.
                     type: object
                     properties:
                       tenantID:

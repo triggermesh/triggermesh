@@ -57,8 +57,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -68,8 +67,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -78,14 +76,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -139,12 +135,10 @@ spec:
                 - required: [value]
                 - required: [valueFromSecret]
               webhookUsername:
-                description: User name Zendesk requests must set to authenticate with the webhook using HTTP Basic
-                  authentication.
+                description: User name Zendesk requests must set to authenticate with the webhook using HTTP Basic authentication.
                 type: string
               webhookPassword:
-                description: Password Zendesk requests must set to authenticate with the webhook using HTTP Basic
-                  authentication.
+                description: Password Zendesk requests must set to authenticate with the webhook using HTTP Basic authentication.
                 type: object
                 properties:
                   value:
@@ -247,8 +241,7 @@ spec:
                   - type
                   - status
               address:
-                description: Public address of the HTTP/S endpoint that is subscribed for receiving Zendesk webhhook
-                  events.
+                description: Public address of the HTTP/S endpoint that is subscribed for receiving Zendesk webhhook events.
                 type: object
                 properties:
                   url:

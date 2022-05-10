@@ -65,8 +65,7 @@ spec:
                 type: object
                 properties:
                   resources:
-                    description: 'Compute Resources required by the adapter. More info:
-                      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                     type: object
                     properties:
                       limits:
@@ -76,8 +75,7 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Limits describes the maximum amount of compute resources allowed. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                       requests:
                         additionalProperties:
@@ -86,14 +84,12 @@ spec:
                           - type: string
                           pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                           x-kubernetes-int-or-string: true
-                        description: 'Requests describes the minimum amount of compute resources required.
-                          If Requests is omitted for a container, it defaults to Limits if that is explicitly
-                          specified, otherwise to an implementation-defined value. More info:
-                          https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
                         type: object
                   tolerations:
-                    description: Pod tolerations, as documented at
-                      https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
                     type: array
                     items:
                       type: object
@@ -155,8 +151,8 @@ spec:
                   # the other Storage event types.
                   - Microsoft.Storage.BlobInventoryPolicyCompleted
               endpoint:
-                description: The intermediate destination of events subscribed via Event Grid, before they are retrieved
-                  by this event source.
+                description: The intermediate destination of events subscribed via Event Grid, before they are retrieved by
+                  this event source.
                 type: object
                 properties:
                   eventHubs:
@@ -172,8 +168,8 @@ spec:
                         type: string
                         pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}$
                       hubName:
-                        description: Name of the Event Hubs instance within the selected namespace. If omitted, an Event
-                          Hubs instance is created on behalf of the user.
+                        description: Name of the Event Hubs instance within the selected namespace. If omitted, an Event Hubs
+                          instance is created on behalf of the user.
                         type: string
                         pattern: ^[A-Za-z0-9][\w.-]{0,49}$
                     required:
@@ -181,14 +177,13 @@ spec:
                 required:
                 - eventHubs
               auth:
-                description: Authentication method to interact with the Azure Storage and Azure Event Hubs REST APIs.
-                  This event source only supports the Service Principal authentication.
+                description: Authentication method to interact with the Azure Storage and Azure Event Hubs REST APIs. This
+                  event source only supports the Service Principal authentication.
                 type: object
                 properties:
                   servicePrincipal:
-                    description: Credentials of an Azure Service Principal. For more information about service
-                      principals, please refer to the Azure Active Directory documentation at
-                      https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals.
+                    description: Credentials of an Azure Service Principal. For more information about service principals,
+                      please refer to the Azure Active Directory documentation at https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals.
                     type: object
                     properties:
                       tenantID:
@@ -302,8 +297,8 @@ spec:
             type: object
             properties:
               eventHubID:
-                description: Resource ID of the Event Hubs instance that is currently receiving events from the Azure
-                  Storage Account.
+                description: Resource ID of the Event Hubs instance that is currently receiving events from the Azure Storage
+                  Account.
                 type: string
               sinkUri:
                 description: URI of the sink where events are currently sent to.
