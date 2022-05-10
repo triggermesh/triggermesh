@@ -116,6 +116,7 @@ jobs:
         credentials_json: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
 
     - name: Run e2e tests
+      id: e2e
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -155,3 +156,27 @@ jobs:
         # Final retrieval of E2E namespaces, gives us a chance to see whether
         # some of them were still Terminating after the grace period.
         kubectl get ns -l e2e-framework
+
+    - name: Collect logs
+      id: logs
+      if: failure() && steps.e2e.outcome == 'failure'
+      run: |
+        tmp_logs="$(mktemp -d)"
+
+        kubectl -n triggermesh logs -l app=triggermesh-controller > "${tmp_logs}/triggermesh-controller.log"
+        kubectl -n triggermesh logs -l app=triggermesh-webhook    > "${tmp_logs}/triggermesh-webhook.log"
+
+        kubectl -n knative-serving logs -l app=controller > "${tmp_logs}/serving-controller.log"
+        kubectl -n knative-serving logs -l app=webhook    > "${tmp_logs}/serving-webhook.log"
+
+        kubectl -n knative-eventing logs -l app=eventing-controller > "${tmp_logs}/eventing-controller.log"
+        kubectl -n knative-eventing logs -l app=eventing-webhook    > "${tmp_logs}/eventing-webhook.log"
+
+        echo "::set-output name=logs_dir::${tmp_logs}"
+
+    - name: Upload logs
+      if: failure() && steps.logs.outputs.logs_dir
+      uses: actions/upload-artifact@v3
+      with:
+        name: logs
+        path: ${{ steps.logs.outputs.logs_dir }}
