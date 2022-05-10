@@ -22,6 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
@@ -35,6 +37,8 @@ import (
 )
 
 const sheetID = "1241k3jl1234hlk1234c1234ln125kch1"
+
+const urlEscapedColonChar = "%3A"
 
 func TestSheetHasAvailableRows(t *testing.T) {
 	httpmock.Activate()
@@ -84,8 +88,14 @@ func TestSheetHasAvailableRows(t *testing.T) {
 			response, err := httpmock.NewJsonResponder(testCase.responseStatus, testCase.response)
 			assert.NoError(t, err)
 
-			mockURL := fmt.Sprintf("/v4/spreadsheets/%s/values/!2:%d", sheetID, maxSheetRow+1)
-			httpmock.RegisterResponder("GET", mockURL, response)
+			mockURL := &url.URL{
+				Path: fmt.Sprintf("/v4/spreadsheets/%s/values/!2:%d", sheetID, maxSheetRow+1),
+			}
+			// url.PathEscape() doesn't escape ':' in URL paths, but
+			// the Google Sheet client does, which confuses httpmock.
+			mockURLStr := strings.ReplaceAll(mockURL.String(), ":", urlEscapedColonChar)
+
+			httpmock.RegisterResponder("GET", mockURLStr, response)
 
 			result, err := adapter.sheetHasAvailableRows(&sheets.Sheet{Properties: &sheets.SheetProperties{}})
 
