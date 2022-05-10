@@ -205,7 +205,11 @@ spec:
           value: gcr.io/triggermesh/xslttransformation-adapter:latest
 
         securityContext:
+          runAsNonRoot: true
           allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: [all]
 
         ports:
         - name: metrics
