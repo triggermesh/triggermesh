@@ -115,7 +115,8 @@ spec:
                 description: The JSON Query to perform on the incoming event
                 type: string
               sink:
-                description: The destination of events transformed by this component.
+                description: The destination of events emitted by the component. If left empty, the events will be sent back
+                  to the sender.
                 type: object
                 properties:
                   ref:

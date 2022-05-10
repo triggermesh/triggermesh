@@ -122,26 +122,25 @@ spec:
                 - required: [uri]
                 properties:
                   ref:
-                    description: Ref points to an Addressable.
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
                     type: object
                     properties:
                       apiVersion:
-                        description: API version of the referent.
                         type: string
                       kind:
-                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                        type: string
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
                         type: string
                       namespace:
-                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
-                          This is optional field, it gets defaulted to the object holding it if left out.'
                         type: string
+                      name:
+                        type: string
+                    required:
+                    - apiVersion
+                    - kind
+                    - name
                   uri:
-                    description: URI can be an absolute URL(non-empty scheme and non-empty host) pointing to the target or
-                      a relative URI. Relative URIs will be resolved using the base URI retrieved from Ref.
+                    description: URI to use as the destination of events.
                     type: string
+                    format: uri
           status:
             type: object
             properties:

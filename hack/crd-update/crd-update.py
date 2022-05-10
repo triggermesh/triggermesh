@@ -74,6 +74,41 @@ except (scanner.ScannerError) as e:
     sys.exit(f"adapterOverrides snippet is not a valid YAML document: {e}")
 
 try:
+    sink_snippet = yaml.load(
+        """\
+        sink:
+          description: The destination of events emitted by the component.
+          type: object
+          properties:
+            ref:
+              description: Reference to an addressable Kubernetes object to be used as the destination of events.
+              type: object
+              properties:
+                apiVersion:
+                  type: string
+                kind:
+                  type: string
+                namespace:
+                  type: string
+                name:
+                  type: string
+              required:
+              - apiVersion
+              - kind
+              - name
+            uri:
+              description: URI to use as the destination of events.
+              type: string
+              format: uri
+          oneOf:
+          - required: [ref]
+          - required: [uri]
+        """
+    )
+except (scanner.ScannerError) as e:
+    sys.exit(f"sink snippet is not a valid YAML document: {e}")
+
+try:
     crd = yaml.load(sys.stdin)
 except (scanner.ScannerError) as e:
     sys.exit(f"Input is not a valid YAML document: {e}")
@@ -87,17 +122,18 @@ except AttributeError as e:
 
 for i in range(len(crd_versions)):
     try:
-        spec_props = (
+        spec = (
             crd_versions[i]
             .get("schema")
             .get("openAPIV3Schema")
             .get("properties")
             .get("spec")
-            .get("properties")
         )
+        spec_props = spec.get("properties")
     except AttributeError as e:
         sys.exit(f"Unable to read spec definition from OpenAPI schema: {e}")
 
+    # spec.adapterOverrides
     current = spec_props.get("adapterOverrides")
     if current is not None:
         desired = adapter_overrides_snippet.get("adapterOverrides")
@@ -105,6 +141,17 @@ for i in range(len(crd_versions)):
             desired.get("properties").pop("public")
 
         spec_props["adapterOverrides"] = desired
+
+    # spec.sink
+    current = spec_props.get("sink", {}).get("properties")
+    if current is not None:
+        desired = sink_snippet.get("sink").get("properties")
+        spec_props.get("sink")["properties"] = desired
+        if "sink" not in spec.get("required", []):
+            spec_props.get("sink")["description"] = (
+                sink_snippet.get("sink").get("description")
+                + " If left empty, the events will be sent back to the sender."
+            )
 
 
 yaml.dump(crd, sys.stdout)

@@ -147,12 +147,12 @@ spec:
                 description: Whether the XSLT informed at the spec can be overriden at each CloudEvent.
                 type: boolean
               sink:
-                description: The destination of events transformed by this component.
+                description: The destination of events emitted by the component. If left empty, the events will be sent back
+                  to the sender.
                 type: object
                 properties:
                   ref:
-                    description: Reference to an addressable Kubernetes object to be used as the destination of events. If
-                      left empty, the events will be sent back to the sender/source.
+                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
                     type: object
                     properties:
                       apiVersion:
