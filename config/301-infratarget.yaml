@@ -56,6 +56,29 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
+              script:
+                description: JavaScript code to invoke when an event comes in.
+                type: object
+                properties:
+                  code:
+                    type: string
+                  timeout:
+                    type: integer
+                required:
+                - code
+              state:
+                type: object
+                description: Indicate whether stateful headers should be created (ensure), propagated (propagate), or dropped
+                  (none).
+                properties:
+                  headersPolicy:
+                    type: string
+                    enum: [ensure, propagate, none]
+                  bridge:
+                    type: string
+              typeLoopProtection:
+                description: Prevent the InfraTarget from consuming events it just produced.
+                type: boolean
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -111,29 +134,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              script:
-                description: JavaScript code to invoke when an event comes in.
-                type: object
-                properties:
-                  code:
-                    type: string
-                  timeout:
-                    type: integer
-                required:
-                - code
-              state:
-                type: object
-                description: Indicate whether stateful headers should be created (ensure), propagated (propagate), or dropped
-                  (none).
-                properties:
-                  headersPolicy:
-                    type: string
-                    enum: [ensure, propagate, none]
-                  bridge:
-                    type: string
-              typeLoopProtection:
-                description: Prevent the InfraTarget from consuming events it just produced.
-                type: boolean
             anyOf:
             - required: [script]
             - required: [state]

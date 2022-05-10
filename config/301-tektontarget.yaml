@@ -55,6 +55,18 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              reapPolicy:
+                type: object
+                description: Specify when successful or failed jobs should remain before being cleand out.
+                properties:
+                  success:
+                    description: Minimum age of a successfully completed run object before automatic purging
+                    type: string
+                    pattern: ^\d+[mhd]$
+                  fail:
+                    description: Minimum age of a failed run object before automatic purging
+                    type: string
+                    pattern: ^\d+[mhd]$
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -110,18 +122,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              reapPolicy:
-                type: object
-                description: Specify when successful or failed jobs should remain before being cleand out.
-                properties:
-                  success:
-                    description: Minimum age of a successfully completed run object before automatic purging
-                    type: string
-                    pattern: ^\d+[mhd]$
-                  fail:
-                    description: Minimum age of a failed run object before automatic purging
-                    type: string
-                    pattern: ^\d+[mhd]$
           status:
             type: object
             description: Reported status of the event target.

@@ -56,6 +56,42 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
+              endpoint:
+                description: REST endpoint for the GraphQL instance.
+                type: string
+                minLength: 1
+              defaultRole:
+                description: The default role a query from this target should assume when it is not specified in the event
+                  payload.
+                type: string
+              queries:
+                type: object
+                description: Preload GraphQL queries the target can respond to. When used, the queries are given a unique
+                  name that is referenced as a part of the cloudevent type 'io.triggermesh.graphql.query'.
+                additionalProperties:
+                  type: string
+              jwt:
+                type: object
+                description: A JavaScript Web Token (JWT) containing the credentials required to connect to Hasura.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              admin:
+                type: object
+                description: An API token that acts as an alternative to the jwt token used to connect to Hasura.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -111,42 +147,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              endpoint:
-                description: REST endpoint for the GraphQL instance.
-                type: string
-                minLength: 1
-              defaultRole:
-                description: The default role a query from this target should assume when it is not specified in the event
-                  payload.
-                type: string
-              queries:
-                type: object
-                description: Preload GraphQL queries the target can respond to. When used, the queries are given a unique
-                  name that is referenced as a part of the cloudevent type 'io.triggermesh.graphql.query'.
-                additionalProperties:
-                  type: string
-              jwt:
-                type: object
-                description: A JavaScript Web Token (JWT) containing the credentials required to connect to Hasura.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              admin:
-                type: object
-                description: An API token that acts as an alternative to the jwt token used to connect to Hasura.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
             required:
             - endpoint
           status:

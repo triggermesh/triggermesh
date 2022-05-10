@@ -60,6 +60,36 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              defaultCollection:
+                description: Default firestore collection to stream events into.
+                type: string
+              projectID:
+                description: Google Cloud Project ID associated with the firestore database.
+                type: string
+              discardCloudEventContext:
+                description: Whether to omit CloudEvent context attributes in documents created in Firestore. When this property
+                  is false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
+                  data is included. component only.
+                type: boolean
+              credentialsJson:
+                type: object
+                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information,
+                  refer to https://cloud.google.com/docs/authentication/production.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              eventOptions:
+                type: object
+                description: 'When should this target generate a response event for processing: always, on error, or never.'
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -115,36 +145,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              defaultCollection:
-                description: Default firestore collection to stream events into.
-                type: string
-              projectID:
-                description: Google Cloud Project ID associated with the firestore database.
-                type: string
-              discardCloudEventContext:
-                description: Whether to omit CloudEvent context attributes in documents created in Firestore. When this property
-                  is false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
-                  data is included. component only.
-                type: boolean
-              credentialsJson:
-                type: object
-                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information,
-                  refer to https://cloud.google.com/docs/authentication/production.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              eventOptions:
-                type: object
-                description: 'When should this target generate a response event for processing: always, on error, or never.'
-                properties:
-                  payloadPolicy:
-                    type: string
-                    enum: [always, error, never]
             required:
             - credentialsJson
             - projectID

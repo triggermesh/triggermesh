@@ -58,6 +58,40 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
+              auth:
+                type: object
+                description: Credentials to authenticate against the Jira instance.
+                properties:
+                  user:
+                    description: Jira username for the target to use.
+                    type: string
+                    minLength: 1
+                  token:
+                    description: Jira API token associated with the Jira user.
+                    type: object
+                    properties:
+                      secretKeyRef:
+                        type: object
+                        properties:
+                          key:
+                            type: string
+                          name:
+                            type: string
+                required:
+                - user
+                - token
+              url:
+                description: Jira instance url.
+                type: string
+                format: url
+                pattern: ^https?:\/\/.+$
+              eventOptions:
+                description: 'When should this target generate a response event for processing: always, on error, or never.'
+                type: object
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -113,40 +147,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              auth:
-                type: object
-                description: Credentials to authenticate against the Jira instance.
-                properties:
-                  user:
-                    description: Jira username for the target to use.
-                    type: string
-                    minLength: 1
-                  token:
-                    description: Jira API token associated with the Jira user.
-                    type: object
-                    properties:
-                      secretKeyRef:
-                        type: object
-                        properties:
-                          key:
-                            type: string
-                          name:
-                            type: string
-                required:
-                - user
-                - token
-              url:
-                description: Jira instance url.
-                type: string
-                format: url
-                pattern: ^https?:\/\/.+$
-              eventOptions:
-                description: 'When should this target generate a response event for processing: always, on error, or never.'
-                type: object
-                properties:
-                  payloadPolicy:
-                    type: string
-                    enum: [always, error, never]
             required:
             - auth
             - url

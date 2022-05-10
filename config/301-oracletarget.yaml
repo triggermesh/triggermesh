@@ -55,6 +55,59 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              oracleApiPrivateKey:
+                type: object
+                description: Oracle API Private Key to sign each request to the Oracle Cloud. For details on how to create
+                  a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              oracleApiPrivateKeyPassphrase:
+                type: object
+                description: Passphrase to unlock the private key used to sign each request to the Oracle Cloud. For details
+                  on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              oracleApiPrivateKeyFingerprint:
+                type: object
+                description: MD5 fingerprint to identify the keypair associated with the key used to sign each request to
+                  the Oracle Cloud. For details on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              oracleTenancy:
+                description: The Oracle Cloud ID (OCID) of the tenant containing the service to be used on the Oracle Cloud.
+                type: string
+              oracleUser:
+                description: The Oracle Cloud ID (OCID) of the user who owns the key used to interact with the Oracle Cloud.
+                type: string
+              oracleRegion:
+                description: The Oracle Cloud region containing the service being executed. A full list of supported regions
+                  can be found at https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm.
+                type: string
+              function:
+                type: object
+                description: Invoke a serverless function on the Oracle Cloud.
+                properties:
+                  function:
+                    description: The Oracle Cloud ID (OCID) of the function being invoked.
+                    type: string
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -110,59 +163,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              oracleApiPrivateKey:
-                type: object
-                description: Oracle API Private Key to sign each request to the Oracle Cloud. For details on how to create
-                  a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              oracleApiPrivateKeyPassphrase:
-                type: object
-                description: Passphrase to unlock the private key used to sign each request to the Oracle Cloud. For details
-                  on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              oracleApiPrivateKeyFingerprint:
-                type: object
-                description: MD5 fingerprint to identify the keypair associated with the key used to sign each request to
-                  the Oracle Cloud. For details on how to create a private keypair for Oracle Cloud, refer to https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              oracleTenancy:
-                description: The Oracle Cloud ID (OCID) of the tenant containing the service to be used on the Oracle Cloud.
-                type: string
-              oracleUser:
-                description: The Oracle Cloud ID (OCID) of the user who owns the key used to interact with the Oracle Cloud.
-                type: string
-              oracleRegion:
-                description: The Oracle Cloud region containing the service being executed. A full list of supported regions
-                  can be found at https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm.
-                type: string
-              function:
-                type: object
-                description: Invoke a serverless function on the Oracle Cloud.
-                properties:
-                  function:
-                    description: The Oracle Cloud ID (OCID) of the function being invoked.
-                    type: string
             oneOf:
             - required: [function]
           status:

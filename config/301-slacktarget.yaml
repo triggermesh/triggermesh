@@ -55,6 +55,18 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
+              token:
+                type: object
+                description: Slack API token used to interface with Slack. Consult the Slack API documenation for details
+                  on how to setup an app for the target https://api.slack.com/web#authentication.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -110,18 +122,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              token:
-                type: object
-                description: Slack API token used to interface with Slack. Consult the Slack API documenation for details
-                  on how to setup an app for the target https://api.slack.com/web#authentication.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
             required:
             - token
           status:

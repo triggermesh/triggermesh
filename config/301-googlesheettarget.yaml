@@ -56,6 +56,27 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              id:
+                type: string
+                description: Googlesheet ID associated with the document being targeted.
+                minLength: 1
+              defaultPrefix:
+                type: string
+                description: A prefix to be used when creating a new sheet inside a document.
+                minLength: 1
+              googleServiceAccount:
+                description: Google service account token used to authenticate access to the Googlesheet document.
+                type: object
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        minLength: 1
+                      name:
+                        type: string
+                        minLength: 1
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -111,27 +132,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              id:
-                type: string
-                description: Googlesheet ID associated with the document being targeted.
-                minLength: 1
-              defaultPrefix:
-                type: string
-                description: A prefix to be used when creating a new sheet inside a document.
-                minLength: 1
-              googleServiceAccount:
-                description: Google service account token used to authenticate access to the Googlesheet document.
-                type: object
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                        minLength: 1
-                      name:
-                        type: string
-                        minLength: 1
             required:
             - id
             - googleServiceAccount
