@@ -164,7 +164,8 @@ spec:
                   required:
                   - operation
               sink:
-                description: The destination of events sourced from the transformation object.
+                description: The destination of events emitted by the component. If left empty, the events will be sent back
+                  to the sender.
                 type: object
                 properties:
                   ref:
