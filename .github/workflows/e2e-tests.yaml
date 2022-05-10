@@ -163,14 +163,14 @@ jobs:
       run: |
         tmp_logs="$(mktemp -d)"
 
-        kubectl -n triggermesh logs -l app=triggermesh-controller > "${tmp_logs}/triggermesh-controller.log"
-        kubectl -n triggermesh logs -l app=triggermesh-webhook    > "${tmp_logs}/triggermesh-webhook.log"
+        kubectl -n triggermesh logs --tail=-1 -l app=triggermesh-controller > "${tmp_logs}/triggermesh-controller.log"
+        kubectl -n triggermesh logs --tail=-1 -l app=triggermesh-webhook    > "${tmp_logs}/triggermesh-webhook.log"
 
-        kubectl -n knative-serving logs -l app=controller > "${tmp_logs}/serving-controller.log"
-        kubectl -n knative-serving logs -l app=webhook    > "${tmp_logs}/serving-webhook.log"
+        kubectl -n knative-serving logs --tail=-1 -l app=controller > "${tmp_logs}/serving-controller.log"
+        kubectl -n knative-serving logs --tail=-1 -l app=webhook    > "${tmp_logs}/serving-webhook.log"
 
-        kubectl -n knative-eventing logs -l app=eventing-controller > "${tmp_logs}/eventing-controller.log"
-        kubectl -n knative-eventing logs -l app=eventing-webhook    > "${tmp_logs}/eventing-webhook.log"
+        kubectl -n knative-eventing logs --tail=-1 -l app=eventing-controller > "${tmp_logs}/eventing-controller.log"
+        kubectl -n knative-eventing logs --tail=-1 -l app=eventing-webhook    > "${tmp_logs}/eventing-webhook.log"
 
         echo "::set-output name=logs_dir::${tmp_logs}"
 
