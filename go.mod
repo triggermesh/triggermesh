@@ -52,7 +52,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/ibm-messaging/mq-golang/v5 v5.2.5
 	github.com/itchyny/gojq v0.12.7
-	github.com/jarcoal/httpmock v1.1.0
+	github.com/jarcoal/httpmock v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
