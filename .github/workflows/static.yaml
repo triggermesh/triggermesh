@@ -59,6 +59,27 @@ jobs:
         restore-keys: |
           ${{ github.job }}-${{ runner.os }}-go-
 
+    - name: RBAC rules consistency
+      run: |
+        pushd hack/rbac-check
+        go install .
+        popd
+        rbac-check
+
+    - name: Lint CRD manifests
+      run: |
+        hack/crd-update/update-all-crds.sh
+
+        git_status="$(git status --porcelain)"
+        if [[ ${git_status} ]]; then
+            echo -e 'CRD manifests are out-of-date. Please run `hack/crd-update/update-all-crds.sh`\n'
+            echo "${git_status}"
+            exit 1
+        fi
+
+    - name: Validate CRD annotations
+      run: hack/crd-annotations-check.sh
+
     - name: Lint Kubernetes manifests
       id: yamllint
       uses: ibiqlik/action-yamllint@v3
@@ -78,13 +99,3 @@ jobs:
       with:
         file_or_dir: config/
         config_file: .github/workflows/config/yamllint-k8s.yaml
-
-    - name: RBAC rules consistency
-      run: |
-        pushd hack/rbac-check
-        go install .
-        popd
-        rbac-check
-
-    - name: Validate CRD annotations
-      run: hack/crd-annotations-check.sh

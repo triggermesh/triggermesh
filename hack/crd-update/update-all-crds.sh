@@ -40,19 +40,44 @@ fi
 
 tool_dir="${0%/*}"
 
-pushd "$tool_dir"
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-popd
+# Creates and populates a Python venv inside the script's directory.
+# No-op if it already exists.
+function create_venv {
+	if [ -d "${tool_dir}"/venv ]; then
+		echo 0
+		return 0
+	elif [ -e "${tool_dir}"/venv ]; then
+		echo "venv exists but is not a directory" >&2
+		echo 0
+		return 1
+	fi
 
+	python3 -m venv "${tool_dir}"/venv >/dev/null
+	source "${tool_dir}"/venv/bin/activate
+	pip3 install -r "${tool_dir}"/requirements.txt >/dev/null
+	deactivate
+
+	echo 1
+}
+
+# Clears the Python venv inside the script's directory.
+function remove_venv {
+	rm -rf "${tool_dir}"/venv
+}
+
+# Runs the crd-update.py script located inside the script's directory.
 function crd_update {
 	"${tool_dir}"/crd-update.py
 }
+
+declare -i venv_created
+venv_created="$(create_venv)"
+if ((venv_created)); then
+	trap remove_venv EXIT HUP INT QUIT PIPE TERM
+fi
+source "${tool_dir}"/venv/bin/activate
 
 for crd_file in "$config_dir"/30[0-4]-*.yaml; do
 	crd_update <"$crd_file" >"$crd_file".new
 	mv "$crd_file".new "$crd_file"
 done
-
-deactivate
