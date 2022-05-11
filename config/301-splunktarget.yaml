@@ -50,6 +50,38 @@ spec:
           spec:
             type: object
             properties:
+              endpoint:
+                type: string
+                description: URL of the HTTP Event Collector (HEC). Only the scheme, hostname, and port (optionally) are evaluated,
+                  the URL path is trimmed if present. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#Enable_HTTP_Event_Collector.
+                format: url
+                pattern: ^https?:\/\/.+$
+              token:
+                type: object
+                description: Token for authenticating requests against the HEC. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#About_Event_Collector_tokens.
+                properties:
+                  value:
+                    type: string
+                    format: guid
+                    pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
+                  valueFromSecret:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      key:
+                        type: string
+                oneOf:
+                - required: [value]
+                - required: [valueFromSecret]
+              index:
+                type: string
+                description: Name of the index to send events to. When undefined, events are sent to the default index defined
+                  in the HEC token's configuration.
+                pattern: ^[\w-]+$
+              skipTLSVerify:
+                description: Control whether the target should verify the SSL/TLS certificate used by the event collector.
+                type: boolean
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -105,38 +137,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              endpoint:
-                type: string
-                description: URL of the HTTP Event Collector (HEC). Only the scheme, hostname, and port (optionally) are evaluated,
-                  the URL path is trimmed if present. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#Enable_HTTP_Event_Collector.
-                format: url
-                pattern: ^https?:\/\/.+$
-              token:
-                type: object
-                description: Token for authenticating requests against the HEC. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#About_Event_Collector_tokens.
-                properties:
-                  value:
-                    type: string
-                    format: guid
-                    pattern: ^[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$
-                  valueFromSecret:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      key:
-                        type: string
-                oneOf:
-                - required: [value]
-                - required: [valueFromSecret]
-              index:
-                type: string
-                description: Name of the index to send events to. When undefined, events are sent to the default index defined
-                  in the HEC token's configuration.
-                pattern: ^[\w-]+$
-              skipTLSVerify:
-                description: Control whether the target should verify the SSL/TLS certificate used by the event collector.
-                type: boolean
             required:
             - endpoint
             - token

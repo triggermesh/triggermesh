@@ -4,6 +4,10 @@ from ruamel.yaml import YAML, scanner, composer
 import sys
 
 yaml = YAML()
+# NOTE(antoineco) Lines may currently overflow this limit under some
+# circumstances due to a bug, which the author of the library expressed
+# interest in fixing in a future release.
+# Ref. https://sourceforge.net/p/ruamel-yaml/tickets/427/
 yaml.width = 120
 
 try:

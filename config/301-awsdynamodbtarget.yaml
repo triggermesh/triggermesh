@@ -55,6 +55,36 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
+              awsApiKey:
+                type: object
+                description: API Key to interact with the Amazon DynamoDB API. For more information about AWS security credentials,
+                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                properties:
+                  secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the access key ID.
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              awsApiSecret:
+                description: API Key to interact with the Amazon DynamoDB API. For more information about AWS security credentials,
+                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                type: object
+                properties:
+                  secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the secret access key.
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              arn:
+                description: ARN of the DynamoDB table to post events to. The expected format is documented at https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondynamodb.html
+                type: string
+                pattern: ^arn:aws(-cn|-us-gov)?:dynamodb:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:table\/[a-zA-Z0-9-_.]{3,255}$
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -110,36 +140,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              awsApiKey:
-                type: object
-                description: API Key to interact with the Amazon DynamoDB API. For more information about AWS security credentials,
-                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
-                properties:
-                  secretKeyRef:
-                    description: A reference to a Kubernetes Secret object containing the access key ID.
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              awsApiSecret:
-                description: API Key to interact with the Amazon DynamoDB API. For more information about AWS security credentials,
-                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
-                type: object
-                properties:
-                  secretKeyRef:
-                    description: A reference to a Kubernetes Secret object containing the secret access key.
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              arn:
-                description: ARN of the DynamoDB table to post events to. The expected format is documented at https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazondynamodb.html
-                type: string
-                pattern: ^arn:aws(-cn|-us-gov)?:dynamodb:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:table\/[a-zA-Z0-9-_.]{3,255}$
             required:
             - arn
             - awsApiSecret

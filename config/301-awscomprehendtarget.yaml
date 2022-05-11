@@ -56,6 +56,39 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              awsApiKey:
+                description: API Key to interact with the Comprehend API. For more information about AWS security credentials,
+                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                type: object
+                properties:
+                  secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the access key ID.
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              awsApiSecret:
+                description: API Secret to interact with the Comprehend API. For more information about AWS security credentials,
+                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+                type: object
+                properties:
+                  secretKeyRef:
+                    description: A reference to a Kubernetes Secret object containing the secret access key.
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              region:
+                description: Code of the AWS region to use for the Comprehend API. Available region codes are documented in
+                  the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
+                type: string
+              language:
+                description: Language code to use for Comprehend. Available languages can be found at https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html.
+                type: string
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -111,39 +144,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              awsApiKey:
-                description: API Key to interact with the Comprehend API. For more information about AWS security credentials,
-                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
-                type: object
-                properties:
-                  secretKeyRef:
-                    description: A reference to a Kubernetes Secret object containing the access key ID.
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              awsApiSecret:
-                description: API Secret to interact with the Comprehend API. For more information about AWS security credentials,
-                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
-                type: object
-                properties:
-                  secretKeyRef:
-                    description: A reference to a Kubernetes Secret object containing the secret access key.
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              region:
-                description: Code of the AWS region to use for the Comprehend API. Available region codes are documented in
-                  the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/rande.html#regional-endpoints.
-                type: string
-              language:
-                description: Language code to use for Comprehend. Available languages can be found at https://docs.aws.amazon.com/comprehend/latest/dg/supported-languages.html.
-                type: string
             required:
             - region
             - language

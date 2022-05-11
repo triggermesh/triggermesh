@@ -55,6 +55,51 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              auth:
+                type: object
+                description: Attributes required to setup OAuth authentication with Salesforce. To create the credentials,
+                  refer to https://help.salesforce.com/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm.
+                properties:
+                  clientID:
+                    description: OAuth Client ID used to identify the target.
+                    type: string
+                    minLength: 1
+                  server:
+                    description: The Salesforce authentication URL associated with the instance being used.
+                    type: string
+                    format: uri
+                    pattern: ^https?:\/\/.+$
+                  user:
+                    description: Username associated with the Salesforce account.
+                    type: string
+                    minLength: 1
+                  certKey:
+                    type: object
+                    description: Salesforce requires a certificate to facilitate the authentication flow.
+                    properties:
+                      secretKeyRef:
+                        type: object
+                        properties:
+                          key:
+                            type: string
+                          name:
+                            type: string
+                required:
+                - clientID
+                - server
+                - user
+                - certKey
+              apiVersion:
+                type: string
+                description: Salesforce API version to use for the target's integration with Salesforce.
+                pattern: v\d+\.\d+$
+              eventOptions:
+                type: object
+                description: 'When should this target generate a response event for processing: always, on error, or never.'
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -110,51 +155,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              auth:
-                type: object
-                description: Attributes required to setup OAuth authentication with Salesforce. To create the credentials,
-                  refer to https://help.salesforce.com/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm.
-                properties:
-                  clientID:
-                    description: OAuth Client ID used to identify the target.
-                    type: string
-                    minLength: 1
-                  server:
-                    description: The Salesforce authentication URL associated with the instance being used.
-                    type: string
-                    format: uri
-                    pattern: ^https?:\/\/.+$
-                  user:
-                    description: Username associated with the Salesforce account.
-                    type: string
-                    minLength: 1
-                  certKey:
-                    type: object
-                    description: Salesforce requires a certificate to facilitate the authentication flow.
-                    properties:
-                      secretKeyRef:
-                        type: object
-                        properties:
-                          key:
-                            type: string
-                          name:
-                            type: string
-                required:
-                - clientID
-                - server
-                - user
-                - certKey
-              apiVersion:
-                type: string
-                description: Salesforce API version to use for the target's integration with Salesforce.
-                pattern: v\d+\.\d+$
-              eventOptions:
-                type: object
-                description: 'When should this target generate a response event for processing: always, on error, or never.'
-                properties:
-                  payloadPolicy:
-                    type: string
-                    enum: [always, error, never]
             required:
             - auth
           status:

@@ -57,6 +57,24 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
+              apiKey:
+                type: object
+                description: Datadog API Key with access to receive metrics.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              eventOptions:
+                description: 'When should this target generate a response event for processing: always, on error, or never.'
+                type: object
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -112,24 +130,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              apiKey:
-                type: object
-                description: Datadog API Key with access to receive metrics.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              eventOptions:
-                description: 'When should this target generate a response event for processing: always, on error, or never.'
-                type: object
-                properties:
-                  payloadPolicy:
-                    type: string
-                    enum: [always, error, never]
             required:
             - apiKey
           status:

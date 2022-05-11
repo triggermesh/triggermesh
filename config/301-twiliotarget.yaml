@@ -55,6 +55,41 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              defaultPhoneFrom:
+                description: Default phone number to send the message from.
+                type: string
+              defaultPhoneTo:
+                description: Default phone number to send the message to.
+                type: string
+              sid:
+                type: object
+                description: Twilio account service ID (SID)
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              token:
+                type: object
+                description: Twilio API Token.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              eventOptions:
+                type: object
+                description: 'When should this target generate a response event for processing: always, on error, or never.'
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -110,41 +145,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              defaultPhoneFrom:
-                description: Default phone number to send the message from.
-                type: string
-              defaultPhoneTo:
-                description: Default phone number to send the message to.
-                type: string
-              sid:
-                type: object
-                description: Twilio account service ID (SID)
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              token:
-                type: object
-                description: Twilio API Token.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              eventOptions:
-                type: object
-                description: 'When should this target generate a response event for processing: always, on error, or never.'
-                properties:
-                  payloadPolicy:
-                    type: string
-                    enum: [always, error, never]
             required:
             - sid
             - token

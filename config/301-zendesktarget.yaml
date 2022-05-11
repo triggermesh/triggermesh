@@ -56,6 +56,26 @@ spec:
             type: object
             description: Desired state of event target.
             properties:
+              subject:
+                description: Default subject line to use for tickets created using this target.
+                type: string
+              subdomain:
+                description: User's subdomain on zendesk being targeted.
+                type: string
+              email:
+                description: Default registered email address for interacting with Zendesk.
+                type: string
+              token:
+                type: object
+                description: Zendesk API token for interacting with Zendesk.
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -111,26 +131,6 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-              subject:
-                description: Default subject line to use for tickets created using this target.
-                type: string
-              subdomain:
-                description: User's subdomain on zendesk being targeted.
-                type: string
-              email:
-                description: Default registered email address for interacting with Zendesk.
-                type: string
-              token:
-                type: object
-                description: Zendesk API token for interacting with Zendesk.
-                properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
             required:
             - subdomain
             - email
