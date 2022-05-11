@@ -96,7 +96,7 @@ jobs:
       env:
         KO_DOCKER_REPO: kind.local
       run: |
-        yq -i 'del(.spec.template.spec.containers[]?.resources)' config/500-controller.yaml
+        yq -yi 'del(.spec.template.spec.containers[]?.resources)' config/500-controller.yaml
 
         ko apply -f config/namespace/
         ko apply -f config/
