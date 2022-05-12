@@ -183,3 +183,24 @@ jobs:
       with:
         name: logs
         path: ${{ steps.logs.outputs.logs_dir }}
+
+    - name: Print debug information about environment
+      if: failure() && steps.e2e.outcome == 'failure'
+      run: |
+        echo '::group::TriggerMesh'
+        kubectl -n triggermesh get pods -l app=triggermesh-webhook -ojsonpath='{.items[*].status.containerStatuses}{"\n"}'
+        kubectl -n triggermesh get pods
+        kubectl -n triggermesh get events --sort-by='.lastTimestamp'
+        echo '::endgroup::'
+
+        echo '::group::Knative Serving'
+        kubectl -n knative-serving get pods -l app=webhook -ojsonpath='{.items[*].status.containerStatuses}{"\n"}'
+        kubectl -n knative-serving get pods
+        kubectl -n knative-serving get events --sort-by='.lastTimestamp'
+        echo '::endgroup::'
+
+        echo '::group::Knative Eventing'
+        kubectl -n knative-eventing get pods -l app=eventing-webhook -ojsonpath='{.items[*].status.containerStatuses}{"\n"}'
+        kubectl -n knative-eventing get pods
+        kubectl -n knative-eventing get events --sort-by='.lastTimestamp'
+        echo '::endgroup::'
