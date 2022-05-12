@@ -101,8 +101,12 @@ jobs:
         ko apply -f config/namespace/
         ko apply -f config/
 
-        kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-controller
-        kubectl -n triggermesh wait --timeout=1m --for=condition=Available deployments.apps/triggermesh-webhook
+        # Building TriggerMesh may cause existing Pods to crash due to resources
+        # exhaustion, including the TriggerMesh webhook. We need to allow enough
+        # time for Pods in CrashLoopBackoff to recover before moving on.
+        kubectl -n triggermesh      wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/part-of=triggermesh
+        kubectl -n knative-serving  wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-serving
+        kubectl -n knative-eventing wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-eventing
 
     - name: Install Ginkgo
       run: go install github.com/onsi/ginkgo/v2/ginkgo
