@@ -42,9 +42,10 @@ jobs:
     - name: KinD Cluster
       uses: container-tools/kind-action@v1
       with:
-        knative_eventing: v1.0.0
-        knative_serving: v1.0.0
-        knative_kourier: v1.0.0
+        version: v0.13.0
+        knative_eventing: v1.4.0
+        knative_serving: v1.4.0
+        knative_kourier: v1.4.0
         # ko loads images directly into KinD's container runtime when
         # KO_DOCKER_REPO is set to the rogue value "kind.local", so we have no
         # use for a container registry.
@@ -142,7 +143,7 @@ jobs:
     # To prevent that, we delay the completion of the job until all namespaces
     # labeled "e2e-framework" have been finalized.
     - name: Wait for termination of E2E namespaces
-      if: always()
+      if: always() && steps.e2e.outcome != 'skipped'
       run: |
         declare -i e2e_ns_count=-1
 
