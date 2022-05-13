@@ -40,10 +40,10 @@ type adapterConfig struct {
 	Image string `default:"gcr.io/triggermesh/awssnstarget-adapter"`
 }
 
-// Verify that Reconciler implements common.AdapterServiceBuilder.
-var _ common.AdapterServiceBuilder = (*Reconciler)(nil)
+// Verify that Reconciler implements common.AdapterBuilder.
+var _ common.AdapterBuilder[*servingv1.Service] = (*Reconciler)(nil)
 
-// BuildAdapter implements common.AdapterServiceBuilder.
+// BuildAdapter implements common.AdapterBuilder.
 func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) (*servingv1.Service, error) {
 	typedTrg := trg.(*v1alpha1.AWSSNSTarget)
 

@@ -120,7 +120,7 @@ func newEventSource() *v1alpha1.AWSSNSSource {
 
 // adapterBuilder returns a slim Reconciler containing only the fields accessed
 // by r.BuildAdapter().
-func adapterBuilder(cfg *adapterConfig) common.AdapterServiceBuilder {
+func adapterBuilder(cfg *adapterConfig) common.AdapterBuilder[*servingv1.Service] {
 	return &Reconciler{
 		adapterCfg: cfg,
 	}

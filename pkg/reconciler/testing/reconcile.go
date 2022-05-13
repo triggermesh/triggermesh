@@ -80,13 +80,15 @@ var (
 //  2. MakeFactory injects those clients into a context along with fake event recorders, etc.
 //  3. A Reconciler is constructed via a Ctor function using the values injected above
 //  4. The Reconciler returned by MakeFactory is used to run the test case
-func TestReconcileAdapter(t *testing.T, ctor Ctor, rcl v1alpha1.Reconcilable, adapterBuilder interface{}) {
+func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
+	ctor Ctor, rcl v1alpha1.Reconcilable, ab common.AdapterBuilder[T]) {
+
 	assertPopulatedComponentInstance(t, rcl)
 
 	newComponentInstance := componentCtor(rcl)
 	newServiceAccount := NewServiceAccount(rcl)
 	newRoleBinding := NewRoleBinding(newServiceAccount())
-	newAdapter := mustAdapterCtor(t, adapterBuilder, rcl)
+	newAdapter := mustAdapterCtor(t, ab, rcl)
 
 	comp := newComponentInstance()
 	a := newAdapter()
@@ -418,9 +420,8 @@ func assertPopulatedComponentInstance(t *testing.T, rcl v1alpha1.Reconcilable) {
 	}
 }
 
-func nameKindAndResource(object runtime.Object) (string /*name*/, string /*kind*/, string /*resource*/) {
-	metaObj, _ := meta.Accessor(object)
-	name := metaObj.GetName()
+func nameKindAndResource(object metav1.Object) (string /*name*/, string /*kind*/, string /*resource*/) {
+	name := object.GetName()
 
 	var kind, resource string
 
@@ -558,24 +559,24 @@ func withClearSink(rcl v1alpha1.Reconcilable) {
 }
 
 // Deployed: True
-func deployed(adapter runtime.Object) componentOption {
-	adapter = adapter.DeepCopyObject()
+func deployed(adapter kmeta.Accessor) componentOption {
+	adapter = adapter.DeepCopyObject().(kmeta.Accessor)
 	ready(adapter)
 
 	return propagateAdapterAvailabilityFunc(adapter)
 }
 
 // Deployed: False
-func notDeployed(adapter runtime.Object) componentOption {
-	adapter = adapter.DeepCopyObject()
+func notDeployed(adapter kmeta.Accessor) componentOption {
+	adapter = adapter.DeepCopyObject().(kmeta.Accessor)
 	notReady(adapter)
 
 	return propagateAdapterAvailabilityFunc(adapter)
 }
 
 // Deployed: Unknown with error
-func unknownDeployedWithError(adapter runtime.Object) componentOption {
-	var nilObj runtime.Object
+func unknownDeployedWithError(adapter kmeta.Accessor) componentOption {
+	var nilObj kmeta.Accessor
 
 	switch adapter.(type) {
 	case *appsv1.Deployment:
@@ -587,7 +588,7 @@ func unknownDeployedWithError(adapter runtime.Object) componentOption {
 	return propagateAdapterAvailabilityFunc(nilObj)
 }
 
-func propagateAdapterAvailabilityFunc(adapter runtime.Object) func(rcl v1alpha1.Reconcilable) {
+func propagateAdapterAvailabilityFunc(adapter kmeta.Accessor) func(rcl v1alpha1.Reconcilable) {
 	return func(rcl v1alpha1.Reconcilable) {
 		switch a := adapter.(type) {
 		case *appsv1.Deployment:
@@ -613,28 +614,20 @@ func deleted(rcl v1alpha1.Reconcilable) {
 
 /* Adapter */
 
-// adapterCtorWithOptions is a function that returns a runtime object with
+// adapterCtorWithOptions is a function that returns an adapter object with
 // modifications applied.
-type adapterCtorWithOptions func(...adapterOption) (runtime.Object, error)
+type adapterCtorWithOptions func(opts ...adapterOption) (adapter kmeta.Accessor, err error)
 
-// adapterCtor creates a copy of the given adapter object and returns a
-// function that can apply options to that object.
-func adapterCtor(adapterBuilder interface{}, rcl v1alpha1.Reconcilable) adapterCtorWithOptions {
-	return func(opts ...adapterOption) (runtime.Object, error) {
-		var obj runtime.Object
-		var err error
-
+// adapterCtor returns a function that can build an adapter object based on the
+// given AdapterBuilder and Reconcilable, then apply options to that object.
+func adapterCtor[T kmeta.Accessor](ab common.AdapterBuilder[T], rcl v1alpha1.Reconcilable) adapterCtorWithOptions {
+	return func(opts ...adapterOption) (kmeta.Accessor, error) {
 		var sinkURI *apis.URL
 		if _, isEventSender := rcl.(v1alpha1.EventSender); isEventSender {
 			sinkURI = tSinkURI
 		}
 
-		switch typedAdapterBuilder := adapterBuilder.(type) {
-		case common.AdapterDeploymentBuilder:
-			obj, err = typedAdapterBuilder.BuildAdapter(rcl, sinkURI)
-		case common.AdapterServiceBuilder:
-			obj, err = typedAdapterBuilder.BuildAdapter(rcl, sinkURI)
-		}
+		adapter, err := ab.BuildAdapter(rcl, sinkURI)
 		if err != nil {
 			return nil, fmt.Errorf("building adapter object using provided Reconcilable: %w", err)
 		}
@@ -643,32 +636,34 @@ func adapterCtor(adapterBuilder interface{}, rcl v1alpha1.Reconcilable) adapterC
 		// automatically sets the ServiceAccount as owner of
 		// multi-tenant adapters
 		if v1alpha1.IsMultiTenant(rcl) {
-			common.OwnByServiceAccount(obj.(metav1.Object), NewServiceAccount(rcl)())
+			common.OwnByServiceAccount(adapter, NewServiceAccount(rcl)())
 		}
 
 		for _, opt := range opts {
-			opt(obj)
+			opt(adapter)
 		}
 
-		return obj, nil
+		return adapter, nil
 	}
 }
 
 // mustAdapterCtor is a wrapper around adapterCtor that fails the test in case
 // of error.
-func mustAdapterCtor(t *testing.T, adapterBuilder interface{}, rcl v1alpha1.Reconcilable) func(...adapterOption) runtime.Object {
-	return func(opts ...adapterOption) runtime.Object {
-		a, err := adapterCtor(adapterBuilder, rcl)(opts...)
+func mustAdapterCtor[T kmeta.Accessor](t *testing.T,
+	ab common.AdapterBuilder[T], rcl v1alpha1.Reconcilable) func(...adapterOption) kmeta.Accessor {
+
+	return func(opts ...adapterOption) kmeta.Accessor {
+		a, err := adapterCtor(ab, rcl)(opts...)
 		require.NoError(t, err)
 		return a
 	}
 }
 
 // adapterOption is a functional option for an adapter object.
-type adapterOption func(runtime.Object)
+type adapterOption func(kmeta.Accessor)
 
 // Ready: True
-func ready(object runtime.Object) {
+func ready(object kmeta.Accessor) {
 	switch o := object.(type) {
 	case *appsv1.Deployment:
 		o.Status = appsv1.DeploymentStatus{
@@ -687,7 +682,7 @@ func ready(object runtime.Object) {
 }
 
 // Ready: False
-func notReady(object runtime.Object) {
+func notReady(object kmeta.Accessor) {
 	switch o := object.(type) {
 	case *appsv1.Deployment:
 		o.Status = appsv1.DeploymentStatus{
@@ -705,7 +700,7 @@ func notReady(object runtime.Object) {
 }
 
 // bumpImage adds a static suffix to the adapter's image.
-func bumpImage(object runtime.Object) {
+func bumpImage(object kmeta.Accessor) {
 	switch o := object.(type) {
 	case *appsv1.Deployment:
 		o.Spec.Template.Spec.Containers[0].Image += "-test"
@@ -715,7 +710,7 @@ func bumpImage(object runtime.Object) {
 }
 
 // rename changes the name of the adapter.
-func rename(object runtime.Object) {
+func rename(object kmeta.Accessor) {
 	switch o := object.(type) {
 	case *appsv1.Deployment:
 		o.Name += "-oldname"
@@ -727,7 +722,7 @@ func rename(object runtime.Object) {
 // noSinkEnv sets the K_SINK env var to an empty value.
 // This mimics the behaviour of (pkg/reconciler).NewAdapter helpers when they
 // receive an empty sink URI.
-func noSinkEnv(object runtime.Object) {
+func noSinkEnv(object kmeta.Accessor) {
 	var envs []corev1.EnvVar
 
 	switch o := object.(type) {

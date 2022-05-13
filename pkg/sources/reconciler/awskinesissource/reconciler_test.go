@@ -22,6 +22,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/kinesis"
 
+	appsv1 "k8s.io/api/apps/v1"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
@@ -79,7 +81,7 @@ func newEventSource(skipCEAtrributes ...interface{}) *v1alpha1.AWSKinesisSource 
 
 // adapterBuilder returns a slim Reconciler containing only the fields accessed
 // by r.BuildAdapter().
-func adapterBuilder(cfg *adapterConfig) common.AdapterDeploymentBuilder {
+func adapterBuilder(cfg *adapterConfig) common.AdapterBuilder[*appsv1.Deployment] {
 	return &Reconciler{
 		adapterCfg: cfg,
 	}

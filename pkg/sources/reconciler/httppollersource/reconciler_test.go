@@ -21,7 +21,9 @@ import (
 	"testing"
 	"time"
 
-	v1 "k8s.io/api/core/v1"
+	appsv1 "k8s.io/api/apps/v1"
+
+	corev1 "k8s.io/api/core/v1"
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	"knative.dev/pkg/controller"
@@ -90,7 +92,7 @@ func newEventSource() *v1alpha1.HTTPPollerSource {
 			},
 			BasicAuthUsername: &username,
 			BasicAuthPassword: &commonv1alpha1.ValueFromField{
-				ValueFromSecret: &v1.SecretKeySelector{
+				ValueFromSecret: &corev1.SecretKeySelector{
 					Key: "key",
 				},
 			},
@@ -105,7 +107,7 @@ func newEventSource() *v1alpha1.HTTPPollerSource {
 
 // adapterBuilder returns a slim Reconciler containing only the fields accessed
 // by r.BuildAdapter().
-func adapterBuilder(cfg *adapterConfig) common.AdapterDeploymentBuilder {
+func adapterBuilder(cfg *adapterConfig) common.AdapterBuilder[*appsv1.Deployment] {
 	return &Reconciler{
 		adapterCfg: cfg,
 	}

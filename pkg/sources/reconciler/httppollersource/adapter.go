@@ -56,7 +56,7 @@ type adapterConfig struct {
 	configs source.ConfigAccessor
 }
 
-// BuildAdapter implements common.AdapterDeploymentBuilder.
+// BuildAdapter implements common.AdapterBuilder.
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.HTTPPollerSource)
 
