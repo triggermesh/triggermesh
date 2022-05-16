@@ -195,7 +195,7 @@ var _ = Describe("AWS CodeCommit source", func() {
 					withCredentials(awsCreds),
 				)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(`spec.eventTypes: Unsupported value: "invalid"`))
+				Expect(err.Error()).To(ContainSubstring(`spec.eventTypes[0]: Unsupported value: "invalid"`))
 			})
 		})
 	})
