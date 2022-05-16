@@ -55,7 +55,7 @@ jobs:
     - name: Vendor third-party licenses
       run: |
         go install github.com/google/go-licenses@v1.0.0
-        go-licenses save ./ --save_path LICENSES/vendor/ --force
+        go-licenses save ./... --save_path LICENSES/vendor/ --force
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
