@@ -117,7 +117,7 @@ func (c *FakeAzureServiceBusQueueSources) UpdateStatus(ctx context.Context, azur
 // Delete takes name of the azureServiceBusQueueSource and deletes it. Returns an error if one occurs.
 func (c *FakeAzureServiceBusQueueSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(azureservicebusqueuesourcesResource, c.ns, name), &v1alpha1.AzureServiceBusQueueSource{})
+		Invokes(testing.NewDeleteActionWithOptions(azureservicebusqueuesourcesResource, c.ns, name, opts), &v1alpha1.AzureServiceBusQueueSource{})
 
 	return err
 }

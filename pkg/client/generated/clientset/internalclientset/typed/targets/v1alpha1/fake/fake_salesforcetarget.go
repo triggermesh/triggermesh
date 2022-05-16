@@ -117,7 +117,7 @@ func (c *FakeSalesforceTargets) UpdateStatus(ctx context.Context, salesforceTarg
 // Delete takes name of the salesforceTarget and deletes it. Returns an error if one occurs.
 func (c *FakeSalesforceTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(salesforcetargetsResource, c.ns, name), &v1alpha1.SalesforceTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(salesforcetargetsResource, c.ns, name, opts), &v1alpha1.SalesforceTarget{})
 
 	return err
 }

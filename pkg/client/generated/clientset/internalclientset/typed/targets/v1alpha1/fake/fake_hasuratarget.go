@@ -117,7 +117,7 @@ func (c *FakeHasuraTargets) UpdateStatus(ctx context.Context, hasuraTarget *v1al
 // Delete takes name of the hasuraTarget and deletes it. Returns an error if one occurs.
 func (c *FakeHasuraTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(hasuratargetsResource, c.ns, name), &v1alpha1.HasuraTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(hasuratargetsResource, c.ns, name, opts), &v1alpha1.HasuraTarget{})
 
 	return err
 }

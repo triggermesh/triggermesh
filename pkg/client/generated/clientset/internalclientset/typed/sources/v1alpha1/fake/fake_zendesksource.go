@@ -117,7 +117,7 @@ func (c *FakeZendeskSources) UpdateStatus(ctx context.Context, zendeskSource *v1
 // Delete takes name of the zendeskSource and deletes it. Returns an error if one occurs.
 func (c *FakeZendeskSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(zendesksourcesResource, c.ns, name), &v1alpha1.ZendeskSource{})
+		Invokes(testing.NewDeleteActionWithOptions(zendesksourcesResource, c.ns, name, opts), &v1alpha1.ZendeskSource{})
 
 	return err
 }

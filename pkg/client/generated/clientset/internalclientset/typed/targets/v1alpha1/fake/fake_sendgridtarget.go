@@ -117,7 +117,7 @@ func (c *FakeSendGridTargets) UpdateStatus(ctx context.Context, sendGridTarget *
 // Delete takes name of the sendGridTarget and deletes it. Returns an error if one occurs.
 func (c *FakeSendGridTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(sendgridtargetsResource, c.ns, name), &v1alpha1.SendGridTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(sendgridtargetsResource, c.ns, name, opts), &v1alpha1.SendGridTarget{})
 
 	return err
 }

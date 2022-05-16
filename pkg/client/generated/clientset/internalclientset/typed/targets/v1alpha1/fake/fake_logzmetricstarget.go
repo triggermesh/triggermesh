@@ -117,7 +117,7 @@ func (c *FakeLogzMetricsTargets) UpdateStatus(ctx context.Context, logzMetricsTa
 // Delete takes name of the logzMetricsTarget and deletes it. Returns an error if one occurs.
 func (c *FakeLogzMetricsTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(logzmetricstargetsResource, c.ns, name), &v1alpha1.LogzMetricsTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(logzmetricstargetsResource, c.ns, name, opts), &v1alpha1.LogzMetricsTarget{})
 
 	return err
 }

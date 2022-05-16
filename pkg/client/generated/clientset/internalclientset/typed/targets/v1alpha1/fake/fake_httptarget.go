@@ -117,7 +117,7 @@ func (c *FakeHTTPTargets) UpdateStatus(ctx context.Context, hTTPTarget *v1alpha1
 // Delete takes name of the hTTPTarget and deletes it. Returns an error if one occurs.
 func (c *FakeHTTPTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(httptargetsResource, c.ns, name), &v1alpha1.HTTPTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(httptargetsResource, c.ns, name, opts), &v1alpha1.HTTPTarget{})
 
 	return err
 }

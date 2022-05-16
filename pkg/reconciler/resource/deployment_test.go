@@ -127,7 +127,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 							Value: "val2",
 						}},
 						ReadinessProbe: &corev1.Probe{
-							Handler: corev1.Handler{
+							ProbeHandler: corev1.ProbeHandler{
 								HTTPGet: &corev1.HTTPGetAction{
 									Path: "/health",
 									Port: intstr.FromString("health"),
@@ -135,7 +135,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 							},
 						},
 						StartupProbe: &corev1.Probe{
-							Handler: corev1.Handler{
+							ProbeHandler: corev1.ProbeHandler{
 								HTTPGet: &corev1.HTTPGetAction{
 									Path: "/initialized",
 									Port: intstr.FromString("health"),

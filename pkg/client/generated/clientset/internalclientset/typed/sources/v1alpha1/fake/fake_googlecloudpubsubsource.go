@@ -117,7 +117,7 @@ func (c *FakeGoogleCloudPubSubSources) UpdateStatus(ctx context.Context, googleC
 // Delete takes name of the googleCloudPubSubSource and deletes it. Returns an error if one occurs.
 func (c *FakeGoogleCloudPubSubSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(googlecloudpubsubsourcesResource, c.ns, name), &v1alpha1.GoogleCloudPubSubSource{})
+		Invokes(testing.NewDeleteActionWithOptions(googlecloudpubsubsourcesResource, c.ns, name, opts), &v1alpha1.GoogleCloudPubSubSource{})
 
 	return err
 }

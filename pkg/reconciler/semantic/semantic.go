@@ -88,7 +88,7 @@ var eq = conversion.EqualitiesOrDie(
 			return false
 		}
 
-		return (conversion.Equalities{}).DeepDerivative(a.Handler, b.Handler)
+		return (conversion.Equalities{}).DeepDerivative(a.ProbeHandler, b.ProbeHandler)
 	},
 	// Needed because DeepDerivative compares EnvVar.Value string fields
 	// without considering EnvVar as a whole. If an EnvVar is specified, we

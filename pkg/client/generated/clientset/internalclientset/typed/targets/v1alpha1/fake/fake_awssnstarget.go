@@ -117,7 +117,7 @@ func (c *FakeAWSSNSTargets) UpdateStatus(ctx context.Context, aWSSNSTarget *v1al
 // Delete takes name of the aWSSNSTarget and deletes it. Returns an error if one occurs.
 func (c *FakeAWSSNSTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awssnstargetsResource, c.ns, name), &v1alpha1.AWSSNSTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(awssnstargetsResource, c.ns, name, opts), &v1alpha1.AWSSNSTarget{})
 
 	return err
 }

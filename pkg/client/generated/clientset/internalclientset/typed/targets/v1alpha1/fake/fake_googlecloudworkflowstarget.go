@@ -117,7 +117,7 @@ func (c *FakeGoogleCloudWorkflowsTargets) UpdateStatus(ctx context.Context, goog
 // Delete takes name of the googleCloudWorkflowsTarget and deletes it. Returns an error if one occurs.
 func (c *FakeGoogleCloudWorkflowsTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(googlecloudworkflowstargetsResource, c.ns, name), &v1alpha1.GoogleCloudWorkflowsTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(googlecloudworkflowstargetsResource, c.ns, name, opts), &v1alpha1.GoogleCloudWorkflowsTarget{})
 
 	return err
 }

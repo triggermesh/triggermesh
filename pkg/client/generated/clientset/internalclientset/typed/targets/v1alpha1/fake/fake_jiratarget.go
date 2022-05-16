@@ -117,7 +117,7 @@ func (c *FakeJiraTargets) UpdateStatus(ctx context.Context, jiraTarget *v1alpha1
 // Delete takes name of the jiraTarget and deletes it. Returns an error if one occurs.
 func (c *FakeJiraTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(jiratargetsResource, c.ns, name), &v1alpha1.JiraTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(jiratargetsResource, c.ns, name, opts), &v1alpha1.JiraTarget{})
 
 	return err
 }

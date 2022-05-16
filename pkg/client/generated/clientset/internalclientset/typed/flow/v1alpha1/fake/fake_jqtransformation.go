@@ -117,7 +117,7 @@ func (c *FakeJQTransformations) UpdateStatus(ctx context.Context, jQTransformati
 // Delete takes name of the jQTransformation and deletes it. Returns an error if one occurs.
 func (c *FakeJQTransformations) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(jqtransformationsResource, c.ns, name), &v1alpha1.JQTransformation{})
+		Invokes(testing.NewDeleteActionWithOptions(jqtransformationsResource, c.ns, name, opts), &v1alpha1.JQTransformation{})
 
 	return err
 }

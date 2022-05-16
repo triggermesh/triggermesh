@@ -117,7 +117,7 @@ func (c *FakeAWSLambdaTargets) UpdateStatus(ctx context.Context, aWSLambdaTarget
 // Delete takes name of the aWSLambdaTarget and deletes it. Returns an error if one occurs.
 func (c *FakeAWSLambdaTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awslambdatargetsResource, c.ns, name), &v1alpha1.AWSLambdaTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(awslambdatargetsResource, c.ns, name, opts), &v1alpha1.AWSLambdaTarget{})
 
 	return err
 }

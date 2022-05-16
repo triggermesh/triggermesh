@@ -117,7 +117,7 @@ func (c *FakeXMLToJSONTransformations) UpdateStatus(ctx context.Context, xMLToJS
 // Delete takes name of the xMLToJSONTransformation and deletes it. Returns an error if one occurs.
 func (c *FakeXMLToJSONTransformations) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(xmltojsontransformationsResource, c.ns, name), &v1alpha1.XMLToJSONTransformation{})
+		Invokes(testing.NewDeleteActionWithOptions(xmltojsontransformationsResource, c.ns, name, opts), &v1alpha1.XMLToJSONTransformation{})
 
 	return err
 }

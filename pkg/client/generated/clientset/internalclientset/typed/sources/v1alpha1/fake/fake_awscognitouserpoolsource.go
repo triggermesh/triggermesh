@@ -117,7 +117,7 @@ func (c *FakeAWSCognitoUserPoolSources) UpdateStatus(ctx context.Context, aWSCog
 // Delete takes name of the aWSCognitoUserPoolSource and deletes it. Returns an error if one occurs.
 func (c *FakeAWSCognitoUserPoolSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awscognitouserpoolsourcesResource, c.ns, name), &v1alpha1.AWSCognitoUserPoolSource{})
+		Invokes(testing.NewDeleteActionWithOptions(awscognitouserpoolsourcesResource, c.ns, name, opts), &v1alpha1.AWSCognitoUserPoolSource{})
 
 	return err
 }

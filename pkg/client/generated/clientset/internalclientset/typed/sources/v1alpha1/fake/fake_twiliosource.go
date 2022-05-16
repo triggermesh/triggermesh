@@ -117,7 +117,7 @@ func (c *FakeTwilioSources) UpdateStatus(ctx context.Context, twilioSource *v1al
 // Delete takes name of the twilioSource and deletes it. Returns an error if one occurs.
 func (c *FakeTwilioSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(twiliosourcesResource, c.ns, name), &v1alpha1.TwilioSource{})
+		Invokes(testing.NewDeleteActionWithOptions(twiliosourcesResource, c.ns, name, opts), &v1alpha1.TwilioSource{})
 
 	return err
 }

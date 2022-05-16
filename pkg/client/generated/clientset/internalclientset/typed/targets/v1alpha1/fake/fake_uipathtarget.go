@@ -117,7 +117,7 @@ func (c *FakeUiPathTargets) UpdateStatus(ctx context.Context, uiPathTarget *v1al
 // Delete takes name of the uiPathTarget and deletes it. Returns an error if one occurs.
 func (c *FakeUiPathTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(uipathtargetsResource, c.ns, name), &v1alpha1.UiPathTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(uipathtargetsResource, c.ns, name, opts), &v1alpha1.UiPathTarget{})
 
 	return err
 }

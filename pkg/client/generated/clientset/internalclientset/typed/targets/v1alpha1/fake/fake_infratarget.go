@@ -117,7 +117,7 @@ func (c *FakeInfraTargets) UpdateStatus(ctx context.Context, infraTarget *v1alph
 // Delete takes name of the infraTarget and deletes it. Returns an error if one occurs.
 func (c *FakeInfraTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(infratargetsResource, c.ns, name), &v1alpha1.InfraTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(infratargetsResource, c.ns, name, opts), &v1alpha1.InfraTarget{})
 
 	return err
 }

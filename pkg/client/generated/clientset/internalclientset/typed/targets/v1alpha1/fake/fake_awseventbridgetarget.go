@@ -117,7 +117,7 @@ func (c *FakeAWSEventBridgeTargets) UpdateStatus(ctx context.Context, aWSEventBr
 // Delete takes name of the aWSEventBridgeTarget and deletes it. Returns an error if one occurs.
 func (c *FakeAWSEventBridgeTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awseventbridgetargetsResource, c.ns, name), &v1alpha1.AWSEventBridgeTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(awseventbridgetargetsResource, c.ns, name, opts), &v1alpha1.AWSEventBridgeTarget{})
 
 	return err
 }

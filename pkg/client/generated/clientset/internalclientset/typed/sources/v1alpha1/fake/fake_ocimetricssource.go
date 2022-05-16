@@ -117,7 +117,7 @@ func (c *FakeOCIMetricsSources) UpdateStatus(ctx context.Context, oCIMetricsSour
 // Delete takes name of the oCIMetricsSource and deletes it. Returns an error if one occurs.
 func (c *FakeOCIMetricsSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(ocimetricssourcesResource, c.ns, name), &v1alpha1.OCIMetricsSource{})
+		Invokes(testing.NewDeleteActionWithOptions(ocimetricssourcesResource, c.ns, name, opts), &v1alpha1.OCIMetricsSource{})
 
 	return err
 }

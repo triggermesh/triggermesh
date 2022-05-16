@@ -117,7 +117,7 @@ func (c *FakeSynchronizers) UpdateStatus(ctx context.Context, synchronizer *v1al
 // Delete takes name of the synchronizer and deletes it. Returns an error if one occurs.
 func (c *FakeSynchronizers) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(synchronizersResource, c.ns, name), &v1alpha1.Synchronizer{})
+		Invokes(testing.NewDeleteActionWithOptions(synchronizersResource, c.ns, name, opts), &v1alpha1.Synchronizer{})
 
 	return err
 }

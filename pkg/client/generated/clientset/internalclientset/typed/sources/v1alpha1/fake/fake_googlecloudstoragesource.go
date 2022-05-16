@@ -117,7 +117,7 @@ func (c *FakeGoogleCloudStorageSources) UpdateStatus(ctx context.Context, google
 // Delete takes name of the googleCloudStorageSource and deletes it. Returns an error if one occurs.
 func (c *FakeGoogleCloudStorageSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(googlecloudstoragesourcesResource, c.ns, name), &v1alpha1.GoogleCloudStorageSource{})
+		Invokes(testing.NewDeleteActionWithOptions(googlecloudstoragesourcesResource, c.ns, name, opts), &v1alpha1.GoogleCloudStorageSource{})
 
 	return err
 }

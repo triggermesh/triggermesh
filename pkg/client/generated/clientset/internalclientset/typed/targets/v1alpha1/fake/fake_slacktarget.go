@@ -117,7 +117,7 @@ func (c *FakeSlackTargets) UpdateStatus(ctx context.Context, slackTarget *v1alph
 // Delete takes name of the slackTarget and deletes it. Returns an error if one occurs.
 func (c *FakeSlackTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(slacktargetsResource, c.ns, name), &v1alpha1.SlackTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(slacktargetsResource, c.ns, name, opts), &v1alpha1.SlackTarget{})
 
 	return err
 }

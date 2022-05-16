@@ -117,7 +117,7 @@ func (c *FakeConfluentTargets) UpdateStatus(ctx context.Context, confluentTarget
 // Delete takes name of the confluentTarget and deletes it. Returns an error if one occurs.
 func (c *FakeConfluentTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(confluenttargetsResource, c.ns, name), &v1alpha1.ConfluentTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(confluenttargetsResource, c.ns, name, opts), &v1alpha1.ConfluentTarget{})
 
 	return err
 }

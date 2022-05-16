@@ -117,7 +117,7 @@ func (c *FakeAWSDynamoDBTargets) UpdateStatus(ctx context.Context, aWSDynamoDBTa
 // Delete takes name of the aWSDynamoDBTarget and deletes it. Returns an error if one occurs.
 func (c *FakeAWSDynamoDBTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awsdynamodbtargetsResource, c.ns, name), &v1alpha1.AWSDynamoDBTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(awsdynamodbtargetsResource, c.ns, name, opts), &v1alpha1.AWSDynamoDBTarget{})
 
 	return err
 }

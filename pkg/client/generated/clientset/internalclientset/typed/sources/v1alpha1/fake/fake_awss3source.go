@@ -117,7 +117,7 @@ func (c *FakeAWSS3Sources) UpdateStatus(ctx context.Context, aWSS3Source *v1alph
 // Delete takes name of the aWSS3Source and deletes it. Returns an error if one occurs.
 func (c *FakeAWSS3Sources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awss3sourcesResource, c.ns, name), &v1alpha1.AWSS3Source{})
+		Invokes(testing.NewDeleteActionWithOptions(awss3sourcesResource, c.ns, name, opts), &v1alpha1.AWSS3Source{})
 
 	return err
 }
