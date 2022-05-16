@@ -52,7 +52,7 @@ func NewController(
 
 	r := &Reconciler{
 		adapterCfg: adapterCfg,
-		trgLister:  informer.Lister().TektonTargets,
+		trgLister:  informer.Lister(),
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
