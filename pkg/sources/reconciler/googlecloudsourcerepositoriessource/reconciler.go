@@ -133,6 +133,10 @@ func toErrMsg(err error) string {
 		return s.Message()
 	}
 
+	if apiErr := (&googleapi.Error{}); errors.As(err, &apiErr) {
+		return apiErr.Message
+	}
+
 	return err.Error()
 }
 
