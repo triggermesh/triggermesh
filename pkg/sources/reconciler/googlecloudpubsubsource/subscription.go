@@ -154,7 +154,6 @@ func ensureSubscription(ctx context.Context, cli *pubsub.Client) error {
 // Required permissions:
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.delete
-// - pubsub.topics.detachSubscription
 func ensureNoSubscription(ctx context.Context, cli *pubsub.Client) error {
 	if skip.Skip(ctx) {
 		return nil

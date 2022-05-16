@@ -29,7 +29,6 @@ includedPermissions:
 - pubsub.topics.attachSubscription
 - pubsub.topics.create
 - pubsub.topics.delete
-- pubsub.topics.detachSubscription
 - pubsub.topics.publish
 - source.repos.create
 - source.repos.delete
@@ -55,7 +54,6 @@ includedPermissions:
 - pubsub.topics.attachSubscription
 - pubsub.topics.create
 - pubsub.topics.delete
-- pubsub.topics.detachSubscription
 - pubsub.topics.get
 - pubsub.topics.getIamPolicy
 - pubsub.topics.publish
@@ -73,7 +71,6 @@ includedPermissions:
 - pubsub.subscriptions.delete
 - pubsub.subscriptions.get
 - pubsub.topics.attachSubscription
-- pubsub.topics.detachSubscription
 
 ---
 
@@ -90,7 +87,6 @@ includedPermissions:
 - pubsub.topics.attachSubscription
 - pubsub.topics.create
 - pubsub.topics.delete
-- pubsub.topics.detachSubscription
 - pubsub.topics.get
 - source.repos.updateRepoConfig
 
@@ -108,7 +104,6 @@ includedPermissions:
 - pubsub.topics.attachSubscription
 - pubsub.topics.create
 - pubsub.topics.delete
-- pubsub.topics.detachSubscription
 - pubsub.topics.get
 - storage.buckets.get
 - storage.buckets.update

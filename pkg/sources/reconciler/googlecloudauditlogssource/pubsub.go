@@ -314,7 +314,6 @@ func ensurePubSubSubscription(ctx context.Context, cli *pubsub.Client, topicResN
 // Required permissions:
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.delete
-// - pubsub.topics.detachSubscription
 func ensureNoPubSubSubscription(ctx context.Context, cli *pubsub.Client) error {
 	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.GoogleCloudAuditLogsSource)
 	status := src.Status
