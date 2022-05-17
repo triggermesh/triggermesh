@@ -64,8 +64,7 @@ func CreateIOTHubComponents(ctx context.Context, subscriptionID, rg, region, nam
 		framework.FailfWithOffset(2, "Unable to create iothub: %s", err)
 	}
 
-	_, err = hub.PollUntilDone(ctx, time.Second*30)
-	if err != nil {
+	if _, err = hub.PollUntilDone(ctx, pollOpts); err != nil {
 		framework.FailfWithOffset(2, "Unable to create iothub: %s", err)
 	}
 

@@ -34,12 +34,12 @@ func TestProcessMessage(t *testing.T) {
 	var ceTime = time.Unix(0, 0)
 
 	testData := &Message{
-		ReceivedMessage: azservicebus.ReceivedMessage{
+		ReceivedMessage: &azservicebus.ReceivedMessage{
+			Body:                 sampleEvent,
 			MessageID:            ceID,
 			EnqueuedTime:         &ceTime,
 			ScheduledEnqueueTime: &ceTime,
 		},
-		Data:      sampleEvent,
 		LockToken: stringifyLockToken(&uuid.Nil),
 	}
 
