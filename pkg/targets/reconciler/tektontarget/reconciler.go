@@ -33,7 +33,7 @@ type Reconciler struct {
 	base       common.GenericServiceReconciler[*v1alpha1.TektonTarget, listersv1alpha1.TektonTargetNamespaceLister]
 	adapterCfg *adapterConfig
 
-	trgLister func(namespace string) listersv1alpha1.TektonTargetNamespaceLister
+	trgLister listersv1alpha1.TektonTargetLister
 }
 
 // Check that our Reconciler implements Interface

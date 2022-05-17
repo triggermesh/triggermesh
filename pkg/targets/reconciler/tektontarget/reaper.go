@@ -20,16 +20,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 
 	"knative.dev/pkg/apis"
-	k8sclient "knative.dev/pkg/client/injection/kube/client"
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
@@ -49,46 +46,36 @@ func reaperThread(ctx context.Context, r *Reconciler) {
 	for {
 		<-poll.C // Used to wait for the poll timer
 		log.Debug("Executing reaping")
-		nsl, err := k8sclient.Get(ctx).CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
+
+		targets, err := r.trgLister.List(labels.Everything())
 		if err != nil {
-			log.Errorw("Unable to list Kubernetes namespaces", zap.Error(err))
+			log.Errorw("Unable to list TektonTargets from cache", zap.Error(err))
 			continue
 		}
 
-		// search for tektontargets across all namespaces
-		for _, ns := range nsl.Items {
-			targets, err := r.trgLister(ns.Name).List(labels.Everything())
-			if err != nil {
-				log.Errorw("Unable to list TektonTarget objects", zap.Error(err), zap.String("namespace", ns.Name))
+		for _, t := range targets {
+			// Abort if the target isn't ready
+			if !t.Status.GetCondition(apis.ConditionReady).IsTrue() ||
+				t.Status.Address == nil || t.Status.Address.URL.IsEmpty() {
 				continue
 			}
 
-			for _, t := range targets {
-				// Abort if the target isn't ready
-				if !t.Status.GetCondition(apis.ConditionReady).IsTrue() ||
-					t.Status.Address == nil || t.Status.Address.URL.IsEmpty() {
-					continue
-				}
+			log.Info("Found target: ", t.Namespace+"."+t.Name)
 
-				log.Info("Found target: ", t.Namespace+"."+t.Name)
+			// Send the reap CloudEvent
+			cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
 
-				// Send the reap CloudEvent
-				cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
+			newEvent := cloudevents.NewEvent(cloudevents.VersionV1)
+			newEvent.SetType(v1alpha1.EventTypeTektonReap)
+			newEvent.SetSource("triggermesh-controller")
 
-				newEvent := cloudevents.NewEvent(cloudevents.VersionV1)
-				newEvent.SetType(v1alpha1.EventTypeTektonReap)
-				newEvent.SetSource("CronJob")
-				newEvent.SetTime(time.Now())
-				newEvent.SetID(uuid.NewString())
+			if err := newEvent.SetData(cloudevents.ApplicationJSON, nil); err != nil {
+				log.Errorw("Failed to set event data", zap.Error(err))
+				continue
+			}
 
-				if err := newEvent.SetData(cloudevents.ApplicationJSON, nil); err != nil {
-					log.Errorw("Failed to set event data", zap.Error(err))
-					continue
-				}
-
-				if result := client.Send(cloudCtx, newEvent); !cloudevents.IsACK(result) {
-					log.Errorw("Event wasn't acknowledged", zap.Error(result))
-				}
+			if result := client.Send(cloudCtx, newEvent); !cloudevents.IsACK(result) {
+				log.Errorw("Event wasn't acknowledged", zap.Error(result))
 			}
 		}
 	}
