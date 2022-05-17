@@ -79,13 +79,13 @@ func toCloudEventData(msg *Message) interface{} {
 
 	data = msg
 
-	// if msg.Data contains raw JSON data, type it as json.RawMessage so
+	// if msg.Body contains raw JSON data, type it as json.RawMessage so
 	// it doesn't get encoded to base64 during the serialization of the
 	// CloudEvent data.
 	var rawData json.RawMessage
-	if err := json.Unmarshal(msg.Data, &rawData); err == nil {
+	if err := json.Unmarshal(msg.Body, &rawData); err == nil {
 		data = &MessageWithRawJSONData{
-			Data:    rawData,
+			Body:    rawData,
 			Message: msg,
 		}
 	}
@@ -96,27 +96,20 @@ func toCloudEventData(msg *Message) interface{} {
 // Message is a servicebus.ReceivedMessage with some selected fields shadowed for
 // improved serialization.
 type Message struct {
-	Data []byte
-	azservicebus.ReceivedMessage
+	*azservicebus.ReceivedMessage
 	LockToken *string
 }
 
 // MessageWithRawJSONData is an ReceivedMessage with RawMessage-typed JSON data.
 type MessageWithRawJSONData struct {
-	Data json.RawMessage
+	Body json.RawMessage
 	*Message
 }
 
 // toMessage converts a azservicebus.ReceivedMessage into a Message
 func toMessage(rcvMsg *azservicebus.ReceivedMessage) (*Message, error) {
-	body, err := rcvMsg.Body()
-	if err != nil {
-		return nil, fmt.Errorf("reading message data: %w", err)
-	}
-
 	return &Message{
-		Data:            body,
-		ReceivedMessage: *rcvMsg,
+		ReceivedMessage: rcvMsg,
 		LockToken:       stringifyLockToken((*uuid.UUID)(&rcvMsg.LockToken)),
 	}, nil
 }

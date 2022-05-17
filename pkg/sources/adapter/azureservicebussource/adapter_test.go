@@ -24,6 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azservicebus"
+
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 )
 
@@ -50,7 +52,9 @@ func TestHandleMessage(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
 
 			msg := &Message{
-				Data: tc.eventData,
+				ReceivedMessage: &azservicebus.ReceivedMessage{
+					Body: tc.eventData,
+				},
 			}
 
 			a := &adapter{
@@ -76,7 +80,7 @@ func extractDataFromEvent(t *testing.T, b []byte) string {
 	err := json.Unmarshal(b, &unstructuredEvent)
 	require.NoError(t, err)
 
-	dataBytes, err := json.Marshal(unstructuredEvent["Data"])
+	dataBytes, err := json.Marshal(unstructuredEvent["Body"])
 	require.NoError(t, err)
 
 	var data json.RawMessage

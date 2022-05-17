@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm/runtime"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
@@ -33,6 +33,11 @@ import (
 // Package azure contains helpers for interacting with Azure and standing up prerequisite services
 
 const E2EInstanceTagKey = "e2e_instance"
+
+// pollOpts contains common options passed to calls to (*runtime.Poller).PollUntilDone.
+var pollOpts = &runtime.PollUntilDoneOptions{
+	Frequency: time.Second * 10,
+}
 
 // CreateResourceGroup will create the resource group containing all of the eventhub components.
 func CreateResourceGroup(ctx context.Context, subscriptionID, name, region string) armresources.ResourceGroup {
@@ -80,7 +85,7 @@ func DeleteResourceGroup(ctx context.Context, subscriptionID, name string) *runt
 
 // WaitForFutureDeletion will wait on the resource group to be deleted before continuing.
 func WaitForFutureDeletion(ctx context.Context, subscriptionID string, future *runtime.Poller[armresources.ResourceGroupsClientDeleteResponse]) {
-	if _, err := future.PollUntilDone(ctx, time.Second*30); err != nil {
+	if _, err := future.PollUntilDone(ctx, pollOpts); err != nil {
 		framework.FailfWithOffset(1, "Resource group deletion failed: %s", err)
 	}
 }
@@ -116,7 +121,7 @@ func CreateStorageAccountCommon(ctx context.Context, cli *armstorage.AccountsCli
 		return armstorage.Account{}
 	}
 
-	newSaClient, err := resp.PollUntilDone(ctx, time.Second*30)
+	newSaClient, err := resp.PollUntilDone(ctx, pollOpts)
 	if err != nil {
 		framework.FailfWithOffset(3, "unable to complete storage account creation: %s", err)
 		return armstorage.Account{}

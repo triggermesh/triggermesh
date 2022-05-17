@@ -18,7 +18,6 @@ package azure
 
 import (
 	"context"
-	"time"
 
 	eventhubs "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
@@ -70,7 +69,7 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 		framework.FailfWithOffset(1, "Unable to create eventhub namespace: %s", err)
 	}
 
-	if _, err = nsResp.PollUntilDone(ctx, time.Second*30); err != nil {
+	if _, err = nsResp.PollUntilDone(ctx, pollOpts); err != nil {
 		framework.FailfWithOffset(1, "Unable to create eventhub namespace: %s", err)
 	}
 
