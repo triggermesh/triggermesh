@@ -122,7 +122,7 @@ func (r *GenericDeploymentReconciler[T, L]) reconcileAdapter(ctx context.Context
 
 	currentAdapter, err := getOrCreateAdapter(ctx, r.Lister, r.Client, desiredAdapter, gvk)
 	if err != nil {
-		rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodClient(rcl.GetNamespace()))
+		rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodLister(rcl.GetNamespace()))
 		return err
 	}
 
@@ -134,7 +134,7 @@ func (r *GenericDeploymentReconciler[T, L]) reconcileAdapter(ctx context.Context
 		return err
 	}
 
-	rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodClient(rcl.GetNamespace()))
+	rcl.GetStatusManager().PropagateDeploymentAvailability(ctx, currentAdapter, r.PodLister(rcl.GetNamespace()))
 
 	return nil
 }

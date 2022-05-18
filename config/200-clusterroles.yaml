@@ -499,13 +499,21 @@ rules:
   - create
   - update
 
-# Determine the exact reason why Deployments fail
+# Observe status of Pods and their ancestors
 - apiGroups:
   - ''
   resources:
   - pods
   verbs:
   - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - list
+  - watch
 
 ---
 

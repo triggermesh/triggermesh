@@ -24,16 +24,27 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
+	fakek8sclient "knative.dev/pkg/client/injection/kube/client/fake"
 	"knative.dev/pkg/controller"
+	"knative.dev/pkg/injection"
 	"knative.dev/pkg/kmeta"
 	logtesting "knative.dev/pkg/logging/testing"
+	"knative.dev/pkg/ptr"
+	rectesting "knative.dev/pkg/reconciler/testing"
+
+	// Link fake informers accessed by the code under test
+	_ "knative.dev/pkg/client/injection/kube/informers/apps/v1/deployment/fake"
+	_ "knative.dev/pkg/client/injection/kube/informers/apps/v1/replicaset/fake"
 )
 
 func TestEnqueueObjectsInNamespaceOf(t *testing.T) {
@@ -105,6 +116,191 @@ func TestHasAdapterLabelsForType(t *testing.T) {
 
 		assert.False(t, filterFn(objMissingLabels), "Expected not to match common set of labels")
 	})
+}
+
+func TestOuterMostAncestorControllerRef(t *testing.T) {
+	const tNs = "test"
+
+	testCases := map[string]struct {
+		objects []runtime.Object
+		expect  *metav1.OwnerReference
+	}{
+		/* In this test, the outermost ancestor of kind Foo is resolved
+		   all the way through a ReplicaSet and a Deployment.
+		*/
+		"Recurse lookup through multiple ancestors": {
+			objects: []runtime.Object{
+				&appsv1.Deployment{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "foo-fake-adapter",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: "fake/v0",
+						Kind:       "Foo",
+						Name:       "fake",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+				&appsv1.ReplicaSet{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "foo-fake-adapter-abc012",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: appsv1.SchemeGroupVersion.String(),
+						Kind:       "Deployment",
+						Name:       "foo-fake-adapter",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+				&corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "foo-fake-adapter-abc012-efg345",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: appsv1.SchemeGroupVersion.String(),
+						Kind:       "ReplicaSet",
+						Name:       "foo-fake-adapter-abc012",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+			},
+			expect: &metav1.OwnerReference{
+				APIVersion: "fake/v0",
+				Kind:       "Foo",
+				Name:       "fake",
+			},
+		},
+		/* In this test, an ancestor of kind ReplicaSet is found to
+		   have no controller, which makes it the outermost ancestor.
+		*/
+		"Ancestor with no controller": {
+			objects: []runtime.Object{
+				&appsv1.ReplicaSet{ObjectMeta: metav1.ObjectMeta{
+					Namespace:       tNs,
+					Name:            "foo-fake-adapter-abc012",
+					OwnerReferences: []metav1.OwnerReference{},
+				}},
+				&corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "foo-fake-adapter-abc012-efg345",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: appsv1.SchemeGroupVersion.String(),
+						Kind:       "ReplicaSet",
+						Name:       "foo-fake-adapter-abc012",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+			},
+			expect: &metav1.OwnerReference{
+				APIVersion: "apps/v1",
+				Kind:       "ReplicaSet",
+				Name:       "foo-fake-adapter-abc012",
+			},
+		},
+		/* In this test, the ReplicaSet is owned by a Deployment, but
+		   this Deployment can't be found in the lister so the ancestor
+		   is considered unknown.
+		*/
+		"One supported kind of ancestor doesn't exist": {
+			objects: []runtime.Object{
+				&appsv1.ReplicaSet{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "foo-fake-adapter-abc012",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: appsv1.SchemeGroupVersion.String(),
+						Kind:       "Deployment",
+						Name:       "foo-fake-adapter",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+				&corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "foo-fake-adapter-abc012-efg345",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: appsv1.SchemeGroupVersion.String(),
+						Kind:       "ReplicaSet",
+						Name:       "foo-fake-adapter-abc012",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+			},
+			expect: nil,
+		},
+		/* In this test, the outermost ancestor of kind Foo can't be
+		   reached because one intermediate ancestor is of kind Service,
+		   which the recursive resolver doesn't support.
+		   The Service is returned as the last resolvable ancestor.
+		*/
+		"One kind of ancestor is not supported for recursive lookup": {
+			objects: []runtime.Object{
+				&corev1.Service{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "fake",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: "fake/v0",
+						Kind:       "Foo",
+						Name:       "fake",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+				&corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+					Namespace: tNs,
+					Name:      "fake",
+					OwnerReferences: []metav1.OwnerReference{{
+						APIVersion: corev1.SchemeGroupVersion.String(),
+						Kind:       "Service",
+						Name:       "fake",
+						Controller: ptr.Bool(true),
+					}},
+				}},
+			},
+			expect: &metav1.OwnerReference{
+				APIVersion: "v1",
+				Kind:       "Service",
+				Name:       "fake",
+			},
+		},
+		/* In this test, the object to resolve the ancestor for doesn't
+		   have a controller. Because it is the initial object, there
+		   is no ancestor to return at all.
+		*/
+		"No controller": {
+			objects: []runtime.Object{
+				&corev1.Pod{ObjectMeta: metav1.ObjectMeta{
+					Namespace:       tNs,
+					Name:            "fake",
+					OwnerReferences: []metav1.OwnerReference{},
+				}},
+			},
+			expect: nil,
+		},
+	}
+
+	for n, tc := range testCases {
+		t.Run(n, func(t *testing.T) {
+			withK8sCli := func(ctx context.Context, _ *rest.Config) context.Context {
+				ctx, _ = fakek8sclient.With(ctx, tc.objects...)
+				return ctx
+			}
+			injection.Fake.RegisterClient(withK8sCli)
+
+			stopCh := make(chan struct{})
+			t.Cleanup(func() { close(stopCh) })
+
+			ctx, infs := rectesting.SetupFakeContext(t)
+			err := controller.StartInformers(stopCh, infs...)
+			require.NoError(t, err)
+
+			objectToResolve := tc.objects[len(tc.objects)-1].(metav1.Object)
+
+			ancestorCtlrRef := outermostAncestorControllerRef(ctx, objectToResolve)
+
+			if tc.expect == nil {
+				assert.Nil(t, ancestorCtlrRef)
+			} else {
+				assert.Equal(t, tc.expect.APIVersion, ancestorCtlrRef.APIVersion)
+				assert.Equal(t, tc.expect.Kind, ancestorCtlrRef.Kind)
+				assert.Equal(t, tc.expect.Name, ancestorCtlrRef.Name)
+			}
+		})
+	}
 }
 
 // popKeys pops n items from a queue and returns their keys.

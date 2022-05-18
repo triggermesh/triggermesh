@@ -25,6 +25,7 @@ import (
 	_ "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/sources/v1alpha1/azureiothubsource/fake"
 	_ "knative.dev/pkg/client/injection/ducks/duck/v1/addressable/fake"
 	_ "knative.dev/pkg/client/injection/kube/informers/apps/v1/deployment/fake"
+	_ "knative.dev/pkg/client/injection/kube/informers/core/v1/pod/fake"
 	_ "knative.dev/pkg/client/injection/kube/informers/core/v1/serviceaccount/fake"
 	_ "knative.dev/pkg/client/injection/kube/informers/rbac/v1/rolebinding/fake"
 	_ "knative.dev/pkg/injection/clients/dynamicclient/fake"
@@ -32,7 +33,10 @@ import (
 
 func TestNewController(t *testing.T) {
 	t.Run("No failure", func(t *testing.T) {
-		TestControllerConstructor(t, NewController)
+		TestControllerConstructor(t, NewController,
+			// we expect "Pod" as an additional informer in this reconciler implementation
+			ExpectExtraInformers(1),
+		)
 	})
 
 	t.Run("Failure cases", func(t *testing.T) {
