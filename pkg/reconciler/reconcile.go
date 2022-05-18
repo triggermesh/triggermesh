@@ -240,6 +240,9 @@ func (r *GenericDeploymentReconciler[T, L]) findAdapter(rcl v1alpha1.Reconcilabl
 
 	for _, d := range depls {
 		objOwner := metav1.GetControllerOfNoCopy(d)
+		if objOwner == nil {
+			continue
+		}
 
 		if objOwner.UID == owner.UID {
 			return d, nil
@@ -441,6 +444,9 @@ func (r *GenericServiceReconciler[T, L]) findAdapter(rcl v1alpha1.Reconcilable,
 
 	for _, s := range svcs {
 		objOwner := metav1.GetControllerOfNoCopy(s)
+		if objOwner == nil {
+			continue
+		}
 
 		if objOwner.UID == owner.UID {
 			return s, nil
