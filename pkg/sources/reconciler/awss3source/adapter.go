@@ -18,7 +18,6 @@ package awss3source
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
-	kr "k8s.io/apimachinery/pkg/api/resource"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
@@ -66,15 +65,5 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.Port(healthPortName, 8080),
 
 		resource.StartupProbe("/health", healthPortName),
-
-		// See awssqssource/adapter.go for an justification for these values.
-		resource.Requests(
-			kr.NewMilliQuantity(90, kr.DecimalSI),     // 90m
-			kr.NewQuantity(1024*1024*30, kr.BinarySI), // 30Mi
-		),
-		resource.Limits(
-			kr.NewMilliQuantity(1000, kr.DecimalSI),   // 1
-			kr.NewQuantity(1024*1024*45, kr.BinarySI), // 45Mi
-		),
 	), nil
 }
