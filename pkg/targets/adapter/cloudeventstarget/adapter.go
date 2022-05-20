@@ -25,22 +25,32 @@ import (
 	"sync"
 	"time"
 
+	"go.uber.org/zap"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cehttp "github.com/cloudevents/sdk-go/v2/protocol/http"
-	"github.com/triggermesh/triggermesh/pkg/adapter/fs"
-	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/adapter/fs"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, listenClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.CloudEventsTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	if _, err := url.Parse(env.URL); err != nil {
 		logger.Panicw("URL is not parseable", zap.Error(err))
@@ -49,14 +59,6 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, listenC
 	fw, err := fs.NewWatcher(logger)
 	if err != nil {
 		logger.Panicw("Could not create a file watcher", zap.Error(err))
-	}
-
-	metrics.MustRegisterEventProcessingStatsView()
-
-	mt := &pkgadapter.MetricTag{
-		ResourceGroup: targets.CloudEventsTargetResource.String(),
-		Namespace:     env.GetNamespace(),
-		Name:          env.GetName(),
 	}
 
 	ceAdapter := &ceAdapter{

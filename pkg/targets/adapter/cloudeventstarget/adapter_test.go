@@ -23,12 +23,11 @@ import (
 	"testing"
 	"time"
 
-	// Essential. Initializes a Prometheus metrics exporter for tests.
-	_ "knative.dev/pkg/metrics/testing"
-
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	loggingtesting "knative.dev/pkg/logging/testing"
@@ -37,6 +36,7 @@ import (
 	fakefs "github.com/triggermesh/triggermesh/pkg/adapter/fs/fake"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
+	metricstesting "github.com/triggermesh/triggermesh/pkg/metrics/testing"
 )
 
 const (
@@ -88,7 +88,7 @@ func TestCloudEventsDispatch(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
-			resetMetrics(t)
+			metricstesting.ResetMetrics(t)
 
 			metricTags := map[string]string{
 				"resource_group": targets.CloudEventsTargetResource.String(),
@@ -166,23 +166,4 @@ func TestCloudEventsDispatch(t *testing.T) {
 			}
 		})
 	}
-}
-
-// OpenCensus metrics carry global state that need to be reset between unit tests.
-func resetMetrics(t *testing.T) {
-	t.Helper()
-
-	metricstest.Unregister(
-		"event_processing_success_count",
-		"event_processing_error_count",
-		"event_processing_latencies",
-	)
-
-	metrics.MustRegisterEventProcessingStatsView()
-
-	metricstest.AssertNoMetric(t,
-		"event_processing_success_count",
-		"event_processing_error_count",
-		"event_processing_latencies",
-	)
 }

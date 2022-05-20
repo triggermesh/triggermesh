@@ -27,6 +27,7 @@ import (
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
@@ -51,10 +52,17 @@ type ibmmqtargetAdapter struct {
 
 // NewAdapter adapter implementation
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*TargetEnvAccessor)
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.IBMMQTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*TargetEnvAccessor)
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -62,12 +70,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
-	}
-
-	mt := &pkgadapter.MetricTag{
-		ResourceGroup: targets.IBMMQTargetResource.String(),
-		Namespace:     env.GetNamespace(),
-		Name:          env.GetName(),
 	}
 
 	return &ibmmqtargetAdapter{

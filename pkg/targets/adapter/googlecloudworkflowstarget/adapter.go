@@ -20,24 +20,37 @@ import (
 	"context"
 	"fmt"
 
+	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+	"knative.dev/pkg/logging"
+
 	workflows "cloud.google.com/go/workflows/apiv1beta"
 	executions "cloud.google.com/go/workflows/executions/apiv1beta"
 	"google.golang.org/api/option"
 	executionspb "google.golang.org/genproto/googleapis/cloud/workflows/executions/v1beta"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"go.uber.org/zap"
-	"knative.dev/pkg/logging"
-
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
-	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.GoogleCloudWorkflowsTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	client, err := workflows.NewClient(ctx, option.WithCredentialsJSON([]byte(env.Credentials)))
 	if err != nil {
@@ -64,6 +77,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -76,6 +91,8 @@ type googlecloudworkflowsAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Returns if stopCh is closed or Send() returns an error.

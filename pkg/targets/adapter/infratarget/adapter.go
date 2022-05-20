@@ -22,26 +22,40 @@ import (
 	"net/http"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	"github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm"
 	jsvm "github.com/triggermesh/triggermesh/pkg/targets/adapter/infratarget/vm/javascript"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.InfraTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	adapter := &infraAdapter{
 		ceClient:           ceClient,
 		logger:             logger,
 		typeLoopProtection: env.TypeLoopProtection,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 
 	if env.ScriptCode != "" {
@@ -69,6 +83,8 @@ type infraAdapter struct {
 
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Returns if stopCh is closed or Send() returns an error.

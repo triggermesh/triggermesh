@@ -22,24 +22,35 @@ import (
 
 	"go.uber.org/zap"
 
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
+	"knative.dev/pkg/logging"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/comprehend"
 	"github.com/aws/aws-sdk-go/service/comprehend/comprehendiface"
 
-	"knative.dev/pkg/logging"
-
-	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
 // NewTarget constructs a target's adapter.
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
-	config := env.GetAwsConfig(env.Region)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.AWSComprehendTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -50,12 +61,14 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	return &comprehendAdapter{
-		config: config,
+		config: env.GetAwsConfig(env.Region),
 
 		language: env.Language,
 		ceClient: ceClient,
 		replier:  replier,
 		logger:   logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -70,6 +83,8 @@ type comprehendAdapter struct {
 	session  *session.Session
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Start implements pkgadapter.Adapter.

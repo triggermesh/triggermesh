@@ -34,6 +34,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -64,6 +65,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		Name:          envAcc.GetName(),
 	}
 
+	metrics.MustRegisterEventProcessingStatsView()
+
 	env := envAcc.(*envAccessor)
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
@@ -79,7 +82,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
-		mt:       mt,
+
+		mt: mt,
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -90,7 +95,9 @@ type Adapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
-	mt       *pkgadapter.MetricTag
+
+	mt *pkgadapter.MetricTag
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Start is a blocking function and will return if an error occurs

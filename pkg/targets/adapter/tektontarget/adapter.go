@@ -21,20 +21,23 @@ import (
 	"fmt"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
-	corev1 "k8s.io/api/core/v1"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	tektonapi "github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 	tektonclient "github.com/tektoncd/pipeline/pkg/client/clientset/versioned"
 	tektoninject "github.com/tektoncd/pipeline/pkg/client/injection/client"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // Expected CloudEvent message reflecting the type of action to perform
@@ -50,12 +53,20 @@ const (
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	var successAge *time.Duration
-	var failAge *time.Duration
+	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.TektonTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
 
 	env := envAcc.(*envAccessor)
-	logger := logging.FromContext(ctx)
-	tektonClient := tektoninject.Get(ctx)
+
+	var successAge *time.Duration
+	var failAge *time.Duration
 
 	if env.ReapSuccessAge != "" {
 		success, err := time.ParseDuration(env.ReapSuccessAge)
@@ -74,13 +85,15 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	return &tektonAdapter{
-		tektonClient:   tektonClient,
+		tektonClient:   tektoninject.Get(ctx),
 		ceClient:       ceClient,
 		namespace:      envAcc.GetNamespace(),
 		targetName:     envAcc.GetName(),
 		reapSuccessAge: successAge,
 		reapFailAge:    failAge,
 		logger:         logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -96,6 +109,8 @@ type tektonAdapter struct {
 	tektonClient tektonclient.Interface
 	ceClient     cloudevents.Client
 	logger       *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Returns if stopCh is closed or Send() returns an error.

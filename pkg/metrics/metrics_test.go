@@ -23,8 +23,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/metrics/metricstest"
 
-	// Essential. Initializes a Prometheus metrics exporter for tests.
-	_ "knative.dev/pkg/metrics/testing"
+	metricstesting "github.com/triggermesh/triggermesh/pkg/metrics/testing"
 
 	. "github.com/triggermesh/triggermesh/pkg/metrics"
 )
@@ -51,7 +50,7 @@ func TestEventProcessingStatsReporter(t *testing.T) {
 	}
 
 	t.Run("record without tags", func(t *testing.T) {
-		resetMetrics(t)
+		metricstesting.ResetMetrics(t)
 
 		st.ReportProcessingSuccess()
 		st.ReportProcessingError(true)
@@ -79,7 +78,7 @@ func TestEventProcessingStatsReporter(t *testing.T) {
 	})
 
 	t.Run("record with tags", func(t *testing.T) {
-		resetMetrics(t)
+		metricstesting.ResetMetrics(t)
 
 		const tEventType = "test.type.v0"
 		tagEventType := TagEventType(tEventType)
@@ -114,7 +113,7 @@ func TestEventProcessingStatsReporter(t *testing.T) {
 	})
 
 	t.Run("latency distribution", func(t *testing.T) {
-		resetMetrics(t)
+		metricstesting.ResetMetrics(t)
 
 		st.ReportProcessingLatency(12 * time.Millisecond)
 		st.ReportProcessingLatency(374 * time.Millisecond)
@@ -128,25 +127,6 @@ func TestEventProcessingStatsReporter(t *testing.T) {
 			2250.0,
 		)
 	})
-}
-
-// OpenCensus metrics carry global state that need to be reset between unit tests.
-func resetMetrics(t *testing.T) {
-	t.Helper()
-
-	metricstest.Unregister(
-		"event_processing_success_count",
-		"event_processing_error_count",
-		"event_processing_latencies",
-	)
-
-	MustRegisterEventProcessingStatsView()
-
-	metricstest.AssertNoMetric(t,
-		"event_processing_success_count",
-		"event_processing_error_count",
-		"event_processing_latencies",
-	)
 }
 
 // appendTags returns a copy of the given metrics tags with extra key/values inserted.

@@ -26,20 +26,34 @@ import (
 	"path"
 	"strings"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.HTTPTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	u, err := url.Parse(env.URL)
 	if err != nil {
@@ -93,6 +107,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 		ceClient: ceClient,
 		logger:   logging.FromContext(ctx),
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -112,6 +128,8 @@ type httpAdapter struct {
 
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Returns if stopCh is closed or Send() returns an error.

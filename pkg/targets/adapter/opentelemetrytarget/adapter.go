@@ -22,8 +22,10 @@ import (
 	"errors"
 	"fmt"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
@@ -37,7 +39,9 @@ import (
 	"go.opentelemetry.io/otel/metric/sdkapi"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -55,6 +59,8 @@ type opentelemetryAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 type cortexAdapter struct {
@@ -65,8 +71,17 @@ type cortexAdapter struct {
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.OpenTelemetryTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -115,6 +130,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 			replier:  replier,
 			ceClient: ceClient,
 			logger:   logger,
+
+			sr: metrics.MustNewEventProcessingStatsReporter(mt),
 		},
 	}
 }

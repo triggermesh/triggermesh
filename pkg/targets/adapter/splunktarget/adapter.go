@@ -23,12 +23,17 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // SplunkClient is the interface that must be implemented by Splunk HEC
@@ -46,6 +51,8 @@ type adapter struct {
 	spClient SplunkClient
 
 	defaultIndex string
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 var _ pkgadapter.Adapter = (*adapter)(nil)
@@ -75,6 +82,14 @@ const httpTimeout = time.Second * 20
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.SplunkTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
 	env := envAcc.(*envConfig)
 
 	hecURL, err := url.Parse(env.HECEndpoint)
@@ -89,6 +104,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		spClient: newClient(*hecURL, env.HECToken, env.Index, hostname(envAcc), env.SkipTLSVerify),
 
 		defaultIndex: env.Index,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
