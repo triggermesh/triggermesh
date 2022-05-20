@@ -143,7 +143,11 @@ func computeDiffs(cfgDir string) ([]diff, error) {
 			for _, res := range resources {
 				val := res + "s" // pluralize kind
 				if subRes, ok := tags["subresource"]; ok {
-					val += "/" + subRes
+					if nVals := len(subRes); nVals != 1 {
+						return nil, fmt.Errorf("encountered a tag with %d value(s) for the "+
+							"subresource key: %v", nVals, subRes)
+					}
+					val += "/" + subRes[0]
 				}
 
 				expectResourcesNode.Content = append(expectResourcesNode.Content, &yaml.Node{
