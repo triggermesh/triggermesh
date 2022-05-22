@@ -58,6 +58,12 @@ var (
 		Resource: "awsdynamodbsources",
 	}
 
+	// AWSEventBridgeSourceResource respresents an event source for Amazon EventBridge.
+	AWSEventBridgeSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "awseventbridgesources",
+	}
+
 	// AWSKinesisSourceResource respresents an event source for Amazon Kinesis.
 	AWSKinesisSourceResource = schema.GroupResource{
 		Group:    GroupName,

@@ -42,6 +42,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&AWSCognitoIdentitySource{}, &AWSCognitoIdentitySourceList{},
 		&AWSCognitoUserPoolSource{}, &AWSCognitoUserPoolSourceList{},
 		&AWSDynamoDBSource{}, &AWSDynamoDBSourceList{},
+		&AWSEventBridgeSource{}, &AWSEventBridgeSourceList{},
 		&AWSKinesisSource{}, &AWSKinesisSourceList{},
 		&AWSS3Source{}, &AWSS3SourceList{},
 		&AWSSNSSource{}, &AWSSNSSourceList{},

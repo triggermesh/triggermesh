@@ -57,13 +57,17 @@ type envConfig struct {
 	// Name of a message processor which takes care of converting SQS
 	// messages to CloudEvents.
 	//
-	// Supported values: [ default s3 ]
+	// Supported values: [ default s3 eventbridge ]
 	MessageProcessor string `envconfig:"SQS_MESSAGE_PROCESSOR" default:"default"`
 
 	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 	// Visibility timeout to set on all messages received by this event source.
 	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 	VisibilityTimeout *time.Duration `envconfig:"SQS_VISIBILITY_TIMEOUT"`
+
+	// Allows overriding common CloudEvents attributes.
+	CEOverrideSource string `envconfig:"CE_SOURCE"`
+	CEOverrideType   string `envconfig:"CE_TYPE"`
 
 	// The environment variables below aren't read from the envConfig struct
 	// by the AWS SDK, but rather directly using os.Getenv().
@@ -118,9 +122,18 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	var msgPrcsr MessageProcessor
 	switch env.MessageProcessor {
 	case "s3":
-		msgPrcsr = &s3MessageProcessor{ceSourceFallback: arn.String()}
+		msgPrcsr = &s3MessageProcessor{
+			ceSourceFallback: arn.String(),
+		}
+	case "eventbridge":
+		msgPrcsr = &eventbridgeMessageProcessor{
+			ceSource:         env.CEOverrideSource,
+			ceSourceFallback: arn.String(),
+		}
 	case "default":
-		msgPrcsr = &defaultMessageProcessor{ceSource: arn.String()}
+		msgPrcsr = &defaultMessageProcessor{
+			ceSource: arn.String(),
+		}
 	default:
 		panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}

@@ -184,6 +184,11 @@ func (l *Listers) GetAWSDynamoDBSourceLister() sourceslistersv1alpha1.AWSDynamoD
 	return sourceslistersv1alpha1.NewAWSDynamoDBSourceLister(l.IndexerFor(&sourcesv1alpha1.AWSDynamoDBSource{}))
 }
 
+// GetAWSEventBridgeSourceLister returns a Lister for AWSEventBridgeSource objects.
+func (l *Listers) GetAWSEventBridgeSourceLister() sourceslistersv1alpha1.AWSEventBridgeSourceLister {
+	return sourceslistersv1alpha1.NewAWSEventBridgeSourceLister(l.IndexerFor(&sourcesv1alpha1.AWSEventBridgeSource{}))
+}
+
 // GetAWSKinesisSourceLister returns a Lister for AWSKinesisSource objects.
 func (l *Listers) GetAWSKinesisSourceLister() sourceslistersv1alpha1.AWSKinesisSourceLister {
 	return sourceslistersv1alpha1.NewAWSKinesisSourceLister(l.IndexerFor(&sourcesv1alpha1.AWSKinesisSource{}))

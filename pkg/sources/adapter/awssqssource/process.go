@@ -21,11 +21,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
+	"github.com/aws/aws-sdk-go/service/eventbridge"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/sqs"
 
@@ -109,11 +111,40 @@ func makeSQSEvent(msg *sqs.Message, srcAttr string) (*cloudevents.Event, error) 
 		event.SetExtension(name, val)
 	}
 
-	if err := event.SetData(cloudevents.ApplicationJSON, msg); err != nil {
+	if err := event.SetData(cloudevents.ApplicationJSON, toCloudEventData(msg)); err != nil {
 		return nil, fmt.Errorf("setting CloudEvent data: %w", err)
 	}
 
 	return &event, nil
+}
+
+// toCloudEventData returns a SQS message in a shape that is suitable for JSON
+// serialization inside some CloudEvent data.
+func toCloudEventData(msg *sqs.Message) interface{} {
+	if msg.Body == nil {
+		return msg
+	}
+
+	var data interface{}
+	data = msg
+
+	// if msg.Body contains raw JSON data, type it as json.RawMessage so it
+	// doesn't get encoded to base64 during the serialization of the
+	// CloudEvent data.
+	if json.Valid([]byte(*msg.Body)) {
+		data = &messageWithRawJSONBody{
+			Body:    json.RawMessage([]byte(*msg.Body)),
+			Message: msg,
+		}
+	}
+
+	return data
+}
+
+// messageWithRawJSONBody is a SQS Message with a RawMessage-typed JSON body.
+type messageWithRawJSONBody struct {
+	Body json.RawMessage
+	*sqs.Message
 }
 
 // s3MessageProcessor processes messages originating from S3 buckets.
@@ -248,4 +279,99 @@ func isTestEventPayload(data map[string]interface{}) bool {
 	}
 
 	return true
+}
+
+// eventbridgeMessageProcessor processes messages originating from EventBridge.
+type eventbridgeMessageProcessor struct {
+	// this value is set as the "source" CE context attribute on messages
+	// that originate from EventBridge
+	ceSource string
+	// this value is set as the "source" CE context attribute when the
+	// EventBridge processor handles messages which are not originating
+	// from EventBridge
+	ceSourceFallback string
+}
+
+// Process implements MessageProcessor.
+//
+// This processor discards everything from the given message except its body,
+// which must be in JSON format.
+//
+// Expected events structure: https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html
+func (p *eventbridgeMessageProcessor) Process(msg *sqs.Message) ([]*cloudevents.Event, error) {
+	var events []*cloudevents.Event
+
+	bodyData := make(map[string]interface{})
+
+	if err := json.Unmarshal([]byte(*msg.Body), &bodyData); err != nil {
+		// if the data is not a JSON object, we can be certain the
+		// message didn't originate from EventBridge, and fall back to
+		// the default processor's behaviour
+		event, err := makeSQSEvent(msg, p.ceSourceFallback)
+		if err != nil {
+			return nil, fmt.Errorf("creating CloudEvent from SQS message: %w", err)
+		}
+
+		return append(events, event), nil
+	}
+
+	switch {
+	case isEventBridgeEvent(bodyData):
+		event, err := makeEventBridgeEvent(bodyData, p.ceSource)
+		if err != nil {
+			return nil, fmt.Errorf("creating CloudEvent from EventBridge event: %w", err)
+		}
+
+		events = append(events, event)
+
+	// instead of discarding non-EventBridge events, fall back to the
+	// default processor's behaviour
+	default:
+		event, err := makeSQSEvent(msg, p.ceSourceFallback)
+		if err != nil {
+			return nil, fmt.Errorf("creating CloudEvent from SQS message: %w", err)
+		}
+
+		events = append(events, event)
+
+	}
+
+	return events, nil
+}
+
+// isEventBridgeEvent returns whether the given data represents a valid
+// EventBridge event.
+func isEventBridgeEvent(data map[string]interface{}) bool {
+	if _, ok := data["detail"]; !ok {
+		return false
+	}
+	if _, ok := data["detail-type"]; !ok {
+		return false
+	}
+	_, ok := data["source"]
+	return ok
+}
+
+// makeEventBridgeEvent returns a CloudEvent for the given EventBridge event.
+func makeEventBridgeEvent(data map[string]interface{}, srcAttr string) (*cloudevents.Event, error) {
+	event := cloudevents.NewEvent()
+	event.SetType(v1alpha1.AWSEventType(eventbridge.EndpointsID, v1alpha1.AWSEventBridgeGenericEventType))
+	event.SetSource(srcAttr)
+	event.SetExtension("awseventssource", data["source"])
+	event.SetExtension("awseventsdetailtype", data["detail-type"])
+
+	if id, ok := data["id"]; ok {
+		event.SetID(id.(string))
+	}
+	if t, ok := data["time"]; ok {
+		if ts, err := time.Parse(time.RFC3339, t.(string)); err == nil {
+			event.SetTime(ts)
+		}
+	}
+
+	if err := event.SetData(cloudevents.ApplicationJSON, data); err != nil {
+		return nil, fmt.Errorf("setting CloudEvent data: %w", err)
+	}
+
+	return &event, nil
 }

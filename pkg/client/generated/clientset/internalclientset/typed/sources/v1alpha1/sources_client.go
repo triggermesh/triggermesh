@@ -34,6 +34,7 @@ type SourcesV1alpha1Interface interface {
 	AWSCognitoIdentitySourcesGetter
 	AWSCognitoUserPoolSourcesGetter
 	AWSDynamoDBSourcesGetter
+	AWSEventBridgeSourcesGetter
 	AWSKinesisSourcesGetter
 	AWSPerformanceInsightsSourcesGetter
 	AWSS3SourcesGetter
@@ -91,6 +92,10 @@ func (c *SourcesV1alpha1Client) AWSCognitoUserPoolSources(namespace string) AWSC
 
 func (c *SourcesV1alpha1Client) AWSDynamoDBSources(namespace string) AWSDynamoDBSourceInterface {
 	return newAWSDynamoDBSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) AWSEventBridgeSources(namespace string) AWSEventBridgeSourceInterface {
+	return newAWSEventBridgeSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) AWSKinesisSources(namespace string) AWSKinesisSourceInterface {

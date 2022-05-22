@@ -66,6 +66,14 @@ type AWSDynamoDBSourceListerExpansion interface{}
 // AWSDynamoDBSourceNamespaceLister.
 type AWSDynamoDBSourceNamespaceListerExpansion interface{}
 
+// AWSEventBridgeSourceListerExpansion allows custom methods to be added to
+// AWSEventBridgeSourceLister.
+type AWSEventBridgeSourceListerExpansion interface{}
+
+// AWSEventBridgeSourceNamespaceListerExpansion allows custom methods to be added to
+// AWSEventBridgeSourceNamespaceLister.
+type AWSEventBridgeSourceNamespaceListerExpansion interface{}
+
 // AWSKinesisSourceListerExpansion allows custom methods to be added to
 // AWSKinesisSourceLister.
 type AWSKinesisSourceListerExpansion interface{}

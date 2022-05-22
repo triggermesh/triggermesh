@@ -93,6 +93,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSCognitoUserPoolSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awsdynamodbsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSDynamoDBSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awseventbridgesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSEventBridgeSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awskinesissources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().AWSKinesisSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("awsperformanceinsightssources"):

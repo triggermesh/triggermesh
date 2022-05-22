@@ -18,6 +18,7 @@ package awssqssource
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 	"testing"
@@ -180,6 +181,66 @@ func TestAdapter(t *testing.T) {
 			assrt.EqualValues(tVisibilityTimeout, *rcvMsgRequests[0].VisibilityTimeout)
 		})
 	}
+}
+
+func TestProcessRawJSON(t *testing.T) {
+	testCases := []struct {
+		name            string
+		msgBody         string
+		expectEventData interface{}
+	}{
+		{
+			name:            "Body is raw string",
+			msgBody:         "test",
+			expectEventData: `"test"`,
+		},
+		{
+			name:            "Body is a JSON object",
+			msgBody:         `{"test": null}`,
+			expectEventData: `{"test":null}`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			msgPrcsr := &defaultMessageProcessor{ceSource: "test"}
+
+			body := tc.msgBody
+
+			mockMsg := &sqs.Message{
+				MessageId: aws.String(tMsgIDPrefix + "001"),
+				Body:      &body,
+			}
+
+			gotEvents, err := msgPrcsr.Process(mockMsg)
+			require.NoError(t, err)
+			require.Len(t, gotEvents, 1, "Expected one processed event")
+
+			eventData := make(map[string]interface{})
+			err = json.Unmarshal(gotEvents[0].Data(), &eventData)
+			require.NoError(t, err)
+
+			// ensure the sent event has the expected encoding (base64 / raw JSON)
+			eventDataStr := stringifyEventData(t, eventData["Body"])
+			assert.Equal(t, tc.expectEventData, eventDataStr)
+		})
+	}
+}
+
+// stringifyEventData returns the given data as a JSON-encoded string. This
+// helps asserting the value of a SQS messages's Body contained in a
+// CloudEvent, which can be either a JSON object encoded as a
+// map[string]interface{} (if the original message contained JSON data) or a
+// quoted string (for any other type of data).
+func stringifyEventData(t *testing.T, data interface{}) string {
+	dataBytes, err := json.Marshal(data)
+	require.NoError(t, err)
+
+	var jsonData json.RawMessage
+	err = json.Unmarshal(dataBytes, &jsonData)
+	require.NoError(t, err)
+
+	return string(jsonData)
 }
 
 // makeARN returns a fake SQS ARN for the given resource.
