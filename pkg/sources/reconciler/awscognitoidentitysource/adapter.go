@@ -40,10 +40,10 @@ type adapterConfig struct {
 	configs source.ConfigAccessor
 }
 
-// Verify that Reconciler implements common.AdapterDeploymentBuilder.
-var _ common.AdapterDeploymentBuilder = (*Reconciler)(nil)
+// Verify that Reconciler implements common.AdapterBuilder.
+var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 
-// BuildAdapter implements common.AdapterDeploymentBuilder.
+// BuildAdapter implements common.AdapterBuilder.
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AWSCognitoIdentitySource)
 

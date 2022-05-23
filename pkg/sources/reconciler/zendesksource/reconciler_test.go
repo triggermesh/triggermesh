@@ -27,6 +27,7 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/logging"
 	rt "knative.dev/pkg/reconciler/testing"
+	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
@@ -105,7 +106,7 @@ func newEventSource() *v1alpha1.ZendeskSource {
 
 // adapterBuilder returns a slim Reconciler containing only the fields accessed
 // by r.BuildAdapter().
-func adapterBuilder(cfg *adapterConfig) common.AdapterServiceBuilder {
+func adapterBuilder(cfg *adapterConfig) common.AdapterBuilder[*servingv1.Service] {
 	return &Reconciler{
 		adapterCfg: cfg,
 	}

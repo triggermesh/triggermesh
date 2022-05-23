@@ -20,6 +20,7 @@ import (
 	"context"
 	"testing"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -98,7 +99,7 @@ func newEventSource() *v1alpha1.SalesforceSource {
 
 // adapterBuilder returns a slim Reconciler containing only the fields accessed
 // by r.BuildAdapter().
-func adapterBuilder(cfg *adapterConfig) common.AdapterDeploymentBuilder {
+func adapterBuilder(cfg *adapterConfig) common.AdapterBuilder[*appsv1.Deployment] {
 	return &Reconciler{
 		adapterCfg: cfg,
 	}

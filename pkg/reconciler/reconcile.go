@@ -53,20 +53,16 @@ var knativeServingAnnotations = []string{
 	serving.UpdaterAnnotation,
 }
 
-// AdapterDeploymentBuilder provides all the necessary information for building
-// a component's adapter backed by a Deployment.
-type AdapterDeploymentBuilder interface {
-	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error)
-}
-
-// AdapterServiceBuilder provides all the necessary information for building a
-// component's adapter backed by a Knative Service.
-type AdapterServiceBuilder interface {
-	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error)
+// AdapterBuilder provides all the necessary information for building a
+// component's adapter object.
+type AdapterBuilder[T metav1.Object] interface {
+	BuildAdapter(rcl v1alpha1.Reconcilable, sinkURI *apis.URL) (T, error)
 }
 
 // ReconcileAdapter reconciles a receive adapter for a component instance.
-func (r *GenericDeploymentReconciler[T, L]) ReconcileAdapter(ctx context.Context, ab AdapterDeploymentBuilder) reconciler.Event {
+func (r *GenericDeploymentReconciler[T, L]) ReconcileAdapter(ctx context.Context,
+	ab AdapterBuilder[*appsv1.Deployment]) reconciler.Event {
+
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
 	initStatus(rcl)
@@ -165,7 +161,9 @@ func (r *GenericDeploymentReconciler[T, L]) syncAdapterDeployment(ctx context.Co
 }
 
 // ReconcileAdapter reconciles a receive adapter for a component instance.
-func (r *GenericServiceReconciler[T, L]) ReconcileAdapter(ctx context.Context, ab AdapterServiceBuilder) reconciler.Event {
+func (r *GenericServiceReconciler[T, L]) ReconcileAdapter(ctx context.Context,
+	ab AdapterBuilder[*servingv1.Service]) reconciler.Event {
+
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
 	initStatus(rcl)
