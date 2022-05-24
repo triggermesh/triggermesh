@@ -74,7 +74,7 @@ jobs:
           ${{ github.job }}-${{ runner.os }}-go-
 
     - name: Install go-licenses
-      run: go install github.com/google/go-licenses@v1.0.0
+      run: go install github.com/google/go-licenses@v1.2.1
 
     - name: Check third-party licenses
       run: |
