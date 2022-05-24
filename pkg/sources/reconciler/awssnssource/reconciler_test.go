@@ -144,7 +144,8 @@ func TestReconcileSubscription(t *testing.T) {
 			Objects: []runtime.Object{
 				newReconciledSource(),
 				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
+				newReconciledConfigWatchRoleBinding(),
+				newReconciledMTAdapterRoleBinding(),
 				newReconciledAdapter(),
 			},
 			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
@@ -167,7 +168,8 @@ func TestReconcileSubscription(t *testing.T) {
 			Objects: []runtime.Object{
 				newReconciledSource(subscribed),
 				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
+				newReconciledConfigWatchRoleBinding(),
+				newReconciledMTAdapterRoleBinding(),
 				newReconciledAdapter(),
 			},
 			PostConditions: []func(*testing.T, *rt.TableRow){
@@ -187,7 +189,8 @@ func TestReconcileSubscription(t *testing.T) {
 			Objects: []runtime.Object{
 				newReconciledSource(subscribed, deleted),
 				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
+				newReconciledConfigWatchRoleBinding(),
+				newReconciledMTAdapterRoleBinding(),
 				newReconciledAdapter(),
 			},
 			WantPatches: []clientgotesting.PatchActionImpl{
@@ -211,7 +214,8 @@ func TestReconcileSubscription(t *testing.T) {
 			Objects: []runtime.Object{
 				newReconciledSource(subscribed, deleted),
 				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
+				newReconciledConfigWatchRoleBinding(),
+				newReconciledMTAdapterRoleBinding(),
 				newReconciledAdapter(),
 			},
 			WantPatches: []clientgotesting.PatchActionImpl{
@@ -235,7 +239,8 @@ func TestReconcileSubscription(t *testing.T) {
 			Objects: []runtime.Object{
 				newReconciledSource(deleted),
 				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
+				newReconciledConfigWatchRoleBinding(),
+				newReconciledMTAdapterRoleBinding(),
 				newReconciledAdapter(),
 			},
 			WantPatches: []clientgotesting.PatchActionImpl{
@@ -259,7 +264,8 @@ func TestReconcileSubscription(t *testing.T) {
 			Objects: []runtime.Object{
 				newReconciledSource(deleted),
 				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
+				newReconciledConfigWatchRoleBinding(),
+				newReconciledMTAdapterRoleBinding(),
 				newReconciledAdapter(),
 			},
 			WantPatches: []clientgotesting.PatchActionImpl{
@@ -286,7 +292,8 @@ func TestReconcileSubscription(t *testing.T) {
 			Objects: []runtime.Object{
 				newReconciledSource(),
 				newReconciledServiceAccount(),
-				newReconciledRoleBinding(),
+				newReconciledConfigWatchRoleBinding(),
+				newReconciledMTAdapterRoleBinding(),
 				newReconciledAdapter(),
 			},
 			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
@@ -399,10 +406,16 @@ func newReconciledServiceAccount() *corev1.ServiceAccount {
 	return NewServiceAccount(newEventSource())()
 }
 
-// newReconciledRoleBinding returns a test RoleBinding object that is
-// identical to what ReconcileKind generates.
-func newReconciledRoleBinding() *rbacv1.RoleBinding {
-	return NewRoleBinding(newReconciledServiceAccount())()
+// newReconciledConfigWatchRoleBinding returns a test config watcher
+// RoleBinding object that is identical to what ReconcileKind generates.
+func newReconciledConfigWatchRoleBinding() *rbacv1.RoleBinding {
+	return NewConfigWatchRoleBinding(newReconciledServiceAccount())()
+}
+
+// newReconciledMTAdapterRoleBinding returns a test (mt-)adapter RoleBinding
+// object that is identical to what ReconcileKind generates.
+func newReconciledMTAdapterRoleBinding() *rbacv1.RoleBinding {
+	return NewMTAdapterRoleBinding(newReconciledServiceAccount())()
 }
 
 // newReconciledAdapter returns a test receive adapter object that is identical

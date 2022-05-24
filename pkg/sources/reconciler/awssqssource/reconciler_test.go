@@ -25,6 +25,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgotesting "k8s.io/client-go/testing"
@@ -123,13 +124,15 @@ func TestReconcileWithIAMRoleAuth(t *testing.T) {
 				newReconciledAdapter(),
 			},
 			WantCreates: []runtime.Object{
-				newReconciledServiceAccount(NoToken, saName(sa), iamRoleAnnotation),
+				newReconciledEksIAMServiceAccount(t)(NoToken),
+				newReconciledEksIAMConfigWatchRoleBinding(t),
 			},
 			WantUpdates: []clientgotesting.UpdateActionImpl{{
 				Object: newReconciledAdapter(podServiceAccount(sa)),
 			}},
 			WantEvents: []string{
 				createServiceAccountEvent(s),
+				createConfigWatchRoleBindingEvent(s),
 				updateAdapterEvent(n),
 			},
 		},
@@ -247,10 +250,19 @@ func podServiceAccount(name string) adapterOption {
 
 /* RBAC */
 
-// newReconciledServiceAccount returns a test ServiceAccount object that is
-// identical to what ReconcileKind generates.
-func newReconciledServiceAccount(opts ...resource.ServiceAccountOption) *corev1.ServiceAccount {
-	return NewServiceAccount(newEventSource())(opts...)
+// newReconciledEksIAMServiceAccount returns a test EKS IAM ServiceAccount
+// object that is identical to what ReconcileKind generates.
+func newReconciledEksIAMServiceAccount(t *testing.T) func(...resource.ServiceAccountOption) *corev1.ServiceAccount {
+	return func(opts ...resource.ServiceAccountOption) *corev1.ServiceAccount {
+		src := mustNewReconciledSource(t)(iamRole)
+		return NewServiceAccount(src)(append(opts, iamRoleAnnotation)...)
+	}
+}
+
+// newReconciledEksIAMConfigWatchRoleBinding returns a test Eks IAM config
+// watcher RoleBinding object that is identical to what ReconcileKind generates.
+func newReconciledEksIAMConfigWatchRoleBinding(t *testing.T) *rbacv1.RoleBinding {
+	return NewConfigWatchRoleBinding(newReconciledEksIAMServiceAccount(t)())()
 }
 
 // iamRoleAnnotation sets the IAM Role annotation, which is expected to be
@@ -259,19 +271,18 @@ func iamRoleAnnotation(sa *corev1.ServiceAccount) {
 	metav1.SetMetaDataAnnotation(&sa.ObjectMeta, "eks.amazonaws.com/role-arn", tIAMRoleARN.String())
 }
 
-// saName overrides the object's Name.
-func saName(name string) resource.ServiceAccountOption {
-	return func(sa *corev1.ServiceAccount) {
-		sa.Name = name
-	}
-}
-
 /* Events */
 
 func createServiceAccountEvent(src commonv1alpha1.Reconcilable) string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
 		"Created ServiceAccount %q due to the creation of a AWSSQSSource object",
 		common.ServiceAccountName(src))
+}
+
+func createConfigWatchRoleBindingEvent(src commonv1alpha1.Reconcilable) string {
+	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
+		"Created RoleBinding %q due to the creation of a %s object",
+		common.ServiceAccountName(src)+"-config-watcher", src.GetGroupVersionKind().Kind)
 }
 
 func updateAdapterEvent(name string) string {

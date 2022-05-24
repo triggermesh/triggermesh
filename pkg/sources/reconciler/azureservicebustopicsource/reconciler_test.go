@@ -330,7 +330,7 @@ func newReconciledServiceAccount() *corev1.ServiceAccount {
 // newReconciledRoleBinding returns a test RoleBinding object that is
 // identical to what ReconcileKind generates.
 func newReconciledRoleBinding() *rbacv1.RoleBinding {
-	return NewRoleBinding(newReconciledServiceAccount())()
+	return NewConfigWatchRoleBinding(newReconciledServiceAccount())()
 }
 
 // newReconciledAdapter returns a test receive adapter object that is identical

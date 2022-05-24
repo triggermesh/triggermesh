@@ -509,6 +509,26 @@ rules:
 
 ---
 
+# This role is used to grant receive adapters read-only access to per-component
+# configurations such as logging, observability and tracing.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-config-watcher
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - watch
+  - get
+
+---
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
