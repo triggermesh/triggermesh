@@ -19,7 +19,7 @@ require (
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/pubsub v1.21.1
-	cloud.google.com/go/storage v1.22.0
+	cloud.google.com/go/storage v1.22.1
 	cloud.google.com/go/workflows v1.4.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.18
@@ -34,7 +34,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
 	github.com/Azure/azure-storage-queue-go v0.0.0-20191125232315-636801874cdd
 	github.com/Azure/go-autorest/autorest v0.11.27
-	github.com/Azure/go-autorest/autorest/adal v0.9.19
+	github.com/Azure/go-autorest/autorest/adal v0.9.20
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.3+incompatible
@@ -76,7 +76,7 @@ require (
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	google.golang.org/api v0.80.0
-	google.golang.org/genproto v0.0.0-20220505152158-f39f71e6c8f3
+	google.golang.org/genproto v0.0.0-20220518221133-4f43b3371335
 	google.golang.org/grpc v1.46.2
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
