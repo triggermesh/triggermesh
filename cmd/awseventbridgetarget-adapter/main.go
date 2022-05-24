@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awseventbridgetarget-adapter", awseventbridgetarget.NewEnvConfig, awseventbridgetarget.NewTarget)
+	pkgadapter.Main("awseventbridgetarget", awseventbridgetarget.NewEnvConfig, awseventbridgetarget.NewTarget)
 }

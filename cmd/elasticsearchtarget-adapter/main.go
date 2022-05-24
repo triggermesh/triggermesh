@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("elasticsearch", elasticsearchtarget.EnvAccessorCtor, elasticsearchtarget.NewTarget)
+	pkgadapter.Main("elasticsearchtarget", elasticsearchtarget.EnvAccessorCtor, elasticsearchtarget.NewTarget)
 }

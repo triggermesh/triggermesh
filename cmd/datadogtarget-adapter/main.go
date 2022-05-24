@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("datadogtarget-adapter", datadogtarget.EnvAccessorCtor, datadogtarget.NewTarget)
+	pkgadapter.Main("datadogtarget", datadogtarget.EnvAccessorCtor, datadogtarget.NewTarget)
 }

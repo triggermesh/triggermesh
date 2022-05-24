@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("dataweavetransformation-adapter", dataweavetransformation.EnvAccessorCtor, dataweavetransformation.NewTarget)
+	pkgadapter.Main("dataweavetransformation", dataweavetransformation.EnvAccessorCtor, dataweavetransformation.NewTarget)
 }

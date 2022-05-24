@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("googlecloudfirestoretarget-adapter", googlecloudfirestoretarget.EnvAccessorCtor, googlecloudfirestoretarget.NewTarget)
+	pkgadapter.Main("googlecloudfirestoretarget", googlecloudfirestoretarget.EnvAccessorCtor, googlecloudfirestoretarget.NewTarget)
 }

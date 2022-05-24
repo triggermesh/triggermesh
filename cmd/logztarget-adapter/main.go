@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("logztarget-adapter", logztarget.EnvAccessorCtor, logztarget.NewTarget)
+	pkgadapter.Main("logztarget", logztarget.EnvAccessorCtor, logztarget.NewTarget)
 }

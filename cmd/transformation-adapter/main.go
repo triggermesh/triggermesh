@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("bumblebee", transformation.NewEnvConfig, transformation.NewAdapter)
+	pkgadapter.Main("transformation", transformation.NewEnvConfig, transformation.NewAdapter)
 }

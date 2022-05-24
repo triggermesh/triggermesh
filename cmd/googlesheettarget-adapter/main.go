@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("googlesheettarget-adapter", googlesheettarget.EnvAccessorCtor, googlesheettarget.NewTarget)
+	pkgadapter.Main("googlesheettarget", googlesheettarget.EnvAccessorCtor, googlesheettarget.NewTarget)
 }

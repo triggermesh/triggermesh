@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("confluenttarget-adapter", confluenttarget.EnvAccessorCtor, confluenttarget.NewTarget)
+	pkgadapter.Main("confluenttarget", confluenttarget.EnvAccessorCtor, confluenttarget.NewTarget)
 }

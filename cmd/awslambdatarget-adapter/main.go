@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awslambdatarget-adapter", awslambdatarget.NewEnvConfig, awslambdatarget.NewTarget)
+	pkgadapter.Main("awslambdatarget", awslambdatarget.NewEnvConfig, awslambdatarget.NewTarget)
 }

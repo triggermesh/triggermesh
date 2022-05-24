@@ -1,0 +1,63 @@
+# Copyright 2022 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-logging
+  namespace: triggermesh
+data:
+  # Common configuration for all Knative codebase
+  zap-logger-config: |
+    {
+      "level": "info",
+      "development": false,
+      "outputPaths": ["stdout"],
+      "errorOutputPaths": ["stderr"],
+      "encoding": "json",
+      "encoderConfig": {
+        "timeKey": "timestamp",
+        "levelKey": "severity",
+        "nameKey": "logger",
+        "callerKey": "caller",
+        "messageKey": "message",
+        "stacktraceKey": "stacktrace",
+        "lineEnding": "",
+        "levelEncoder": "",
+        "timeEncoder": "iso8601",
+        "durationEncoder": "",
+        "callerEncoder": ""
+      }
+    }
+
+  # Log level overrides
+  # For all components except the queue proxy,
+  # changes are picked up immediately.
+  # For queue proxy, changes require recreation of the pods.
+  loglevel.controller: "info"
+  loglevel.autoscaler: "info"
+  loglevel.queueproxy: "info"
+  loglevel.webhook: "info"
+  loglevel.activator: "info"
+  loglevel.hpaautoscaler: "info"
+  loglevel.net-certmanager-controller: "info"
+  loglevel.net-istio-controller: "info"
+
+  # Log level overrides for TriggerMesh components.
+  # Log level changes require manual reconciliation for adapter components.
+  # Logger name is the lower case component name, for example:
+  loglevel.triggermesh-controller: "info"
+  loglevel.awss3target: "info"
+  loglevel.ibmmqsource: "info"
+  loglevel.transformation: "info"

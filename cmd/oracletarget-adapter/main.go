@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("oracletarget-adapter", oracletarget.EnvAccessorCtor, oracletarget.NewTarget)
+	pkgadapter.Main("oracletarget", oracletarget.EnvAccessorCtor, oracletarget.NewTarget)
 }

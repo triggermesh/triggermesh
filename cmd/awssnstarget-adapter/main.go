@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awssnstarget-adapter", awssnstarget.NewEnvConfig, awssnstarget.NewTarget)
+	pkgadapter.Main("awssnstarget", awssnstarget.NewEnvConfig, awssnstarget.NewTarget)
 }

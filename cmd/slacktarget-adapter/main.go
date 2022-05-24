@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("slacktarget-adapter", slacktarget.EnvAccessorCtor, slacktarget.NewTarget)
+	pkgadapter.Main("slacktarget", slacktarget.EnvAccessorCtor, slacktarget.NewTarget)
 }

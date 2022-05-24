@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("httptarget-adapter", httptarget.EnvAccessorCtor, httptarget.NewTarget)
+	pkgadapter.Main("httptarget", httptarget.EnvAccessorCtor, httptarget.NewTarget)
 }

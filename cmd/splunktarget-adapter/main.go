@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("splunktarget-adapter", splunktarget.NewEnvConfig, splunktarget.NewTarget)
+	pkgadapter.Main("splunktarget", splunktarget.NewEnvConfig, splunktarget.NewTarget)
 }

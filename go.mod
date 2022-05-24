@@ -5,8 +5,8 @@ go 1.18
 // Knative and CloudEvents are the common denominator to all TriggerMesh components.
 require (
 	github.com/cloudevents/sdk-go/v2 v2.10.0
-	knative.dev/eventing v0.31.0
-	knative.dev/pkg v0.0.0-20220412134708-e325df66cb51
+	knative.dev/eventing v0.31.1-0.20220523181303-c3e13967001f
+	knative.dev/pkg v0.0.0-20220512013937-2d8305b2e59a
 	knative.dev/serving v0.31.0
 )
 

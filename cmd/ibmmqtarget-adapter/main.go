@@ -25,5 +25,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("ibmmqtarget-adapter", ibmmqtarget.EnvAccessorCtor, ibmmqtarget.NewAdapter)
+	pkgadapter.Main("ibmmqtarget", ibmmqtarget.EnvAccessorCtor, ibmmqtarget.NewAdapter)
 }

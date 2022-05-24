@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("zendesktarget-adapter", zendesktarget.EnvAccessorCtor, zendesktarget.NewTarget)
+	pkgadapter.Main("zendesktarget", zendesktarget.EnvAccessorCtor, zendesktarget.NewTarget)
 }
