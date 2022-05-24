@@ -18,20 +18,22 @@ package xmltojsontransformation
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cetest "github.com/cloudevents/sdk-go/v2/client/test"
-	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	cetest "github.com/cloudevents/sdk-go/v2/client/test"
+
 	"knative.dev/eventing/pkg/adapter/v2"
+	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
+	logtesting "knative.dev/pkg/logging/testing"
+
+	"github.com/triggermesh/triggermesh/pkg/metrics"
+	metricstesting "github.com/triggermesh/triggermesh/pkg/metrics/testing"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 const (
@@ -40,7 +42,7 @@ const (
 	tCloudEventSource = "ce.test.source"
 
 	tXML1        = `<note><to>Tove</to></note>`
-	tJSONOutput1 = "{\"note\": {\"to\": \"Tove\"}}\n"
+	tJSONOutput1 = `{"note": {"to": "Tove"}}` + "\n"
 
 	tFalseXML         = `"this is not xml"`
 	tFalseXMLResponse = `{"Code":"request-validation","Description":"invalid XML","Details":null}`
@@ -56,35 +58,39 @@ func TestSink(t *testing.T) {
 			expectEvent: newCloudEvent(t, tJSONOutput1, cloudevents.ApplicationJSON),
 		},
 	}
+
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				body, err := ioutil.ReadAll(r.Body)
-				assert.NoError(t, err)
-				assert.Equal(t, tXML1, string(body))
-				fmt.Fprintf(w, "OK")
-			}))
-			defer svr.Close()
+			metricstesting.ResetMetrics(t)
 
-			env := &envAccessor{
-				EnvConfig: adapter.EnvConfig{
-					Component: tCloudEventSource,
-					Sink:      svr.URL,
-				},
+			ceClient := adaptertest.NewTestClient()
+
+			logger := logtesting.TestLogger(t)
+
+			replier, err := targetce.New("test-xmltojson", logger)
+			require.NoError(t, err)
+
+			mt := &adapter.MetricTag{}
+
+			a := &Adapter{
+				sink:     "http://fake",
+				replier:  replier,
+				ceClient: ceClient,
+				logger:   logger,
+
+				mt: mt,
+				sr: metrics.MustNewEventProcessingStatsReporter(mt),
 			}
+
 			ctx := context.Background()
-			c, err := cloudevents.NewClientHTTP()
-			assert.NoError(t, err)
-			a := NewAdapter(ctx, env, c)
 
-			go func() {
-				if err := a.Start(ctx); err != nil {
-					assert.FailNow(t, "could not start test adapter")
-				}
-			}()
+			e, r := a.dispatch(ctx, tc.inEvent)
+			assert.Nil(t, e)
+			assert.Equal(t, cloudevents.ResultACK, r)
 
-			response := sendCE(t, &tc.inEvent, c, svr.URL)
-			assert.NotEqual(t, cloudevents.IsUndelivered(response), response)
+			events := ceClient.Sent()
+			require.Equal(t, 1, len(events))
+			assert.Equal(t, tc.expectEvent, events[0])
 		})
 	}
 }
@@ -99,25 +105,35 @@ func TestReplier(t *testing.T) {
 			expectEvent: newCloudEvent(t, tJSONOutput1, cloudevents.ApplicationJSON),
 		},
 		"transform error": {
-			inEvent: newCloudEvent(t, tFalseXML, cloudevents.ApplicationXML),
-
+			inEvent:     newCloudEvent(t, tFalseXML, cloudevents.ApplicationXML),
 			expectEvent: newCloudEvent(t, tFalseXMLResponse, cloudevents.ApplicationXML),
 		},
 	}
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			ctx := context.Background()
-
-			env := &envAccessor{
-				EnvConfig: adapter.EnvConfig{
-					Component: tCloudEventSource,
-				},
-			}
+			metricstesting.ResetMetrics(t)
 
 			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
 
-			a := NewAdapter(ctx, env, ceClient)
+			logger := logtesting.TestLogger(t)
+
+			replier, err := targetce.New(tCloudEventSource, logger)
+			require.NoError(t, err)
+
+			mt := &adapter.MetricTag{}
+
+			a := &Adapter{
+				replier:  replier,
+				ceClient: ceClient,
+				logger:   logger,
+
+				mt: mt,
+				sr: metrics.MustNewEventProcessingStatsReporter(mt),
+			}
+
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
 
 			go func() {
 				if err := a.Start(ctx); err != nil {
@@ -140,23 +156,17 @@ func TestReplier(t *testing.T) {
 	}
 }
 
-type cloudEventOptions func(*cloudevents.Event)
+func newCloudEvent(t *testing.T, data, contentType string) cloudevents.Event {
+	t.Helper()
 
-func newCloudEvent(t *testing.T, data, contentType string, opts ...cloudEventOptions) cloudevents.Event {
 	event := cloudevents.NewEvent()
+
 	event.SetID(tCloudEventID)
 	event.SetType(tCloudEventType)
 	event.SetSource(tCloudEventSource)
+
 	err := event.SetData(contentType, []byte(data))
 	require.NoError(t, err)
+
 	return event
-}
-
-func sendCE(t *testing.T, event *cloudevents.Event, cs cloudevents.Client, sink string) protocol.Result {
-	ctx := cloudevents.ContextWithTarget(context.Background(), sink)
-	c, err := cloudevents.NewClientHTTP()
-	require.NoError(t, err)
-
-	result := c.Send(ctx, *event)
-	return result
 }

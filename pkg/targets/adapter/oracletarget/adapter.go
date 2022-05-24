@@ -19,23 +19,35 @@ package oracletarget
 import (
 	"bytes"
 	"context"
-
 	"io/ioutil"
 	"net/http"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/oracle/oci-go-sdk/common"
-	"github.com/oracle/oci-go-sdk/functions"
-
 	"go.uber.org/zap"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
+
+	"github.com/oracle/oci-go-sdk/common"
+	"github.com/oracle/oci-go-sdk/functions"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // NewTarget constructs a target's adapter.
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.OracleTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
 	env := envAcc.(*envAccessor)
 
 	fn := env.OracleFunction
@@ -47,6 +59,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		fn:       fn,
 		ceClient: ceClient,
 		logger:   logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -61,6 +75,8 @@ type oracleAdapter struct {
 
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 func (a *oracleAdapter) Start(ctx context.Context) error {

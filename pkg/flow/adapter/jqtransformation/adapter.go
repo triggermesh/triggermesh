@@ -28,6 +28,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -40,6 +41,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		Namespace:     envAcc.GetNamespace(),
 		Name:          envAcc.GetName(),
 	}
+
+	metrics.MustRegisterEventProcessingStatsView()
 
 	env := envAcc.(*envAccessor)
 
@@ -63,7 +66,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
-		mt:       mt,
+
+		mt: mt,
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -76,7 +81,9 @@ type jqadapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
-	mt       *pkgadapter.MetricTag
+
+	mt *pkgadapter.MetricTag
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Start is a blocking function and will return if an error occurs

@@ -22,21 +22,24 @@ import (
 	"testing"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/metrics"
-	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	cetest "github.com/cloudevents/sdk-go/v2/client/test"
+
 	"knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	logtesting "knative.dev/pkg/logging/testing"
+	"knative.dev/pkg/ptr"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
+	metricstesting "github.com/triggermesh/triggermesh/pkg/metrics/testing"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 const (
-	tBridgeID               = "bride-abdc-0123"
 	tCloudEventID           = "ce-abcd-0123"
 	tCloudEventType         = "ce.test.type"
 	tCloudEventResponseType = "ce.test.type.response"
@@ -206,7 +209,6 @@ func TestDataWeaveTransformationEvents(t *testing.T) {
 
 		inEvent cloudevents.Event
 
-		expectPanic    string
 		expectEvent    cloudevents.Event
 		expectCategory string
 	}{
@@ -301,36 +303,41 @@ func TestDataWeaveTransformationEvents(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
+			metricstesting.ResetMetrics(t)
 
-			defer func() {
-				r := recover()
-				switch {
-				case r == nil:
-					assert.Empty(t, tc.expectPanic, "Expected panic did not occur")
-				case tc.expectPanic == "":
-					assert.Fail(t, "Unexpected panic", r)
-				default:
-					assert.Contains(t, r, tc.expectPanic)
-				}
-			}()
-
-			ctx := context.Background()
-			logtesting.TestContextWithLogger(t)
-
-			env := &envAccessor{
-				EnvConfig: adapter.EnvConfig{
-					Component: tCloudEventSource,
-				},
-				AllowDwSpellOverride: tc.allowDwSpellOverride,
-				DwSpell:              tc.dwSpell,
-				InputContentType:     tc.inputContentType,
-				OutputContentType:    tc.outputContentType,
-				BridgeIdentifier:     tBridgeID,
-			}
+			logger := logtesting.TestLogger(t)
 
 			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
 
-			a := NewTarget(ctx, env, ceClient)
+			replier, err := targetce.New(tCloudEventSource, logger)
+			require.NoError(t, err)
+
+			mt := &adapter.MetricTag{}
+
+			a := &dataweaveTransformAdapter{
+				replier:  replier,
+				ceClient: ceClient,
+				logger:   logger,
+
+				defaultOutputContentType: ptr.String("application/json"),
+				spellOverride:            tc.allowDwSpellOverride,
+
+				mt: mt,
+				sr: metrics.MustNewEventProcessingStatsReporter(mt),
+			}
+
+			if v := tc.dwSpell; v != "" {
+				a.defaultSpell = &v
+			}
+			if v := tc.inputContentType; v != "" {
+				a.defaultInputContentType = &v
+			}
+			if v := tc.outputContentType; v != "" {
+				a.defaultOutputContentType = &v
+			}
+
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
 
 			go func() {
 				if err := a.Start(ctx); err != nil {
@@ -377,10 +384,10 @@ func TestDataWeaveTransformationToSink(t *testing.T) {
 			expectedEvent:       newCloudEvent(tOutAlternativeJSON, cloudevents.ApplicationJSON, cloudEventWithEventType(tCloudEventResponseType)),
 		},
 	}
+
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
-			ctx := context.Background()
 
 			mt := &adapter.MetricTag{}
 
@@ -395,6 +402,8 @@ func TestDataWeaveTransformationToSink(t *testing.T) {
 				mt:                       mt,
 				sr:                       metrics.MustNewEventProcessingStatsReporter(mt),
 			}
+
+			ctx := context.Background()
 
 			e, r := a.dispatch(ctx, tc.inEvent)
 			assert.Nil(t, e)

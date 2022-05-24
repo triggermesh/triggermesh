@@ -72,6 +72,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		Name:          envAcc.GetName(),
 	}
 
+	metrics.MustRegisterEventProcessingStatsView()
+
 	env := envAcc.(*envAccessor)
 
 	if err := env.validate(); err != nil {

@@ -21,25 +21,30 @@ package xslttransformation
 import (
 	"context"
 	"encoding/json"
+	"runtime"
 	"testing"
 	"time"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	xslt "github.com/wamuir/go-xslt"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 
 	"knative.dev/eventing/pkg/adapter/v2"
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	logtesting "knative.dev/pkg/logging/testing"
 
+	xslt "github.com/wamuir/go-xslt"
+
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
+	metricstesting "github.com/triggermesh/triggermesh/pkg/metrics/testing"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 const (
-	tBridgeID               = "bride-abdc-0123"
+	tBridgeID               = "bridge-abdc-0123"
 	tComponent              = "xslt-adapter"
 	tCloudEventID           = "ce-abcd-0123"
 	tCloudEventType         = "ce.test.type"
@@ -122,6 +127,52 @@ const (
 `
 )
 
+func TestNewTarget(t *testing.T) {
+	testCases := map[string]struct {
+		xslt        string
+		expectPanic string
+	}{
+		"wrong XSLT": {
+			xslt:        tFaultyXML,
+			expectPanic: "XSLT validation error: failed to parse xsl",
+		},
+
+		"wrong configuration not providing XSLT": {
+			xslt:        "",
+			expectPanic: "if XSLT cannot be overriden by CloudEvent payloads, configured XSLT cannot be empty",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			metricstesting.UnregisterMetrics()
+
+			defer func() {
+				r := recover()
+				switch {
+				case r == nil:
+					assert.Empty(t, tc.expectPanic, "Expected panic did not occur")
+				case tc.expectPanic == "":
+					assert.Fail(t, "Unexpected panic", r)
+				default:
+					assert.Contains(t, r, tc.expectPanic)
+				}
+			}()
+
+			env := &envAccessor{
+				XSLT:              tc.xslt,
+				AllowXSLTOverride: false,
+			}
+
+			ceClient, _, _ := cetest.NewMockResponderClient(t, 1)
+
+			ctx := logtesting.TestContextWithLogger(t)
+
+			_ = NewTarget(ctx, env, ceClient)
+		})
+	}
+}
+
 func TestXSLTTransformationEvents(t *testing.T) {
 	testCases := map[string]struct {
 		allowXSLTOverride bool
@@ -129,7 +180,6 @@ func TestXSLTTransformationEvents(t *testing.T) {
 
 		inEvent cloudevents.Event
 
-		expectPanic    string
 		expectEvent    cloudevents.Event
 		expectCategory string
 	}{
@@ -159,7 +209,6 @@ func TestXSLTTransformationEvents(t *testing.T) {
 			expectEvent:    newCloudEvent(tOutXML, cloudevents.ApplicationXML),
 			expectCategory: tSuccessAttribute,
 		},
-
 		"transform xslt at event overrides default, ok": {
 			allowXSLTOverride: true,
 			xslt:              tXSLT,
@@ -171,21 +220,6 @@ func TestXSLTTransformationEvents(t *testing.T) {
 			expectEvent:    newCloudEvent(tAlternativeOutXML, cloudevents.ApplicationXML),
 			expectCategory: tSuccessAttribute,
 		},
-
-		"wrong XSLT": {
-			allowXSLTOverride: false,
-			xslt:              tFaultyXML,
-
-			expectPanic: "XSLT validation error: failed to parse xsl",
-		},
-
-		"wrong configuration not providing XSLT": {
-			allowXSLTOverride: false,
-			xslt:              "",
-
-			expectPanic: "if XSLT cannot be overriden by CloudEvent payloads, configured XSLT cannot be empty",
-		},
-
 		"malformed incoming event": {
 			allowXSLTOverride: false,
 			xslt:              tXSLT,
@@ -200,34 +234,38 @@ func TestXSLTTransformationEvents(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
+			metricstesting.ResetMetrics(t)
 
-			defer func() {
-				r := recover()
-				switch {
-				case r == nil:
-					assert.Empty(t, tc.expectPanic, "Expected panic did not occur")
-				case tc.expectPanic == "":
-					assert.Fail(t, "Unexpected panic", r)
-				default:
-					assert.Contains(t, r, tc.expectPanic)
-				}
-			}()
-
-			ctx := context.Background()
-			logtesting.TestContextWithLogger(t)
-
-			env := &envAccessor{
-				EnvConfig: adapter.EnvConfig{
-					Component: tComponent,
-				},
-				XSLT:              tc.xslt,
-				AllowXSLTOverride: tc.allowXSLTOverride,
-				BridgeIdentifier:  tBridgeID,
-			}
+			logger := logtesting.TestLogger(t)
 
 			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
 
-			a := NewTarget(ctx, env, ceClient)
+			replier, err := targetce.New(tComponent, logger,
+				targetce.ReplierWithStatefulHeaders(tBridgeID),
+			)
+			require.NoError(t, err)
+
+			mt := &adapter.MetricTag{}
+
+			a := &xsltTransformAdapter{
+				xsltOverride: tc.allowXSLTOverride,
+
+				replier:  replier,
+				ceClient: ceClient,
+				logger:   logger,
+
+				mt: mt,
+				sr: metrics.MustNewEventProcessingStatsReporter(mt),
+			}
+
+			if v := tc.xslt; v != "" {
+				a.defaultXSLT, err = xslt.NewStylesheet([]byte(v))
+				require.NoError(t, err)
+				runtime.SetFinalizer(a.defaultXSLT, (*xslt.Stylesheet).Close)
+			}
+
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
 
 			go func() {
 				if err := a.Start(ctx); err != nil {
@@ -269,7 +307,6 @@ func TestXSLTTransformationToSink(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
-			ctx := context.Background()
 			style, err := xslt.NewStylesheet([]byte(tc.xslt))
 			assert.NoError(t, err)
 
@@ -281,6 +318,8 @@ func TestXSLTTransformationToSink(t *testing.T) {
 				defaultXSLT:  style,
 				sink:         "http://localhost:8080",
 			}
+
+			ctx := context.Background()
 
 			e, r := a.dispatch(ctx, tc.inEvent)
 			assert.Nil(t, e)

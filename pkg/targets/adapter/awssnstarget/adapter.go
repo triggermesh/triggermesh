@@ -23,20 +23,33 @@ import (
 
 	"go.uber.org/zap"
 
+	cloudevents "github.com/cloudevents/sdk-go/v2"
+
+	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+	"knative.dev/pkg/logging"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
-	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
-	"knative.dev/pkg/logging"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // NewTarget Adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.AWSSNSTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	a := MustParseARN(env.AwsTargetArn)
 
@@ -53,6 +66,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
 		logger:           logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -66,6 +81,8 @@ type adapter struct {
 	discardCEContext bool
 	ceClient         cloudevents.Client
 	logger           *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 func (a *adapter) Start(ctx context.Context) error {

@@ -76,9 +76,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		Name:          envAcc.GetName(),
 	}
 
-	env := envAcc.(*envConfig)
-
 	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envConfig)
 
 	trnContext, trnData := []v1alpha1.Transform{}, []v1alpha1.Transform{}
 	err := json.Unmarshal([]byte(env.TransformationContext), &trnContext)
@@ -108,8 +108,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		ContextPipeline: contextPl,
 		DataPipeline:    dataPl,
 
-		mt:     mt,
-		sr:     metrics.MustNewEventProcessingStatsReporter(mt),
+		mt: mt,
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
+
 		sink:   env.Sink,
 		client: ceClient,
 	}

@@ -24,25 +24,38 @@ import (
 	"net/http"
 	"strconv"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"go.uber.org/zap"
 	"golang.org/x/oauth2"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 const baseURL = "/v1/graphql"
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	var token string
-	queries := make(map[string]string)
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.HasuraTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
+
+	var token string
 	isAdmin := false
+	queries := make(map[string]string)
 
 	if env.JwtToken != "" {
 		token = env.JwtToken
@@ -67,6 +80,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 		ceClient: ceClient,
 		logger:   logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -82,6 +97,8 @@ type hasuraAdapter struct {
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 	client   *http.Client
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 type hasuraTargetPayload struct {

@@ -33,6 +33,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -45,8 +46,10 @@ type xsltTransformAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
-	mt       *pkgadapter.MetricTag
 	sink     string
+
+	mt *pkgadapter.MetricTag
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // NewTarget adapter implementation
@@ -58,6 +61,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		Namespace:     envAcc.GetNamespace(),
 		Name:          envAcc.GetName(),
 	}
+
+	metrics.MustRegisterEventProcessingStatsView()
 
 	env := envAcc.(*envAccessor)
 
@@ -80,8 +85,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
-		mt:       mt,
 		sink:     env.Sink,
+
+		mt: mt,
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 
 	if env.XSLT != "" {

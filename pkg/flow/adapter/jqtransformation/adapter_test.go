@@ -25,12 +25,21 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	cetest "github.com/cloudevents/sdk-go/v2/client/test"
 	"github.com/cloudevents/sdk-go/v2/protocol"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+
 	"knative.dev/eventing/pkg/adapter/v2"
+	logtesting "knative.dev/pkg/logging/testing"
+
+	"github.com/itchyny/gojq"
+
+	"github.com/triggermesh/triggermesh/pkg/metrics"
+	metricstesting "github.com/triggermesh/triggermesh/pkg/metrics/testing"
+	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 const (
@@ -77,7 +86,10 @@ func TestSink(t *testing.T) {
 				},
 				Query: tJSONQuery,
 			}
-			ctx := context.Background()
+
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
+
 			c, err := cloudevents.NewClientHTTP()
 			assert.NoError(t, err)
 			a := NewAdapter(ctx, env, c)
@@ -119,18 +131,33 @@ func TestReplier(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			ctx := context.Background()
+			metricstesting.ResetMetrics(t)
 
-			env := &envAccessor{
-				EnvConfig: adapter.EnvConfig{
-					Component: tCloudEventSource,
-				},
-				Query: tc.query,
-			}
+			logger := logtesting.TestLogger(t)
 
 			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
 
-			a := NewAdapter(ctx, env, ceClient)
+			replier, err := targetce.New(tCloudEventSource, logger)
+			require.NoError(t, err)
+
+			query, err := gojq.Parse(tc.query)
+			require.NoError(t, err)
+
+			mt := &adapter.MetricTag{}
+
+			a := &jqadapter{
+				query: query,
+
+				replier:  replier,
+				ceClient: ceClient,
+				logger:   logger,
+
+				mt: mt,
+				sr: metrics.MustNewEventProcessingStatsReporter(mt),
+			}
+
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
 
 			go func() {
 				if err := a.Start(ctx); err != nil {

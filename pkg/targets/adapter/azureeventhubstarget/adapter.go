@@ -20,21 +20,34 @@ import (
 	"context"
 	"encoding/json"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.AzureEventHubsTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -56,6 +69,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:          replier,
 		ceClient:         ceClient,
 		logger:           logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -68,6 +83,8 @@ type adapter struct {
 	replier          *targetce.Replier
 	ceClient         cloudevents.Client
 	logger           *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Returns if stopCh is closed or Send() returns an error.

@@ -28,6 +28,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -36,7 +37,9 @@ var _ pkgadapter.Adapter = (*adapter)(nil)
 type adapter struct {
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
-	mt       *pkgadapter.MetricTag
+
+	mt *pkgadapter.MetricTag
+	sr *metrics.EventProcessingStatsReporter
 
 	correlationKey  *correlationKey
 	responseTimeout time.Duration
@@ -56,6 +59,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		Name:          envAcc.GetName(),
 	}
 
+	metrics.MustRegisterEventProcessingStatsView()
+
 	env := envAcc.(*envAccessor)
 
 	key, err := newCorrelationKey(env.CorrelationKey, env.CorrelationKeyLength)
@@ -66,7 +71,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	return &adapter{
 		ceClient: ceClient,
 		logger:   logger,
-		mt:       mt,
+
+		mt: mt,
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 
 		correlationKey:  key,
 		responseTimeout: env.ResponseWaitTimeout,

@@ -147,6 +147,11 @@ var (
 		Group:    GroupName,
 		Resource: "logzmetricstargets",
 	}
+	// OpenTelemetryTargetResource respresents an event target for OpenTelemetry.
+	OpenTelemetryTargetResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "opentelemetrytargets",
+	}
 	// OracleTargetResource respresents an event target for Oracle.
 	OracleTargetResource = schema.GroupResource{
 		Group:    GroupName,

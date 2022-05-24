@@ -23,23 +23,35 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/elastic/go-elasticsearch/v7"
-	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
-	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: targets.ElasticsearchTargetResource.String(),
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
+	metrics.MustRegisterEventProcessingStatsView()
+
+	env := envAcc.(*envAccessor)
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -56,6 +68,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,
 		logger:           logger,
+
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -72,6 +86,8 @@ type esAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+
+	sr *metrics.EventProcessingStatsReporter
 }
 
 // Returns if stopCh is closed or Send() returns an error.
