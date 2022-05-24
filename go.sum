@@ -353,8 +353,9 @@ github.com/cloudevents/conformance v0.2.0/go.mod h1:rHKDwylBH89Rns6U3wL9ww8bg9/4
 github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.4.1/go.mod h1:lhEpxMrIUkeu9rVRgoAbyqZ8GR8Hd3DUy+thHUxAHoI=
 github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.6.1 h1:/m04xHW0w7DrE2L7eOqQ/vH5n6juM5bZeegT1xM124g=
 github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.6.1/go.mod h1:iK7S8dxIfimo/z9bu8e/lEyJ0hVWd52hQevJefnX/iw=
-github.com/cloudevents/sdk-go/sql/v2 v2.8.0 h1:gWednxJHL0Ycf93XeEFyQxYj81A7b4eNwkzjNxGunAM=
 github.com/cloudevents/sdk-go/sql/v2 v2.8.0/go.mod h1:u9acNJbhmi1wnDJro4PEAqbr4N1LTCyEUClErxbPS1A=
+github.com/cloudevents/sdk-go/sql/v2 v2.10.0 h1:b8Yy1VxsDSr3bqWRLbs4K5PPQeHZ7T5OnP9JEe9Tke0=
+github.com/cloudevents/sdk-go/sql/v2 v2.10.0/go.mod h1:JuixnoTSRwWM9vTsP94dovBgNxWB+N4Kh8TM3vQ5Lc0=
 github.com/cloudevents/sdk-go/v2 v2.4.1/go.mod h1:MZiMwmAh5tGj+fPFvtHv9hKurKqXtdB9haJYMJ/7GJY=
 github.com/cloudevents/sdk-go/v2 v2.6.1/go.mod h1:nlXhgFkf0uTopxmRXalyMwS2LG70cRGPrxzmjJgSG0U=
 github.com/cloudevents/sdk-go/v2 v2.8.0/go.mod h1:GpCBmUj7DIRiDhVvsK5d6WCbgTWs8DxAWTRtAwQmIXs=
