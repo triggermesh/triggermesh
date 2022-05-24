@@ -20,13 +20,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"go.uber.org/zap"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
+	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
@@ -56,6 +57,7 @@ type adapter struct {
 	sink string
 
 	client cloudevents.Client
+	logger *zap.SugaredLogger
 }
 
 // ceContext represents CloudEvents context structure but with exported Extensions.
@@ -70,6 +72,8 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 }
 
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
+	logger := logging.FromContext(ctx)
+
 	mt := &pkgadapter.MetricTag{
 		ResourceGroup: flow.TransformationResource.String(),
 		Namespace:     envAcc.GetNamespace(),
@@ -83,21 +87,21 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	trnContext, trnData := []v1alpha1.Transform{}, []v1alpha1.Transform{}
 	err := json.Unmarshal([]byte(env.TransformationContext), &trnContext)
 	if err != nil {
-		log.Fatalf("Cannot unmarshal context transformation env variable: %v", err)
+		logger.Fatalf("Cannot unmarshal context transformation env variable: %v", err)
 	}
 	err = json.Unmarshal([]byte(env.TransformationData), &trnData)
 	if err != nil {
-		log.Fatalf("Cannot unmarshal data transformation env variable: %v", err)
+		logger.Fatalf("Cannot unmarshal data transformation env variable: %v", err)
 	}
 
 	contextPl, err := newPipeline(trnContext)
 	if err != nil {
-		log.Fatalf("Cannot create context transformation pipeline: %v", err)
+		logger.Fatalf("Cannot create context transformation pipeline: %v", err)
 	}
 
 	dataPl, err := newPipeline(trnData)
 	if err != nil {
-		log.Fatalf("Cannot create data transformation pipeline: %v", err)
+		logger.Fatalf("Cannot create data transformation pipeline: %v", err)
 	}
 
 	sharedStorage := storage.New()
@@ -113,13 +117,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 		sink:   env.Sink,
 		client: ceClient,
+		logger: logger,
 	}
 }
 
 // Start runs CloudEvent receiver and applies transformation Pipeline
 // on incoming events.
 func (t *adapter) Start(ctx context.Context) error {
-	log.Println("Starting CloudEvent receiver")
+	t.logger.Info("Starting CloudEvent receiver")
 
 	var receiver interface{}
 	receiver = t.receiveAndReply
@@ -181,7 +186,7 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality
 	if !strings.Contains(event.DataContentType(), cloudevents.ApplicationJSON) {
-		log.Printf("CE Content Type %q is not supported", event.DataContentType())
+		t.logger.Errorf("CE Content Type %q is not supported", event.DataContentType())
 		return nil, fmt.Errorf("CE Content Type %q is not supported", event.DataContentType())
 	}
 
@@ -192,7 +197,7 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 
 	localContextBytes, err := json.Marshal(localContext)
 	if err != nil {
-		log.Printf("Cannot encode CE context: %v", err)
+		t.logger.Errorf("Cannot encode CE context: %v", err)
 		return nil, fmt.Errorf("cannot encode CE context: %w", err)
 	}
 
@@ -215,13 +220,13 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 		errs = append(errs, err.Error())
 	}
 	if err := json.Unmarshal(eventContext, &localContext); err != nil {
-		log.Printf("Cannot decode CE new context: %v", err)
+		t.logger.Errorf("Cannot decode CE new context: %v", err)
 		return nil, fmt.Errorf("cannot decode CE new context: %w", err)
 	}
 	event.Context = localContext
 	for k, v := range localContext.Extensions {
 		if err := event.Context.SetExtension(k, v); err != nil {
-			log.Printf("Cannot set CE extension: %v", err)
+			t.logger.Errorf("Cannot set CE extension: %v", err)
 			return nil, fmt.Errorf("cannot set CE extension: %w", err)
 		}
 	}
@@ -231,12 +236,13 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 		errs = append(errs, err.Error())
 	}
 	if err = event.SetData(cloudevents.ApplicationJSON, eventPayload); err != nil {
-		return nil, fmt.Errorf("cannot set data: %w", err)
+		t.logger.Errorf("Cannot set CE data: %v", err)
+		return nil, fmt.Errorf("cannot set CE data: %w", err)
 	}
 	// Failed transformation operations should not stop event flow
 	// therefore, just log the errors
 	if len(errs) != 0 {
-		log.Printf("Event transformation errors: %s", strings.Join(errs, ","))
+		t.logger.Errorf("Event transformation errors: %s", strings.Join(errs, ","))
 	}
 
 	return &event, nil

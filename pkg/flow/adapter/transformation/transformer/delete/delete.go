@@ -19,7 +19,6 @@ package delete
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
@@ -140,8 +139,6 @@ func (d *Delete) parse(data interface{}, key, path string) (interface{}, error) 
 			}
 			output[k] = o
 		}
-	default:
-		log.Printf("unhandled type %T\n", value)
 	}
 
 	return output, nil

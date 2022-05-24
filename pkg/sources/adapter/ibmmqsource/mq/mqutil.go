@@ -140,7 +140,7 @@ func OpenQueue(queueName string, dlqName string, conn ibmmq.MQQueueManager) (Obj
 }
 
 // RegisterCallback registers the callback function for the incoming messages in the target queue.
-func (q *Object) RegisterCallback(f Handler, delivery Delivery, log *zap.SugaredLogger) error {
+func (q *Object) RegisterCallback(f Handler, delivery Delivery, logger *zap.SugaredLogger) error {
 	handler := func(
 		mqConn *ibmmq.MQQueueManager,
 		mqObj *ibmmq.MQObject,
@@ -154,7 +154,7 @@ func (q *Object) RegisterCallback(f Handler, delivery Delivery, log *zap.Sugared
 			return
 		}
 		if mqRet.MQCC != ibmmq.MQCC_OK {
-			log.Errorf("Callback received unexpected status: %s", mqRet.Error())
+			logger.Errorf("Callback received unexpected status: %s", mqRet.Error())
 			return
 		}
 		cid := strings.TrimFunc(string(mqMD.CorrelId), func(r rune) bool {
@@ -163,24 +163,24 @@ func (q *Object) RegisterCallback(f Handler, delivery Delivery, log *zap.Sugared
 
 		err := f(data, cid)
 		if err != nil {
-			log.Errorf("Callback execution error: %v", err)
+			logger.Errorf("Callback execution error: %v", err)
 			if mqMD.BackoutCount >= int32(delivery.Retry) {
 				if delivery.DeadLetterQueue == "" {
-					log.Infof("Dead-letter queue is not set, discarding poisoned message %q", string(mqMD.MsgId))
+					logger.Infof("Dead-letter queue is not set, discarding poisoned message %q", string(mqMD.MsgId))
 				} else if err := q.sendToDLQ(data, mqMD); err != nil {
-					log.Errorf("Failed to forward the message to DLQ, discarding: %v", err)
+					logger.Errorf("Failed to forward the message to DLQ, discarding: %v", err)
 				}
 				mqConn.Cmit()
 				return
 			}
 			if err := mqConn.Back(); err != nil {
-				log.Errorf("Backout failed: %v", err)
+				logger.Errorf("Backout failed: %v", err)
 			}
 			return
 		}
 
 		if err := mqConn.Cmit(); err != nil {
-			log.Errorf("Commit failed: %v", err)
+			logger.Errorf("Commit failed: %v", err)
 		}
 	}
 

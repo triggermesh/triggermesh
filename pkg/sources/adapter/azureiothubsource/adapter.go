@@ -19,7 +19,6 @@ package azureiothubsource
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"go.uber.org/zap"
@@ -78,7 +77,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		env.ConnectionString,
 	)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("Failed to obtain IoT client", zap.Error(err))
 	}
 
 	return &adapter{
@@ -96,9 +95,7 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
-	log.Fatal(a.c.SubscribeEvents(ctx, a.eventHandler(ctx)))
-
-	return nil
+	return a.c.SubscribeEvents(ctx, a.eventHandler(ctx))
 }
 
 func (a *adapter) eventHandler(ctx context.Context) iotservice.EventHandler {
