@@ -141,13 +141,14 @@ jobs:
           name: Publishing container images and creating release manifests
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
+            KOFLAGS: --jobs=8  # adjust based on resource_class
             DIST_DIR: /tmp/dist/
           command: |
             pushd hack/manifest-cleaner
             go install .
             popd
 
-            IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} KOFLAGS=--jobs=$(($(nproc)/2)) make release
+            IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
 
             declare -a release_files=(
               triggermesh-crds.yaml
