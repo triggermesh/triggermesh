@@ -117,7 +117,7 @@ func (c *FakeOracleTargets) UpdateStatus(ctx context.Context, oracleTarget *v1al
 // Delete takes name of the oracleTarget and deletes it. Returns an error if one occurs.
 func (c *FakeOracleTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(oracletargetsResource, c.ns, name), &v1alpha1.OracleTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(oracletargetsResource, c.ns, name, opts), &v1alpha1.OracleTarget{})
 
 	return err
 }

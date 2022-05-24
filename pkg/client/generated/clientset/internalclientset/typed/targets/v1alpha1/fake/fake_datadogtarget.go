@@ -117,7 +117,7 @@ func (c *FakeDatadogTargets) UpdateStatus(ctx context.Context, datadogTarget *v1
 // Delete takes name of the datadogTarget and deletes it. Returns an error if one occurs.
 func (c *FakeDatadogTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(datadogtargetsResource, c.ns, name), &v1alpha1.DatadogTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(datadogtargetsResource, c.ns, name, opts), &v1alpha1.DatadogTarget{})
 
 	return err
 }

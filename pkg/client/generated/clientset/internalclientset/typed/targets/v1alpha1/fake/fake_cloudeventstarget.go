@@ -117,7 +117,7 @@ func (c *FakeCloudEventsTargets) UpdateStatus(ctx context.Context, cloudEventsTa
 // Delete takes name of the cloudEventsTarget and deletes it. Returns an error if one occurs.
 func (c *FakeCloudEventsTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(cloudeventstargetsResource, c.ns, name), &v1alpha1.CloudEventsTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(cloudeventstargetsResource, c.ns, name, opts), &v1alpha1.CloudEventsTarget{})
 
 	return err
 }

@@ -117,7 +117,7 @@ func (c *FakeGoogleCloudIoTSources) UpdateStatus(ctx context.Context, googleClou
 // Delete takes name of the googleCloudIoTSource and deletes it. Returns an error if one occurs.
 func (c *FakeGoogleCloudIoTSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(googlecloudiotsourcesResource, c.ns, name), &v1alpha1.GoogleCloudIoTSource{})
+		Invokes(testing.NewDeleteActionWithOptions(googlecloudiotsourcesResource, c.ns, name, opts), &v1alpha1.GoogleCloudIoTSource{})
 
 	return err
 }

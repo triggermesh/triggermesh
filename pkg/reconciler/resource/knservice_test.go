@@ -117,14 +117,14 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 									Value: "val2",
 								}},
 								ReadinessProbe: &corev1.Probe{
-									Handler: corev1.Handler{
+									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
 											Path: "/health",
 										},
 									},
 								},
 								StartupProbe: &corev1.Probe{
-									Handler: corev1.Handler{
+									ProbeHandler: corev1.ProbeHandler{
 										HTTPGet: &corev1.HTTPGetAction{
 											Path: "/initialized",
 										},

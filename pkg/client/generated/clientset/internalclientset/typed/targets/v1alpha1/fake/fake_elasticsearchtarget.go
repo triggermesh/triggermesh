@@ -117,7 +117,7 @@ func (c *FakeElasticsearchTargets) UpdateStatus(ctx context.Context, elasticsear
 // Delete takes name of the elasticsearchTarget and deletes it. Returns an error if one occurs.
 func (c *FakeElasticsearchTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(elasticsearchtargetsResource, c.ns, name), &v1alpha1.ElasticsearchTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(elasticsearchtargetsResource, c.ns, name, opts), &v1alpha1.ElasticsearchTarget{})
 
 	return err
 }

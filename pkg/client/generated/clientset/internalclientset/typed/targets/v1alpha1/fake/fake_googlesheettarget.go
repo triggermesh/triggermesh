@@ -117,7 +117,7 @@ func (c *FakeGoogleSheetTargets) UpdateStatus(ctx context.Context, googleSheetTa
 // Delete takes name of the googleSheetTarget and deletes it. Returns an error if one occurs.
 func (c *FakeGoogleSheetTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(googlesheettargetsResource, c.ns, name), &v1alpha1.GoogleSheetTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(googlesheettargetsResource, c.ns, name, opts), &v1alpha1.GoogleSheetTarget{})
 
 	return err
 }

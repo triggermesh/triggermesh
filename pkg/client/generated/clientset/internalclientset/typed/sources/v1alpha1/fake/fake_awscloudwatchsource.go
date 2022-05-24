@@ -117,7 +117,7 @@ func (c *FakeAWSCloudWatchSources) UpdateStatus(ctx context.Context, aWSCloudWat
 // Delete takes name of the aWSCloudWatchSource and deletes it. Returns an error if one occurs.
 func (c *FakeAWSCloudWatchSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awscloudwatchsourcesResource, c.ns, name), &v1alpha1.AWSCloudWatchSource{})
+		Invokes(testing.NewDeleteActionWithOptions(awscloudwatchsourcesResource, c.ns, name, opts), &v1alpha1.AWSCloudWatchSource{})
 
 	return err
 }

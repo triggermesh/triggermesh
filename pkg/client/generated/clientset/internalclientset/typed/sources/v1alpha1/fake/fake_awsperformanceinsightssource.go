@@ -117,7 +117,7 @@ func (c *FakeAWSPerformanceInsightsSources) UpdateStatus(ctx context.Context, aW
 // Delete takes name of the aWSPerformanceInsightsSource and deletes it. Returns an error if one occurs.
 func (c *FakeAWSPerformanceInsightsSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awsperformanceinsightssourcesResource, c.ns, name), &v1alpha1.AWSPerformanceInsightsSource{})
+		Invokes(testing.NewDeleteActionWithOptions(awsperformanceinsightssourcesResource, c.ns, name, opts), &v1alpha1.AWSPerformanceInsightsSource{})
 
 	return err
 }

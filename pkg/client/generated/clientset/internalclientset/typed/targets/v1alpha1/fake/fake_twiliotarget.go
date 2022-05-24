@@ -117,7 +117,7 @@ func (c *FakeTwilioTargets) UpdateStatus(ctx context.Context, twilioTarget *v1al
 // Delete takes name of the twilioTarget and deletes it. Returns an error if one occurs.
 func (c *FakeTwilioTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(twiliotargetsResource, c.ns, name), &v1alpha1.TwilioTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(twiliotargetsResource, c.ns, name, opts), &v1alpha1.TwilioTarget{})
 
 	return err
 }

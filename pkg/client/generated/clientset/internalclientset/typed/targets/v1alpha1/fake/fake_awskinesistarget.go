@@ -117,7 +117,7 @@ func (c *FakeAWSKinesisTargets) UpdateStatus(ctx context.Context, aWSKinesisTarg
 // Delete takes name of the aWSKinesisTarget and deletes it. Returns an error if one occurs.
 func (c *FakeAWSKinesisTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awskinesistargetsResource, c.ns, name), &v1alpha1.AWSKinesisTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(awskinesistargetsResource, c.ns, name, opts), &v1alpha1.AWSKinesisTarget{})
 
 	return err
 }

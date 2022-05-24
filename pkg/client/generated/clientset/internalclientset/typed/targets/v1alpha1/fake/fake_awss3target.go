@@ -117,7 +117,7 @@ func (c *FakeAWSS3Targets) UpdateStatus(ctx context.Context, aWSS3Target *v1alph
 // Delete takes name of the aWSS3Target and deletes it. Returns an error if one occurs.
 func (c *FakeAWSS3Targets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awss3targetsResource, c.ns, name), &v1alpha1.AWSS3Target{})
+		Invokes(testing.NewDeleteActionWithOptions(awss3targetsResource, c.ns, name, opts), &v1alpha1.AWSS3Target{})
 
 	return err
 }

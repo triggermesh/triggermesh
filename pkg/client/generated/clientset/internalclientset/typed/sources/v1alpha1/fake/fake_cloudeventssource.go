@@ -117,7 +117,7 @@ func (c *FakeCloudEventsSources) UpdateStatus(ctx context.Context, cloudEventsSo
 // Delete takes name of the cloudEventsSource and deletes it. Returns an error if one occurs.
 func (c *FakeCloudEventsSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(cloudeventssourcesResource, c.ns, name), &v1alpha1.CloudEventsSource{})
+		Invokes(testing.NewDeleteActionWithOptions(cloudeventssourcesResource, c.ns, name, opts), &v1alpha1.CloudEventsSource{})
 
 	return err
 }

@@ -82,7 +82,7 @@ func WithStartupProbe(path string) DeploymentOption {
 		port := int(d.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort)
 
 		*sp = &corev1.Probe{
-			Handler: corev1.Handler{
+			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path: path,
 					Port: intstr.FromInt(port),

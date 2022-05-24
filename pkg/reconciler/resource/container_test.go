@@ -86,7 +86,7 @@ func TestNewContainer(t *testing.T) {
 			},
 		}},
 		ReadinessProbe: &corev1.Probe{
-			Handler: corev1.Handler{
+			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path: "/health",
 					Port: intstr.FromString("health"),
@@ -94,7 +94,7 @@ func TestNewContainer(t *testing.T) {
 			},
 		},
 		StartupProbe: &corev1.Probe{
-			Handler: corev1.Handler{
+			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path: "/initialized",
 					Port: intstr.FromString("health"),

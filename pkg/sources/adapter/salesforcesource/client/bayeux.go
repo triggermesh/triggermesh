@@ -34,8 +34,8 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/net/publicsuffix"
 
-	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/utils/clock"
 
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/salesforcesource/auth"
 )

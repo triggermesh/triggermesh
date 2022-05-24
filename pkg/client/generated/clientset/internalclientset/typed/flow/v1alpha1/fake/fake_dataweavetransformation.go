@@ -117,7 +117,7 @@ func (c *FakeDataWeaveTransformations) UpdateStatus(ctx context.Context, dataWea
 // Delete takes name of the dataWeaveTransformation and deletes it. Returns an error if one occurs.
 func (c *FakeDataWeaveTransformations) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(dataweavetransformationsResource, c.ns, name), &v1alpha1.DataWeaveTransformation{})
+		Invokes(testing.NewDeleteActionWithOptions(dataweavetransformationsResource, c.ns, name, opts), &v1alpha1.DataWeaveTransformation{})
 
 	return err
 }

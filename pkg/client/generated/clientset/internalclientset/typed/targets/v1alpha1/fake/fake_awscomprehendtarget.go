@@ -117,7 +117,7 @@ func (c *FakeAWSComprehendTargets) UpdateStatus(ctx context.Context, aWSComprehe
 // Delete takes name of the aWSComprehendTarget and deletes it. Returns an error if one occurs.
 func (c *FakeAWSComprehendTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(awscomprehendtargetsResource, c.ns, name), &v1alpha1.AWSComprehendTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(awscomprehendtargetsResource, c.ns, name, opts), &v1alpha1.AWSComprehendTarget{})
 
 	return err
 }

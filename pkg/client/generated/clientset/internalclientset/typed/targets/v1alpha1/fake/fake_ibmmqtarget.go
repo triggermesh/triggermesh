@@ -117,7 +117,7 @@ func (c *FakeIBMMQTargets) UpdateStatus(ctx context.Context, iBMMQTarget *v1alph
 // Delete takes name of the iBMMQTarget and deletes it. Returns an error if one occurs.
 func (c *FakeIBMMQTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(ibmmqtargetsResource, c.ns, name), &v1alpha1.IBMMQTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(ibmmqtargetsResource, c.ns, name, opts), &v1alpha1.IBMMQTarget{})
 
 	return err
 }

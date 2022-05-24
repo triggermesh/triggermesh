@@ -117,7 +117,7 @@ func (c *FakeAlibabaOSSTargets) UpdateStatus(ctx context.Context, alibabaOSSTarg
 // Delete takes name of the alibabaOSSTarget and deletes it. Returns an error if one occurs.
 func (c *FakeAlibabaOSSTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(alibabaosstargetsResource, c.ns, name), &v1alpha1.AlibabaOSSTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(alibabaosstargetsResource, c.ns, name, opts), &v1alpha1.AlibabaOSSTarget{})
 
 	return err
 }

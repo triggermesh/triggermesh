@@ -117,7 +117,7 @@ func (c *FakeSlackSources) UpdateStatus(ctx context.Context, slackSource *v1alph
 // Delete takes name of the slackSource and deletes it. Returns an error if one occurs.
 func (c *FakeSlackSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(slacksourcesResource, c.ns, name), &v1alpha1.SlackSource{})
+		Invokes(testing.NewDeleteActionWithOptions(slacksourcesResource, c.ns, name, opts), &v1alpha1.SlackSource{})
 
 	return err
 }

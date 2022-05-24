@@ -117,7 +117,7 @@ func (c *FakeGoogleCloudStorageTargets) UpdateStatus(ctx context.Context, google
 // Delete takes name of the googleCloudStorageTarget and deletes it. Returns an error if one occurs.
 func (c *FakeGoogleCloudStorageTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(googlecloudstoragetargetsResource, c.ns, name), &v1alpha1.GoogleCloudStorageTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(googlecloudstoragetargetsResource, c.ns, name, opts), &v1alpha1.GoogleCloudStorageTarget{})
 
 	return err
 }

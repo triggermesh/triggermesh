@@ -157,7 +157,7 @@ func Probe(path, port string) ObjectOption {
 		}
 
 		*rp = &corev1.Probe{
-			Handler: corev1.Handler{
+			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path: path,
 					Port: intstrPort,
@@ -188,7 +188,7 @@ func StartupProbe(path, port string) ObjectOption {
 		}
 
 		*sp = &corev1.Probe{
-			Handler: corev1.Handler{
+			ProbeHandler: corev1.ProbeHandler{
 				HTTPGet: &corev1.HTTPGetAction{
 					Path: path,
 					Port: intstrPort,

@@ -117,7 +117,7 @@ func (c *FakeAzureEventHubSources) UpdateStatus(ctx context.Context, azureEventH
 // Delete takes name of the azureEventHubSource and deletes it. Returns an error if one occurs.
 func (c *FakeAzureEventHubSources) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(azureeventhubsourcesResource, c.ns, name), &v1alpha1.AzureEventHubSource{})
+		Invokes(testing.NewDeleteActionWithOptions(azureeventhubsourcesResource, c.ns, name, opts), &v1alpha1.AzureEventHubSource{})
 
 	return err
 }

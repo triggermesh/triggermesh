@@ -117,7 +117,7 @@ func (c *FakeZendeskTargets) UpdateStatus(ctx context.Context, zendeskTarget *v1
 // Delete takes name of the zendeskTarget and deletes it. Returns an error if one occurs.
 func (c *FakeZendeskTargets) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(zendesktargetsResource, c.ns, name), &v1alpha1.ZendeskTarget{})
+		Invokes(testing.NewDeleteActionWithOptions(zendesktargetsResource, c.ns, name, opts), &v1alpha1.ZendeskTarget{})
 
 	return err
 }
