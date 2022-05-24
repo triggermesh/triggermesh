@@ -147,7 +147,7 @@ jobs:
             go install .
             popd
 
-            IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
+            IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} KOFLAGS=--jobs=$(($(nproc)/2)) make release
 
             declare -a release_files=(
               triggermesh-crds.yaml
