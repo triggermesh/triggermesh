@@ -19,7 +19,6 @@ package httppollersource
 import (
 	"context"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 
@@ -62,7 +61,7 @@ func (h *httpPoller) Start(ctx context.Context) error {
 		select {
 
 		case <-ctx.Done():
-			log.Printf("Shutting down HTTP poller")
+			h.logger.Info("Shutting down HTTP poller")
 			return nil
 
 		case <-t.C:

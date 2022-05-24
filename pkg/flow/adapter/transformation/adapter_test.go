@@ -25,6 +25,8 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/stretchr/testify/assert"
 
+	logtesting "knative.dev/pkg/logging/testing"
+
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 )
@@ -50,6 +52,7 @@ func TestStart(t *testing.T) {
 		DataPipeline:    pipeline,
 
 		client: ceClient,
+		logger: logtesting.TestLogger(t),
 	}
 
 	errChan := make(chan error)
@@ -295,6 +298,7 @@ func TestReceiveAndTransform(t *testing.T) {
 			a := &adapter{
 				DataPipeline:    pipeline,
 				ContextPipeline: pipeline,
+				logger:          logtesting.TestLogger(t),
 			}
 
 			transformedEvent, err := a.applyTransformations(tc.originalEvent)

@@ -82,7 +82,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		httpRequest: httpRequest,
 
 		ceClient: ceClient,
-		logger:   logging.FromContext(ctx),
+		logger:   logger,
 		mt:       mt,
 	}
 }

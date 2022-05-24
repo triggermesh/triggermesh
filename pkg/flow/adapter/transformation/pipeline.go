@@ -18,7 +18,6 @@ package transformation
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
@@ -62,7 +61,6 @@ func newPipeline(transformations []v1alpha1.Transform) (*Pipeline, error) {
 		}
 		for _, kv := range transformation.Paths {
 			pipeline = append(pipeline, operation.New(kv.Key, kv.Value))
-			log.Printf("%s: %s", transformation.Operation, kv.Key)
 		}
 	}
 

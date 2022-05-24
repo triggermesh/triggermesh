@@ -36,20 +36,20 @@ import (
 func reaperThread(ctx context.Context, r *Reconciler) {
 	interval, _ := time.ParseDuration(r.adapterCfg.ReapingInterval)
 	poll := time.NewTicker(interval)
-	log := logging.FromContext(ctx)
+	logger := logging.FromContext(ctx)
 
 	client, err := cloudevents.NewClientHTTP()
 	if err != nil {
-		log.Fatalw("Unable to create CloudEvent client", zap.Error(err))
+		logger.Fatalw("Unable to create CloudEvent client", zap.Error(err))
 	}
 
 	for {
 		<-poll.C // Used to wait for the poll timer
-		log.Debug("Executing reaping")
+		logger.Debug("Executing reaping")
 
 		targets, err := r.trgLister.List(labels.Everything())
 		if err != nil {
-			log.Errorw("Unable to list TektonTargets from cache", zap.Error(err))
+			logger.Errorw("Unable to list TektonTargets from cache", zap.Error(err))
 			continue
 		}
 
@@ -60,7 +60,7 @@ func reaperThread(ctx context.Context, r *Reconciler) {
 				continue
 			}
 
-			log.Info("Found target: ", t.Namespace+"."+t.Name)
+			logger.Info("Found target: ", t.Namespace+"."+t.Name)
 
 			// Send the reap CloudEvent
 			cloudCtx := cloudevents.ContextWithTarget(ctx, t.Status.Address.URL.String())
@@ -70,12 +70,12 @@ func reaperThread(ctx context.Context, r *Reconciler) {
 			newEvent.SetSource("triggermesh-controller")
 
 			if err := newEvent.SetData(cloudevents.ApplicationJSON, nil); err != nil {
-				log.Errorw("Failed to set event data", zap.Error(err))
+				logger.Errorw("Failed to set event data", zap.Error(err))
 				continue
 			}
 
 			if result := client.Send(cloudCtx, newEvent); !cloudevents.IsACK(result) {
-				log.Errorw("Event wasn't acknowledged", zap.Error(result))
+				logger.Errorw("Event wasn't acknowledged", zap.Error(result))
 			}
 		}
 	}
