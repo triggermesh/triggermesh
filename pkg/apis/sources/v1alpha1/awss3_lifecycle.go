@@ -149,8 +149,7 @@ var awsS3SourceConditionSet = v1alpha1.NewConditionSet(
 	AWSS3ConditionSubscribed,
 )
 
-// MarkSubscribed sets the Subscribed condition to True and reports the ARN of
-// the S3 subscription.
+// MarkSubscribed sets the Subscribed condition to True.
 func (s *AWSS3SourceStatus) MarkSubscribed() {
 	awsS3SourceConditionSet.Manage(s).MarkTrue(AWSS3ConditionSubscribed)
 }

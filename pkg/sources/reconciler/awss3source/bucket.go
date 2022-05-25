@@ -67,7 +67,7 @@ func (r *Reconciler) ensureNotificationsEnabled(ctx context.Context, cli s3iface
 			"Failed to synchronize bucket configuration: %s", toErrMsg(err)))
 	case err != nil:
 		status.MarkNotSubscribed(v1alpha1.AWSS3ReasonAPIError, "Cannot obtain current bucket configuration")
-		// wrap any other error to fail the finalization
+		// wrap any other error to fail the reconciliation
 		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
 			"Error reading current event notifications configuration: %s", toErrMsg(err)))
 	}

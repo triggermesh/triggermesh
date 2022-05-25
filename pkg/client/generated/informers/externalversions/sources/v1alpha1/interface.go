@@ -36,6 +36,8 @@ type Interface interface {
 	AWSCognitoUserPoolSources() AWSCognitoUserPoolSourceInformer
 	// AWSDynamoDBSources returns a AWSDynamoDBSourceInformer.
 	AWSDynamoDBSources() AWSDynamoDBSourceInformer
+	// AWSEventBridgeSources returns a AWSEventBridgeSourceInformer.
+	AWSEventBridgeSources() AWSEventBridgeSourceInformer
 	// AWSKinesisSources returns a AWSKinesisSourceInformer.
 	AWSKinesisSources() AWSKinesisSourceInformer
 	// AWSPerformanceInsightsSources returns a AWSPerformanceInsightsSourceInformer.
@@ -133,6 +135,11 @@ func (v *version) AWSCognitoUserPoolSources() AWSCognitoUserPoolSourceInformer {
 // AWSDynamoDBSources returns a AWSDynamoDBSourceInformer.
 func (v *version) AWSDynamoDBSources() AWSDynamoDBSourceInformer {
 	return &aWSDynamoDBSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AWSEventBridgeSources returns a AWSEventBridgeSourceInformer.
+func (v *version) AWSEventBridgeSources() AWSEventBridgeSourceInformer {
+	return &aWSEventBridgeSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // AWSKinesisSources returns a AWSKinesisSourceInformer.

@@ -24,6 +24,7 @@ resources:
 - config/300-awscognitoidentitysource.yaml
 - config/300-awscognitouserpoolsource.yaml
 - config/300-awsdynamodbsource.yaml
+- config/300-awseventbridgesource.yaml
 - config/300-awskinesissource.yaml
 - config/300-awsperformanceinsightssource.yaml
 - config/300-awss3source.yaml

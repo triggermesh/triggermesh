@@ -52,6 +52,10 @@ func (c *FakeSourcesV1alpha1) AWSDynamoDBSources(namespace string) v1alpha1.AWSD
 	return &FakeAWSDynamoDBSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) AWSEventBridgeSources(namespace string) v1alpha1.AWSEventBridgeSourceInterface {
+	return &FakeAWSEventBridgeSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) AWSKinesisSources(namespace string) v1alpha1.AWSKinesisSourceInterface {
 	return &FakeAWSKinesisSources{c, namespace}
 }

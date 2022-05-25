@@ -43,7 +43,7 @@ const defaultS3Region = "us-east-1"
 // Client is an alias for the S3API interface.
 type Client = s3iface.S3API
 
-// SQSClient is an alias for the S3API interface.
+// SQSClient is an alias for the SQSAPI interface.
 type SQSClient = sqsiface.SQSAPI
 
 // ClientGetter can obtain S3 and SQS clients.
