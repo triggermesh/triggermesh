@@ -37,7 +37,7 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.9.20
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
-	github.com/aliyun/aliyun-oss-go-sdk v2.2.3+incompatible
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.15.1
 	github.com/aws/aws-sdk-go v1.44.20
