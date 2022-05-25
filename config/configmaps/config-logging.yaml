@@ -18,7 +18,7 @@ metadata:
   name: config-logging
   namespace: triggermesh
 data:
-  # Common configuration for all Knative codebase
+  # Global logger configuration, applied by default to all TriggerMesh components.
   zap-logger-config: |
     {
       "level": "info",
@@ -41,23 +41,12 @@ data:
       }
     }
 
-  # Log level overrides
-  # For all components except the queue proxy,
-  # changes are picked up immediately.
-  # For queue proxy, changes require recreation of the pods.
-  loglevel.controller: "info"
-  loglevel.autoscaler: "info"
-  loglevel.queueproxy: "info"
-  loglevel.webhook: "info"
-  loglevel.activator: "info"
-  loglevel.hpaautoscaler: "info"
-  loglevel.net-certmanager-controller: "info"
-  loglevel.net-istio-controller: "info"
+  # Logging level overrides for the TriggerMesh control plane.
+  loglevel.triggermesh-controller: info
+  loglevel.triggermesh-webhook: info
 
-  # Log level overrides for TriggerMesh components.
-  # Log level changes require manual reconciliation for adapter components.
-  # Logger name is the lower case component name, for example:
-  loglevel.triggermesh-controller: "info"
-  loglevel.awss3target: "info"
-  loglevel.ibmmqsource: "info"
-  loglevel.transformation: "info"
+  # Logging level overrides for TriggerMesh components.
+  # The name of the logger is the Kubernetes kind of the component.
+  loglevel.awss3target: info
+  loglevel.ibmmqsource: info
+  loglevel.transformation: info
