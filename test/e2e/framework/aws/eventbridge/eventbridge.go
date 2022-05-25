@@ -56,7 +56,7 @@ func ForceDeleteEventBus(ebClient eventbridgeiface.EventBridgeAPI, eventBusName 
 // any associated rule should also be deleted.
 func deleteEventBus(ebClient eventbridgeiface.EventBridgeAPI, eventBusName string, force bool) {
 	if force {
-		removeAllRules(ebClient, eventBusName)
+		deleteAllRules(ebClient, eventBusName)
 	}
 
 	eventBus := &eventbridge.DeleteEventBusInput{
