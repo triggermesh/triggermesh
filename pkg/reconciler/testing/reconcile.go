@@ -87,7 +87,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 
 	newComponentInstance := componentCtor(rcl)
 	newServiceAccount := NewServiceAccount(rcl)
-	newRoleBinding := NewRoleBinding(newServiceAccount())
+	newConfigWatchRoleBinding := NewConfigWatchRoleBinding(newServiceAccount())
+	newMTAdapterRoleBinding := NewMTAdapterRoleBinding(newServiceAccount())
 	newAdapter := mustAdapterCtor(t, ab, rcl)
 
 	comp := newComponentInstance()
@@ -113,11 +114,12 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 			WantCreates: func() []runtime.Object {
 				objs := []runtime.Object{
 					newServiceAccount(NoToken),
+					newConfigWatchRoleBinding(),
 					newAdapter(),
 				}
 				// only multi-tenant components expect a RoleBinding
 				if v1alpha1.IsMultiTenant(comp) {
-					return insertObject(objs, newRoleBinding(), 1)
+					return insertObject(objs, newMTAdapterRoleBinding(), 2)
 				}
 				return objs
 			}(),
@@ -127,11 +129,12 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 			WantEvents: func() []string {
 				events := []string{
 					createServiceAccountEvent(comp),
+					createConfigWatchRoleBindingEvent(comp),
 					createAdapterEvent(n, k),
 				}
 				// only multi-tenant components expect a RoleBinding
 				if v1alpha1.IsMultiTenant(comp) {
-					return insertString(events, createRoleBindingEvent(comp), 1)
+					return insertString(events, createMTAdapterRoleBindingEvent(comp), 2)
 				}
 				return events
 			}(),
@@ -155,7 +158,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink, notDeployed(a)),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready),
 			},
 			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
@@ -170,7 +174,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink, deployed(a)),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(notReady),
 			},
 			WantStatusUpdates: []clientgotesting.UpdateActionImpl{{
@@ -185,7 +190,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink, deployed(a)),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready, bumpImage),
 			},
 			WantUpdates: []clientgotesting.UpdateActionImpl{{
@@ -203,7 +209,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink, deployed(a)),
 				newServiceAccount(noOwner),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready),
 			},
 			WantUpdates: []clientgotesting.UpdateActionImpl{{
@@ -221,7 +228,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink, deployed(a)),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready),
 			},
 			WantUpdates: nil,
@@ -235,7 +243,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink, deployed(a)),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready, rename),
 			},
 			WantUpdates: nil,
@@ -253,7 +262,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 					withoutSinkSpec, // 2. spec.sink got deleted by the user
 				),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready),
 			},
 			WantStatusUpdates: func() []clientgotesting.UpdateActionImpl {
@@ -303,7 +313,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				/* sink omitted */
 				newComponentInstance(withSink, deployed(a)),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready),
 			},
 			WantStatusUpdates: func() []clientgotesting.UpdateActionImpl {
@@ -344,7 +355,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 			},
 			WantCreates: []runtime.Object{
 				newAdapter(),
@@ -368,7 +380,8 @@ func TestReconcileAdapter[T kmeta.Accessor](t *testing.T,
 				newAddressable(),
 				newComponentInstance(withSink, deployed(a)),
 				newServiceAccount(),
-				newRoleBinding(),
+				newConfigWatchRoleBinding(),
+				newMTAdapterRoleBinding(),
 				newAdapter(ready, bumpImage),
 			},
 			WantUpdates: []clientgotesting.UpdateActionImpl{{
@@ -818,8 +831,46 @@ func noOwner(sa *corev1.ServiceAccount) {
 	sa.OwnerReferences = nil
 }
 
-// NewRoleBinding returns a RoleBinding constructor for the given ServiceAccount.
-func NewRoleBinding(sa *corev1.ServiceAccount) func() *rbacv1.RoleBinding {
+// NewConfigWatchRoleBinding returns a config watcher RoleBinding constructor
+// for the given ServiceAccount.
+func NewConfigWatchRoleBinding(sa *corev1.ServiceAccount) func() *rbacv1.RoleBinding {
+	return func() *rbacv1.RoleBinding {
+		return &rbacv1.RoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: tNs,
+				Name:      sa.Name + "-config-watcher",
+				Labels:    sa.Labels,
+				OwnerReferences: []metav1.OwnerReference{
+					{
+						APIVersion:         "v1",
+						Kind:               "ServiceAccount",
+						Name:               sa.Name,
+						UID:                sa.UID,
+						Controller:         ptr.Bool(true),
+						BlockOwnerDeletion: ptr.Bool(true),
+					},
+				},
+			},
+			RoleRef: rbacv1.RoleRef{
+				APIGroup: "rbac.authorization.k8s.io",
+				Kind:     "ClusterRole",
+				Name:     "triggermesh-config-watcher",
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					APIGroup:  "",
+					Kind:      "ServiceAccount",
+					Namespace: tNs,
+					Name:      sa.Name,
+				},
+			},
+		}
+	}
+}
+
+// NewMTAdapterRoleBinding returns a (mt-)adapter RoleBinding constructor for
+// the given ServiceAccount.
+func NewMTAdapterRoleBinding(sa *corev1.ServiceAccount) func() *rbacv1.RoleBinding {
 	return func() *rbacv1.RoleBinding {
 		return &rbacv1.RoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
@@ -866,7 +917,12 @@ func updateServiceAccountEvent(rcl v1alpha1.Reconcilable) string {
 		"Updated ServiceAccount %q due to the creation/deletion of a %s object",
 		common.MTAdapterObjectName(rcl), rcl.GetGroupVersionKind().Kind)
 }
-func createRoleBindingEvent(rcl v1alpha1.Reconcilable) string {
+func createConfigWatchRoleBindingEvent(rcl v1alpha1.Reconcilable) string {
+	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
+		"Created RoleBinding %q due to the creation of a %s object",
+		common.MTAdapterObjectName(rcl)+"-config-watcher", rcl.GetGroupVersionKind().Kind)
+}
+func createMTAdapterRoleBindingEvent(rcl v1alpha1.Reconcilable) string {
 	return eventtesting.Eventf(corev1.EventTypeNormal, common.ReasonRBACCreate,
 		"Created RoleBinding %q due to the creation of a %s object",
 		common.MTAdapterObjectName(rcl), rcl.GetGroupVersionKind().Kind)

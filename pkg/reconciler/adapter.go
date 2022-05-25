@@ -50,6 +50,8 @@ const (
 	metricsPrometheusPort uint16 = 9092
 )
 
+const roleNameConfigWatcher = "triggermesh-config-watcher"
+
 // ComponentName returns the component name for the given object.
 func ComponentName(o kmeta.OwnerRefable) string {
 	return strings.ToLower(o.GetGroupVersionKind().Kind)
@@ -260,31 +262,48 @@ func newServiceAccount(rcl v1alpha1.Reconcilable, owners []kmeta.OwnerRefable) *
 	)
 }
 
+// newConfigWatchRoleBinding returns a RoleBinding object that binds a ServiceAccount
+// (namespace-scoped) to the config watcher ClusterRole (cluster-scoped).
+func newConfigWatchRoleBinding(rcl v1alpha1.Reconcilable, owner *corev1.ServiceAccount) *rbacv1.RoleBinding {
+	rbName := owner.Name + "-config-watcher" // {kind}-adapter-config-watcher or {kind}-i-{name}-config-watcher
+
+	return newRoleBinding(rbName, roleNameConfigWatcher, rcl, owner)
+}
+
+// newMTAdapterRoleBinding returns a RoleBinding object that binds a ServiceAccount
+// (namespace-scoped) to the (mt-)adapter's ClusterRole (cluster-scoped).
+func newMTAdapterRoleBinding(rcl v1alpha1.Reconcilable, owner *corev1.ServiceAccount) *rbacv1.RoleBinding {
+	// Per convention, both the roleBinding and clusterRole of multi-tenant
+	// adapters are named after the component type.
+	baseName := MTAdapterObjectName(rcl) // {kind}-adapter
+
+	return newRoleBinding(baseName, baseName, rcl, owner)
+}
+
 // newRoleBinding returns a RoleBinding object that binds a ServiceAccount
 // (namespace-scoped) to a ClusterRole (cluster-scoped).
-func newRoleBinding(rcl v1alpha1.Reconcilable, owner *corev1.ServiceAccount) *rbacv1.RoleBinding {
+func newRoleBinding(name, roleName string, rcl v1alpha1.Reconcilable, owner *corev1.ServiceAccount) *rbacv1.RoleBinding {
 	crGVK := rbacv1.SchemeGroupVersion.WithKind("ClusterRole")
 	saGVK := corev1.SchemeGroupVersion.WithKind("ServiceAccount")
 
 	ns := rcl.GetNamespace()
-	n := MTAdapterObjectName(rcl)
 
 	rb := &rbacv1.RoleBinding{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: ns,
-			Name:      n,
+			Name:      name,
 			Labels:    CommonObjectLabels(rcl),
 		},
 		RoleRef: rbacv1.RoleRef{
 			APIGroup: crGVK.Group,
 			Kind:     crGVK.Kind,
-			Name:     n,
+			Name:     roleName,
 		},
 		Subjects: []rbacv1.Subject{{
 			APIGroup:  saGVK.Group,
 			Kind:      saGVK.Kind,
 			Namespace: ns,
-			Name:      n,
+			Name:      owner.Name, // {kind}-adapter or {kind}-i-{name}
 		}},
 	}
 

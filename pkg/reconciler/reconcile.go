@@ -311,8 +311,23 @@ func (r *GenericRBACReconciler[T, L]) reconcileRBAC(ctx context.Context,
 		return nil, fmt.Errorf("synchronizing adapter ServiceAccount: %w", err)
 	}
 
+	// Bind serviceAccount to shared "triggermesh-config-watcher" clusterRole.
+	// All adapters require permissions to read configMaps.
+	desiredRB := newConfigWatchRoleBinding(rcl, currentSA)
+	currentRB, err := r.getOrCreateAdapterRoleBinding(ctx, desiredRB)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err = r.syncAdapterRoleBinding(ctx, currentRB, desiredRB); err != nil {
+		return nil, fmt.Errorf("synchronizing adapter RoleBinding: %w", err)
+	}
+
+	// Bind serviceAccount to "{kind}-adapter" clusterRole.
+	// Multi-tenant adapters require extra permissions to interact with
+	// objects of their kind.
 	if v1alpha1.IsMultiTenant(rcl) {
-		desiredRB := newRoleBinding(rcl, currentSA)
+		desiredRB := newMTAdapterRoleBinding(rcl, currentSA)
 		currentRB, err := r.getOrCreateAdapterRoleBinding(ctx, desiredRB)
 		if err != nil {
 			return nil, err
