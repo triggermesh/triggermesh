@@ -95,9 +95,9 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	splitter, err := parseRequestURI(request.RequestURI)
+	splitter, err := parseRequestURI(request.URL.Path)
 	if err != nil {
-		h.logger.Info("Unable to parse path as splitter", zap.Error(err), zap.String("path", request.RequestURI))
+		h.logger.Errorw("Unable to parse path as splitter", zap.Error(err), zap.String("path", request.RequestURI))
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -111,16 +111,16 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	event, err := binding.ToEvent(ctx, message)
 	if err != nil {
-		h.logger.Warn("failed to extract event from request", zap.Error(err))
+		h.logger.Warnw("failed to extract event from request", zap.Error(err))
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	h.logger.Debug("Received message", zap.Any("splitter", splitter))
+	h.logger.Debugw("Received message", zap.Any("splitter", splitter))
 
 	s, err := h.splitterLister.Get(splitter)
 	if err != nil {
-		h.logger.Info("Unable to get the Splitter", zap.Error(err), zap.Any("splitter", splitter))
+		h.logger.Errorw("Unable to get the Splitter", zap.Error(err), zap.Any("splitter", splitter))
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -135,7 +135,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		// we may want to keep responses and send them back to the source
 		_, err := h.sendEvent(ctx, request.Header, s.Status.SinkURI.String(), e)
 		if err != nil {
-			h.logger.Error("failed to send the event", zap.Error(err))
+			h.logger.Errorw("failed to send the event", zap.Error(err))
 		}
 	}
 
@@ -189,8 +189,8 @@ func (h *Handler) sendEvent(ctx context.Context, headers http.Header, target str
 
 func parseRequestURI(path string) (string, error) {
 	parts := strings.Split(path, "/")
-	if len(parts) != 2 {
+	if len(parts) != 3 {
 		return "", fmt.Errorf("incorrect number of parts in the path, expected 2, actual %d, '%s'", len(parts), path)
 	}
-	return parts[1], nil
+	return parts[2], nil
 }
