@@ -6,7 +6,7 @@ go 1.18
 require (
 	github.com/cloudevents/sdk-go/v2 v2.10.0
 	knative.dev/eventing v0.31.1-0.20220523181303-c3e13967001f
-	knative.dev/pkg v0.0.0-20220512013937-2d8305b2e59a
+	knative.dev/pkg v0.0.0-20220525153005-18f69958870f
 	knative.dev/serving v0.31.0
 )
 
