@@ -16,13 +16,15 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: triggermesh-namespaced-admin
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
-    app.kubernetes.io/name: triggermesh
+    app.kubernetes.io/part-of: triggermesh
 rules:
-  - apiGroups: ["flow.triggermesh.io", "routing.triggermesh.io", "sources.triggermesh.io", "targets.triggermesh.io"]
+- apiGroups:
+  - flow.triggermesh.io
+  - routing.triggermesh.io
+  - sources.triggermesh.io
+  - targets.triggermesh.io
     resources: ["*"]
     verbs: ["*"]
 ---
@@ -30,13 +32,15 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: triggermesh-namespaced-edit
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
-    app.kubernetes.io/name: triggermesh
+    app.kubernetes.io/part-of: triggermesh
 rules:
-  - apiGroups: ["flow.triggermesh.io", "routing.triggermesh.io", "sources.triggermesh.io", "targets.triggermesh.io"]
+- apiGroups:
+  - flow.triggermesh.io
+  - routing.triggermesh.io
+  - sources.triggermesh.io
+  - targets.triggermesh.io
     resources: ["*"]
     verbs: ["create", "update", "patch", "delete"]
 ---
@@ -44,12 +48,14 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: triggermesh-namespaced-view
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     rbac.authorization.k8s.io/aggregate-to-view: "true"
-    app.kubernetes.io/name: triggermesh
+    app.kubernetes.io/part-of: triggermesh
 rules:
-  - apiGroups: ["flow.triggermesh.io", "routing.triggermesh.io", "sources.triggermesh.io", "targets.triggermesh.io"]
+- apiGroups:
+  - flow.triggermesh.io
+  - routing.triggermesh.io
+  - sources.triggermesh.io
+  - targets.triggermesh.io
     resources: ["*"]
     verbs: ["get", "list", "watch"]
