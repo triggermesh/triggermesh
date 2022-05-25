@@ -20,27 +20,27 @@ run_cmd:
 
 write_files:
 - encoding: gz+b64
-  content: $(curl -sSfL https://github.com/knative/serving/releases/download/v${KNATIVE_SERVING_VERSION}/serving-crds.yaml | gzip -c  | base64)
+  content: $(curl -sSfL https://github.com/knative/serving/releases/download/knative-v${KNATIVE_SERVING_VERSION}/serving-crds.yaml | gzip -c  | base64)
   owner: root
   path: /var/lib/rancher/k3s/server/manifests/knative/serving-crds.yaml
   permissions: '0644'
 - encoding: gz+b64
-  content: $(curl -sSfL https://github.com/knative/serving/releases/download/v${KNATIVE_SERVING_VERSION}/serving-core.yaml | sed '/^[ ]*defaultExternalScheme: .*/a \\n  ingress.class: "kourier.ingress.networking.knative.dev"' | gzip -c  | base64)
+  content: $(curl -sSfL https://github.com/knative/serving/releases/download/knative-v${KNATIVE_SERVING_VERSION}/serving-core.yaml | sed '/^[ ]*queue-proxy-cert-secret: .*/a \\n  ingress.class: "kourier.ingress.networking.knative.dev"' | gzip -c  | base64)
   owner: root
   path: /var/lib/rancher/k3s/server/manifests/knative/serving-core.yaml
   permissions: '0644'
 - encoding: gz+b64
-  content: $(curl -sSfL https://github.com/knative/net-kourier/releases/download/v${KNATIVE_NET_KOURIER_VERSION}/kourier.yaml | gzip -c  | base64)
+  content: $(curl -sSfL https://github.com/knative-sandbox/net-kourier/releases/download/knative-v${KNATIVE_NET_KOURIER_VERSION}/kourier.yaml | gzip -c  | base64)
   owner: root
   path: /var/lib/rancher/k3s/server/manifests/knative/kourier.yaml
   permissions: '0644'
 - encoding: gz+b64
-  content: $(curl -sSfL https://github.com/knative/eventing/releases/download/v${KNATIVE_EVENTING_VERSION}/eventing-crds.yaml | gzip -c  | base64)
+  content: $(curl -sSfL https://github.com/knative/eventing/releases/download/knative-v${KNATIVE_EVENTING_VERSION}/eventing-crds.yaml | gzip -c  | base64)
   owner: root
   path: /var/lib/rancher/k3s/server/manifests/knative/eventing-crds.yaml
   permissions: '0644'
 - encoding: gz+b64
-  content: $(curl -sSfL https://github.com/knative/eventing/releases/download/v${KNATIVE_EVENTING_VERSION}/eventing-core.yaml | gzip -c  | base64)
+  content: $(curl -sSfL https://github.com/knative/eventing/releases/download/knative-v${KNATIVE_EVENTING_VERSION}/eventing-core.yaml | gzip -c  | base64)
   owner: root
   path: /var/lib/rancher/k3s/server/manifests/knative/eventing-core.yaml
   permissions: '0644'
@@ -65,7 +65,7 @@ write_files:
     DEV=\$(echo "\$PART" | sed -r 's/((\d+)p)?\d+\$/\2/')
     NUM=\$(echo "\$PART" | sed 's!.*[^0-9]!!')
 
-    echo -e "Yes\n100%" | sudo parted \$DEV resizepart \$NUM ---pretend-input-tty unit %
+    echo -e "Yes" | parted \$DEV unit % resizepart \$NUM 100% ---pretend-input-tty
     partprobe \$DEV
     sleep 2
     resize2fs \$PART
