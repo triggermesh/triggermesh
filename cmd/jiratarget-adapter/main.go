@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("jiratarget-adapter", jiratarget.EnvAccessorCtor, jiratarget.NewTarget)
+	pkgadapter.Main("jiratarget", jiratarget.EnvAccessorCtor, jiratarget.NewTarget)
 }

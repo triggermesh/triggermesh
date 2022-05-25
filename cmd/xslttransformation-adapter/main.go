@@ -24,5 +24,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("xslttransformation-adapter", xslttransformation.EnvAccessorCtor, xslttransformation.NewTarget)
+	pkgadapter.Main("xslttransformation", xslttransformation.EnvAccessorCtor, xslttransformation.NewTarget)
 }

@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("googlecloudworkflowstarget-adapter", googlecloudworkflowstarget.EnvAccessorCtor, googlecloudworkflowstarget.NewTarget)
+	pkgadapter.Main("googlecloudworkflowstarget", googlecloudworkflowstarget.EnvAccessorCtor, googlecloudworkflowstarget.NewTarget)
 }

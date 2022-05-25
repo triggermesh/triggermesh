@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("googlecloudstoragetarget-adapter", googlecloudstoragetarget.EnvAccessorCtor, googlecloudstoragetarget.NewTarget)
+	pkgadapter.Main("googlecloudstoragetarget", googlecloudstoragetarget.EnvAccessorCtor, googlecloudstoragetarget.NewTarget)
 }

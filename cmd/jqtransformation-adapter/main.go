@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("jqtransformation-adapter", jqtransformation.EnvAccessorCtor, jqtransformation.NewAdapter)
+	pkgadapter.Main("jqtransformation", jqtransformation.EnvAccessorCtor, jqtransformation.NewAdapter)
 }

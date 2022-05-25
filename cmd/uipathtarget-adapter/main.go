@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("uipathtarget-adapter", uipathtarget.EnvAccessorCtor, uipathtarget.NewTarget)
+	pkgadapter.Main("uipathtarget", uipathtarget.EnvAccessorCtor, uipathtarget.NewTarget)
 }

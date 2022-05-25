@@ -30,5 +30,5 @@ func main() {
 	// library to marshal single item Audience array as a string.
 	jwt.MarshalSingleStringAsArray = false
 
-	pkgadapter.Main("salesforcetarget-adapter", salesforcetarget.EnvAccessor, salesforcetarget.NewTarget)
+	pkgadapter.Main("salesforcetarget", salesforcetarget.EnvAccessor, salesforcetarget.NewTarget)
 }

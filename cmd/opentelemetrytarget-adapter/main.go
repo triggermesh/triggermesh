@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("opentelemetrytarget-adapter", opentelemetrytarget.EnvAccessorCtor, opentelemetrytarget.NewTarget)
+	pkgadapter.Main("opentelemetrytarget", opentelemetrytarget.EnvAccessorCtor, opentelemetrytarget.NewTarget)
 }

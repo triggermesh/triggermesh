@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("hasuratarget-adapter", hasuratarget.EnvAccessorCtor, hasuratarget.NewTarget)
+	pkgadapter.Main("hasuratarget", hasuratarget.EnvAccessorCtor, hasuratarget.NewTarget)
 }

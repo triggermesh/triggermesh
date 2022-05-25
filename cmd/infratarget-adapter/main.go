@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("infratarget-adapter", infratarget.EnvAccessorCtor, infratarget.NewTarget)
+	pkgadapter.Main("infratarget", infratarget.EnvAccessorCtor, infratarget.NewTarget)
 }

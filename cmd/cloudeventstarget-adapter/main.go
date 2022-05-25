@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("cloudeventstarget-adapter", cloudeventstarget.EnvAccessorCtor, cloudeventstarget.NewTarget)
+	pkgadapter.Main("cloudeventstarget", cloudeventstarget.EnvAccessorCtor, cloudeventstarget.NewTarget)
 }

@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("awscomphrehendtarget-adapter", awscomphrehendtarget.EnvAccessorCtor, awscomphrehendtarget.NewTarget)
+	pkgadapter.Main("awscomphrehendtarget", awscomphrehendtarget.EnvAccessorCtor, awscomphrehendtarget.NewTarget)
 }

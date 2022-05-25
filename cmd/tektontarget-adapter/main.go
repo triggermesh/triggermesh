@@ -45,7 +45,7 @@ func main() {
 
 	ctx, _ = injection.Default.SetupInformers(ctx, config)
 
-	pkgadapter.MainWithContext(ctx, "tektontarget-adapter", tektontarget.EnvAccessorCtor, tektontarget.NewTarget)
+	pkgadapter.MainWithContext(ctx, "tektontarget", tektontarget.EnvAccessorCtor, tektontarget.NewTarget)
 }
 
 // Locate the cluster configuration for the adapter to properly instantiate the Tekton injector

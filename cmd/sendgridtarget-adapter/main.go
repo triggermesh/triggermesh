@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("sendgridtarget-adapter", sendgridtarget.EnvAccessorCtor, sendgridtarget.NewTarget)
+	pkgadapter.Main("sendgridtarget", sendgridtarget.EnvAccessorCtor, sendgridtarget.NewTarget)
 }

@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("azureeventhubstarget-adapter", azureeventhubstarget.EnvAccessorCtor, azureeventhubstarget.NewTarget)
+	pkgadapter.Main("azureeventhubstarget", azureeventhubstarget.EnvAccessorCtor, azureeventhubstarget.NewTarget)
 }

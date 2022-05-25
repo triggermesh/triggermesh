@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("alibabaosstarget-adapter", alibabaosstarget.EnvAccessorCtor, alibabaosstarget.NewTarget)
+	pkgadapter.Main("alibabaosstarget", alibabaosstarget.EnvAccessorCtor, alibabaosstarget.NewTarget)
 }

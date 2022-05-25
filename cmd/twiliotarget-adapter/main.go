@@ -23,5 +23,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("twiliotarget-adapter", twiliotarget.EnvAccessorCtor, twiliotarget.NewTarget)
+	pkgadapter.Main("twiliotarget", twiliotarget.EnvAccessorCtor, twiliotarget.NewTarget)
 }

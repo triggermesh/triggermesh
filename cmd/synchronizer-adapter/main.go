@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("synchronizer-adapter", synchronizer.EnvAccessorCtor, synchronizer.NewAdapter)
+	pkgadapter.Main("synchronizer", synchronizer.EnvAccessorCtor, synchronizer.NewAdapter)
 }
