@@ -19,6 +19,7 @@ package reconciler
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -51,6 +52,8 @@ const (
 )
 
 const roleNameConfigWatcher = "triggermesh-config-watcher"
+
+const defaultSinkTimeout = 30 * time.Second
 
 // ComponentName returns the component name for the given object.
 func ComponentName(o kmeta.OwnerRefable) string {
@@ -146,6 +149,7 @@ func commonAdapterDeploymentOptions(rcl v1alpha1.Reconcilable) []resource.Object
 		resource.ServiceAccount(ServiceAccountName(rcl)),
 
 		resource.EnvVar(envComponent, app),
+		resource.EnvVar(envSinkTimeout, strconv.FormatInt(int64(defaultSinkTimeout.Seconds()), 10)),
 		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPort), 10)),
 
 		resource.Port(metricsPrometheusPortName, int32(metricsPrometheusPort)),
@@ -233,6 +237,7 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 		resource.ServiceAccount(MTAdapterObjectName(rcl)),
 
 		resource.EnvVar(envComponent, app),
+		resource.EnvVar(envSinkTimeout, strconv.FormatInt(int64(defaultSinkTimeout.Seconds()), 10)),
 		resource.EnvVar(envMetricsPrometheusPort, strconv.FormatUint(uint64(metricsPrometheusPort), 10)),
 	}
 
