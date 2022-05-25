@@ -44,7 +44,7 @@ func NewController(
 	// Calling envconfig.Process() with a prefix appends that prefix
 	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
 	adapterCfg := &adapterConfig{
-		obsConfig: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
+		obsConfig: source.WatchConfigurations(ctx, app, cmw),
 	}
 	envconfig.MustProcess(app, adapterCfg)
 

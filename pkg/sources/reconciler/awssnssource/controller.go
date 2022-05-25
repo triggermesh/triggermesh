@@ -50,7 +50,7 @@ func NewController(
 	// Calling envconfig.Process() with a prefix appends that prefix
 	// (uppercased) to the Go field name, e.g. MYSOURCE_IMAGE.
 	adapterCfg := &adapterConfig{
-		configs: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
+		configs: source.WatchConfigurations(ctx, app, cmw),
 	}
 	envconfig.MustProcess(app, adapterCfg)
 
