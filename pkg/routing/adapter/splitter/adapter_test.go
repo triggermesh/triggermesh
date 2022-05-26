@@ -168,7 +168,7 @@ func sendCE(t *testing.T, event *cloudevents.Event, sink string) protocol.Result
 	return c.Send(ctx, *event)
 }
 
-func setupFakeInformers(t *testing.T, ctx context.Context, sinkURI string) context.Context { //nolint:staticcheck
+func setupFakeInformers(t *testing.T, ctx context.Context, sinkURI string) context.Context {
 	injection.Fake.RegisterClient(func(ctx context.Context, _ *rest.Config) context.Context {
 		ctx, _ = fakeinjectionclient.With(ctx, newSplitter(t, tSplitter.key, tSplitter.path, sinkURI))
 		return ctx

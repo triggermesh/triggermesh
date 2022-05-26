@@ -226,7 +226,7 @@ func sendCE(t *testing.T, event *cloudevents.Event, sink string) protocol.Result
 	return c.Send(ctx, *event)
 }
 
-func setupFakeInformers(t *testing.T, ctx context.Context, sinkURI string) context.Context { //nolint:staticcheck
+func setupFakeInformers(t *testing.T, ctx context.Context, sinkURI string) context.Context {
 	var filters []runtime.Object
 	for _, f := range tFilters {
 		filters = append(filters, newFilter(t, f.key, f.expression, sinkURI))
