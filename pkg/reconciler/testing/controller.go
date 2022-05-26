@@ -27,6 +27,7 @@ import (
 	"knative.dev/pkg/logging"
 	"knative.dev/pkg/metrics"
 	rt "knative.dev/pkg/reconciler/testing"
+	tracing "knative.dev/pkg/tracing/config"
 
 	"github.com/triggermesh/triggermesh/pkg/testing/structs"
 )
@@ -67,6 +68,7 @@ func TestControllerConstructor(t *testing.T, ctor injection.ControllerConstructo
 	cmw := configmap.NewStaticWatcher(
 		NewConfigMap(metrics.ConfigMapName(), nil),
 		NewConfigMap(logging.ConfigMapName(), nil),
+		NewConfigMap(tracing.ConfigName, nil),
 	)
 
 	ctrler := ctor(ctx, cmw)

@@ -41,7 +41,7 @@ func NewController(
 	app := common.ComponentName(typ)
 
 	adapterCfg := &adapterConfig{
-		configs: source.WatchConfigurations(ctx, app, cmw, source.WithLogging, source.WithMetrics),
+		configs: source.WatchConfigurations(ctx, app, cmw),
 	}
 	envconfig.MustProcess(app, adapterCfg)
 
