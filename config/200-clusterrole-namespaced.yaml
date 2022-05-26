@@ -62,4 +62,7 @@ rules:
   - sources.triggermesh.io
   - targets.triggermesh.io
   resources: ["*"]
-  verbs: ["get", "list", "watch"]
+  verbs:
+  - get
+  - list
+  - watch
