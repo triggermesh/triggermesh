@@ -37,7 +37,6 @@ import (
 	"knative.dev/pkg/logging"
 
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
-	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/routing/v1alpha1/filter"
 	routinglisters "github.com/triggermesh/triggermesh/pkg/client/generated/listers/routing/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/routing/adapter/common/env"
@@ -106,9 +105,9 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	filter, err := parseRequestURI(request.RequestURI)
+	filter, err := parseRequestURI(request.URL.Path)
 	if err != nil {
-		h.logger.Info("Unable to parse path as filter", zap.Error(err), zap.String("path", request.RequestURI))
+		h.logger.Errorw("Unable to parse path as filter", zap.Error(err), zap.String("path", request.RequestURI))
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -129,9 +128,9 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	h.logger.Debug("Received message", zap.Any("filter", filter))
 
-	f, err := h.getFilter(filter)
+	f, err := h.filterLister.Get(filter)
 	if err != nil {
-		h.logger.Info("Unable to get the Filter", zap.Error(err), zap.Any("filter", filter))
+		h.logger.Errorw("Unable to get the Filter", zap.Error(err), zap.Any("filter", filter))
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -140,7 +139,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	if !exists {
 		cond, err = cel.CompileExpression(f.Spec.Expression)
 		if err != nil {
-			h.logger.Info("Failed to compile filter expression", zap.Error(err), zap.Any("filter", filter))
+			h.logger.Errorw("Failed to compile filter expression", zap.Error(err), zap.Any("filter", filter))
 			writer.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -168,7 +167,7 @@ func (h *Handler) send(ctx context.Context, writer http.ResponseWriter, headers 
 	// send the event to trigger's subscriber
 	response, err := h.sendEvent(ctx, headers, target, event)
 	if err != nil {
-		h.logger.Error("failed to send event", zap.Error(err))
+		h.logger.Errorw("failed to send event", zap.Error(err))
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -178,7 +177,7 @@ func (h *Handler) send(ctx context.Context, writer http.ResponseWriter, headers 
 	// If there is an event in the response write it to the response
 	_, err = h.writeResponse(ctx, writer, response, target)
 	if err != nil {
-		h.logger.Error("failed to write response", zap.Error(err))
+		h.logger.Errorw("failed to write response", zap.Error(err))
 	}
 }
 
@@ -257,10 +256,6 @@ func (h *Handler) writeResponse(ctx context.Context, writer http.ResponseWriter,
 	return resp.StatusCode, nil
 }
 
-func (h *Handler) getFilter(filter string) (*routingv1alpha1.Filter, error) {
-	return h.filterLister.Get(filter)
-}
-
 func filterEvent(ctx context.Context, filter cel.ConditionalFilter, event cloudevents.Event) eventfilter.FilterResult {
 	var filters eventfilter.Filters
 	if filter.Expression != nil {
@@ -272,8 +267,8 @@ func filterEvent(ctx context.Context, filter cel.ConditionalFilter, event cloude
 
 func parseRequestURI(path string) (string, error) {
 	parts := strings.Split(path, "/")
-	if len(parts) != 2 {
+	if len(parts) != 3 {
 		return "", fmt.Errorf("incorrect number of parts in the path, expected 2, actual %d, '%s'", len(parts), path)
 	}
-	return parts[1], nil
+	return parts[2], nil
 }
