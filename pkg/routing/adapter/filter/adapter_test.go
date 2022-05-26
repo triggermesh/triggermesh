@@ -28,7 +28,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/uuid"
 	"k8s.io/client-go/rest"
@@ -42,7 +42,6 @@ import (
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/injection"
 	logtesting "knative.dev/pkg/logging/testing"
-	rectesting "knative.dev/pkg/reconciler/testing"
 
 	common "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
@@ -239,7 +238,7 @@ func setupFakeInformers(t *testing.T, ctx context.Context, sinkURI string) conte
 	})
 
 	var infs []controller.Informer
-	ctx, infs = rectesting.SetupFakeContext(t) //nolint:staticcheck
+	ctx, infs = injection.Fake.SetupInformers(ctx, &rest.Config{})
 	err := controller.StartInformers(ctx.Done(), infs...)
 	require.NoError(t, err)
 
@@ -251,7 +250,7 @@ func newFilter(t *testing.T, key, expression, addr string) *v1alpha1.Filter {
 	assert.NoError(t, err)
 
 	return &v1alpha1.Filter{
-		ObjectMeta: v1.ObjectMeta{
+		ObjectMeta: metav1.ObjectMeta{
 			Namespace:  strings.Split(key, "/")[0],
 			Name:       strings.Split(key, "/")[1],
 			UID:        uuid.NewUUID(),
