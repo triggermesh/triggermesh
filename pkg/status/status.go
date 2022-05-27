@@ -18,7 +18,6 @@ limitations under the License.
 package status
 
 import (
-	"context"
 	"strings"
 	"unicode"
 
@@ -26,7 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
-	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	corelistersv1 "k8s.io/client-go/listers/core/v1"
 
 	"knative.dev/pkg/apis"
 )
@@ -45,16 +44,19 @@ const (
 // and returns the state of the first observed Pod in a "waiting" state, or nil
 // if no Pod is found in that state.
 func DeploymentPodsWaitingState(d *appsv1.Deployment,
-	pi coreclientv1.PodInterface) (*corev1.ContainerStateWaiting, error) {
+	pl corelistersv1.PodNamespaceLister) (*corev1.ContainerStateWaiting, error) {
 
-	pods, err := pi.List(context.Background(), metav1.ListOptions{
-		LabelSelector: metav1.FormatLabelSelector(d.Spec.Selector),
-	})
+	sel, err := metav1.LabelSelectorAsSelector(d.Spec.Selector)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, p := range pods.Items {
+	pods, err := pl.List(sel)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range pods {
 		if p.Status.Phase == corev1.PodRunning || p.Status.Phase == corev1.PodSucceeded {
 			continue
 		}

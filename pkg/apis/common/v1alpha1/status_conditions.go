@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap"
 
 	appsv1 "k8s.io/api/apps/v1"
-	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	corelistersv1 "k8s.io/client-go/listers/core/v1"
 
 	"knative.dev/eventing/pkg/apis/duck"
 	"knative.dev/pkg/apis"
@@ -151,11 +151,11 @@ func (m *StatusManager) MarkRBACNotBound() {
 // PropagateDeploymentAvailability uses the readiness of the provided
 // Deployment to determine whether the Deployed condition should be marked as
 // True or False.
-// Given an optional PodInterface, the status of dependant Pods is inspected to
-// generate a more meaningful failure reason in case of non-ready status of the
-// Deployment.
+// Given an optional PodLister interface, the status of dependant Pods is
+// inspected to generate a more meaningful failure reason in case of non-ready
+// status of the Deployment.
 func (m *StatusManager) PropagateDeploymentAvailability(ctx context.Context,
-	d *appsv1.Deployment, pi coreclientv1.PodInterface) {
+	d *appsv1.Deployment, pl corelistersv1.PodNamespaceLister) {
 
 	// Deployments are not addressable
 	m.Address = nil
@@ -180,8 +180,8 @@ func (m *StatusManager) PropagateDeploymentAvailability(ctx context.Context,
 		}
 	}
 
-	if pi != nil {
-		ws, err := status.DeploymentPodsWaitingState(d, pi)
+	if pl != nil {
+		ws, err := status.DeploymentPodsWaitingState(d, pl)
 		if err != nil {
 			logging.FromContext(ctx).Warn("Unable to look up statuses of dependant Pods", zap.Error(err))
 		} else if ws != nil {

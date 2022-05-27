@@ -121,9 +121,9 @@ func NewTestDeploymentReconciler[T kmeta.OwnerRefable, L common.Lister[T]](ctx c
 
 	return common.GenericDeploymentReconciler[T, L]{
 		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker.New(func(types.NamespacedName) {}, 0)),
-		Lister:                ls.GetDeploymentLister().Deployments,
 		Client:                fakek8sinjectionclient.Get(ctx).AppsV1().Deployments,
-		PodClient:             fakek8sinjectionclient.Get(ctx).CoreV1().Pods,
+		Lister:                ls.GetDeploymentLister().Deployments,
+		PodLister:             ls.GetPodLister().Pods,
 		GenericRBACReconciler: newTestRBACReconciler(ctx, ls, ownersLister),
 	}
 }

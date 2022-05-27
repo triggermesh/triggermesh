@@ -109,6 +109,11 @@ func (l *Listers) GetDeploymentLister() appslistersv1.DeploymentLister {
 	return appslistersv1.NewDeploymentLister(l.IndexerFor(&appsv1.Deployment{}))
 }
 
+// GetPodLister returns a lister for Pod objects.
+func (l *Listers) GetPodLister() corelistersv1.PodLister {
+	return corelistersv1.NewPodLister(l.IndexerFor(&corev1.Pod{}))
+}
+
 // GetServiceLister returns a lister for Service objects.
 func (l *Listers) GetServiceLister() servinglistersv1.ServiceLister {
 	return servinglistersv1.NewServiceLister(l.IndexerFor(&servingv1.Service{}))

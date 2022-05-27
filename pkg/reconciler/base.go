@@ -24,6 +24,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	appsclientv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -35,6 +36,8 @@ import (
 
 	k8sclient "knative.dev/pkg/client/injection/kube/client"
 	deploymentinformerv1 "knative.dev/pkg/client/injection/kube/informers/apps/v1/deployment"
+	replicasetinformerv1 "knative.dev/pkg/client/injection/kube/informers/apps/v1/replicaset"
+	podinformerv1 "knative.dev/pkg/client/injection/kube/informers/core/v1/pod"
 	sainformerv1 "knative.dev/pkg/client/injection/kube/informers/core/v1/serviceaccount"
 	rbinformerv1 "knative.dev/pkg/client/injection/kube/informers/rbac/v1/rolebinding"
 	"knative.dev/pkg/controller"
@@ -53,10 +56,10 @@ type GenericDeploymentReconciler[T kmeta.OwnerRefable, L Lister[T]] struct {
 	// URI resolver for sinks
 	SinkResolver *resolver.URIResolver
 	// API clients
-	Client    k8sClientGetter[*appsv1.Deployment, appsclientv1.DeploymentInterface]
-	PodClient func(namespace string) coreclientv1.PodInterface
+	Client k8sClientGetter[*appsv1.Deployment, appsclientv1.DeploymentInterface]
 	// objects listers
-	Lister func(namespace string) appslistersv1.DeploymentNamespaceLister
+	Lister    func(namespace string) appslistersv1.DeploymentNamespaceLister
+	PodLister func(namespace string) corelistersv1.PodNamespaceLister
 
 	*GenericRBACReconciler[T, L]
 }
@@ -146,19 +149,29 @@ func NewGenericDeploymentReconciler[T kmeta.OwnerRefable, L Lister[T]](ctx conte
 	ownersLister ListerGetter[T, L],
 ) GenericDeploymentReconciler[T, L] {
 
-	informer := deploymentinformerv1.Get(ctx)
+	deplInformer := deploymentinformerv1.Get(ctx)
+	podInformer := podinformerv1.Get(ctx)
 
 	r := GenericDeploymentReconciler[T, L]{
 		SinkResolver:          resolver.NewURIResolverFromTracker(ctx, tracker),
 		Client:                k8sclient.Get(ctx).AppsV1().Deployments,
-		PodClient:             k8sclient.Get(ctx).CoreV1().Pods,
-		Lister:                informer.Lister().Deployments,
+		Lister:                deplInformer.Lister().Deployments,
+		PodLister:             podInformer.Lister().Pods,
 		GenericRBACReconciler: NewGenericRBACReconciler(ctx, ownersLister),
 	}
 
-	informer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
+	deplInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
 		FilterFunc: controller.FilterControllerGVK(gvk),
 		Handler:    controller.HandleAll(adapterHandlerFn),
+	})
+
+	var outermostCtlrType T
+
+	podinformerv1.Get(ctx).Informer().AddEventHandler(cache.FilteringResourceEventHandler{
+		FilterFunc: adapterPodWithAncestorOfKind(ctx, outermostCtlrType),
+		Handler: controller.HandleAll(
+			podOutermostAncestorHandlerFn(ctx, adapterHandlerFn),
+		),
 	})
 
 	return r
@@ -273,3 +286,120 @@ func EnqueueObjectsInNamespaceOf(inf cache.SharedInformer, resyncFn filteredGlob
 		resyncFn(isInNamespace(adapter.GetNamespace()), inf)
 	}
 }
+
+// adapterPodWithAncestorOfKind returns a filter function which returns whether a Pod:
+//  - has labels that correspond to an adapter of the given type
+//  - has an outermost ancestor of the given kind
+func adapterPodWithAncestorOfKind(ctx context.Context, typ kmeta.OwnerRefable) objectFilterFunc {
+	return func(obj interface{}) bool {
+		return hasAdapterLabelsForType(typ)(obj) &&
+			hasOutermostAncestorOfKind(ctx, typ.GetGroupVersionKind())(obj)
+	}
+}
+
+// hasOutermostAncestorOfKind returns a filter function which returns whether
+// the given object has an outermost ancestor of the given kind.
+func hasOutermostAncestorOfKind(ctx context.Context, gvk schema.GroupVersionKind) objectFilterFunc {
+	return func(obj interface{}) bool {
+		object, ok := obj.(metav1.Object)
+		if !ok {
+			return false
+		}
+
+		ancestorCtlrRef := outermostAncestorControllerRef(ctx, object)
+		return ancestorCtlrRef != nil &&
+			ancestorCtlrRef.APIVersion == gvk.GroupVersion().String() &&
+			ancestorCtlrRef.Kind == gvk.Kind
+	}
+}
+
+// outermostAncestorControllerRef returns the outermost ancestor controller of
+// the given object.
+func outermostAncestorControllerRef(ctx context.Context, obj metav1.Object) *metav1.OwnerReference {
+	return resolveOutermostAncestorControllerRef(ctx, obj, schema.GroupVersionKind{})
+}
+
+// resolveOutermostAncestorControllerRef returns a reference to the controller
+// of an API object, recursing up the hierarchy of controllers.
+// eg. pod -> replicaset -> deployment -> TriggerMesh component
+func resolveOutermostAncestorControllerRef(ctx context.Context, obj metav1.Object, gvk schema.GroupVersionKind) *metav1.OwnerReference {
+	controllerRef := metav1.GetControllerOf(obj)
+	if controllerRef == nil {
+		if firstIteration := gvk.Empty(); firstIteration {
+			return nil
+		}
+		self := metav1.NewControllerRef(obj, gvk)
+		return self
+	}
+
+	var controllerObj metav1.Object
+	var err error
+
+	switch controllerRef.Kind {
+	case "ReplicaSet":
+		controllerObj, err = replicasetinformerv1.Get(ctx).Lister().ReplicaSets(obj.GetNamespace()).Get(controllerRef.Name)
+	case "Deployment":
+		controllerObj, err = deploymentinformerv1.Get(ctx).Lister().Deployments(obj.GetNamespace()).Get(controllerRef.Name)
+	default:
+		// we only support a subset of dependency chains
+		return controllerRef
+	}
+	if err != nil {
+		return nil
+	}
+
+	gvk = schema.FromAPIVersionAndKind(controllerRef.APIVersion, controllerRef.Kind)
+	return resolveOutermostAncestorControllerRef(ctx, controllerObj, gvk)
+}
+
+// podOutermostAncestorHandlerFn returns a resource handler function which passes
+// the outermost ancestor of a Pod to the provided resource handler function.
+func podOutermostAncestorHandlerFn(ctx context.Context, handlerFn func(interface{})) func(interface{}) {
+	return func(obj interface{}) {
+		object, ok := obj.(metav1.Object)
+		if !ok {
+			return
+		}
+
+		ancestorCtlrRef := outermostAncestorControllerRef(ctx, object)
+		if ancestorCtlrRef == nil {
+			return
+		}
+
+		// It is assumed that handlerFn is impl.EnqueueControllerOf,
+		// originally passed by the component's Reconciler implementation,
+		// which means that the type of the variable passed to it must
+		//  - satisfy kmeta.Accessor
+		//  - be controlled by the object to be enqueued
+		handlerFn(newAccessorWithController(object.GetNamespace(), ancestorCtlrRef))
+	}
+}
+
+// newAccessorWithController returns a kmeta.Accessor that has the given owner.
+func newAccessorWithController(ns string, owner *metav1.OwnerReference) kmeta.Accessor {
+	return &accessor{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace:       ns,
+			OwnerReferences: []metav1.OwnerReference{*owner},
+		},
+	}
+}
+
+// accessor is an adapter type which allows a metav1.Object to implement kmeta.Accessor.
+type accessor struct {
+	metav1.ObjectMeta
+}
+
+var _ kmeta.Accessor = (*accessor)(nil)
+
+// GroupVersionKind implements kmeta.Accessor.
+func (*accessor) GroupVersionKind() schema.GroupVersionKind { return schema.GroupVersionKind{} }
+
+// SetGroupVersionKind implements kmeta.Accessor.
+func (*accessor) SetGroupVersionKind(schema.GroupVersionKind) {}
+
+// GetObjectKind implements kmeta.Accessor.
+func (*accessor) GetObjectKind() schema.ObjectKind { return nil }
+
+// DeepCopyObject implements kmeta.Accessor.
+func (*accessor) DeepCopyObject() runtime.Object { return nil }
