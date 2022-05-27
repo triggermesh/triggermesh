@@ -23,8 +23,8 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
 
-// removeAllRules removes all rules from the given event bus.
-func removeAllRules(ebClient eventbridgeiface.EventBridgeAPI, eventBusName string) {
+// deleteAllRules deletes all rules from the given event bus.
+func deleteAllRules(ebClient eventbridgeiface.EventBridgeAPI, eventBusName string) {
 	in := &eventbridge.ListRulesInput{
 		EventBusName: &eventBusName,
 	}

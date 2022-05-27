@@ -7,6 +7,35 @@
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "E2EFrameworkEventBridgeEventBus",
+            "Effect": "Allow",
+            "Action": [
+                "events:CreateEventBus",
+                "events:TagResource",
+                "events:DeleteEventBus",
+                "events:PutEvents"
+            ],
+            "Resource": "arn:aws:events:*:043455440429:event-bus/e2e-*"
+        },
+        {
+            "Sid": "E2EFrameworkEventBridgeEventRule1",
+            "Effect": "Allow",
+            "Action": [
+                "events:ListRules"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "E2EFrameworkEventBridgeEventRule2",
+            "Effect": "Allow",
+            "Action": [
+                "events:DeleteRule",
+                "events:ListTargetsByRule",
+                "events:RemoveTargets"
+            ],
+            "Resource": "arn:aws:events:*:043455440429:rule/e2e-*"
+        },
+        {
             "Sid": "E2EFrameworkSNS",
             "Effect": "Allow",
             "Action": [
@@ -16,9 +45,7 @@
                 "sns:GetTopicAttributes",
                 "sns:SetTopicAttributes"
             ],
-            "Resource": [
-                "arn:aws:sns:*:043455440429:e2e-*"
-            ]
+            "Resource": "arn:aws:sns:*:043455440429:e2e-*"
         },
         {
             "Sid": "E2EFrameworkSQS",
@@ -32,9 +59,7 @@
                 "sqs:SetQueueAttributes",
                 "sqs:TagQueue"
             ],
-            "Resource": [
-                "arn:aws:sqs:*:043455440429:e2e-*"
-            ]
+            "Resource": "arn:aws:sqs:*:043455440429:e2e-*"
         },
         {
             "Sid": "E2EFrameworkCodeCommit",
@@ -46,9 +71,7 @@
                 "codecommit:CreateCommit",
                 "codecommit:TagResource"
             ],
-            "Resource": [
-                "arn:aws:codecommit:*:043455440429:e2e-*"
-            ]
+            "Resource": "arn:aws:codecommit:*:043455440429:e2e-*"
         },
         {
             "Sid": "E2EFrameworkKinesis",
@@ -62,9 +85,7 @@
                 "kinesis:GetShardIterator",
                 "kinesis:GetRecords"
             ],
-            "Resource": [
-                "arn:aws:kinesis:*:043455440429:stream/e2e-*"
-            ]
+            "Resource": "arn:aws:kinesis:*:043455440429:stream/e2e-*"
         },
         {
             "Sid": "E2EFrameworkCognitoUserPools",
@@ -74,9 +95,7 @@
                 "cognito-idp:AdminCreateUser",
                 "cognito-idp:DeleteUserPool"
             ],
-            "Resource": [
-                "*"
-            ]
+            "Resource": "*"
         },
         {
             "Sid": "E2EFrameworkDynamoDB",
@@ -87,9 +106,7 @@
                 "dynamodb:DeleteTable",
                 "dynamodb:PutItem"
             ],
-            "Resource": [
-                "arn:aws:dynamodb:*:043455440429:table/e2e-*"
-            ]
+            "Resource": "arn:aws:dynamodb:*:043455440429:table/e2e-*"
         },
         {
             "Sid": "E2EFrameworkS3",
@@ -101,9 +118,44 @@
                 "s3:DeleteBucket",
                 "s3:DeleteObject"
             ],
-            "Resource": [
-                "arn:aws:s3:::e2e-*"
-            ]
+            "Resource": "arn:aws:s3:::e2e-*"
+        },
+        {
+            "Sid": "AWSEventBridgeSourceReconcilerEventRule1",
+            "Effect": "Allow",
+            "Action": [
+                "events:ListRuleNamesByTarget"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "AWSEventBridgeSourceReconcilerEventRule2",
+            "Effect": "Allow",
+            "Action": [
+                "events:DescribeRule",
+                "events:ListTargetsByRule",
+                "events:PutRule",
+                "events:PutTargets",
+                "events:DeleteRule",
+                "events:RemoveTargets",
+                "events:ListTagsForResource",
+                "events:TagResource"
+            ],
+            "Resource": "arn:aws:events:*:043455440429:rule/e2e-*"
+        },
+        {
+            "Sid": "AWSEventBridgeSourceReconcilerQueue",
+            "Effect": "Allow",
+            "Action": [
+                "sqs:GetQueueUrl",
+                "sqs:GetQueueAttributes",
+                "sqs:ListQueueTags",
+                "sqs:CreateQueue",
+                "sqs:SetQueueAttributes",
+                "sqs:TagQueue",
+                "sqs:DeleteQueue"
+            ],
+            "Resource": "arn:aws:sqs:*:043455440429:io_triggermesh_awseventbridgesources-*"
         },
         {
             "Sid": "AWSCodeCommitSourceReceiveAdapter",
@@ -115,9 +167,7 @@
                 "codecommit:ListPullRequests",
                 "codecommit:GetPullRequest"
             ],
-            "Resource": [
-                "arn:aws:codecommit:*:043455440429:e2e-*"
-            ]
+            "Resource": "arn:aws:codecommit:*:043455440429:e2e-*"
         },
         {
             "Sid": "AWSSNSSourceReceiveAdapter",
@@ -125,9 +175,7 @@
             "Action": [
                 "sns:ConfirmSubscription"
             ],
-            "Resource": [
-                "arn:aws:sns:*:043455440429:e2e-*"
-            ]
+            "Resource": "arn:aws:sns:*:043455440429:e2e-*"
         },
         {
             "Sid": "AWSSNSSourceReconciler",
@@ -137,9 +185,7 @@
                 "sns:Subscribe",
                 "sns:Unsubscribe"
             ],
-            "Resource": [
-                "arn:aws:sns:*:043455440429:e2e-*"
-            ]
+            "Resource": "arn:aws:sns:*:043455440429:e2e-*"
         },
         {
             "Sid": "AWSSQSSourceReceiveAdapter",
@@ -150,8 +196,9 @@
                 "sqs:DeleteMessage"
             ],
             "Resource": [
-                "arn:aws:sqs:*:043455440429:e2e-*"
-            ]
+                "arn:aws:sqs:*:043455440429:e2e-*",
+                "arn:aws:sqs:*:043455440429:io_triggermesh_awseventbridgesources-*"
+	    ]
         },
         {
             "Sid": "AWSKinesisSourceReceiveAdapter",
@@ -161,9 +208,7 @@
                 "kinesis:GetShardIterator",
                 "kinesis:GetRecords"
             ],
-            "Resource": [
-                "arn:aws:kinesis:*:043455440429:stream/e2e-*"
-            ]
+            "Resource": "arn:aws:kinesis:*:043455440429:stream/e2e-*"
         },
         {
             "Sid": "AWSCognitoUserPoolSourceReceiveAdapter",
