@@ -74,14 +74,21 @@
             "Resource": "arn:aws:codecommit:*:043455440429:e2e-*"
         },
         {
-            "Sid": "E2EFrameworkKinesis",
+            "Sid": "E2EFrameworkKinesis1",
+            "Effect": "Allow",
+            "Action": [
+                "kinesis:ListShards"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "E2EFrameworkKinesis2",
             "Effect": "Allow",
             "Action": [
                 "kinesis:PutRecord",
                 "kinesis:DeleteStream",
                 "kinesis:CreateStream",
                 "kinesis:DescribeStream",
-                "kinesis:ListShards",
                 "kinesis:GetShardIterator",
                 "kinesis:GetRecords"
             ],
@@ -109,16 +116,23 @@
             "Resource": "arn:aws:dynamodb:*:043455440429:table/e2e-*"
         },
         {
-            "Sid": "E2EFrameworkS3",
+            "Sid": "E2EFrameworkS3Bucket",
             "Effect": "Allow",
             "Action": [
                 "s3:CreateBucket",
-                "s3:GetObject",
                 "s3:ListBucket",
-                "s3:DeleteBucket",
-                "s3:DeleteObject"
+                "s3:DeleteBucket"
             ],
             "Resource": "arn:aws:s3:::e2e-*"
+        },
+        {
+            "Sid": "E2EFrameworkS3Object",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::e2e-*/*"
         },
         {
             "Sid": "AWSEventBridgeSourceReconcilerEventRule1",
@@ -178,12 +192,19 @@
             "Resource": "arn:aws:sns:*:043455440429:e2e-*"
         },
         {
-            "Sid": "AWSSNSSourceReconciler",
+            "Sid": "AWSSNSSourceReconciler1",
+            "Effect": "Allow",
+            "Action": [
+                "sns:Unsubscribe"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "AWSSNSSourceReconciler2",
             "Effect": "Allow",
             "Action": [
                 "sns:ListSubscriptionsByTopic",
-                "sns:Subscribe",
-                "sns:Unsubscribe"
+                "sns:Subscribe"
             ],
             "Resource": "arn:aws:sns:*:043455440429:e2e-*"
         },
@@ -220,7 +241,7 @@
             "Resource": "arn:aws:cognito-idp:*:043455440429:userpool/*"
         },
         {
-            "Sid": "AWSDynamoDBTableSourceReceiveAdapter",
+            "Sid": "AWSDynamoDBSourceReceiveAdapterTable",
             "Effect": "Allow",
             "Action": [
                 "dynamodb:DescribeTable"
@@ -228,7 +249,7 @@
             "Resource": "arn:aws:dynamodb:*:043455440429:table/e2e-*"
         },
         {
-            "Sid": "AWSDynamoDBStreamSourceReceiveAdapter",
+            "Sid": "AWSDynamoDBSourceReceiveAdapterStream",
             "Effect": "Allow",
             "Action": [
                 "dynamodb:GetShardIterator",
@@ -238,13 +259,20 @@
             "Resource": "arn:aws:dynamodb:*:043455440429:table/e2e-*/stream/*"
         },
         {
-            "Sid": "AWSS3TargetReceiveAdapter",
+            "Sid": "AWSS3TargetReceiveAdapterBucket",
             "Effect": "Allow",
             "Action": [
-                "s3:GetBucketLocation",
-                "s3:PutObject"
+                "s3:GetBucketLocation"
             ],
             "Resource": "arn:aws:s3:::e2e-*"
+        },
+        {
+            "Sid": "AWSS3TargetReceiveAdapterObject",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": "arn:aws:s3:::e2e-*/*"
         }
     ]
 }
