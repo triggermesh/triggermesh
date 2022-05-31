@@ -155,7 +155,7 @@ func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GClou
 			Labels: pubsubResourceLabels(src),
 		}
 
-		topic, err = cli.CreateTopicWithConfig(ctx, topicID, cfg)
+		_, err = cli.CreateTopicWithConfig(ctx, topicID, cfg)
 		switch {
 		case isDenied(err):
 			status.MarkNotSubscribed(v1alpha1.GCloudReasonAPIError,
@@ -168,7 +168,7 @@ func ensurePubSubTopic(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GClou
 			return nil, fmt.Errorf("%w", failCreateTopicEvent(topicID, err))
 		}
 
-		event.Normal(ctx, ReasonSubscribed, "Created topic %q", topic)
+		event.Normal(ctx, ReasonSubscribed, "Created topic %q", topicID)
 	}
 
 	topicResName := &v1alpha1.GCloudResourceName{}
