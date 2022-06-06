@@ -107,7 +107,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	if kc == nil {
-		logger.Panic("kafka client is nil")
+		logger.Panic("Kafka client is nil! Please check the configuration.")
 	}
 
 	return &confluentAdapter{
