@@ -52,7 +52,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	var kc KafkaClient
 	var err error
 
-	if env.SecurityProtocol == "SASL_SSL" && env.SecurityMechanisms == "PLAIN" {
+	switch env.SecurityMechanisms {
+	case "PLAIN":
 		kc, err = NewKafkaClient(&kafka.ConfigMap{
 			"bootstrap.servers":       env.BootstrapServers,
 			"sasl.username":           env.SASLUsername,
@@ -65,9 +66,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		if err != nil {
 			logger.Panic(err)
 		}
-	}
-
-	if env.SecurityProtocol == "SASL_SSL" && env.SecurityMechanisms == "SCRAM-SHA-256" {
+	case "SCRAM-SHA-256":
 		kc, err = NewKafkaClient(&kafka.ConfigMap{
 			"bootstrap.servers":        env.BootstrapServers,
 			"sasl.username":            env.SASLUsername,
@@ -83,10 +82,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		if err != nil {
 			logger.Panic(err)
 		}
-	}
-
-	if env.SecurityProtocol == "SASL_SSL" && env.SecurityMechanisms == "GSSAPI" {
-		fmt.Println("GSSAPI")
+	case "GSSAPI":
 		kc, err = NewKafkaClient(&kafka.ConfigMap{
 			"bootstrap.servers":          env.BootstrapServers,
 			"group.id":                   env.GroupID,
@@ -104,6 +100,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		if err != nil {
 			logger.Panic(err)
 		}
+	default:
+		logger.Panicf("Unsupported security mechanism: %s", env.SecurityMechanisms)
 	}
 
 	if kc == nil {

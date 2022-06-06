@@ -35,7 +35,7 @@ type envAccessor struct {
 	SASLPassword       string `envconfig:"CONFLUENT_SASL_PASSWORD" required:"true"`
 	Topic              string `envconfig:"CONFLUENT_TOPIC" required:"true"`
 	SecurityMechanisms string `envconfig:"CONFLUENT_SECURITY_MECANISMS" required:"true"`
-	SecurityProtocol   string `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"true"`
+	SecurityProtocol   string `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"false" default:"SASL_SSL"`
 
 	SSLCALocation string `envconfig:"SSL_CA_LOCATION" required:"false"`
 	SSLClientCert string `envconfig:"SSL_CLIENT_CERT" required:"false"`
