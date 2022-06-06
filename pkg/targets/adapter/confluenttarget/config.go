@@ -30,12 +30,21 @@ type envAccessor struct {
 
 	// This block of environment variables are expected to be informed
 	// by the the Confluent object and as such part of the CRD.
-	BootstrapServers string `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
-	SASLUsername     string `envconfig:"CONFLUENT_SASL_USERNAME" required:"true"`
-	SASLPassword     string `envconfig:"CONFLUENT_SASL_PASSWORD" required:"true"`
-	Topic            string `envconfig:"CONFLUENT_TOPIC" required:"true"`
-	SASLMechanisms   string `envconfig:"CONFLUENT_SASL_MECHANISMS" required:"false" default:"PLAIN"`
-	SecurityProtocol string `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"false" default:"SASL_SSL"`
+	BootstrapServers   string `envconfig:"CONFLUENT_BOOTSTRAP_SERVERS" required:"true"`
+	SASLUsername       string `envconfig:"CONFLUENT_SASL_USERNAME" required:"true"`
+	SASLPassword       string `envconfig:"CONFLUENT_SASL_PASSWORD" required:"true"`
+	Topic              string `envconfig:"CONFLUENT_TOPIC" required:"true"`
+	SecurityMechanisms string `envconfig:"CONFLUENT_SECURITY_MECANISMS" required:"true"`
+	SecurityProtocol   string `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"true"`
+
+	SSLCALocation string `envconfig:"SSL_CA_LOCATION" required:"false"`
+	SSLClientCert string `envconfig:"SSL_CLIENT_CERT" required:"false"`
+	SSLClientKey  string `envconfig:"SSL_CLIENT_KEY" required:"false"`
+
+	KerberosKeytab      string `envconfig:"KERBEROS_KEYTAB" required:"false"`
+	KerberosPrincipal   string `envconfig:"KERBEROS_PRINCIPAL" required:"false" `
+	KerberosServiceName string `envconfig:"KERBEROS_SERVICE_NAME" required:"false" `
+	GroupID             string `envconfig:"CONFLUENT_GROUP_ID" required:"false" `
 
 	// This set of variables are experimental and not graduated to the CRD.
 	BrokerVersionFallback       string `envconfig:"CONFLUENT_BROKER_VERSION_FALLBACK" required:"false" default:"0.10.0.0"`

@@ -49,21 +49,69 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
-	kafkaClient, err := NewKafkaClient(&kafka.ConfigMap{
-		"bootstrap.servers":       env.BootstrapServers,
-		"sasl.username":           env.SASLUsername,
-		"sasl.password":           env.SASLPassword,
-		"sasl.mechanisms":         env.SASLMechanisms,
-		"security.protocol":       env.SecurityProtocol,
-		"broker.version.fallback": env.BrokerVersionFallback,
-		"api.version.fallback.ms": env.APIVersionFallbackMs,
-	})
-	if err != nil {
-		logger.Panic(err)
+	var kc KafkaClient
+	var err error
+
+	if env.SecurityProtocol == "SASL_SSL" && env.SecurityMechanisms == "PLAIN" {
+		kc, err = NewKafkaClient(&kafka.ConfigMap{
+			"bootstrap.servers":       env.BootstrapServers,
+			"sasl.username":           env.SASLUsername,
+			"sasl.password":           env.SASLPassword,
+			"sasl.mechanisms":         env.SecurityMechanisms,
+			"security.protocol":       env.SecurityProtocol,
+			"broker.version.fallback": env.BrokerVersionFallback,
+			"api.version.fallback.ms": env.APIVersionFallbackMs,
+		})
+		if err != nil {
+			logger.Panic(err)
+		}
+	}
+
+	if env.SecurityProtocol == "SASL_SSL" && env.SecurityMechanisms == "SCRAM-SHA-256" {
+		kc, err = NewKafkaClient(&kafka.ConfigMap{
+			"bootstrap.servers":        env.BootstrapServers,
+			"sasl.username":            env.SASLUsername,
+			"sasl.password":            env.SASLPassword,
+			"sasl.mechanisms":          env.SecurityMechanisms,
+			"security.protocol":        env.SecurityProtocol,
+			"broker.version.fallback":  env.BrokerVersionFallback,
+			"api.version.fallback.ms":  env.APIVersionFallbackMs,
+			"ssl.ca.location":          env.SSLCALocation,
+			"ssl.certificate.location": env.SSLClientCert,
+			"ssl.key.location":         env.SSLClientKey,
+		})
+		if err != nil {
+			logger.Panic(err)
+		}
+	}
+
+	if env.SecurityProtocol == "SASL_SSL" && env.SecurityMechanisms == "GSSAPI" {
+		fmt.Println("GSSAPI")
+		kc, err = NewKafkaClient(&kafka.ConfigMap{
+			"bootstrap.servers":          env.BootstrapServers,
+			"group.id":                   env.GroupID,
+			"fetch.min.bytes":            1000000,
+			"fetch.max.bytes":            1000000000,
+			"fetch.wait.max.ms":          1 * time.Second,
+			"security.protocol":          env.SecurityProtocol,
+			"sasl.mechanisms":            env.SecurityMechanisms,
+			"sasl.kerberos.service.name": env.KerberosServiceName,
+			"sasl.kerberos.principal":    env.KerberosPrincipal,
+			"sasl.kerberos.keytab":       env.KerberosKeytab,
+			"ssl.ca.location":            env.SSLCALocation,
+		})
+
+		if err != nil {
+			logger.Panic(err)
+		}
+	}
+
+	if kc == nil {
+		logger.Panic("kafka client is nil")
 	}
 
 	return &confluentAdapter{
-		kafkaClient:               kafkaClient,
+		kafkaClient:               kc,
 		topic:                     env.Topic,
 		createTopicIfMissing:      env.CreateTopicIfMissing,
 		flushTimeout:              env.FlushOnExitTimeoutMillisecs,
@@ -160,7 +208,7 @@ func (a *confluentAdapter) dispatch(event cloudevents.Event) cloudevents.Result 
 		return cloudevents.ResultNACK
 	}
 
-	a.logger.Debugf("Delivered message to topic %s [%d] at offset %v",
+	a.logger.Infof("Delivered message to topic %s [%d] at offset %v",
 		*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
 
 	return cloudevents.ResultACK
