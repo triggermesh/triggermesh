@@ -137,7 +137,7 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 		res := a.withBridgeIdentifier(result)
 		return &res, cloudevents.ResultACK
 	case <-time.After(a.responseTimeout):
-		a.logger.Errorw("Request time out", fmt.Errorf("request %q did not receive backend response in time", correlationID))
+		a.logger.Errorw("Request time out", zap.Error(fmt.Errorf("request %q did not receive backend response in time", correlationID)))
 		return nil, cloudevents.NewHTTPResult(http.StatusGatewayTimeout, "backend did not respond in time")
 	}
 }
@@ -148,7 +148,7 @@ func (a *adapter) serveResponse(ctx context.Context, correlationID string, event
 
 	responseChan, exists := a.sessions.get(correlationID)
 	if !exists {
-		a.logger.Errorw("Session not found", fmt.Errorf("client session with ID %q does not exist", correlationID))
+		a.logger.Errorw("Session not found", zap.Error(fmt.Errorf("client session with ID %q does not exist", correlationID)))
 		return nil, cloudevents.NewHTTPResult(http.StatusBadGateway, "client session does not exist")
 	}
 
@@ -158,7 +158,7 @@ func (a *adapter) serveResponse(ctx context.Context, correlationID string, event
 		a.logger.Debugf("Response %q completed", correlationID)
 		return nil, cloudevents.ResultACK
 	default:
-		a.logger.Errorw("Unable to forward the response", fmt.Errorf("client connection with ID %q is closed", correlationID))
+		a.logger.Errorw("Unable to forward the response", zap.Error(fmt.Errorf("client connection with ID %q is closed", correlationID)))
 		return nil, cloudevents.NewHTTPResult(http.StatusBadGateway, "client connection is closed")
 	}
 }

@@ -186,8 +186,9 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality
 	if !strings.Contains(event.DataContentType(), cloudevents.ApplicationJSON) {
-		t.logger.Errorw("Bad Content-Type", fmt.Errorf("%q content-type is not supported", event.DataContentType()))
-		return nil, fmt.Errorf("CE Content-Type %q is not supported", event.DataContentType())
+		err := fmt.Errorf("CE Content-Type %q is not supported", event.DataContentType())
+		t.logger.Errorw("Bad Content-Type", zap.Error(err))
+		return nil, err
 	}
 
 	localContext := ceContext{
