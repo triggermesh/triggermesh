@@ -1555,8 +1555,8 @@ github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635/go.mod h1:hkRG
 github.com/syndtr/goleveldb v1.0.0 h1:fBdIW9lB4Iz0n9khmH8w27SJ3QEJ7+IgjPEwGSZiFdE=
 github.com/syndtr/goleveldb v1.0.0/go.mod h1:ZVVdQEZoIme9iO1Ch2Jdy24qqXrMMOU6lpPAyBWyWuQ=
 github.com/tchap/go-patricia v2.2.6+incompatible/go.mod h1:bmLyhP68RS6kStMGxByiQ23RP/odRBOTVjwp2cDyi6I=
-github.com/tektoncd/pipeline v0.35.1 h1:cgEVV+DqXQRyduFDnqLjuK6uMcau3betM0iV+F1vjPQ=
-github.com/tektoncd/pipeline v0.35.1/go.mod h1:+Jc1ESROXrzosXmpAKMWY8CJhUu52mK+wigjpVMgOio=
+github.com/tektoncd/pipeline v0.36.0 h1:4FU7yZ28sv1LmXR9f7tngXcsu4Dq04q0nWTXEm+0RL4=
+github.com/tektoncd/pipeline v0.36.0/go.mod h1:ZZOSGj1vCeK/xONQGcxBs+m17NzCXNNOqglCDhOPwjY=
 github.com/tidwall/gjson v1.14.1 h1:iymTbGkQBhveq21bEvAQ81I0LEBork8BFe1CUZXdyuo=
 github.com/tidwall/gjson v1.14.1/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=
