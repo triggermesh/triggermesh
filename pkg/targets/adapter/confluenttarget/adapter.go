@@ -75,9 +75,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 			"security.protocol":        env.SecurityProtocol,
 			"broker.version.fallback":  env.BrokerVersionFallback,
 			"api.version.fallback.ms":  env.APIVersionFallbackMs,
-			"ssl.ca.location":          env.SSLCALocation,
-			"ssl.certificate.location": env.SSLClientCert,
-			"ssl.key.location":         env.SSLClientKey,
+			"ssl.ca.location":          env.SSLCAFileLocation,
+			"ssl.certificate.location": env.SSLClientCertFileLocation,
+			"ssl.key.location":         env.SSLClientKeyFileLocation,
 		})
 		if err != nil {
 			logger.Panic(err)
@@ -93,8 +93,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 			"sasl.mechanisms":            env.SecurityMechanisms,
 			"sasl.kerberos.service.name": env.KerberosServiceName,
 			"sasl.kerberos.principal":    env.KerberosPrincipal,
-			"sasl.kerberos.keytab":       env.KerberosKeytab,
-			"ssl.ca.location":            env.SSLCALocation,
+			"sasl.kerberos.keytab":       env.KerberosKeytabFileLocation,
+			"ssl.ca.location":            env.SSLCAFileLocation,
 		})
 
 		if err != nil {

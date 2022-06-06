@@ -37,14 +37,14 @@ type envAccessor struct {
 	SecurityMechanisms string `envconfig:"CONFLUENT_SECURITY_MECANISMS" required:"true"`
 	SecurityProtocol   string `envconfig:"CONFLUENT_SECURITY_PROTOCOL" required:"false" default:"SASL_SSL"`
 
-	SSLCALocation string `envconfig:"SSL_CA_LOCATION" required:"false"`
-	SSLClientCert string `envconfig:"SSL_CLIENT_CERT" required:"false"`
-	SSLClientKey  string `envconfig:"SSL_CLIENT_KEY" required:"false"`
+	SSLCAFileLocation         string `envconfig:"SSL_CA_LOCATION" required:"false"`
+	SSLClientCertFileLocation string `envconfig:"SSL_CLIENT_CERT" required:"false"`
+	SSLClientKeyFileLocation  string `envconfig:"SSL_CLIENT_KEY" required:"false"`
 
-	KerberosKeytab      string `envconfig:"KERBEROS_KEYTAB" required:"false"`
-	KerberosPrincipal   string `envconfig:"KERBEROS_PRINCIPAL" required:"false" `
-	KerberosServiceName string `envconfig:"KERBEROS_SERVICE_NAME" required:"false" `
-	GroupID             string `envconfig:"CONFLUENT_GROUP_ID" required:"false" `
+	KerberosKeytabFileLocation string `envconfig:"KERBEROS_KEYTAB" required:"false"`
+	KerberosPrincipal          string `envconfig:"KERBEROS_PRINCIPAL" required:"false" `
+	KerberosServiceName        string `envconfig:"KERBEROS_SERVICE_NAME" required:"false" `
+	GroupID                    string `envconfig:"CONFLUENT_GROUP_ID" required:"false" `
 
 	// This set of variables are experimental and not graduated to the CRD.
 	BrokerVersionFallback       string `envconfig:"CONFLUENT_BROKER_VERSION_FALLBACK" required:"false" default:"0.10.0.0"`
