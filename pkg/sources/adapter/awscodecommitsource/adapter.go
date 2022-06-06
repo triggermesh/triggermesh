@@ -128,28 +128,28 @@ func (a *adapter) Start(ctx context.Context) error {
 	health.MarkReady()
 
 	if strings.Contains(a.gitEvents, pushEventType) {
-		a.logger.Info("Push events enabled")
+		a.logger.Info("AWS CodeCommit Push events enabled")
 
 		branchInfo, err := a.ccClient.GetBranch(&codecommit.GetBranchInput{
 			RepositoryName: &a.arn.Resource,
 			BranchName:     &a.branch,
 		})
 		if err != nil {
-			a.logger.Fatalw("Failed to retrieve branch info", "error", err)
+			a.logger.Fatalw("Failed to retrieve branch info", zap.Error(err))
 		}
 
 		lastCommit = *branchInfo.Branch.CommitId
 	}
 
 	if strings.Contains(a.gitEvents, prEventType) {
-		a.logger.Info("Pull Request events enabled")
+		a.logger.Info("AWS CodeCommit Pull Request events enabled")
 
 		// get pull request IDs
 		pullRequestsOutput, err := a.ccClient.ListPullRequests(&codecommit.ListPullRequestsInput{
 			RepositoryName: &a.arn.Resource,
 		})
 		if err != nil {
-			a.logger.Fatalw("Failed to retrieve list of pull requests", "error", err)
+			a.logger.Fatalw("Failed to retrieve list of pull requests", zap.Error(err))
 		}
 
 		pullRequestIDs = pullRequestsOutput.PullRequestIds
@@ -161,7 +161,7 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	processedPullRequests, err := a.preparePullRequests()
 	if err != nil {
-		a.logger.Errorw("Failed to process pull requests", "error", err)
+		a.logger.Errorw("Failed to process pull requests", zap.Error(err))
 	}
 
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
@@ -174,7 +174,7 @@ func (a *adapter) Start(ctx context.Context) error {
 		if strings.Contains(a.gitEvents, pushEventType) {
 			err := a.processCommits(ctx)
 			if err != nil {
-				a.logger.Errorw("Failed to process commits", "error", err)
+				a.logger.Errorw("Failed to process commits", zap.Error(err))
 				return resetBackoff, nil
 			}
 		}
@@ -182,7 +182,7 @@ func (a *adapter) Start(ctx context.Context) error {
 		if strings.Contains(a.gitEvents, prEventType) {
 			pullRequests, err := a.preparePullRequests()
 			if err != nil {
-				a.logger.Errorw("Failed to process pull requests", "error", err)
+				a.logger.Errorw("Failed to process pull requests", zap.Error(err))
 				return resetBackoff, nil
 			}
 
@@ -192,7 +192,7 @@ func (a *adapter) Start(ctx context.Context) error {
 				resetBackoff = true
 				err = a.sendEvent(ctx, pr)
 				if err != nil {
-					a.logger.Errorw("Failed to send PR event", "error", err)
+					a.logger.Errorw("Failed to send PR event", zap.Error(err))
 					return resetBackoff, nil
 				}
 				processedPullRequests = append(processedPullRequests, pr)
@@ -264,7 +264,7 @@ func (a *adapter) preparePullRequests() ([]*codecommit.PullRequest, error) {
 
 // sendEvent sends an event containing data about a git commit or PR
 func (a *adapter) sendEvent(ctx context.Context, codeCommitEvent interface{}) error {
-	a.logger.Info("Sending CodeCommit event")
+	a.logger.Debug("Sending CodeCommit event")
 
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetSubject(a.branch)

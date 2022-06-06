@@ -111,7 +111,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	event, err := binding.ToEvent(ctx, message)
 	if err != nil {
-		h.logger.Warnw("failed to extract event from request", zap.Error(err))
+		h.logger.Errorw("Failed to extract event from request", zap.Error(err))
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -120,7 +120,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 
 	s, err := h.splitterLister.Get(splitter)
 	if err != nil {
-		h.logger.Errorw("Unable to get the Splitter", zap.Error(err), zap.Any("splitter", splitter))
+		h.logger.Errorw("Unable to get the Splitter", zap.Error(err))
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -135,7 +135,7 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		// we may want to keep responses and send them back to the source
 		_, err := h.sendEvent(ctx, request.Header, s.Status.SinkURI.String(), e)
 		if err != nil {
-			h.logger.Errorw("failed to send the event", zap.Error(err))
+			h.logger.Errorw("Failed to send the event", zap.Error(err))
 		}
 	}
 

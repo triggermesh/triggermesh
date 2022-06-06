@@ -110,7 +110,7 @@ func (a *esAdapter) Start(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("failed to read info using Elasticsearch client: %v", err)
 		}
-		a.logger.Info("Connected to Elasticsearch: %s", string(info))
+		a.logger.Debug("Connected to Elasticsearch: %s", string(info))
 	}
 
 	return a.ceClient.StartReceiver(ctx, a.dispatch)

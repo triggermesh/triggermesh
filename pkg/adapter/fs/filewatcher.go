@@ -92,7 +92,7 @@ func (cw *fileWatcher) Start(ctx context.Context) {
 					cw.m.RLock()
 					cbs, ok := cw.watchedFiles[e.Name]
 					if !ok {
-						cw.logger.Warnf("Received a notification for a non watched file")
+						cw.logger.Warn("Received a notification for a non watched file")
 					}
 
 					for _, cb := range cbs {
@@ -105,11 +105,10 @@ func (cw *fileWatcher) Start(ctx context.Context) {
 						// watcher error channel finished
 						return
 					}
-					cw.logger.Error("Error watching files", zap.Error(err))
+					cw.logger.Errorw("Error watching files", zap.Error(err))
 
 				case <-ctx.Done():
-					//
-					cw.logger.Info("Exiting file watcher process")
+					cw.logger.Debug("Exiting file watcher process")
 					return
 				}
 			}

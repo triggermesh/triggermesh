@@ -116,25 +116,25 @@ func (a *adapter) Start(ctx context.Context) error {
 		resetBackoff := false
 		identities, err := a.getIdentities()
 		if err != nil {
-			a.logger.Error(err)
+			a.logger.Errorw("Unable to get identities", zap.Error(err))
 		}
 
 		datasets, err := a.getDatasets(identities)
 		if err != nil {
-			a.logger.Error(err)
+			a.logger.Errorw("Unable to get datasets", zap.Error(err))
 		}
 
 		for _, dataset := range datasets {
 			resetBackoff = true
 			records, err := a.getRecords(dataset)
 			if err != nil {
-				a.logger.Error(err)
+				a.logger.Errorw("Unable to get records", zap.Error(err))
 				continue
 			}
 
 			err = a.sendCognitoEvent(ctx, dataset, records)
 			if err != nil {
-				a.logger.Errorf("SendCloudEvent failed: %v", err)
+				a.logger.Errorw("Failed to send the event", zap.Error(err))
 			}
 		}
 		return resetBackoff, nil
@@ -222,7 +222,7 @@ func (a *adapter) getRecords(dataset *cognitosync.Dataset) ([]*cognitosync.Recor
 }
 
 func (a *adapter) sendCognitoEvent(ctx context.Context, dataset *cognitosync.Dataset, records []*cognitosync.Record) error {
-	a.logger.Info("Processing Dataset: ", *dataset.DatasetName)
+	a.logger.Debugf("Processing Dataset: %s", *dataset.DatasetName)
 
 	data := &CognitoIdentitySyncEvent{
 		CreationDate:     dataset.CreationDate,

@@ -237,7 +237,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	<-ctx.Done()
 	cancel()
 
-	a.logger.Info("Waiting for message handlers to terminate")
+	a.logger.Debug("Waiting for message handlers to terminate")
 	wg.Wait()
 
 	return nil

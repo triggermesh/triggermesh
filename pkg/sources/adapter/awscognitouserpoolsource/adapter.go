@@ -125,7 +125,7 @@ func (a *adapter) Start(ctx context.Context) error {
 		resetBackoff := false
 		users, err := a.listUsers()
 		if err != nil {
-			a.logger.Errorf("Cognito ListUsers failed: %v", err)
+			a.logger.Errorw("Cognito ListUsers failed", zap.Error(err))
 			return resetBackoff, err
 		}
 
@@ -136,7 +136,7 @@ func (a *adapter) Start(ctx context.Context) error {
 			resetBackoff = true
 			err := a.sendCognitoEvent(ctx, user)
 			if err != nil {
-				a.logger.Errorf("Failed to send cloudevent: %v", err)
+				a.logger.Errorw("Failed to send CloudEvent", zap.Error(err))
 			}
 		}
 		return resetBackoff, nil

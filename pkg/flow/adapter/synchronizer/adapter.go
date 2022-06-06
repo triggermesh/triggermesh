@@ -18,6 +18,7 @@ package synchronizer
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -125,18 +126,18 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 
 	select {
 	case err := <-sendErr:
-		a.logger.Errorf("Unable to forward the request: %v", err)
+		a.logger.Errorw("Unable to forward the request", zap.Error(err))
 		return nil, cloudevents.NewHTTPResult(http.StatusBadRequest, "unable to forward the request: %v", err)
 	case result := <-respChan:
 		if result == nil {
-			a.logger.Errorf("No response from %q", correlationID)
+			a.logger.Errorw("No response", zap.Error(fmt.Errorf("response channel with ID %q is closed", correlationID)))
 			return nil, cloudevents.NewHTTPResult(http.StatusInternalServerError, "failed to communicate the response")
 		}
 		a.logger.Debugf("Received response for %q", correlationID)
 		res := a.withBridgeIdentifier(result)
 		return &res, cloudevents.ResultACK
 	case <-time.After(a.responseTimeout):
-		a.logger.Errorf("Request %q timed out", correlationID)
+		a.logger.Errorw("Request time out", zap.Error(fmt.Errorf("request %q did not receive backend response in time", correlationID)))
 		return nil, cloudevents.NewHTTPResult(http.StatusGatewayTimeout, "backend did not respond in time")
 	}
 }
@@ -147,18 +148,17 @@ func (a *adapter) serveResponse(ctx context.Context, correlationID string, event
 
 	responseChan, exists := a.sessions.get(correlationID)
 	if !exists {
-		a.logger.Errorf("Session for %q does not exist", correlationID)
+		a.logger.Errorw("Session not found", zap.Error(fmt.Errorf("client session with ID %q does not exist", correlationID)))
 		return nil, cloudevents.NewHTTPResult(http.StatusBadGateway, "client session does not exist")
 	}
 
 	a.logger.Debugf("Forwarding response %q", correlationID)
-
 	select {
 	case responseChan <- &event:
 		a.logger.Debugf("Response %q completed", correlationID)
 		return nil, cloudevents.ResultACK
 	default:
-		a.logger.Errorf("Unable to forward the response %q", correlationID)
+		a.logger.Errorw("Unable to forward the response", zap.Error(fmt.Errorf("client connection with ID %q is closed", correlationID)))
 		return nil, cloudevents.NewHTTPResult(http.StatusBadGateway, "client connection is closed")
 	}
 }

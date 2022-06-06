@@ -269,14 +269,14 @@ func (b *bayeux) Start(ctx context.Context) error {
 
 func (b *bayeux) manageMeta(cr *ConnectResponse) {
 	if cr.Successful {
-		b.logger.Infof("meta channel (channel: %s client: %s) ok", cr.Channel, cr.ClientID)
+		b.logger.Debugf("Meta channel (channel: %s client: %s) ok", cr.Channel, cr.ClientID)
 		return
 	}
 
 	b.logger.Warnf("meta channel (channel: %s client: %s) was not successful: %+v", cr.Channel, cr.ClientID, *cr)
 
 	if cr.Advice.Reconnect == "handshake" {
-		b.logger.Infof("marking handshake needed as advised by channel response")
+		b.logger.Debug("Marking handshake needed as advised by channel response")
 		b.mutex.Lock()
 		defer b.mutex.Unlock()
 		b.needsHandshake = true

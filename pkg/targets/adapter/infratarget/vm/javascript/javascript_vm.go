@@ -75,7 +75,7 @@ func New(script string, timeout time.Duration, logger *zap.SugaredLogger) vm.Inf
 			o := otto.New()
 			o.Interrupt = make(chan func(), 1)
 			if err := o.Set("log", vmLogger(logger)); err != nil {
-				logger.Errorf("could not inject logger inside virtual machine: %v", err)
+				logger.Errorw("Could not inject logger inside virtual machine", zap.Error(err))
 			}
 			return o
 		},

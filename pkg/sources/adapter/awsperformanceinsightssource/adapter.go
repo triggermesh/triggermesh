@@ -104,7 +104,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	interval, err := time.ParseDuration(env.PollingInterval)
 	if err != nil {
-		logger.Panicf("Unable to parse interval duration: %v", zap.Error(err))
+		logger.Panicf("Unable to parse interval duration: %v", err)
 	}
 
 	var mql []*pi.MetricQuery
@@ -125,11 +125,11 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		},
 	})
 	if err != nil {
-		logger.Panicw("Unable to describe DB instances", zap.Error(err))
+		logger.Panicf("Unable to describe DB instances: %v", err)
 	}
 
 	if len(dbi.DBInstances) != 1 {
-		logger.Panic("DB instance not found: " + a.String())
+		logger.Panicf("DB instance %s not found", a.String())
 	}
 
 	resourceID := *dbi.DBInstances[0].DbiResourceId
@@ -194,7 +194,7 @@ func (a *adapter) PollMetrics(ctx context.Context, priorTime time.Time, currentT
 	rm, err := a.pIClient.GetResourceMetrics(rmi)
 
 	if err != nil {
-		a.logger.Errorf("retrieving resource metrics: %v", err)
+		a.logger.Errorw("Error retrieving resource metrics", zap.Error(err))
 		return
 	}
 
@@ -212,16 +212,16 @@ func (a *adapter) PollMetrics(ctx context.Context, priorTime time.Time, currentT
 				event.SetExtension("pimetric", d.Key.Metric)
 				ceer := event.SetData(cloudevents.ApplicationJSON, e)
 				if ceer != nil {
-					a.logger.Errorf("failed to set event data: %v", err)
+					a.logger.Errorw("Failed to set event data", zap.Error(err))
 					return
 				}
 
 				if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-					a.logger.Errorf("failed to send event data: %v", err)
+					a.logger.Errorw("Failed to send event data", zap.Error(err))
 					return
 				}
 
-				a.logger.Debug("Sent Cloudevent Sucessfully")
+				a.logger.Debug("Sent Cloudevent Successfully")
 			}
 		}
 	}

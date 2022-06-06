@@ -81,13 +81,13 @@ func (h *slackEventAPIHandler) Start(ctx context.Context) error {
 	done := make(chan bool, 1)
 	go h.gracefulShutdown(ctx.Done(), done)
 
-	h.logger.Infof("Server is ready to handle requests at %s", h.srv.Addr)
+	h.logger.Debugf("Server is ready to handle requests at %s", h.srv.Addr)
 	if err := h.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("could not listen on %s: %w", h.srv.Addr, err)
 	}
 
 	<-done
-	h.logger.Infof("Server stopped")
+	h.logger.Debug("Server stopped")
 	return nil
 }
 
@@ -151,7 +151,7 @@ func (h *slackEventAPIHandler) handleAll(ctx context.Context) http.HandlerFunc {
 
 func (h *slackEventAPIHandler) gracefulShutdown(stopCh <-chan struct{}, done chan<- bool) {
 	<-stopCh
-	h.logger.Info("Server is shutting down...")
+	h.logger.Debug("Server is shutting down...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -169,7 +169,7 @@ func (h *slackEventAPIHandler) handleError(err error, code int, w http.ResponseW
 }
 
 func (h *slackEventAPIHandler) handleChallenge(body []byte, w http.ResponseWriter) {
-	h.logger.Info("Challenge received")
+	h.logger.Debug("Challenge received")
 	c := &SlackChallenge{}
 
 	err := json.Unmarshal(body, c)
@@ -194,7 +194,7 @@ func (h *slackEventAPIHandler) handleChallenge(body []byte, w http.ResponseWrite
 }
 
 func (h *slackEventAPIHandler) handleCallback(ctx context.Context, wrapper *SlackEventWrapper, w http.ResponseWriter) {
-	h.logger.Info("callback received")
+	h.logger.Debug("Callback received")
 
 	event, err := cloudEventFromEventWrapper(wrapper)
 	if err != nil {

@@ -81,7 +81,7 @@ func (ccw *cachedFileWatcher) callback(path string) WatchCallback {
 		ccw.m.Lock()
 		defer ccw.m.Unlock()
 		if err := ccw.updateContentFromFile(path); err != nil {
-			ccw.logger.Error("Could not read watched file", zap.Error(err))
+			ccw.logger.Errorw("Could not read watched file", zap.Error(err))
 		}
 	}
 }

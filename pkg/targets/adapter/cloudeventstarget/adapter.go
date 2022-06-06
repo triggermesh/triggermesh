@@ -63,7 +63,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, listenC
 
 	ceAdapter := &ceAdapter{
 		listenClient: listenClient,
-		logger:       logging.FromContext(ctx),
+		logger:       logger,
 		m:            sync.RWMutex{},
 		sr:           metrics.MustNewEventProcessingStatsReporter(mt),
 	}

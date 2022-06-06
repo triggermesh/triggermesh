@@ -113,11 +113,11 @@ func (a *ibmmqsourceAdapter) eventHandler(ctx context.Context) mq.Handler {
 			contentType = cloudevents.ApplicationJSON
 		}
 		if err := event.SetData(contentType, data); err != nil {
-			a.logger.Errorf("Can't set Cloudevent data: %v", err)
+			a.logger.Errorw("Can't set Cloudevent data", zap.Error(err))
 			return err
 		}
 		if res := a.ceClient.Send(ctx, event); cloudevents.IsUndelivered(res) {
-			a.logger.Errorf("Cloudevent is not delivered: %v\n", res)
+			a.logger.Errorw("Cloudevent is not delivered", zap.Error(res))
 			return res
 		}
 		return nil

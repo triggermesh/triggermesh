@@ -101,7 +101,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		messagesURL: messagesURL,
 		ceClient:    ceClient,
 		eventsource: queueURL.String(),
-		logger:      logging.FromContext(ctx),
+		logger:      logger,
 		mt:          mt,
 	}
 }
@@ -129,7 +129,7 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 		// Create goroutines that can process messages in parallel
 		dmr, err := h.messagesURL.Dequeue(ctx, int32(concurrentMsgProcessing), 24*time.Hour)
 		if err != nil {
-			h.logger.Error(err)
+			h.logger.Errorw("Unable to retrieve the message", zap.Error(err))
 			continue
 		}
 
@@ -139,7 +139,7 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 			go func(msgCh <-chan *azqueue.DequeuedMessage) {
 
 				msg := <-msgCh // Get a message from the channel
-				h.logger.Infof("New msg [%v] in the channel!", msg.Text)
+				h.logger.Debugf("New msg [%v] in the channel!", msg.Text)
 				// Create a URL allowing you to manipulate this message.
 				// This returns a MessageIDURL object that wraps the this message's URL and a request pipeline (inherited from messagesURL)
 				msgIDURL := h.messagesURL.NewMessageIDURL(msg.ID)
@@ -147,21 +147,21 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 
 				update, err := msgIDURL.Update(ctx, popReceipt, time.Second*20, msg.Text)
 				if err != nil {
-					h.logger.Error(err)
+					h.logger.Errorw("Unable to update the message", zap.Error(err))
 					return
 				}
 				popReceipt = update.PopReceipt // Performing any operation on a message ID always requires the most recent pop receipt
 
 				err = h.sendCloudEvent(ctx, msg)
 				if err != nil {
-					h.logger.Error(err)
+					h.logger.Errorw("Unable to send the event", zap.Error(err))
 					return
 				}
 
 				// After processing the message, delete it from the queue so it won't be dequeued ever again:
 				_, err = msgIDURL.Delete(ctx, popReceipt)
 				if err != nil {
-					h.logger.Error(err)
+					h.logger.Errorw("Unable to delete the message", zap.Error(err))
 					return
 				}
 			}(msgCh)

@@ -166,7 +166,7 @@ func (t *tektonAdapter) submitPipelineRun(ctx context.Context, msg *tektonMsg, i
 		return fmt.Errorf("error generating pipeline run job: %w", err)
 	}
 
-	t.logger.Infof("Pipeline submitted as: %+v", runJob)
+	t.logger.Debugf("Pipeline submitted as: %+v", runJob)
 	return cloudevents.ResultACK
 }
 
@@ -188,7 +188,7 @@ func (t *tektonAdapter) submitTaskRun(ctx context.Context, msg *tektonMsg, id st
 		return fmt.Errorf("error generating task run job: %w", err)
 	}
 
-	t.logger.Infof("Task submitted as: %+v", runJob)
+	t.logger.Debugf("Task submitted as: %+v", runJob)
 	return cloudevents.ResultACK
 }
 
@@ -234,7 +234,7 @@ func (t *tektonAdapter) reapRuns(ctx context.Context) cloudevents.Result {
 				}
 			}
 
-			t.logger.Info("Reaping taskrun: ", v.Name)
+			t.logger.Debug("Reaping taskrun: ", v.Name)
 			if err := t.tektonClient.TektonV1beta1().TaskRuns(t.namespace).Delete(ctx, v.Name, metav1.DeleteOptions{}); err != nil {
 				return fmt.Errorf("error unable to delete task run object %q: %w", v.Name, err)
 			}
@@ -260,7 +260,7 @@ func (t *tektonAdapter) reapRuns(ctx context.Context) cloudevents.Result {
 				}
 			}
 
-			t.logger.Info("Reaping pipelinerun: ", v.Name)
+			t.logger.Debug("Reaping pipelinerun: ", v.Name)
 			if err := t.tektonClient.TektonV1beta1().PipelineRuns(t.namespace).Delete(ctx, v.Name, metav1.DeleteOptions{}); err != nil {
 				return fmt.Errorf("error unable to delete pipeline run object %q: %w", v.Name, err)
 			}

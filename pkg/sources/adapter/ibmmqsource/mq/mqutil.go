@@ -154,7 +154,7 @@ func (q *Object) RegisterCallback(f Handler, delivery Delivery, logger *zap.Suga
 			return
 		}
 		if mqRet.MQCC != ibmmq.MQCC_OK {
-			logger.Errorf("Callback received unexpected status: %s", mqRet.Error())
+			logger.Errorw("Callback received unexpected status", zap.Error(mqRet))
 			return
 		}
 		cid := strings.TrimFunc(string(mqMD.CorrelId), func(r rune) bool {
@@ -163,24 +163,24 @@ func (q *Object) RegisterCallback(f Handler, delivery Delivery, logger *zap.Suga
 
 		err := f(data, cid)
 		if err != nil {
-			logger.Errorf("Callback execution error: %v", err)
+			logger.Errorw("Callback execution error", zap.Error(err))
 			if mqMD.BackoutCount >= int32(delivery.Retry) {
 				if delivery.DeadLetterQueue == "" {
 					logger.Infof("Dead-letter queue is not set, discarding poisoned message %q", string(mqMD.MsgId))
 				} else if err := q.sendToDLQ(data, mqMD); err != nil {
-					logger.Errorf("Failed to forward the message to DLQ, discarding: %v", err)
+					logger.Errorw("Failed to forward the message to DLQ, discarding", zap.Error(err))
 				}
 				mqConn.Cmit()
 				return
 			}
 			if err := mqConn.Back(); err != nil {
-				logger.Errorf("Backout failed: %v", err)
+				logger.Errorw("Backout failed", zap.Error(err))
 			}
 			return
 		}
 
 		if err := mqConn.Cmit(); err != nil {
-			logger.Errorf("Commit failed: %v", err)
+			logger.Errorf("Commit failed", zap.Error(err))
 		}
 	}
 
