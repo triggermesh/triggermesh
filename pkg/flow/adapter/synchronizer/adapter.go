@@ -130,7 +130,7 @@ func (a *adapter) serveRequest(ctx context.Context, correlationID string, event 
 		return nil, cloudevents.NewHTTPResult(http.StatusBadRequest, "unable to forward the request: %v", err)
 	case result := <-respChan:
 		if result == nil {
-			a.logger.Errorw("No response", fmt.Errorf("response channel with ID %q is closed", correlationID))
+			a.logger.Errorw("No response", zap.Error(fmt.Errorf("response channel with ID %q is closed", correlationID)))
 			return nil, cloudevents.NewHTTPResult(http.StatusInternalServerError, "failed to communicate the response")
 		}
 		a.logger.Debugf("Received response for %q", correlationID)
