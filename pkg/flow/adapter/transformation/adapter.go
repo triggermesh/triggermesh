@@ -124,7 +124,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 // Start runs CloudEvent receiver and applies transformation Pipeline
 // on incoming events.
 func (t *adapter) Start(ctx context.Context) error {
-	t.logger.Info("Starting CloudEvent receiver")
+	t.logger.Info("Starting Transformation adapter")
 
 	var receiver interface{}
 	receiver = t.receiveAndReply
@@ -186,8 +186,8 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality
 	if !strings.Contains(event.DataContentType(), cloudevents.ApplicationJSON) {
-		t.logger.Errorf("CE Content Type %q is not supported", event.DataContentType())
-		return nil, fmt.Errorf("CE Content Type %q is not supported", event.DataContentType())
+		t.logger.Errorw("Bad Content-Type", fmt.Errorf("%q content-type is not supported", event.DataContentType()))
+		return nil, fmt.Errorf("CE Content-Type %q is not supported", event.DataContentType())
 	}
 
 	localContext := ceContext{
@@ -197,52 +197,52 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 
 	localContextBytes, err := json.Marshal(localContext)
 	if err != nil {
-		t.logger.Errorf("Cannot encode CE context: %v", err)
+		t.logger.Errorw("Cannot encode CE context", zap.Error(err))
 		return nil, fmt.Errorf("cannot encode CE context: %w", err)
 	}
 
 	// init indicates if we need to run initial step transformation
 	var init = true
-	var errs []string
+	var errs []error
 
 	// Run init step such as load Pipeline variables first
 	eventContext, err := t.ContextPipeline.apply(localContextBytes, init)
 	if err != nil {
-		errs = append(errs, err.Error())
+		errs = append(errs, err)
 	}
 	eventPayload, err := t.DataPipeline.apply(event.Data(), init)
 	if err != nil {
-		errs = append(errs, err.Error())
+		errs = append(errs, err)
 	}
 
 	// CE Context transformation
 	if eventContext, err = t.ContextPipeline.apply(eventContext, !init); err != nil {
-		errs = append(errs, err.Error())
+		errs = append(errs, err)
 	}
 	if err := json.Unmarshal(eventContext, &localContext); err != nil {
-		t.logger.Errorf("Cannot decode CE new context: %v", err)
+		t.logger.Errorw("Cannot decode CE new context", zap.Error(err))
 		return nil, fmt.Errorf("cannot decode CE new context: %w", err)
 	}
 	event.Context = localContext
 	for k, v := range localContext.Extensions {
 		if err := event.Context.SetExtension(k, v); err != nil {
-			t.logger.Errorf("Cannot set CE extension: %v", err)
+			t.logger.Errorw("Cannot set CE extension", zap.Error(err))
 			return nil, fmt.Errorf("cannot set CE extension: %w", err)
 		}
 	}
 
 	// CE Data transformation
 	if eventPayload, err = t.DataPipeline.apply(eventPayload, !init); err != nil {
-		errs = append(errs, err.Error())
+		errs = append(errs, err)
 	}
 	if err = event.SetData(cloudevents.ApplicationJSON, eventPayload); err != nil {
-		t.logger.Errorf("Cannot set CE data: %v", err)
+		t.logger.Errorw("Cannot set CE data", zap.Error(err))
 		return nil, fmt.Errorf("cannot set CE data: %w", err)
 	}
 	// Failed transformation operations should not stop event flow
 	// therefore, just log the errors
 	if len(errs) != 0 {
-		t.logger.Errorf("Event transformation errors: %s", strings.Join(errs, ","))
+		t.logger.Errorw("Event transformation errors", zap.Errors("errors", errs))
 	}
 
 	return &event, nil

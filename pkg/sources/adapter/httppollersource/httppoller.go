@@ -47,6 +47,8 @@ var _ pkgadapter.Adapter = (*httpPoller)(nil)
 // Start implements adapter.Adapter.
 // Runs the server for receiving HTTP events until ctx gets cancelled.
 func (h *httpPoller) Start(ctx context.Context) error {
+	h.logger.Info("Starting HTTP Poller source")
+
 	ctx = pkgadapter.ContextWithMetricTag(ctx, h.mt)
 
 	// initial request to avoid waiting for the first tick.
@@ -61,7 +63,7 @@ func (h *httpPoller) Start(ctx context.Context) error {
 		select {
 
 		case <-ctx.Done():
-			h.logger.Info("Shutting down HTTP poller")
+			h.logger.Debug("Shutting down HTTP poller")
 			return nil
 
 		case <-t.C:

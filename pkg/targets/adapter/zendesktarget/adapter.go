@@ -157,7 +157,7 @@ func (a *zendeskAdapter) createTicket(ctx context.Context, event cloudevents.Eve
 		return nil, res
 	}
 
-	a.logger.Info("Successfully created ticket #" + strconv.Itoa(int(nT.ID)))
+	a.logger.Debug("Successfully created ticket #" + strconv.Itoa(int(nT.ID)))
 	return re, cloudevents.ResultACK
 }
 
@@ -195,7 +195,7 @@ func (a *zendeskAdapter) tagTicket(ctx context.Context, event cloudevents.Event)
 		return nil, res
 	}
 
-	a.logger.Info("Successfully updated tag on ticket #" + strconv.Itoa(int(nT.ID)))
+	a.logger.Debug("Successfully updated tag on ticket #" + strconv.Itoa(int(nT.ID)))
 	return re, cloudevents.ResultACK
 }
 
@@ -205,7 +205,7 @@ func (a *zendeskAdapter) updateTag(ctx context.Context, ticket zendesk.Ticket, t
 
 	uT, err := a.zclient.UpdateTicket(ctx, ticket.ID, ticket)
 	if err != nil {
-		a.logger.Errorw("An error has occurred updating the tag")
+		a.logger.Errorw("An error has occurred updating the tag", zap.Error(err))
 		return ticket, err
 	}
 

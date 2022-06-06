@@ -77,7 +77,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		env.ConnectionString,
 	)
 	if err != nil {
-		logger.Fatal("Failed to obtain IoT client", zap.Error(err))
+		logger.Fatalw("Failed to obtain IoT client", zap.Error(err))
 	}
 
 	return &adapter{

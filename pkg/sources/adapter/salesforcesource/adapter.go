@@ -127,18 +127,18 @@ func (e *eventDispatcher) DispatchEvent(ctx context.Context, msg *sfclient.Conne
 	event.SetID(uuid.New().String())
 	event.SetSubject(subjectNameFromConnectResponse(msg))
 	if err := event.SetData(cloudevents.ApplicationJSON, msg.Data); err != nil {
-		e.logger.Error("Failed to set event data: %w", err)
+		e.logger.Errorw("Failed to set event data", zap.Error(err))
 		return
 	}
 
 	if result := e.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-		e.logger.Errorf("Could not send CloudEvent %s: %v", event.Subject(), result)
+		e.logger.Errorw("Could not send CloudEvent", zap.Error(result))
 		return
 	}
 }
 
 func (e *eventDispatcher) DispatchError(err error) {
-	e.logger.Errorf("Error receiving events: %v", err)
+	e.logger.Errorw("Error receiving events", zap.Error(err))
 }
 
 func subjectNameFromConnectResponse(msg *sfclient.ConnectResponse) string {

@@ -232,11 +232,11 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 	}
 
 	event.SetType(event.Type() + ".response")
-	a.logger.Infof("responding with transformed event: %v", event.Type())
+	a.logger.Debugf("Responding with transformed event: %s", event.Type())
 	if a.sink != "" {
 		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 			a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
-			a.logger.Errorf("Error sending event to sink: %v", result)
+			a.logger.Errorw("Error sending event to sink", zap.Error(result))
 		}
 		a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 		return nil, cloudevents.ResultACK

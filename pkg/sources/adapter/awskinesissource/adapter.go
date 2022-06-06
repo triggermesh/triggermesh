@@ -208,7 +208,7 @@ func (a *adapter) processInputs(inputs []kinesis.GetRecordsInput) ([]*kinesis.Re
 }
 
 func (a *adapter) sendKinesisRecord(ctx context.Context, record *kinesis.Record) error {
-	a.logger.Infof("Processing record ID: %s", *record.SequenceNumber)
+	a.logger.Debugf("Processing record ID: %s", *record.SequenceNumber)
 
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetType(v1alpha1.AWSEventType(a.arn.Service, v1alpha1.AWSKinesisGenericEventType))

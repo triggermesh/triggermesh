@@ -167,7 +167,7 @@ loop:
 		}
 	}
 
-	a.logger.Info("Waiting for termination of records processors")
+	a.logger.Debug("Waiting for termination of records processors")
 	a.wg.Wait()
 
 	return nil
@@ -258,14 +258,14 @@ func (a *adapter) ensureRecordsProcessor(ctx context.Context, streamARN *string,
 		defer a.processors.Delete(*shardID)
 		defer a.wg.Done()
 
-		a.logger.Info("Starting records processor for shard ID ", *shardID)
+		a.logger.Debug("Starting records processor for shard ID ", *shardID)
 
 		if err := a.runRecordsProcessor(ctx, streamARN, shardID); err != nil {
 			a.logger.Errorw("Records processor for shard ID "+*shardID+" returned with error", zap.Error(err))
 			return
 		}
 
-		a.logger.Info("Records processor for shard ID " + *shardID + " has stopped")
+		a.logger.Debug("Records processor for shard ID " + *shardID + " has stopped")
 	}()
 }
 
@@ -326,7 +326,7 @@ loop:
 			// sealed (marked as READ_ONLY), which happens on
 			// average every 4 hours.
 			if currentShardIter == nil {
-				a.logger.Info("Shard ID ", *shardID, " got sealed")
+				a.logger.Debug("Shard ID ", *shardID, " got sealed")
 				break loop
 			}
 

@@ -156,7 +156,7 @@ func (a *confluentAdapter) dispatch(event cloudevents.Event) cloudevents.Result 
 	m := r.(*kafka.Message)
 
 	if m.TopicPartition.Error != nil {
-		a.logger.Infof("Message delivery failed: %v", m.TopicPartition.Error)
+		a.logger.Errorw("Message delivery failed", zap.Error(m.TopicPartition.Error))
 		return cloudevents.ResultNACK
 	}
 
@@ -168,7 +168,7 @@ func (a *confluentAdapter) dispatch(event cloudevents.Event) cloudevents.Result 
 
 //ensureTopic creates a topic if missing
 func (a *confluentAdapter) ensureTopic(ctx context.Context, topic string) error {
-	a.logger.Infof("Ensuring topic %q", topic)
+	a.logger.Debug("Ensuring topic %q", topic)
 
 	adminClient, err := a.kafkaClient.CreateKafkaAdminClient()
 	if err != nil {
@@ -196,7 +196,7 @@ func (a *confluentAdapter) ensureTopic(ctx context.Context, topic string) error 
 
 	switch t.Error.Code() {
 	case kafka.ErrNoError:
-		a.logger.Infof("Topic found: %q with %d partitions", t.Topic, len(t.Partitions))
+		a.logger.Debug("Topic found: %q with %d partitions", t.Topic, len(t.Partitions))
 		return nil
 	case kafka.ErrUnknownTopic, kafka.ErrUnknownTopicOrPart:
 		// topic does not exists, we need to create it.
@@ -204,7 +204,7 @@ func (a *confluentAdapter) ensureTopic(ctx context.Context, topic string) error 
 		return fmt.Errorf("topic %q metadata returned inexpected status: %w", a.topic, t.Error)
 	}
 
-	a.logger.Infof("Creating topic %q", topic)
+	a.logger.Debug("Creating topic %q", topic)
 	results, err := adminClient.CreateTopics(ctx, ts, kafka.SetAdminOperationTimeout(time.Duration(a.topicTimeout)*time.Millisecond))
 	if err != nil {
 		return fmt.Errorf("error creating topic %q: %w", a.topic, err)

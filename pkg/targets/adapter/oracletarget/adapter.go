@@ -85,7 +85,7 @@ func (a *oracleAdapter) Start(ctx context.Context) error {
 	// Need to obtain the function endpoint, and then create the client
 	mgmtClient, err := functions.NewFunctionsManagementClientWithConfigurationProvider(a.provider)
 	if err != nil {
-		a.logger.Errorw("failed to initialize oracle functions mgmt client", zap.Error(err))
+		a.logger.Errorw("Failed to initialize oracle functions mgmt client", zap.Error(err))
 		return err
 	}
 	a.mgmtClient = mgmtClient
@@ -96,7 +96,7 @@ func (a *oracleAdapter) Start(ctx context.Context) error {
 
 	funcResponse, err := mgmtClient.GetFunction(ctx, funcRequest)
 	if err != nil {
-		a.logger.Errorw("failed to obtain functions metadata ", zap.Error(err))
+		a.logger.Errorw("Failed to obtain functions metadata ", zap.Error(err))
 		return err
 	}
 	a.funcMetadata = funcResponse
@@ -123,12 +123,12 @@ func (a *oracleAdapter) dispatch(ctx context.Context, event cloudevents.Event) (
 
 	response, err := a.fnClient.InvokeFunction(ctx, request)
 	if err != nil {
-		a.logger.Errorw("error invoking function", zap.Error(err))
+		a.logger.Errorw("Error invoking function", zap.Error(err))
 		return nil, cloudevents.ResultNACK
 	}
 
 	if response.HTTPResponse().StatusCode != http.StatusOK {
-		a.logger.Errorf("invalid response status for function invocation: %d", response.HTTPResponse().Status)
+		a.logger.Errorf("Invalid response status for function invocation: %d", response.HTTPResponse().Status)
 		return nil, cloudevents.ResultNACK
 	}
 
@@ -136,7 +136,7 @@ func (a *oracleAdapter) dispatch(ctx context.Context, event cloudevents.Event) (
 
 	respBody, err := ioutil.ReadAll(response.Content)
 	if err != nil {
-		a.logger.Errorw("error extracting response from function", zap.Error(err))
+		a.logger.Errorw("Error extracting response from function", zap.Error(err))
 		return nil, cloudevents.ResultNACK
 	}
 
@@ -144,7 +144,7 @@ func (a *oracleAdapter) dispatch(ctx context.Context, event cloudevents.Event) (
 	responseEvent := cloudevents.NewEvent(cloudevents.VersionV1)
 	err = responseEvent.SetData("application/json", respBody)
 	if err != nil {
-		a.logger.Errorw("error generating response event", zap.Error(err))
+		a.logger.Errorw("Error generating response event", zap.Error(err))
 		return nil, cloudevents.ResultNACK
 	}
 	responseEvent.SetType("functions.oracletargets.targets.triggermesh.io")

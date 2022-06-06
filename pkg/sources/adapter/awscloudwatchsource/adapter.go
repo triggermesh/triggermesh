@@ -182,7 +182,7 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	health.MarkReady()
 
-	a.logger.Info("Enabling CloudWatch")
+	a.logger.Info("Starting CloudWatch adapter")
 
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
@@ -221,7 +221,7 @@ func (a *adapter) CollectMetrics(ctx context.Context, priorTime *time.Time, curr
 	err := a.cwClient.GetMetricDataPages(&metricInput, func(output *cloudwatch.GetMetricDataOutput, b bool) bool {
 		err := a.SendMetricEvent(ctx, output)
 		if err != nil {
-			a.logger.Errorf("error sending metrics: %v", zap.Error(err))
+			a.logger.Errorw("Error sending metrics", zap.Error(err))
 			return false
 		}
 
@@ -229,7 +229,7 @@ func (a *adapter) CollectMetrics(ctx context.Context, priorTime *time.Time, curr
 		return !b
 	})
 	if err != nil {
-		a.logger.Errorf("error retrieving metrics: %v", zap.Error(err))
+		a.logger.Errorw("Error retrieving metrics", zap.Error(err))
 		return
 	}
 }

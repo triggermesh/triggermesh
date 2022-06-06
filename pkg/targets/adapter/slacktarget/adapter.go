@@ -96,7 +96,7 @@ func (t *slackAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 
 	et := event.Type()
 	if !strings.HasPrefix(et, eventTypePrefix) {
-		t.logger.Errorf("Unsupported event type %q", et)
+		t.logger.Errorw("Unsupported event type", zap.String("error", "event type is not supported: "+et))
 		return cloudevents.ResultNACK
 	}
 
@@ -112,7 +112,7 @@ func (t *slackAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 	}
 
 	if !res.IsOK() {
-		t.logger.Errorf("Request failed: %s", res.Error())
+		t.logger.Errorw("Request failed", zap.String("error", res.Error()))
 		return cloudevents.ResultNACK
 	}
 

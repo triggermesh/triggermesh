@@ -199,7 +199,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	health.MarkReady()
 
 	<-ctx.Done()
-	a.logger.Info("Terminating all active Event Hub message receivers")
+	a.logger.Debug("Terminating all active Event Hub message receivers")
 
 	closeCtx, cancel := context.WithTimeout(context.Background(), drainTimeout)
 	defer cancel()

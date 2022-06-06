@@ -146,7 +146,7 @@ func (a *adapter) Start(ctx context.Context) error {
 
 	health.MarkReady()
 
-	a.logger.Info("Enabling CloudWatchLog")
+	a.logger.Info("Starting CloudWatch Log adapter")
 
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
@@ -225,12 +225,12 @@ func (a *adapter) CollectLogs(ctx context.Context, priorTime *time.Time, current
 
 					err := event.SetData(cloudevents.ApplicationJSON, v)
 					if err != nil {
-						a.logger.Errorf("failed to set event data: %v", err)
+						a.logger.Errorw("Failed to set event data", zap.Error(err))
 						return false
 					}
 
 					if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-						a.logger.Errorf("failed to send event data: %v", err)
+						a.logger.Errorw("Failed to send event", zap.Error(err))
 						return false
 					}
 				}
@@ -239,7 +239,7 @@ func (a *adapter) CollectLogs(ctx context.Context, priorTime *time.Time, current
 			})
 
 			if err != nil {
-				a.logger.Errorf("error retrieving logs: %v", zap.Error(err))
+				a.logger.Errorw("Error retrieving logs", zap.Error(err))
 			}
 		}
 
@@ -247,7 +247,7 @@ func (a *adapter) CollectLogs(ctx context.Context, priorTime *time.Time, current
 	})
 
 	if err != nil {
-		a.logger.Errorf("error retrieving log streams: %v", zap.Error(err))
+		a.logger.Errorw("Error retrieving log streams", zap.Error(err))
 	}
 }
 

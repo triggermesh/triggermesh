@@ -96,7 +96,7 @@ func (o *ociMetricsAPIHandler) Start(ctx context.Context) error {
 	// handle stop signals
 	go func() {
 		<-ctx.Done()
-		o.logger.Info("Shutdown signal received. Terminating")
+		o.logger.Debug("Shutdown signal received. Terminating")
 		metricsCh <- true
 		cancel()
 	}()

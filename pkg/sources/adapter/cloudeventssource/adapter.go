@@ -63,7 +63,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 		cfw:      cfw,
 		ceClient: ceClient,
-		logger:   logging.FromContext(ctx),
+		logger:   logger,
 		mt:       mt,
 	}
 

@@ -102,7 +102,7 @@ func (a *infraAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*
 	if a.preProcessHeaders != nil {
 		if err = a.preProcessHeaders(&event); err != nil {
 			r := cloudevents.NewHTTPResult(http.StatusInternalServerError, "Pre processing headers: %w", err)
-			a.logger.Error(r.Error())
+			a.logger.Errorw("Pre processing headers error", zap.Error(r))
 			return nil, r
 		}
 	}
@@ -113,7 +113,7 @@ func (a *infraAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*
 		out, err = a.vm.Exec(&event)
 		if err != nil {
 			r := cloudevents.NewHTTPResult(http.StatusInternalServerError, "Error executing script: %w", err)
-			a.logger.Error(r.Error())
+			a.logger.Errorw("Error executing script", zap.Error(r))
 			return nil, r
 		}
 	} else {
@@ -130,7 +130,7 @@ func (a *infraAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*
 	if a.typeLoopProtection {
 		if event.Type() == out.Type() {
 			r := cloudevents.NewHTTPResult(http.StatusInternalServerError, "incoming and outgoing CloudEvents have the same type %q. Skipping", event.Type())
-			a.logger.Error(r.Error())
+			a.logger.Errorw("CE type error", zap.Error(r))
 			return nil, r
 		}
 	}
@@ -140,8 +140,8 @@ func (a *infraAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*
 	// output as part of this process.
 	if a.postProcessHeaders != nil && out != nil {
 		if err = a.postProcessHeaders(&event, out); err != nil {
-			r := cloudevents.NewHTTPResult(http.StatusInternalServerError, "Pre processing headers: %w", err)
-			a.logger.Error(r.Error())
+			r := cloudevents.NewHTTPResult(http.StatusInternalServerError, "Post processing headers: %w", err)
+			a.logger.Errorw("Post processing headers", zap.Error(r))
 			return nil, r
 		}
 	}

@@ -106,7 +106,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		client:            client,
 
 		ceClient: ceClient,
-		logger:   logging.FromContext(ctx),
+		logger:   logger,
 
 		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
