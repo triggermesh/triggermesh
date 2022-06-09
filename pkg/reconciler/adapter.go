@@ -385,6 +385,10 @@ func adapterOverrideOptions(overrides *v1alpha1.AdapterOverrides) []resource.Obj
 		opts = append(opts, resource.Toleration(t))
 	}
 
+	for _, t := range overrides.Env {
+		opts = append(opts, resource.EnvVar(t.Name, t.Value))
+	}
+
 	return opts
 }
 
