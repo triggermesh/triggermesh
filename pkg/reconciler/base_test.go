@@ -18,6 +18,7 @@ package reconciler
 
 import (
 	"context"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"testing"
 	"time"
 
@@ -82,6 +83,13 @@ func TestEnqueueObjectsInNamespaceOf(t *testing.T) {
 
 	enqueued := popKeys(len(expectEnqueued), impl.WorkQueue())
 	assert.ElementsMatch(t, expectEnqueued, enqueued)
+}
+
+func TestAdapterOverrideOptions(t *testing.T) {
+	t.Run("overrideOptions", func(t *testing.T) {
+		objectOptions := adapterOverrideOptions(&v1alpha1.AdapterOverrides{Env: []corev1.EnvVar{{Name: "foo", Value: "bar"}}})
+		assert.Len(t, objectOptions, 2) // bad test
+	})
 }
 
 func TestHasAdapterLabelsForType(t *testing.T) {
