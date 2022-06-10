@@ -17,6 +17,16 @@ try:
           description: Kubernetes object parameters to apply on top of default adapter values.
           type: object
           properties:
+            env:
+              description: Adapter environment variables.
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  value:
+                    type: string
             public:
               description: Adapter visibility scope.
               type: boolean
