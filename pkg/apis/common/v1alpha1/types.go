@@ -44,4 +44,6 @@ type AdapterOverrides struct {
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
 	// Pod tolerations.
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+	// Environment variables applied on adapter container.
+	Env []corev1.EnvVar `json:"env,omitempty"`
 }
