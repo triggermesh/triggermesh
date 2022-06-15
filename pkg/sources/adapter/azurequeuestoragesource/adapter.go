@@ -171,9 +171,10 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 
 func (h *adapter) sendCloudEvent(ctx context.Context, m *azqueue.DequeuedMessage) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
+	event.SetID(m.ID.String())
 	event.SetType(v1alpha1.AzureQueueStorageEventType)
 	event.SetSource(h.eventsource)
-	if err := event.SetData(cloudevents.ApplicationJSON, m); err != nil {
+	if err := event.SetData(cloudevents.ApplicationJSON, []byte(m.Text)); err != nil {
 		return fmt.Errorf("failed to set event data: %w", err)
 	}
 
