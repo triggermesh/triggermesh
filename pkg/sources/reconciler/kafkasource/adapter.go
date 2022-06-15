@@ -105,7 +105,7 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVars(makeAppEnv(typedSrc)...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Volumes(secretVolumes...),
@@ -113,7 +113,9 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 	), nil
 }
 
-func makeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 	envs := []corev1.EnvVar{
 		{
 			Name:  envBootstrapServers,

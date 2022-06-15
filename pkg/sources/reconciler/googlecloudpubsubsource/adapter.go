@@ -45,22 +45,29 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.GoogleCloudPubSubSource)
 
+	return common.NewAdapterDeployment(src, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
+		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.GoogleCloudPubSubSource) []corev1.EnvVar {
 	// the user may or may not provide a Pub/Sub subscription ID in the
 	// source's spec, so the source's status is unfortunately our only
 	// source of truth here
 	var subsName string
-	if sn := typedSrc.Status.Subscription; sn != nil {
+	if sn := o.Status.Subscription; sn != nil {
 		subsName = sn.String()
 	}
 
-	var authEnvs []corev1.EnvVar
-	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvGCloudSAKey, typedSrc.Spec.ServiceAccountKey)
-
-	return common.NewAdapterDeployment(src, sinkURI,
-		resource.Image(r.adapterCfg.Image),
-
-		resource.EnvVar(common.EnvGCloudPubSubSubscription, subsName),
-		resource.EnvVars(authEnvs...),
-		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	), nil
+	return append(common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, o.Spec.ServiceAccountKey),
+		corev1.EnvVar{
+			Name:  common.EnvGCloudPubSubSubscription,
+			Value: subsName,
+		},
+	)
 }

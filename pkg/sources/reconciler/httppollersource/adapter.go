@@ -63,12 +63,14 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVars(makeHTTPPollerEnvs(typedSrc)...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
 }
 
-func makeHTTPPollerEnvs(src *v1alpha1.HTTPPollerSource) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(src *v1alpha1.HTTPPollerSource) []corev1.EnvVar {
 	skipVerify := false
 	if src.Spec.SkipVerify != nil {
 		skipVerify = *src.Spec.SkipVerify

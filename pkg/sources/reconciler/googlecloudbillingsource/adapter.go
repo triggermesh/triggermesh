@@ -48,25 +48,38 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.GoogleCloudBillingSource)
 
-	// we rely on the source's status to persist the ID of the Pub/Sub subscription
-	var subsName string
-	if sn := typedSrc.Status.Subscription; sn != nil {
-		subsName = sn.String()
-	}
-
-	var authEnvs []corev1.EnvVar
-	authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvGCloudSAKey, typedSrc.Spec.ServiceAccountKey)
-
-	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
-
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvGCloudPubSubSubscription, subsName),
-		resource.EnvVars(authEnvs...),
-		resource.EnvVar(common.EnvCESource, src.(commonv1alpha1.EventSource).AsEventSource()),
-		resource.EnvVar(common.EnvCEType, v1alpha1.GoogleCloudBillingGenericEventType),
-		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.GoogleCloudBillingSource) []corev1.EnvVar {
+	// we rely on the source's status to persist the ID of the Pub/Sub subscription
+	var subsName string
+	if sn := o.Status.Subscription; sn != nil {
+		subsName = sn.String()
+	}
+
+	return append(common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, o.Spec.ServiceAccountKey),
+		[]corev1.EnvVar{
+			{
+				Name:  common.EnvGCloudPubSubSubscription,
+				Value: subsName,
+			}, {
+				Name:  common.EnvCESource,
+				Value: o.AsEventSource(),
+			}, {
+				Name:  common.EnvCEType,
+				Value: v1alpha1.GoogleCloudBillingGenericEventType,
+			}, {
+				Name:  adapter.EnvConfigCEOverrides,
+				Value: cloudevents.OverridesJSON(o.Spec.CloudEventOverrides),
+			},
+		}...,
+	)
 }

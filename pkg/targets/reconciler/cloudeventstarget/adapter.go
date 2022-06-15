@@ -81,7 +81,7 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 	}
 
 	options = append(options,
-		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(MakeAppEnv(typedTrg)...),
 		// make sure that a non optional parameter is located as the last element
 		// to avoid derivative comparison issues when the environment variables
 		// tail element is removed.
@@ -92,7 +92,9 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 	return common.NewAdapterKnService(trg, nil, options...), nil
 }
 
-func makeAppEnv(o *v1alpha1.CloudEventsTarget) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.CloudEventsTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  envCloudEventsURL,

@@ -18,6 +18,7 @@ package awseventbridgesource
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
@@ -50,24 +51,40 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AWSEventBridgeSource)
 
-	// the user may or may not provide a queue ARN in the source's spec, so
-	// the source's status is unfortunately our only source of truth here
-	var queueARN string
-	if qa := typedSrc.Status.QueueARN; qa != nil {
-		queueARN = qa.String()
-	}
-
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvARN, queueARN),
-		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
-		resource.EnvVar(envMessageProcessor, "eventbridge"),
-		resource.EnvVar(common.EnvCESource, src.(commonv1alpha1.EventSource).AsEventSource()),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
 
 		resource.StartupProbe("/health", healthPortName),
 	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AWSEventBridgeSource) []corev1.EnvVar {
+	// the user may or may not provide a queue ARN in the source's spec, so
+	// the source's status is unfortunately our only source of truth here
+	var queueARN string
+	if qa := o.Status.QueueARN; qa != nil {
+		queueARN = qa.String()
+	}
+
+	return append(reconciler.MakeAWSAuthEnvVars(o.Spec.Auth),
+		[]corev1.EnvVar{
+			{
+				Name:  common.EnvARN,
+				Value: queueARN,
+			}, {
+				Name:  envMessageProcessor,
+				Value: "eventbridge",
+			}, {
+				Name:  common.EnvCESource,
+				Value: o.AsEventSource(),
+			},
+		}...,
+	)
 }

@@ -52,33 +52,47 @@ var _ common.AdapterBuilder[*servingv1.Service] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) (*servingv1.Service, error) {
 	typedTrg := trg.(*v1alpha1.AzureEventHubsTarget)
 
-	var envs []corev1.EnvVar
+	return common.NewAdapterKnService(trg, nil,
+		resource.Image(r.adapterCfg.Image),
 
-	if sasAuth := typedTrg.Spec.Auth.SASToken; sasAuth != nil {
+		resource.EnvVars(MakeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureEventHubsTarget) []corev1.EnvVar {
+	envs := []corev1.EnvVar{
+		{
+			Name:  common.EnvHubNamespace,
+			Value: o.Spec.EventHubID.Namespace,
+		}, {
+			Name:  common.EnvHubName,
+			Value: o.Spec.EventHubID.EventHub,
+		}, {
+			Name:  envDiscardCECtx,
+			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
+		},
+	}
+
+	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
 		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyName, sasAuth.KeyName)
 		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyValue, sasAuth.KeyValue)
 		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubConnStr, sasAuth.ConnectionString)
 	}
 
-	if spAuth := typedTrg.Spec.Auth.ServicePrincipal; spAuth != nil {
+	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
 		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADTenantID, spAuth.TenantID)
 		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADClientID, spAuth.ClientID)
 		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
-	if typedTrg.Spec.EventOptions != nil && typedTrg.Spec.EventOptions.PayloadPolicy != nil {
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		envs = append(envs, corev1.EnvVar{
 			Name:  envEventsPayloadPolicy,
-			Value: string(*typedTrg.Spec.EventOptions.PayloadPolicy),
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
 		})
 	}
-
-	return common.NewAdapterKnService(trg, nil,
-		resource.Image(r.adapterCfg.Image),
-		resource.EnvVar(common.EnvHubNamespace, typedTrg.Spec.EventHubID.Namespace),
-		resource.EnvVar(common.EnvHubName, typedTrg.Spec.EventHubID.EventHub),
-		resource.EnvVar(envDiscardCECtx, strconv.FormatBool(typedTrg.Spec.DiscardCEContext)),
-		resource.EnvVars(envs...),
-		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
-	), nil
+	return envs
 }

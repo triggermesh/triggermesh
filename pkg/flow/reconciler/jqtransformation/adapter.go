@@ -52,12 +52,14 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis
 
 	return common.NewAdapterKnService(trg, sinkURI,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(MakeAppEnv(typedTrg)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	), nil
 }
 
-func makeAppEnv(o *v1alpha1.JQTransformation) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.JQTransformation) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  envQuery,

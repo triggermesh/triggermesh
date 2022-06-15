@@ -47,28 +47,44 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureEventHubSource)
 
-	var hubEnvs []corev1.EnvVar
-	if sasAuth := typedSrc.Spec.Auth.SASToken; sasAuth != nil {
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyName, sasAuth.KeyName)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyValue, sasAuth.KeyValue)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubConnStr, sasAuth.ConnectionString)
-	}
-	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
-	}
-
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvHubResourceID, typedSrc.Spec.EventHubID.String()),
-		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.EventHubID.Namespace),
-		resource.EnvVar(common.EnvHubName, typedSrc.Spec.EventHubID.ResourceName),
-		resource.EnvVars(hubEnvs...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
 		resource.StartupProbe("/health", healthPortName),
 	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureEventHubSource) []corev1.EnvVar {
+	var hubEnvs []corev1.EnvVar
+	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyName, sasAuth.KeyName)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyValue, sasAuth.KeyValue)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubConnStr, sasAuth.ConnectionString)
+	}
+	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
+	}
+
+	return append(hubEnvs,
+		[]corev1.EnvVar{
+			{
+				Name:  common.EnvHubResourceID,
+				Value: o.Spec.EventHubID.String(),
+			}, {
+				Name:  common.EnvHubNamespace,
+				Value: o.Spec.EventHubID.Namespace,
+			}, {
+				Name:  common.EnvHubName,
+				Value: o.Spec.EventHubID.ResourceName,
+			},
+		}...,
+	)
 }

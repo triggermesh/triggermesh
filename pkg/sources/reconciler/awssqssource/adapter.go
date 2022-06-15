@@ -50,16 +50,10 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AWSSQSSource)
 
-	var optEnvs []corev1.EnvVar
-	optEnvs = maybeSetMessageProcessor(optEnvs, typedSrc)
-
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvARN, typedSrc.Spec.ARN.String()),
-		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
-		resource.EnvVars(reconciler.MakeAWSEndpointEnvVars(typedSrc.Spec.Endpoint)...),
-		resource.EnvVars(optEnvs...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
@@ -79,4 +73,17 @@ func maybeSetMessageProcessor(envs []corev1.EnvVar, src *v1alpha1.AWSSQSSource) 
 	}
 
 	return envs
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AWSSQSSource) []corev1.EnvVar {
+	awsEnvs := append(reconciler.MakeAWSAuthEnvVars(o.Spec.Auth),
+		reconciler.MakeAWSEndpointEnvVars(o.Spec.Endpoint)...)
+	awsEnvs = maybeSetMessageProcessor(awsEnvs, o)
+
+	return append(awsEnvs, corev1.EnvVar{
+		Name:  common.EnvARN,
+		Value: o.Spec.ARN.String(),
+	})
 }

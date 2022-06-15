@@ -74,12 +74,14 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 	return common.NewAdapterKnService(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVars(makeWebhookEnvs(typedSrc)...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
 }
 
-func makeWebhookEnvs(src *v1alpha1.WebhookSource) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(src *v1alpha1.WebhookSource) []corev1.EnvVar {
 	envs := []corev1.EnvVar{{
 		Name:  envWebhookEventType,
 		Value: src.Spec.EventType,

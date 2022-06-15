@@ -46,11 +46,16 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 // BuildAdapter implements common.AdapterBuilder.
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureIOTHubSource)
-	iotHubEnvs := []corev1.EnvVar{}
-	iotHubEnvs = common.MaybeAppendValueFromEnvVar(iotHubEnvs, envAzureIOTHubConnString, typedSrc.Spec.Auth.SASToken.ConnectionString)
+
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVars(iotHubEnvs...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureIOTHubSource) []corev1.EnvVar {
+	return common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, envAzureIOTHubConnString, o.Spec.Auth.SASToken.ConnectionString)
 }
