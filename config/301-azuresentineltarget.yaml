@@ -54,7 +54,104 @@ spec:
             description: Desired state of the event target.
             type: object
             properties:
-
+              subscriptionID:
+                type: string
+                description: subscriptionID refers to the Azure Subscription ID that the Azure Sentinel instance is associated with.
+              resourceGroup:
+                type: string
+                description: resourceGroup refers to the resource group where the Azure Sentinel instance is deployed.
+              workspace:
+                type: string
+                description: workspace refers to the workspace name in Azure Sentinel.
+              clientID:
+                type: string
+                description: clientID refers to the Application (client) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+              tenantID:
+                type: string
+                description: tenantID refers to the Directory (tenant) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+              clientSecret:
+                type: object
+                description: clientSecret refers to the Client Secret of an App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+                properties:
+                  secretKeyRef:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      name:
+                        type: string
+              adapterOverrides:
+                description: Kubernetes object parameters to apply on top of default adapter values.
+                type: object
+                properties:
+                  env:
+                    description: Adapter environment variables.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: string
+                  public:
+                    description: Adapter visibility scope.
+                    type: boolean
+                  resources:
+                    description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                    properties:
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: Limits describes the maximum amount of compute resources allowed. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: Requests describes the minimum amount of compute resources required. If Requests is omitted
+                          for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined
+                          value. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                  tolerations:
+                    description: Pod tolerations, as documented at https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          description: Taint key that the toleration applies to.
+                          type: string
+                        operator:
+                          description: Key's relationship to the value.
+                          type: string
+                          enum: [Exists, Equal]
+                        value:
+                          description: Taint value the toleration matches to.
+                          type: string
+                        effect:
+                          description: Taint effect to match.
+                          type: string
+                          enum: [NoSchedule, PreferNoSchedule, NoExecute]
+                        tolerationSeconds:
+                          description: Period of time a toleration of effect NoExecute tolerates the taint.
+                          type: integer
+                          format: int64
+            required:
+            - subscriptionID
+            - resourceGroup
+            - workspace
+            - clientID
+            - tenantID
+            - clientSecret
           status:
             type: object
             description: Reported status of the event target.

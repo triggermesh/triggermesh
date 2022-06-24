@@ -1,6 +1,17 @@
 
+
+You can send any request that the standard Azure Sentinel API [Incidents - Create Or Update](https://docs.microsoft.com/en-us/rest/api/securityinsights/stable/incidents/create-or-update) supports. IE we are expecting this [Request Body](https://docs.microsoft.com/en-us/rest/api/securityinsights/stable/incidents/create-or-update#request-body) at the payload of the events.
+
+Note there are some minimum required fields:
 ```
-curl -v localhost:8080\
+properties.severity
+properties.status
+properties.title
+```
+
+Example supported event:
+```
+curl -v http://azuresentineltarget-hello-sentinel.default.10.107.122.79.sslip.io\
  -X POST \
  -H "Content-Type: application/json" \
  -H "Ce-Specversion: 1.0" \

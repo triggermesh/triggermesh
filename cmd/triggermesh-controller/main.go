@@ -73,6 +73,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awssnstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awssqstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/azureeventhubstarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/azuresentineltarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/cloudeventstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/confluenttarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/datadogtarget"
@@ -148,6 +149,7 @@ func main() {
 		awssnstarget.NewController,
 		awssqstarget.NewController,
 		azureeventhubstarget.NewController,
+		azuresentineltarget.NewController,
 		cloudeventstarget.NewController,
 		confluenttarget.NewController,
 		dataweavetransformation.NewController,

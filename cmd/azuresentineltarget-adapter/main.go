@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("azuresentineltarget-adapter", azuresentineltarget.EnvAccessorCtor, azuresentineltarget.NewTarget)
+	pkgadapter.Main("azuresentineltarget", azuresentineltarget.EnvAccessorCtor, azuresentineltarget.NewTarget)
 }

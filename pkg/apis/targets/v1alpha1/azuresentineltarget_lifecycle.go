@@ -32,7 +32,7 @@ const (
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
 func (s *AzureSentinelTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AzureSentinelTarget Target")
+	return SchemeGroupVersion.WithKind("AzureSentinelTarget")
 }
 
 // GetConditionSet implements duckv1.KRShaped.

@@ -32,7 +32,7 @@ type AzureSentinelTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AzureSentinelTargetSpec `json:"spec"`
+	Spec   AzureSentinelTargetSpec `json:"spec,omitempty"`
 	Status v1alpha1.Status         `json:"status,omitempty"`
 }
 
@@ -47,21 +47,20 @@ var (
 
 // AzureSentinelTargetSpec holds the desired state of the event target.
 type AzureSentinelTargetSpec struct {
+	// SubscriptionID refers to the Azure Subscription ID that the Azure Sentinel instance is associated with.
 	SubscriptionID string `json:"subscriptionID"`
-
+	// ResourceGroup refers to the resource group where the Azure Sentinel instance is deployed.
 	ResourceGroup string `json:"resourceGroup"`
-
+	// Workspace refers to the workspace name in Azure Sentinel.
 	Workspace string `json:"workspace"`
-
+	// ClientID refers to the Application (client) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
 	ClientID string `json:"clientID"`
-
+	// ClientSecret refers to the Client Secret of an App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
 	ClientSecret SecretValueFromSource `json:"clientSecret"`
-
+	// TenantID refers to the Directory (tenant) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
 	TenantID string `json:"tenantID"`
-
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
