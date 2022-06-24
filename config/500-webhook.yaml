@@ -38,7 +38,7 @@ spec:
       containers:
       - name: webhook
         terminationMessagePolicy: FallbackToLogsOnError
-        # image: ko://github.com/triggermesh/triggermesh/cmd/triggermesh-webhook
+        image: ko://github.com/triggermesh/triggermesh/cmd/triggermesh-webhook
         env:
         - name: SYSTEM_NAMESPACE
           valueFrom:
