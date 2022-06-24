@@ -61,6 +61,7 @@ spec:
                 type: object
                 properties:
                   visibilityTimeout:
+                    format: duration
                     description: Period of time during which Amazon SQS prevents other consumers from receiving and processing
                       a message that has been received via ReceiveMessage. Expressed as a duration string, which format is
                       documented at https://pkg.go.dev/time#ParseDuration. If not defined, the overall visibility timeout

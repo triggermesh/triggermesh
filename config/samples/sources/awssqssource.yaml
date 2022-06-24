@@ -25,7 +25,8 @@ metadata:
   name: sample
 spec:
   arn: arn:aws:sqs:us-west-2:123456789012:triggermeshtest
-
+  receiveOptions:
+    visibilityTimeout: 30m
   auth:
     credentials:
       accessKeyID:
@@ -36,7 +37,6 @@ spec:
         valueFromSecret:
           name: awscreds
           key: aws_secret_access_key
-
   sink:
     ref:
       apiVersion: eventing.knative.dev/v1
