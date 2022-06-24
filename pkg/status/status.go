@@ -186,7 +186,7 @@ func isResourceMissingError(reason, msg string) (bool, string /*resource type*/)
 		if unicode.IsLetter(rune(msg[i-1])) {
 			// if we reached the beginning of the message, it means
 			// the type is at the beginning of the message
-			if i-1 == 0 {
+			if i == 0 {
 				typeBeginningIdx = 0
 			}
 			continue

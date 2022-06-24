@@ -55,6 +55,7 @@ spec:
               arn:
                 description: ARN of the Amazon SQS queue to consume messages from. The expected format is documented at https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies.
                 type: string
+                format: duration
                 pattern: ^arn:aws(-cn|-us-gov)?:sqs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               receiveOptions:
                 description: Options that control the behavior of message receivers.
