@@ -32,6 +32,13 @@ const (
 	adapterName = "azuresentineltarget"
 
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
+
+	envSubscriptionID = "AZURE_SUBSCRIPTION_ID"
+	envResourceGroup  = "AZURE_RESOURCE_GROUP"
+	envWorkspace      = "AZURE_WORKSPACE"
+	envClientID       = "AZURE_CLIENT_ID"
+	envClientSecret   = "AZURE_CLIENT_SECRET"
+	envTenantID       = "AZURE_TENANT_ID"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -68,6 +75,32 @@ func makeAppEnv(o *v1alpha1.AzureSentinelTarget) []corev1.EnvVar {
 		{
 			Name:  libreconciler.EnvBridgeID,
 			Value: libreconciler.GetStatefulBridgeID(o),
+		},
+		{
+			Name:  envSubscriptionID,
+			Value: o.Spec.SubscriptionID,
+		},
+		{
+			Name:  envResourceGroup,
+			Value: o.Spec.ResourceGroup,
+		},
+		{
+			Name:  envWorkspace,
+			Value: o.Spec.Workspace,
+		},
+		{
+			Name: envClientSecret,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.ClientSecret.SecretKeyRef,
+			},
+		},
+		{
+			Name:  envClientID,
+			Value: o.Spec.ClientID,
+		},
+		{
+			Name:  envTenantID,
+			Value: o.Spec.TenantID,
 		},
 	}
 

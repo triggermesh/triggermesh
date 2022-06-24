@@ -17,12 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	"knative.dev/pkg/kmeta"
 )
 
 // +genclient
@@ -34,24 +32,39 @@ type AzureSentinelTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AzureSentinelTargetSpec   `json:"spec"`
-	Status AzureSentinelTargetStatus `json:"status,omitempty"`
+	Spec   AzureSentinelTargetSpec `json:"spec"`
+	Status v1alpha1.Status         `json:"status,omitempty"`
 }
 
 // Check the interfaces AzureSentinelTarget should be implementing.
+// Check the interfaces the event target should be implementing.
 var (
-	_ runtime.Object            = (*AzureSentinelTarget)(nil)
-	_ kmeta.OwnerRefable        = (*AzureSentinelTarget)(nil)
-	_ targets.IntegrationTarget = (*AzureSentinelTarget)(nil)
-	_ targets.EventSource       = (*AzureSentinelTarget)(nil)
-	_ duckv1.KRShaped           = (*AzureSentinelTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureSentinelTarget)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureSentinelTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*AzureSentinelTarget)(nil)
+	_ v1alpha1.EventSource         = (*AzureSentinelTarget)(nil)
 )
 
 // AzureSentinelTargetSpec holds the desired state of the event target.
 type AzureSentinelTargetSpec struct {
+	SubscriptionID string `json:"subscriptionID"`
+
+	ResourceGroup string `json:"resourceGroup"`
+
+	Workspace string `json:"workspace"`
+
+	ClientID string `json:"clientID"`
+
+	ClientSecret SecretValueFromSource `json:"clientSecret"`
+
+	TenantID string `json:"tenantID"`
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// Adapter spec overrides parameters.
+	// +optional
+	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
 // AzureSentinelTargetStatus communicates the observed state of the event target. (from the controller).
@@ -61,6 +74,16 @@ type AzureSentinelTargetStatus struct {
 
 	// Accepted/emitted CloudEvent attributes
 	CloudEventStatus `json:",inline"`
+}
+
+// CloudEventStatus contains attributes that event receivers can embed to
+// declare the event types they accept.
+//
+// +k8s:deepcopy-gen=true
+type CloudEventStatus struct {
+	// AcceptedEventTypes are the CloudEvent types that a component can process.
+	// +optional
+	AcceptedEventTypes []string `json:"acceptedEventTypes,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

@@ -56,6 +56,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&AWSSQSTargetList{},
 		&AzureEventHubsTarget{},
 		&AzureEventHubsTargetList{},
+		&AzureSentinelTarget{},
+		&AzureSentinelTargetList{},
 		&CloudEventsTarget{},
 		&CloudEventsTargetList{},
 		&ConfluentTarget{},

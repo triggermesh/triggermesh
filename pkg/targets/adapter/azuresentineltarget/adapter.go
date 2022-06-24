@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -66,10 +65,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		targetce.ReplierWithStaticResponseType("io.triggermesh.azuresentineltarget.response"),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
-		logger.Panicf("Error creating CloudEvents replier: %v", err)
+		logger.Panicf("creating CloudEvents replier: %v", err)
 	}
 
-	return &azuresentineltargetadapter{
+	return &azuresentineltargetAdapter{
 		client:         http.DefaultClient,
 		clientID:       env.ClientID,
 		tenantID:       env.TenantID,
@@ -90,14 +89,14 @@ var _ pkgadapter.Adapter = (*azuresentineltargetAdapter)(nil)
 
 // Returns if stopCh is closed or Send() returns an error.
 func (a *azuresentineltargetAdapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting AzureSentinelTarget Adapter")
+	a.logger.Info("Starting AzureSentinel Target Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
 func (a *azuresentineltargetAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	ee := &expectedEvent{}
-	if err := event.DataAs(ee); err != nil {
-		a.logger.Errorf("Error decoding event: %v", err)
+	i := &Incident{}
+	if err := event.DataAs(i); err != nil {
+		a.logger.Errorf("decoding event: %v", err)
 		return nil, nil
 	}
 
@@ -107,8 +106,7 @@ func (a *azuresentineltargetAdapter) dispatch(ctx context.Context, event cloudev
 		return nil, nil
 	}
 
-	incident := createIncident(*ee)
-	reqBody, err := json.Marshal(*incident)
+	reqBody, err := json.Marshal(*i)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "marshaling request for retrieving an access token")
 	}
@@ -142,67 +140,4 @@ func (a *azuresentineltargetAdapter) dispatch(ctx context.Context, event cloudev
 	}
 
 	return a.replier.Ok(&event, body)
-}
-
-func createIncident(ee expectedEvent) *Incident {
-	i := &Incident{}
-	alertProductNames := []string{}
-	alertProductNames = append(alertProductNames, ee.Event.GUID)
-	alertProductNames = append(alertProductNames, ee.Event.Name)
-	alertProductNames = append(alertProductNames, ee.Event.Severity)
-	alertProductNames = append(alertProductNames, ee.Event.ShortDescription)
-
-	// i.Properties.ProviderIncidentId = ee.Event.GUID
-
-	fmt.Printf("+%v", ee.Event)
-
-	i.Properties.Title = ee.Event.Name
-	i.Properties.Description = ee.Event.ShortDescription
-	i.Properties.AdditionalData.AlertProductNames = alertProductNames
-
-	i.Properties.Owner.AssignedTo = ee.Resource.Name
-
-	// incidentLabelType := IncidentLabel{
-	// 	LabelName: ee.Provider.AccountID,
-	// 	LabelType: IncidentLabelType[
-	// 		{
-	// 		Name: "Account",
-	// 		Type: "Azure",
-	// 		},
-	// 	]
-	// 	},
-	// }
-
-	// i.Properties.Labels = incidentLabelType
-
-	// i.Properties.Labels = []struct {
-	// 	LabelName string `json:"labelName"`
-	// 	LabelType string `json:"labelType"`
-	// }{
-	// 	{
-	// 		LabelName: ee.Provider.AccountID,
-	// 		LabelType: "accountID",
-	// 	},
-	// }
-	// alertProductNames := []string{}
-	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Platform)
-	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].AccountID)
-	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Region)
-	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Service)
-	// alertProductNames = append(alertProductNames, ee.Event.Event.Resources[0].Type+":"+ee.Event.Event.Resources[0].Name+":"+ee.Event.Event.Resources[0].GUID)
-	// i.Properties.Title = ee.Event.Event.Metadata.Name
-	// i.Properties.Description = ee.Event.Event.Metadata.ShortDescription
-	// i.Properties.AdditionalData.AlertProductNames = alertProductNames
-	// i.Properties.Labels = []struct {
-	// 	LabelName string `json:"labelName"`
-	// 	LabelType string `json:"labelType"`
-	// }{
-	// 	{
-	// 		LabelName: "accountID",
-	// 		LabelType: ee.Provider.AccountID,
-	// 	},
-	// }
-	i.Properties.Severity = "High"
-	i.Properties.Status = "Active"
-	return i
 }

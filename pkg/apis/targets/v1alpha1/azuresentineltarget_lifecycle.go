@@ -21,13 +21,24 @@ import (
 
 	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
-	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Managed event types
 const (
 	EventTypeAzureSentinelTargetGenericResponse = "io.triggermesh.azuresentineltarget.response"
 )
+
+// GetGroupVersionKind implements kmeta.OwnerRefable.
+func (s *AzureSentinelTarget) GetGroupVersionKind() schema.GroupVersionKind {
+	return SchemeGroupVersion.WithKind("AzureSentinelTarget Target")
+}
+
+// GetConditionSet implements duckv1.KRShaped.
+func (*AzureSentinelTarget) GetConditionSet() apis.ConditionSet {
+	return v1alpha1.DefaultConditionSet
+}
 
 // AcceptedEventTypes implements IntegrationTarget.
 func (*AzureSentinelTarget) AcceptedEventTypes() []string {
@@ -43,71 +54,25 @@ func (*AzureSentinelTarget) GetEventTypes() []string {
 	}
 }
 
-// AsEventSource implements targets.EventSource.
-func (s *AzureSentinelTarget) AsEventSource() string {
-	return "https://" + "REPLACEME"
+// GetStatus implements duckv1.KRShaped.
+func (t *AzureSentinelTarget) GetStatus() *duckv1.Status {
+	return &t.Status.Status
 }
 
-// GetGroupVersionKind implements kmeta.OwnerRefable.
-func (s *AzureSentinelTarget) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemeGroupVersion.WithKind("AzureSentinelTarget Target")
-}
-
-// AzureSentinelTargetCondSet is the group of possible conditions
-var AzureSentinelTargetCondSet = apis.NewLivingConditionSet(
-	ConditionDeployed,
-)
-
-// InitializeConditions sets relevant unset conditions to Unknown state.
-func (s *AzureSentinelTargetStatus) InitializeConditions() {
-	AzureSentinelTargetCondSet.Manage(s).InitializeConditions()
-}
-
-// PropagateKServiceAvailability uses the availability of the provided KService to determine if
-// ConditionDeployed should be marked as true or false.
-func (s *AzureSentinelTargetStatus) PropagateKServiceAvailability(ksvc *servingv1.Service) {
-	if ksvc == nil {
-		AzureSentinelTargetCondSet.Manage(s).MarkUnknown(ConditionDeployed, ReasonUnavailable,
-			"The status of the adapter Service can not be determined")
-		return
+// GetStatusManager implements Reconcilable.
+func (t *AzureSentinelTarget) GetStatusManager() *v1alpha1.StatusManager {
+	return &v1alpha1.StatusManager{
+		ConditionSet: t.GetConditionSet(),
+		Status:       &t.Status,
 	}
-
-	if s.Address == nil {
-		s.Address = &duckv1.Addressable{}
-	}
-	s.Address.URL = ksvc.Status.URL
-
-	if ksvc.IsReady() {
-		AzureSentinelTargetCondSet.Manage(s).MarkTrue(ConditionDeployed)
-		return
-	}
-
-	msg := "The adapter Service is unavailable"
-	readyCond := ksvc.Status.GetCondition(servingv1.ServiceConditionReady)
-	if readyCond != nil && readyCond.Message != "" {
-		msg += ": " + readyCond.Message
-	}
-
-	AzureSentinelTargetCondSet.Manage(s).MarkFalse(ConditionDeployed, ReasonUnavailable, msg)
-
 }
 
-// MarkNoKService sets the condition that the service is not ready
-func (s *AzureSentinelTargetStatus) MarkNoKService(reason, messageFormat string, messageA ...interface{}) {
-	AzureSentinelTargetCondSet.Manage(s).MarkFalse(ConditionDeployed, reason, messageFormat, messageA...)
+// AsEventSource implements EventSource.
+func (t *AzureSentinelTarget) AsEventSource() string {
+	return "sentinel." + t.Spec.ResourceGroup
 }
 
-// IsReady returns true if the resource is ready overall.
-func (s *AzureSentinelTargetStatus) IsReady() bool {
-	return AzureSentinelTargetCondSet.Manage(s).IsHappy()
-}
-
-// GetConditionSet retrieves the condition set for this resource. Implements the KRShaped interface.
-func (s *AzureSentinelTarget) GetConditionSet() apis.ConditionSet {
-	return AzureSentinelTargetCondSet
-}
-
-// GetStatus retrieves the status of the resource. Implements the KRShaped interface.
-func (s *AzureSentinelTarget) GetStatus() *duckv1.Status {
-	return &s.Status.Status
+// GetAdapterOverrides implements AdapterConfigurable.
+func (t *AzureSentinelTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return t.Spec.AdapterOverrides
 }
