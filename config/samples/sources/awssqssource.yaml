@@ -25,7 +25,9 @@ metadata:
   name: sample
 spec:
   arn: arn:aws:sqs:us-west-2:123456789012:triggermeshtest
-
+  
+  receiveOptions:
+    visibilityTimeout: 30m
   auth:
     credentials:
       accessKeyID:
