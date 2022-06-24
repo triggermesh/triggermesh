@@ -60,154 +60,154 @@ spec:
         - name: METRICS_DOMAIN
           value: triggermesh.io
         # Source adapters
-        # - name: AWSCLOUDWATCHSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awscloudwatchsource-adapter
-        # - name: AWSCLOUDWATCHLOGSSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awscloudwatchlogssource-adapter
-        # - name: AWSCODECOMMITSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awscodecommitsource-adapter
-        # - name: AWSCOGNITOIDENTITYSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awscognitoidentitysource-adapter
-        # - name: AWSCOGNITOUSERPOOLSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awscognitouserpoolsource-adapter
-        # - name: AWSDYNAMODBSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbsource-adapter
-        # - name: AWSKINESISSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awskinesissource-adapter
-        # - name: AWSPERFORMANCEINSIGHTSSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awsperformanceinsightssource-adapter
-        # - name: AWSSNSSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awssnssource-adapter
-        # - name: AWSSQSSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awssqssource-adapter
-        # - name: AZUREEVENTHUBSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubsource-adapter
-        # - name: AZUREIOTHUBSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/azureiothubsource-adapter
-        # - name: AZUREQUEUESTORAGESOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/azurequeuestoragesource-adapter
-        # - name: AZURESERVICEBUSSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/azureservicebussource-adapter
-        # - name: CLOUDEVENTSSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/cloudeventssource-adapter
-        # - name: GOOGLECLOUDPUBSUBSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudpubsubsource-adapter
-        # - name: HTTPPOLLERSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/httppollersource-adapter
-        # - name: OCIMETRICSSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/ocimetricssource-adapter
-        # - name: SALESFORCESOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/salesforcesource-adapter
-        # - name: SLACKSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/slacksource-adapter
-        # - name: TWILIOSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/twiliosource-adapter
-        # - name: WEBHOOKSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/webhooksource-adapter
-        # - name: ZENDESKSOURCE_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/zendesksource-adapter
-        # # Target adapters
-        # - name: ALIBABAOSSTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/alibabaosstarget-adapter
-        # - name: AWSCOMPREHENDTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehendtarget-adapter
-        # - name: AWSDYNAMODBTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbtarget-adapter
-        # - name: AWSEVENTBRIDGETARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awseventbridgetarget-adapter
-        # - name: AWSKINESISTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awskinesistarget-adapter
-        # - name: AWSLAMBDATARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awslambdatarget-adapter
-        # - name: AWSS3TARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awss3target-adapter
-        # - name: AWSSNSTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awssnstarget-adapter
-        # - name: AWSSQSTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/awssqstarget-adapter
-        # - name: AZUREEVENTHUBSTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubstarget-adapter
+        - name: AWSCLOUDWATCHSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awscloudwatchsource-adapter
+        - name: AWSCLOUDWATCHLOGSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awscloudwatchlogssource-adapter
+        - name: AWSCODECOMMITSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awscodecommitsource-adapter
+        - name: AWSCOGNITOIDENTITYSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awscognitoidentitysource-adapter
+        - name: AWSCOGNITOUSERPOOLSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awscognitouserpoolsource-adapter
+        - name: AWSDYNAMODBSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbsource-adapter
+        - name: AWSKINESISSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awskinesissource-adapter
+        - name: AWSPERFORMANCEINSIGHTSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awsperformanceinsightssource-adapter
+        - name: AWSSNSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awssnssource-adapter
+        - name: AWSSQSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awssqssource-adapter
+        - name: AZUREEVENTHUBSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubsource-adapter
+        - name: AZUREIOTHUBSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azureiothubsource-adapter
+        - name: AZUREQUEUESTORAGESOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azurequeuestoragesource-adapter
+        - name: AZURESERVICEBUSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azureservicebussource-adapter
+        - name: CLOUDEVENTSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/cloudeventssource-adapter
+        - name: GOOGLECLOUDPUBSUBSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudpubsubsource-adapter
+        - name: HTTPPOLLERSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/httppollersource-adapter
+        - name: OCIMETRICSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/ocimetricssource-adapter
+        - name: SALESFORCESOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/salesforcesource-adapter
+        - name: SLACKSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/slacksource-adapter
+        - name: TWILIOSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/twiliosource-adapter
+        - name: WEBHOOKSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/webhooksource-adapter
+        - name: ZENDESKSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/zendesksource-adapter
+        # Target adapters
+        - name: ALIBABAOSSTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/alibabaosstarget-adapter
+        - name: AWSCOMPREHENDTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehendtarget-adapter
+        - name: AWSDYNAMODBTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awsdynamodbtarget-adapter
+        - name: AWSEVENTBRIDGETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awseventbridgetarget-adapter
+        - name: AWSKINESISTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awskinesistarget-adapter
+        - name: AWSLAMBDATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awslambdatarget-adapter
+        - name: AWSS3TARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awss3target-adapter
+        - name: AWSSNSTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awssnstarget-adapter
+        - name: AWSSQSTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/awssqstarget-adapter
+        - name: AZUREEVENTHUBSTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubstarget-adapter
         - name: AZURESENTINELTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/azuresentineltarget-adapter
-        # - name: CLOUDEVENTSTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/cloudeventstarget-adapter
-        # - name: CONFLUENTTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/confluenttarget-adapter
-        # - name: DATADOGTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/datadogtarget-adapter
-        # - name: ELASTICSEARCHTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearchtarget-adapter
-        # - name: GOOGLECLOUDFIRESTORETARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestoretarget-adapter
-        # - name: GOOGLECLOUDSTORAGETARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter
-        # - name: GOOGLECLOUDWORKFLOWSTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflowstarget-adapter
-        # - name: GOOGLESHEETTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
-        # - name: HASURATARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/hasuratarget-adapter
-        # - name: HTTPTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/httptarget-adapter
-        # - name: INFRATARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/infratarget-adapter
-        # - name: JIRATARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/jiratarget-adapter
-        # - name: LOGZTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/logztarget-adapter
-        # - name: OPENTELEMETRYTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/opentelemetrytarget-adapter
-        # - name: ORACLETARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/oracletarget-adapter
-        # - name: SALESFORCETARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/salesforcetarget-adapter
-        # - name: SENDGRIDTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/sendgridtarget-adapter
-        # - name: SLACKTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter
-        # - name: SPLUNKTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
-        # - name: TEKTONTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
-        # - name: TWILIOTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
-        # - name: UIPATHTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
-        # - name: ZENDESKTARGET_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
-        # Flow adapters
-        # - name: JQTRANSFORMATION_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
-        # - name: SYNCHRONIZER_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
-        # - name: TRANSFORMATION_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
-        # - name: XMLTOJSONTRANSFORMATION_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
-        # Routing adapters
-        # - name: FILTER_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter
-        # - name: SPLITTER_IMAGE
-        #   value: ko://github.com/triggermesh/triggermesh/cmd/splitter-adapter
-        # # Function Runtimes
-        # - name: RUNTIME_KLR_PYTHON
-        #   value: gcr.io/triggermesh/knative-lambda-python37:v1.17.1
-        # - name: RUNTIME_KLR_NODE
-        #   value: gcr.io/triggermesh/knative-lambda-node10:v1.17.1
-        # - name: RUNTIME_KLR_RUBY
-        #   value: gcr.io/triggermesh/knative-lambda-ruby25:v1.17.1
-        # # Type-specific options
-        # - name: TEKTONTARGET_REAPING_INTERVAL
-        #   value: 2m
-        # # Custom build adapters
-        # - name: DATAWEAVETRANSFORMATION_IMAGE
-        #   value: gcr.io/triggermesh/dataweavetransformation-adapter:latest
-        # - name: IBMMQSOURCE_IMAGE
-        #   value: gcr.io/triggermesh/ibmmqsource-adapter:latest
-        # - name: IBMMQTARGET_IMAGE
-        #   value: gcr.io/triggermesh/ibmmqtarget-adapter:latest
-        # - name: XSLTTRANSFORMATION_IMAGE
-        #   value: gcr.io/triggermesh/xslttransformation-adapter:latest
+        - name: CLOUDEVENTSTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/cloudeventstarget-adapter
+        - name: CONFLUENTTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/confluenttarget-adapter
+        - name: DATADOGTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/datadogtarget-adapter
+        - name: ELASTICSEARCHTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/elasticsearchtarget-adapter
+        - name: GOOGLECLOUDFIRESTORETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudfirestoretarget-adapter
+        - name: GOOGLECLOUDSTORAGETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter
+        - name: GOOGLECLOUDWORKFLOWSTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflowstarget-adapter
+        - name: GOOGLESHEETTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
+        - name: HASURATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/hasuratarget-adapter
+        - name: HTTPTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/httptarget-adapter
+        - name: INFRATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/infratarget-adapter
+        - name: JIRATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/jiratarget-adapter
+        - name: LOGZTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/logztarget-adapter
+        - name: OPENTELEMETRYTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/opentelemetrytarget-adapter
+        - name: ORACLETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/oracletarget-adapter
+        - name: SALESFORCETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/salesforcetarget-adapter
+        - name: SENDGRIDTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/sendgridtarget-adapter
+        - name: SLACKTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter
+        - name: SPLUNKTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
+        - name: TEKTONTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
+        - name: TWILIOTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
+        - name: UIPATHTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
+        - name: ZENDESKTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
+        Flow adapters
+        - name: JQTRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
+        - name: SYNCHRONIZER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/synchronizer-adapter
+        - name: TRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
+        - name: XMLTOJSONTRANSFORMATION_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
+        Routing adapters
+        - name: FILTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter
+        - name: SPLITTER_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/splitter-adapter
+        # Function Runtimes
+        - name: RUNTIME_KLR_PYTHON
+          value: gcr.io/triggermesh/knative-lambda-python37:v1.17.1
+        - name: RUNTIME_KLR_NODE
+          value: gcr.io/triggermesh/knative-lambda-node10:v1.17.1
+        - name: RUNTIME_KLR_RUBY
+          value: gcr.io/triggermesh/knative-lambda-ruby25:v1.17.1
+        # Type-specific options
+        - name: TEKTONTARGET_REAPING_INTERVAL
+          value: 2m
+        # Custom build adapters
+        - name: DATAWEAVETRANSFORMATION_IMAGE
+          value: gcr.io/triggermesh/dataweavetransformation-adapter:latest
+        - name: IBMMQSOURCE_IMAGE
+          value: gcr.io/triggermesh/ibmmqsource-adapter:latest
+        - name: IBMMQTARGET_IMAGE
+          value: gcr.io/triggermesh/ibmmqtarget-adapter:latest
+        - name: XSLTTRANSFORMATION_IMAGE
+          value: gcr.io/triggermesh/xslttransformation-adapter:latest
 
         securityContext:
           runAsNonRoot: true
