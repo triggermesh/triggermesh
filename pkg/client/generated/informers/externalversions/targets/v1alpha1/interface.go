@@ -44,6 +44,8 @@ type Interface interface {
 	AlibabaOSSTargets() AlibabaOSSTargetInformer
 	// AzureEventHubsTargets returns a AzureEventHubsTargetInformer.
 	AzureEventHubsTargets() AzureEventHubsTargetInformer
+	// AzureSentinelTargets returns a AzureSentinelTargetInformer.
+	AzureSentinelTargets() AzureSentinelTargetInformer
 	// CloudEventsTargets returns a CloudEventsTargetInformer.
 	CloudEventsTargets() CloudEventsTargetInformer
 	// ConfluentTargets returns a ConfluentTargetInformer.
@@ -153,6 +155,11 @@ func (v *version) AlibabaOSSTargets() AlibabaOSSTargetInformer {
 // AzureEventHubsTargets returns a AzureEventHubsTargetInformer.
 func (v *version) AzureEventHubsTargets() AzureEventHubsTargetInformer {
 	return &azureEventHubsTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureSentinelTargets returns a AzureSentinelTargetInformer.
+func (v *version) AzureSentinelTargets() AzureSentinelTargetInformer {
+	return &azureSentinelTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // CloudEventsTargets returns a CloudEventsTargetInformer.
