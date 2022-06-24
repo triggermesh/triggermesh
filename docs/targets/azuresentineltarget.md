@@ -1,6 +1,6 @@
 
 
-You can send any request that the standard Azure Sentinel API [Incidents - Create Or Update](https://docs.microsoft.com/en-us/rest/api/securityinsights/stable/incidents/create-or-update) supports. IE we are expecting this [Request Body](https://docs.microsoft.com/en-us/rest/api/securityinsights/stable/incidents/create-or-update#request-body) at the payload of the events.
+You can send any payload that the standard Azure Sentinel API [Incidents - Create Or Update](https://docs.microsoft.com/en-us/rest/api/securityinsights/stable/incidents/create-or-update) supports. IE we are expecting this [Request Body](https://docs.microsoft.com/en-us/rest/api/securityinsights/stable/incidents/create-or-update#request-body) at the payload of the events.
 
 Note there are some minimum required fields:
 ```
