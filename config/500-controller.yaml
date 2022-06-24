@@ -175,7 +175,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
         - name: ZENDESKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
-        Flow adapters
+        # Flow adapters
         - name: JQTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/jqtransformation-adapter
         - name: SYNCHRONIZER_IMAGE
@@ -184,7 +184,7 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/transformation-adapter
         - name: XMLTOJSONTRANSFORMATION_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/xmltojsontransformation-adapter
-        Routing adapters
+        # Routing adapters
         - name: FILTER_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/filter-adapter
         - name: SPLITTER_IMAGE
