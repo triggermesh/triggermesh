@@ -30,16 +30,13 @@ import (
 )
 
 const (
-	adapterName = "azuresentineltarget"
-
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
-
-	envSubscriptionID = "AZURE_SUBSCRIPTION_ID"
-	envResourceGroup  = "AZURE_RESOURCE_GROUP"
-	envWorkspace      = "AZURE_WORKSPACE"
-	envClientID       = "AZURE_CLIENT_ID"
-	envClientSecret   = "AZURE_CLIENT_SECRET"
-	envTenantID       = "AZURE_TENANT_ID"
+	envSubscriptionID      = "AZURE_SUBSCRIPTION_ID"
+	envResourceGroup       = "AZURE_RESOURCE_GROUP"
+	envWorkspace           = "AZURE_WORKSPACE"
+	envClientID            = "AZURE_CLIENT_ID"
+	envClientSecret        = "AZURE_CLIENT_SECRET"
+	envTenantID            = "AZURE_TENANT_ID"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.

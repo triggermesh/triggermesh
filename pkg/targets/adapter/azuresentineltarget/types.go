@@ -71,7 +71,7 @@ type Incident struct {
 		FirstActivityTimeUtc string            `json:"firstActivityTimeUtc"`
 		Labels               []IncidentLabel   `json:"labels"`
 		Owner                IncidentOwnerInfo `json:"owner"`
-		ProviderIncidentId   string            `json:"providerIncidentId"`
+		ProviderIncidentID   string            `json:"providerIncidentId"`
 		Severity             string            `json:"severity"`
 		Status               string            `json:"status"`
 		Title                string            `json:"title"`
