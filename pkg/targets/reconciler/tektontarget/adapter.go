@@ -65,7 +65,7 @@ func makeAppEnv(o *v1alpha1.TektonTarget) []corev1.EnvVar {
 			})
 		}
 
-		if o.Spec.ReapPolicy.ReapSuccessAge != nil {
+		if o.Spec.ReapPolicy.ReapFailAge != nil {
 			envVar = append(envVar, corev1.EnvVar{
 				Name:  "TEKTON_REAP_FAIL_AGE",
 				Value: *o.Spec.ReapPolicy.ReapFailAge,

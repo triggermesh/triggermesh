@@ -17,9 +17,9 @@ replace k8s.io/client-go => k8s.io/client-go v0.23.5
 require (
 	cloud.google.com/go/billing v1.2.0
 	cloud.google.com/go/firestore v1.6.1
-	cloud.google.com/go/logging v1.4.2
-	cloud.google.com/go/pubsub v1.22.2
-	cloud.google.com/go/storage v1.22.1
+	cloud.google.com/go/logging v1.5.0
+	cloud.google.com/go/pubsub v1.23.0
+	cloud.google.com/go/storage v1.23.0
 	cloud.google.com/go/workflows v1.4.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.18
@@ -41,13 +41,13 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.15.1
-	github.com/aws/aws-sdk-go v1.44.38
+	github.com/aws/aws-sdk-go v1.44.43
 	github.com/basgys/goxml2json v1.1.0
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
 	github.com/elastic/go-elasticsearch/v7 v7.17.1
 	github.com/fsnotify/fsnotify v1.5.4
-	github.com/golang-jwt/jwt/v4 v4.4.1
+	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/google/cel-go v0.11.2
 	github.com/google/go-cmp v0.5.8
 	github.com/google/uuid v1.3.0
@@ -57,15 +57,15 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
-	github.com/nukosuke/go-zendesk v0.12.0
+	github.com/nukosuke/go-zendesk v0.12.1
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/robertkrimen/otto v0.0.0-20211019175142-5b0d97091c6f
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
-	github.com/stretchr/testify v1.7.4
-	github.com/tektoncd/pipeline v0.36.0
+	github.com/stretchr/testify v1.7.5
+	github.com/tektoncd/pipeline v0.37.0
 	github.com/tidwall/gjson v1.14.1
 	github.com/wamuir/go-xslt v0.1.4
 	go.opencensus.io v0.23.0
@@ -90,7 +90,7 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.102.0 // indirect
+	cloud.google.com/go v0.102.1 // indirect
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
@@ -224,7 +224,7 @@ require (
 	golang.org/x/sys v0.0.0-20220615213510-4f61da869c0c // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
+	golang.org/x/time v0.0.0-20220609170525-579cf78fd858 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
