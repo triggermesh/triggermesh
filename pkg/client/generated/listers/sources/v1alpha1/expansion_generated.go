@@ -250,6 +250,14 @@ type IBMMQSourceListerExpansion interface{}
 // IBMMQSourceNamespaceLister.
 type IBMMQSourceNamespaceListerExpansion interface{}
 
+// KafkaSourceListerExpansion allows custom methods to be added to
+// KafkaSourceLister.
+type KafkaSourceListerExpansion interface{}
+
+// KafkaSourceNamespaceListerExpansion allows custom methods to be added to
+// KafkaSourceNamespaceLister.
+type KafkaSourceNamespaceListerExpansion interface{}
+
 // OCIMetricsSourceListerExpansion allows custom methods to be added to
 // OCIMetricsSourceLister.
 type OCIMetricsSourceListerExpansion interface{}

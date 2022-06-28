@@ -120,6 +120,10 @@ func (c *FakeTargetsV1alpha1) JiraTargets(namespace string) v1alpha1.JiraTargetI
 	return &FakeJiraTargets{c, namespace}
 }
 
+func (c *FakeTargetsV1alpha1) KafkaTargets(namespace string) v1alpha1.KafkaTargetInterface {
+	return &FakeKafkaTargets{c, namespace}
+}
+
 func (c *FakeTargetsV1alpha1) LogzMetricsTargets(namespace string) v1alpha1.LogzMetricsTargetInterface {
 	return &FakeLogzMetricsTargets{c, namespace}
 }

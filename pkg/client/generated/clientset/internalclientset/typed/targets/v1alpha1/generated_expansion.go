@@ -64,6 +64,8 @@ type InfraTargetExpansion interface{}
 
 type JiraTargetExpansion interface{}
 
+type KafkaTargetExpansion interface{}
+
 type LogzMetricsTargetExpansion interface{}
 
 type LogzTargetExpansion interface{}

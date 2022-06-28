@@ -47,6 +47,7 @@ resources:
 - config/300-googlecloudstoragesource.yaml
 - config/300-httppollersource.yaml
 - config/300-ibmmqsource.yaml
+- config/300-kafkasource.yaml
 - config/300-ocimetricssource.yaml
 - config/300-salesforcesource.yaml
 - config/300-slacksource.yaml
@@ -76,6 +77,7 @@ resources:
 - config/301-ibmmqtarget.yaml
 - config/301-infratarget.yaml
 - config/301-jiratarget.yaml
+- config/301-kafkatarget.yaml
 - config/301-logzmetricstarget.yaml
 - config/301-logztarget.yaml
 - config/301-oracletarget.yaml

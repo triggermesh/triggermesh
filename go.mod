@@ -36,6 +36,7 @@ require (
 	github.com/Azure/go-autorest/autorest v0.11.27
 	github.com/Azure/go-autorest/autorest/adal v0.9.20
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
+	github.com/Shopify/sarama v1.34.1
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
@@ -123,6 +124,9 @@ require (
 	github.com/confluentinc/confluent-kafka-go v1.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
+	github.com/eapache/go-resiliency v1.2.0 // indirect
+	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
+	github.com/eapache/queue v1.1.0 // indirect
 	github.com/emicklei/go-restful v2.15.0+incompatible // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
@@ -157,16 +161,23 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
+	github.com/hashicorp/go-uuid v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20201112154412-8562bdadbbac // indirect
 	github.com/itchyny/timefmt-go v0.1.3 // indirect
+	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
+	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
+	github.com/jcmturner/gofork v1.0.0 // indirect
+	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
+	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
 	github.com/kevinburke/rest v0.0.0-20210506044642-5611499aa33c // indirect
+	github.com/klauspost/compress v1.15.6 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
@@ -177,15 +188,17 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/openzipkin/zipkin-go v0.3.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.14 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.11.1 // indirect
+	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
-	github.com/prometheus/procfs v0.6.0 // indirect
+	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/prometheus/prometheus v1.8.2-0.20210928085443-fafb309d4027 // indirect
 	github.com/prometheus/statsd_exporter v0.21.0 // indirect
+	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rickb777/date v1.13.0 // indirect
 	github.com/rickb777/plural v1.2.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect

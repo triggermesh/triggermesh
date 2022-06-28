@@ -5142,6 +5142,137 @@ func (w *wrapSourcesV1alpha1IBMMQSourceImpl) Watch(ctx context.Context, opts v1.
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapSourcesV1alpha1) KafkaSources(namespace string) typedsourcesv1alpha1.KafkaSourceInterface {
+	return &wrapSourcesV1alpha1KafkaSourceImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "sources.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "kafkasources",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapSourcesV1alpha1KafkaSourceImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedsourcesv1alpha1.KafkaSourceInterface = (*wrapSourcesV1alpha1KafkaSourceImpl)(nil)
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.KafkaSource, opts v1.CreateOptions) (*sourcesv1alpha1.KafkaSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "KafkaSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.KafkaSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.KafkaSource, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.KafkaSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.KafkaSourceList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.KafkaSourceList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.KafkaSource, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.KafkaSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.KafkaSource, opts v1.UpdateOptions) (*sourcesv1alpha1.KafkaSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "KafkaSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.KafkaSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.KafkaSource, opts v1.UpdateOptions) (*sourcesv1alpha1.KafkaSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "KafkaSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.KafkaSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1KafkaSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapSourcesV1alpha1) OCIMetricsSources(namespace string) typedsourcesv1alpha1.OCIMetricsSourceInterface {
 	return &wrapSourcesV1alpha1OCIMetricsSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
@@ -8953,6 +9084,137 @@ func (w *wrapTargetsV1alpha1JiraTargetImpl) UpdateStatus(ctx context.Context, in
 }
 
 func (w *wrapTargetsV1alpha1JiraTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
+func (w *wrapTargetsV1alpha1) KafkaTargets(namespace string) typedtargetsv1alpha1.KafkaTargetInterface {
+	return &wrapTargetsV1alpha1KafkaTargetImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "targets.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "kafkatargets",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapTargetsV1alpha1KafkaTargetImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedtargetsv1alpha1.KafkaTargetInterface = (*wrapTargetsV1alpha1KafkaTargetImpl)(nil)
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.KafkaTarget, opts v1.CreateOptions) (*targetsv1alpha1.KafkaTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "KafkaTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.KafkaTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.KafkaTarget, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.KafkaTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.KafkaTargetList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.KafkaTargetList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.KafkaTarget, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.KafkaTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.KafkaTarget, opts v1.UpdateOptions) (*targetsv1alpha1.KafkaTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "KafkaTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.KafkaTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.KafkaTarget, opts v1.UpdateOptions) (*targetsv1alpha1.KafkaTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "KafkaTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.KafkaTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1KafkaTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return nil, errors.New("NYI: Watch")
 }
 

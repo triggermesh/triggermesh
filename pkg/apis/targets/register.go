@@ -137,6 +137,11 @@ var (
 		Group:    GroupName,
 		Resource: "jiratargets",
 	}
+	// KafkaTargetResource respresents an event target for Kafka.
+	KafkaTargetResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "kafkatargets",
+	}
 	// LogzTargetResource respresents an event target for Logz.
 	LogzTargetResource = schema.GroupResource{
 		Group:    GroupName,

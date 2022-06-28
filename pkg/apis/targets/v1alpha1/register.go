@@ -80,6 +80,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&IBMMQTargetList{},
 		&JiraTarget{},
 		&JiraTargetList{},
+		&KafkaTarget{},
+		&KafkaTargetList{},
 		&InfraTarget{},
 		&InfraTargetList{},
 		&LogzMetricsTarget{},

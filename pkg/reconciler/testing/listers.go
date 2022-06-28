@@ -429,6 +429,11 @@ func (l *Listers) GetJiraTargetLister() targetslistersv1alpha1.JiraTargetLister 
 	return targetslistersv1alpha1.NewJiraTargetLister(l.IndexerFor(&targetsv1alpha1.JiraTarget{}))
 }
 
+// GetKafkaTargetLister returns a Lister for KafkaTarget objects.
+func (l *Listers) GetKafkaTargetLister() targetslistersv1alpha1.KafkaTargetLister {
+	return targetslistersv1alpha1.NewKafkaTargetLister(l.IndexerFor(&targetsv1alpha1.KafkaTarget{}))
+}
+
 // GetLogzMetricsTargetLister returns a Lister for LogzMetricsTarget objects.
 func (l *Listers) GetLogzMetricsTargetLister() targetslistersv1alpha1.LogzMetricsTargetLister {
 	return targetslistersv1alpha1.NewLogzMetricsTargetLister(l.IndexerFor(&targetsv1alpha1.LogzMetricsTarget{}))

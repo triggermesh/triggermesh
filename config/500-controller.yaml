@@ -96,6 +96,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/httppollersource-adapter
         - name: OCIMETRICSSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/ocimetricssource-adapter
+        - name: KAFKASOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/kafkasource-adapter
         - name: SALESFORCESOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/salesforcesource-adapter
         - name: SLACKSOURCE_IMAGE
@@ -151,6 +153,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/infratarget-adapter
         - name: JIRATARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/jiratarget-adapter
+        - name: KAFKATARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/kafkatarget-adapter
         - name: LOGZTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/logztarget-adapter
         - name: OPENTELEMETRYTARGET_IMAGE
