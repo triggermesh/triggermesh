@@ -16,7 +16,7 @@ FROM golang:1.18-bullseye as builder
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/9.2.3.0-IBM-MQC-Redist-LinuxX64.tar.gz -o mq.tar.gz          && \
+    curl https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqdev/redist/9.3.0.0-IBM-MQC-Redist-LinuxX64.tar.gz -o mq.tar.gz          && \
     mkdir -p /opt/mqm && \
     tar -C /opt/mqm -xzf mq.tar.gz
 
