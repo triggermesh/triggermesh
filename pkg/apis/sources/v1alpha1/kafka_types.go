@@ -72,10 +72,10 @@ type KafkaSourceSpec struct {
 	// SASLMechanisms all the assignment of specific SASL mechanisms.
 	SecurityMechanisms string `json:"securityMechanism"`
 
-	// SSL Authentication method to interact with Kafka.
+	// SSLAuth Authentication method to interact with Kafka.
 	SSLAuth KafkaSourceSSLAuth `json:"sslAuth"`
 
-	// Kerberos Authentication method to interact with Kafka.
+	// KerberosAuth Authentication method to interact with Kafka.
 	KerberosAuth KafkaSourceKerberosAuth `json:"kerberosAuth"`
 
 	// Adapter spec overrides parameters.
