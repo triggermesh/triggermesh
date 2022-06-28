@@ -50,13 +50,13 @@ require (
 	github.com/google/cel-go v0.11.2
 	github.com/google/go-cmp v0.5.8
 	github.com/google/uuid v1.3.0
-	github.com/ibm-messaging/mq-golang/v5 v5.2.5
+	github.com/ibm-messaging/mq-golang/v5 v5.3.0
 	github.com/itchyny/gojq v0.12.8
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
-	github.com/nukosuke/go-zendesk v0.12.0
+	github.com/nukosuke/go-zendesk v0.12.1
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
