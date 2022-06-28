@@ -64,7 +64,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.7.4
-	github.com/tektoncd/pipeline v0.36.0
+	github.com/tektoncd/pipeline v0.37.0
 	github.com/tidwall/gjson v1.14.1
 	github.com/wamuir/go-xslt v0.1.4
 	go.opencensus.io v0.23.0
