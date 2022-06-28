@@ -27,9 +27,9 @@ spec:
   salsEnable: true
   tlsEnable: false
   bootstrapServers:
-    - kafka.example.com:9092
-  topics: 
-    - test-topic
+  - kafka.example.com:9092
+  topics:
+  - test-topic
   groupID: test-consumer-group
   securityMechanism: GSSAPI
   kerberosAuth:
