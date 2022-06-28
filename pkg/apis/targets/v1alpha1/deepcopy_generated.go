@@ -2594,11 +2594,6 @@ func (in *KafkaTargetSpec) DeepCopyInto(out *KafkaTargetSpec) {
 	}
 	in.SSLAuth.DeepCopyInto(&out.SSLAuth)
 	in.KerberosAuth.DeepCopyInto(&out.KerberosAuth)
-	if in.GroupID != nil {
-		in, out := &in.GroupID, &out.GroupID
-		*out = new(string)
-		**out = **in
-	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)

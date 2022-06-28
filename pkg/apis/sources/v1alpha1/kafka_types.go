@@ -72,10 +72,10 @@ type KafkaSourceSpec struct {
 	// SASLMechanisms all the assignment of specific SASL mechanisms.
 	SecurityMechanisms string `json:"securityMechanism"`
 
-	// TODO SSLAuth
+	// SSL Authentication method to interact with Kafka.
 	SSLAuth KafkaSourceSSLAuth `json:"sslAuth"`
 
-	// TODO KerberosAuth
+	// Kerberos Authentication method to interact with Kafka.
 	KerberosAuth KafkaSourceKerberosAuth `json:"kerberosAuth"`
 
 	// Adapter spec overrides parameters.
@@ -83,7 +83,6 @@ type KafkaSourceSpec struct {
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
-// TODO: duplicated SSLCA and check *
 // KafkaSourceSSLAuth contains kerberos credentials.
 type KafkaSourceSSLAuth struct {
 	SSLCA         *v1alpha1.ValueFromField `json:"sslCA"`
@@ -91,7 +90,6 @@ type KafkaSourceSSLAuth struct {
 	SSLClientKey  *v1alpha1.ValueFromField `json:"sslClientKey"`
 }
 
-// Keytab needs to be configmap?
 // KafkaSourceKerberosAuth contains kerberos credentials.
 type KafkaSourceKerberosAuth struct {
 	Username            *string                  `json:"username"`

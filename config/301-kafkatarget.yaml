@@ -73,8 +73,6 @@ spec:
               tlsEnable:
                 description: Boolean to indicate if TLS is enabled.
                 type: boolean
-                #TODO if TLS, securityMechanism should be empty
-                #TODO OAUTHBEARER is not supported
               securityMechanism:
                 description: securityProtocol attribute indicate which mechanism to use.
                 type: string

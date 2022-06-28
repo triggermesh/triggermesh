@@ -77,16 +77,11 @@ type KafkaTargetSpec struct {
 	// SASLMechanisms all the assignment of specific SASL mechanisms.
 	SecurityMechanisms string `json:"securityMechanism"`
 
-	// TODO SSLAuth
+	// SSL Authentication method to interact with Kafka.
 	SSLAuth KafkaTargetSSLAuth `json:"sslAuth"`
 
-	// TODO KerberosAuth
+	// Kerberos Authentication method to interact with Kafka.
 	KerberosAuth KafkaTargetKerberosAuth `json:"kerberosAuth"`
-
-	// TODO
-	// GroupID the configured groupID.
-	// +optional
-	GroupID *string `json:"groupID"`
 
 	// Whether to omit CloudEvent context attributes in messages sent to Kafka.
 	// When this property is false (default), the entire CloudEvent payload is included.
@@ -98,7 +93,6 @@ type KafkaTargetSpec struct {
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
-// TODO: duplicated SSLCA and check *
 // KafkaTargetKerberosAuth contains kerberos credentials.
 type KafkaTargetSSLAuth struct {
 	SSLCA         *v1alpha1.ValueFromField `json:"sslCA"`
