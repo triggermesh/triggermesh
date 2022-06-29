@@ -21,11 +21,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"strconv"
 
 	"github.com/devigned/tab"
 	"go.uber.org/zap"
+	"nhooyr.io/websocket"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
@@ -71,6 +73,8 @@ type envConfig struct {
 	// Supported values: [ default ]
 	MessageProcessor string `envconfig:"SERVICEBUS_MESSAGE_PROCESSOR" default:"default"`
 
+	ConnectionString string `envconfig:"SERVICEBUS_CONNECTION_STRING"`
+
 	// The environment variables below aren't read from the envConfig struct
 	// by the Service Bus SDK, but rather directly using os.Getenv().
 	// They are nevertheless listed here for documentation purposes.
@@ -79,7 +83,6 @@ type envConfig struct {
 	_ string `envconfig:"AZURE_CLIENT_SECRET"`
 	_ string `envconfig:"SERVICEBUS_KEY_NAME"`
 	_ string `envconfig:"SERVICEBUS_KEY_VALUE"`
-	_ string `envconfig:"SERVICEBUS_CONNECTION_STRING"`
 }
 
 // adapter implements the source's adapter.
@@ -113,9 +116,17 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.EntityResourceID), zap.Error(err))
 	}
 
-	client, err := clientFromEnvironment(entityID)
-	if err != nil {
-		logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
+	var client *azservicebus.Client
+	if env.ConnectionString == "" {
+		client, err = clientFromEnvironment(entityID)
+		if err != nil {
+			logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
+		}
+	} else {
+		client, err = wssClientFromEnvironment(entityID, env.ConnectionString)
+		if err != nil {
+			logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
+		}
 	}
 
 	var rcvr *azservicebus.Receiver
@@ -224,6 +235,27 @@ func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Cl
 		return nil, fmt.Errorf("creating client from service principal: %w", err)
 	}
 	return client, nil
+}
+
+// wssClientFromEnvironment returns an *azservicebus.Client via Websocket.
+func wssClientFromEnvironment(entityID *v1alpha1.AzureResourceID, connectionString string) (*azservicebus.Client, error) {
+	client, err := azservicebus.NewClientFromConnectionString(connectionString, &azservicebus.ClientOptions{
+		NewWebSocketConn: func(ctx context.Context, args azservicebus.NewWebSocketConnArgs) (net.Conn, error) {
+			opts := &websocket.DialOptions{Subprotocols: []string{"amqp"}}
+			wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
+
+			if err != nil {
+				return nil, fmt.Errorf("creating client from connection string: %w", err)
+			}
+
+			return websocket.NetConn(context.Background(), wssConn, websocket.MessageBinary), nil
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("creating client from connection string: %w", err)
+	}
+	return client, nil
+
 }
 
 // connectionStringFromEnvironment returns a Service Bus connection string
