@@ -77,23 +77,26 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 	var secretVolumes []corev1.Volume
 	var secretVolMounts []corev1.VolumeMount
 
-	if typedTrg.Spec.KerberosAuth.KerberosConfig != nil && typedTrg.Spec.KerberosAuth.KerberosKeytab != nil {
+	if typedTrg.Spec.KerberosAuth.KerberosConfig != nil {
 		configVol, configVolMount := secretVolumeAndMountAtPath(
 			"krb5-config",
 			krb5ConfPath,
 			typedTrg.Spec.KerberosAuth.KerberosConfig.ValueFromSecret.Name,
 			typedTrg.Spec.KerberosAuth.KerberosConfig.ValueFromSecret.Key,
 		)
+		secretVolumes = append(secretVolumes, configVol)
+		secretVolMounts = append(secretVolMounts, configVolMount)
+	}
 
+	if typedTrg.Spec.KerberosAuth.KerberosKeytab != nil {
 		keytabVol, keytabVolMount := secretVolumeAndMountAtPath(
 			"krb5-keytab",
 			krb5KeytabPath,
 			typedTrg.Spec.KerberosAuth.KerberosKeytab.ValueFromSecret.Name,
 			typedTrg.Spec.KerberosAuth.KerberosKeytab.ValueFromSecret.Key,
 		)
-
-		secretVolumes = append(secretVolumes, configVol, keytabVol)
-		secretVolMounts = append(secretVolMounts, configVolMount, keytabVolMount)
+		secretVolumes = append(secretVolumes, keytabVol)
+		secretVolMounts = append(secretVolMounts, keytabVolMount)
 	}
 
 	return common.NewAdapterKnService(trg, nil,
