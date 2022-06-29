@@ -41,4 +41,3 @@ spec:
       valueFromSecret:
         name: cacert
         key: ca-cert
-
