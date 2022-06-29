@@ -75,6 +75,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		}
 		tlsCfg = newTLSRootCAConfig(tlsCfg, env.SSLCA)
 		config.Net.TLS.Config = tlsCfg
+		config.Net.TLS.Config.InsecureSkipVerify = env.SSLInsecureSkipVerify
 	}
 
 	if env.SecurityMechanisms == "GSSAPI" {

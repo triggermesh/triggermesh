@@ -20,7 +20,7 @@ spec:
   salsEnable: true
   tlsEnable: false
   bootstrapServers:
-  - kafka.example.com:9092
+  - kafka.example.com:9093
   topic: test-topic
   securityMechanism: GSSAPI
   kerberosAuth:
@@ -35,3 +35,10 @@ spec:
       valueFromSecret:
         name: keytab
         key: krb5.keytab
+  sslAuth:
+    insecureSkipVerify: true
+    sslCA:
+      valueFromSecret:
+        name: cacert
+        key: ca-cert
+

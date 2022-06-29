@@ -74,7 +74,7 @@ spec:
                 description: Boolean to indicate if TLS is enabled.
                 type: boolean
               securityMechanism:
-                description: securityProtocol attribute indicate which mechanism to use.
+                description: securityMechanism attribute indicate which mechanism to use.
                 type: string
                 enum: [GSSAPI, PLAIN, SCRAM-SHA-256, SCRAM-SHA-512]
               username:
@@ -121,23 +121,6 @@ spec:
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
-                  sslCA:
-                    description: The value to the configured CA.
-                    type: object
-                    properties:
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the value.
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    required:
-                    - valueFromSecret
                   kerberosConfig:
                     type: object
                     properties:
@@ -152,8 +135,9 @@ spec:
                         required:
                         - name
                         - key
-                    required:
-                    - valueFromSecret
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
                   kerberosKeytab:
                     type: object
                     properties:
@@ -168,8 +152,6 @@ spec:
                         required:
                         - name
                         - key
-                    required:
-                    - valueFromSecret
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
@@ -192,8 +174,9 @@ spec:
                         required:
                         - name
                         - key
-                    required:
-                    - valueFromSecret
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
                   sslClientCert:
                     description: The value of the SSL Client Cert.
                     type: object
@@ -209,8 +192,9 @@ spec:
                         required:
                         - name
                         - key
-                    required:
-                    - valueFromSecret
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
                   sslClientKey:
                     description: The value of the SSL Client Key.
                     type: object
@@ -226,11 +210,14 @@ spec:
                         required:
                         - name
                         - key
-                    required:
-                    - valueFromSecret
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
+                  insecureSkipVerify:
+                    description: InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name.
+                                 If InsecureSkipVerify is true, crypto/tls accepts any certificate presented by the server and any host name in that certificate.
+                                 In this mode, TLS is susceptible to machine-in-the-middle attacks unless custom verification is used. This should be used only for testing.
+                    type: boolean
               sink:
                 description: The destination of events sourced from Kafka Kafka.
                 type: object

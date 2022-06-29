@@ -54,11 +54,11 @@ type KafkaSourceSpec struct {
 
 	// Username Kafka account User
 	// +optional
-	Username *string `json:"username"`
+	Username *string `json:"username,omitempty"`
 
 	// Password Kafka account Password
 	// +optional
-	Password *v1alpha1.ValueFromField `json:"password"`
+	Password *v1alpha1.ValueFromField `json:"password,omitempty"`
 
 	// BootstrapServers holds the name of the Kafka Bootstrap server.
 	BootstrapServers []string `json:"bootstrapServers"`
@@ -73,10 +73,10 @@ type KafkaSourceSpec struct {
 	SecurityMechanisms string `json:"securityMechanism"`
 
 	// SSLAuth Authentication method to interact with Kafka.
-	SSLAuth KafkaSourceSSLAuth `json:"sslAuth"`
+	SSLAuth *KafkaSourceSSLAuth `json:"sslAuth,omitempty"`
 
 	// KerberosAuth Authentication method to interact with Kafka.
-	KerberosAuth KafkaSourceKerberosAuth `json:"kerberosAuth"`
+	KerberosAuth *KafkaSourceKerberosAuth `json:"kerberosAuth,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional
@@ -85,22 +85,22 @@ type KafkaSourceSpec struct {
 
 // KafkaSourceSSLAuth contains kerberos credentials.
 type KafkaSourceSSLAuth struct {
-	SSLCA         *v1alpha1.ValueFromField `json:"sslCA"`
-	SSLClientCert *v1alpha1.ValueFromField `json:"sslClientCert"`
-	SSLClientKey  *v1alpha1.ValueFromField `json:"sslClientKey"`
+	SSLCA              *v1alpha1.ValueFromField `json:"sslCA,omitempty"`
+	SSLClientCert      *v1alpha1.ValueFromField `json:"sslClientCert,omitempty"`
+	SSLClientKey       *v1alpha1.ValueFromField `json:"sslClientKey,omitempty"`
+	InsecureSkipVerify *bool                    `json:"insecureSkipVerify,omitempty"`
 }
 
 // KafkaSourceKerberosAuth contains kerberos credentials.
 type KafkaSourceKerberosAuth struct {
-	Username            *string                  `json:"username"`
-	Password            *v1alpha1.ValueFromField `json:"password"`
-	KerberosServiceName *string                  `json:"kerberosServiceName"`
-	KerberosConfigPath  *string                  `json:"kerberosConfigPath"`
-	KerberosKeytabPath  *string                  `json:"kerberosKeytabPath"`
-	KerberosSSLCA       *v1alpha1.ValueFromField `json:"sslCA"`
-	KerberosConfig      *v1alpha1.ValueFromField `json:"kerberosConfig"`
-	KerberosKeytab      *v1alpha1.ValueFromField `json:"kerberosKeytab"`
-	KerberosRealm       *string                  `json:"kerberosRealm"`
+	Username            *string                  `json:"username,omitempty"`
+	Password            *v1alpha1.ValueFromField `json:"password,omitempty"`
+	KerberosRealm       *string                  `json:"kerberosRealm,omitempty"`
+	KerberosServiceName *string                  `json:"kerberosServiceName,omitempty"`
+	KerberosConfigPath  *string                  `json:"kerberosConfigPath,omitempty"`
+	KerberosKeytabPath  *string                  `json:"kerberosKeytabPath,omitempty"`
+	KerberosConfig      *v1alpha1.ValueFromField `json:"kerberosConfig,omitempty"`
+	KerberosKeytab      *v1alpha1.ValueFromField `json:"kerberosKeytab,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

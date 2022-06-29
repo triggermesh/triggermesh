@@ -3554,6 +3554,11 @@ func (in *KafkaSourceKerberosAuth) DeepCopyInto(out *KafkaSourceKerberosAuth) {
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.KerberosRealm != nil {
+		in, out := &in.KerberosRealm, &out.KerberosRealm
+		*out = new(string)
+		**out = **in
+	}
 	if in.KerberosServiceName != nil {
 		in, out := &in.KerberosServiceName, &out.KerberosServiceName
 		*out = new(string)
@@ -3569,11 +3574,6 @@ func (in *KafkaSourceKerberosAuth) DeepCopyInto(out *KafkaSourceKerberosAuth) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.KerberosSSLCA != nil {
-		in, out := &in.KerberosSSLCA, &out.KerberosSSLCA
-		*out = new(commonv1alpha1.ValueFromField)
-		(*in).DeepCopyInto(*out)
-	}
 	if in.KerberosConfig != nil {
 		in, out := &in.KerberosConfig, &out.KerberosConfig
 		*out = new(commonv1alpha1.ValueFromField)
@@ -3583,11 +3583,6 @@ func (in *KafkaSourceKerberosAuth) DeepCopyInto(out *KafkaSourceKerberosAuth) {
 		in, out := &in.KerberosKeytab, &out.KerberosKeytab
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
-	}
-	if in.KerberosRealm != nil {
-		in, out := &in.KerberosRealm, &out.KerberosRealm
-		*out = new(string)
-		**out = **in
 	}
 	return
 }
@@ -3653,6 +3648,11 @@ func (in *KafkaSourceSSLAuth) DeepCopyInto(out *KafkaSourceSSLAuth) {
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.InsecureSkipVerify != nil {
+		in, out := &in.InsecureSkipVerify, &out.InsecureSkipVerify
+		*out = new(bool)
+		**out = **in
+	}
 	return
 }
 
@@ -3690,8 +3690,16 @@ func (in *KafkaSourceSpec) DeepCopyInto(out *KafkaSourceSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	in.SSLAuth.DeepCopyInto(&out.SSLAuth)
-	in.KerberosAuth.DeepCopyInto(&out.KerberosAuth)
+	if in.SSLAuth != nil {
+		in, out := &in.SSLAuth, &out.SSLAuth
+		*out = new(KafkaSourceSSLAuth)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.KerberosAuth != nil {
+		in, out := &in.KerberosAuth, &out.KerberosAuth
+		*out = new(KafkaSourceKerberosAuth)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)

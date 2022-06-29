@@ -52,7 +52,6 @@ func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
 		caCertPool.AppendCertsFromPEM([]byte(caCertFile))
 		tlsConfig.RootCAs = caCertPool
 	}
-
 	return tlsConfig
 }
 

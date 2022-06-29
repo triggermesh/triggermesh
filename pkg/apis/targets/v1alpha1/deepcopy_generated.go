@@ -2467,11 +2467,6 @@ func (in *KafkaTargetKerberosAuth) DeepCopyInto(out *KafkaTargetKerberosAuth) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.KerberosSSLCA != nil {
-		in, out := &in.KerberosSSLCA, &out.KerberosSSLCA
-		*out = new(commonv1alpha1.ValueFromField)
-		(*in).DeepCopyInto(*out)
-	}
 	if in.KerberosConfig != nil {
 		in, out := &in.KerberosConfig, &out.KerberosConfig
 		*out = new(commonv1alpha1.ValueFromField)
@@ -2551,6 +2546,11 @@ func (in *KafkaTargetSSLAuth) DeepCopyInto(out *KafkaTargetSSLAuth) {
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.InsecureSkipVerify != nil {
+		in, out := &in.InsecureSkipVerify, &out.InsecureSkipVerify
+		*out = new(bool)
+		**out = **in
+	}
 	return
 }
 
@@ -2592,8 +2592,16 @@ func (in *KafkaTargetSpec) DeepCopyInto(out *KafkaTargetSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	in.SSLAuth.DeepCopyInto(&out.SSLAuth)
-	in.KerberosAuth.DeepCopyInto(&out.KerberosAuth)
+	if in.SSLAuth != nil {
+		in, out := &in.SSLAuth, &out.SSLAuth
+		*out = new(KafkaTargetSSLAuth)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.KerberosAuth != nil {
+		in, out := &in.KerberosAuth, &out.KerberosAuth
+		*out = new(KafkaTargetKerberosAuth)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)

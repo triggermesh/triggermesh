@@ -34,15 +34,16 @@ import (
 )
 
 const (
-	envBootstrapServers   = "BOOTSTRAP_SERVERS"
-	envTopics             = "TOPICS"
-	envGroupID            = "GROUP_ID"
-	envUsername           = "USERNAME"
-	envPassword           = "PASSWORD"
-	envSecurityMechanisms = "SECURITY_MECHANISMS"
-	envSSLCA              = "SSL_CA"
-	envSSLClientCert      = "SSL_CLIENT_CERT"
-	envSSLClientKey       = "SSL_CLIENT_KEY"
+	envBootstrapServers      = "BOOTSTRAP_SERVERS"
+	envTopics                = "TOPICS"
+	envGroupID               = "GROUP_ID"
+	envUsername              = "USERNAME"
+	envPassword              = "PASSWORD"
+	envSecurityMechanisms    = "SECURITY_MECHANISMS"
+	envSSLCA                 = "SSL_CA"
+	envSSLClientCert         = "SSL_CLIENT_CERT"
+	envSSLClientKey          = "SSL_CLIENT_KEY"
+	envSSLInsecureSkipVerify = "SSL_INSECURE_SKIP_VERIFY"
 
 	envSalsEnable = "SALS_ENABLE"
 	envTLSEnable  = "TLS_ENABLE"
@@ -53,7 +54,6 @@ const (
 	envKerberosRealm       = "KERBEROS_REALM"
 	envKerberosUsername    = "KERBEROS_USERNAME"
 	envKerberosPassword    = "KERBEROS_PASSWORD"
-	envKerberosSSLCA       = "KERBEROS_SSL_CA"
 
 	krb5ConfPath   = "/etc/krb5.conf"
 	krb5KeytabPath = "/etc/krb5.keytab"
@@ -167,6 +167,13 @@ func makeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 		)
 	}
 
+	if o.Spec.SSLAuth.InsecureSkipVerify != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envSSLInsecureSkipVerify,
+			Value: strconv.FormatBool(*o.Spec.SSLAuth.InsecureSkipVerify),
+		})
+	}
+
 	if o.Spec.KerberosAuth.KerberosConfig != nil {
 		envs = append(envs, corev1.EnvVar{
 			Name:  envKerberosConfigPath,
@@ -205,12 +212,6 @@ func makeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 	if o.Spec.KerberosAuth.Password != nil {
 		envs = common.MaybeAppendValueFromEnvVar(
 			envs, envKerberosPassword, *o.Spec.KerberosAuth.Password,
-		)
-	}
-
-	if o.Spec.KerberosAuth.KerberosSSLCA != nil {
-		envs = common.MaybeAppendValueFromEnvVar(
-			envs, envKerberosSSLCA, *o.Spec.KerberosAuth.KerberosSSLCA,
 		)
 	}
 

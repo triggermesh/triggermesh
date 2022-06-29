@@ -51,37 +51,36 @@ type KafkaTargetSpec struct {
 
 	// Username Kafka account User
 	// +optional
-	Username *string `json:"username"`
+	Username *string `json:"username,omitempty"`
 
 	// Password Kafka account Password
 	// +optional
-	Password *v1alpha1.ValueFromField `json:"password"`
+	Password *v1alpha1.ValueFromField `json:"password,omitempty"`
 
 	// Topic where messages are produced.
 	Topic string `json:"topic"`
 
 	// TopicReplicationFactor is the number of replicas for the topic.
 	// +optional
-	TopicReplicationFactor *int `json:"topicReplicationFactor"`
+	TopicReplicationFactor *int `json:"topicReplicationFactor,omitempty"`
 
 	// TopicPartitions is the number of partitions for the topic.
 	// +optional
-	TopicPartitions *int `json:"topicPartitions"`
+	TopicPartitions *int `json:"topicPartitions,omitempty"`
 
 	// BootstrapServers holds the name of the Kafka Bootstrap server.
 	BootstrapServers []string `json:"bootstrapServers"`
-
-	// SecurityProtocol allows the user to set the security protocol
-	SecurityProtocol string `json:"securityProtocol"`
 
 	// SASLMechanisms all the assignment of specific SASL mechanisms.
 	SecurityMechanisms string `json:"securityMechanism"`
 
 	// SSLAuth Authentication method to interact with Kafka.
-	SSLAuth KafkaTargetSSLAuth `json:"sslAuth"`
+	// +optional
+	SSLAuth *KafkaTargetSSLAuth `json:"sslAuth,omitempty"`
 
 	// KerberosAuth Authentication method to interact with Kafka.
-	KerberosAuth KafkaTargetKerberosAuth `json:"kerberosAuth"`
+	// +optional
+	KerberosAuth *KafkaTargetKerberosAuth `json:"kerberosAuth,omitempty"`
 
 	// Whether to omit CloudEvent context attributes in messages sent to Kafka.
 	// When this property is false (default), the entire CloudEvent payload is included.
@@ -95,22 +94,22 @@ type KafkaTargetSpec struct {
 
 // KafkaTargetSSLAuth contains kerberos credentials.
 type KafkaTargetSSLAuth struct {
-	SSLCA         *v1alpha1.ValueFromField `json:"sslCA"`
-	SSLClientCert *v1alpha1.ValueFromField `json:"sslClientCert"`
-	SSLClientKey  *v1alpha1.ValueFromField `json:"sslClientKey"`
+	SSLCA              *v1alpha1.ValueFromField `json:"sslCA,omitempty"`
+	SSLClientCert      *v1alpha1.ValueFromField `json:"sslClientCert,omitempty"`
+	SSLClientKey       *v1alpha1.ValueFromField `json:"sslClientKey,omitempty"`
+	InsecureSkipVerify *bool                    `json:"insecureSkipVerify,omitempty"`
 }
 
 // KafkaTargetKerberosAuth contains kerberos credentials.
 type KafkaTargetKerberosAuth struct {
-	Username            *string                  `json:"username"`
-	Password            *v1alpha1.ValueFromField `json:"password"`
-	KerberosServiceName *string                  `json:"kerberosServiceName"`
-	KerberosConfigPath  *string                  `json:"kerberosConfigPath"`
-	KerberosKeytabPath  *string                  `json:"kerberosKeytabPath"`
-	KerberosSSLCA       *v1alpha1.ValueFromField `json:"sslCA"`
-	KerberosConfig      *v1alpha1.ValueFromField `json:"kerberosConfig"`
-	KerberosKeytab      *v1alpha1.ValueFromField `json:"kerberosKeytab"`
-	KerberosRealm       *string                  `json:"kerberosRealm"`
+	Username            *string                  `json:"username,omitempty"`
+	Password            *v1alpha1.ValueFromField `json:"password,omitempty"`
+	KerberosServiceName *string                  `json:"kerberosServiceName,omitempty"`
+	KerberosConfigPath  *string                  `json:"kerberosConfigPath,omitempty"`
+	KerberosKeytabPath  *string                  `json:"kerberosKeytabPath,omitempty"`
+	KerberosConfig      *v1alpha1.ValueFromField `json:"kerberosConfig,omitempty"`
+	KerberosKeytab      *v1alpha1.ValueFromField `json:"kerberosKeytab,omitempty"`
+	KerberosRealm       *string                  `json:"kerberosRealm,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
