@@ -214,9 +214,10 @@ spec:
                     - required: [value]
                     - required: [valueFromSecret]
                   insecureSkipVerify:
-                    description: InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name.
-                                  If InsecureSkipVerify is true, crypto/tls accepts any certificate presented by the server and any host name in that certificate.
-                                  In this mode, TLS is susceptible to machine-in-the-middle attacks unless custom verification is used. This should be used only for testing.
+                    description: InsecureSkipVerify controls whether a client verifies the server's certificate chain and
+                      host name. If InsecureSkipVerify is true, crypto/tls accepts any certificate presented by the server
+                      and any host name in that certificate. In this mode, TLS is susceptible to machine-in-the-middle attacks
+                      unless custom verification is used. This should be used only for testing.
                     type: boolean
               discardCloudEventContext:
                 description: Whether to omit CloudEvent context attributes in messages sent to Kafka. When this property is
