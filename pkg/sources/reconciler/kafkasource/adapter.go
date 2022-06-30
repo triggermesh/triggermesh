@@ -45,7 +45,7 @@ const (
 	envSSLClientKey          = "SSL_CLIENT_KEY"
 	envSSLInsecureSkipVerify = "SSL_INSECURE_SKIP_VERIFY"
 
-	envSalsEnable = "SALS_ENABLE"
+	envSaslEnable = "SASL_ENABLE"
 	envTLSEnable  = "TLS_ENABLE"
 
 	envKerberosConfigPath  = "KERBEROS_CONFIG_PATH"
@@ -78,24 +78,24 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 	var secretVolumes []corev1.Volume
 	var secretVolMounts []corev1.VolumeMount
 
-	if typedSrc.Spec.KerberosAuth != nil {
-		if typedSrc.Spec.KerberosAuth.KerberosConfig != nil {
+	if typedSrc.Spec.Auth.KerberosAuth != nil {
+		if typedSrc.Spec.Auth.KerberosAuth.KerberosConfig != nil {
 			configVol, configVolMount := secretVolumeAndMountAtPath(
 				"krb5-config",
 				krb5ConfPath,
-				typedSrc.Spec.KerberosAuth.KerberosConfig.ValueFromSecret.Name,
-				typedSrc.Spec.KerberosAuth.KerberosConfig.ValueFromSecret.Key,
+				typedSrc.Spec.Auth.KerberosAuth.KerberosConfig.ValueFromSecret.Name,
+				typedSrc.Spec.Auth.KerberosAuth.KerberosConfig.ValueFromSecret.Key,
 			)
 			secretVolumes = append(secretVolumes, configVol)
 			secretVolMounts = append(secretVolMounts, configVolMount)
 		}
 
-		if typedSrc.Spec.KerberosAuth.KerberosKeytab != nil {
+		if typedSrc.Spec.Auth.KerberosAuth.KerberosKeytab != nil {
 			keytabVol, keytabVolMount := secretVolumeAndMountAtPath(
 				"krb5-keytab",
 				krb5KeytabPath,
-				typedSrc.Spec.KerberosAuth.KerberosKeytab.ValueFromSecret.Name,
-				typedSrc.Spec.KerberosAuth.KerberosKeytab.ValueFromSecret.Key,
+				typedSrc.Spec.Auth.KerberosAuth.KerberosKeytab.ValueFromSecret.Name,
+				typedSrc.Spec.Auth.KerberosAuth.KerberosKeytab.ValueFromSecret.Key,
 			)
 			secretVolumes = append(secretVolumes, keytabVol)
 			secretVolMounts = append(secretVolMounts, keytabVolMount)
@@ -124,16 +124,12 @@ func makeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 			Value: strings.Join(o.Spec.Topics, ","),
 		},
 		{
-			Name:  envSecurityMechanisms,
-			Value: o.Spec.SecurityMechanisms,
-		},
-		{
-			Name:  envSalsEnable,
-			Value: strconv.FormatBool(o.Spec.SALSEnable),
+			Name:  envSaslEnable,
+			Value: strconv.FormatBool(o.Spec.Auth.SASLEnable),
 		},
 		{
 			Name:  envTLSEnable,
-			Value: strconv.FormatBool(o.Spec.TLSEnable),
+			Value: strconv.FormatBool(o.Spec.Auth.TLSEnable),
 		},
 		{
 			Name:  envGroupID,
@@ -141,85 +137,92 @@ func makeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 		},
 	}
 
-	if o.Spec.Username != nil {
+	if o.Spec.Auth.SecurityMechanisms != nil {
 		envs = append(envs, corev1.EnvVar{
-			Name:  envUsername,
-			Value: *o.Spec.Username,
+			Name:  envSecurityMechanisms,
+			Value: *o.Spec.Auth.SecurityMechanisms,
 		})
 	}
 
-	if o.Spec.Password != nil {
+	if o.Spec.Auth.Username != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envUsername,
+			Value: *o.Spec.Auth.Username,
+		})
+	}
+
+	if o.Spec.Auth.Password != nil {
 		envs = common.MaybeAppendValueFromEnvVar(
-			envs, envPassword, *o.Spec.Password,
+			envs, envPassword, *o.Spec.Auth.Password,
 		)
 	}
 
-	if o.Spec.SSLAuth != nil {
-		if o.Spec.SSLAuth.SSLCA != nil {
+	if o.Spec.Auth.SSLAuth != nil {
+		if o.Spec.Auth.SSLAuth.SSLCA != nil {
 			envs = common.MaybeAppendValueFromEnvVar(
-				envs, envSSLCA, *o.Spec.SSLAuth.SSLCA,
+				envs, envSSLCA, *o.Spec.Auth.SSLAuth.SSLCA,
 			)
 		}
 
-		if o.Spec.SSLAuth.SSLClientCert != nil {
+		if o.Spec.Auth.SSLAuth.SSLClientCert != nil {
 			envs = common.MaybeAppendValueFromEnvVar(
-				envs, envSSLClientCert, *o.Spec.SSLAuth.SSLClientCert,
+				envs, envSSLClientCert, *o.Spec.Auth.SSLAuth.SSLClientCert,
 			)
 		}
 
-		if o.Spec.SSLAuth.SSLClientKey != nil {
+		if o.Spec.Auth.SSLAuth.SSLClientKey != nil {
 			envs = common.MaybeAppendValueFromEnvVar(
-				envs, envSSLClientKey, *o.Spec.SSLAuth.SSLClientKey,
+				envs, envSSLClientKey, *o.Spec.Auth.SSLAuth.SSLClientKey,
 			)
 		}
 
-		if o.Spec.SSLAuth.InsecureSkipVerify != nil {
+		if o.Spec.Auth.SSLAuth.InsecureSkipVerify != nil {
 			envs = append(envs, corev1.EnvVar{
 				Name:  envSSLInsecureSkipVerify,
-				Value: strconv.FormatBool(*o.Spec.SSLAuth.InsecureSkipVerify),
+				Value: strconv.FormatBool(*o.Spec.Auth.SSLAuth.InsecureSkipVerify),
 			})
 		}
 	}
 
-	if o.Spec.KerberosAuth != nil {
-		if o.Spec.KerberosAuth.KerberosConfig != nil {
+	if o.Spec.Auth.KerberosAuth != nil {
+		if o.Spec.Auth.KerberosAuth.KerberosConfig != nil {
 			envs = append(envs, corev1.EnvVar{
 				Name:  envKerberosConfigPath,
 				Value: krb5ConfPath,
 			})
 		}
 
-		if o.Spec.KerberosAuth.KerberosKeytab != nil {
+		if o.Spec.Auth.KerberosAuth.KerberosKeytab != nil {
 			envs = append(envs, corev1.EnvVar{
 				Name:  envKerberosKeytabPath,
 				Value: krb5KeytabPath,
 			})
 		}
 
-		if o.Spec.KerberosAuth.KerberosServiceName != nil {
+		if o.Spec.Auth.KerberosAuth.KerberosServiceName != nil {
 			envs = append(envs, corev1.EnvVar{
 				Name:  envKerberosServiceName,
-				Value: *o.Spec.KerberosAuth.KerberosServiceName,
+				Value: *o.Spec.Auth.KerberosAuth.KerberosServiceName,
 			})
 		}
 
-		if o.Spec.KerberosAuth.KerberosRealm != nil {
+		if o.Spec.Auth.KerberosAuth.KerberosRealm != nil {
 			envs = append(envs, corev1.EnvVar{
 				Name:  envKerberosRealm,
-				Value: *o.Spec.KerberosAuth.KerberosRealm,
+				Value: *o.Spec.Auth.KerberosAuth.KerberosRealm,
 			})
 		}
 
-		if o.Spec.KerberosAuth.Username != nil {
+		if o.Spec.Auth.KerberosAuth.Username != nil {
 			envs = append(envs, corev1.EnvVar{
 				Name:  envKerberosUsername,
-				Value: *o.Spec.KerberosAuth.Username,
+				Value: *o.Spec.Auth.KerberosAuth.Username,
 			})
 		}
 
-		if o.Spec.KerberosAuth.Password != nil {
+		if o.Spec.Auth.KerberosAuth.Password != nil {
 			envs = common.MaybeAppendValueFromEnvVar(
-				envs, envKerberosPassword, *o.Spec.KerberosAuth.Password,
+				envs, envKerberosPassword, *o.Spec.Auth.KerberosAuth.Password,
 			)
 		}
 	}

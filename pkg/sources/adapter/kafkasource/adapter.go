@@ -60,8 +60,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	config := sarama.NewConfig()
 	tlsCfg := &tls.Config{}
 
-	if env.SALSEnable {
-		config.Net.SASL.Enable = env.SALSEnable
+	if env.SASLEnable {
+		config.Net.SASL.Enable = env.SASLEnable
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(env.SecurityMechanisms)
 		config.Net.SASL.User = env.Username
 		config.Net.SASL.Password = env.Password

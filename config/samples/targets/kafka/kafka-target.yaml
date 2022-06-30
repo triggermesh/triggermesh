@@ -17,27 +17,28 @@ kind: KafkaTarget
 metadata:
   name: sample
 spec:
-  salsEnable: true
-  tlsEnable: false
   bootstrapServers:
   - kafka.example.com:9093
   topic: test-topic
-  securityMechanism: GSSAPI
-  kerberosAuth:
-    username: kafka
-    kerberosRealm: EXAMPLE.COM
-    kerberosServiceName: kafka
-    kerberosConfig:
-      valueFromSecret:
-        name: config
-        key: krb5.conf
-    kerberosKeytab:
-      valueFromSecret:
-        name: keytab
-        key: krb5.keytab
-  sslAuth:
-    insecureSkipVerify: true
-    sslCA:
-      valueFromSecret:
-        name: cacert
-        key: ca-cert
+  auth:
+    saslEnable: true
+    tlsEnable: true
+    securityMechanism: GSSAPI
+    kerberosAuth:
+      username: kafka
+      kerberosRealm: EXAMPLE.COM
+      kerberosServiceName: kafka
+      kerberosConfig:
+        valueFromSecret:
+          name: config
+          key: krb5.conf
+      kerberosKeytab:
+        valueFromSecret:
+          name: keytab
+          key: krb5.keytab
+    sslAuth:
+      insecureSkipVerify: true
+      sslCA:
+        valueFromSecret:
+          name: cacert
+          key: ca-cert

@@ -28,7 +28,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	SALSEnable bool `envconfig:"SALS_ENABLE" required:"true"`
+	SASLEnable bool `envconfig:"SASL_ENABLE" required:"true"`
 	TLSEnable  bool `envconfig:"TLS_ENABLE" required:"true"`
 
 	BootstrapServers   []string `envconfig:"BOOTSTRAP_SERVERS" required:"true"`

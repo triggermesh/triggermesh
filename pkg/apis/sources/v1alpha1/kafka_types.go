@@ -46,20 +46,6 @@ var (
 type KafkaSourceSpec struct {
 	duckv1.SourceSpec `json:",inline"`
 
-	// SALS Enable
-	SALSEnable bool `json:"salsEnable"`
-
-	// TLS Enable
-	TLSEnable bool `json:"tlsEnable"`
-
-	// Username Kafka account User
-	// +optional
-	Username *string `json:"username,omitempty"`
-
-	// Password Kafka account Password
-	// +optional
-	Password *v1alpha1.ValueFromField `json:"password,omitempty"`
-
 	// BootstrapServers holds the name of the Kafka Bootstrap server.
 	BootstrapServers []string `json:"bootstrapServers"`
 
@@ -69,18 +55,36 @@ type KafkaSourceSpec struct {
 	// GroupID holds the name of the Kafka Group ID.
 	GroupID string `json:"groupID"`
 
-	// SASLMechanisms all the assignment of specific SASL mechanisms.
-	SecurityMechanisms string `json:"securityMechanism"`
-
-	// SSLAuth Authentication method to interact with Kafka.
-	SSLAuth *KafkaSourceSSLAuth `json:"sslAuth,omitempty"`
-
-	// KerberosAuth Authentication method to interact with Kafka.
-	KerberosAuth *KafkaSourceKerberosAuth `json:"kerberosAuth,omitempty"`
+	// Auth contains Authentication method used to interact with Kafka.
+	Auth *KafkaSourceAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
+}
+
+// KafkaSourceAuth contains Authentication method used to interact with Kafka.
+type KafkaSourceAuth struct {
+	KerberosAuth *KafkaSourceKerberosAuth `json:"kerberosAuth,omitempty"`
+	SSLAuth      *KafkaSourceSSLAuth      `json:"sslAuth,omitempty"`
+
+	// SASL Enable
+	SASLEnable bool `json:"saslEnable"`
+
+	// TLS Enable
+	TLSEnable bool `json:"tlsEnable"`
+
+	// SecurityMechanisms holds the assignment of the specific SASL mechanisms.
+	// +optional
+	SecurityMechanisms *string `json:"securityMechanism,omitempty"`
+
+	// Username Kafka account User
+	// +optional
+	Username *string `json:"username,omitempty"`
+
+	// Password Kafka account Password
+	// +optional
+	Password *v1alpha1.ValueFromField `json:"password,omitempty"`
 }
 
 // KafkaSourceSSLAuth contains kerberos credentials.
