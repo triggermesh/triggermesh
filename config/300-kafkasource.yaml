@@ -134,6 +134,8 @@ spec:
                         properties:
                           type: object
                           properties:
+                            value:
+                              type: string
                             valueFromSecret:
                               description: A reference to a secret containing the Kerberos keytab.
                               type: object
@@ -154,6 +156,8 @@ spec:
                         description: The value to the CA configuration.
                         type: object
                         properties:
+                          value:
+                            type: string
                           valueFromSecret:
                             description: A reference to a Kubernetes Secret object containing the value.
                             type: object
@@ -172,6 +176,8 @@ spec:
                         description: The value of the SSL Client Cert.
                         type: object
                         properties:
+                          value:
+                            type: string
                           valueFromSecret:
                             description: A reference to a Kubernetes Secret object containing the value.
                             type: object
@@ -190,6 +196,8 @@ spec:
                         description: The value of the SSL Client Key.
                         type: object
                         properties:
+                          value:
+                            type: string
                           valueFromSecret:
                             description: A reference to a Kubernetes Secret object containing the value.
                             type: object
