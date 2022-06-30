@@ -67,158 +67,172 @@ spec:
               groupID:
                 description: The ID of the kafka group.
                 type: string
-              salsEnable:
-                description: Boolean to indicate if SALS is enabled.
-                type: boolean
-              tlsEnable:
-                description: Boolean to indicate if TLS is enabled.
-                type: boolean
-              securityMechanism:
-                description: securityMechanism attribute indicate which mechanism to use.
-                type: string
-                enum: [GSSAPI, PLAIN, SCRAM-SHA-256, SCRAM-SHA-512]
-              username:
-                description: Kafka account username when using SASL.
-                type: string
-              password:
-                description: Kafka account password when using SASL.
+              auth:
+                description: Authentication method used to interact with Kafka.
                 type: object
                 properties:
-                  secretKeyRef:
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-                oneOf:
-                - required: [value]
-                - required: [valueFromSecret]
-              kerberosAuth:
-                description: Kerberos Authentication method to interact with Kafka.
-                type: object
-                properties:
-                  kerberosRealm:
-                    description: Kerberos Realm.
-                    type: string
-                  kerberosServiceName:
-                    description: The primary name of the Kafka server configured.
-                    type: string
-                  username:
-                    description: Kerberos Username.
-                    type: string
-                  password:
-                    description: Kerberos Password.
-                    type: object
-                    properties:
-                      secretKeyRef:
-                        type: object
-                        properties:
-                          key:
-                            type: string
-                          name:
-                            type: string
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
-                  kerberosConfig:
-                    type: object
-                    properties:
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the value.
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
-                  kerberosKeytab:
-                    type: object
-                    properties:
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the value.
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
-              sslAuth:
-                description: SSL Authentication method to interact with Kafka.
-                type: object
-                properties:
-                  sslCA:
-                    description: The value to the configured CA.
-                    type: object
-                    properties:
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the value.
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
-                  sslClientCert:
-                    description: The value of the SSL Client Cert.
-                    type: object
-                    properties:
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the value.
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
-                  sslClientKey:
-                    description: The value of the SSL Client Key.
-                    type: object
-                    properties:
-                      valueFromSecret:
-                        description: A reference to a Kubernetes Secret object containing the value.
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          key:
-                            type: string
-                        required:
-                        - name
-                        - key
-                    oneOf:
-                    - required: [value]
-                    - required: [valueFromSecret]
-                  insecureSkipVerify:
-                    description: InsecureSkipVerify controls whether a client verifies the server's certificate chain and
-                      host name. If InsecureSkipVerify is true, crypto/tls accepts any certificate presented by the server
-                      and any host name in that certificate. In this mode, TLS is susceptible to machine-in-the-middle attacks
-                      unless custom verification is used. This should be used only for testing.
+                  saslEnable:
+                    description: Boolean to indicate if SASL is enabled.
                     type: boolean
+                  tlsEnable:
+                    description: Boolean to indicate if TLS is enabled.
+                    type: boolean
+                  securityMechanism:
+                    description: securityMechanism attribute indicate which mechanism to use.
+                    type: string
+                    enum: [GSSAPI, PLAIN, SCRAM-SHA-256, SCRAM-SHA-512]
+                  kerberos:
+                    description: Authentication method parameters used to configure Kafka with Kerberos.
+                    type: object
+                    properties:
+                      relm:
+                        description: The realm to use for Kerberos.
+                        type: string
+                      serviceName:
+                        description: The service name to use for Kerberos.
+                        type: string
+                      username:
+                        description: The username to use for Kerberos.
+                        type: string
+                      password:
+                        description: The password to use for Kerberos.
+                        type: object
+                        properties:
+                          secretKeyRef:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                          value:
+                            type: string
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      config:
+                        type: object
+                        description: Kerberos configuration.
+                        properties:
+                          value:
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a secret containing the Kerberos configuration.
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                            required: [key, name]
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      keytab:
+                        type: object
+                        description: Kerberos keytab configuration.
+                        properties:
+                          type: object
+                          properties:
+                            valueFromSecret:
+                              description: A reference to a secret containing the Kerberos keytab.
+                              type: object
+                              properties:
+                                key:
+                                  type: string
+                                name:
+                                  type: string
+                            required: [key, name]
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                  ssl:
+                    description: Authentication method parameters used to configure Kafka with SSL.
+                    type: object
+                    properties:
+                      caConfiguration:
+                        description: The value to the CA configuration.
+                        type: object
+                        properties:
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the value.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientCert:
+                        description: The value of the SSL Client Cert.
+                        type: object
+                        properties:
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the value.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      clientKey:
+                        description: The value of the SSL Client Key.
+                        type: object
+                        properties:
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the value.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      insecureSkipVerify:
+                        description: InsecureSkipVerify controls whether a client verifies the server's certificate chain and
+                          host name. If InsecureSkipVerify is true, crypto/tls accepts any certificate presented by the server
+                          and any host name in that certificate. In this mode, TLS is susceptible to machine-in-the-middle attacks
+                          unless custom verification is used. This should be used only for testing.
+                        type: boolean
+                  sasl:
+                    description: secuity mechanism parameters used to configure Kafka with SASL.
+                    type: object
+                    properties:
+                      username:
+                        description: SASL username.
+                        type: string
+                      password:
+                        description: SASL password.
+                        type: object
+                        properties:
+                          value:
+                            type: string
+                          secretKeyRef:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              name:
+                                type: string
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
               sink:
                 description: The destination of events sourced from Kafka Kafka.
                 type: object
