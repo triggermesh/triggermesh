@@ -88,13 +88,20 @@ spec:
                     description: Kafka account password.
                     type: object
                     properties:
-                      secretKeyRef:
+                      value:
+                        description: Plain text password.
+                        type: string
+                      valueFromSecret:
+                        description: A reference to a Kubernetes Secret object containing the password.
                         type: object
                         properties:
-                          key:
-                            type: string
                           name:
                             type: string
+                          key:
+                            type: string
+                        required:
+                        - name
+                        - key
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
@@ -115,13 +122,20 @@ spec:
                         description: Kerberos Password.
                         type: object
                         properties:
-                          secretKeyRef:
+                          value:
+                            description: Plain text password.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the password.
                             type: object
                             properties:
-                              key:
-                                type: string
                               name:
                                 type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
                         oneOf:
                         - required: [value]
                         - required: [valueFromSecret]
@@ -139,9 +153,8 @@ spec:
                             required:
                             - name
                             - key
-                        oneOf:
-                        - required: [value]
-                        - required: [valueFromSecret]
+                        required:
+                        - valueFromSecret
                       kerberosKeytab:
                         type: object
                         properties:
@@ -156,9 +169,8 @@ spec:
                             required:
                             - name
                             - key
-                        oneOf:
-                        - required: [value]
-                        - required: [valueFromSecret]
+                        required:
+                        - valueFromSecret
                   sslAuth:
                     description: SSL Authentication method to interact with Kafka.
                     type: object
@@ -178,9 +190,8 @@ spec:
                             required:
                             - name
                             - key
-                        oneOf:
-                        - required: [value]
-                        - required: [valueFromSecret]
+                        required:
+                        - valueFromSecret
                       sslClientCert:
                         description: The value of the SSL Client Cert.
                         type: object
@@ -196,9 +207,8 @@ spec:
                             required:
                             - name
                             - key
-                        oneOf:
-                        - required: [value]
-                        - required: [valueFromSecret]
+                        required:
+                        - valueFromSecret
                       sslClientKey:
                         description: The value of the SSL Client Key.
                         type: object
@@ -214,9 +224,8 @@ spec:
                             required:
                             - name
                             - key
-                        oneOf:
-                        - required: [value]
-                        - required: [valueFromSecret]
+                        required:
+                        - valueFromSecret
                       insecureSkipVerify:
                         description: InsecureSkipVerify controls whether a client verifies the server's certificate chain
                           and host name. If InsecureSkipVerify is true, crypto/tls accepts any certificate presented by the
