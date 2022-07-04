@@ -46,7 +46,7 @@ spec:
 
 ## Creating a Kafka Source with Kerberos-SSL
 
-Before to create the KafkaSource, we are going to create some secrets that KafkaSource will need for the authentication with Kerberos + SSL.
+Before creating the `KafkaSource`, we are going to create some secrets that the `KafkaSource` will need for the authentication with Kerberos + SSL.
 
 ```console
 kubectl create secret generic config --from-file=krb5.conf
