@@ -8,8 +8,9 @@ as CloudEvents'.
 - [Kafka event source](#kafka-event-source)
   - [Contents](#contents)
   - [Prerequisites](#prerequisites)
-  - [Creating a Kafka Source with SASL-PLAIN](#creating-a-kafka-source-with-sasl-plain)
-  - [Creating a Kafka Source with Kerberos-SSL](#creating-a-kafka-source-with-kerberos-ssl)
+  - [Creating a Kafka Source](#creating-a-kafka-source)
+      + [SASL-PLAIN](#with-sasl-plain)
+      + [Kerberos-SSL](#with-kerberos-ssl)
     - [Status](#status)
 
 ## Prerequisites
