@@ -5,19 +5,23 @@ This event target integrates with Kafka, where any Cloud Event received are publ
 ## Contents
 
 - [Kafka event target](#kafka-event-target)
-  - [Contents](#contents)
   - [Prerequisites](#prerequisites)
-  - [Creating a Kafka Targe with SASL-PLAIN](#creating-a-kafka-target-with-sasl-plain)
-  - [Creating a Kafka Targe with Kerberos-SSL](#creating-a-kafka-target-with-kerberos-ssl)
-    - [Status](#status)
-    - [Kafka Target as an event Sink](#kafka-target-as-an-event-sink)
-    - [Sending messages to the Kafka Target](#sending-messages-to-the-kafka-target)
+  - [Creating a Kafka Target](#creating-a-kafka-target)
+    - [SASL-PLAIN](#sasl-plain)
+    - [Kerberos-SSL](#kerberos-ssl)
+  - [Status](#status)
+  - [Kafka Target as an event Sink](#kafka-target-as-an-event-sink)
+  - [Sending messages to the Kafka Target](#sending-messages-to-the-kafka-target)
 
 ## Prerequisites
 
 A running Kafka cluster.
 
-## Creating a Kafka Target with SASL-PLAIN
+## Creating a Kafka Source
+
+### Creating a Kafka Target with SASL-PLAIN
+
+This section demonstrates how to configure a KafkaTarget to use SASL-PLAIN authentication.
 
 ```yaml
 apiVersion: targets.triggermesh.io/v1alpha1
@@ -37,9 +41,15 @@ spec:
       value: admin-secret
 ```
 
-## Creating a Kafka Target with Kerberos-SSL
+### Creating a Kafka Target with Kerberos-SSL
 
-Before to create the KafkaTarget, we are going to create some secrets that KafkaTarget will need for the authentication with Kerberos + SSL.
+This section demonstrates how to configure a KafkaTarget to use Kerberos-SSL authentication.
+
+Before creating the `KafkaTarget`, we are going to create some secrets that the `KafkaTarget` will need for the authentication with Kerberos + SSL.
+
+- The kerberos config file.
+- The kerberos keytab file.
+- The CA Cert file.
 
 ```console
 kubectl create secret generic config --from-file=krb5.conf
@@ -86,7 +96,7 @@ The following *ARE NOT* optional and without them the adapter will not deploy:
 - salsEnable
 - tlsEnable
 
-### Status
+## Status
 
 KafkaTarget requires secrets to be provided for the credentials. Once they are present it will create a Knative Service. Controller
 logs and events can provide detailed information about the process. A Status
@@ -94,6 +104,12 @@ summary is added to the KafkaTarget object informing of the all conditions
 that the target needs.
 
 When ready the `status.address.url` will point to the internal point where Cloud Events should be sent.
+
+```console
+kubectl get kafkatarget
+NAME     URL                                                   READY   REASON   AGE
+sample   http://kafkatarget-sample.default.svc.cluster.local   True             1m
+```
 
 ### Kafka Target as an event Sink
 
