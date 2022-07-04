@@ -79,8 +79,8 @@ cloud.google.com/go/storage v1.18.2/go.mod h1:AiIj7BWXyhO5gGVmYJ+S8tbkCx3yb0IMju
 cloud.google.com/go/storage v1.22.1/go.mod h1:S8N1cAStu7BOeFfE8KAQzmyyLkK8p/vmRq6kuBTW58Y=
 cloud.google.com/go/storage v1.23.0 h1:wWRIaDURQA8xxHguFCshYepGlrWIrbBnAmc7wfg07qY=
 cloud.google.com/go/storage v1.23.0/go.mod h1:vOEEDNFnciUMhBeT6hsJIn3ieU5cFRmzeLgDvXzfIXc=
-cloud.google.com/go/workflows v1.4.0 h1:M9bARbwHQiCPpnVBvkw4mfnc1ufrz5H1jn84NU11j0U=
-cloud.google.com/go/workflows v1.4.0/go.mod h1:Kyi72n8xcHwAUMHYYKtkU4ERcSG2KQGVILCJWXA1fUI=
+cloud.google.com/go/workflows v1.5.0 h1:cj4YjDurKw+BzU1LQNcLB0CPS1Gzapdz76HTl3GEvLw=
+cloud.google.com/go/workflows v1.5.0/go.mod h1:LXnzSTS2+eBQ0c1IcXvMOf9QXp1jw+2AAGQV7gl65ik=
 collectd.org v0.3.0/go.mod h1:A/8DzQBkF6abtvrT2j/AU/4tiBgJWYyh0y/oB/4MlWE=
 contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d h1:LblfooH1lKOpp1hIhukktmSAxFkqMPFk9KR6iZ0MJNI=
 contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d/go.mod h1:IshRmMJBhDfFj5Y67nVhMYTTIze91RUeT73ipWKs/GY=
