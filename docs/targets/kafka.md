@@ -136,7 +136,7 @@ spec:
 
  A Kafka Target will, by default, accept any CloudEvent and pass the entire event into a message body.
 
-`Curl` can be used from a container in the cluster pointing to the ConfluentTarget exposed URL:
+`curl` can be used from a container in the cluster pointing to the `ConfluentTarget` exposed URL:
 
 ```console
 curl -v http://kafkatarget-int1-9fg4abc7d44bdd0204bd0a221bea9453k.default.svc.cluster.local
