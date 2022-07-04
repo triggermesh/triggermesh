@@ -94,7 +94,7 @@ spec:
       name: default
 ```
 
-The following *ARE NOT* optional and without them the adapter will not deploy:
+In order to configure the adapter correctly the following fields are mandatory:
 
 - boostrapservers
 - topics
