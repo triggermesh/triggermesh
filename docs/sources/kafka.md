@@ -1,7 +1,7 @@
 # Kafka event source
 
-This event source acts as a consumer of a Kafka Cluster and forwards all messages it receives
-after wrapping them in a CloudEvent envelope.
+This event source acts as a consumer of a Kafka events and forwards all messages it receives
+as CloudEvents'.
 
 ## Contents
 
