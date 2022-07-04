@@ -101,7 +101,7 @@ In order to configure the adapter correctly the following fields are mandatory:
 - `salsEnable`
 - `tlsEnable`
 
-### Status
+### Verifying
 
 KafkaSource requires secrets to be provided for the credentials. Once they are present it will start. Controller
 logs and events can provide detailed information about the process. A Status
