@@ -1,6 +1,6 @@
 # Kafka event target
 
-This event target integrates with Kafka, using received Cloud Event messages to publish a message to a Kafka Cluster.
+This event target integrates with Kafka, where any Cloud Event received are published to a Kafka Cluster.
 
 ## Contents
 
