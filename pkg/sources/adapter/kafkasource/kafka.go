@@ -18,8 +18,6 @@ package kafkasource
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 
 	"github.com/Shopify/sarama"
@@ -34,31 +32,10 @@ type consumerGroupHandler struct {
 	adapter *kafkasourceAdapter
 }
 
-func newTLSCertificatesConfig(tlsConfig *tls.Config, clientCert, clientKey string) (*tls.Config, error) {
-	if clientCert != "" && clientKey != "" {
-		cert, err := tls.LoadX509KeyPair(clientCert, clientKey)
-		if err != nil {
-			return tlsConfig, err
-		}
-		tlsConfig.Certificates = []tls.Certificate{cert}
-	}
-
-	return tlsConfig, nil
-}
-
-func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
-	if caCertFile != "" {
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM([]byte(caCertFile))
-		tlsConfig.RootCAs = caCertPool
-	}
-	return tlsConfig
-}
-
 func (a *kafkasourceAdapter) emitEvent(ctx context.Context, msg sarama.ConsumerMessage) error {
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetType(eventType)
-	event.SetSubject("/kafka/target/event")
+	event.SetSubject("kafka/event")
 	event.SetSource(msg.Topic)
 	event.SetID(string(msg.Key))
 
@@ -84,7 +61,6 @@ func (c consumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, 
 	return nil
 }
 
-// TODO
 func (consumerGroupHandler) Setup(sarama.ConsumerGroupSession) error { return nil }
 
 func (consumerGroupHandler) Cleanup(sarama.ConsumerGroupSession) error { return nil }

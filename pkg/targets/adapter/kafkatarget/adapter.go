@@ -19,6 +19,7 @@ package kafkatarget
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"time"
 
@@ -198,4 +199,26 @@ func (a *kafkaAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 	}
 
 	return cloudevents.ResultACK
+}
+
+func newTLSCertificatesConfig(tlsConfig *tls.Config, clientCert, clientKey string) (*tls.Config, error) {
+	if clientCert != "" && clientKey != "" {
+		cert, err := tls.LoadX509KeyPair(clientCert, clientKey)
+		if err != nil {
+			return tlsConfig, err
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+	}
+
+	return tlsConfig, nil
+}
+
+func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
+	if caCertFile != "" {
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM([]byte(caCertFile))
+		tlsConfig.RootCAs = caCertPool
+	}
+
+	return tlsConfig
 }

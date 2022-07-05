@@ -48,8 +48,4 @@ type envAccessor struct {
 	ClientCert string `envconfig:"CLIENT_CERT" required:"false"`
 	ClientKey  string `envconfig:"CLIENT_KEY" required:"false"`
 	SkipVerify bool   `envconfig:"SKIP_VERIFY" required:"false"`
-
-	// This set of variables are experimental and not graduated to the CRD.
-	BrokerVersionFallback string `envconfig:"BROKER_VERSION_FALLBACK" required:"false" default:"0.10.0.0"`
-	APIVersionFallbackMs  string `envconfig:"API_VERSION_FALLBACK_MS" required:"false" default:"0"`
 }

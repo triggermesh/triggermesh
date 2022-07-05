@@ -19,6 +19,7 @@ package kafkasource
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"sync"
 
 	"go.uber.org/zap"
@@ -67,7 +68,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		config.Net.SASL.Password = env.Password
 	}
 
-	if env.CA != "" || env.ClientCert != "" || env.ClientKey != "" {
+	if env.CA != "" || env.ClientCert != "" || env.ClientKey != "" || env.SkipVerify {
 		config.Net.TLS.Enable = true
 		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
 		if err != nil {
@@ -136,4 +137,25 @@ func (a *kafkasourceAdapter) Start(ctx context.Context) error {
 			a.logger.Panicw("Error Consuming Kafka Messages", err)
 		}
 	}
+}
+
+func newTLSCertificatesConfig(tlsConfig *tls.Config, clientCert, clientKey string) (*tls.Config, error) {
+	if clientCert != "" && clientKey != "" {
+		cert, err := tls.LoadX509KeyPair(clientCert, clientKey)
+		if err != nil {
+			return tlsConfig, err
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+	}
+
+	return tlsConfig, nil
+}
+
+func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
+	if caCertFile != "" {
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM([]byte(caCertFile))
+		tlsConfig.RootCAs = caCertPool
+	}
+	return tlsConfig
 }
