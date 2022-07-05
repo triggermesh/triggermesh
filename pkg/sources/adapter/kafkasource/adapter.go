@@ -119,7 +119,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 }
 
 func (a *kafkasourceAdapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting Kafka Target Adapter")
+	a.logger.Info("Starting Kafka Source Adapter")
 
 	consumerGroup := consumerGroupHandler{
 		adapter: a,

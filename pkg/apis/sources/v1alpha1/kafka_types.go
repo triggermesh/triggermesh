@@ -65,8 +65,8 @@ type KafkaSourceSpec struct {
 
 // KafkaSourceAuth contains Authentication method used to interact with Kafka.
 type KafkaSourceAuth struct {
-	KerberosAuth *KafkaSourceKerberosAuth `json:"kerberosAuth,omitempty"`
-	SSLAuth      *KafkaSourceSSLAuth      `json:"sslAuth,omitempty"`
+	Kerberos *KafkaSourceKerberos `json:"kerberos,omitempty"`
+	TLS      *KafkaSourceTLSAuth  `json:"tls,omitempty"`
 
 	// SASL Enable
 	SASLEnable bool `json:"saslEnable"`
@@ -87,24 +87,24 @@ type KafkaSourceAuth struct {
 	Password *v1alpha1.ValueFromField `json:"password,omitempty"`
 }
 
-// KafkaSourceSSLAuth contains kerberos credentials.
-type KafkaSourceSSLAuth struct {
-	SSLCA              *v1alpha1.ValueFromField `json:"sslCA,omitempty"`
-	SSLClientCert      *v1alpha1.ValueFromField `json:"sslClientCert,omitempty"`
-	SSLClientKey       *v1alpha1.ValueFromField `json:"sslClientKey,omitempty"`
-	InsecureSkipVerify *bool                    `json:"insecureSkipVerify,omitempty"`
+// KafkaSourceTLSAuth contains kerberos credentials.
+type KafkaSourceTLSAuth struct {
+	CA         *v1alpha1.ValueFromField `json:"ca,omitempty"`
+	ClientCert *v1alpha1.ValueFromField `json:"clientCert,omitempty"`
+	ClientKey  *v1alpha1.ValueFromField `json:"clientKey,omitempty"`
+	SkipVerify *bool                    `json:"skipVerify,omitempty"`
 }
 
-// KafkaSourceKerberosAuth contains kerberos credentials.
-type KafkaSourceKerberosAuth struct {
-	Username            *string                  `json:"username,omitempty"`
-	Password            *v1alpha1.ValueFromField `json:"password,omitempty"`
-	KerberosRealm       *string                  `json:"kerberosRealm,omitempty"`
-	KerberosServiceName *string                  `json:"kerberosServiceName,omitempty"`
-	KerberosConfigPath  *string                  `json:"kerberosConfigPath,omitempty"`
-	KerberosKeytabPath  *string                  `json:"kerberosKeytabPath,omitempty"`
-	KerberosConfig      *v1alpha1.ValueFromField `json:"kerberosConfig,omitempty"`
-	KerberosKeytab      *v1alpha1.ValueFromField `json:"kerberosKeytab,omitempty"`
+// KafkaSourceKerberos contains kerberos credentials.
+type KafkaSourceKerberos struct {
+	Username    *string                  `json:"username,omitempty"`
+	Password    *v1alpha1.ValueFromField `json:"password,omitempty"`
+	Realm       *string                  `json:"realm,omitempty"`
+	ServiceName *string                  `json:"serviceName,omitempty"`
+	ConfigPath  *string                  `json:"configPath,omitempty"`
+	KeytabPath  *string                  `json:"keytabPath,omitempty"`
+	Config      *v1alpha1.ValueFromField `json:"config,omitempty"`
+	Keytab      *v1alpha1.ValueFromField `json:"keytab,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

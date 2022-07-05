@@ -45,7 +45,7 @@ spec:
       status: {}
     schema:
       openAPIV3Schema:
-        description: TriggerMesh event target for Kafka.
+        description: TriggerMesh event source for Kafka.
         type: object
         properties:
           spec:
@@ -105,18 +105,18 @@ spec:
                     oneOf:
                     - required: [value]
                     - required: [valueFromSecret]
-                  kerberosAuth:
+                  kerberos:
                     description: Kerberos Authentication method to interact with Kafka.
                     type: object
                     properties:
-                      kerberosRealm:
+                      realm:
                         description: The name of the Kerberos Realm.
                         type: string
-                      kerberosServiceName:
+                      serviceName:
                         description: The primary name of the Kafka server configured.
                         type: string
                       username:
-                        description: Kerberos Username.
+                        description: Kerberos username or Kerberos Principal Name. The Username or the Principal doesn't require the Realm in it.
                         type: string
                       password:
                         description: Kerberos Password.
@@ -139,11 +139,11 @@ spec:
                         oneOf:
                         - required: [value]
                         - required: [valueFromSecret]
-                      kerberosConfig:
+                      config:
                         type: object
                         properties:
                           valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the value.
+                            description: A reference to a Kubernetes Secret object containing the kerberos configuration file (krb5.conf).
                             type: object
                             properties:
                               name:
@@ -155,11 +155,11 @@ spec:
                             - key
                         required:
                         - valueFromSecret
-                      kerberosKeytab:
+                      keytab:
                         type: object
                         properties:
                           valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the value.
+                            description: A reference to a Kubernetes Secret object containing the kerberos keytab file contents.
                             type: object
                             properties:
                               name:
@@ -171,16 +171,16 @@ spec:
                             - key
                         required:
                         - valueFromSecret
-                  sslAuth:
-                    description: SSL Authentication method to interact with Kafka.
+                  tls:
+                    description: TLS Authentication method to interact with Kafka.
                     type: object
                     properties:
-                      sslCA:
+                      ca:
                         description: The value to the configured CA.
                         type: object
                         properties:
                           valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the value.
+                            description: A reference to a Kubernetes Secret object containing the CA content.
                             type: object
                             properties:
                               name:
@@ -192,12 +192,12 @@ spec:
                             - key
                         required:
                         - valueFromSecret
-                      sslClientCert:
-                        description: The value of the SSL Client Cert.
+                      clientCert:
+                        description: The value of the Client Cert.
                         type: object
                         properties:
                           valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the value.
+                            description: A reference to a Kubernetes Secret object containing the Client Cert content.
                             type: object
                             properties:
                               name:
@@ -209,12 +209,12 @@ spec:
                             - key
                         required:
                         - valueFromSecret
-                      sslClientKey:
-                        description: The value of the SSL Client Key.
+                      clientKey:
+                        description: The value of the Client Key.
                         type: object
                         properties:
                           valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the value.
+                            description: A reference to a Kubernetes Secret object containing the Client Key content.
                             type: object
                             properties:
                               name:
@@ -226,9 +226,9 @@ spec:
                             - key
                         required:
                         - valueFromSecret
-                      insecureSkipVerify:
-                        description: InsecureSkipVerify controls whether a client verifies the server's certificate chain
-                          and host name. If InsecureSkipVerify is true, crypto/tls accepts any certificate presented by the
+                      skipVerify:
+                        description: SkipVerify controls whether a client verifies the server's certificate chain
+                          and host name. If skipVerify is true, crypto/tls accepts any certificate presented by the
                           server and any host name in that certificate. In this mode, TLS is susceptible to machine-in-the-middle
                           attacks unless custom verification is used. This should be used only for testing.
                         type: boolean
