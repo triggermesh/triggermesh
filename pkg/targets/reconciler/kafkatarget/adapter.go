@@ -34,18 +34,17 @@ import (
 )
 
 const (
-	envBootstrapServers      = "BOOTSTRAP_SERVERS"
-	envTopic                 = "TOPIC"
-	envUsername              = "USERNAME"
-	envPassword              = "PASSWORD"
-	envSecurityMechanisms    = "SECURITY_MECHANISMS"
-	envSSLCA                 = "SSL_CA"
-	envSSLClientCert         = "SSL_CLIENT_CERT"
-	envSSLClientKey          = "SSL_CLIENT_KEY"
-	envSSLInsecureSkipVerify = "SSL_INSECURE_SKIP_VERIFY"
+	envBootstrapServers   = "BOOTSTRAP_SERVERS"
+	envTopic              = "TOPIC"
+	envUsername           = "USERNAME"
+	envPassword           = "PASSWORD"
+	envSecurityMechanisms = "SECURITY_MECHANISMS"
+	envCA                 = "CA"
+	envClientCert         = "CLIENT_CERT"
+	envClientKey          = "CLIENT_KEY"
+	envSkipVerify         = "SKIP_VERIFY"
 
 	envSaslEnable = "SASL_ENABLE"
-	envTLSEnable  = "TLS_ENABLE"
 
 	envKerberosConfigPath  = "KERBEROS_CONFIG_PATH"
 	envKerberosKeytabPath  = "KERBEROS_KEYTAB_PATH"
@@ -128,10 +127,6 @@ func makeAppEnv(o *v1alpha1.KafkaTarget) []corev1.EnvVar {
 			Name:  envSaslEnable,
 			Value: strconv.FormatBool(o.Spec.Auth.SASLEnable),
 		},
-		{
-			Name:  envTLSEnable,
-			Value: strconv.FormatBool(o.Spec.Auth.TLSEnable),
-		},
 	}
 
 	if o.Spec.Auth.SecurityMechanisms != nil {
@@ -157,25 +152,25 @@ func makeAppEnv(o *v1alpha1.KafkaTarget) []corev1.EnvVar {
 	if o.Spec.Auth.TLS != nil {
 		if o.Spec.Auth.TLS.CA != nil {
 			env = common.MaybeAppendValueFromEnvVar(
-				env, envSSLCA, *o.Spec.Auth.TLS.CA,
+				env, envCA, *o.Spec.Auth.TLS.CA,
 			)
 		}
 
 		if o.Spec.Auth.TLS.ClientCert != nil {
 			env = common.MaybeAppendValueFromEnvVar(
-				env, envSSLClientCert, *o.Spec.Auth.TLS.ClientCert,
+				env, envClientCert, *o.Spec.Auth.TLS.ClientCert,
 			)
 		}
 
 		if o.Spec.Auth.TLS.ClientKey != nil {
 			env = common.MaybeAppendValueFromEnvVar(
-				env, envSSLClientKey, *o.Spec.Auth.TLS.ClientKey,
+				env, envClientKey, *o.Spec.Auth.TLS.ClientKey,
 			)
 		}
 
 		if o.Spec.Auth.TLS.SkipVerify != nil {
 			env = append(env, corev1.EnvVar{
-				Name:  envSSLInsecureSkipVerify,
+				Name:  envSkipVerify,
 				Value: strconv.FormatBool(*o.Spec.Auth.TLS.SkipVerify),
 			})
 		}

@@ -62,15 +62,15 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		config.Net.SASL.Password = env.Password
 	}
 
-	if env.TLSEnable {
-		config.Net.TLS.Enable = env.TLSEnable
-		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.SSLClientCert, env.SSLClientKey)
+	if env.CA != "" || env.ClientCert != "" || env.ClientKey != "" {
+		config.Net.TLS.Enable = true
+		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
 		if err != nil {
 			logger.Panicw("Could not create the TLS Certificates Config", err)
 		}
-		tlsCfg = newTLSRootCAConfig(tlsCfg, env.SSLCA)
+		tlsCfg = newTLSRootCAConfig(tlsCfg, env.CA)
 		config.Net.TLS.Config = tlsCfg
-		config.Net.TLS.Config.InsecureSkipVerify = env.SSLInsecureSkipVerify
+		config.Net.TLS.Config.InsecureSkipVerify = env.SkipVerify
 	}
 
 	if env.SecurityMechanisms == "GSSAPI" {

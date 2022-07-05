@@ -29,7 +29,6 @@ type envAccessor struct {
 	adapter.EnvConfig
 
 	SASLEnable bool `envconfig:"SASL_ENABLE" required:"true"`
-	TLSEnable  bool `envconfig:"TLS_ENABLE" required:"true"`
 
 	BootstrapServers []string `envconfig:"BOOTSTRAP_SERVERS" required:"true"`
 	Username         string   `envconfig:"USERNAME" required:"false"`
@@ -45,10 +44,10 @@ type envAccessor struct {
 	KerberosUsername    string `envconfig:"KERBEROS_USERNAME" required:"false"`
 	KerberosPassword    string `envconfig:"KERBEROS_PASSWORD" required:"false"`
 
-	SSLCA                 string `envconfig:"SSL_CA" required:"false"`
-	SSLClientCert         string `envconfig:"SSL_CLIENT_CERT" required:"false"`
-	SSLClientKey          string `envconfig:"SSL_CLIENT_KEY" required:"false"`
-	SSLInsecureSkipVerify bool   `envconfig:"SSL_INSECURE_SKIP_VERIFY" required:"false"`
+	CA         string `envconfig:"CA" required:"false"`
+	ClientCert string `envconfig:"CLIENT_CERT" required:"false"`
+	ClientKey  string `envconfig:"CLIENT_KEY" required:"false"`
+	SkipVerify bool   `envconfig:"SKIP_VERIFY" required:"false"`
 
 	// This set of variables are experimental and not graduated to the CRD.
 	BrokerVersionFallback string `envconfig:"BROKER_VERSION_FALLBACK" required:"false" default:"0.10.0.0"`

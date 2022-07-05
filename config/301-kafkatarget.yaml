@@ -74,9 +74,6 @@ spec:
                   saslEnable:
                     description: Boolean to indicate if SASL is enabled.
                     type: boolean
-                  tlsEnable:
-                    description: Boolean to indicate if TLS is enabled.
-                    type: boolean
                   securityMechanism:
                     description: securityMechanism attribute indicate which mechanism to use.
                     type: string
@@ -236,7 +233,6 @@ spec:
                         type: boolean
                 required:
                 - saslEnable
-                - tlsEnable
               discardCloudEventContext:
                 description: Whether to omit CloudEvent context attributes in messages sent to Kafka. When this property is
                   false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
