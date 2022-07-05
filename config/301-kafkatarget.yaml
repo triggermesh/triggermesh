@@ -116,7 +116,8 @@ spec:
                         description: The primary name of the Kafka server configured.
                         type: string
                       username:
-                        description: Kerberos username or Kerberos Principal Name. The Username or the Principal doesn't require the Realm in it.
+                        description: Kerberos username or Kerberos Principal Name. The Username or the Principal doesn't require
+                          the Realm in it.
                         type: string
                       password:
                         description: Kerberos Password.
@@ -143,7 +144,8 @@ spec:
                         type: object
                         properties:
                           valueFromSecret:
-                            description: A reference to a Kubernetes Secret object containing the kerberos configuration file (krb5.conf).
+                            description: A reference to a Kubernetes Secret object containing the kerberos configuration file
+                              (krb5.conf).
                             type: object
                             properties:
                               name:
@@ -227,10 +229,10 @@ spec:
                         required:
                         - valueFromSecret
                       skipVerify:
-                        description: SkipVerify controls whether a client verifies the server's certificate chain
-                          and host name. If skipVerify is true, crypto/tls accepts any certificate presented by the
-                          server and any host name in that certificate. In this mode, TLS is susceptible to machine-in-the-middle
-                          attacks unless custom verification is used. This should be used only for testing.
+                        description: SkipVerify controls whether a client verifies the server's certificate chain and host
+                          name. If skipVerify is true, crypto/tls accepts any certificate presented by the server and any
+                          host name in that certificate. In this mode, TLS is susceptible to machine-in-the-middle attacks
+                          unless custom verification is used. This should be used only for testing.
                         type: boolean
                 required:
                 - saslEnable

@@ -24,21 +24,21 @@ spec:
     saslEnable: true
     tlsEnable: true
     securityMechanism: GSSAPI
-    kerberosAuth:
+    kerberos:
       username: kafka
-      kerberosRealm: EXAMPLE.COM
-      kerberosServiceName: kafka
-      kerberosConfig:
+      realm: EXAMPLE.COM
+      serviceName: kafka
+      config:
         valueFromSecret:
-          name: config
+          name: kafka
           key: krb5.conf
-      kerberosKeytab:
+      keytab:
         valueFromSecret:
-          name: keytab
+          name: kafka
           key: krb5.keytab
-    sslAuth:
-      insecureSkipVerify: true
-      sslCA:
+    tls:
+      skipVerify: true
+      ca:
         valueFromSecret:
-          name: cacert
+          name: kafka
           key: ca-cert

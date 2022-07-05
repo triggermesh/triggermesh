@@ -80,7 +80,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	if env.SecurityMechanisms == "GSSAPI" {
 		kerberosConfig := sarama.GSSAPIConfig{
-			AuthType:           sarama.KRB5_USER_AUTH,
 			KerberosConfigPath: env.KerberosConfigPath,
 			ServiceName:        env.KerberosServiceName,
 			Username:           env.KerberosUsername,
@@ -91,6 +90,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		if env.KerberosKeytabPath != "" {
 			kerberosConfig.AuthType = sarama.KRB5_KEYTAB_AUTH
 			kerberosConfig.KeyTabPath = env.KerberosKeytabPath
+		} else {
+			kerberosConfig.AuthType = sarama.KRB5_USER_AUTH
 		}
 
 		config.Net.SASL.GSSAPI = kerberosConfig
