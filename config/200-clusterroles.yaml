@@ -343,7 +343,6 @@ rules:
   - awss3targets/finalizers
   - awssnstargets/finalizers
   - awssqstargets/finalizers
-  - azuresentineltargets/finalizers
   - azureeventhubstargets/finalizers
   - cloudeventstargets/finalizers
   - confluenttargets/finalizers
