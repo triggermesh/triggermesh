@@ -63,7 +63,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		config.Net.SASL.Password = env.Password
 	}
 
-	if env.CA != "" || env.ClientCert != "" || env.ClientKey != "" {
+	if env.CA != "" || env.ClientCert != "" || env.ClientKey != "" || env.SkipVerify {
 		config.Net.TLS.Enable = true
 		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
 		if err != nil {

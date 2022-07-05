@@ -36,7 +36,6 @@ spec:
           name: kafka
           key: krb5.keytab
     tls:
-      skipVerify: true
       ca:
         valueFromSecret:
           name: kafka
