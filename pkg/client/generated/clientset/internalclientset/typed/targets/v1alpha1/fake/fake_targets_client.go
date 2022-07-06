@@ -88,6 +88,10 @@ func (c *FakeTargetsV1alpha1) GoogleCloudFirestoreTargets(namespace string) v1al
 	return &FakeGoogleCloudFirestoreTargets{c, namespace}
 }
 
+func (c *FakeTargetsV1alpha1) GoogleCloudPubSubTargets(namespace string) v1alpha1.GoogleCloudPubSubTargetInterface {
+	return &FakeGoogleCloudPubSubTargets{c, namespace}
+}
+
 func (c *FakeTargetsV1alpha1) GoogleCloudStorageTargets(namespace string) v1alpha1.GoogleCloudStorageTargetInterface {
 	return &FakeGoogleCloudStorageTargets{c, namespace}
 }

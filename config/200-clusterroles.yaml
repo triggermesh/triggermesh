@@ -165,6 +165,7 @@ rules:
   - googlecloudfirestoretargets
   - googlecloudstoragetargets
   - googlecloudworkflowstargets
+  - googlecloudpubsubtargets
   - googlesheettargets
   - hasuratargets
   - httptargets
@@ -208,6 +209,7 @@ rules:
   - googlecloudfirestoretargets/status
   - googlecloudstoragetargets/status
   - googlecloudworkflowstargets/status
+  - googlecloudpubsubtargets/status
   - googlesheettargets/status
   - hasuratargets/status
   - httptargets/status
@@ -863,6 +865,7 @@ rules:
   - googlecloudfirestoretargets
   - googlecloudstoragetargets
   - googlecloudworkflowstargets
+  - googlecloudpubsubtargets
   - googlesheettargets
   - hasuratargets
   - httptargets
