@@ -284,6 +284,11 @@ func (l *Listers) GetHTTPPollerSourceLister() sourceslistersv1alpha1.HTTPPollerS
 	return sourceslistersv1alpha1.NewHTTPPollerSourceLister(l.IndexerFor(&sourcesv1alpha1.HTTPPollerSource{}))
 }
 
+// GetKafkaSourceLister returns a Lister for KafkaSource objects.
+func (l *Listers) GetKafkaSourceLister() sourceslistersv1alpha1.KafkaSourceLister {
+	return sourceslistersv1alpha1.NewKafkaSourceLister(l.IndexerFor(&sourcesv1alpha1.KafkaSource{}))
+}
+
 // GetOCIMetricsSourceLister returns a Lister for OCIMetricsSource objects.
 func (l *Listers) GetOCIMetricsSourceLister() sourceslistersv1alpha1.OCIMetricsSourceLister {
 	return sourceslistersv1alpha1.NewOCIMetricsSourceLister(l.IndexerFor(&sourcesv1alpha1.OCIMetricsSource{}))
