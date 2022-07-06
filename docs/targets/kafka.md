@@ -129,7 +129,7 @@ spec:
       name: triggermesh-kafka
 ```
 
-- A sample sink binding to a Kafka Target deployment.
+- A sample sink binding to a `KafkaTarget` deployment.
 
 ```yaml
 apiVersion: sources.triggermesh.io/v1alpha1
