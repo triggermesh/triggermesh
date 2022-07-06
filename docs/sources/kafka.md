@@ -117,7 +117,7 @@ logs and events can provide detailed information about the process. A Status
 summary is added to the KafkaSource object informing of the all conditions
 that the source needs.
 
-When ready, the `status.ready`will be True.
+When ready, the `status.ready` will be **True**.
 
 ```console
 kubectl get kafkasource
