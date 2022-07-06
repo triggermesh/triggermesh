@@ -107,6 +107,11 @@ var (
 		Group:    GroupName,
 		Resource: "googlecloudworkflowstargets",
 	}
+	// GoogleCloudPubSubTargetResource respresents an event target for Google Workflows.
+	GoogleCloudPubSubTargetResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "googlecloudpubsubtargets",
+	}
 	// GoogleSheetTargetResource respresents an event target for Google Sheet.
 	GoogleSheetTargetResource = schema.GroupResource{
 		Group:    GroupName,

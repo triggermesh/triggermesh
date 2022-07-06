@@ -39,7 +39,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `default:"gcr.io/triggermesh/GoogleCloudPubSubTarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/googlecloudpubsubtarget-adapter"`
 }
 
 // Verify that Reconciler implements common.AdapterBuilder.
@@ -52,6 +52,7 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 	return common.NewAdapterKnService(trg, nil,
 		resource.Image(r.adapterCfg.Image),
 		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVar("GCLOUD_PUBSUB_TOPIC", typedTrg.Spec.Topic.String()),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	), nil
 }
@@ -63,10 +64,6 @@ func makeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.ServiceAccountKey.SecretKeyRef,
 			},
-		},
-		{
-			Name:  "GCLOUD_PUBSUB_TOPIC",
-			Value: o.Spec.Topic.String(),
 		},
 	}
 

@@ -17,9 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"bytes"
-	"errors"
-
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -48,56 +45,6 @@ var (
 	_ duckv1.KRShaped    = (*GoogleCloudPubSubTarget)(nil)
 )
 
-// GCloudResourceName represents a fully qualified resource name,
-// as described at
-//  https://cloud.google.com/apis/design/resource_names
-//
-// Examples of such resource names include:
-//  - projects/{project_name}/topics/{topic_name}
-//  - projects/{project_name}/repos/{repo_name}
-//  - projects/{project_name}/subscriptions/{subscription_name}
-type GCloudResourceName struct {
-	Project    string
-	Collection string
-	Resource   string
-}
-
-// String implements the fmt.Stringer interface.
-func (n *GCloudResourceName) String() string {
-	b, err := n.MarshalJSON()
-	if err != nil {
-		return ""
-	}
-
-	// skip checks on slice bound and leading/trailing quotes since we know
-	// exactly what MarshalJSON returns
-	return string(b[1 : len(b)-1])
-}
-
-// errGCloudResourceNameEmptyAttrs indicates that a resource name string
-// or object contains empty attributes.
-var errGCloudResourceNameEmptyAttrs = errors.New("resource name contains empty attributes")
-
-// MarshalJSON implements json.Marshaler
-func (n GCloudResourceName) MarshalJSON() ([]byte, error) {
-	if n.Project == "" || n.Collection == "" || n.Resource == "" {
-		return nil, errGCloudResourceNameEmptyAttrs
-	}
-
-	var b bytes.Buffer
-
-	b.WriteByte('"')
-	b.WriteString("projects/")
-	b.WriteString(n.Project)
-	b.WriteByte('/')
-	b.WriteString(n.Collection)
-	b.WriteByte('/')
-	b.WriteString(n.Resource)
-	b.WriteByte('"')
-
-	return b.Bytes(), nil
-}
-
 // GoogleCloudPubSubTargetSpec holds the desired state of the event target.
 type GoogleCloudPubSubTargetSpec struct {
 
@@ -107,7 +54,7 @@ type GoogleCloudPubSubTargetSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-	ServiceAccountKey SecretValueFromSource `json:"serviceAccountKey"`
+	ServiceAccountKey SecretValueFromSource `json:"credentialsJson"`
 
 	// Adapter spec overrides parameters.
 	// +optional

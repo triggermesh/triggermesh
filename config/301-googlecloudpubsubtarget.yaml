@@ -58,55 +58,18 @@ spec:
                 description: Full resource name of the Pub/Sub topic to subscribe to, in the format "projects/{project_name}/topics/{topic_name}".
                 type: string
                 pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
-              serviceAccountKey:
-                description: Service account key used to authenticate the event source and allow it to interact with Google
-                  Cloud APIs. Only the JSON format is supported.
+              credentialsJson:
                 type: object
+                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information,
+                  refer to https://cloud.google.com/docs/authentication/production.
                 properties:
-                  value:
-                    description: Literal value of the service account key.
-                    type: string
-                  valueFromSecret:
-                    description: A reference to a Kubernetes Secret object containing the service account key.
+                  secretKeyRef:
                     type: object
                     properties:
-                      name:
-                        type: string
                       key:
                         type: string
-                    required:
-                    - name
-                    - key
-                oneOf:
-                - required: [value]
-                - required: [valueFromSecret]
-              sink:
-                description: The destination of events received via change notifications.
-                type: object
-                properties:
-                  ref:
-                    description: Reference to an addressable Kubernetes object to be used as the destination of events.
-                    type: object
-                    properties:
-                      apiVersion:
-                        type: string
-                      kind:
-                        type: string
-                      namespace:
-                        type: string
                       name:
                         type: string
-                    required:
-                    - apiVersion
-                    - kind
-                    - name
-                  uri:
-                    description: URI to use as the destination of events.
-                    type: string
-                    format: uri
-                oneOf:
-                - required: [ref]
-                - required: [uri]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
@@ -171,8 +134,7 @@ spec:
                           format: int64
             required:
             - topic
-            - serviceAccountKey
-            - sink
+            - credentialsJson
 
           status:
             type: object

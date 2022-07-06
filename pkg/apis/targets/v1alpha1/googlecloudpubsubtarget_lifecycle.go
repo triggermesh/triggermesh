@@ -27,7 +27,7 @@ import (
 
 // Managed event types
 const (
-	EventTypeGoogleOSSGenericResponse = "io.triggermesh.google.oss.response"
+	EventTypeGoogleGenericResponse = "io.triggermesh.google.pubsub.response"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -63,7 +63,7 @@ func (*GoogleCloudPubSubTarget) AcceptedEventTypes() []string {
 // GetEventTypes implements EventSource.
 func (*GoogleCloudPubSubTarget) GetEventTypes() []string {
 	return []string{
-		EventTypeGoogleOSSGenericResponse,
+		EventTypeGoogleGenericResponse,
 	}
 }
 
