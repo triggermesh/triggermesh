@@ -139,6 +139,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().HTTPPollerSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("ibmmqsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().IBMMQSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("kafkasources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().KafkaSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("ocimetricssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().OCIMetricsSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("salesforcesources"):
@@ -199,6 +201,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().InfraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("jiratargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().JiraTargets().Informer()}, nil
+	case targetsv1alpha1.SchemeGroupVersion.WithResource("kafkatargets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().KafkaTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("logzmetricstargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().LogzMetricsTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("logztargets"):

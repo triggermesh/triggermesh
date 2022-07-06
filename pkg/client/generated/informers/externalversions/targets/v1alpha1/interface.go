@@ -70,6 +70,8 @@ type Interface interface {
 	InfraTargets() InfraTargetInformer
 	// JiraTargets returns a JiraTargetInformer.
 	JiraTargets() JiraTargetInformer
+	// KafkaTargets returns a KafkaTargetInformer.
+	KafkaTargets() KafkaTargetInformer
 	// LogzMetricsTargets returns a LogzMetricsTargetInformer.
 	LogzMetricsTargets() LogzMetricsTargetInformer
 	// LogzTargets returns a LogzTargetInformer.
@@ -218,6 +220,11 @@ func (v *version) InfraTargets() InfraTargetInformer {
 // JiraTargets returns a JiraTargetInformer.
 func (v *version) JiraTargets() JiraTargetInformer {
 	return &jiraTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// KafkaTargets returns a KafkaTargetInformer.
+func (v *version) KafkaTargets() KafkaTargetInformer {
+	return &kafkaTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // LogzMetricsTargets returns a LogzMetricsTargetInformer.

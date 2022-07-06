@@ -76,6 +76,8 @@ type HTTPPollerSourceExpansion interface{}
 
 type IBMMQSourceExpansion interface{}
 
+type KafkaSourceExpansion interface{}
+
 type OCIMetricsSourceExpansion interface{}
 
 type SalesforceSourceExpansion interface{}

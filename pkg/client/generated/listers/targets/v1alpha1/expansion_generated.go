@@ -202,6 +202,14 @@ type JiraTargetListerExpansion interface{}
 // JiraTargetNamespaceLister.
 type JiraTargetNamespaceListerExpansion interface{}
 
+// KafkaTargetListerExpansion allows custom methods to be added to
+// KafkaTargetLister.
+type KafkaTargetListerExpansion interface{}
+
+// KafkaTargetNamespaceListerExpansion allows custom methods to be added to
+// KafkaTargetNamespaceLister.
+type KafkaTargetNamespaceListerExpansion interface{}
+
 // LogzMetricsTargetListerExpansion allows custom methods to be added to
 // LogzMetricsTargetLister.
 type LogzMetricsTargetListerExpansion interface{}

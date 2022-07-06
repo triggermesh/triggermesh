@@ -57,6 +57,7 @@ type SourcesV1alpha1Interface interface {
 	GoogleCloudStorageSourcesGetter
 	HTTPPollerSourcesGetter
 	IBMMQSourcesGetter
+	KafkaSourcesGetter
 	OCIMetricsSourcesGetter
 	SalesforceSourcesGetter
 	SlackSourcesGetter
@@ -184,6 +185,10 @@ func (c *SourcesV1alpha1Client) HTTPPollerSources(namespace string) HTTPPollerSo
 
 func (c *SourcesV1alpha1Client) IBMMQSources(namespace string) IBMMQSourceInterface {
 	return newIBMMQSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) KafkaSources(namespace string) KafkaSourceInterface {
+	return newKafkaSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) OCIMetricsSources(namespace string) OCIMetricsSourceInterface {

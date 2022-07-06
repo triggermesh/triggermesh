@@ -153,6 +153,12 @@ var (
 		Resource: "cloudeventssources",
 	}
 
+	// KafkaSourceResource respresents an event source for Kafka.
+	KafkaSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "kafkasources",
+	}
+
 	// GoogleCloudAuditLogsSourceResource respresents an event source for Google
 	// Cloud Audit Logs.
 	GoogleCloudAuditLogsSourceResource = schema.GroupResource{

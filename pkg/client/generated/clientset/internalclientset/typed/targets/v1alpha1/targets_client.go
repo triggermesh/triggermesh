@@ -51,6 +51,7 @@ type TargetsV1alpha1Interface interface {
 	IBMMQTargetsGetter
 	InfraTargetsGetter
 	JiraTargetsGetter
+	KafkaTargetsGetter
 	LogzMetricsTargetsGetter
 	LogzTargetsGetter
 	OracleTargetsGetter
@@ -159,6 +160,10 @@ func (c *TargetsV1alpha1Client) InfraTargets(namespace string) InfraTargetInterf
 
 func (c *TargetsV1alpha1Client) JiraTargets(namespace string) JiraTargetInterface {
 	return newJiraTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) KafkaTargets(namespace string) KafkaTargetInterface {
+	return newKafkaTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) LogzMetricsTargets(namespace string) LogzMetricsTargetInterface {

@@ -284,6 +284,11 @@ func (l *Listers) GetHTTPPollerSourceLister() sourceslistersv1alpha1.HTTPPollerS
 	return sourceslistersv1alpha1.NewHTTPPollerSourceLister(l.IndexerFor(&sourcesv1alpha1.HTTPPollerSource{}))
 }
 
+// GetKafkaSourceLister returns a Lister for KafkaSource objects.
+func (l *Listers) GetKafkaSourceLister() sourceslistersv1alpha1.KafkaSourceLister {
+	return sourceslistersv1alpha1.NewKafkaSourceLister(l.IndexerFor(&sourcesv1alpha1.KafkaSource{}))
+}
+
 // GetOCIMetricsSourceLister returns a Lister for OCIMetricsSource objects.
 func (l *Listers) GetOCIMetricsSourceLister() sourceslistersv1alpha1.OCIMetricsSourceLister {
 	return sourceslistersv1alpha1.NewOCIMetricsSourceLister(l.IndexerFor(&sourcesv1alpha1.OCIMetricsSource{}))
@@ -427,6 +432,11 @@ func (l *Listers) GetInfraTargetLister() targetslistersv1alpha1.InfraTargetListe
 // GetJiraTargetLister returns a Lister for JiraTarget objects.
 func (l *Listers) GetJiraTargetLister() targetslistersv1alpha1.JiraTargetLister {
 	return targetslistersv1alpha1.NewJiraTargetLister(l.IndexerFor(&targetsv1alpha1.JiraTarget{}))
+}
+
+// GetKafkaTargetLister returns a Lister for KafkaTarget objects.
+func (l *Listers) GetKafkaTargetLister() targetslistersv1alpha1.KafkaTargetLister {
+	return targetslistersv1alpha1.NewKafkaTargetLister(l.IndexerFor(&targetsv1alpha1.KafkaTarget{}))
 }
 
 // GetLogzMetricsTargetLister returns a Lister for LogzMetricsTarget objects.
