@@ -21,7 +21,6 @@ import (
 	"errors"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
@@ -38,17 +37,15 @@ type GoogleCloudPubSubTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GoogleCloudPubSubTargetSpec   `json:"spec"`
-	Status GoogleCloudPubSubTargetStatus `json:"status,omitempty"`
+	Spec   GoogleCloudPubSubTargetSpec `json:"spec"`
+	Status v1alpha1.Status             `json:"status,omitempty"`
 }
 
 // Check the interfaces GoogleCloudPubSubTarget should be implementing.
 var (
-	_ runtime.Object            = (*GoogleCloudPubSubTarget)(nil)
-	_ kmeta.OwnerRefable        = (*GoogleCloudPubSubTarget)(nil)
-	_ targets.IntegrationTarget = (*GoogleCloudPubSubTarget)(nil)
-	_ targets.EventSource       = (*GoogleCloudPubSubTarget)(nil)
-	_ duckv1.KRShaped           = (*GoogleCloudPubSubTarget)(nil)
+	_ runtime.Object     = (*GoogleCloudPubSubTarget)(nil)
+	_ kmeta.OwnerRefable = (*GoogleCloudPubSubTarget)(nil)
+	_ duckv1.KRShaped    = (*GoogleCloudPubSubTarget)(nil)
 )
 
 // GCloudResourceName represents a fully qualified resource name,
@@ -110,7 +107,7 @@ type GoogleCloudPubSubTargetSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-	ServiceAccountKey v1alpha1.ValueFromField `json:"serviceAccountKey"`
+	ServiceAccountKey SecretValueFromSource `json:"serviceAccountKey"`
 
 	// Adapter spec overrides parameters.
 	// +optional

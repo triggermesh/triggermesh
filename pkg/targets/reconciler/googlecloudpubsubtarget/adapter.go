@@ -20,19 +20,16 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
-	"knative.dev/pkg/kmeta"
+	"knative.dev/pkg/apis"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
 
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/common"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/resources"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const (
-	adapterName = "googlecloudpubsubtarget"
-
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -42,35 +39,30 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"GOOGLECLOUDPUBSUBTARGET_ADAPTER_IMAGE" default:"gcr.io/triggermesh/googlecloudpubsubtarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/GoogleCloudPubSubTarget-adapter"`
 }
 
-// makeTargetAdapterKService generates (but does not insert into K8s) the Target Adapter KService.
-func makeTargetAdapterKService(target *v1alpha1.GoogleCloudPubSubTarget, cfg *adapterConfig) *servingv1.Service {
-	name := kmeta.ChildName(adapterName+"-", target.Name)
-	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, target)
-	podLabels := libreconciler.MakeAdapterLabels(adapterName, target)
-	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(target)
-	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
-	envs := append(envSvc, envApp...)
-	envs = append(envs, envObs...)
-	envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvGCloudSAKey, target.Spec.ServiceAccountKey)
+// Verify that Reconciler implements common.AdapterBuilder.
+var _ common.AdapterBuilder[*servingv1.Service] = (*Reconciler)(nil)
 
-	return resources.MakeKService(target.Namespace, name, cfg.Image,
-		resources.KsvcLabels(ksvcLabels),
-		resources.KsvcLabelVisibilityClusterLocal,
-		resources.KsvcOwner(target),
-		resources.KsvcPodLabels(podLabels),
-		resources.KsvcPodEnvVars(envs),
-	)
+// BuildAdapter implements common.AdapterBuilder.
+func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) (*servingv1.Service, error) {
+	typedTrg := trg.(*v1alpha1.GoogleCloudPubSubTarget)
+
+	return common.NewAdapterKnService(trg, nil,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	), nil
 }
 
 func makeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
-			Name:  libreconciler.EnvBridgeID,
-			Value: libreconciler.GetStatefulBridgeID(o),
+			Name: common.EnvGCloudSAKey,
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: o.Spec.ServiceAccountKey.SecretKeyRef,
+			},
 		},
 		{
 			Name:  "GCLOUD_PUBSUB_TOPIC",
@@ -86,5 +78,4 @@ func makeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
 	}
 
 	return env
-
 }

@@ -21,19 +21,14 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
-	"k8s.io/client-go/tools/cache"
-
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/configmap"
 	"knative.dev/pkg/controller"
-	"knative.dev/pkg/logging"
-	servingclient "knative.dev/serving/pkg/client/injection/client"
-	serviceinformerv1 "knative.dev/serving/pkg/client/injection/informers/serving/v1/service"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	informerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/informers/targets/v1alpha1/googlecloudpubsubtarget"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlecloudpubsubtarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // NewController initializes the controller and is called by the generated code
@@ -43,27 +38,32 @@ func NewController(
 	cmw configmap.Watcher,
 ) *controller.Impl {
 
-	adapterCfg := &adapterConfig{
-		obsConfig: source.WatchConfigurations(ctx, adapterName, cmw, source.WithLogging, source.WithMetrics),
-	}
-	envconfig.MustProcess(adapterName, adapterCfg)
+	typ := (*v1alpha1.GoogleCloudFirestoreTarget)(nil)
+	app := common.ComponentName(typ)
 
-	targetInformer := informerv1alpha1.Get(ctx)
-	serviceInformer := serviceinformerv1.Get(ctx)
+	// Calling envconfig.Process() with a prefix appends that prefix
+	// (uppercased) to the Go field name, e.g. MYTARGET_IMAGE.
+	adapterCfg := &adapterConfig{
+		obsConfig: source.WatchConfigurations(ctx, app, cmw),
+	}
+	envconfig.MustProcess(app, adapterCfg)
+
+	informer := informerv1alpha1.Get(ctx)
 
 	r := &Reconciler{
-		ksvcr:      libreconciler.NewKServiceReconciler(servingclient.Get(ctx), serviceInformer.Lister()),
 		adapterCfg: adapterCfg,
 	}
-
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	targetInformer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
+	r.base = common.NewGenericServiceReconciler[*v1alpha1.GoogleCloudPubSubTarget](
+		ctx,
+		typ.GetGroupVersionKind(),
+		impl.Tracker,
+		impl.EnqueueControllerOf,
+		informer.Lister().GoogleCloudPubSubTargets,
+	)
 
-	serviceInformer.Informer().AddEventHandler(cache.FilteringResourceEventHandler{
-		FilterFunc: controller.FilterControllerGVK((&v1alpha1.GoogleCloudPubSubTarget{}).GetGroupVersionKind()),
-		Handler:    controller.HandleAll(impl.EnqueueControllerOf),
-	})
+	informer.Informer().AddEventHandler(controller.HandleAll(impl.Enqueue))
 
 	return impl
 }

@@ -19,35 +19,35 @@ package googlecloudpubsubtarget
 import (
 	"context"
 
-	pkgreconciler "knative.dev/pkg/reconciler"
+	"context"
 
 	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/googlecloudpubsubtarget"
-	libreconciler "github.com/triggermesh/triggermesh/pkg/targets/reconciler"
+	"knative.dev/pkg/reconciler"
+
+	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/GoogleCloudPubSubTarget"
+
+	listersv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/listers/targets/v1alpha1"
+
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 )
 
 // Reconciler implements controller.Reconciler for the event target type.
 type Reconciler struct {
-	// adapter properties
+	base       common.GenericServiceReconciler[*v1alpha1.GoogleCloudPubSubTarget, listersv1alpha1.GoogleCloudPubSubTargetNamespaceLister]
 	adapterCfg *adapterConfig
-
-	// Knative Service reconciler
-	ksvcr libreconciler.KServiceReconciler
 }
 
 // Check that our Reconciler implements Interface
 var _ reconcilerv1alpha1.Interface = (*Reconciler)(nil)
 
 // ReconcileKind implements Interface.ReconcileKind.
-func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.GoogleCloudPubSubTarget) pkgreconciler.Event {
-	trg.Status.InitializeConditions()
-	trg.Status.ObservedGeneration = trg.Generation
-	trg.Status.AcceptedEventTypes = trg.AcceptedEventTypes()
-	trg.Status.ResponseAttributes = libreconciler.CeResponseAttributes(trg)
+func (r *Reconciler) ReconcileKind(ctx context.Context, trg *v1alpha1.GoogleCloudPubSubTarget) reconciler.Event {
+	// inject target into context for usage in reconciliation logic
+	ctx = commonv1alpha1.WithReconcilable(ctx, trg)
 
-	adapter, event := r.ksvcr.ReconcileKService(ctx, trg, makeTargetAdapterKService(trg, r.adapterCfg))
-
-	trg.Status.PropagateKServiceAvailability(adapter)
-
-	return event
+	return r.base.ReconcileAdapter(ctx, r)
 }
