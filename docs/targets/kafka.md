@@ -6,20 +6,20 @@ This event target integrates with Kafka, where any Cloud Event received are publ
 
 - [Kafka event target](#kafka-event-target)
   - [Prerequisites](#prerequisites)
-  - [Creating a Kafka Target](#creating-a-kafka-target)
+  - [Creating a KafkaTarget](#creating-a-kafka-target)
     - [SASL-PLAIN](#sasl-plain)
     - [Kerberos-SSL](#kerberos-ssl)
   - [Status](#status)
-  - [Kafka Target as an event Sink](#kafka-target-as-an-event-sink)
-  - [Sending messages to the Kafka Target](#sending-messages-to-the-kafka-target)
+  - [KafkaTarget as an event Sink](#kafka-target-as-an-event-sink)
+  - [Sending messages to the KafkaTarget](#sending-messages-to-the-kafka-target)
 
 ## Prerequisites
 
 A running Kafka cluster.
 
-## Creating a Kafka Source
+## Creating a KafkaTarget
 
-### Creating a Kafka Target with SASL-PLAIN
+### SASL-PLAIN
 
 This section demonstrates how to configure a KafkaTarget to use SASL-PLAIN authentication.
 
@@ -41,7 +41,7 @@ spec:
       value: admin-secret
 ```
 
-### Creating a Kafka Target with Kerberos-SSL
+### Kerberos-SSL
 
 This section demonstrates how to configure a KafkaTarget to use Kerberos-SSL authentication.
 
@@ -111,7 +111,7 @@ NAME     URL                                                   READY   REASON   
 sample   http://kafkatarget-sample.default.svc.cluster.local   True             1m
 ```
 
-### Kafka Target as an event Sink
+### KafkaTarget as an event Sink
 
 A `KafkaTarget` is addressable, which means it can be used as a Sink for Knative components.
 
@@ -148,9 +148,9 @@ spec:
       name: triggermesh-kafka
 ```
 
-### Sending messages to the Kafka Target
+### Sending messages to the KafkaTarget
 
- A Kafka Target will, by default, accept any CloudEvent and pass the entire event into a message body.
+ A KafkaTarget will, by default, accept any CloudEvent and pass the entire event into a message body.
 
 `curl` can be used from a container in the cluster pointing to the `ConfluentTarget` exposed URL:
 

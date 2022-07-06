@@ -7,7 +7,7 @@ as CloudEvents'.
 
 - [Kafka event source](#kafka-event-source)
   - [Prerequisites](#prerequisites)
-  - [Creating a Kafka Source](#creating-a-kafka-source)
+  - [Creating a KafkaSource](#creating-a-kafka-source)
     - [SASL-PLAIN](#with-sasl-plain)
     - [Kerberos-SSL](#with-kerberos-ssl)
   - [Status](#status)
@@ -16,9 +16,9 @@ as CloudEvents'.
 
 A running Kafka cluster.
 
-## Creating a Kafka Source
+## Creating a KafkaSource
 
-### Creating a Kafka Source with SASL-PLAIN
+### SASL-PLAIN
 
 This section demonstrates how to configure a KafkaSource to use SASL-PLAIN authentication.
 
@@ -47,7 +47,7 @@ spec:
       name: default
 ```
 
-### Creating a Kafka Source with Kerberos-SSL
+### Kerberos-SSL
 
 This section demonstrates how to configure a KafkaSource to use Kerberos-SSL authentication.
 
