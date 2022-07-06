@@ -20,7 +20,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"sync"
+	"fmt"
 
 	"go.uber.org/zap"
 
@@ -127,19 +127,31 @@ func (a *kafkasourceAdapter) Start(ctx context.Context) error {
 		adapter: a,
 	}
 
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-
-	defer wg.Done()
-	for {
-		go func() {
+	e := make(chan error, 1)
+	go func() {
+		for {
+			// `Consume` should be called inside an infinite loop, when a
+			// server-side rebalance happens, the consumer session will need to be
+			// recreated to get the new claims.
 			err := a.kafkaClient.Consume(ctx, a.topics, consumerGroup)
 			if err != nil {
-				a.logger.Panicw("Error Consuming Kafka Messages", err)
+				e <- err
+				return
 			}
-		}()
-		wg.Wait()
+			if ctx.Err() != nil {
+				// Context was cancelled, signal to exit the Start function and
+				// exit this routine
+				e <- nil
+				return
+			}
+		}
+	}()
+
+	if err := <-e; err != nil {
+		return fmt.Errorf("error consuming kafka messages: %w", err)
 	}
+
+	return nil
 }
 
 func newTLSCertificatesConfig(tlsConfig *tls.Config, clientCert, clientKey string) (*tls.Config, error) {
