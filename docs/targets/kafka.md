@@ -113,7 +113,7 @@ sample   http://kafkatarget-sample.default.svc.cluster.local   True             
 
 ### Kafka Target as an event Sink
 
-A Kafka Target is addressable, which means it can be used as a Sink for Knative components.
+A `KafkaTarget` is addressable, which means it can be used as a Sink for Knative components.
 
 ```yaml
 apiVersion: eventing.knative.dev/v1beta1
