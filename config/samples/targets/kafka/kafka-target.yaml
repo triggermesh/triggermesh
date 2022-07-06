@@ -22,6 +22,7 @@ spec:
   topic: test-topic
   auth:
     saslEnable: true
+    tlsEnable: true
     securityMechanism: GSSAPI
     kerberos:
       username: kafka

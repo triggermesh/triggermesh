@@ -29,6 +29,7 @@ type envAccessor struct {
 	pkgadapter.EnvConfig
 
 	SASLEnable bool `envconfig:"SASL_ENABLE" required:"true"`
+	TLSEnable  bool `envconfig:"TLS_ENABLE" required:"true"`
 
 	BootstrapServers   []string `envconfig:"BOOTSTRAP_SERVERS" required:"true"`
 	Username           string   `envconfig:"USERNAME" required:"false"`
