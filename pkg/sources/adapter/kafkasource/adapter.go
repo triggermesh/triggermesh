@@ -20,7 +20,6 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"sync"
 
 	"go.uber.org/zap"
 
@@ -68,8 +67,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		config.Net.SASL.Password = env.Password
 	}
 
-	if env.CA != "" || env.ClientCert != "" || env.ClientKey != "" || env.SkipVerify {
-		config.Net.TLS.Enable = true
+	if env.TLSEnable {
+		config.Net.TLS.Enable = env.TLSEnable
 		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
 		if err != nil {
 			logger.Panicw("Could not create the TLS Certificates Config", err)
@@ -127,14 +126,15 @@ func (a *kafkasourceAdapter) Start(ctx context.Context) error {
 		adapter: a,
 	}
 
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-
-	defer wg.Done()
 	for {
-		err := a.kafkaClient.Consume(ctx, a.topics, consumerGroup)
-		if err != nil {
-			a.logger.Panicw("Error Consuming Kafka Messages", err)
+		// `Consume` should be called inside an infinite loop, when a
+		// server-side rebalance happens, the consumer session will need to be
+		// recreated to get the new claims.
+		if err := a.kafkaClient.Consume(ctx, a.topics, consumerGroup); err != nil {
+			return err
+		}
+		if ctx.Err() != nil {
+			return nil
 		}
 	}
 }

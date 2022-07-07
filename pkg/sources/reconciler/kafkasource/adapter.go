@@ -46,6 +46,7 @@ const (
 	envSkipVerify         = "SKIP_VERIFY"
 
 	envSaslEnable = "SASL_ENABLE"
+	envTLSEnable  = "TLS_ENABLE"
 
 	envKerberosConfigPath  = "KERBEROS_CONFIG_PATH"
 	envKerberosKeytabPath  = "KERBEROS_KEYTAB_PATH"
@@ -130,6 +131,13 @@ func makeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 			Name:  envGroupID,
 			Value: o.Spec.GroupID,
 		},
+	}
+
+	if o.Spec.Auth.TLSEnable != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envTLSEnable,
+			Value: strconv.FormatBool(*o.Spec.Auth.TLSEnable),
+		})
 	}
 
 	if o.Spec.Auth.SecurityMechanisms != nil {

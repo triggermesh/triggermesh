@@ -78,6 +78,10 @@ type KafkaTargetAuth struct {
 	// SASL Enable
 	SASLEnable bool `json:"saslEnable"`
 
+	// TLS Enable
+	// +optional
+	TLSEnable *bool `json:"tlsEnable,omitempty"`
+
 	// SecurityMechanisms holds the assignment of the specific SASL mechanisms.
 	// +optional
 	SecurityMechanisms *string `json:"securityMechanism,omitempty"`

@@ -108,7 +108,6 @@ In order to configure the adapter correctly the following fields are mandatory:
 - `boostrapservers`
 - `topics`
 - `salsEnable`
-- `tlsEnable`
 
 ### Status
 

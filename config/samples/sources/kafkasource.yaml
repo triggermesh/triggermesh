@@ -31,6 +31,7 @@ spec:
   groupID: test-consumer-group
   auth:
     saslEnable: true
+    tlsEnable: true
     securityMechanism: GSSAPI
     auth:
       username: kafka
