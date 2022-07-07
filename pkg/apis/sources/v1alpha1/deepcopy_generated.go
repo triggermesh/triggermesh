@@ -3554,6 +3554,11 @@ func (in *KafkaSourceAuth) DeepCopyInto(out *KafkaSourceAuth) {
 		*out = new(KafkaSourceTLSAuth)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.TLSEnable != nil {
+		in, out := &in.TLSEnable, &out.TLSEnable
+		*out = new(bool)
+		**out = **in
+	}
 	if in.SecurityMechanisms != nil {
 		in, out := &in.SecurityMechanisms, &out.SecurityMechanisms
 		*out = new(string)
