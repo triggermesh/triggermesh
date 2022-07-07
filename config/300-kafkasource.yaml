@@ -236,7 +236,6 @@ spec:
                         type: boolean
                 required:
                 - saslEnable
-                - tlsEnable
               sink:
                 description: The destination of events sourced from Kafka Kafka.
                 type: object

@@ -236,7 +236,6 @@ spec:
                         type: boolean
                 required:
                 - saslEnable
-                - tlsEnable
               discardCloudEventContext:
                 description: Whether to omit CloudEvent context attributes in messages sent to Kafka. When this property is
                   false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent

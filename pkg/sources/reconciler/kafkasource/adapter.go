@@ -128,13 +128,16 @@ func makeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 			Value: strconv.FormatBool(o.Spec.Auth.SASLEnable),
 		},
 		{
-			Name:  envTLSEnable,
-			Value: strconv.FormatBool(o.Spec.Auth.TLSEnable),
-		},
-		{
 			Name:  envGroupID,
 			Value: o.Spec.GroupID,
 		},
+	}
+
+	if o.Spec.Auth.TLSEnable != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  envTLSEnable,
+			Value: strconv.FormatBool(*o.Spec.Auth.TLSEnable),
+		})
 	}
 
 	if o.Spec.Auth.SecurityMechanisms != nil {
