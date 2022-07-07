@@ -94,7 +94,6 @@ spec:
 - boostrapservers
 - topic
 - salsEnable
-- tlsEnable
 
 ## Status
 
