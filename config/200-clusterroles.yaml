@@ -354,6 +354,7 @@ rules:
   - datadogtargets/finalizers
   - elasticsearchtargets/finalizers
   - googlecloudfirestoretargets/finalizers
+  - googlecloudpubsubtargets/finalizers
   - googlecloudstoragetargets/finalizers
   - googlecloudworkflowstargets/finalizers
   - googlesheettargets/finalizers
