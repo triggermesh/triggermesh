@@ -163,9 +163,9 @@ rules:
   - datadogtargets
   - elasticsearchtargets
   - googlecloudfirestoretargets
+  - googlecloudpubsubtargets
   - googlecloudstoragetargets
   - googlecloudworkflowstargets
-  - googlecloudpubsubtargets
   - googlesheettargets
   - hasuratargets
   - httptargets
@@ -207,9 +207,9 @@ rules:
   - datadogtargets/status
   - elasticsearchtargets/status
   - googlecloudfirestoretargets/status
+  - googlecloudpubsubtargets/status
   - googlecloudstoragetargets/status
   - googlecloudworkflowstargets/status
-  - googlecloudpubsubtargets/status
   - googlesheettargets/status
   - hasuratargets/status
   - httptargets/status
@@ -863,9 +863,9 @@ rules:
   - datadogtargets
   - elasticsearchtargets
   - googlecloudfirestoretargets
+  - googlecloudpubsubtargets
   - googlecloudstoragetargets
   - googlecloudworkflowstargets
-  - googlecloudpubsubtargets
   - googlesheettargets
   - hasuratargets
   - httptargets
