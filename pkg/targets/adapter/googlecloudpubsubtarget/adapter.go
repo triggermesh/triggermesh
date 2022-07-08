@@ -28,6 +28,7 @@ import (
 	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/option"
 
+	"github.com/triggermesh/triggermesh/pkg/sources/adapter/googlecloudpubsubsource"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -39,7 +40,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	TopicName GCloudResourceName `envconfig:"GCLOUD_PUBSUB_TOPIC" required:"true"`
+	TopicName googlecloudpubsubsource.GCloudResourceName `envconfig:"GCLOUD_PUBSUB_TOPIC" required:"true"`
 
 	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
 

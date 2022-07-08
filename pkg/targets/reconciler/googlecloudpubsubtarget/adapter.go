@@ -39,7 +39,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `default:"gcr.io/triggermesh/googlecloudpubsubtarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/googlecloudpubsubtarget-adapter" envconfig:"GOOGLECLOUDPUBSUBTARGET_IMAGE"`
 }
 
 // Verify that Reconciler implements common.AdapterBuilder.

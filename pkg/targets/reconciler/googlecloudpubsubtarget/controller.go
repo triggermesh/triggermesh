@@ -38,7 +38,7 @@ func NewController(
 	cmw configmap.Watcher,
 ) *controller.Impl {
 
-	typ := (*v1alpha1.GoogleCloudFirestoreTarget)(nil)
+	typ := (*v1alpha1.GoogleCloudPubSubTarget)(nil)
 	app := common.ComponentName(typ)
 
 	// Calling envconfig.Process() with a prefix appends that prefix
