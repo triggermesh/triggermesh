@@ -54,7 +54,6 @@ type envAccessor struct {
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
-
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
 		targetce.ReplierWithStaticResponseType("io.triggermesh.googlecloudpubsubtarget.response"),
@@ -72,7 +71,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	t := psCli.Topic(env.TopicName.Resource)
 	return &googlecloudpubsubtargetAdapter{
-		topic:    t,
+		topic: t,
+
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
@@ -103,7 +103,7 @@ func (a *googlecloudpubsubtargetAdapter) dispatch(ctx context.Context, event clo
 	if err != nil {
 		a.logger.Panic(err)
 	}
-	a.logger.Infof("Published a message; msg ID: %v\n", id)
 
+	a.logger.Debugf("Published a message; msg ID: %v\n", id)
 	return a.replier.Ok(&event, "ok")
 }
