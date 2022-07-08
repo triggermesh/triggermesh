@@ -65,7 +65,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		targetce.ReplierWithStaticResponseType("io.triggermesh.azuresentineltarget.response"),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
-		logger.Panicf("creating CloudEvents replier: %v", err)
+		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
 	return &azuresentineltargetAdapter{
@@ -102,7 +102,7 @@ func (a *azuresentineltargetAdapter) dispatch(ctx context.Context, event cloudev
 
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
-		a.logger.Errorf("Error creating Azure authorizer: %v", err)
+		a.logger.Errorf("creating Azure authorizer: %v", err)
 		return nil, nil
 	}
 
