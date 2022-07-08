@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -31,6 +32,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
@@ -62,7 +64,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		targetce.ReplierWithStaticResponseType("io.triggermesh.azuresentineltarget.response"),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeAzureSentinelTargetGenericResponse),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
@@ -94,6 +96,11 @@ func (a *azuresentineltargetAdapter) Start(ctx context.Context) error {
 }
 
 func (a *azuresentineltargetAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+	typ := event.Type()
+	if typ != v1alpha1.EventTypeAzureSentinelTargetIncident {
+		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
+	}
+
 	i := &Incident{}
 	if err := event.DataAs(i); err != nil {
 		a.logger.Errorf("decoding event: %v", err)

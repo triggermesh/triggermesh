@@ -27,7 +27,9 @@ import (
 
 // Managed event types
 const (
-	EventTypeAzureSentinelTargetGenericResponse = "io.triggermesh.azuresentineltarget.response"
+	EventTypeAzureSentinelTargetIncident = "io.triggermesh.azure.sentinel.incident"
+
+	EventTypeAzureSentinelTargetGenericResponse = "io.triggermesh.azure.sentinel.response"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.

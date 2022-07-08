@@ -22,11 +22,11 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "*" }
+        { "type": "io.triggermesh.azure.sentinel.incident" }
       ]
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.azuresentineltarget.response" }
+        { "type": "io.triggermesh.azure.sentinel.response" }
       ]
 spec:
   group: targets.triggermesh.io
