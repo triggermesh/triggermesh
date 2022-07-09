@@ -344,6 +344,7 @@ rules:
   - awssnstargets/finalizers
   - awssqstargets/finalizers
   - azureeventhubstargets/finalizers
+  - azuresentineltargets/finalizers
   - cloudeventstargets/finalizers
   - confluenttargets/finalizers
   - datadogtargets/finalizers
