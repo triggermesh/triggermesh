@@ -23,11 +23,14 @@ spec:
   resourceGroup: <resource_group>
   # workspace refers to the workspace name in Azure Sentinel.
   workspace: <workspace>
-  # clientID refers to the Application (client) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+  # clientID refers to the Application (client) ID of the App Registration.
+  # see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
   clientID: <client_id>
-  # tenantID refers to the Directory (tenant) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+  # tenantID refers to the Directory (tenant) ID of the App Registration.
+  # see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
   tenantID: <tenant_id>
-  # clientSecret refers to the Client Secret of an App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+  # clientSecret refers to the Client Secret of an App Registration.
+  # see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
   clientSecret:
     secretKeyRef:
       name: azurecreds
