@@ -56,7 +56,8 @@ spec:
             properties:
               subscriptionID:
                 type: string
-                description: subscriptionID refers to the Azure Subscription ID that the Azure Sentinel instance is associated with.
+                description: subscriptionID refers to the Azure Subscription ID that the Azure Sentinel instance is associated
+                  with.
               resourceGroup:
                 type: string
                 description: resourceGroup refers to the resource group where the Azure Sentinel instance is deployed.
@@ -65,13 +66,16 @@ spec:
                 description: workspace refers to the workspace name in Azure Sentinel.
               clientID:
                 type: string
-                description: clientID refers to the Application (client) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+                description: clientID refers to the Application (client) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
+                  for more details
               tenantID:
                 type: string
-                description: tenantID refers to the Directory (tenant) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+                description: tenantID refers to the Directory (tenant) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
+                  for more details
               clientSecret:
                 type: object
-                description: clientSecret refers to the Client Secret of an App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
+                description: clientSecret refers to the Client Secret of an App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
+                  for more details
                 properties:
                   secretKeyRef:
                     type: object
