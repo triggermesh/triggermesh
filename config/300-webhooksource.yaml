@@ -128,7 +128,7 @@ spec:
                         value:
                           type: string
                   public:
-                    description: Endpoint visibility scope.
+                    description: Adapter visibility scope.
                     type: boolean
                   resources:
                     description: Compute Resources required by the adapter. More info at https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
