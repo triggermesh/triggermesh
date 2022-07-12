@@ -52,3 +52,8 @@ func (s *CloudEventsSource) GetStatusManager() *v1alpha1.StatusManager {
 		Status:       &s.Status,
 	}
 }
+
+// GetAdapterOverrides implements AdapterConfigurable.
+func (s *CloudEventsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
+}

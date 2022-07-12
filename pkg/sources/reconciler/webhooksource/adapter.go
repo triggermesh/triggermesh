@@ -54,10 +54,22 @@ var _ common.AdapterBuilder[*servingv1.Service] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	typedSrc := src.(*v1alpha1.WebhookSource)
 
+	// Common reconciler internals set the visibility to non public by default. That does
+	// not play well with sources which should default to being public if no visibility
+	// configuration is provided.
+	switch {
+	case typedSrc.Spec.AdapterOverrides == nil:
+		t := true
+		typedSrc.Spec.AdapterOverrides = &commonv1alpha1.AdapterOverrides{
+			Public: &t,
+		}
+	case typedSrc.Spec.AdapterOverrides.Public == nil:
+		t := true
+		typedSrc.Spec.AdapterOverrides.Public = &t
+	}
+
 	return common.NewAdapterKnService(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
-
-		resource.VisibilityPublic,
 
 		resource.EnvVars(makeWebhookEnvs(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
