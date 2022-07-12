@@ -2463,6 +2463,11 @@ func (in *CloudEventsSourceSpec) DeepCopyInto(out *CloudEventsSourceSpec) {
 		*out = new(RateLimiter)
 		**out = **in
 	}
+	if in.AdapterOverrides != nil {
+		in, out := &in.AdapterOverrides, &out.AdapterOverrides
+		*out = new(commonv1alpha1.AdapterOverrides)
+		(*in).DeepCopyInto(*out)
+	}
 	return
 }
 
