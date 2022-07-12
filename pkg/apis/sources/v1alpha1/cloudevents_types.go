@@ -39,9 +39,9 @@ type CloudEventsSource struct {
 // Check the interfaces the event source should be implementing.
 var (
 	_ v1alpha1.Reconcilable        = (*CloudEventsSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*WebhookSource)(nil)
-	_ v1alpha1.EventSource         = (*WebhookSource)(nil)
-	_ v1alpha1.EventSender         = (*WebhookSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*CloudEventsSource)(nil)
+	_ v1alpha1.EventSource         = (*CloudEventsSource)(nil)
+	_ v1alpha1.EventSender         = (*CloudEventsSource)(nil)
 )
 
 // CloudEventsSourceSpec defines the desired state of the event source.

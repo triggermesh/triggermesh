@@ -57,3 +57,18 @@ func (s *CloudEventsSource) GetStatusManager() *v1alpha1.StatusManager {
 func (s *CloudEventsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
 }
+
+// AsEventSource implements EventSource.
+func (s *CloudEventsSource) AsEventSource() string {
+	sourceName := s.Name
+	if s.Namespace != "" {
+		sourceName = s.Namespace + "." + sourceName
+	}
+
+	return sourceName
+}
+
+// GetEventTypes implements EventSource.
+func (s *CloudEventsSource) GetEventTypes() []string {
+	return []string{"*"}
+}
