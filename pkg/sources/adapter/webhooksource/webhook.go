@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -35,14 +36,17 @@ import (
 const (
 	serverPort                uint16 = 8080
 	serverShutdownGracePeriod        = time.Second * 10
+	queryPrefix                      = "q"
+	headerPrefix                     = "h"
 )
 
 type webhookHandler struct {
-	eventType       string
-	eventSource     string
-	username        string
-	password        string
-	corsAllowOrigin string
+	eventType               string
+	eventSource             string
+	extensionAttributesFrom *ExtensionAttributesFrom
+	username                string
+	password                string
+	corsAllowOrigin         string
 
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
@@ -136,6 +140,48 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 		event.SetType(h.eventType)
 		event.SetSource(h.eventSource)
 
+		// Add extension attributes if configured
+		if h.extensionAttributesFrom != nil {
+			if h.extensionAttributesFrom.path {
+				event.SetExtension("path", r.URL.Path)
+			}
+			if h.extensionAttributesFrom.method {
+				event.SetExtension("method", r.Method)
+			}
+			if h.extensionAttributesFrom.host {
+				event.SetExtension("host", r.Host)
+			}
+			if h.extensionAttributesFrom.queries {
+				for k, v := range r.URL.Query() {
+					if len(v) == 1 {
+						event.SetExtension(sanitizeCloudEventAttributeName(queryPrefix+k), v[0])
+					} else {
+						for i := range v {
+							event.SetExtension(sanitizeCloudEventAttributeName(
+								fmt.Sprintf("%s%s%d", queryPrefix, k, i)), v[i])
+						}
+					}
+				}
+			}
+			if h.extensionAttributesFrom.headers {
+				for k, v := range r.Header {
+					// Prevent Authorization header from being added
+					// as a CloudEvent atribute
+					if k == "Authorization" {
+						continue
+					}
+					if len(v) == 1 {
+						event.SetExtension(sanitizeCloudEventAttributeName(headerPrefix+k), v[0])
+					} else {
+						for i := range v {
+							event.SetExtension(sanitizeCloudEventAttributeName(
+								fmt.Sprintf("%s%s%d", headerPrefix, k, i)), v[i])
+						}
+					}
+				}
+			}
+		}
+
 		if err := event.SetData(r.Header.Get("Content-Type"), body); err != nil {
 			h.handleError(fmt.Errorf("failed to set event data: %w", err), http.StatusInternalServerError, w)
 			return
@@ -157,4 +203,39 @@ func (h *webhookHandler) handleError(err error, code int, w http.ResponseWriter)
 func healthCheckHandler(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
+}
+
+func sanitizeCloudEventAttributeName(name string) string {
+	// only lowercase accepted
+	name = strings.ToLower(name)
+
+	// strip non valid characters
+	needsStripping := false
+	for i := range name {
+		if !((name[i] >= 'a' && name[i] <= 'z') || (name[i] >= '0' && name[i] <= '9')) {
+			needsStripping = true
+			break
+		}
+	}
+
+	if needsStripping {
+		stripped := []byte{}
+		for i := range name {
+			if (name[i] >= 'a' && name[i] <= 'z') || (name[i] >= '0' && name[i] <= '9') {
+				stripped = append(stripped, name[i])
+			}
+		}
+		name = string(stripped)
+	}
+
+	// truncate if longer than 20 characters
+	if len(name) > 20 {
+		name = name[:20]
+	}
+
+	// data is a reserved element at CloudEvents
+	if name == "data" || name == "path" || name == "method" || name == "host" {
+		return "data0"
+	}
+	return name
 }

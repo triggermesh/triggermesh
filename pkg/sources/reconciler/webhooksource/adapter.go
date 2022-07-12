@@ -17,6 +17,8 @@ limitations under the License.
 package webhooksource
 
 import (
+	"strings"
+
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -30,11 +32,12 @@ import (
 )
 
 const (
-	envWebhookEventType         = "WEBHOOK_EVENT_TYPE"
-	envWebhookEventSource       = "WEBHOOK_EVENT_SOURCE"
-	envWebhookBasicAuthUsername = "WEBHOOK_BASICAUTH_USERNAME"
-	envWebhookBasicAuthPassword = "WEBHOOK_BASICAUTH_PASSWORD"
-	envCorsAllowOrigin          = "WEBHOOK_CORS_ALLOW_ORIGIN"
+	envWebhookEventType                    = "WEBHOOK_EVENT_TYPE"
+	envWebhookEventSource                  = "WEBHOOK_EVENT_SOURCE"
+	envWebhookEventExtensionAttributesFrom = "WEBHOOK_EVENT_EXTENSION_ATTRIBUTES_FROM"
+	envWebhookBasicAuthUsername            = "WEBHOOK_BASICAUTH_USERNAME"
+	envWebhookBasicAuthPassword            = "WEBHOOK_BASICAUTH_PASSWORD"
+	envCorsAllowOrigin                     = "WEBHOOK_CORS_ALLOW_ORIGIN"
 )
 
 // adapterConfig contains properties used to configure the adapter.
@@ -84,6 +87,15 @@ func makeWebhookEnvs(src *v1alpha1.WebhookSource) []corev1.EnvVar {
 		Name:  envWebhookEventSource,
 		Value: src.AsEventSource(),
 	}}
+
+	if extAttributes := src.Spec.EventExtensionAttributes; extAttributes != nil {
+		if len(extAttributes.From) != 0 {
+			envs = append(envs, corev1.EnvVar{
+				Name:  envWebhookEventExtensionAttributesFrom,
+				Value: strings.Join(extAttributes.From, ","),
+			})
+		}
+	}
 
 	if origin := src.Spec.CORSAllowOrigin; origin != nil {
 		envs = append(envs, corev1.EnvVar{

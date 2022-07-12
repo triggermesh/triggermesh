@@ -57,6 +57,24 @@ spec:
                   \ in which an event happened. Must be expressed as a URI-reference. Please refer to the CloudEvents specification\
                   \ for more details: https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#source-1"
                 type: string
+              eventExtensionAttributes:
+                description: CloudEvents extension attributes to be added based on HTTP request fields.
+                type: object
+                properties:
+                  from:
+                    description: Source elements to create attributes from. Elements that might contain multiple values (headers,
+                      queries) will convert all of them into extension attributes
+                    type: array
+                    items:
+                      type: string
+                      enum:
+                      - method
+                      - path
+                      - host
+                      - queries
+                      - headers
+                required:
+                - from
               corsAllowOrigin:
                 description: Value of the CORS 'Access-Control-Allow-Origin' header to set on ingested requests.
                 type: string

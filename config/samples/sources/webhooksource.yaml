@@ -27,6 +27,11 @@ spec:
   eventType: com.example.mysample.event
   eventSource: instance-abc123
 
+  eventExtensionAttributes:
+    from:
+    - path
+    - queries
+
   basicAuthUsername: customuser
   basicAuthPassword:
     value: abc123secret
