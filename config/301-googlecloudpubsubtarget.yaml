@@ -55,7 +55,7 @@ spec:
             type: object
             properties:
               topic:
-                description: Full resource name of the Pub/Sub topic to subscribe to, in the format "projects/{project_name}/topics/{topic_name}".
+                description: Full resource name of the Pub/Sub topic to stream events to, in the format "projects/{project_name}/topics/{topic_name}".
                 type: string
                 pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
               credentialsJson:
