@@ -51,11 +51,11 @@ type envAccessor struct {
 	SkipVerify bool   `envconfig:"SKIP_VERIFY" required:"false"`
 
 	// This set of variables are experimental and not graduated to the CRD.
-	CreateTopicIfMissing        bool `envconfig:"CREATE_MISSING_TOPIC" default:"true"`
-	FlushOnExitTimeoutMillisecs int  `envconfig:"FLUSH_ON_EXIT_TIMEOUT_MS" default:"10000"`
-	CreateTopicTimeoutMillisecs int  `envconfig:"CREATE_TOPIC_TIMEOUT_MS" default:"10000"`
-	NewTopicPartitions          int  `envconfig:"TOPIC_PARTITIONS" default:"1"`
-	NewTopicReplicationFactor   int  `envconfig:"TOPIC_REPLICATION_FACTOR" default:"1"`
+	CreateTopicIfMissing        bool  `envconfig:"CREATE_MISSING_TOPIC" default:"true"`
+	FlushOnExitTimeoutMillisecs int   `envconfig:"FLUSH_ON_EXIT_TIMEOUT_MS" default:"10000"`
+	CreateTopicTimeoutMillisecs int   `envconfig:"CREATE_TOPIC_TIMEOUT_MS" default:"10000"`
+	NewTopicPartitions          int32 `envconfig:"TOPIC_PARTITIONS" default:"1"`
+	NewTopicReplicationFactor   int16 `envconfig:"TOPIC_REPLICATION_FACTOR" default:"1"`
 
 	DiscardCEContext bool `envconfig:"DISCARD_CE_CONTEXT"`
 }

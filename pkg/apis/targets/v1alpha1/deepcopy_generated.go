@@ -2579,12 +2579,12 @@ func (in *KafkaTargetSpec) DeepCopyInto(out *KafkaTargetSpec) {
 	*out = *in
 	if in.TopicReplicationFactor != nil {
 		in, out := &in.TopicReplicationFactor, &out.TopicReplicationFactor
-		*out = new(int)
+		*out = new(int32)
 		**out = **in
 	}
 	if in.TopicPartitions != nil {
 		in, out := &in.TopicPartitions, &out.TopicPartitions
-		*out = new(int)
+		*out = new(int16)
 		**out = **in
 	}
 	if in.BootstrapServers != nil {
