@@ -60,7 +60,7 @@ spec:
                 pattern: ^projects\/[a-z][a-z0-9-]{3,29}\/topics\/[a-zA-Z][\w-.~%+]{2,254}$
               credentialsJson:
                 type: object
-                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information,
+                description: GCP credentials used to programmatically interact with Google Cloud Pub/Sub. For additional information,
                   refer to https://cloud.google.com/docs/authentication/production.
                 properties:
                   secretKeyRef:
