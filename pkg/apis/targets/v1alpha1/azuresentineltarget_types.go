@@ -65,24 +65,6 @@ type AzureSentinelTargetSpec struct {
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
-// AzureSentinelTargetStatus communicates the observed state of the event target. (from the controller).
-type AzureSentinelTargetStatus struct {
-	duckv1.Status        `json:",inline"`
-	duckv1.AddressStatus `json:",inline"`
-
-	// Accepted/emitted CloudEvent attributes
-	CloudEventStatus `json:",inline"`
-}
-
-// CloudEventStatus contains attributes that event receivers can embed to
-// declare the event types they accept.
-//
-// +k8s:deepcopy-gen=true
-type CloudEventStatus struct {
-	// AcceptedEventTypes are the CloudEvent types that a component can process.
-	// +optional
-	AcceptedEventTypes []string `json:"acceptedEventTypes,omitempty"`
-}
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
