@@ -75,7 +75,7 @@ var (
 	// AzureSentinelTargetResource respresents an event target for Azure Sentinel.
 	AzureSentinelTargetResource = schema.GroupResource{
 		Group:    GroupName,
-		Resource: "azuresentinelstargets",
+		Resource: "azuresentineltargets",
 	}
 	// CloudEventsTargetResource respresents an event target for CloudEvents gateway.
 	CloudEventsTargetResource = schema.GroupResource{

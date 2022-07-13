@@ -33,6 +33,6 @@ spec:
     "name": "b60b95e8-e229-4398-b3bf-25d1fe51b4f0", "region": "us-ashburn-1", "type": "HostAgentScan", "zone": "Comp-Name" }, "source": { "sourceId": "none", "sourceName": "Cloud Guard" } }'
   sink:
     ref:
-      apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: transformation-csnf-sentinel
+      apiVersion: flow.triggermesh.io/v1alpha1
+      kind: Transformation
+      name: csnf-sentinel

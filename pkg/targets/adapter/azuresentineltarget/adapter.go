@@ -33,10 +33,11 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
 
-type azuresentineltargetAdapter struct {
+type adapter struct {
 	client         *http.Client
 	clientID       string
 	tenantID       string
@@ -46,10 +47,11 @@ type azuresentineltargetAdapter struct {
 	workspace      string
 	clientSecret   string
 
-	// sink     string
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
+	sr       *metrics.EventProcessingStatsReporter
 }
 
 // EnvAccessorCtor for configuration parameters
@@ -62,6 +64,12 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
 
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: "azuresentineltargets",
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
+	}
+
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
 		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeAzureSentinelTargetGenericResponse),
@@ -70,7 +78,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	return &azuresentineltargetAdapter{
+	return &adapter{
 		client:         http.DefaultClient,
 		clientID:       env.ClientID,
 		tenantID:       env.TenantID,
@@ -80,22 +88,23 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		workspace:      env.Workspace,
 		clientSecret:   env.ClientSecret,
 
-		// sink:     env.Sink,
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
+		mt:       mt,
+		sr:       metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
-var _ pkgadapter.Adapter = (*azuresentineltargetAdapter)(nil)
+var _ pkgadapter.Adapter = (*adapter)(nil)
 
 // Returns if stopCh is closed or Send() returns an error.
-func (a *azuresentineltargetAdapter) Start(ctx context.Context) error {
+func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AzureSentinel Target Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *azuresentineltargetAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	typ := event.Type()
 	if typ != v1alpha1.EventTypeAzureSentinelTargetIncident {
 		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
@@ -103,14 +112,14 @@ func (a *azuresentineltargetAdapter) dispatch(ctx context.Context, event cloudev
 
 	i := &Incident{}
 	if err := event.DataAs(i); err != nil {
-		a.logger.Errorf("decoding event: %v", err)
-		return nil, nil
+		a.logger.Errorw("decoding event: %v", zap.Error(err))
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
-		a.logger.Errorf("creating Azure authorizer: %v", err)
-		return nil, nil
+		a.logger.Errorw("creating Azure authorizer: %v", zap.Error(err))
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	reqBody, err := json.Marshal(*i)

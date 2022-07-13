@@ -38,32 +38,64 @@ type envAccessor struct {
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
-	// Sink defines the target sink for the events. If no Sink is defined the
-	// events are replied back to the sender.
-	Sink string `envconfig:"K_SINK"`
 }
 
+// IncidentLabel is the label used to identify the incident in the Azure Sentinel
 type IncidentLabel struct {
 	LabelName string            `json:"labelName"`
 	LabelType IncidentLabelType `json:"labelType"`
 }
 
+// IncidentLabelType is the type of the label associated with an incident
 type IncidentLabelType []struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
 }
 
+// IncidentOwnerInfo is the owner information of an incident
 type IncidentOwnerInfo struct {
 	// ObjectId string `json:"objectId"`
 	AssignedTo string `json:"assignedTo"`
 }
 
+// IncidentStatus an Azure Sentinel incident status object
 type IncidentStatus struct {
 	Active string `json:"active"`
 	Closed string `json:"closed"`
 	New    string `json:"new"`
 }
 
+// Incident an Azure Sentinel incident.
+type Incident struct {
+	ID                 string                 `json:"id"`
+	Name               string                 `json:"name"`
+	Description        string                 `json:"description"`
+	Status             IncidentStatus        `json:"status"`
+	Labels             []IncidentLabel        `json:"labels"`
+	OwnerInfo          IncidentOwnerInfo      `json:"ownerInfo"`
+	CreatedAt          string                 `json:"createdAt"`
+	UpdatedAt          string                 `json:"updatedAt"`
+	IncidentType       string                 `json:"incidentType"`
+	IncidentTypeID     string                 `json:"incidentTypeId"`
+	IncidentTypeName   string                 `json:"incidentTypeName"`
+	IncidentTypeStatus string                 `json:"incidentTypeStatus"`
+	IncidentTypeLabels []IncidentLabel        `json:"incidentTypeLabels"`
+	IncidentTypeOwner  IncidentOwnerInfo      `json:"incidentTypeOwner"`
+	IncidentTypeCreatedAt string                 `json:"incidentTypeCreatedAt"`
+	IncidentTypeUpdatedAt string                 `json:"incidentTypeUpdatedAt"`
+	IncidentTypeDescription string                 `json:"incidentTypeDescription"`
+	IncidentTypeStatus string                 `json:"incidentTypeStatus"`
+	IncidentTypeLabels []IncidentLabel        `json:"incidentTypeLabels"`
+	IncidentTypeOwner IncidentOwnerInfo      `json:"incidentTypeOwner"`
+	IncidentTypeCreatedAt string                 `json:"incidentTypeCreatedAt"`
+	IncidentTypeUpdatedAt string                 `json:"incidentTypeUpdatedAt"`
+	IncidentTypeDescription string                 `json:"incidentTypeDescription"`
+	IncidentTypeStatus string                 `json:"incidentTypeStatus"`
+	IncidentTypeLabels []IncidentLabel        `json:"incidentTypeLabels"`
+	IncidentTypeOwner IncidentOwnerInfo      `json:"incidentTypeOwner"`
+	IncidentTypeCreatedAt string                 `json:"incidentTypeCreatedAt"`
+	IncidentTypeUpdatedAt string                 `json:"incidentTypeUpdatedAt"`
+	IncidentTypeDescription string
 type Incident struct {
 	Etag       string `json:"etag"`
 	Properties struct {
