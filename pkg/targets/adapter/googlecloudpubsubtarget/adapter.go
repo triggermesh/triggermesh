@@ -18,6 +18,7 @@ package googlecloudpubsubtarget
 
 import (
 	"context"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -28,27 +29,9 @@ import (
 	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/option"
 
-	"github.com/triggermesh/triggermesh/pkg/sources/adapter/googlecloudpubsubsource"
+	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
-
-// EnvAccessorCtor for configuration parameters
-func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
-	return &envAccessor{}
-}
-
-type envAccessor struct {
-	pkgadapter.EnvConfig
-
-	TopicName googlecloudpubsubsource.GCloudResourceName `envconfig:"GCLOUD_PUBSUB_TOPIC" required:"true"`
-
-	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
-
-	// BridgeIdentifier is the name of the bridge workflow this target is part of
-	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
-	// CloudEvents responses parametrization
-	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
-}
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
@@ -60,6 +43,12 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
+	}
+
+	mt := &pkgadapter.MetricTag{
+		ResourceGroup: "googlecloudpubsubtargets",
+		Namespace:     envAcc.GetNamespace(),
+		Name:          envAcc.GetName(),
 	}
 
 	psCli, err := pubsub.NewClient(ctx, env.TopicName.Project,
@@ -76,6 +65,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		replier:  replier,
 		ceClient: ceClient,
 		logger:   logger,
+		mt:       mt,
+		sr:       metrics.MustNewEventProcessingStatsReporter(mt),
 	}
 }
 
@@ -87,6 +78,8 @@ type googlecloudpubsubtargetAdapter struct {
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
+	mt       *pkgadapter.MetricTag
+	sr       *metrics.EventProcessingStatsReporter
 }
 
 // Returns if stopCh is closed or Send() returns an error.
@@ -96,14 +89,24 @@ func (a *googlecloudpubsubtargetAdapter) Start(ctx context.Context) error {
 }
 
 func (a *googlecloudpubsubtargetAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
+	start := time.Now()
+	defer func() {
+		a.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
+	}()
+
 	result := a.topic.Publish(ctx, &pubsub.Message{
 		Data: event.Data(),
 	})
 	id, err := result.Get(ctx)
 	if err != nil {
-		a.logger.Panic(err)
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil))
 	}
 
 	a.logger.Debugf("Published a message; msg ID: %v\n", id)
+	a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	return a.replier.Ok(&event, "ok")
 }
