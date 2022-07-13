@@ -20,5 +20,5 @@ spec:
   topic: ''
   credentialsJson:
     secretKeyRef:
-      name: googlecloudfirestore
+      name: googlecloudpubsub
       key: creds
