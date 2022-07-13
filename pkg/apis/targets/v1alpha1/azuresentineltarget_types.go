@@ -37,7 +37,6 @@ type AzureSentinelTarget struct {
 }
 
 // Check the interfaces AzureSentinelTarget should be implementing.
-// Check the interfaces the event target should be implementing.
 var (
 	_ v1alpha1.Reconcilable        = (*AzureSentinelTarget)(nil)
 	_ v1alpha1.AdapterConfigurable = (*AzureSentinelTarget)(nil)
