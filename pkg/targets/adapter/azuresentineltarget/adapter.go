@@ -148,7 +148,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "reading response body ")
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "reading response body")
 	}
 
 	if res.StatusCode != 201 {
