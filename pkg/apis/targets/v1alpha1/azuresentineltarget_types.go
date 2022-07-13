@@ -27,7 +27,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AzureSentinelTarget is the Schema the event target.
+// AzureSentinelTarget is the Schema for an Azure Sentinel Target.
 type AzureSentinelTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
