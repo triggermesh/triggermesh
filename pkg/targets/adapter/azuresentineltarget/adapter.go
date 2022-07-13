@@ -127,7 +127,11 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "marshaling request for retrieving an access token")
 	}
 
-	rURL := `https://management.azure.com/subscriptions/` + a.subscriptionID + `/resourceGroups/` + a.resourceGroup + `/providers/Microsoft.OperationalInsights/workspaces/` + a.workspace + `/providers/Microsoft.SecurityInsights/incidents/` + uuid.New().String() + `?api-version=2020-01-01`
+	rURL := fmt.Sprintf("https://management.azure.com/"+
+		"subscriptions/%s/resourceGroups/%s/"+
+		"providers/Microsoft.OperationalInsights/workspaces/%s/"+
+		"providers/Microsoft.SecurityInsights/incidents/%s?api-version=2020-01-01",
+		a.subscriptionID, a.resourceGroup, a.workspace, uuid.New().String())
 	request, err := http.NewRequest(http.MethodPut, rURL, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating request token")
