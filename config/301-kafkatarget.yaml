@@ -58,9 +58,13 @@ spec:
               topicReplicationFactor:
                 description: The number of replicas required to stream to the topic.
                 type: integer
+                minimum: 1
+                maximum: 32767
               topicPartitions:
                 description: The number of partitions used by the topic to stream an event to.
                 type: integer
+                minimum: 1
+                maximum: 2147483647
               bootstrapServers:
                 description: Array of Kafka servers used to bootstrap the connection.
                 type: array
