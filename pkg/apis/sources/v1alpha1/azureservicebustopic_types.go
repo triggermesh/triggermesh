@@ -58,6 +58,10 @@ type AzureServiceBusTopicSourceSpec struct {
 	// This event source only supports the ServicePrincipal authentication.
 	Auth AzureAuth `json:"auth"`
 
+	// WebSocketsEnable
+	// +optional
+	WebSocketsEnable *bool `json:"webSocketsEnable,omitempty"`
+
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`

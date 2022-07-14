@@ -17,6 +17,8 @@ limitations under the License.
 package azureservicebustopicsource
 
 import (
+	"strconv"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 
@@ -51,6 +53,11 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		subsID = sID.String()
 	}
 
+	var webSocketsEnable bool
+	if wss := typedSrc.Spec.WebSocketsEnable; wss != nil {
+		webSocketsEnable = *wss
+	}
+
 	var authEnvs []corev1.EnvVar
 	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADTenantID, spAuth.TenantID)
@@ -62,6 +69,7 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.Image(r.adapterCfg.Image),
 
 		resource.EnvVar(common.EnvServiceBusEntityResourceID, subsID),
+		resource.EnvVar(common.EnvServiceBusWebSocketsEnable, strconv.FormatBool(webSocketsEnable)),
 		resource.EnvVars(authEnvs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil

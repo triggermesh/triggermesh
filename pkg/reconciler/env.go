@@ -55,6 +55,7 @@ const (
 	EnvServiceBusKeyValue         = "SERVICEBUS_KEY_VALUE"
 	EnvServiceBusConnStr          = "SERVICEBUS_CONNECTION_STRING"
 	EnvServiceBusEntityResourceID = "SERVICEBUS_ENTITY_RESOURCE_ID"
+	EnvServiceBusWebSocketsEnable = "SERVICEBUS_WEBSOCKETS_ENABLE"
 
 	// Common Google Cloud attributes
 	EnvGCloudSAKey = "GCLOUD_SERVICEACCOUNT_KEY"
