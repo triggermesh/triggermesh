@@ -118,7 +118,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.EntityResourceID), zap.Error(err))
 	}
 
-	client, err := clientFromEnvironment(entityID, newClientOptions(env.WebSocketsEnable))
+	client, err := clientFromEnvironment(entityID, webSocketsClientOptions(env.WebSocketsEnable))
 	if err != nil {
 		logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
 	}
@@ -368,7 +368,7 @@ func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event
 	return origEvent
 }
 
-func newClientOptions(webSocketsEnable bool) *azservicebus.ClientOptions {
+func webSocketsClientOptions(webSocketsEnable bool) *azservicebus.ClientOptions {
 	clientOptions := &azservicebus.ClientOptions{}
 
 	if webSocketsEnable {
