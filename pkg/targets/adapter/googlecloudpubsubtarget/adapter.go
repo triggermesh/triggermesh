@@ -103,7 +103,7 @@ func (a *googlecloudpubsubtargetAdapter) dispatch(ctx context.Context, event clo
 	id, err := result.Get(ctx)
 	if err != nil {
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil))
+		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	a.logger.Debugf("Published a message; msg ID: %v\n", id)
