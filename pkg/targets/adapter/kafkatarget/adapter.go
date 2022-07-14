@@ -124,8 +124,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		createTopicIfMissing:      env.CreateTopicIfMissing,
 		flushTimeout:              env.FlushOnExitTimeoutMillisecs,
 		topicTimeout:              env.CreateTopicTimeoutMillisecs,
-		newTopicPartitions:        env.NewTopicPartitions,
 		newTopicReplicationFactor: env.NewTopicReplicationFactor,
+		newTopicPartitions:        env.NewTopicPartitions,
 
 		discardCEContext: env.DiscardCEContext,
 
@@ -148,8 +148,8 @@ type kafkaAdapter struct {
 
 	flushTimeout              int
 	topicTimeout              int
-	newTopicPartitions        int32
 	newTopicReplicationFactor int16
+	newTopicPartitions        int32
 
 	discardCEContext bool
 
@@ -240,8 +240,8 @@ func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
 // ensureTopic creates a topic if the received topic does not exists.
 func (a *kafkaAdapter) ensureTopic(admin sarama.ClusterAdmin, topicName string) (string, error) {
 	topicDetail := &sarama.TopicDetail{
-		NumPartitions:     a.newTopicPartitions,
 		ReplicationFactor: a.newTopicReplicationFactor,
+		NumPartitions:     a.newTopicPartitions,
 	}
 
 	createTopicError := admin.CreateTopic(topicName, topicDetail, false)
