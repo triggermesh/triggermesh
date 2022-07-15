@@ -18,6 +18,8 @@ package googlecloudpubsubtarget
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"go.uber.org/zap"
@@ -62,11 +64,12 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	return &googlecloudpubsubtargetAdapter{
 		topic: t,
 
-		replier:  replier,
-		ceClient: ceClient,
-		logger:   logger,
-		mt:       mt,
-		sr:       metrics.MustNewEventProcessingStatsReporter(mt),
+		replier:          replier,
+		ceClient:         ceClient,
+		logger:           logger,
+		mt:               mt,
+		sr:               metrics.MustNewEventProcessingStatsReporter(mt),
+		discardCEContext: env.DiscardCEContext,
 	}
 }
 
@@ -75,11 +78,12 @@ var _ pkgadapter.Adapter = (*googlecloudpubsubtargetAdapter)(nil)
 type googlecloudpubsubtargetAdapter struct {
 	topic *pubsub.Topic
 
-	replier  *targetce.Replier
-	ceClient cloudevents.Client
-	logger   *zap.SugaredLogger
-	mt       *pkgadapter.MetricTag
-	sr       *metrics.EventProcessingStatsReporter
+	replier          *targetce.Replier
+	ceClient         cloudevents.Client
+	logger           *zap.SugaredLogger
+	mt               *pkgadapter.MetricTag
+	sr               *metrics.EventProcessingStatsReporter
+	discardCEContext bool
 }
 
 // Returns if stopCh is closed or Send() returns an error.
@@ -91,14 +95,25 @@ func (a *googlecloudpubsubtargetAdapter) Start(ctx context.Context) error {
 func (a *googlecloudpubsubtargetAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	ceTypeTag := metrics.TagEventType(event.Type())
 	ceSrcTag := metrics.TagEventSource(event.Source())
-
 	start := time.Now()
 	defer func() {
 		a.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
 	}()
 
+	var data []byte
+
+	if a.discardCEContext {
+		data = event.Data()
+	} else {
+		jsonEvent, err := json.Marshal(event)
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, fmt.Errorf("Error marshalling CloudEvent"), nil)
+		}
+		data = jsonEvent
+	}
+
 	result := a.topic.Publish(ctx, &pubsub.Message{
-		Data: event.Data(),
+		Data: data,
 	})
 	id, err := result.Get(ctx)
 	if err != nil {

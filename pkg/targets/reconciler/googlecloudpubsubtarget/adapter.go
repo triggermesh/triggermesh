@@ -31,6 +31,7 @@ import (
 
 const (
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
+	envDiscardCEContext    = "DISCARD_CE_CONTEXT"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -64,6 +65,10 @@ func makeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: o.Spec.ServiceAccountKey.SecretKeyRef,
 			},
+		},
+		{
+			Name:  envEventsPayloadPolicy,
+			Value: o.Spec.DiscardCloudEventContext,
 		},
 	}
 

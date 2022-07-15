@@ -37,4 +37,5 @@ type envAccessor struct {
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 	// CloudEvents responses parametrization
 	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
+	DiscardCEContext        bool   `envconfig:"DISCARD_CE_CONTEXT"`
 }

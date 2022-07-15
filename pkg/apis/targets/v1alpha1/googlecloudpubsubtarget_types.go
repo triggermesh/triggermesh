@@ -62,6 +62,10 @@ type GoogleCloudPubSubTargetSpec struct {
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
+
+	// DiscardCloudEventContext is the policy for how to handle the payload of
+	// the CloudEvent.
+	DiscardCloudEventContext string `json:"discardCloudEventContext,omitempty"`
 }
 
 // GoogleCloudPubSubTargetStatus communicates the observed state of the event target. (from the controller).
