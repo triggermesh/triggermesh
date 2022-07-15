@@ -48,11 +48,11 @@ type KafkaTargetSpec struct {
 
 	// TopicReplicationFactor is the number of replicas for the topic.
 	// +optional
-	TopicReplicationFactor *int `json:"topicReplicationFactor,omitempty"`
+	TopicReplicationFactor *int16 `json:"topicReplicationFactor,omitempty"`
 
 	// TopicPartitions is the number of partitions for the topic.
 	// +optional
-	TopicPartitions *int `json:"topicPartitions,omitempty"`
+	TopicPartitions *int32 `json:"topicPartitions,omitempty"`
 
 	// BootstrapServers holds the name of the Kafka Bootstrap server.
 	BootstrapServers []string `json:"bootstrapServers"`

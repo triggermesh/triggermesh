@@ -67,7 +67,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		config.Net.TLS.Enable = true
 		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
 		if err != nil {
-			logger.Panicw("Could not create the TLS Certificates Config", err)
+			logger.Panicf("Could not create the TLS Certificates Config: %v", err)
 		}
 		tlsCfg = newTLSRootCAConfig(tlsCfg, env.CA)
 		config.Net.TLS.Config = tlsCfg
@@ -95,7 +95,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	config.Producer.Return.Successes = true
 	err = config.Validate()
 	if err != nil {
-		logger.Panicw("Config not valid", err)
+		logger.Panicf("Config not valid: %v", err)
 	}
 
 	sc, err = sarama.NewClient(
@@ -103,23 +103,29 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		config,
 	)
 	if err != nil {
-		logger.Panicw("Error creating Sarama Client", err)
+		logger.Panicf("Error creating Sarama Client: %v", err)
+	}
+
+	sac, err := sarama.NewClusterAdminFromClient(sc)
+	if err != nil {
+		logger.Panicf("Error creating Sarama Admin Client: %v", err)
 	}
 
 	kc, err := sarama.NewSyncProducerFromClient(sc)
 	if err != nil {
-		logger.Panicw("Error creating Kafka Producer", err)
+		logger.Panicf("Error creating Kafka Producer: %v", err)
 	}
 
 	return &kafkaAdapter{
 		saramaClient:              sc,
+		saramaAdminClient:         sac,
 		kafkaClient:               kc,
 		topic:                     env.Topic,
 		createTopicIfMissing:      env.CreateTopicIfMissing,
 		flushTimeout:              env.FlushOnExitTimeoutMillisecs,
 		topicTimeout:              env.CreateTopicTimeoutMillisecs,
-		newTopicPartitions:        env.NewTopicPartitions,
 		newTopicReplicationFactor: env.NewTopicReplicationFactor,
+		newTopicPartitions:        env.NewTopicPartitions,
 
 		discardCEContext: env.DiscardCEContext,
 
@@ -133,16 +139,17 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*kafkaAdapter)(nil)
 
 type kafkaAdapter struct {
-	saramaClient sarama.Client
-	kafkaClient  sarama.SyncProducer
-	topic        string
+	saramaClient      sarama.Client
+	saramaAdminClient sarama.ClusterAdmin
+	kafkaClient       sarama.SyncProducer
+	topic             string
 
 	createTopicIfMissing bool
 
 	flushTimeout              int
 	topicTimeout              int
-	newTopicPartitions        int
-	newTopicReplicationFactor int
+	newTopicReplicationFactor int16
+	newTopicPartitions        int32
 
 	discardCEContext bool
 
@@ -185,13 +192,20 @@ func (a *kafkaAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 		msgVal = jsonEvent
 	}
 
+	topic, err := a.ensureTopic(a.saramaAdminClient, a.topic)
+	if err != nil {
+		a.logger.Errorw("Error Ensuring Kafka Topic", zap.String("msg", string(msgVal)), zap.Error(err))
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
+		return err
+	}
+
 	msg := &sarama.ProducerMessage{
-		Topic: a.topic,
+		Topic: topic,
 		Key:   sarama.StringEncoder(event.ID()),
 		Value: sarama.ByteEncoder(msgVal),
 	}
 
-	_, _, err := a.kafkaClient.SendMessage(msg)
+	_, _, err = a.kafkaClient.SendMessage(msg)
 	if err != nil {
 		a.logger.Errorw("Error producing Kafka message", zap.String("msg", string(msgVal)), zap.Error(err))
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
@@ -221,4 +235,19 @@ func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
 	}
 
 	return tlsConfig
+}
+
+// ensureTopic creates a topic if the received topic does not exists.
+func (a *kafkaAdapter) ensureTopic(admin sarama.ClusterAdmin, topicName string) (string, error) {
+	topicDetail := &sarama.TopicDetail{
+		ReplicationFactor: a.newTopicReplicationFactor,
+		NumPartitions:     a.newTopicPartitions,
+	}
+
+	createTopicError := admin.CreateTopic(topicName, topicDetail, false)
+	if err, ok := createTopicError.(*sarama.TopicError); ok && err.Err == sarama.ErrTopicAlreadyExists {
+		return topicName, nil
+	}
+
+	return topicName, createTopicError
 }

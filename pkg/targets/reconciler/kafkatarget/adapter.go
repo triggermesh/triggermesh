@@ -230,14 +230,14 @@ func makeAppEnv(o *v1alpha1.KafkaTarget) []corev1.EnvVar {
 	if o.Spec.TopicReplicationFactor != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  "TOPIC_REPLICATION_FACTOR",
-			Value: strconv.Itoa(*o.Spec.TopicReplicationFactor),
+			Value: strconv.Itoa(int(*o.Spec.TopicReplicationFactor)),
 		})
 	}
 
 	if o.Spec.TopicPartitions != nil {
 		env = append(env, corev1.EnvVar{
 			Name:  "TOPIC_PARTITIONS",
-			Value: strconv.Itoa(*o.Spec.TopicPartitions),
+			Value: strconv.Itoa(int(*o.Spec.TopicPartitions)),
 		})
 	}
 
