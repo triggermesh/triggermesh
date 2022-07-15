@@ -21,11 +21,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"strconv"
 
 	"github.com/devigned/tab"
 	"go.uber.org/zap"
+	"nhooyr.io/websocket"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
@@ -71,6 +73,9 @@ type envConfig struct {
 	// Supported values: [ default ]
 	MessageProcessor string `envconfig:"SERVICEBUS_MESSAGE_PROCESSOR" default:"default"`
 
+	// WebSocketsEnable.
+	WebSocketsEnable bool `envconfig:"SERVICEBUS_WEBSOCKETS_ENABLE" default:"false"`
+
 	// The environment variables below aren't read from the envConfig struct
 	// by the Service Bus SDK, but rather directly using os.Getenv().
 	// They are nevertheless listed here for documentation purposes.
@@ -113,7 +118,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.EntityResourceID), zap.Error(err))
 	}
 
-	client, err := clientFromEnvironment(entityID)
+	client, err := clientFromEnvironment(entityID, newAzureServiceBusClientOptions(
+		webSocketsClientOption(env.WebSocketsEnable)))
 	if err != nil {
 		logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
 	}
@@ -201,11 +207,11 @@ func entityPath(entityID *v1alpha1.AzureResourceID) string {
 // clientFromEnvironment mimics the behaviour of eventhub.NewHubFromEnvironment.
 // It returns a azservicebus.Client that is suitable for the
 // authentication method selected via environment variables.
-func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Client, error) {
+func clientFromEnvironment(entityID *v1alpha1.AzureResourceID, clientOptions *azservicebus.ClientOptions) (*azservicebus.Client, error) {
 	// SAS authentication (token, connection string)
 	connStr := connectionStringFromEnvironment(entityID.Namespace, entityPath(entityID))
 	if connStr != "" {
-		client, err := azservicebus.NewClientFromConnectionString(connStr, nil)
+		client, err := azservicebus.NewClientFromConnectionString(connStr, clientOptions)
 		if err != nil {
 			return nil, fmt.Errorf("creating client from connection string: %w", err)
 		}
@@ -219,7 +225,7 @@ func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azservicebus.Cl
 	}
 
 	fqNamespace := entityID.Namespace + ".servicebus.windows.net"
-	client, err := azservicebus.NewClient(fqNamespace, cred, nil)
+	client, err := azservicebus.NewClient(fqNamespace, cred, clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("creating client from service principal: %w", err)
 	}
@@ -361,4 +367,32 @@ func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event
 	}
 
 	return origEvent
+}
+
+type clientOption func(*azservicebus.ClientOptions)
+
+func newAzureServiceBusClientOptions(opts ...clientOption) *azservicebus.ClientOptions {
+	co := &azservicebus.ClientOptions{}
+	for _, opt := range opts {
+		opt(co)
+	}
+	return co
+}
+
+func webSocketsClientOption(webSocketsEnable bool) clientOption {
+	return func(opts *azservicebus.ClientOptions) {
+
+		if webSocketsEnable {
+			opts.NewWebSocketConn = func(ctx context.Context, args azservicebus.NewWebSocketConnArgs) (net.Conn, error) {
+				opts := &websocket.DialOptions{Subprotocols: []string{"amqp"}}
+				wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
+
+				if err != nil {
+					return nil, fmt.Errorf("creating client: %w", err)
+				}
+
+				return websocket.NetConn(context.Background(), wssConn, websocket.MessageBinary), nil
+			}
+		}
+	}
 }

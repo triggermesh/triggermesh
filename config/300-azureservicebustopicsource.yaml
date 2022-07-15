@@ -144,6 +144,9 @@ spec:
                     - clientSecret
                 required:
                 - servicePrincipal
+              webSocketsEnable:
+                description: Boolean to indicate to use WebSockets.
+                type: boolean
               sink:
                 description: The destination of events sourced from the Azure Service Bus Topic.
                 type: object

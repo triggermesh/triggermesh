@@ -2324,6 +2324,11 @@ func (in *AzureServiceBusTopicSourceSpec) DeepCopyInto(out *AzureServiceBusTopic
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.TopicID = in.TopicID
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.WebSocketsEnable != nil {
+		in, out := &in.WebSocketsEnable, &out.WebSocketsEnable
+		*out = new(bool)
+		**out = **in
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
