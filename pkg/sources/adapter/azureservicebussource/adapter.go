@@ -74,7 +74,7 @@ type envConfig struct {
 	MessageProcessor string `envconfig:"SERVICEBUS_MESSAGE_PROCESSOR" default:"default"`
 
 	// WebSocketsEnable.
-	WebSocketsEnable bool `envconfig:"SERVICEBUS_WEBSOCKETS_ENABLE" required:"false"`
+	WebSocketsEnable bool `envconfig:"SERVICEBUS_WEBSOCKETS_ENABLE" default:"false"`
 
 	// The environment variables below aren't read from the envConfig struct
 	// by the Service Bus SDK, but rather directly using os.Getenv().
@@ -118,7 +118,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.EntityResourceID), zap.Error(err))
 	}
 
-	client, err := clientFromEnvironment(entityID, webSocketsClientOptions(env.WebSocketsEnable))
+	client, err := clientFromEnvironment(entityID, newAzureServiceBusClientOptions(
+		webSocketsClientOption(env.WebSocketsEnable)))
 	if err != nil {
 		logger.Panicw("Unable to obtain interface for Service Bus Namespace", zap.Error(err))
 	}
@@ -368,23 +369,30 @@ func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event
 	return origEvent
 }
 
-func webSocketsClientOptions(webSocketsEnable bool) *azservicebus.ClientOptions {
-	clientOptions := &azservicebus.ClientOptions{}
+type clientOption func(*azservicebus.ClientOptions)
 
-	if webSocketsEnable {
-		clientOptions = &azservicebus.ClientOptions{
-			NewWebSocketConn: func(ctx context.Context, args azservicebus.NewWebSocketConnArgs) (net.Conn, error) {
+func newAzureServiceBusClientOptions(opts ...clientOption) *azservicebus.ClientOptions {
+	co := &azservicebus.ClientOptions{}
+	for _, opt := range opts {
+		opt(co)
+	}
+	return co
+}
+
+func webSocketsClientOption(webSocketsEnable bool) clientOption {
+	return func(opts *azservicebus.ClientOptions) {
+
+		if webSocketsEnable {
+			opts.NewWebSocketConn = func(ctx context.Context, args azservicebus.NewWebSocketConnArgs) (net.Conn, error) {
 				opts := &websocket.DialOptions{Subprotocols: []string{"amqp"}}
 				wssConn, _, err := websocket.Dial(ctx, args.Host, opts)
 
 				if err != nil {
-					return nil, fmt.Errorf("creating client from connection string: %w", err)
+					return nil, fmt.Errorf("creating client: %w", err)
 				}
 
 				return websocket.NetConn(context.Background(), wssConn, websocket.MessageBinary), nil
-			},
+			}
 		}
 	}
-
-	return clientOptions
 }
