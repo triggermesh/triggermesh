@@ -67,7 +67,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		config.Net.TLS.Enable = true
 		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
 		if err != nil {
-			logger.Panicw("Could not create the TLS Certificates Config", err)
+			logger.Panicf("Could not create the TLS Certificates Config: %v", err)
 		}
 		tlsCfg = newTLSRootCAConfig(tlsCfg, env.CA)
 		config.Net.TLS.Config = tlsCfg
@@ -95,7 +95,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	config.Producer.Return.Successes = true
 	err = config.Validate()
 	if err != nil {
-		logger.Panicw("Config not valid", err)
+		logger.Panicf("Config not valid: %v", err)
 	}
 
 	sc, err = sarama.NewClient(
@@ -103,17 +103,17 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		config,
 	)
 	if err != nil {
-		logger.Panicw("Error creating Sarama Client", err)
+		logger.Panicf("Error creating Sarama Client: %v", err)
 	}
 
 	sac, err := sarama.NewClusterAdminFromClient(sc)
 	if err != nil {
-		logger.Panicw("Error creating Sarama Admin Client", err)
+		logger.Panicf("Error creating Sarama Admin Client: %v", err)
 	}
 
 	kc, err := sarama.NewSyncProducerFromClient(sc)
 	if err != nil {
-		logger.Panicw("Error creating Kafka Producer", err)
+		logger.Panicf("Error creating Kafka Producer: %v", err)
 	}
 
 	return &kafkaAdapter{
