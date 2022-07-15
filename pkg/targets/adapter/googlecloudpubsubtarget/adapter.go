@@ -107,7 +107,7 @@ func (a *googlecloudpubsubtargetAdapter) dispatch(ctx context.Context, event clo
 	} else {
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, fmt.Errorf("Error marshalling CloudEvent"), nil)
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, fmt.Errorf("marshalling CloudEvent"), nil)
 		}
 		data = jsonEvent
 	}

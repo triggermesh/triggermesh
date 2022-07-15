@@ -17,6 +17,8 @@ limitations under the License.
 package googlecloudpubsubtarget
 
 import (
+	"strconv"
+
 	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
@@ -67,8 +69,8 @@ func makeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
 			},
 		},
 		{
-			Name:  envEventsPayloadPolicy,
-			Value: o.Spec.DiscardCloudEventContext,
+			Name:  envDiscardCEContext,
+			Value: strconv.FormatBool(o.Spec.DiscardCloudEventContext),
 		},
 	}
 
