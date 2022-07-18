@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
@@ -105,25 +106,37 @@ func (a *adapter) Start(ctx context.Context) error {
 }
 
 func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+	ceTypeTag := metrics.TagEventType(event.Type())
+	ceSrcTag := metrics.TagEventSource(event.Source())
+
+	start := time.Now()
+	defer func() {
+		a.sr.ReportProcessingLatency(time.Since(start), ceTypeTag, ceSrcTag)
+	}()
+
 	typ := event.Type()
 	if typ != v1alpha1.EventTypeAzureSentinelTargetIncident {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeEventContext, fmt.Errorf("event type %q is not supported", typ), nil)
 	}
 
 	i := &Incident{}
 	if err := event.DataAs(i); err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		a.logger.Errorw("decoding event: %v", zap.Error(err))
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		a.logger.Errorw("creating Azure authorizer: %v", zap.Error(err))
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
 	reqBody, err := json.Marshal(*i)
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "marshaling request for retrieving an access token")
 	}
 
@@ -134,6 +147,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		a.subscriptionID, a.resourceGroup, a.workspace, uuid.New().String())
 	request, err := http.NewRequest(http.MethodPut, rURL, bytes.NewBuffer(reqBody))
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "creating request token")
 	}
 
@@ -141,23 +155,28 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	req, err := autorest.Prepare(request,
 		authorizer.WithAuthorization())
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "preparing request")
 	}
 
 	res, err := autorest.Send(req)
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "sending request")
 	}
 
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "reading response body")
 	}
 
 	if res.StatusCode != 201 {
+		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "invalid response from Azure: "+string(body))
 	}
 
+	a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	return a.replier.Ok(&event, body)
 }

@@ -364,6 +364,11 @@ func (l *Listers) GetAzureEventHubsTargetLister() targetslistersv1alpha1.AzureEv
 	return targetslistersv1alpha1.NewAzureEventHubsTargetLister(l.IndexerFor(&targetsv1alpha1.AzureEventHubsTarget{}))
 }
 
+// GetAzureSentinelTargetLister returns a Lister for AzureSentinelTarget objects.
+func (l *Listers) GetAzureSentinelTargetLister() targetslistersv1alpha1.AzureSentinelTargetLister {
+	return targetslistersv1alpha1.NewAzureSentinelTargetLister(l.IndexerFor(&targetsv1alpha1.AzureSentinelTarget{}))
+}
+
 // GetCloudEventsTargetLister returns a Lister for CloudEventsTarget objects.
 func (l *Listers) GetCloudEventsTargetLister() targetslistersv1alpha1.CloudEventsTargetLister {
 	return targetslistersv1alpha1.NewCloudEventsTargetLister(l.IndexerFor(&targetsv1alpha1.CloudEventsTarget{}))
