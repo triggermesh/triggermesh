@@ -67,36 +67,6 @@ type IncidentStatus struct {
 
 // Incident an Azure Sentinel incident.
 type Incident struct {
-	ID                 string                 `json:"id"`
-	Name               string                 `json:"name"`
-	Description        string                 `json:"description"`
-	Status             IncidentStatus        `json:"status"`
-	Labels             []IncidentLabel        `json:"labels"`
-	OwnerInfo          IncidentOwnerInfo      `json:"ownerInfo"`
-	CreatedAt          string                 `json:"createdAt"`
-	UpdatedAt          string                 `json:"updatedAt"`
-	IncidentType       string                 `json:"incidentType"`
-	IncidentTypeID     string                 `json:"incidentTypeId"`
-	IncidentTypeName   string                 `json:"incidentTypeName"`
-	IncidentTypeStatus string                 `json:"incidentTypeStatus"`
-	IncidentTypeLabels []IncidentLabel        `json:"incidentTypeLabels"`
-	IncidentTypeOwner  IncidentOwnerInfo      `json:"incidentTypeOwner"`
-	IncidentTypeCreatedAt string                 `json:"incidentTypeCreatedAt"`
-	IncidentTypeUpdatedAt string                 `json:"incidentTypeUpdatedAt"`
-	IncidentTypeDescription string                 `json:"incidentTypeDescription"`
-	IncidentTypeStatus string                 `json:"incidentTypeStatus"`
-	IncidentTypeLabels []IncidentLabel        `json:"incidentTypeLabels"`
-	IncidentTypeOwner IncidentOwnerInfo      `json:"incidentTypeOwner"`
-	IncidentTypeCreatedAt string                 `json:"incidentTypeCreatedAt"`
-	IncidentTypeUpdatedAt string                 `json:"incidentTypeUpdatedAt"`
-	IncidentTypeDescription string                 `json:"incidentTypeDescription"`
-	IncidentTypeStatus string                 `json:"incidentTypeStatus"`
-	IncidentTypeLabels []IncidentLabel        `json:"incidentTypeLabels"`
-	IncidentTypeOwner IncidentOwnerInfo      `json:"incidentTypeOwner"`
-	IncidentTypeCreatedAt string                 `json:"incidentTypeCreatedAt"`
-	IncidentTypeUpdatedAt string                 `json:"incidentTypeUpdatedAt"`
-	IncidentTypeDescription string
-type Incident struct {
 	Etag       string `json:"etag"`
 	Properties struct {
 		LastActivityTimeUtc  string            `json:"lastActivityTimeUtc"`
