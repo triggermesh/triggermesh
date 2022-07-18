@@ -394,6 +394,11 @@ func (l *Listers) GetGoogleCloudFirestoreTargetLister() targetslistersv1alpha1.G
 	return targetslistersv1alpha1.NewGoogleCloudFirestoreTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudFirestoreTarget{}))
 }
 
+// GetGoogleCloudPubSubTargetLister returns a Lister for GoogleCloudPubSubTarget objects.
+func (l *Listers) GetGoogleCloudPubSubTargetLister() targetslistersv1alpha1.GoogleCloudPubSubTargetLister {
+	return targetslistersv1alpha1.NewGoogleCloudPubSubTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudPubSubTarget{}))
+}
+
 // GetGoogleCloudStorageTargetLister returns a Lister for GoogleCloudStorageTarget objects.
 func (l *Listers) GetGoogleCloudStorageTargetLister() targetslistersv1alpha1.GoogleCloudStorageTargetLister {
 	return targetslistersv1alpha1.NewGoogleCloudStorageTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleCloudStorageTarget{}))
