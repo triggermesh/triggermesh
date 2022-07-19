@@ -140,7 +140,6 @@ spec:
             required:
             - topic
             - credentialsJson
-
           status:
             type: object
             description: Reported status of the event target.
