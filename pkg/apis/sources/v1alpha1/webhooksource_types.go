@@ -62,6 +62,11 @@ type WebhookSourceSpec struct {
 	// +optional
 	EventSource *string `json:"eventSource,omitempty"`
 
+	// Options to transform HTTP request data into CloudEvent extensions.
+	// https://github.com/cloudevents/spec/blob/main/cloudevents/spec.md#extension-context-attributes
+	// +optional
+	EventExtensionAttributes *WebhookEventExtensionAttributes `json:"eventExtensionAttributes,omitempty"`
+
 	// User name HTTP clients must set to authenticate with the webhook using HTTP Basic authentication.
 	// +optional
 	BasicAuthUsername *string `json:"basicAuthUsername,omitempty"`
@@ -77,6 +82,13 @@ type WebhookSourceSpec struct {
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
+}
+
+// WebhookEventExtensionAttributes sets the policy for converting HTTP data into.
+type WebhookEventExtensionAttributes struct {
+	// From informs HTTP elements that will be converted into CloudEvents attributes
+	// +optional
+	From []string `json:"from,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

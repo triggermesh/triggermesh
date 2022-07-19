@@ -37,6 +37,15 @@ import (
 const (
 	tEventType   = "testType"
 	tEventSource = "testSource"
+	tHost        = "test-host"
+)
+
+var (
+	expectedExtensionsBase = map[string]interface{}{
+		"host":   tHost,
+		"method": http.MethodGet,
+		"path":   "/",
+	}
 )
 
 func TestWebhookEvent(t *testing.T) {
@@ -48,24 +57,28 @@ func TestWebhookEvent(t *testing.T) {
 
 		username string
 		password string
+		query    string
 		headers  map[string]string
 
 		expectedCode             int
 		expectedResponseContains string
 		expectedEventData        string
+		expectedExtensions       map[string]interface{}
 	}{
 		"nil body": {
 			body: nil,
 
 			expectedCode:             http.StatusBadRequest,
 			expectedResponseContains: "request without body not supported",
+			expectedExtensions:       expectedExtensionsBase,
 		},
 
 		"arbitrary message": {
 			body: read("arbitrary message"),
 
-			expectedCode:      http.StatusOK,
-			expectedEventData: "arbitrary message",
+			expectedCode:       http.StatusOK,
+			expectedEventData:  "arbitrary message",
+			expectedExtensions: expectedExtensionsBase,
 		},
 
 		"basic auth no header": {
@@ -75,6 +88,7 @@ func TestWebhookEvent(t *testing.T) {
 
 			expectedCode:             http.StatusBadRequest,
 			expectedResponseContains: "wrong authentication header",
+			expectedExtensions:       expectedExtensionsBase,
 		},
 
 		"basic auth wrong header": {
@@ -88,6 +102,7 @@ func TestWebhookEvent(t *testing.T) {
 
 			expectedCode:             http.StatusBadRequest,
 			expectedResponseContains: "wrong authentication header",
+			expectedExtensions:       expectedExtensionsBase,
 		},
 
 		"basic auth wrong creds": {
@@ -101,6 +116,7 @@ func TestWebhookEvent(t *testing.T) {
 
 			expectedCode:             http.StatusUnauthorized,
 			expectedResponseContains: "credentials are not valid",
+			expectedExtensions:       expectedExtensionsBase,
 		},
 
 		"basic auth success": {
@@ -112,7 +128,35 @@ func TestWebhookEvent(t *testing.T) {
 			username: "foo",
 			password: "bar",
 
-			expectedCode: http.StatusOK,
+			expectedCode:       http.StatusOK,
+			expectedEventData:  "arbitrary message",
+			expectedExtensions: expectedExtensionsBase,
+		},
+
+		"extra headers": {
+			body: read("arbitrary message"),
+			headers: map[string]string{
+				"k1": "v1",
+				"k2": "v2",
+			},
+
+			expectedCode:      http.StatusOK,
+			expectedEventData: "arbitrary message",
+			expectedExtensions: expectedExtensions(map[string]string{
+				"hk1": "v1",
+				"hk2": "v2",
+			}),
+		},
+		"extra queries": {
+			body:  read("arbitrary message"),
+			query: "?k1=v1&k2=v2",
+
+			expectedCode:      http.StatusOK,
+			expectedEventData: "arbitrary message",
+			expectedExtensions: expectedExtensions(map[string]string{
+				"qk1": "v1",
+				"qk2": "v2",
+			}),
 		},
 	}
 
@@ -130,12 +174,20 @@ func TestWebhookEvent(t *testing.T) {
 
 				ceClient: ceClient,
 				logger:   logger,
+				extensionAttributesFrom: &ExtensionAttributesFrom{
+					method:  true,
+					path:    true,
+					host:    true,
+					queries: true,
+					headers: true,
+				},
 			}
 
-			req, _ := http.NewRequest("GET", "/", c.body)
+			req, _ := http.NewRequest(http.MethodGet, "/"+c.query, c.body)
 			for k, v := range c.headers {
 				req.Header.Add(k, v)
 			}
+			req.Host = tHost
 
 			ctx := context.Background()
 
@@ -152,6 +204,7 @@ func TestWebhookEvent(t *testing.T) {
 				select {
 				case event := <-chEvent:
 					assert.Equal(t, c.expectedEventData, string(event.Data()), "event Data does not match")
+					assert.Equal(t, c.expectedExtensions, event.Context.GetExtensions(), "event extensions does not match")
 
 				case <-time.After(1 * time.Second):
 					assert.Fail(t, "expected cloud event containing %q was not sent", c.expectedEventData)
@@ -167,4 +220,60 @@ func read(s string) io.Reader {
 
 func basicAuth(user, password string) string {
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(user+":"+password))
+}
+
+func TestAttributeSanitize(t *testing.T) {
+	tc := map[string]struct {
+		name      string
+		sanitized string
+	}{
+		"no change": {
+			name:      "myattribute",
+			sanitized: "myattribute",
+		},
+		"truncate more than 20 chars": {
+			name:      "123456789012345678901",
+			sanitized: "12345678901234567890",
+		},
+		"upper case": {
+			name:      "1A2B3c4d",
+			sanitized: "1a2b3c4d",
+		},
+		"non valid chars": {
+			name:      "*-?*abcd",
+			sanitized: "abcd",
+		},
+		"reserved word data": {
+			name:      "data",
+			sanitized: "data0",
+		},
+		"reserved word data upper case": {
+			name:      "DatA",
+			sanitized: "data0",
+		},
+		"more than 20 chars, some non valid, some upper case": {
+			name:      "1234567890*?'abcdeº!FGHIJxxxx?",
+			sanitized: "1234567890abcdefghij",
+		},
+	}
+
+	for name, c := range tc {
+		t.Run(name, func(t *testing.T) {
+			r := sanitizeCloudEventAttributeName(c.name)
+			assert.Equal(t, c.sanitized, r)
+		})
+	}
+}
+
+func expectedExtensions(extensions map[string]string) map[string]interface{} {
+	ee := make(map[string]interface{}, len(expectedExtensionsBase)+len(extensions))
+	// copy the base expected extensions
+	for k, v := range expectedExtensionsBase {
+		ee[k] = v
+	}
+	// extend or overwrite with the extensions provided for the test
+	for k, v := range extensions {
+		ee[k] = v
+	}
+	return ee
 }
