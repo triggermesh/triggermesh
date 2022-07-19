@@ -41,7 +41,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	logger := logging.FromContext(ctx)
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		targetce.ReplierWithStaticResponseType("io.triggermesh.googlecloudpubsubtarget.response"),
+		targetce.ReplierWithStaticResponseType(v1alpha1. GoogleCloudPubSubResponseEventType),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)

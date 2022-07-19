@@ -143,7 +143,7 @@ type GoogleCloudSourcePubSubSpec struct {
 
 	// Full resource name of the Pub/Sub topic where messages/notifications
 	// originating from the configured Google Cloud resource are sent to,
-	// before being retrieved by this event source. If not supplied, a
+	// before being retrieved by this event target. If not supplied, a
 	// topic is created on behalf of the user, in the GCP project
 	// referenced by the Project attribute.
 	//

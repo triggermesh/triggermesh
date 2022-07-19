@@ -68,7 +68,7 @@ type GoogleCloudPubSubTargetSpec struct {
 	DiscardCloudEventContext bool `json:"discardCloudEventContext,omitempty"`
 }
 
-// GoogleCloudPubSubTargetStatus communicates the observed state of the event target. (from the controller).
+// GoogleCloudPubSubTargetStatus communicates the observed state of the event target.
 type GoogleCloudPubSubTargetStatus struct {
 	duckv1.Status        `json:",inline"`
 	duckv1.AddressStatus `json:",inline"`
