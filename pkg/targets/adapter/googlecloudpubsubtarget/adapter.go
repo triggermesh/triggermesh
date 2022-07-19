@@ -47,7 +47,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	mt := &pkgadapter.MetricTag{
-		ResourceGroup: "googlecloudpubsubtargets",
+		ResourceGroup: targets.GoogleCloudPubSubTargetResource.String(),
 		Namespace:     envAcc.GetNamespace(),
 		Name:          envAcc.GetName(),
 	}
