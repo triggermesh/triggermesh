@@ -19,7 +19,6 @@ package googlecloudpubsubtarget
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"go.uber.org/zap"
@@ -41,7 +40,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	logger := logging.FromContext(ctx)
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		targetce.ReplierWithStaticResponseType(v1alpha1. GoogleCloudPubSubResponseEventType),
+		targetce.ReplierWithStaticResponseType(v1alpha1.GoogleCloudPubSubResponseEventType),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
@@ -61,7 +60,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	t := psCli.Topic(env.TopicName.Resource)
-	return &googlecloudpubsubtargetAdapter{
+	return &adapter{
 		topic: t,
 
 		replier:          replier,
@@ -73,9 +72,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 }
 
-var _ pkgadapter.Adapter = (*googlecloudpubsubtargetAdapter)(nil)
+var _ pkgadapter.Adapter = (*adapter)(nil)
 
-type googlecloudpubsubtargetAdapter struct {
+type adapter struct {
 	topic *pubsub.Topic
 
 	replier          *targetce.Replier
@@ -86,13 +85,12 @@ type googlecloudpubsubtargetAdapter struct {
 	discardCEContext bool
 }
 
-// Returns if stopCh is closed or Send() returns an error.
-func (a *googlecloudpubsubtargetAdapter) Start(ctx context.Context) error {
+func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting GoogleCloudPubSubTarget Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *googlecloudpubsubtargetAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
+func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	ceTypeTag := metrics.TagEventType(event.Type())
 	ceSrcTag := metrics.TagEventSource(event.Source())
 	start := time.Now()
@@ -107,7 +105,7 @@ func (a *googlecloudpubsubtargetAdapter) dispatch(ctx context.Context, event clo
 	} else {
 		jsonEvent, err := json.Marshal(event)
 		if err != nil {
-			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, fmt.Errorf("marshalling CloudEvent"), nil)
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
 		data = jsonEvent
 	}
