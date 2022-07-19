@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	pkgadapter.Main("googlecloudpubsubtarget-adapter", googlecloudpubsubtarget.EnvAccessorCtor, googlecloudpubsubtarget.NewTarget)
+	pkgadapter.Main("googlecloudpubsubtarget", googlecloudpubsubtarget.EnvAccessorCtor, googlecloudpubsubtarget.NewTarget)
 }
