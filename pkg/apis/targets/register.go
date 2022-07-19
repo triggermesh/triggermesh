@@ -107,7 +107,7 @@ var (
 		Group:    GroupName,
 		Resource: "googlecloudworkflowstargets",
 	}
-	// GoogleCloudPubSubTargetResource respresents an event target for Google Workflows.
+	// GoogleCloudPubSubTargetResource respresents an event target for Google Pub/Sub.
 	GoogleCloudPubSubTargetResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "googlecloudpubsubtargets",
