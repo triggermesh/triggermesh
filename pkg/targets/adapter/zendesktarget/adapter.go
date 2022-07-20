@@ -126,7 +126,18 @@ func (a *zendeskAdapter) createTicket(ctx context.Context, event cloudevents.Eve
 		return nil, res
 	}
 
-	ticket := &zendesk.Ticket{}
+	var content string
+	if it.Body == "" {
+		content = event.String()
+	} else {
+		content = it.Body
+	}
+
+	ticket := &zendesk.Ticket{
+		Comment: &zendesk.TicketComment{
+			Body: content,
+		},
+	}
 
 	// Assign the incoming ticket's subject to the new ticket.
 	// If the new ticket subject is empty, use defaultTicketSubject
@@ -139,14 +150,9 @@ func (a *zendeskAdapter) createTicket(ctx context.Context, event cloudevents.Eve
 		}
 	}
 
-	if it.Body == "" {
-		ticket.Comment.Body = event.String()
-	} else {
-		ticket.Comment.Body = it.Body
-	}
-
 	nT, err := a.zclient.CreateTicket(ctx, zendesk.Ticket(*ticket))
 	if err != nil {
+		fmt.Println(err)
 		res := fmt.Errorf("error creating ticket: %w", err)
 		return nil, res
 	}
@@ -157,7 +163,7 @@ func (a *zendeskAdapter) createTicket(ctx context.Context, event cloudevents.Eve
 		return nil, res
 	}
 
-	a.logger.Debug("Successfully created ticket #" + strconv.Itoa(int(nT.ID)))
+	a.logger.Debugf("Successfully created ticket #" + strconv.Itoa(int(nT.ID)))
 	return re, cloudevents.ResultACK
 }
 
