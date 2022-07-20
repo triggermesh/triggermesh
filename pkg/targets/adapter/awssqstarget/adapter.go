@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"go.uber.org/zap"
 
@@ -63,6 +64,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		awsArn:           a,
 		discardCEContext: env.DiscardCEContext,
 		sqsClient:        sqs.New(sqsSession),
+		messageGroupID:   env.MessageGroupID,
 
 		ceClient: ceClient,
 		logger:   logger,
@@ -74,9 +76,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*adapter)(nil)
 
 type adapter struct {
-	awsArnString string
-	awsArn       arn.ARN
-	sqsClient    *sqs.SQS
+	awsArnString   string
+	awsArn         arn.ARN
+	sqsClient      *sqs.SQS
+	messageGroupID string
 
 	discardCEContext bool
 	ceClient         cloudevents.Client
@@ -107,10 +110,22 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 	// The SendMessageInput only accepts a URL for publishing messages. This can be extracted from the ARN
 	url := "https://" + a.awsArn.Service + "." + a.awsArn.Region + ".amazonaws.com/" + a.awsArn.AccountID + "/" + a.awsArn.Resource
 
-	result, err := a.sqsClient.SendMessage(&sqs.SendMessageInput{
-		MessageBody: aws.String(string(msg)),
-		QueueUrl:    &url,
-	})
+	var err error
+	var result *sqs.SendMessageOutput
+	if strings.HasSuffix(url, ".fifo") {
+		ceId := event.ID()
+		result, err = a.sqsClient.SendMessage(&sqs.SendMessageInput{
+			MessageBody:            aws.String(string(msg)),
+			QueueUrl:               &url,
+			MessageGroupId:         &a.messageGroupID,
+			MessageDeduplicationId: &ceId,
+		})
+	} else {
+		result, err = a.sqsClient.SendMessage(&sqs.SendMessageInput{
+			MessageBody: aws.String(string(msg)),
+			QueueUrl:    &url,
+		})
+	}
 
 	if err != nil {
 		return a.reportError("error publishing to sqs", err)
