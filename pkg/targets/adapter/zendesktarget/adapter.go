@@ -163,7 +163,7 @@ func (a *zendeskAdapter) createTicket(ctx context.Context, event cloudevents.Eve
 		return nil, res
 	}
 
-	a.logger.Debugf("Successfully created ticket #" + strconv.Itoa(int(nT.ID)))
+	a.logger.Debug("Successfully created ticket #" + strconv.Itoa(int(nT.ID)))
 	return re, cloudevents.ResultACK
 }
 
