@@ -152,7 +152,6 @@ func (a *zendeskAdapter) createTicket(ctx context.Context, event cloudevents.Eve
 
 	nT, err := a.zclient.CreateTicket(ctx, zendesk.Ticket(*ticket))
 	if err != nil {
-		fmt.Println(err)
 		res := fmt.Errorf("error creating ticket: %w", err)
 		return nil, res
 	}
