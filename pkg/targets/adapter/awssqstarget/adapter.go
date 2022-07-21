@@ -113,12 +113,12 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 	var err error
 	var result *sqs.SendMessageOutput
 	if strings.HasSuffix(url, ".fifo") {
-		ceID := event.ID()
+		dedupID := event.ID() + ";" + event.Source()
 		result, err = a.sqsClient.SendMessage(&sqs.SendMessageInput{
 			MessageBody:            aws.String(string(msg)),
 			QueueUrl:               &url,
 			MessageGroupId:         &a.messageGroupID,
-			MessageDeduplicationId: &ceID,
+			MessageDeduplicationId: &dedupID,
 		})
 	} else {
 		result, err = a.sqsClient.SendMessage(&sqs.SendMessageInput{

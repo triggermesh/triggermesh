@@ -55,6 +55,7 @@ type AWSSQSTargetSpec struct {
 
 	// Message Group ID is required for FIFO based queues, and is used to uniquely identify the event producer
 	// https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-understanding-logic.html
+	// +optional
 	MessageGroupID string `json:"messageGroupId,omitempty"`
 
 	// Whether to omit CloudEvent context attributes in messages sent to SQS.
