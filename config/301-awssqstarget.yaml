@@ -85,6 +85,9 @@ spec:
                 description: ARN of the SQS queue that will receive events. The expected format is documented at https://docs.aws.amazon.com/service-authorization/latest/reference/list_awslambda.html
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:sqs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
+              messageGroupId:
+                description: FIFO queue grouping to ensure proper ordering. Should be unique per target
+                type: string
               discardCloudEventContext:
                 description: Whether to omit CloudEvent context attributes in messages sent to SQS. When this property is
                   false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent

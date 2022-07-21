@@ -72,6 +72,9 @@ func makeAppEnv(o *v1alpha1.AWSSQSTarget) []corev1.EnvVar {
 		}, {
 			Name:  "AWS_DISCARD_CE_CONTEXT",
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
+		}, {
+			Name:  "AWS_MESSAGE_GROUP_ID",
+			Value: o.Spec.MessageGroupID,
 		},
 	}
 

@@ -31,9 +31,10 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	AWSApiKey    string `envconfig:"AWS_ACCESS_KEY_ID" required:"true"`
-	AWSApiSecret string `envconfig:"AWS_SECRET_ACCESS_KEY" required:"true"`
-	AwsTargetArn string `envconfig:"ARN" required:"true"`
+	AWSApiKey      string `envconfig:"AWS_ACCESS_KEY_ID" required:"true"`
+	AWSApiSecret   string `envconfig:"AWS_SECRET_ACCESS_KEY" required:"true"`
+	AwsTargetArn   string `envconfig:"ARN" required:"true"`
+	MessageGroupID string `envconfig:"AWS_MESSAGE_GROUP_ID"`
 
 	DiscardCEContext bool `envconfig:"AWS_DISCARD_CE_CONTEXT"`
 }
