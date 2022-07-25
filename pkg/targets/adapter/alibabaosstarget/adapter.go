@@ -25,7 +25,6 @@ import (
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/nknorg/nkn-sdk-go"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
@@ -37,6 +36,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/common"
 )
 
 // NewTarget adapter implementation
@@ -67,7 +67,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	var nknClient *nkn.Client
-	var account string
+	var account *nkn.Account
 	if env.EventTransportLayer == "NKN" {
 		seed, err := hex.DecodeString(env.Seed)
 		if err != nil {
@@ -79,7 +79,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 			logger.Panicf("Error creating NKN account from seed: %v", err)
 		}
 
-		nknClient, err := nkn.NewClient(account, "any string", nil)
+		nknClient, err = nkn.NewClient(account, "any string", nil)
 		if err != nil {
 			logger.Panicf("Error creating NKN client: %v", err)
 		}
@@ -118,8 +118,17 @@ type ossAdapter struct {
 
 // Returns if stopCh is closed or Send() returns an error.
 func (a *ossAdapter) Start(ctx context.Context) error {
-	a.logger.Info("Starting Alibaba OSS Adapter")
-	return a.ceClient.StartReceiver(ctx, a.dispatch)
+	a.logger.Infof("Starting Alibaba OSS Adapter with transport layer: %s", a.transportLayer)
+	// Start the event transport layer
+	if a.transportLayer == "CE" {
+
+		return a.ceClient.StartReceiver(ctx, a.dispatch)
+	}
+
+	if a.transportLayer == "NKN" {
+		return a.startNKN(ctx)
+	}
+	return nil
 }
 
 func (a *ossAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
@@ -146,7 +155,7 @@ func (a *ossAdapter) startNKN(ctx context.Context) error {
 		msg := <-a.nknClient.OnMessage.C
 		a.logger.Debugf("Received NKN message: %s", msg)
 
-		cloudEvent, err := convertNKNMessageToCloudevent(*msg)
+		cloudEvent, err := common.ConvertNKNMessageToCloudevent(*msg)
 		if err != nil {
 			a.logger.Errorf("Error converting NKN message to CloudEvent: %v", err)
 			break
@@ -161,14 +170,4 @@ func (a *ossAdapter) startNKN(ctx context.Context) error {
 		}
 	}
 	return nil
-}
-
-func convertNKNMessageToCloudevent(message nkn.Message) (cloudevents.Event, error) {
-	var cloudEvent cloudevents.Event
-	err := cloudEvent.DataAs(message.Data)
-	if err != nil {
-		return cloudevents.NewEvent(), err
-	}
-
-	return cloudEvent, nil
 }

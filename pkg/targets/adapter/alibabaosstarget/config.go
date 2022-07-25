@@ -17,6 +17,7 @@ limitations under the License.
 package alibabaosstarget
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/targets/adapter/common"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -26,7 +27,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 }
 
 type envAccessor struct {
-	pkgadapter.EnvConfig
+	*common.CommonEnv
 
 	// Connection parameters
 	Endpoint        string `envconfig:"OSS_ENDPOINT" required:"true"`
@@ -34,18 +35,4 @@ type envAccessor struct {
 	AccessKeySecret string `envconfig:"OSS_ACCESS_KEY_SECRET" required:"true"`
 
 	Bucket string `envconfig:"OSS_BUCKET" required:"true"`
-
-	// BridgeIdentifier is the name of the bridge workflow this target is part of
-	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
-
-	// CloudEvents responses parametrization
-	CloudEventPayloadPolicy string `envconfig:"EVENTS_PAYLOAD_POLICY" default:"error"`
-
-	// EventTransportLayer is the name of the transport layer used to send events
-	// options are: "CE", or "NKN".
-	EventTransportLayer string `envconfig:"EVENTS_TRANSPORT_LAYER" default:"CE"`
-
-	// Optional component parameters required by the NKN transport layer
-	// When using the CE transport layer, these parameters are ignored/not required.
-	Seed string `envconfig:"EVENTS_NKN_SEED"`
 }
