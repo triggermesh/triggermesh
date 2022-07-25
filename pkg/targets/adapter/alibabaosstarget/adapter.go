@@ -19,16 +19,19 @@ package alibabaosstarget
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"fmt"
 
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/nknorg/nkn-sdk-go"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	nkn "github.com/nknorg/nkn-sdk-go"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
@@ -63,13 +66,35 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error creating OSS client: %v", err)
 	}
 
+	var nknClient *nkn.Client
+	var account string
+	if env.EventTransportLayer == "NKN" {
+		seed, err := hex.DecodeString(env.Seed)
+		if err != nil {
+			logger.Panicf("Error decoding seed from hex: %v", err)
+		}
+
+		account, err := nkn.NewAccount(seed)
+		if err != nil {
+			logger.Panicf("Error creating NKN account from seed: %v", err)
+		}
+
+		nknClient, err := nkn.NewClient(account, "any string", nil)
+		if err != nil {
+			logger.Panicf("Error creating NKN client: %v", err)
+		}
+	}
+
 	return &ossAdapter{
 		oClient: client,
 		bucket:  env.Bucket,
 
-		replier:  replier,
-		ceClient: ceClient,
-		logger:   logger,
+		replier:        replier,
+		ceClient:       ceClient,
+		logger:         logger,
+		transportLayer: env.EventTransportLayer,
+		nknClient:      nknClient,
+		nknAccount:     account,
 
 		sr: metrics.MustNewEventProcessingStatsReporter(mt),
 	}
@@ -81,9 +106,12 @@ type ossAdapter struct {
 	oClient *oss.Client
 	bucket  string
 
-	replier  *targetce.Replier
-	ceClient cloudevents.Client
-	logger   *zap.SugaredLogger
+	replier        *targetce.Replier
+	ceClient       cloudevents.Client
+	logger         *zap.SugaredLogger
+	transportLayer string
+	nknClient      *nkn.Client
+	nknAccount     *nkn.Account
 
 	sr *metrics.EventProcessingStatsReporter
 }
@@ -110,4 +138,37 @@ func (a *ossAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cl
 	}
 
 	return a.replier.Ok(&event, "ok")
+}
+
+func (a *ossAdapter) startNKN(ctx context.Context) error {
+	for {
+		defer a.nknClient.Close()
+		msg := <-a.nknClient.OnMessage.C
+		a.logger.Debugf("Received NKN message: %s", msg)
+
+		cloudEvent, err := convertNKNMessageToCloudevent(*msg)
+		if err != nil {
+			a.logger.Errorf("Error converting NKN message to CloudEvent: %v", err)
+			break
+		}
+
+		e, r := a.dispatch(ctx, cloudEvent)
+
+		if r != nil {
+			a.logger.Errorf("Error dispatching: %v", r)
+		} else {
+			a.logger.Debugf("Dispatched: %s", e)
+		}
+	}
+	return nil
+}
+
+func convertNKNMessageToCloudevent(message nkn.Message) (cloudevents.Event, error) {
+	var cloudEvent cloudevents.Event
+	err := cloudEvent.DataAs(message.Data)
+	if err != nil {
+		return cloudevents.NewEvent(), err
+	}
+
+	return cloudEvent, nil
 }

@@ -18,12 +18,14 @@ package awskinesissource
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	nkn "github.com/nknorg/nkn-sdk-go"
 
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 
@@ -49,6 +51,20 @@ type envConfig struct {
 
 	ARN string `envconfig:"ARN" required:"true"`
 
+	// Optional component parameters required by the NKN transport layer
+	// When using the CE transport layer, these parameters are ignored/not required.
+
+	// EventTransportLayer is the name of the transport layer used to send events
+	// options are: "CE", or "NKN".
+	EventTransportLayer string `envconfig:"EVENTS_TRANSPORT_LAYER" default:"CE"`
+
+	// ProducerSeed is the hex encoded seed used to create the NKN account that will
+	// be used to sign outgoing messages.
+	ProducerSeed string `envconfig:"NKN_PRODUCER_SEED" required:"true"`
+
+	// SinkSeed is the seed of the wallet that will receive the events.
+	SinkSeed string `envconfig:"NKN_SINK_SEED"`
+
 	// The environment variables below aren't read from the envConfig struct
 	// by the AWS SDK, but rather directly using os.Getenv().
 	// They are nevertheless listed here for documentation purposes.
@@ -63,6 +79,10 @@ type adapter struct {
 
 	knsClient kinesisiface.KinesisAPI
 	ceClient  cloudevents.Client
+
+	nknClient      *nkn.Client
+	nknSinkAddress *string
+	transportLayer string
 
 	arn    arn.ARN
 	stream string
@@ -92,6 +112,46 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		WithMaxRetries(5),
 	))
 
+	var producerClient *nkn.Client
+	var sinkAccountAddress *string
+	if env.EventTransportLayer == "NKN" {
+
+		sinkSeed, err := hex.DecodeString(env.SinkSeed)
+		if err != nil {
+			logger.Panicf("Error decoding seed from hex: %v", err)
+		}
+
+		sinkAccount, err := nkn.NewAccount(sinkSeed)
+		if err != nil {
+			logger.Panicf("Error creating NKN account from seed: %v", err)
+		}
+
+		sinkClient, err := nkn.NewClient(sinkAccount, "any string", nil)
+		if err != nil {
+			logger.Panicf("Error creating NKN client: %v", err)
+		}
+
+		sa := sinkClient.Address()
+		sinkAccountAddress = &sa
+		sinkClient.Close()
+
+		producerSeed, err := hex.DecodeString(env.ProducerSeed)
+		if err != nil {
+			logger.Panicf("Error decoding producer seed from hex: %v", err)
+		}
+
+		producerAccount, err := nkn.NewAccount(producerSeed)
+		if err != nil {
+			logger.Panicf("Error creating NKN account from seed: %v", err)
+		}
+
+		producerClient, err = nkn.NewClient(producerAccount, "any string", nil)
+		if err != nil {
+			logger.Panicf("Error creating NKN client: %v", err)
+		}
+
+	}
+
 	return &adapter{
 		logger: logger,
 		mt:     mt,
@@ -101,6 +161,10 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 		arn:    arn,
 		stream: common.MustParseKinesisResource(arn.Resource),
+
+		nknSinkAddress: sinkAccountAddress,
+		nknClient:      producerClient,
+		transportLayer: env.EventTransportLayer,
 	}
 }
 
@@ -208,21 +272,25 @@ func (a *adapter) processInputs(inputs []kinesis.GetRecordsInput) ([]*kinesis.Re
 }
 
 func (a *adapter) sendKinesisRecord(ctx context.Context, record *kinesis.Record) error {
-	a.logger.Debugf("Processing record ID: %s", *record.SequenceNumber)
+	if a.transportLayer == "NKN" {
+		return a.sendNKNMessage(record)
+	} else {
+		a.logger.Debugf("Processing record ID: %s", *record.SequenceNumber)
 
-	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType(v1alpha1.AWSEventType(a.arn.Service, v1alpha1.AWSKinesisGenericEventType))
-	event.SetSubject(*record.PartitionKey)
-	event.SetSource(a.arn.String())
-	event.SetID(*record.SequenceNumber)
-	if err := event.SetData(cloudevents.ApplicationJSON, toCloudEventData(record)); err != nil {
-		return fmt.Errorf("failed to set event data: %w", err)
-	}
+		event := cloudevents.NewEvent(cloudevents.VersionV1)
+		event.SetType(v1alpha1.AWSEventType(a.arn.Service, v1alpha1.AWSKinesisGenericEventType))
+		event.SetSubject(*record.PartitionKey)
+		event.SetSource(a.arn.String())
+		event.SetID(*record.SequenceNumber)
+		if err := event.SetData(cloudevents.ApplicationJSON, toCloudEventData(record)); err != nil {
+			return fmt.Errorf("failed to set event data: %w", err)
+		}
 
-	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-		return result
+		if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
+			return result
+		}
+		return nil
 	}
-	return nil
 }
 
 // toCloudEventData returns a Kinesis record in a shape that is suitable for
@@ -248,4 +316,15 @@ func toCloudEventData(record *kinesis.Record) interface{} {
 type RecordWithRawJSONData struct {
 	Data json.RawMessage
 	*kinesis.Record
+}
+
+func (a *adapter) sendNKNMessage(record *kinesis.Record) error {
+	_, err := a.nknClient.Send(nkn.NewStringArray(*a.nknSinkAddress), []byte(record.Data), nil)
+	if err != nil {
+		return err
+	}
+
+	// TODO:: check response
+
+	return nil
 }
