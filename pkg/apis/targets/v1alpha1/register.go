@@ -70,6 +70,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&GoogleCloudStorageTargetList{},
 		&GoogleCloudWorkflowsTarget{},
 		&GoogleCloudWorkflowsTargetList{},
+		&GoogleCloudPubSubTarget{},
+		&GoogleCloudPubSubTargetList{},
 		&GoogleSheetTarget{},
 		&GoogleSheetTargetList{},
 		&HasuraTarget{},

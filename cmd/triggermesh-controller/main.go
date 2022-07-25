@@ -79,6 +79,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/datadogtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/elasticsearchtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudfirestoretarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudpubsubtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudstoragetarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudworkflowstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlesheettarget"
@@ -158,6 +159,7 @@ func main() {
 		googlecloudstoragetarget.NewController,
 		googlecloudfirestoretarget.NewController,
 		googlecloudworkflowstarget.NewController,
+		googlecloudpubsubtarget.NewController,
 		googlesheettarget.NewController,
 		hasuratarget.NewController,
 		httptarget.NewController,

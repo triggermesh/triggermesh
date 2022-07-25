@@ -8039,6 +8039,137 @@ func (w *wrapTargetsV1alpha1GoogleCloudFirestoreTargetImpl) Watch(ctx context.Co
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapTargetsV1alpha1) GoogleCloudPubSubTargets(namespace string) typedtargetsv1alpha1.GoogleCloudPubSubTargetInterface {
+	return &wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "targets.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "googlecloudpubsubtargets",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedtargetsv1alpha1.GoogleCloudPubSubTargetInterface = (*wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl)(nil)
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.GoogleCloudPubSubTarget, opts v1.CreateOptions) (*targetsv1alpha1.GoogleCloudPubSubTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "GoogleCloudPubSubTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.GoogleCloudPubSubTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.GoogleCloudPubSubTarget, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.GoogleCloudPubSubTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.GoogleCloudPubSubTargetList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.GoogleCloudPubSubTargetList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.GoogleCloudPubSubTarget, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.GoogleCloudPubSubTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.GoogleCloudPubSubTarget, opts v1.UpdateOptions) (*targetsv1alpha1.GoogleCloudPubSubTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "GoogleCloudPubSubTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.GoogleCloudPubSubTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.GoogleCloudPubSubTarget, opts v1.UpdateOptions) (*targetsv1alpha1.GoogleCloudPubSubTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "GoogleCloudPubSubTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.GoogleCloudPubSubTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1GoogleCloudPubSubTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapTargetsV1alpha1) GoogleCloudStorageTargets(namespace string) typedtargetsv1alpha1.GoogleCloudStorageTargetInterface {
 	return &wrapTargetsV1alpha1GoogleCloudStorageTargetImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{

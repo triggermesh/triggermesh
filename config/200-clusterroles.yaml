@@ -163,6 +163,7 @@ rules:
   - datadogtargets
   - elasticsearchtargets
   - googlecloudfirestoretargets
+  - googlecloudpubsubtargets
   - googlecloudstoragetargets
   - googlecloudworkflowstargets
   - googlesheettargets
@@ -206,6 +207,7 @@ rules:
   - datadogtargets/status
   - elasticsearchtargets/status
   - googlecloudfirestoretargets/status
+  - googlecloudpubsubtargets/status
   - googlecloudstoragetargets/status
   - googlecloudworkflowstargets/status
   - googlesheettargets/status
@@ -352,6 +354,7 @@ rules:
   - datadogtargets/finalizers
   - elasticsearchtargets/finalizers
   - googlecloudfirestoretargets/finalizers
+  - googlecloudpubsubtargets/finalizers
   - googlecloudstoragetargets/finalizers
   - googlecloudworkflowstargets/finalizers
   - googlesheettargets/finalizers
@@ -861,6 +864,7 @@ rules:
   - datadogtargets
   - elasticsearchtargets
   - googlecloudfirestoretargets
+  - googlecloudpubsubtargets
   - googlecloudstoragetargets
   - googlecloudworkflowstargets
   - googlesheettargets

@@ -143,6 +143,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudstoragetarget-adapter
         - name: GOOGLECLOUDWORKFLOWSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudworkflowstarget-adapter
+        - name: GOOGLECLOUDPUBSUBTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudpubsubtarget-adapter
         - name: GOOGLESHEETTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
         - name: HASURATARGET_IMAGE

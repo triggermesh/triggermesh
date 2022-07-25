@@ -43,6 +43,7 @@ type TargetsV1alpha1Interface interface {
 	DatadogTargetsGetter
 	ElasticsearchTargetsGetter
 	GoogleCloudFirestoreTargetsGetter
+	GoogleCloudPubSubTargetsGetter
 	GoogleCloudStorageTargetsGetter
 	GoogleCloudWorkflowsTargetsGetter
 	GoogleSheetTargetsGetter
@@ -128,6 +129,10 @@ func (c *TargetsV1alpha1Client) ElasticsearchTargets(namespace string) Elasticse
 
 func (c *TargetsV1alpha1Client) GoogleCloudFirestoreTargets(namespace string) GoogleCloudFirestoreTargetInterface {
 	return newGoogleCloudFirestoreTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) GoogleCloudPubSubTargets(namespace string) GoogleCloudPubSubTargetInterface {
+	return newGoogleCloudPubSubTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) GoogleCloudStorageTargets(namespace string) GoogleCloudStorageTargetInterface {

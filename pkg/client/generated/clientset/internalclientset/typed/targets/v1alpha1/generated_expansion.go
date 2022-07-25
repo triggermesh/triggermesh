@@ -48,6 +48,8 @@ type ElasticsearchTargetExpansion interface{}
 
 type GoogleCloudFirestoreTargetExpansion interface{}
 
+type GoogleCloudPubSubTargetExpansion interface{}
+
 type GoogleCloudStorageTargetExpansion interface{}
 
 type GoogleCloudWorkflowsTargetExpansion interface{}

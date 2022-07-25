@@ -54,6 +54,8 @@ type Interface interface {
 	ElasticsearchTargets() ElasticsearchTargetInformer
 	// GoogleCloudFirestoreTargets returns a GoogleCloudFirestoreTargetInformer.
 	GoogleCloudFirestoreTargets() GoogleCloudFirestoreTargetInformer
+	// GoogleCloudPubSubTargets returns a GoogleCloudPubSubTargetInformer.
+	GoogleCloudPubSubTargets() GoogleCloudPubSubTargetInformer
 	// GoogleCloudStorageTargets returns a GoogleCloudStorageTargetInformer.
 	GoogleCloudStorageTargets() GoogleCloudStorageTargetInformer
 	// GoogleCloudWorkflowsTargets returns a GoogleCloudWorkflowsTargetInformer.
@@ -180,6 +182,11 @@ func (v *version) ElasticsearchTargets() ElasticsearchTargetInformer {
 // GoogleCloudFirestoreTargets returns a GoogleCloudFirestoreTargetInformer.
 func (v *version) GoogleCloudFirestoreTargets() GoogleCloudFirestoreTargetInformer {
 	return &googleCloudFirestoreTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GoogleCloudPubSubTargets returns a GoogleCloudPubSubTargetInformer.
+func (v *version) GoogleCloudPubSubTargets() GoogleCloudPubSubTargetInformer {
+	return &googleCloudPubSubTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GoogleCloudStorageTargets returns a GoogleCloudStorageTargetInformer.

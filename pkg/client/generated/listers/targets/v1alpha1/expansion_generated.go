@@ -138,6 +138,14 @@ type GoogleCloudFirestoreTargetListerExpansion interface{}
 // GoogleCloudFirestoreTargetNamespaceLister.
 type GoogleCloudFirestoreTargetNamespaceListerExpansion interface{}
 
+// GoogleCloudPubSubTargetListerExpansion allows custom methods to be added to
+// GoogleCloudPubSubTargetLister.
+type GoogleCloudPubSubTargetListerExpansion interface{}
+
+// GoogleCloudPubSubTargetNamespaceListerExpansion allows custom methods to be added to
+// GoogleCloudPubSubTargetNamespaceLister.
+type GoogleCloudPubSubTargetNamespaceListerExpansion interface{}
+
 // GoogleCloudStorageTargetListerExpansion allows custom methods to be added to
 // GoogleCloudStorageTargetLister.
 type GoogleCloudStorageTargetListerExpansion interface{}
