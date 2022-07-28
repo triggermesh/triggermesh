@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/convert"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer"
@@ -80,57 +81,8 @@ func (s *Store) Apply(data []byte) ([]byte, error) {
 		return data, err
 	}
 
-	value := readValue(event, path)
+	value := common.ReadValue(event, path)
 	s.variables.Set(s.Path, value)
 
 	return data, nil
-}
-
-func readValue(source interface{}, path map[string]interface{}) interface{} {
-	var result interface{}
-	for k, v := range path {
-		switch value := v.(type) {
-		case float64, bool, string:
-			sourceMap, ok := source.(map[string]interface{})
-			if !ok {
-				break
-			}
-			result = sourceMap[k]
-		case []interface{}:
-			if k != "" {
-				// array is inside the object
-				// {"foo":[{},{},{}]}
-				sourceMap, ok := source.(map[string]interface{})
-				if !ok {
-					break
-				}
-				source, ok = sourceMap[k]
-				if !ok {
-					break
-				}
-			}
-			// array is a root object
-			// [{},{},{}]
-			sourceArr, ok := source.([]interface{})
-			if !ok {
-				break
-			}
-
-			index := len(value) - 1
-			if index >= len(sourceArr) {
-				break
-			}
-			result = readValue(sourceArr[index], value[index].(map[string]interface{}))
-		case map[string]interface{}:
-			sourceMap, ok := source.(map[string]interface{})
-			if !ok {
-				break
-			}
-			if _, ok := sourceMap[k]; !ok {
-				break
-			}
-			result = readValue(sourceMap[k], value)
-		}
-	}
-	return result
 }

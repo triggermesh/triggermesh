@@ -166,6 +166,10 @@ func extractValue(source interface{}, path map[string]interface{}) (map[string]i
 				sourceMap[k] = append(sourceArr[:index], sourceArr[index+1:]...)
 			}
 		case map[string]interface{}:
+			if k == "" {
+				result = source
+				break
+			}
 			sourceMap, ok = source.(map[string]interface{})
 			if !ok {
 				break
