@@ -19,7 +19,7 @@ require (
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.5.0
 	cloud.google.com/go/pubsub v1.24.0
-	cloud.google.com/go/storage v1.23.0
+	cloud.google.com/go/storage v1.24.0
 	cloud.google.com/go/workflows v1.5.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.18
@@ -65,7 +65,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.8.0
-	github.com/tektoncd/pipeline v0.37.2
+	github.com/tektoncd/pipeline v0.38.1
 	github.com/tidwall/gjson v1.14.1
 	github.com/wamuir/go-xslt v0.1.4
 	go.opencensus.io v0.23.0
@@ -156,9 +156,8 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.4.0 // indirect
 	github.com/googleapis/gnostic v0.5.5 // indirect
-	github.com/googleapis/go-type-adapters v1.0.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
-	github.com/hashicorp/errwrap v1.0.0 // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
