@@ -196,6 +196,21 @@ func TestReceiveAndTransform(t *testing.T) {
 				},
 			},
 		}, {
+			name: "Shift full body",
+			originalEvent: setData(t, newEvent(),
+				json.RawMessage(`[{"key1":"value1"}]`)),
+			expectedEventData: `{"body":[{"key1":"value1"}]}`,
+			data: []v1alpha1.Transform{
+				{
+					Operation: "shift",
+					Paths: []v1alpha1.Path{
+						{
+							Key: ".:body",
+						},
+					},
+				},
+			},
+		}, {
 			name: "Store operation",
 			originalEvent: setData(t, newEvent(),
 				json.RawMessage(`{"key1":"value1","object":{"foo":"bar"}}`)),
@@ -221,6 +236,37 @@ func TestReceiveAndTransform(t *testing.T) {
 						}, {
 							Key:   "object.foo",
 							Value: "$var1",
+						},
+					},
+				},
+			},
+		}, {
+			name: "Store full body",
+			originalEvent: setData(t, newEvent(),
+				json.RawMessage(`[{"key1":"value1"}]`)),
+			expectedEventData: `{"body":[{"key1":"value1"}]}`,
+			data: []v1alpha1.Transform{
+				{
+					Operation: "store",
+					Paths: []v1alpha1.Path{
+						{
+							Key:   "$body",
+							Value: ".",
+						},
+					},
+				}, {
+					Operation: "delete",
+					Paths: []v1alpha1.Path{
+						{
+							Key: "",
+						},
+					},
+				}, {
+					Operation: "add",
+					Paths: []v1alpha1.Path{
+						{
+							Key:   "body",
+							Value: "$body",
 						},
 					},
 				},
