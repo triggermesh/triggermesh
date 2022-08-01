@@ -80,20 +80,25 @@ func makeAppEnv(o *v1alpha1.AzureSentinelTarget) []corev1.EnvVar {
 			Name:  envWorkspace,
 			Value: o.Spec.Workspace,
 		},
-		{
-			Name: envClientSecret,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.ClientSecret.SecretKeyRef,
-			},
-		},
-		{
-			Name:  envClientID,
-			Value: o.Spec.ClientID,
-		},
-		{
-			Name:  envTenantID,
-			Value: o.Spec.TenantID,
-		},
+	}
+
+	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
+		env = common.MaybeAppendValueFromEnvVar(env, common.EnvHubKeyName, sasAuth.KeyName)
+		env = common.MaybeAppendValueFromEnvVar(env, common.EnvHubKeyValue, sasAuth.KeyValue)
+		env = common.MaybeAppendValueFromEnvVar(env, common.EnvHubConnStr, sasAuth.ConnectionString)
+	}
+
+	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
+		env = common.MaybeAppendValueFromEnvVar(env, common.EnvAADTenantID, spAuth.TenantID)
+		env = common.MaybeAppendValueFromEnvVar(env, common.EnvAADClientID, spAuth.ClientID)
+		env = common.MaybeAppendValueFromEnvVar(env, common.EnvAADClientSecret, spAuth.ClientSecret)
+	}
+
+	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envEventsPayloadPolicy,
+			Value: string(*o.Spec.EventOptions.PayloadPolicy),
+		})
 	}
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {

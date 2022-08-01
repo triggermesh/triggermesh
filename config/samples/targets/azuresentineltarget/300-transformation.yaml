@@ -27,7 +27,7 @@ spec:
   - operation: add
     paths:
     - key: type
-      value: io.triggermesh.azure.sentinel.create.incident
+      value: io.triggermesh.azure.sentinel.incident
   data:
   - operation: store
     paths:

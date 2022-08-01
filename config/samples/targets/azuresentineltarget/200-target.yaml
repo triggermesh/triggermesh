@@ -18,23 +18,22 @@ metadata:
   name: hello-sentinel
 spec:
   # subscriptionID refers to the Azure Subscription ID that the Azure Sentinel instance is associated with.
-  subscriptionId: <subscription_id>
+  subscriptionID: <subscription_id>
   # resourceGroup refers to the resource group where the Azure Sentinel instance is deployed.
   resourceGroup: <resource_group>
   # workspace refers to the workspace name in Azure Sentinel.
   workspace: <workspace>
-  # clientID refers to the Application (client) ID of the App Registration.
-  # see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
-  clientID: <client_id>
-  # tenantID refers to the Directory (tenant) ID of the App Registration.
-  # see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
-  tenantID: <tenant_id>
-  # clientSecret refers to the Client Secret of an App Registration.
-  # see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
-  clientSecret:
-    secretKeyRef:
-      name: azurecreds
-      key: secret
-  # If you would like this service to create a public endpoint
-  adapterOverrides:
-    public: true
+  auth:
+    servicePrincipal:
+      tenantID:
+        valueFromSecret:
+          name: azure
+          key: tenantID
+      clientID:
+        valueFromSecret:
+          name: azure
+          key: clientID
+      clientSecret:
+        valueFromSecret:
+          name: azure
+          key: clientSecret

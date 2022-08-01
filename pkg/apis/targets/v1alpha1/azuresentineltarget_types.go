@@ -51,12 +51,8 @@ type AzureSentinelTargetSpec struct {
 	ResourceGroup string `json:"resourceGroup"`
 	// Workspace refers to the workspace name in Azure Sentinel.
 	Workspace string `json:"workspace"`
-	// ClientID refers to the Application (client) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
-	ClientID string `json:"clientID"`
-	// ClientSecret refers to the Client Secret of an App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
-	ClientSecret SecretValueFromSource `json:"clientSecret"`
-	// TenantID refers to the Directory (tenant) ID of the App Registration. see -> https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app for more details
-	TenantID string `json:"tenantID"`
+	// Authentication method to interact with the Azure Event Hubs API.
+	Auth AzureAuth `json:"auth"`
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 	// Adapter spec overrides parameters.
