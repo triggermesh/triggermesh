@@ -99,7 +99,6 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 var _ pkgadapter.Adapter = (*adapter)(nil)
 
-// Returns if stopCh is closed or Send() returns an error.
 func (a *adapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting AzureSentinel Target Adapter")
 	return a.ceClient.StartReceiver(ctx, a.dispatch)

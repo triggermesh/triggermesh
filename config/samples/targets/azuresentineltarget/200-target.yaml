@@ -34,7 +34,7 @@ spec:
   clientSecret:
     secretKeyRef:
       name: azurecreds
-      key: secrete
+      key: secret
   # If you would like this service to create a public endpoint
   adapterOverrides:
     public: true
