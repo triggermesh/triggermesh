@@ -158,6 +158,7 @@ rules:
   - awssnstargets
   - awssqstargets
   - azureeventhubstargets
+  - azuresentineltargets
   - cloudeventstargets
   - confluenttargets
   - datadogtargets
@@ -202,6 +203,7 @@ rules:
   - awssnstargets/status
   - awssqstargets/status
   - azureeventhubstargets/status
+  - azuresentineltargets/status
   - cloudeventstargets/status
   - confluenttargets/status
   - datadogtargets/status
@@ -349,6 +351,7 @@ rules:
   - awssnstargets/finalizers
   - awssqstargets/finalizers
   - azureeventhubstargets/finalizers
+  - azuresentineltargets/finalizers
   - cloudeventstargets/finalizers
   - confluenttargets/finalizers
   - datadogtargets/finalizers
@@ -859,6 +862,7 @@ rules:
   - awssnstargets
   - awssqstargets
   - azureeventhubstargets
+  - azuresentineltargets
   - cloudeventstargets
   - confluenttargets
   - datadogtargets

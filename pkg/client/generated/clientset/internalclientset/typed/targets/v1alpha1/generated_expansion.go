@@ -38,6 +38,8 @@ type AlibabaOSSTargetExpansion interface{}
 
 type AzureEventHubsTargetExpansion interface{}
 
+type AzureSentinelTargetExpansion interface{}
+
 type CloudEventsTargetExpansion interface{}
 
 type ConfluentTargetExpansion interface{}

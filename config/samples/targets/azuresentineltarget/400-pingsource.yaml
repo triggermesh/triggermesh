@@ -1,0 +1,38 @@
+# Copyright 2022 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: sources.knative.dev/v1
+kind: PingSource
+metadata:
+  name: fake-event-generator
+spec:
+  schedule: "*/1 * * * *"
+  contentType: application/json
+  data: '{ "event":
+   { "guid": "ocid1.cloudguardproblem.oc1.iad.1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e",
+    "name": "SCANNED_HOST_VULNERABILITY",
+    "severity": "CRITICAL",
+    "shortDescription": "Prerequisite: Create a Host Scan Recipe and a Host Scan Target in the Scanning service.
+    The Scanning service scans compute hosts to identify known cybersecurity vulnerabilities related to applications,
+    libraries, operating systems, and services. This detector triggers a problem when the Scanning service has reported
+    that an instance has one or more CRITICAL (or lower severity, based on the Input Settings within the detector config)
+    vulnerabilities.", "startTime": "2022-01-30T11:14:29.130Z", "status": "OPEN" },
+    "provider":{ "accountId": "ocid1.tenancy.oc1..1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e" },
+    "providerId": "1", "providerType": "CSP", "resource": { "identifier": "ocid1.instance.oc1.iad.1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e1q2w3e",
+    "name": "b60b95e8-e229-4398-b3bf-25d1fe51b4f0", "region": "us-ashburn-1", "type": "HostAgentScan", "zone": "Comp-Name" }, "source": { "sourceId": "none", "sourceName": "Cloud Guard" } }'
+  sink:
+    ref:
+      apiVersion: flow.triggermesh.io/v1alpha1
+      kind: Transformation
+      name: csnf-sentinel

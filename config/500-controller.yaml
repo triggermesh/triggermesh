@@ -129,6 +129,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awssqstarget-adapter
         - name: AZUREEVENTHUBSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubstarget-adapter
+        - name: AZURESENTINELTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azuresentineltarget-adapter
         - name: CLOUDEVENTSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/cloudeventstarget-adapter
         - name: CONFLUENTTARGET_IMAGE
