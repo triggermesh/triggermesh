@@ -195,3 +195,23 @@ clean: ## Clean build artifacts
 
 # Code generation
 include $(BASE_DIR)/hack/inc.Codegen.mk
+
+# init_local_prereqs is a special target that is used to realize the prerequisites for a Triggermesh Install
+# in a local Docker Desktop Kubernetes environment. It is not intended to be used in production.
+init_local_prereqs:
+	@chmod +x hack/scripts/DockerDesktopInitPrerequisites.sh
+	@./hack/scripts/DockerDesktopInitPrerequisites.sh
+
+# init_local_dev is a special target that is used to realize the prerequisites for a Triggermesh Install.
+# This target first builds Triggermesh from the local files, and then deploy the stack in a local Docker
+# Desktop Kubernetes environment. This is not intended to be used in production.
+init_local_dev:
+	@chmod +x hack/scripts/DockerDesktopInitPrerequisites.sh
+	@./hack/scripts/DockerDesktopInitPrerequisites.sh
+	@ko apply -f config/
+
+# init_local_release is a special target that is used to realize the prerequisites for a Triggermesh Install, and
+# then deploy the latest release of the Triggermesh stack in a local Docker Desktop Kubernetes environment. This is not intended to be used in production.
+init_local_release:
+	@chmod +x hack/scripts/DockerDesktopInstallLatestRelease.sh
+	@./hack/scripts/DockerDesktopInstallLatestRelease.sh

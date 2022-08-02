@@ -36,6 +36,36 @@ kubectl apply -f https://github.com/triggermesh/triggermesh/releases/latest/down
 
 Please refer to our [guidelines for contributors](CONTRIBUTING.md).
 
+### Setting up a Local Development Environment For Testing and Development
+
+The following section describes how to quickly set up a local development environment for testing and development with Docker Desktop.
+
+**Note** In this guide/example we are using Docker Desktop as our enviorment of choice, however, any Kubernetes cluster can be used.
+
+### Prerequisites
+
+    - golang
+    - kubectl
+    - Docker Desktop (with Kubernetes enabled)
+    - ko
+
+### Deploying a Local Development Environment (From the Latest Release)
+
+```shell
+make init_local_release
+```
+### Deploying a Local Development Environment (From Source)
+
+```shell
+make init_local_dev
+```
+
+### Realize the Prerequisites, WIHOUT Deploying Triggermesh
+
+```shell
+make init_local_prereqs
+```
+
 ## Commercial Support
 
 TriggerMesh Inc. offers commercial support for the TriggerMesh platform. Email us at <info@triggermesh.com> to get more
