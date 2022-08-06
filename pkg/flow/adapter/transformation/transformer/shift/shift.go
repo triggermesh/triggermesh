@@ -36,7 +36,7 @@ type Shift struct {
 	variables *storage.Storage
 }
 
-const Root = "$$ROOT"
+const Root = "$ROOT"
 
 const delimeter string = ":"
 
