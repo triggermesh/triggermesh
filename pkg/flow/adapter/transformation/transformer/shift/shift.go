@@ -36,6 +36,8 @@ type Shift struct {
 	variables *storage.Storage
 }
 
+const Root = "$$ROOT"
+
 const delimeter string = ":"
 
 // InitStep is used to figure out if this operation should
@@ -82,21 +84,29 @@ func (s *Shift) New(key, value string) transformer.Transformer {
 // Apply is a main method of Transformation that moves existing
 // values to a new locations.
 func (s *Shift) Apply(data []byte) ([]byte, error) {
-	oldPath := convert.SliceToMap(strings.Split(s.Path, "."), "")
-
 	var event interface{}
 	if err := json.Unmarshal(data, &event); err != nil {
 		return data, err
 	}
 
-	newEvent, value := extractValue(event, oldPath)
-	if s.Value != "" {
-		if !equal(s.retrieveInterface(s.Value), value) {
+	newEvent := make(map[string]interface{})
+	var value interface{}
+
+	switch s.Path {
+	case Root:
+		value = event
+	default:
+		oldPath := convert.SliceToMap(strings.Split(s.Path, "."), "")
+
+		newEvent, value = extractValue(event, oldPath)
+		if s.Value != "" {
+			if !equal(s.retrieveInterface(s.Value), value) {
+				return data, nil
+			}
+		}
+		if value == nil {
 			return data, nil
 		}
-	}
-	if value == nil {
-		return data, nil
 	}
 
 	newPath := convert.SliceToMap(strings.Split(s.NewPath, "."), value)
