@@ -1,0 +1,56 @@
+# This Transformation example aims to demonstrate the use of the $ROOT variable
+# and its use to shift the root structure of an event payload
+
+# Example Input:
+#{
+#    "test": "teststore",
+#    "Shifter": {
+#        "some": "values"
+#    }
+#}
+
+
+# Example Output:
+#{
+#    "data": {
+#        "Shifter": {
+#            "some": "values"
+#        },
+#        "context": {
+#            "transaction": "say-hello"
+#        },
+#        "noah": "teststore",
+#        "shifted": {
+#            "test": "noah"
+#        },
+#        "test": "teststore"
+#    }
+#}
+
+apiVersion: flow.triggermesh.io/v1alpha1
+kind: Transformation
+metadata:
+  name: github-push-transformation
+spec:
+  context:
+    - operation: store
+      paths:
+        - key: $id
+          value: id
+  data:
+    - operation: store
+      paths:
+        - key: $tstore
+          value: test
+    - operation: add
+      paths:
+        - key: context.transaction
+          value: $id
+        - key: shifted.test
+          value: noah
+        - key: noah
+          value: $tstore
+    - operation: shift
+      paths:
+        - key: $ROOT:data
+
