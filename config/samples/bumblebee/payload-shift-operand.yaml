@@ -48,24 +48,23 @@ metadata:
   name: github-push-transformation
 spec:
   context:
-    - operation: store
-      paths:
-        - key: $id
-          value: id
+  - operation: store
+    paths:
+    - key: $id
+      value: id
   data:
-    - operation: store
-      paths:
-        - key: $tstore
-          value: test
-    - operation: add
-      paths:
-        - key: context.transaction
-          value: $id
-        - key: shifted.test
-          value: noah
-        - key: noah
-          value: $tstore
-    - operation: shift
-      paths:
-        - key: $ROOT:data
-
+  - operation: store
+    paths:
+    - key: $tstore
+      value: test
+  - operation: add
+    paths:
+    - key: context.transaction
+      value: $id
+    - key: shifted.test
+      value: noah
+    - key: noah
+      value: $tstore
+  - operation: shift
+    paths:
+    - key: $ROOT:data
