@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -94,7 +94,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch msgType := r.Header.Get(headerMsgTypeKey); msgType {
 	case headerMsgTypeNotification:
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			handleError("Failed to read request body", err, http.StatusInternalServerError, h.logger, w)
 			return
@@ -129,7 +129,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.logger.Debug("Successfully sent SNS notification: ", event)
 
 	case headerMsgTypeSubsConfirm:
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			handleError("Failed to read request body", err, http.StatusInternalServerError, h.logger, w)
 			return

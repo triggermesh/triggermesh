@@ -24,7 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -97,7 +97,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		handleError("Failed to read request body", err, http.StatusInternalServerError, h.logger, w)
 		return

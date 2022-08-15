@@ -19,7 +19,7 @@ package oracletarget
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -114,7 +114,7 @@ func (a *oracleAdapter) Start(ctx context.Context) error {
 }
 
 func (a *oracleAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	requestPayload := ioutil.NopCloser(bytes.NewReader(event.Data()))
+	requestPayload := io.NopCloser(bytes.NewReader(event.Data()))
 
 	request := functions.InvokeFunctionRequest{
 		FunctionId:         &a.fn,
@@ -134,7 +134,7 @@ func (a *oracleAdapter) dispatch(ctx context.Context, event cloudevents.Event) (
 
 	defer a.responseCleanup(response)
 
-	respBody, err := ioutil.ReadAll(response.Content)
+	respBody, err := io.ReadAll(response.Content)
 	if err != nil {
 		a.logger.Errorw("Error extracting response from function", zap.Error(err))
 		return nil, cloudevents.ResultNACK

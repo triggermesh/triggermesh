@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -113,7 +113,7 @@ func (j *JWTAuthenticator) NewCredentials() (*Credentials, error) {
 
 	if res.StatusCode >= 300 {
 		msg := fmt.Sprintf("received unexpected status code %d from authentication", res.StatusCode)
-		if resb, err := ioutil.ReadAll(res.Body); err == nil {
+		if resb, err := io.ReadAll(res.Body); err == nil {
 			msg += ": " + string(resb)
 		}
 		return nil, errors.New(msg)

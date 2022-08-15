@@ -19,7 +19,7 @@ package awss3
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/url"
 	"os"
 
@@ -147,7 +147,7 @@ var _ = Describe("AWS S3 target", func() {
 							"Received %d objects instead of 1", len(receivedObjs))
 
 						object := *receivedObjs[0]
-						receivedObj, err = ioutil.ReadAll(object.Body)
+						receivedObj, err = io.ReadAll(object.Body)
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -194,7 +194,7 @@ var _ = Describe("AWS S3 target", func() {
 							"Received %d objects instead of 1", len(receivedObjs))
 
 						object := *receivedObjs[0]
-						receivedObj, err = ioutil.ReadAll(object.Body)
+						receivedObj, err = io.ReadAll(object.Body)
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -241,7 +241,7 @@ var _ = Describe("AWS S3 target", func() {
 							"Received %d objects instead of 1", len(receivedObjs))
 
 						object := *receivedObjs[0]
-						receivedObj, err = ioutil.ReadAll(object.Body)
+						receivedObj, err = io.ReadAll(object.Body)
 						Expect(err).ToNot(HaveOccurred())
 					})
 					By("inspecting the object payload", func() {

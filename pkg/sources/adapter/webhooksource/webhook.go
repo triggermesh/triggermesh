@@ -20,7 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -130,7 +130,7 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 		}
 
 		defer r.Body.Close()
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			h.handleError(err, http.StatusInternalServerError, w)
 			return

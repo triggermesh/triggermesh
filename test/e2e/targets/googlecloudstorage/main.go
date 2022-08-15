@@ -19,7 +19,7 @@ package googlecloudstorage
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/url"
 
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
@@ -146,7 +146,7 @@ var _ = Describe("Google Cloud Storage target", func() {
 							"Received %d objects instead of 1", len(receivedObjs))
 
 						object := receivedObjs[0]
-						receivedObj, err = ioutil.ReadAll(object)
+						receivedObj, err = io.ReadAll(object)
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -194,7 +194,7 @@ var _ = Describe("Google Cloud Storage target", func() {
 							"Received %d objects instead of 1", len(receivedObjs))
 
 						object := receivedObjs[0]
-						receivedObj, err = ioutil.ReadAll(object)
+						receivedObj, err = io.ReadAll(object)
 						Expect(err).ToNot(HaveOccurred())
 					})
 
@@ -242,7 +242,7 @@ var _ = Describe("Google Cloud Storage target", func() {
 							"Received %d objects instead of 1", len(receivedObjs))
 
 						object := receivedObjs[0]
-						receivedObj, err = ioutil.ReadAll(object)
+						receivedObj, err = io.ReadAll(object)
 						Expect(err).ToNot(HaveOccurred())
 					})
 					By("inspecting the object payload", func() {

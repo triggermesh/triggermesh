@@ -20,7 +20,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -189,7 +189,7 @@ func (a *httpAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*c
 	}
 
 	defer res.Body.Close()
-	resb, err := ioutil.ReadAll(res.Body)
+	resb, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, a.errorHTTPResult(http.StatusInternalServerError, "Error reading response body: %w", err)
 	}

@@ -19,7 +19,7 @@ package salesforcetarget
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -126,7 +126,7 @@ func (a *salesforceTarget) dispatch(ctx context.Context, event cloudevents.Event
 	}
 
 	defer res.Body.Close()
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}

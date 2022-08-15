@@ -18,7 +18,7 @@ package semantic
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -288,7 +288,7 @@ func TestServiceAccountEqual(t *testing.T) {
 func loadFixture(t *testing.T, file string, obj runtime.Object) {
 	t.Helper()
 
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		t.Fatalf("Error reading fixture file: %s", err)
 	}

@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"io/ioutil"
 	"strings"
 	"time"
 
@@ -217,7 +216,7 @@ func parseCloudEvent(ce string) cloudevents.Event {
 
 			// read everything that's left to read and set
 			// it as the event's data
-			b, err := ioutil.ReadAll(r)
+			b, err := io.ReadAll(r)
 			if err != nil {
 				framework.Logf("Error reading event's data: %s", err)
 				break

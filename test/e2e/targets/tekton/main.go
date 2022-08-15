@@ -18,7 +18,7 @@ package tekton
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/url"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
@@ -130,7 +130,7 @@ var _ = FDescribe("Tekton Target", func() {
 
 					By("verifying the build results", func() {
 						log := tekton.GetPodLogs(f.KubeClient, ns, task.GetName()+"-12345-pod")
-						bs, err := ioutil.ReadAll(log)
+						bs, err := io.ReadAll(log)
 						Expect(err).ToNot(HaveOccurred())
 						Expect(string(bs)).To(Equal("Hello world e2etest\n"))
 					})
@@ -158,7 +158,7 @@ var _ = FDescribe("Tekton Target", func() {
 
 					By("verifying the build results", func() {
 						log := tekton.GetPodLogs(f.KubeClient, ns, pipeline.GetName()+"-12345-greeting-pipeline-pod")
-						bs, err := ioutil.ReadAll(log)
+						bs, err := io.ReadAll(log)
 						Expect(err).ToNot(HaveOccurred())
 						Expect(string(bs)).To(Equal("Hello world e2epipeline\n"))
 					})

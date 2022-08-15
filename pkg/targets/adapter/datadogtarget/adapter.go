@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -130,7 +130,7 @@ func (a *datadogAdapter) postLog(event cloudevents.Event) (*cloudevents.Event, c
 	}
 
 	defer res.Body.Close()
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}
@@ -161,7 +161,7 @@ func (a *datadogAdapter) postEvent(event cloudevents.Event) (*cloudevents.Event,
 	}
 
 	defer res.Body.Close()
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}
@@ -191,7 +191,7 @@ func (a *datadogAdapter) postMetric(event cloudevents.Event) (*cloudevents.Event
 	}
 
 	defer res.Body.Close()
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeParseResponse, err, nil)
 	}
