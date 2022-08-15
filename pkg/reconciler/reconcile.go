@@ -546,8 +546,8 @@ func resolveSinkURL(ctx context.Context, r *resolver.URIResolver) (*apis.URL, er
 //
 // The result is  the following chain of ownership:
 //
-//   FooComponent/instance-a, FooComponent/instance-b, FooComponent/instance-c, ...
-//   └─ServiceAccount/foocomponent-adapter
+//	FooComponent/instance-a, FooComponent/instance-b, FooComponent/instance-c, ...
+//	└─ServiceAccount/foocomponent-adapter
 func serviceAccountOwners[T kmeta.OwnerRefable](rcl v1alpha1.Reconcilable, l Lister[T]) ([]kmeta.OwnerRefable, error) {
 	if v1alpha1.WantsOwnServiceAccount(rcl) {
 		return []kmeta.OwnerRefable{rcl}, nil

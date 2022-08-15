@@ -54,16 +54,16 @@ func ceExtensionAttrsForMessage(msg *sqs.Message) map[string]interface{} {
 // so that it can be used as a CloudEvent context attribute.
 //
 // The naming conventions for both formats are described at:
-//  - https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html#message-attribute-components
-//  - https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#context-attributes
+//   - https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html#message-attribute-components
+//   - https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#context-attributes
 func ceExtensionAttrForMessageAttr(attrName string) string {
 	return ceExtensionSQSMessagePrefix + stripNonAlphanumCharsAndMapToLower(attrName)
 }
 
 // stripNonAlphanumCharsAndMapToLower applies the following transformations to
 // the given string:
-//  - strips all non alphanumeric characters
-//  - maps all Unicode letters to their lower case
+//   - strips all non alphanumeric characters
+//   - maps all Unicode letters to their lower case
 func stripNonAlphanumCharsAndMapToLower(s string) string {
 	var stripped strings.Builder
 	stripped.Grow(len(s))

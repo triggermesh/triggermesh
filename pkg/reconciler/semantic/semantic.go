@@ -31,7 +31,7 @@ import (
 //
 // For a given comparison function
 //
-//   comp(a, b interface{})
+//	comp(a, b interface{})
 //
 // 'a' should always be the desired state, and 'b' the current state for
 // DeepDerivative comparisons to work as expected.

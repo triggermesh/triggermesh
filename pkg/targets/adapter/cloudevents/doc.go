@@ -18,7 +18,7 @@ limitations under the License.
 Package cloudevents provides a CloudEvents library focused on target component
 requirements and on how responses should be composed.
 
-Basics
+# Basics
 
 The package provides a Replier object that should be instantiated as a singleton,
 and a set of pubic functions that are further divided into Knative managed and
@@ -31,13 +31,13 @@ Custom managed responses on the other hand provide information through payload. 
 case of successful responses the payload is provided by the target, but when an error
 occurs, a custom managed response includes an EventError payload.
 
-		type EventError struct {
-			Code        string		// short string to identify error nature
-			Description string		// description from the error object
-			Fields interface{}	// additional information
-		}
+	type EventError struct {
+		Code        string		// short string to identify error nature
+		Description string		// description from the error object
+		Fields interface{}	// additional information
+	}
 
-Replier
+# Replier
 
 The Replier constructor can be customized by passing an array of ReplierOption objects,
 being that customization applied to all responses. Customization choices are:

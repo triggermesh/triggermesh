@@ -94,9 +94,11 @@ type EventDispatcher interface {
 
 // Subscription contains data about the channel and replayID for the subscription.
 // For replayID can be:
-// 		-2 for all past (stored) and new events.
-// 		-1 for new events only.
-//		replayID for receiving events after that replayID event.
+//
+//	-2 for all past (stored) and new events.
+//	-1 for new events only.
+//	replayID for receiving events after that replayID event.
+//
 // See: https://developer.salesforce.com/docs/atlas.en-us.api_streaming.meta/api_streaming/using_streaming_api_durability.htm
 type Subscription struct {
 	Channel  string

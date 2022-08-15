@@ -61,12 +61,12 @@ const (
 
 // ensureSystemTopic ensures a system topic exists with the expected configuration.
 // Required permissions:
-//  - Microsoft.EventGrid/systemTopics/read
-//  - Microsoft.EventGrid/systemTopics/write
-//  To manage the default resource group, when the scope is an Azure subscription:
+//   - Microsoft.EventGrid/systemTopics/read
+//   - Microsoft.EventGrid/systemTopics/write
+//     To manage the default resource group, when the scope is an Azure subscription:
 //   - Microsoft.Resources/subscriptions/resourceGroups/read
 //   - Microsoft.Resources/subscriptions/resourceGroups/write
-//  Additionally, for regional resources, "read" permission on the resource (scope).
+//     Additionally, for regional resources, "read" permission on the resource (scope).
 func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	providersCli eventgrid.ProvidersClient,
 	resGroupsCli eventgrid.ResourceGroupsClient) (*v1alpha1.AzureResourceID /*sysTopicResID*/, error) {
@@ -203,8 +203,8 @@ func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 
 // ensureNoSystemTopic ensures the system topic is removed.
 // Required permissions:
-//  - Microsoft.EventGrid/systemTopics/read
-//  - Microsoft.EventGrid/systemTopics/delete
+//   - Microsoft.EventGrid/systemTopics/read
+//   - Microsoft.EventGrid/systemTopics/delete
 func ensureNoSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	eventSubsCli eventgrid.EventSubscriptionsClient, sysTopic *azureeventgrid.SystemTopic) reconciler.Event {
 

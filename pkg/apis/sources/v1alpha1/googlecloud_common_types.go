@@ -26,12 +26,13 @@ import (
 
 // GCloudResourceName represents a fully qualified resource name,
 // as described at
-//  https://cloud.google.com/apis/design/resource_names
+//
+//	https://cloud.google.com/apis/design/resource_names
 //
 // Examples of such resource names include:
-//  - projects/{project_name}/topics/{topic_name}
-//  - projects/{project_name}/repos/{repo_name}
-//  - projects/{project_name}/subscriptions/{subscription_name}
+//   - projects/{project_name}/topics/{topic_name}
+//   - projects/{project_name}/repos/{repo_name}
+//   - projects/{project_name}/subscriptions/{subscription_name}
 type GCloudResourceName struct {
 	Project    string
 	Collection string

@@ -57,8 +57,8 @@ func ceExtensionAttrForMessageAttr(attrName string) string {
 
 // stripNonAlphanumCharsAndMapToLower applies the following transformations to
 // the given string:
-//  - strips all non alphanumeric characters
-//  - maps all Unicode letters to their lower case
+//   - strips all non alphanumeric characters
+//   - maps all Unicode letters to their lower case
 func stripNonAlphanumCharsAndMapToLower(s string) string {
 	var stripped strings.Builder
 	stripped.Grow(len(s))

@@ -251,13 +251,14 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 // Start implements adapter.Adapter.
 //
 // Required permissions:
-//  Service Bus Queues:
-//    - Microsoft.ServiceBus/namespaces/queues/read
-//  Service Bus Topics:
-//    - Microsoft.ServiceBus/namespaces/topics/read
-//    - Microsoft.ServiceBus/namespaces/topics/subscriptions/read
-//  Both (DataAction):
-//  - Microsoft.ServiceBus/namespaces/messages/receive/action
+//
+//	Service Bus Queues:
+//	  - Microsoft.ServiceBus/namespaces/queues/read
+//	Service Bus Topics:
+//	  - Microsoft.ServiceBus/namespaces/topics/read
+//	  - Microsoft.ServiceBus/namespaces/topics/subscriptions/read
+//	Both (DataAction):
+//	- Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
 	const maxMessages = 100
 	logging.FromContext(ctx).Info("Listening for messages")
@@ -355,7 +356,8 @@ func (e errList) Error() string {
 //
 // For now, this helper exists solely to fix CloudEvents sent by Azure Event
 // Grid, which often contain
-//   "dataschema": "#"
+//
+//	"dataschema": "#"
 func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event) *cloudevents.Event {
 	for attr := range validErrs {
 		// we don't bother cloning, events are garbage collected after

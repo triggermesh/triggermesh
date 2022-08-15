@@ -62,9 +62,9 @@ const crudTimeout = time.Second * 15
 
 // ensureDiagnosticSettings ensures diagnostic settings exist with the expected configuration.
 // Required permissions:
-//  - Microsoft.Insights/DiagnosticSettings/Read
-//  - Microsoft.Insights/DiagnosticSettings/Write
-//  - Microsoft.EventHub/namespaces/authorizationRules/listkeys/action
+//   - Microsoft.Insights/DiagnosticSettings/Read
+//   - Microsoft.Insights/DiagnosticSettings/Write
+//   - Microsoft.EventHub/namespaces/authorizationRules/listkeys/action
 func (r *Reconciler) ensureDiagnosticSettings(ctx context.Context) error {
 	if skip.Skip(ctx) {
 		return nil
@@ -205,7 +205,7 @@ func sasPolicyResourceID(namespaceID *v1alpha1.AzureResourceID, polName string) 
 
 // ensureNoDiagnosticSettings ensures diagnostic settings are removed.
 // Required permissions:
-//  - Microsoft.Insights/DiagnosticSettings/Delete
+//   - Microsoft.Insights/DiagnosticSettings/Delete
 func (r *Reconciler) ensureNoDiagnosticSettings(ctx context.Context) reconciler.Event {
 	if skip.Skip(ctx) {
 		return nil

@@ -28,6 +28,7 @@ import (
 )
 
 // Accepted event types
+//
 //nolint:stylecheck
 const (
 	// EventTypeUiPathStartJob represents job data to be initiated

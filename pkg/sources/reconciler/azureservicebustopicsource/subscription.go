@@ -47,8 +47,8 @@ const crudTimeout = time.Second * 15
 
 // ensureSubscription ensures a Subscription exists with the expected configuration.
 // Required permissions:
-//  - Microsoft.ServiceBus/namespaces/topics/subscriptions/read
-//  - Microsoft.ServiceBus/namespaces/topics/subscriptions/write
+//   - Microsoft.ServiceBus/namespaces/topics/subscriptions/read
+//   - Microsoft.ServiceBus/namespaces/topics/subscriptions/write
 func ensureSubscription(ctx context.Context, cli servicebustopics.SubscriptionsClient) error {
 	if skip.Skip(ctx) {
 		return nil
@@ -125,7 +125,7 @@ func ensureSubscription(ctx context.Context, cli servicebustopics.SubscriptionsC
 
 // ensureNoSubscription ensures the Subscription is removed.
 // Required permissions:
-//  - Microsoft.ServiceBus/namespaces/topics/subscriptions/delete
+//   - Microsoft.ServiceBus/namespaces/topics/subscriptions/delete
 func ensureNoSubscription(ctx context.Context, cli servicebustopics.SubscriptionsClient) reconciler.Event {
 	if skip.Skip(ctx) {
 		return nil

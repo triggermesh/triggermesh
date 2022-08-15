@@ -29,10 +29,10 @@ type namedAdapterConstructor func(component string) adapter.AdapterConstructor
 
 // MainWithController is a shared main tailored to multi-tenant receive-adapters.
 // It performs the following initializations:
-//  * process environment variables
-//  * enable leader election / HA
-//  * set the scope to a single namespace
-//  * inject the given controller constructor
+//   - process environment variables
+//   - enable leader election / HA
+//   - set the scope to a single namespace
+//   - inject the given controller constructor
 func MainWithController(envCtor env.ConfigConstructor,
 	cCtor namedControllerConstructor, aCtor namedAdapterConstructor) {
 

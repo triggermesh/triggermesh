@@ -288,8 +288,8 @@ func EnqueueObjectsInNamespaceOf(inf cache.SharedInformer, resyncFn filteredGlob
 }
 
 // adapterPodWithAncestorOfKind returns a filter function which returns whether a Pod:
-//  - has labels that correspond to an adapter of the given type
-//  - has an outermost ancestor of the given kind
+//   - has labels that correspond to an adapter of the given type
+//   - has an outermost ancestor of the given kind
 func adapterPodWithAncestorOfKind(ctx context.Context, typ kmeta.OwnerRefable) objectFilterFunc {
 	return func(obj interface{}) bool {
 		return hasAdapterLabelsForType(typ)(obj) &&

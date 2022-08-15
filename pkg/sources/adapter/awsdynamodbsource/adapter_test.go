@@ -230,9 +230,9 @@ func (c *standardMockDynamoDBStreamsClient) GetRecordsWithContext(_ context.Cont
 // represents the following structure:
 //
 // []shard id
-//    \_ [] shard iterator
-//           \_ [] record
 //
+//	\_ [] shard iterator
+//	       \_ [] record
 type mockShards map[ /*shard id*/ *string][]*mockShardIterator
 type mockShardIterator struct {
 	name    *string

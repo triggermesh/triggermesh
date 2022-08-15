@@ -47,9 +47,9 @@ const (
 
 // ensureEventSubscription ensures an event subscription exists with the expected configuration.
 // Required permissions:
-//  - Microsoft.EventGrid/systemTopics/eventSubscriptions/read
-//  - Microsoft.EventGrid/systemTopics/eventSubscriptions/write
-//  - Microsoft.EventHub/namespaces/eventhubs/write
+//   - Microsoft.EventGrid/systemTopics/eventSubscriptions/read
+//   - Microsoft.EventGrid/systemTopics/eventSubscriptions/write
+//   - Microsoft.EventHub/namespaces/eventhubs/write
 func ensureEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptionsClient,
 	sysTopicResID *v1alpha1.AzureResourceID, eventHubResID string) error {
 
@@ -168,7 +168,7 @@ func newEventSubscription(eventHubResID string, eventTypes []string) azureeventg
 
 // ensureNoEventSubscription ensures the event subscription is removed.
 // Required permissions:
-//  - Microsoft.EventGrid/systemTopics/eventSubscriptions/delete
+//   - Microsoft.EventGrid/systemTopics/eventSubscriptions/delete
 func ensureNoEventSubscription(ctx context.Context, cli eventgrid.EventSubscriptionsClient,
 	sysTopic *azureeventgrid.SystemTopic) reconciler.Event {
 

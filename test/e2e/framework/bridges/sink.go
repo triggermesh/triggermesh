@@ -177,19 +177,24 @@ func splitEvents(logStream io.Reader) []string {
 // ☁  cloudevents.Event
 // Validation: valid
 // Context Attributes,
-//   specversion: 1.0
-//   type: io.triggermesh.some.event
-//   source: some/source
-//   subject: some-subject
-//   id: edecf007-f651-4e10-959e-e2f0a5b8ccd0
-//   time: 2020-09-14T13:59:40.693213706Z
-//   datacontenttype: application/json
+//
+//	specversion: 1.0
+//	type: io.triggermesh.some.event
+//	source: some/source
+//	subject: some-subject
+//	id: edecf007-f651-4e10-959e-e2f0a5b8ccd0
+//	time: 2020-09-14T13:59:40.693213706Z
+//	datacontenttype: application/json
+//
 // Extensions,
-//   someextension: some-value
+//
+//	someextension: some-value
+//
 // Data,
-//   {
-//     ...
-//   }
+//
+//	{
+//	  ...
+//	}
 func parseCloudEvent(ce string) cloudevents.Event {
 	e := cloudevents.NewEvent()
 
