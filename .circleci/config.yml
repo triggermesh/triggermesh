@@ -166,6 +166,21 @@ jobs:
       - store_artifacts:
           path: /tmp/dist/
 
+  trigger-github-action:
+    executor:
+      name: go/default
+      tag: '1.19'
+    steps:
+      - run:
+          name: Sending dispatch event
+          command: |
+            curl \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              https://api.github.com/repos/triggermesh/triggermesh/dispatches \
+              -d '{"event_type":"e2e-test","client_payload":{"image_hash":"${CIRCLE_SHA1}"}}'
+
   update-manifests:
     description: Patches target cluster configuration
     executor:
@@ -289,6 +304,15 @@ workflows:
           context: production
           requires:
             - gen-apidocs
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+            branches:
+              only: main
+      - trigger-github-action:
+          context: production
+          requires:
+            - publish-image
           filters:
             tags:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
