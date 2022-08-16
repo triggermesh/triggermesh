@@ -66,7 +66,7 @@ require (
 	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.8.0
 	github.com/tektoncd/pipeline v0.37.2
-	github.com/tidwall/gjson v1.14.1
+	github.com/tidwall/gjson v1.14.2
 	github.com/wamuir/go-xslt v0.1.4
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.29.0
