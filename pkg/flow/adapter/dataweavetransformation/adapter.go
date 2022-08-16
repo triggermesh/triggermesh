@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"time"
@@ -252,7 +251,7 @@ func registerAndPopulateSpell(spell, dwFolder string) error {
 		return err
 	}
 
-	if err := ioutil.WriteFile(dwFolder+"/src/Main.dwl", []byte(spell), 0644); err != nil {
+	if err := os.WriteFile(dwFolder+"/src/Main.dwl", []byte(spell), 0644); err != nil {
 		return err
 	}
 

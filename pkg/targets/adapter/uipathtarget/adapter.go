@@ -21,7 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -172,7 +172,7 @@ func (a *uipathAdapter) getAccessToken() (string, error) {
 
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", fmt.Errorf("reading response body from requesting the auth token: %w", err)
 	}
@@ -204,7 +204,7 @@ func (a *uipathAdapter) getReleaseKey(bearer string) (string, error) {
 
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", fmt.Errorf("retrieving release key: %w", err)
 	}
@@ -234,7 +234,7 @@ func (a *uipathAdapter) getRobotID(bearer string) (int, error) {
 		return -1, fmt.Errorf("processing robot ID request: %w", err)
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return -1, fmt.Errorf("retrieving robot ID: %w", err)
 	}
@@ -281,7 +281,7 @@ func (a *uipathAdapter) postToQueue(qd *QueueItemData, bearer string) error {
 	defer res.Body.Close()
 
 	if a.logger.Desugar().Core().Enabled(zap.DebugLevel) {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			a.logger.Debugw("Failed to read response body from posting to a queue", zap.Error(err))
 		} else {
@@ -332,7 +332,7 @@ func (a *uipathAdapter) startJob(bearer, rK, inputArgs string, robotID int) erro
 	defer res.Body.Close()
 
 	if a.logger.Desugar().Core().Enabled(zap.DebugLevel) {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			a.logger.Debugw("Failed to read response body from starting a job", zap.Error(err))
 		} else {

@@ -18,7 +18,7 @@ package jiratarget
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/url"
 	"path"
 
@@ -200,7 +200,7 @@ func (a *jiraAdapter) jiraCustomRequest(ctx context.Context, event cloudevents.E
 	}
 
 	defer res.Body.Close()
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		a.logger.Errorw("Error reading response from Jira API", zap.Error(err))
 		return nil, cloudevents.ResultACK

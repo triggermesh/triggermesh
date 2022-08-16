@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"strconv"
@@ -396,7 +396,7 @@ func (b *bayeux) doPost(payload string) (*http.Response, error) {
 
 	if res.StatusCode >= 300 {
 		msg := fmt.Sprintf("received unexpected status code %d", res.StatusCode)
-		if resb, err := ioutil.ReadAll(res.Body); err == nil {
+		if resb, err := io.ReadAll(res.Body); err == nil {
 			msg += ": " + string(resb)
 		}
 		return nil, errors.New(msg)

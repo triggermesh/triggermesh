@@ -18,7 +18,7 @@ package httppollersource
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -82,7 +82,7 @@ func (h *httpPoller) dispatch(ctx context.Context) {
 	}
 
 	defer res.Body.Close()
-	resb, err := ioutil.ReadAll(res.Body)
+	resb, err := io.ReadAll(res.Body)
 	if err != nil {
 		h.logger.Errorw("Failed reading response body", zap.Error(err))
 		return

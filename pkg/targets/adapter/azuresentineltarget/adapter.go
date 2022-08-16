@@ -21,7 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -165,7 +165,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 	}
 
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "reading response body")

@@ -21,7 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -218,7 +218,7 @@ type salesforceError struct {
 // doNonLockingCall is not thread safe and should only be used if the client lock has been previously acquired.
 func (c *SalesforceClient) manageAPIError(res *http.Response) error {
 	msg := fmt.Sprintf("API returned an error (%d): ", res.StatusCode)
-	body := ioutil.NopCloser(res.Body)
+	body := io.NopCloser(res.Body)
 
 	// try to use the docummented Salesforce format.
 	// See: https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/errorcodes.htm
@@ -229,7 +229,7 @@ func (c *SalesforceClient) manageAPIError(res *http.Response) error {
 	}
 
 	// write raw response as a string
-	b, err := ioutil.ReadAll(res.Body)
+	b, err := io.ReadAll(res.Body)
 	if err == nil {
 		return fmt.Errorf(msg+"%s", string(b))
 	}

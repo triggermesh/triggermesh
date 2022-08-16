@@ -172,9 +172,9 @@ func withRBACCheckTag(node *yaml.Node) bool {
 // extractRBACCheckTags parses '+rbac-check' tags from a YAML node's comments,
 // and returns them in the format:
 //
-//   map[string][]string{
-//     "subresource": {"status"},
-//   }
+//	map[string][]string{
+//	  "subresource": {"status"},
+//	}
 //
 // The returned map is empty if the parsed tag doesn't contain any key/value,
 // nil if the provided YAML node isn't tagged.

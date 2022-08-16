@@ -271,7 +271,8 @@ func (e errList) Error() string {
 //
 // For now, this helper exists solely to fix CloudEvents sent by Azure Event
 // Grid, which often contain
-//   "dataschema": "#"
+//
+//	"dataschema": "#"
 func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event) *cloudevents.Event {
 	for attr := range validErrs {
 		// we don't bother cloning, events are garbage collected after

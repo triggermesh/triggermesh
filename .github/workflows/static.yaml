@@ -18,7 +18,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: '1.18'
+        go-version: '1.19'
 
     # This action takes care of caching/restoring modules and build caches.
     # Therefore, this step should remain the first one that is executed after
@@ -35,7 +35,7 @@ jobs:
         #   --out-format=github-actions --out-format=colored-line-number
         #
         # Ref. https://github.com/golangci/golangci-lint-action/issues/119#issuecomment-981090648
-        args: "--out-${NO_FUTURE}format=colored-line-number"
+        args: --out-${NO_FUTURE}format=colored-line-number --timeout 15m
 
   lint-config:
     name: Configuration Linting
@@ -47,7 +47,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: '1.18'
+        go-version: '1.19'
 
     - name: Go caches
       uses: actions/cache@v3

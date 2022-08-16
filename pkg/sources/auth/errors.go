@@ -27,11 +27,10 @@ package auth
 //
 // Examples of assertion:
 //
-//   _, ok := err.(PermanentCredentialsError)
+//	_, ok := err.(PermanentCredentialsError)
 //
-//   permErr := (PermanentCredentialsError)(nil)
-//   ok := errors.As(err, &permErr)
-//
+//	permErr := (PermanentCredentialsError)(nil)
+//	ok := errors.As(err, &permErr)
 type PermanentCredentialsError interface {
 	error
 	IsPermanent()

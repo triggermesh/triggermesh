@@ -21,7 +21,7 @@ import (
 	"context"
 	"encoding/xml"
 	"errors"
-	"io/ioutil"
+	"io"
 
 	"go.uber.org/zap"
 
@@ -120,7 +120,7 @@ func (a *Adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
 
-	readBuf, err := ioutil.ReadAll(jsn)
+	readBuf, err := io.ReadAll(jsn)
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}

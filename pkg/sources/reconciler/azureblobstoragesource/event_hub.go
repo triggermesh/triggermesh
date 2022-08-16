@@ -48,8 +48,8 @@ const resourceTypeEventHubs = "eventhubs"
 
 // ensureEventHub ensures the existence of an Event Hub for sending storage events.
 // Required permissions:
-//  - Microsoft.EventHub/namespaces/eventhubs/read
-//  - Microsoft.EventHub/namespaces/eventhubs/write
+//   - Microsoft.EventHub/namespaces/eventhubs/read
+//   - Microsoft.EventHub/namespaces/eventhubs/write
 func ensureEventHub(ctx context.Context, cli storage.EventHubsClient) (string /*resource ID*/, error) {
 	if skip.Skip(ctx) {
 		return "", nil
@@ -137,7 +137,7 @@ func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) *v1al
 // ensureNoEventHub ensures that the Event Hub created for sending storage
 // events is deleted.
 // Required permissions:
-//  - Microsoft.EventHub/namespaces/eventhubs/delete
+//   - Microsoft.EventHub/namespaces/eventhubs/delete
 func ensureNoEventHub(ctx context.Context, cli storage.EventHubsClient) error {
 	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureBlobStorageSource)
 

@@ -19,7 +19,7 @@ package filter
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -284,7 +284,7 @@ func setupSink(t *testing.T, ctx context.Context) (chan string, net.Addr) {
 	c := make(chan string, 1)
 
 	sink := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		assert.NoError(t, err)
 		c <- string(body)
 		w.WriteHeader(http.StatusOK)

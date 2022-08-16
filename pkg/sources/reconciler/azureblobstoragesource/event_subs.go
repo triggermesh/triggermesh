@@ -57,9 +57,9 @@ const (
 
 // ensureEventSubscription ensures an event subscription exists with the expected configuration.
 // Required permissions:
-//  - Microsoft.EventGrid/eventSubscriptions/read
-//  - Microsoft.EventGrid/eventSubscriptions/write
-//  - Microsoft.EventHub/namespaces/eventhubs/write
+//   - Microsoft.EventGrid/eventSubscriptions/read
+//   - Microsoft.EventGrid/eventSubscriptions/write
+//   - Microsoft.EventHub/namespaces/eventhubs/write
 func ensureEventSubscription(ctx context.Context, cli storage.EventSubscriptionsClient, eventHubResID string) error {
 	if skip.Skip(ctx) {
 		return nil
@@ -154,7 +154,7 @@ func newEventSubscription(eventHubResID string, eventTypes []string) eventgrid.E
 
 // ensureNoEventSubscription ensures the event subscription is removed.
 // Required permissions:
-//  - Microsoft.EventGrid/eventSubscriptions/delete
+//   - Microsoft.EventGrid/eventSubscriptions/delete
 func ensureNoEventSubscription(ctx context.Context, cli storage.EventSubscriptionsClient) reconciler.Event {
 	if skip.Skip(ctx) {
 		return nil

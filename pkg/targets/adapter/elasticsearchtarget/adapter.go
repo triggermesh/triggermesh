@@ -21,7 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 
 	"go.uber.org/zap"
 
@@ -106,7 +106,7 @@ func (a *esAdapter) Start(ctx context.Context) error {
 	}
 	a.client = client
 	if !resp.IsError() {
-		info, err := ioutil.ReadAll(resp.Body)
+		info, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read info using Elasticsearch client: %v", err)
 		}

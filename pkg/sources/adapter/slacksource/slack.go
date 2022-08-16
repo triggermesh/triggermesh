@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -101,7 +101,7 @@ func (h *slackEventAPIHandler) handleAll(ctx context.Context) http.HandlerFunc {
 		}
 
 		defer r.Body.Close()
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			h.handleError(err, http.StatusInternalServerError, w)
 			return

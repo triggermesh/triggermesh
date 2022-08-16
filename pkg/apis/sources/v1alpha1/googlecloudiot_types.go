@@ -92,10 +92,11 @@ type GoogleCloudIoTSourceList struct {
 
 // GCloudIoTResourceName represents a fully qualified IoT resource name,
 // as described at
-//  https://pkg.go.dev/google.golang.org/api/cloudiot/v1#DeviceRegistry.Name
+//
+//	https://pkg.go.dev/google.golang.org/api/cloudiot/v1#DeviceRegistry.Name
 //
 // Examples of such resource names include:
-//  - projects/{project_name}/locations/{location_name}/registries/{registry_name}
+//   - projects/{project_name}/locations/{location_name}/registries/{registry_name}
 type GCloudIoTResourceName struct {
 	Project    string
 	Location   string

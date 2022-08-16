@@ -19,7 +19,7 @@ package jqtransformation
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -72,7 +72,7 @@ func TestSink(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				body, err := ioutil.ReadAll(r.Body)
+				body, err := io.ReadAll(r.Body)
 				assert.NoError(t, err)
 				assert.Equal(t, tJSON1, string(body))
 				fmt.Fprintf(w, "OK")

@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -411,7 +411,7 @@ func isNotFound(err error) bool {
 // formatError formats Zendesk errors.
 func formatError(origErr error) error {
 	if zdErr := (zendesk.Error{}); errors.As(origErr, &zdErr) {
-		rawErrBody, err := ioutil.ReadAll(zdErr.Body())
+		rawErrBody, err := io.ReadAll(zdErr.Body())
 		if err != nil {
 			return origErr
 		}

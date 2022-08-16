@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -188,7 +188,7 @@ func (h *hasuraAdapter) dispatch(ctx context.Context, event cloudevents.Event) (
 
 	// NOTE: All responses will return a 200 OK message as per https://hasura.io/docs/1.0/graphql/core/api-reference/graphql-api/index.html
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return h.reportError("Unable to read response body", err)
 	}

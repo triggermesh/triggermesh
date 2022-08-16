@@ -166,7 +166,7 @@ func (a *confluentAdapter) dispatch(event cloudevents.Event) cloudevents.Result 
 	return cloudevents.ResultACK
 }
 
-//ensureTopic creates a topic if missing
+// ensureTopic creates a topic if missing
 func (a *confluentAdapter) ensureTopic(ctx context.Context, topic string) error {
 	a.logger.Debug("Ensuring topic %q", topic)
 
