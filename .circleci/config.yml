@@ -166,7 +166,7 @@ jobs:
       - store_artifacts:
           path: /tmp/dist/
 
-  trigger-github-action:
+  trigger-e2e-test:
     executor:
       name: go/default
       tag: '1.19'
@@ -179,7 +179,7 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: token ${GITHUB_TOKEN}" \
               https://api.github.com/repos/triggermesh/triggermesh/dispatches \
-              -d '{"event_type":"e2e-test","client_payload":{"image_hash":"${CIRCLE_SHA1}"}}'
+              -d '{"event_type":"e2e-test","client_payload":{"commit_sha":"${CIRCLE_SHA1}"}}'
 
   update-manifests:
     description: Patches target cluster configuration
@@ -309,15 +309,15 @@ workflows:
               only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
             branches:
               only: main
-      - trigger-github-action:
+      - trigger-e2e-test:
           context: production
-          # requires:
-            # - publish-image
-          # filters:
-            # tags:
-              # only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            # branches:
-              # only: main
+          requires:
+            - publish-image
+          filters:
+            tags:
+              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+            branches:
+              only: main
       - update-manifests:
           name: update-staging-config
           cluster: staging
