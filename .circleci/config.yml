@@ -179,7 +179,7 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: token ${GITHUB_TOKEN}" \
               https://api.github.com/repos/triggermesh/triggermesh/dispatches \
-              -d '{"event_type":"e2e-test","client_payload":{"commit_sha":"${CIRCLE_SHA1}"}}'
+              -d '{"event_type":"e2e-test","client_payload":{"commit_sha":"'${CIRCLE_SHA1}'"}}'
 
   update-manifests:
     description: Patches target cluster configuration
