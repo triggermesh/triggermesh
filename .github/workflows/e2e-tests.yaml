@@ -13,6 +13,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Report test status
+      run: |
+        curl \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/triggermesh/triggermesh/statuses/${{ github.event.client_payload.image_hash }} \
+          -d '{"state":"pending","target_url":"https://example.com/build/status","context":"${{ github.workflow }}"}'
+
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
@@ -87,7 +96,7 @@ jobs:
     - name: Deploy TriggerMesh
       run: |
         sed -i config/500-*.yaml \
-          -e "s|ko://github.com/triggermesh/triggermesh/cmd/\(.*$\)|gcr.io/triggermesh/\1:"${{ !github.event.client_payload.image_hash }}"|g"
+          -e "s|ko://github.com/triggermesh/triggermesh/cmd/\(.*$\)|gcr.io/triggermesh/\1:${{ github.event.client_payload.image_hash }}|g"
 
         kubectl apply -f config/namespace/
         kubectl apply -f config/
@@ -123,6 +132,15 @@ jobs:
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       run: ginkgo -procs=$(($(nproc)*2)) -slow-spec-threshold=10m -randomize-all ./test/e2e/
+
+    - name: Report test status
+      run: |
+        curl \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/triggermesh/triggermesh/statuses/${{ github.event.client_payload.image_hash }} \
+          -d '{"state":"${{ job.status }}","target_url":"https://example.com/build/status","context":"${{ github.workflow }}"}'
 
     # The KinD cluster can get shut down before all API objects created during
     # E2E tests have been terminated, which leaks cloud resources depending on

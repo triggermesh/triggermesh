@@ -311,13 +311,13 @@ workflows:
               only: main
       - trigger-github-action:
           context: production
-          requires:
-            - publish-image
-          filters:
-            tags:
-              only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
-            branches:
-              only: main
+          # requires:
+            # - publish-image
+          # filters:
+            # tags:
+              # only: /^v([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+)?$/
+            # branches:
+              # only: main
       - update-manifests:
           name: update-staging-config
           cluster: staging
