@@ -49,7 +49,7 @@ func makeTargetAdapterKService(target *v1alpha1.{{.Kind}}, cfg *adapterConfig) *
 	ksvcLabels := libreconciler.MakeAdapterLabels(adapterName, target)
 	podLabels := libreconciler.MakeAdapterLabels(adapterName, target)
 	envSvc := libreconciler.MakeServiceEnv(name, target.Namespace)
-	envApp := makeAppEnv(target)
+	envApp := MakeAppEnv(target)
 	envObs := libreconciler.MakeObsEnv(cfg.obsConfig)
 	envs := append(envSvc, envApp...)
 	envs = append(envs, envObs...)
@@ -63,7 +63,9 @@ func makeTargetAdapterKService(target *v1alpha1.{{.Kind}}, cfg *adapterConfig) *
 	)
 }
 
-func makeAppEnv(o *v1alpha1.{{.Kind}}) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.{{.Kind}}) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		{
 			Name:  libreconciler.EnvBridgeID,

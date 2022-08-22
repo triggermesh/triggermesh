@@ -132,7 +132,7 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 		resource.VolumeMounts(authVolumeMounts...),
 		resource.EnvVars(authEnvs...),
 
-		resource.EnvVars(makeAppEnv(typedSrc)...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
@@ -150,8 +150,9 @@ func (kmv *KeyMountedValue) Decode(value string) error {
 	return nil
 }
 
-// makeAppEnv creates the environment variables specific to this adapter component.
-func makeAppEnv(o *v1alpha1.CloudEventsSource) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.CloudEventsSource) []corev1.EnvVar {
 	envs := []corev1.EnvVar{
 		{
 			Name:  common.EnvBridgeID,

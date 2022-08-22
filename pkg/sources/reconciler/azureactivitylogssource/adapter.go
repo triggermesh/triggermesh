@@ -53,34 +53,10 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureActivityLogsSource)
 
-	hubNamespaceID := typedSrc.Spec.Destination.EventHubs.NamespaceID
-
-	eventHubName := defaultActivityLogsEventHubName
-	if hubName := typedSrc.Spec.Destination.EventHubs.HubName; hubName != nil && *hubName != "" {
-		eventHubName = *hubName
-	}
-
-	var hubEnvs []corev1.EnvVar
-	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
-	}
-
-	ceType := v1alpha1.AzureEventType(sources.AzureServiceMonitor, v1alpha1.AzureActivityLogsActivityLogEventType)
-
-	ceOverridesStr := cloudevents.OverridesJSON(typedSrc.Spec.CloudEventOverrides)
-
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvHubResourceID, makeEventHubID(&hubNamespaceID, eventHubName)),
-		resource.EnvVar(common.EnvHubNamespace, hubNamespaceID.ResourceName),
-		resource.EnvVar(common.EnvHubName, eventHubName),
-		resource.EnvVars(hubEnvs...),
-		resource.EnvVar(common.EnvCESource, src.(commonv1alpha1.EventSource).AsEventSource()),
-		resource.EnvVar(common.EnvCEType, ceType),
-		resource.EnvVar(adapter.EnvConfigCEOverrides, ceOverridesStr),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
@@ -96,4 +72,47 @@ func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) strin
 	hubID.ResourceType = resourceTypeEventHubs
 	hubID.ResourceName = hubName
 	return hubID.String()
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureActivityLogsSource) []corev1.EnvVar {
+	hubNamespaceID := o.Spec.Destination.EventHubs.NamespaceID
+	eventHubName := defaultActivityLogsEventHubName
+	if hubName := o.Spec.Destination.EventHubs.HubName; hubName != nil && *hubName != "" {
+		eventHubName = *hubName
+	}
+
+	var hubEnvs []corev1.EnvVar
+	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
+	}
+
+	ceType := v1alpha1.AzureEventType(sources.AzureServiceMonitor, v1alpha1.AzureActivityLogsActivityLogEventType)
+	ceOverridesStr := cloudevents.OverridesJSON(o.Spec.CloudEventOverrides)
+
+	return append(hubEnvs, []corev1.EnvVar{
+		{
+			Name:  common.EnvHubResourceID,
+			Value: makeEventHubID(&hubNamespaceID, eventHubName),
+		}, {
+			Name:  common.EnvHubNamespace,
+			Value: hubNamespaceID.ResourceName,
+		}, {
+			Name:  common.EnvHubName,
+			Value: eventHubName,
+		}, {
+			Name:  common.EnvCESource,
+			Value: o.AsEventSource(),
+		}, {
+			Name:  common.EnvCEType,
+			Value: ceType,
+		}, {
+			Name:  adapter.EnvConfigCEOverrides,
+			Value: ceOverridesStr,
+		},
+	}...,
+	)
 }

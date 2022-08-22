@@ -45,15 +45,26 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureQueueStorageSource)
 
-	storageQueueEnvs := []corev1.EnvVar{}
-
-	storageQueueEnvs = common.MaybeAppendValueFromEnvVar(storageQueueEnvs, "AZURE_ACCOUNT_KEY", typedSrc.Spec.AccountKey)
-
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVar("AZURE_ACCOUNT_NAME", typedSrc.Spec.AccountName),
-		resource.EnvVar("AZURE_QUEUE_NAME", typedSrc.Spec.QueueName),
-		resource.EnvVars(storageQueueEnvs...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureQueueStorageSource) []corev1.EnvVar {
+	storageQueueEnvs := common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, "AZURE_ACCOUNT_KEY", o.Spec.AccountKey)
+
+	return append(storageQueueEnvs, []corev1.EnvVar{
+		{
+			Name:  "AZURE_ACCOUNT_NAME",
+			Value: o.Spec.AccountName,
+		}, {
+			Name:  "AZURE_QUEUE_NAME",
+			Value: o.Spec.QueueName,
+		},
+	}...,
+	)
 }

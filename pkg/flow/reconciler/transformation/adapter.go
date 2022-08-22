@@ -19,6 +19,8 @@ package transformation
 import (
 	"encoding/json"
 
+	corev1 "k8s.io/api/core/v1"
+
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
@@ -50,20 +52,34 @@ var _ common.AdapterBuilder[*servingv1.Service] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*servingv1.Service, error) {
 	typedTrg := trg.(*v1alpha1.Transformation)
 
+	return common.NewAdapterKnService(trg, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+		resource.EnvVars(MakeAppEnv(typedTrg)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.Transformation) []corev1.EnvVar {
 	var trnContext string
-	if b, err := json.Marshal(typedTrg.Spec.Context); err == nil {
+	if b, err := json.Marshal(o.Spec.Context); err == nil {
 		trnContext = string(b)
 	}
 
 	var trnData string
-	if b, err := json.Marshal(typedTrg.Spec.Data); err == nil {
+	if b, err := json.Marshal(o.Spec.Data); err == nil {
 		trnData = string(b)
 	}
 
-	return common.NewAdapterKnService(trg, sinkURI,
-		resource.Image(r.adapterCfg.Image),
-		resource.EnvVar(envTransformationCtx, trnContext),
-		resource.EnvVar(envTransformationData, trnData),
-		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
-	), nil
+	return []corev1.EnvVar{
+		{
+			Name:  envTransformationCtx,
+			Value: trnContext,
+		},
+		{
+			Name:  envTransformationData,
+			Value: trnData,
+		},
+	}
 }

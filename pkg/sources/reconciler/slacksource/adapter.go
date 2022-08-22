@@ -56,12 +56,14 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 		resource.VisibilityPublic,
 
-		resource.EnvVars(makeSlackEnvs(typedSrc)...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
 }
 
-func makeSlackEnvs(src *v1alpha1.SlackSource) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(src *v1alpha1.SlackSource) []corev1.EnvVar {
 	var slackEnvs []corev1.EnvVar
 
 	if appID := src.Spec.AppID; appID != nil {

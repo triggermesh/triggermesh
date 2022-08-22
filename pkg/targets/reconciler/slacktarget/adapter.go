@@ -47,12 +47,12 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 
 	return common.NewAdapterKnService(trg, nil,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(MakeAppEnv(typedTrg)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	), nil
 }
 
-func makeAppEnv(o *v1alpha1.SlackTarget) []corev1.EnvVar {
+func MakeAppEnv(o *v1alpha1.SlackTarget) []corev1.EnvVar {
 	return []corev1.EnvVar{
 		{
 			Name: "SLACK_TOKEN",

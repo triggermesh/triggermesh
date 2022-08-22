@@ -50,34 +50,52 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureEventGridSource)
 
-	// the user may or may not provide an Event Hub name in the source's
-	// spec, so the source's status is unfortunately our only source of
-	// truth here
-	var hubResID string
-	var hubName string
-	if ehID := typedSrc.Status.EventHubID; ehID != nil {
-		hubResID = ehID.String()
-		hubName = ehID.ResourceName
-	}
-
-	var hubEnvs []corev1.EnvVar
-	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
-		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
-	}
-
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvHubResourceID, hubResID),
-		resource.EnvVar(common.EnvHubNamespace, typedSrc.Spec.Endpoint.EventHubs.NamespaceID.ResourceName),
-		resource.EnvVar(common.EnvHubName, hubName),
-		resource.EnvVars(hubEnvs...),
-		resource.EnvVar(envMessageProcessor, "eventgrid"),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
 		resource.StartupProbe("/health", healthPortName),
 	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureEventGridSource) []corev1.EnvVar {
+	// the user may or may not provide an Event Hub name in the source's
+	// spec, so the source's status is unfortunately our only source of
+	// truth here
+	var hubResID string
+	var hubName string
+	if ehID := o.Status.EventHubID; ehID != nil {
+		hubResID = ehID.String()
+		hubName = ehID.ResourceName
+	}
+
+	var hubEnvs []corev1.EnvVar
+	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
+	}
+
+	return append(hubEnvs,
+		[]corev1.EnvVar{
+			{
+				Name:  common.EnvHubResourceID,
+				Value: hubResID,
+			}, {
+				Name:  common.EnvHubNamespace,
+				Value: o.Spec.Endpoint.EventHubs.NamespaceID.ResourceName,
+			}, {
+				Name:  common.EnvHubName,
+				Value: hubName,
+			}, {
+				Name:  envMessageProcessor,
+				Value: "eventgrid",
+			},
+		}...,
+	)
 }

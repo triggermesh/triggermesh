@@ -46,23 +46,31 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureServiceBusQueueSource)
 
+	return common.NewAdapterDeployment(src, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
+		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureServiceBusQueueSource) []corev1.EnvVar {
 	var authEnvs []corev1.EnvVar
-	if sasAuth := typedSrc.Spec.Auth.SASToken; sasAuth != nil {
+	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusKeyName, sasAuth.KeyName)
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusKeyValue, sasAuth.KeyValue)
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusConnStr, sasAuth.ConnectionString)
 	}
-	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
+	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADTenantID, spAuth.TenantID)
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientID, spAuth.ClientID)
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
-
-	return common.NewAdapterDeployment(src, sinkURI,
-		resource.Image(r.adapterCfg.Image),
-
-		resource.EnvVar(common.EnvServiceBusEntityResourceID, typedSrc.Spec.QueueID.String()),
-		resource.EnvVars(authEnvs...),
-		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	), nil
+	return append(authEnvs, corev1.EnvVar{
+		Name:  common.EnvServiceBusEntityResourceID,
+		Value: o.Spec.QueueID.String(),
+	},
+	)
 }

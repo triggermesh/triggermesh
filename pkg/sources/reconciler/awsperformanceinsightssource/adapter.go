@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 
 	"knative.dev/eventing/pkg/reconciler/source"
 	"knative.dev/pkg/apis"
@@ -57,13 +58,29 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(common.EnvARN, typedSrc.Spec.ARN.String()),
-		resource.EnvVar(envPollingInterval, typedSrc.Spec.PollingInterval.String()),
-		resource.EnvVar(envMetrics, strings.Join(typedSrc.Spec.Metrics, ",")),
-		resource.EnvVars(reconciler.MakeAWSAuthEnvVars(typedSrc.Spec.Auth)...),
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 
 		resource.Port(healthPortName, 8080),
 		resource.StartupProbe("/health", healthPortName),
 	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AWSPerformanceInsightsSource) []corev1.EnvVar {
+	return append(reconciler.MakeAWSAuthEnvVars(o.Spec.Auth),
+		[]corev1.EnvVar{
+			{
+				Name:  common.EnvARN,
+				Value: o.Spec.ARN.String(),
+			}, {
+				Name:  envPollingInterval,
+				Value: o.Spec.PollingInterval.String(),
+			}, {
+				Name:  envMetrics,
+				Value: strings.Join(o.Spec.Metrics, ","),
+			},
+		}...,
+	)
 }

@@ -48,29 +48,38 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.AzureServiceBusTopicSource)
 
+	return common.NewAdapterDeployment(src, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
+		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.AzureServiceBusTopicSource) []corev1.EnvVar {
 	var subsID string
-	if sID := typedSrc.Status.SubscriptionID; sID != nil {
+	if sID := o.Status.SubscriptionID; sID != nil {
 		subsID = sID.String()
 	}
 
 	var webSocketsEnable bool
-	if wss := typedSrc.Spec.WebSocketsEnable; wss != nil {
+	if wss := o.Spec.WebSocketsEnable; wss != nil {
 		webSocketsEnable = *wss
 	}
 
 	var authEnvs []corev1.EnvVar
-	if spAuth := typedSrc.Spec.Auth.ServicePrincipal; spAuth != nil {
+	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADTenantID, spAuth.TenantID)
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientID, spAuth.ClientID)
 		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
-
-	return common.NewAdapterDeployment(src, sinkURI,
-		resource.Image(r.adapterCfg.Image),
-
-		resource.EnvVar(common.EnvServiceBusEntityResourceID, subsID),
-		resource.EnvVar(common.EnvServiceBusWebSocketsEnable, strconv.FormatBool(webSocketsEnable)),
-		resource.EnvVars(authEnvs...),
-		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	), nil
+	return append(authEnvs, []corev1.EnvVar{{
+		Name:  common.EnvServiceBusEntityResourceID,
+		Value: subsID,
+	}, {
+		Name:  common.EnvServiceBusWebSocketsEnable,
+		Value: strconv.FormatBool(webSocketsEnable),
+	}}...)
 }

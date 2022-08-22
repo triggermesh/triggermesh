@@ -57,47 +57,53 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.SalesforceSource)
 
+	return common.NewAdapterDeployment(src, sinkURI,
+		resource.Image(r.adapterCfg.Image),
+
+		resource.EnvVars(MakeAppEnv(typedSrc)...),
+		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
+	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.SalesforceSource) []corev1.EnvVar {
 	appEnv := []corev1.EnvVar{
 		{
 			Name:  envSalesforceAuthClientID,
-			Value: typedSrc.Spec.Auth.ClientID,
+			Value: o.Spec.Auth.ClientID,
 		},
 		{
 			Name:  envSalesforceAuthServer,
-			Value: typedSrc.Spec.Auth.Server,
+			Value: o.Spec.Auth.Server,
 		},
 		{
 			Name:  envSalesforceAuthUser,
-			Value: typedSrc.Spec.Auth.User,
+			Value: o.Spec.Auth.User,
 		},
 		{
 			Name:  envSalesforceChannel,
-			Value: typedSrc.Spec.Subscription.Channel,
+			Value: o.Spec.Subscription.Channel,
 		},
 	}
 
 	appEnv = common.MaybeAppendValueFromEnvVar(appEnv,
-		envSalesforceAuthCertKey, typedSrc.Spec.Auth.CertKey,
+		envSalesforceAuthCertKey, o.Spec.Auth.CertKey,
 	)
 
-	if typedSrc.Spec.Subscription.ReplayID != nil {
+	if o.Spec.Subscription.ReplayID != nil {
 		appEnv = append(appEnv, corev1.EnvVar{
 			Name:  envSalesforceReplayID,
-			Value: strconv.Itoa(*typedSrc.Spec.Subscription.ReplayID),
+			Value: strconv.Itoa(*o.Spec.Subscription.ReplayID),
 		})
 	}
 
-	if typedSrc.Spec.APIVersion != nil {
+	if o.Spec.APIVersion != nil {
 		appEnv = append(appEnv, corev1.EnvVar{
 			Name:  envSalesforceAPIVersion,
-			Value: *typedSrc.Spec.APIVersion,
+			Value: *o.Spec.APIVersion,
 		})
 	}
 
-	return common.NewAdapterDeployment(src, sinkURI,
-		resource.Image(r.adapterCfg.Image),
-
-		resource.EnvVars(appEnv...),
-		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
-	), nil
+	return appEnv
 }

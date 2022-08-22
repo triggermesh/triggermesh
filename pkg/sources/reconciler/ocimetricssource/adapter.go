@@ -61,27 +61,37 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
 	typedSrc := src.(*v1alpha1.OCIMetricsSource)
 
-	m, err := json.Marshal(typedSrc.Spec.Metrics)
+	envs, err := MakeAppEnv(typedSrc)
 	if err != nil {
-		return nil, fmt.Errorf("serializing spec.metrics to JSON: %w", err)
+		return nil, fmt.Errorf("build adapter environment: %w", err)
 	}
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
 
-		resource.EnvVar(metrics, string(m)),
-		resource.EnvVars(makeOCIMetricsEnvs(typedSrc)...),
+		resource.EnvVars(envs...),
 		resource.EnvVars(r.adapterCfg.configs.ToEnvVars()...),
 	), nil
 }
 
-func makeOCIMetricsEnvs(src *v1alpha1.OCIMetricsSource) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(src *v1alpha1.OCIMetricsSource) ([]corev1.EnvVar, error) {
+	m, err := json.Marshal(src.Spec.Metrics)
+	if err != nil {
+		return nil, fmt.Errorf("serializing spec.metrics to JSON: %w", err)
+	}
+
 	frequency := defaultPollingFrequency
 	if src.Spec.PollingFrequency != nil {
 		frequency = *src.Spec.PollingFrequency
 	}
 
 	ociEnvs := []corev1.EnvVar{
+		{
+			Name:  metrics,
+			Value: string(m),
+		},
 		{
 			Name:  userOCID,
 			Value: src.Spec.User,
@@ -104,5 +114,5 @@ func makeOCIMetricsEnvs(src *v1alpha1.OCIMetricsSource) []corev1.EnvVar {
 	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleAPIKeyPassphrase, src.Spec.OracleAPIPrivateKeyPassphrase)
 	ociEnvs = common.MaybeAppendValueFromEnvVar(ociEnvs, oracleAPIKeyFingerprint, src.Spec.OracleAPIPrivateKeyFingerprint)
 
-	return ociEnvs
+	return ociEnvs, nil
 }

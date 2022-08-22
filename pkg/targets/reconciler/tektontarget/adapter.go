@@ -49,12 +49,14 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 
 	return common.NewAdapterKnService(trg, nil,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVars(makeAppEnv(typedTrg)...),
+		resource.EnvVars(MakeAppEnv(typedTrg)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	), nil
 }
 
-func makeAppEnv(o *v1alpha1.TektonTarget) []corev1.EnvVar {
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(o *v1alpha1.TektonTarget) []corev1.EnvVar {
 	var envVar []corev1.EnvVar
 
 	if o.Spec.ReapPolicy != nil {

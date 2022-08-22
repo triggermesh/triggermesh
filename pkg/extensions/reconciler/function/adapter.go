@@ -69,7 +69,28 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 	srcCodePath := filepath.Join("/opt", "source."+fileExtension(f.Spec.Runtime))
 	srcCodeVol, srcCodeVolMount := sourceCodeVolumeAndMount(srcCodePath, cmapName)
 
-	handler := "source." + f.Spec.Entrypoint
+	return common.NewAdapterKnService(rcl, sinkURI,
+		resource.Image(lookupRuntimeImage(f.Spec.Runtime)),
+
+		resource.Annotation(codeVersionAnnotation, cmapRev),
+		resource.Label(functionNameLabel, f.Name),
+
+		resource.EnvVars(MakeAppEnv(f)...),
+		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
+		resource.EntrypointCommand(klrEntrypoint),
+
+		resource.Volumes(srcCodeVol),
+		resource.VolumeMounts(srcCodeVolMount),
+	), nil
+}
+
+// MakeAppEnv extracts environment variables from the object.
+// Exported to be used in external tools for local test environments.
+func MakeAppEnv(f *v1alpha1.Function) []corev1.EnvVar {
+	var responseMode string
+	if f.Spec.ResponseIsEvent {
+		responseMode = "event"
+	}
 
 	ceOverrides := map[string]string{
 		// Default values for required attributes
@@ -85,30 +106,24 @@ func (r *Reconciler) BuildAdapter(rcl commonv1alpha1.Reconcilable, sinkURI *apis
 		}
 	}
 
-	var responseMode string
-	if f.Spec.ResponseIsEvent {
-		responseMode = "event"
-	}
-
-	return common.NewAdapterKnService(rcl, sinkURI,
-		resource.Image(lookupRuntimeImage(f.Spec.Runtime)),
-
-		resource.Annotation(codeVersionAnnotation, cmapRev),
-
-		resource.Label(functionNameLabel, f.Name),
-
-		resource.EnvVar(eventStoreEnv, f.Spec.EventStore.URI),
-		resource.EnvVar("_HANDLER", handler),
-		resource.EnvVar("RESPONSE_FORMAT", "CLOUDEVENTS"),
-		resource.EnvVar("CE_FUNCTION_RESPONSE_MODE", responseMode),
-		resource.EnvVars(sortedEnvVarsWithPrefix("CE_OVERRIDES_", ceOverrides)...),
-		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
-
-		resource.Volumes(srcCodeVol),
-		resource.VolumeMounts(srcCodeVolMount),
-
-		resource.EntrypointCommand(klrEntrypoint),
-	), nil
+	return append([]corev1.EnvVar{
+		{
+			Name:  eventStoreEnv,
+			Value: f.Spec.EventStore.URI,
+		},
+		{
+			Name:  "_HANDLER",
+			Value: "source." + f.Spec.Entrypoint,
+		},
+		{
+			Name:  "RESPONSE_FORMAT",
+			Value: "CLOUDEVENTS",
+		},
+		{
+			Name:  "CE_FUNCTION_RESPONSE_MODE",
+			Value: responseMode,
+		},
+	}, sortedEnvVarsWithPrefix("CE_OVERRIDES_", ceOverrides)...)
 }
 
 // Lambda runtimes require file extensions to match the language,
