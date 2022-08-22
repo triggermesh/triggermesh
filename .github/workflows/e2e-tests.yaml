@@ -1,19 +1,8 @@
 name: End-to-End Testing
 
 on:
-  push:
-    # NOTE(antoineco): To avoid exposing repository secrets to user supplied
-    # code in pull requests, we only allow this workflow to run on the 'main'
-    # branch, where all code changes are expected to have been reviewed by
-    # maintainers.
-    #
-    # We may want to relax this in the future, on condition that safeguards are
-    # added to prevent the workflow from running automatically when an external
-    # contributor submits code changes inside the .github/workflows/ or
-    # test/e2e/ directories.
-    #
-    # Ref. https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
-    branches: [ main ]
+  repository_dispatch:
+    types: [e2e-test]
 
 jobs:
 
@@ -95,21 +84,14 @@ jobs:
         kubectl create -f https://github.com/knative/serving/releases/download/knative-v1.0.0/serving-default-domain.yaml
         kubectl -n knative-serving wait --timeout=1m --for=condition=Complete jobs.batch/default-domain
 
-    - name: Install ko
-      run: go install github.com/google/ko@v0.11.2
-
     - name: Deploy TriggerMesh
-      env:
-        KO_DOCKER_REPO: kind.local
       run: |
-        yq -yi 'del(.spec.template.spec.containers[]?.resources)' config/500-controller.yaml
+        sed -i config/500-*.yaml \
+          -e "s|ko://github.com/triggermesh/triggermesh/cmd/\(.*$\)|gcr.io/triggermesh/\1:"${{ !github.event.client_payload.image_hash }}"|g"
 
-        ko apply -f config/namespace/
-        ko apply -f config/
+        kubectl apply -f config/namespace/
+        kubectl apply -f config/
 
-        # Building TriggerMesh may cause existing Pods to crash due to resources
-        # exhaustion, including the TriggerMesh webhook. We need to allow enough
-        # time for Pods in CrashLoopBackoff to recover before moving on.
         kubectl -n triggermesh      wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/part-of=triggermesh
         kubectl -n knative-serving  wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-serving
         kubectl -n knative-eventing wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-eventing
