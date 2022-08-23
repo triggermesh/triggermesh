@@ -82,11 +82,6 @@ jobs:
               - ${{ steps.kind-subnet.outputs.prefix }}.255.200-${{ steps.kind-subnet.outputs.prefix }}.255.250
         EOM
 
-    - name: Tekton Pipeline
-      # Pin Tekton's version 0.37 until https://github.com/triggermesh/triggermesh/issues/1043 is resolved
-      run: |
-        kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.37.3/release.yaml
-
     - name: Knative default domain
       # Sets a magic default Knative domain that resolves to <gateway-ip>.sslip.io
       run: |
