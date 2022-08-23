@@ -99,7 +99,6 @@ jobs:
         kubectl -n triggermesh      wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/part-of=triggermesh
         kubectl -n knative-serving  wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-serving
         kubectl -n knative-eventing wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-eventing
-        kubectl -n tekton-pipelines  wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/part-of=tekton-pipelines
 
     - name: Install Ginkgo
       run: go install github.com/onsi/ginkgo/v2/ginkgo
