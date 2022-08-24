@@ -99,7 +99,6 @@ jobs:
         kubectl -n triggermesh      wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/part-of=triggermesh
         kubectl -n knative-serving  wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-serving
         kubectl -n knative-eventing wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/name=knative-eventing
-        kubectl -n tekton-pipelines  wait deployments.app --timeout=5m --for=condition=Available -l app.kubernetes.io/part-of=tekton-pipelines
 
     - name: Install Ginkgo
       run: go install github.com/onsi/ginkgo/v2/ginkgo
@@ -136,7 +135,7 @@ jobs:
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/triggermesh/triggermesh/statuses/${{ github.event.client_payload.commit_sha }} \
-          -d '{"state":"${{ steps.e2e.outcome }}","target_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}","context":"${{ github.workflow }}"}'
+          -d '{"state":"${{ steps.e2e.outcome == 'success' && 'success' || 'failure' }}","target_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}","context":"${{ github.workflow }}"}'
 
     # The KinD cluster can get shut down before all API objects created during
     # E2E tests have been terminated, which leaks cloud resources depending on
