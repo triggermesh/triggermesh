@@ -812,6 +812,36 @@ rules:
   - get
   - list
   - watch
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources/finalizers
+  - awscloudwatchsources/finalizers
+  - awscodecommitsources/finalizers
+  - awscognitoidentitysources/finalizers
+  - awscognitouserpoolsources/finalizers
+  - awsdynamodbsources/finalizers
+  - awskinesissources/finalizers
+  - awsperformanceinsightssources/finalizers
+  - awss3sources/finalizers
+  - awssnssources/finalizers
+  - awssqssources/finalizers
+  - azureactivitylogssources/finalizers
+  - azureblobstoragesources/finalizers
+  - azureeventgridsources/finalizers
+  - azureeventhubsources/finalizers
+  - azureiothubsources/finalizers
+  - azurequeuestoragesources/finalizers
+  - azureservicebusqueuesources/finalizers
+  - azureservicebustopicsources/finalizers
+  - googlecloudauditlogssources/finalizers
+  - googlecloudbillingsources/finalizers
+  - googlecloudiotsources/finalizers
+  - googlecloudpubsubsources/finalizers
+  - googlecloudsourcerepositoriessources/finalizers
+  - googlecloudstoragesources/finalizers
+  verbs:
+  - update
 
 ---
 
