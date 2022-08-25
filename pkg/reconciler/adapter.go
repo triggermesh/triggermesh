@@ -326,9 +326,9 @@ func OwnByServiceAccount(obj metav1.Object, owner *corev1.ServiceAccount) {
 	})
 }
 
-// CommonObjectLabels returns a set of labels which are always applied to
-// objects reconciled for the given component type.
-func CommonObjectLabels(o kmeta.OwnerRefable) labels.Set {
+// TMCommonObjectLabels returns a set of labels which are always applied to
+// triggermesh objects reconciled for the given component type.
+func TMCommonObjectLabels(o kmeta.OwnerRefable) labels.Set {
 	return labels.Set{
 		appNameLabel:      ComponentName(o),
 		appComponentLabel: componentAdapter,
@@ -336,6 +336,10 @@ func CommonObjectLabels(o kmeta.OwnerRefable) labels.Set {
 		appManagedByLabel: managedBy,
 	}
 }
+
+// CommonObjectLabels set of labels which are always applied to
+// resource objects reconciled for the given component type
+var CommonObjectLabels = TMCommonObjectLabels
 
 // MaybeAppendValueFromEnvVar conditionally appends an EnvVar to env based on
 // the contents of valueFrom.
