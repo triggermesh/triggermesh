@@ -338,7 +338,7 @@ func TMCommonObjectLabels(o kmeta.OwnerRefable) labels.Set {
 }
 
 // CommonObjectLabels set of labels which are always applied to
-// resource objects reconciled for the given component type
+// resource objects reconciled for the given component type.
 var CommonObjectLabels = TMCommonObjectLabels
 
 // MaybeAppendValueFromEnvVar conditionally appends an EnvVar to env based on
