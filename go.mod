@@ -18,7 +18,7 @@ require (
 	cloud.google.com/go/billing v1.2.0
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.5.0
-	cloud.google.com/go/pubsub v1.24.0
+	cloud.google.com/go/pubsub v1.25.1
 	cloud.google.com/go/storage v1.25.0
 	cloud.google.com/go/workflows v1.5.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
@@ -77,7 +77,7 @@ require (
 	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced
 	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2
 	google.golang.org/api v0.93.0
-	google.golang.org/genproto v0.0.0-20220720214146-176da50484ac
+	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
@@ -91,7 +91,7 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.102.1 // indirect
+	cloud.google.com/go v0.104.0 // indirect
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
