@@ -212,16 +212,16 @@ func (a *dataweaveTransformAdapter) dispatch(ctx context.Context, event cloudeve
 	cmd.Stdin = bytes.NewReader([]byte(inputData))
 	cmd.Stderr = &serr
 
+	// Add a cleanup method in case of success/failure. We're not interested in
+	// the failure scenario here as it could fail with the directory not existing
+	defer func() {
+		_ = os.RemoveAll(dwFolder)
+	}()
+
 	err = cmd.Run()
 	if err != nil {
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "executing the spell")
-	}
-
-	err = os.RemoveAll(dwFolder)
-	if err != nil {
-		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
-		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, "removing the folder")
 	}
 
 	cleaned := bytes.Trim(sout.Bytes(), "Running local spell")
