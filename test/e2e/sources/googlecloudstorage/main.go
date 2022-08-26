@@ -199,7 +199,7 @@ var _ = Describe("Google Cloud Storage source", func() {
 					withServiceAccountKey(serviceaccountKey),
 				)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(`spec.eventTypes[0]: Unsupported value: "invalid_type"`))
+				Expect(err.Error()).To(ContainSubstring(`spec.eventTypes: Unsupported value: "invalid_type"`))
 			})
 
 			By("setting an invalid project", func() {
