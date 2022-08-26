@@ -327,7 +327,7 @@ func OwnByServiceAccount(obj metav1.Object, owner *corev1.ServiceAccount) {
 }
 
 // TMCommonObjectLabels returns a set of labels which are always applied to
-// triggermesh objects reconciled for the given component type.
+// TriggerMesh objects reconciled for the given component type.
 func TMCommonObjectLabels(o kmeta.OwnerRefable) labels.Set {
 	return labels.Set{
 		appNameLabel:      ComponentName(o),
