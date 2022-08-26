@@ -114,8 +114,8 @@ github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v1.0.0 h1
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/iothub/armiothub v1.0.0/go.mod h1:QkfhbQER4NOI2IWYrUlWcv6n1etv8hG1q2Z8bMIKIvE=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0 h1:ECsQtyERDVz3NP3kvDOTLvbQhqWp/x9EsGKtb4ogUr8=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0/go.mod h1:s1tW/At+xHqjNFvWU4G0c0Qv33KOhvbGNj0RCTQDV8s=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.0.0 h1:TMEyRFKh1zaSPmoQh3kxK+xRAYVq8guCI/7SMO0F3KY=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.0.0/go.mod h1:c+Lifp3EDEamAkPVzMooRNOK6CZjNSdEnf1A7jsI9u4=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.1.0 h1:fsVypuWj+j1xqp8S7t5SyibKxVt5OyjVUHO5rlLkZnw=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.1.0/go.mod h1:c+Lifp3EDEamAkPVzMooRNOK6CZjNSdEnf1A7jsI9u4=
 github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1 h1:QSdcrd/UFJv6Bp/CfoVf2SrENpFn9P6Yh8yb+xNhYMM=
 github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1/go.mod h1:eZ4g6GUvXiGulfIbbhh1Xr4XwUYaYaWMqzGD/284wCA=
 github.com/Azure/azure-storage-blob-go v0.6.0/go.mod h1:oGfmITT1V6x//CswqY2gtAHND+xIP64/qL7a5QJix0Y=
