@@ -7,7 +7,7 @@ This event target receives [CloudEvents][ce] over HTTP and sends them to a pre-d
 
 - Google Cloud Console account.
 - A service account and it's associated JSON credentials.
-- a pre-existing Google Cloud Pub Sub Topic.
+- A pre-existing Google Cloud Pub/Sub Topic.
 
 
 ## Deploying an Instance of the Target
