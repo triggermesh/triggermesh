@@ -12,7 +12,7 @@ This event target receives [CloudEvents][ce] over HTTP and sends them to a pre-d
 
 ## Deploying an Instance of the Target
 
-1. [Clone][clone] the Triggermesh mono repo and navigate to the example manifest located in the [`triggermesh/config/samples/targets/googlecloudpubsub/`][sample-manifest] section of the Triggermesh mono repo.
+1. [Clone][clone] the TriggerMesh mono repo and navigate to the example manifest located in the [`triggermesh/config/samples/targets/googlecloudpubsub/`][sample-manifest] section of the TriggerMesh mono repo.
 
 1. Replace the example credentials in the `100-secret.yaml` file with the JSON credentials of a valid Service Account.
 
