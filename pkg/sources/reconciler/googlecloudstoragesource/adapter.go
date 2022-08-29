@@ -75,7 +75,7 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudStorageSource) []corev1.EnvVar {
 				Value: o.AsEventSource(),
 			}, {
 				Name:  common.EnvCEType,
-				Value: v1alpha1.GoogleCloudSourceRepoGenericEventType,
+				Value: v1alpha1.GoogleCloudStorageGenericEventType,
 			}, {
 				Name:  adapter.EnvConfigCEOverrides,
 				Value: cloudevents.OverridesJSON(o.Spec.CloudEventOverrides),
