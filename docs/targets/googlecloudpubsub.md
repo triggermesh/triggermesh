@@ -1,4 +1,4 @@
-# Event Target for Google Cloud Pub Sub
+# Event Target for Google Cloud Pub/Sub
 
 This event target receives [CloudEvents][ce] over HTTP and sends them to a pre-defined Google Cloud Pub Sub Topic.
 
