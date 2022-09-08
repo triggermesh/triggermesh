@@ -112,7 +112,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 
 	key := event.Subject()
 	if key == "" {
-		key = event.Type() + "/" + event.Source() + "/" + event.Time().String()
+		key = event.Type() "/" + event.Time().String()
 	}
 
 	bucket := strings.Split(a.awsArn.Resource, "/")[0]
