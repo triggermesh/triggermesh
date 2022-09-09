@@ -41,7 +41,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.16.0
-	github.com/aws/aws-sdk-go v1.44.91
+	github.com/aws/aws-sdk-go v1.44.94
 	github.com/basgys/goxml2json v1.1.0
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
@@ -49,7 +49,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/google/cel-go v0.11.2
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
 	github.com/ibm-messaging/mq-golang/v5 v5.3.1
 	github.com/itchyny/gojq v0.12.8
