@@ -249,5 +249,8 @@ fi
 # Install ko
 go install github.com/google/ko@latest
 
+# Start minikube
+minikube start &
+
 
 echo -e "\nDone!"
