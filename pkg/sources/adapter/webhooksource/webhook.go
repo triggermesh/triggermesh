@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -165,11 +166,17 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 			}
 			if h.extensionAttributesFrom.headers {
 				for k, v := range r.Header {
+					log.Println(k, v)
 					// Prevent Authorization header from being added
-					// as a CloudEvent atribute
+					// as a CloudEvent attribute
 					if k == "Authorization" {
 						continue
 					}
+					if k == "Ce-Id" {
+						event.SetID(v[0])
+						continue
+					}
+
 					if len(v) == 1 {
 						event.SetExtension(sanitizeCloudEventAttributeName(headerPrefix+k), v[0])
 					} else {
