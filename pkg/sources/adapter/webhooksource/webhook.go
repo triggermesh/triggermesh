@@ -70,7 +70,7 @@ func (h *webhookHandler) Start(ctx context.Context) error {
 	return runHandler(ctx, s)
 }
 
-// runHandler runs the HTTP event handler until ctx gets cancelled.
+// runHandler runs the HTTP event handler until ctx get cancelled.
 func runHandler(ctx context.Context, s *http.Server) error {
 	logging.FromContext(ctx).Info("Starting webhook event handler")
 
@@ -166,14 +166,8 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 			if h.extensionAttributesFrom.headers {
 				for k, v := range r.Header {
 					// Prevent Authorization header from being added
-					// as a CloudEvent attribute
+					// as a CloudEvent atribute
 					if k == "Authorization" {
-						continue
-					}
-					if k == "Ce-Id" {
-						if len(v) != 0 {
-							event.SetID(v[0])
-						}
 						continue
 					}
 
