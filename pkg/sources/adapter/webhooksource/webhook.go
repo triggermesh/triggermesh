@@ -170,10 +170,14 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 					if k == "Authorization" {
 						continue
 					}
+<<<<<<< HEAD
 					if k == "Ce-Id" {
 						if len(v) != 0 {
 							event.SetID(v[0])
 						}
+=======
+					if k == "Ce-Id" && (v != nil && v[0] != "") {
+>>>>>>> 5e9b6d0e (verify value exists and is not empty before assigning)
 						event.SetID(v[0])
 						continue
 					}
