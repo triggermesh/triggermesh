@@ -70,7 +70,7 @@ func (h *webhookHandler) Start(ctx context.Context) error {
 	return runHandler(ctx, s)
 }
 
-// runHandler runs the HTTP event handler until ctx get cancelled.
+// runHandler runs the HTTP event handler until ctx gets cancelled.
 func runHandler(ctx context.Context, s *http.Server) error {
 	logging.FromContext(ctx).Info("Starting webhook event handler")
 
