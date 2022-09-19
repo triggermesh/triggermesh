@@ -82,6 +82,7 @@ func (s *Store) Apply(data []byte) ([]byte, error) {
 	}
 
 	value := common.ReadValue(event, path)
+
 	s.variables.Set(s.Path, value)
 
 	return data, nil
