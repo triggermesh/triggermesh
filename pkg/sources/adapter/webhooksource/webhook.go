@@ -171,7 +171,7 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 						continue
 					}
 					if k == "Ce-Id" {
-						if v != nil && len(v) != 0 {
+						if len(v) != 0 {
 							event.SetID(v[0])
 						}
 						continue
