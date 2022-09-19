@@ -28,7 +28,6 @@ import (
 	logtesting "knative.dev/pkg/logging/testing"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 )
 
 var availableTransformations = []v1alpha1.Transform{
@@ -39,17 +38,12 @@ var availableTransformations = []v1alpha1.Transform{
 }
 
 func TestStart(t *testing.T) {
-	pipeline, err := newPipeline(availableTransformations)
-	assert.NoError(t, err)
-
-	pipeline.setStorage(storage.New())
-
 	ceClient, err := cloudevents.NewClientHTTP()
 	assert.NoError(t, err)
 
 	a := &adapter{
-		ContextPipeline: pipeline,
-		DataPipeline:    pipeline,
+		ContextPipeline: availableTransformations,
+		DataPipeline:    availableTransformations,
 
 		client: ceClient,
 		logger: logtesting.TestLogger(t),
@@ -336,14 +330,9 @@ func TestReceiveAndTransform(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			pipeline, err := newPipeline(tc.data)
-			assert.NoError(t, err)
-
-			pipeline.setStorage(storage.New())
-
 			a := &adapter{
-				DataPipeline:    pipeline,
-				ContextPipeline: pipeline,
+				DataPipeline:    tc.data,
+				ContextPipeline: tc.data,
 				logger:          logtesting.TestLogger(t),
 			}
 
