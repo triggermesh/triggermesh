@@ -15,12 +15,12 @@ require (
 replace k8s.io/client-go => k8s.io/client-go v0.23.5
 
 require (
-	cloud.google.com/go/billing v1.2.0
+	cloud.google.com/go/billing v1.4.0
 	cloud.google.com/go/firestore v1.6.1
 	cloud.google.com/go/logging v1.5.0
 	cloud.google.com/go/pubsub v1.25.1
 	cloud.google.com/go/storage v1.26.0
-	cloud.google.com/go/workflows v1.5.0
+	cloud.google.com/go/workflows v1.6.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.18
 	github.com/Azure/azure-sdk-for-go v66.0.0+incompatible
@@ -75,7 +75,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.27.0
 	go.uber.org/zap v1.23.0
 	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced
-	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
+	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 	google.golang.org/api v0.95.0
 	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
 	google.golang.org/grpc v1.49.0
