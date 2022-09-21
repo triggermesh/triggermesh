@@ -53,7 +53,7 @@ type webhookHandler struct {
 	mt       *pkgadapter.MetricTag
 }
 
-// Start implements pkgadapter.Adapter.
+// Start implements pkgadapter.Adapter
 // Runs the server for receiving HTTP events until ctx gets cancelled.
 func (h *webhookHandler) Start(ctx context.Context) error {
 	ctx = pkgadapter.ContextWithMetricTag(ctx, h.mt)
