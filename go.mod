@@ -4,7 +4,7 @@ go 1.18
 
 // Knative and CloudEvents are the common denominator to all TriggerMesh components.
 require (
-	github.com/cloudevents/sdk-go/v2 v2.11.0
+	github.com/cloudevents/sdk-go/v2 v2.12.0
 	knative.dev/eventing v0.31.1-0.20220523181303-c3e13967001f
 	knative.dev/pkg v0.0.0-20220525153005-18f69958870f
 	knative.dev/serving v0.31.0
@@ -20,7 +20,7 @@ require (
 	cloud.google.com/go/logging v1.5.0
 	cloud.google.com/go/pubsub v1.25.1
 	cloud.google.com/go/storage v1.26.0
-	cloud.google.com/go/workflows v1.5.0
+	cloud.google.com/go/workflows v1.6.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.18
 	github.com/Azure/azure-sdk-for-go v66.0.0+incompatible
