@@ -107,10 +107,37 @@ type MessageWithRawJSONData struct {
 }
 
 // toMessage converts a azservicebus.ReceivedMessage into a Message
+// removing a new parameter (RawAMQPMessage) introduced in azservicebus v1.1.0
+// that breaks our serialization.
 func toMessage(rcvMsg *azservicebus.ReceivedMessage) (*Message, error) {
 	return &Message{
-		ReceivedMessage: rcvMsg,
-		LockToken:       stringifyLockToken((*uuid.UUID)(&rcvMsg.LockToken)),
+		ReceivedMessage: &azservicebus.ReceivedMessage{
+			ApplicationProperties:      rcvMsg.ApplicationProperties,
+			Body:                       rcvMsg.Body,
+			ContentType:                rcvMsg.ContentType,
+			CorrelationID:              rcvMsg.CorrelationID,
+			DeadLetterErrorDescription: rcvMsg.DeadLetterErrorDescription,
+			DeadLetterReason:           rcvMsg.DeadLetterReason,
+			DeadLetterSource:           rcvMsg.DeadLetterSource,
+			DeliveryCount:              rcvMsg.DeliveryCount,
+			EnqueuedSequenceNumber:     rcvMsg.EnqueuedSequenceNumber,
+			EnqueuedTime:               rcvMsg.EnqueuedTime,
+			ExpiresAt:                  rcvMsg.ExpiresAt,
+			LockedUntil:                rcvMsg.LockedUntil,
+			LockToken:                  rcvMsg.LockToken,
+			MessageID:                  rcvMsg.MessageID,
+			PartitionKey:               rcvMsg.PartitionKey,
+			ReplyTo:                    rcvMsg.ReplyTo,
+			ReplyToSessionID:           rcvMsg.ReplyToSessionID,
+			ScheduledEnqueueTime:       rcvMsg.ScheduledEnqueueTime,
+			SequenceNumber:             rcvMsg.SequenceNumber,
+			SessionID:                  rcvMsg.SessionID,
+			State:                      rcvMsg.State,
+			Subject:                    rcvMsg.Subject,
+			TimeToLive:                 rcvMsg.TimeToLive,
+			To:                         rcvMsg.To,
+		},
+		LockToken: stringifyLockToken((*uuid.UUID)(&rcvMsg.LockToken)),
 	}, nil
 }
 
