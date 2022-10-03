@@ -123,6 +123,10 @@ func MakeAppEnv(f *v1alpha1.Function) []corev1.EnvVar {
 			Name:  "CE_FUNCTION_RESPONSE_MODE",
 			Value: responseMode,
 		},
+		{
+			Name:  "INTERNAL_API_PORT",
+			Value: "8088",
+		},
 	}, sortedEnvVarsWithPrefix("CE_OVERRIDES_", ceOverrides)...)
 }
 
