@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.amazon.dynamodb.stream_record" }
+        {
+          "type": "com.amazon.dynamodb.stream_record",
+          "schema": https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.dynamodb.stream_record.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.google.cloud.pubsub.message" }
+        {
+          "type": "com.google.cloud.pubsub.message",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.google.cloud.pubsub.message.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

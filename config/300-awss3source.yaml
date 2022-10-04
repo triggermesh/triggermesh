@@ -24,12 +24,36 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.amazon.s3.objectcreated" },
-        { "type": "com.amazon.s3.objectremoved" },
-        { "type": "com.amazon.s3.objectrestore" },
-        { "type": "com.amazon.s3.reducedredundancylostobject" },
-        { "type": "com.amazon.s3.replication" },
-        { "type": "com.amazon.s3.testevent" }
+        {
+          "type": "com.amazon.s3.objectcreated",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.s3.event.json",
+          "description": ""
+        },
+        {
+          "type": "com.amazon.s3.objectremoved",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.s3.event.json",
+          "description": ""
+        },
+        {
+          "type": "com.amazon.s3.objectrestore",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.s3.event.json",
+          "description": ""
+        },
+        {
+          "type": "com.amazon.s3.reducedredundancylostobject",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.s3.event.json",
+          "description": ""
+        },
+        {
+          "type": "com.amazon.s3.replication",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.s3.event.json",
+          "description": ""
+        },
+        {
+          "type": "com.amazon.s3.testevent",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.s3.event.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io
