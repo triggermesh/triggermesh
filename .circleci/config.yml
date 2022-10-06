@@ -9,7 +9,7 @@ jobs:
   gomod-cache:
     executor:
       name: go/default
-      tag: '1.19'
+      tag: '1.19.1'
     steps:
       - checkout
       - go/mod-download-cached
@@ -17,7 +17,7 @@ jobs:
   test:
     executor:
       name: go/default
-      tag: '1.19'
+      tag: '1.19.1'
     steps:
       - checkout
       - go/load-cache
@@ -75,7 +75,7 @@ jobs:
   gen-apidocs:
     executor:
       name: go/default
-      tag: '1.19'
+      tag: '1.19.1'
     parameters:
       committer_name:
         type: string
@@ -116,7 +116,7 @@ jobs:
   publish-image:
     executor:
       name: go/default
-      tag: '1.19'
+      tag: '1.19.1'
     resource_class: xlarge
     steps:
       - checkout
@@ -169,7 +169,7 @@ jobs:
   trigger-e2e-test:
     executor:
       name: go/default
-      tag: '1.19'
+      tag: '1.19.1'
     steps:
       - run:
           name: Sending dispatch event
@@ -185,7 +185,7 @@ jobs:
     description: Patches target cluster configuration
     executor:
       name: go/default
-      tag: '1.19'
+      tag: '1.19.1'
     parameters:
       cluster:
         type: string
@@ -237,7 +237,7 @@ jobs:
   release:
     executor:
       name: go/default
-      tag: '1.19'
+      tag: '1.19.1'
     steps:
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
