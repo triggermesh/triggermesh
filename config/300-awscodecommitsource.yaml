@@ -24,8 +24,16 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.amazon.codecommit.push" },
-        { "type": "com.amazon.codecommit.pull_request" }
+        {
+          "type": "com.amazon.codecommit.push",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.codecommit.push.json",
+          "description": ""
+        },
+        {
+          "type": "com.amazon.codecommit.pull_request",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.codecommit.pull_request.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.amazon.cognito-identity.sync_trigger" }
+        {
+          "type": "com.amazon.cognito-identity.sync_trigger",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.cognito-identity.sync_trigger.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io
