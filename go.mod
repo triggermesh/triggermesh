@@ -6,7 +6,7 @@ go 1.18
 require (
 	github.com/cloudevents/sdk-go/v2 v2.12.0
 	knative.dev/eventing v0.31.1-0.20220523181303-c3e13967001f
-	knative.dev/pkg v0.0.0-20220525153005-18f69958870f
+	knative.dev/pkg v0.0.0-20220818004048-4a03844c0b15
 	knative.dev/serving v0.31.0
 )
 
@@ -65,7 +65,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.8.0
-	github.com/tektoncd/pipeline v0.37.2
+	github.com/tektoncd/pipeline v0.40.2
 	github.com/tidwall/gjson v1.14.3
 	github.com/wamuir/go-xslt v0.1.4
 	go.opencensus.io v0.23.0
@@ -81,10 +81,10 @@ require (
 	google.golang.org/grpc v1.49.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
-	k8s.io/api v0.23.5
-	k8s.io/apimachinery v0.23.5
+	k8s.io/api v0.23.9
+	k8s.io/apimachinery v0.23.9
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
-	k8s.io/code-generator v0.23.5
+	k8s.io/code-generator v0.23.9
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 	knative.dev/networking v0.0.0-20220412163509-1145ec58c8be
 	nhooyr.io/websocket v1.8.7
@@ -127,7 +127,7 @@ require (
 	github.com/eapache/go-resiliency v1.3.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/emicklei/go-restful v2.15.0+incompatible // indirect
+	github.com/emicklei/go-restful v2.16.0+incompatible // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
@@ -156,7 +156,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.5.1 // indirect
 	github.com/googleapis/gnostic v0.5.5 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
-	github.com/hashicorp/errwrap v1.0.0 // indirect
+	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
@@ -233,9 +233,9 @@ require (
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.23.4 // indirect
-	k8s.io/gengo v0.0.0-20220307231824-4627b89bbf1b // indirect
-	k8s.io/klog/v2 v2.60.1-0.20220317184644-43cc75f9ae89 // indirect
+	k8s.io/apiextensions-apiserver v0.23.9 // indirect
+	k8s.io/gengo v0.0.0-20220613173612-397b4ae3bce7 // indirect
+	k8s.io/klog/v2 v2.70.2-0.20220707122935-0990e81f1a8f // indirect
 	k8s.io/kube-openapi v0.0.0-20220124234850-424119656bbf // indirect
 	sigs.k8s.io/json v0.0.0-20211208200746-9f7c6b3444d2 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
