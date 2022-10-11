@@ -79,14 +79,7 @@ func UploadBlob(ctx context.Context, containerName, saName, name, data string) {
 	}
 
 	containerClient := serviceClient.NewContainerClient(containerName)
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to create Blob container client: %s", err)
-	}
-
 	blobClient := containerClient.NewBlockBlobClient(name)
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to create Blob block client: %s", err)
-	}
 
 	rs := ReadSeekCloser(strings.NewReader(data))
 
