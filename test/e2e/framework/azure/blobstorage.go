@@ -22,7 +22,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	azservice "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/service"
 
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
@@ -71,13 +71,19 @@ func UploadBlob(ctx context.Context, containerName, saName, name, data string) {
 		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
 	}
 
-	url := "https://" + saName + AzureBlobStorageURL + containerName
-	containerClient, err := azblob.NewContainerClient(url, cred, nil)
+	url := "https://" + saName + AzureBlobStorageURL
+
+	serviceClient, err := azservice.NewClient(url, cred, nil)
+	if err != nil {
+		framework.FailfWithOffset(2, "Failed to create Service client: %s", err)
+	}
+
+	containerClient := serviceClient.NewContainerClient(containerName)
 	if err != nil {
 		framework.FailfWithOffset(2, "Failed to create Blob container client: %s", err)
 	}
 
-	blobClient, err := containerClient.NewBlockBlobClient(name)
+	blobClient := containerClient.NewBlockBlobClient(name)
 	if err != nil {
 		framework.FailfWithOffset(2, "Failed to create Blob block client: %s", err)
 	}
@@ -97,16 +103,15 @@ func DeleteBlob(ctx context.Context, containerName, saName, name string) {
 		framework.FailfWithOffset(2, "Unable to authenticate: %s", err)
 	}
 
-	url := "https://" + saName + AzureBlobStorageURL + containerName
-	containerClient, err := azblob.NewContainerClient(url, cred, nil)
+	url := "https://" + saName + AzureBlobStorageURL
+
+	serviceClient, err := azservice.NewClient(url, cred, nil)
 	if err != nil {
-		framework.FailfWithOffset(2, "Unable to obtain blob client: %s", err)
+		framework.FailfWithOffset(2, "Failed to create Service client: %s", err)
 	}
 
-	blobClient, err := containerClient.NewBlockBlobClient(name)
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to create Blob block client: %s", err)
-	}
+	containerClient := serviceClient.NewContainerClient(containerName)
+	blobClient := containerClient.NewBlockBlobClient(name)
 
 	if _, err := blobClient.Delete(ctx, nil); err != nil {
 		framework.FailfWithOffset(2, "Unable to delete blob: %s", err)
