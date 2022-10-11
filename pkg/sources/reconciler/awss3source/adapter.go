@@ -68,13 +68,15 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 func MakeAppEnv(o *v1alpha1.AWSS3Source) []corev1.EnvVar {
 	// the user may or may not provide a queue ARN in the source's spec, so
 	// the source's status is unfortunately our only source of truth here
-	queueARN := o.Status.QueueARN
-
+	var queueARN string
+	if qa := o.Status.QueueARN; qa != nil {
+		queueARN = qa.String()
+	}
 	return append(reconciler.MakeAWSAuthEnvVars(o.Spec.Auth),
 		[]corev1.EnvVar{
 			{
 				Name:  common.EnvARN,
-				Value: queueARN.String(),
+				Value: queueARN,
 			}, {
 				Name:  envMessageProcessor,
 				Value: "s3",
