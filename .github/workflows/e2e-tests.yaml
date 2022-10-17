@@ -38,7 +38,7 @@ jobs:
           ${{ github.job }}-${{ runner.os }}-go-
 
     - name: KinD Cluster
-      uses: container-tools/kind-action@v1
+      uses: container-tools/kind-action@v2
       with:
         version: v0.13.0
         knative_eventing: v1.4.0
