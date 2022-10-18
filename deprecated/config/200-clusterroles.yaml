@@ -1,0 +1,901 @@
+# Copyright 2022 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-controller
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+
+rules:
+
+# Record Kubernetes events
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+
+# Manage receive-adapters
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
+
+# Read reconciled TriggerMesh resources and update their statuses
+# +rbac-check
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources
+  - awscloudwatchsources
+  - awscodecommitsources
+  - awscognitoidentitysources
+  - awscognitouserpoolsources
+  - awsdynamodbsources
+  - awskinesissources
+  - awsperformanceinsightssources
+  - awss3sources
+  - awssnssources
+  - awssqssources
+  - azureactivitylogssources
+  - azureblobstoragesources
+  - azureeventgridsources
+  - azureeventhubsources
+  - azureiothubsources
+  - azurequeuestoragesources
+  - azureservicebusqueuesources
+  - azureservicebustopicsources
+  - cloudeventssources
+  - googlecloudauditlogssources
+  - googlecloudbillingsources
+  - googlecloudiotsources
+  - googlecloudpubsubsources
+  - googlecloudsourcerepositoriessources
+  - googlecloudstoragesources
+  - httppollersources
+  - ibmmqsources
+  - ocimetricssources
+  - salesforcesources
+  - slacksources
+  - twiliosources
+  - webhooksources
+  - zendesksources
+  verbs:
+  - list
+  - watch
+  - get
+# +rbac-check:subresource=status
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources/status
+  - awscloudwatchsources/status
+  - awscodecommitsources/status
+  - awscognitoidentitysources/status
+  - awscognitouserpoolsources/status
+  - awsdynamodbsources/status
+  - awskinesissources/status
+  - awsperformanceinsightssources/status
+  - awss3sources/status
+  - awssnssources/status
+  - awssqssources/status
+  - azureactivitylogssources/status
+  - azureblobstoragesources/status
+  - azureeventgridsources/status
+  - azureeventhubsources/status
+  - azureiothubsources/status
+  - azurequeuestoragesources/status
+  - azureservicebusqueuesources/status
+  - azureservicebustopicsources/status
+  - cloudeventssources/status
+  - googlecloudauditlogssources/status
+  - googlecloudbillingsources/status
+  - googlecloudiotsources/status
+  - googlecloudpubsubsources/status
+  - googlecloudsourcerepositoriessources/status
+  - googlecloudstoragesources/status
+  - httppollersources/status
+  - ibmmqsources/status
+  - ocimetricssources/status
+  - salesforcesources/status
+  - slacksources/status
+  - twiliosources/status
+  - webhooksources/status
+  - zendesksources/status
+  verbs:
+  - update
+# +rbac-check
+- apiGroups:
+  - targets.triggermesh.io
+  resources:
+  - alibabaosstargets
+  - awscomprehendtargets
+  - awsdynamodbtargets
+  - awseventbridgetargets
+  - awskinesistargets
+  - awslambdatargets
+  - awss3targets
+  - awssnstargets
+  - awssqstargets
+  - azureeventhubstargets
+  - confluenttargets
+  - datadogtargets
+  - elasticsearchtargets
+  - googlecloudfirestoretargets
+  - googlecloudstoragetargets
+  - googlecloudworkflowstargets
+  - googlesheettargets
+  - hasuratargets
+  - httptargets
+  - ibmmqtargets
+  - infratargets
+  - jiratargets
+  - logzmetricstargets
+  - logztargets
+  - oracletargets
+  - salesforcetargets
+  - sendgridtargets
+  - slacktargets
+  - splunktargets
+  - tektontargets
+  - twiliotargets
+  - uipathtargets
+  - zendesktargets
+  verbs:
+  - list
+  - watch
+  - get
+# +rbac-check:subresource=status
+- apiGroups:
+  - targets.triggermesh.io
+  resources:
+  - alibabaosstargets/status
+  - awscomprehendtargets/status
+  - awsdynamodbtargets/status
+  - awseventbridgetargets/status
+  - awskinesistargets/status
+  - awslambdatargets/status
+  - awss3targets/status
+  - awssnstargets/status
+  - awssqstargets/status
+  - azureeventhubstargets/status
+  - confluenttargets/status
+  - datadogtargets/status
+  - elasticsearchtargets/status
+  - googlecloudfirestoretargets/status
+  - googlecloudstoragetargets/status
+  - googlecloudworkflowstargets/status
+  - googlesheettargets/status
+  - hasuratargets/status
+  - httptargets/status
+  - ibmmqtargets/status
+  - infratargets/status
+  - jiratargets/status
+  - logzmetricstargets/status
+  - logztargets/status
+  - oracletargets/status
+  - salesforcetargets/status
+  - sendgridtargets/status
+  - slacktargets/status
+  - splunktargets/status
+  - tektontargets/status
+  - twiliotargets/status
+  - uipathtargets/status
+  - zendesktargets/status
+  verbs:
+  - update
+# +rbac-check
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - dataweavetransformations
+  - jqtransformations
+  - synchronizers
+  - transformations
+  - xmltojsontransformations
+  - xslttransformations
+  verbs:
+  - list
+  - watch
+  - get
+# +rbac-check:subresource=status
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - dataweavetransformations/status
+  - jqtransformations/status
+  - synchronizers/status
+  - transformations/status
+  - xmltojsontransformations/status
+  - xslttransformations/status
+  verbs:
+  - update
+# +rbac-check
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions
+  verbs:
+  - list
+  - watch
+  - get
+# +rbac-check:subresource=status
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions/status
+  verbs:
+  - update
+# +rbac-check
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters
+  - splitters
+  verbs:
+  - list
+  - watch
+  - get
+# +rbac-check:subresource=status
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters/status
+  - splitters/status
+  verbs:
+  - update
+
+# Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
+# https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources/finalizers
+  - awscloudwatchsources/finalizers
+  - awscodecommitsources/finalizers
+  - awscognitoidentitysources/finalizers
+  - awscognitouserpoolsources/finalizers
+  - awsdynamodbsources/finalizers
+  - awskinesissources/finalizers
+  - awsperformanceinsightssources/finalizers
+  - awss3sources/finalizers
+  - awssnssources/finalizers
+  - awssqssources/finalizers
+  - azureactivitylogssources/finalizers
+  - azureblobstoragesources/finalizers
+  - azureeventgridsources/finalizers
+  - azureeventhubsources/finalizers
+  - azureiothubsources/finalizers
+  - azurequeuestoragesources/finalizers
+  - azureservicebusqueuesources/finalizers
+  - azureservicebustopicsources/finalizers
+  - cloudeventssources/finalizers
+  - googlecloudauditlogssources/finalizers
+  - googlecloudbillingsources/finalizers
+  - googlecloudiotsources/finalizers
+  - googlecloudpubsubsources/finalizers
+  - googlecloudsourcerepositoriessources/finalizers
+  - googlecloudstoragesources/finalizers
+  - httppollersources/finalizers
+  - ibmmqsources/finalizers
+  - ocimetricssources/finalizers
+  - salesforcesources/finalizers
+  - slacksources/finalizers
+  - twiliosources/finalizers
+  - webhooksources/finalizers
+  - zendesksources/finalizers
+  verbs:
+  - update
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - targets.triggermesh.io
+  resources:
+  - alibabaosstargets/finalizers
+  - awscomprehendtargets/finalizers
+  - awsdynamodbtargets/finalizers
+  - awseventbridgetargets/finalizers
+  - awskinesistargets/finalizers
+  - awslambdatargets/finalizers
+  - awss3targets/finalizers
+  - awssnstargets/finalizers
+  - awssqstargets/finalizers
+  - azureeventhubstargets/finalizers
+  - confluenttargets/finalizers
+  - datadogtargets/finalizers
+  - elasticsearchtargets/finalizers
+  - googlecloudfirestoretargets/finalizers
+  - googlecloudstoragetargets/finalizers
+  - googlecloudworkflowstargets/finalizers
+  - googlesheettargets/finalizers
+  - hasuratargets/finalizers
+  - httptargets/finalizers
+  - ibmmqtargets/finalizers
+  - infratargets/finalizers
+  - jiratargets/finalizers
+  - logzmetricstargets/finalizers
+  - logztargets/finalizers
+  - oracletargets/finalizers
+  - salesforcetargets/finalizers
+  - sendgridtargets/finalizers
+  - slacktargets/finalizers
+  - splunktargets/finalizers
+  - tektontargets/finalizers
+  - twiliotargets/finalizers
+  - uipathtargets/finalizers
+  - zendesktargets/finalizers
+  verbs:
+  - update
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - dataweavetransformations/finalizers
+  - jqtransformations/finalizers
+  - synchronizers/finalizers
+  - transformations/finalizers
+  - xmltojsontransformations/finalizers
+  - xslttransformations/finalizers
+  verbs:
+  - update
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions/finalizers
+  verbs:
+  - update
+# +rbac-check:subresource=finalizers
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters/finalizers
+  - splitters/finalizers
+  verbs:
+  - update
+
+# Set finalizers
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awss3sources
+  - awssnssources
+  - azureactivitylogssources
+  - azureblobstoragesources
+  - azureeventgridsources
+  - azureservicebusqueuesources
+  - azureservicebustopicsources
+  - googlecloudauditlogssources
+  - googlecloudbillingsources
+  - googlecloudiotsources
+  - googlecloudpubsubsources
+  - googlecloudsourcerepositoriessources
+  - googlecloudstoragesources
+  - zendesksources
+  verbs:
+  - patch
+
+# Manage resource-specific ServiceAccounts and RoleBindings
+- apiGroups:
+  - ''
+  resources:
+  - serviceaccounts
+  - serviceaccounts/finalizers
+  verbs:
+  - list
+  - watch
+  - create
+  - update
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - list
+  - watch
+  - create
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  # Only multi-tenant components receive permissions via RoleBindings to
+  # interact with the Kubernetes API.
+  resourceNames:
+  - awssnssource-adapter
+  - zendesksource-adapter
+  - tektontarget-adapter
+  - filter-adapter
+  - splitter-adapter
+  verbs:
+  - update
+
+# List namespaces
+# Required by the TektonTarget reaper.
+- apiGroups:
+  - ''
+  resources:
+  - namespaces
+  verbs:
+  - list
+
+# Read credentials
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - get
+
+# Required by Function controller to store, and mount user's code
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - create
+  - update
+  - delete
+  - patch
+  - watch
+
+# Read controller configurations
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  resourceNames:
+  - config-logging
+  - config-observability
+  - config-leader-election
+  verbs:
+  - get
+
+# Acquire leases for leader election
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+# Determine the exact reason why Deployments fail
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - list
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: awssnssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+
+# Record Kubernetes events
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+
+# Read Source resources and update their statuses
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awssnssources
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awssnssources/status
+  verbs:
+  - patch
+
+# Read credentials
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - get
+
+# Acquire leases for leader election
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: zendesksource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+
+# Record Kubernetes events
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+
+# Read Source resources
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - zendesksources
+  verbs:
+  - list
+  - watch
+
+# Read credentials
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  verbs:
+  - get
+
+# Acquire leases for leader election
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tektontarget-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+- apiGroups:
+  - tekton.dev
+  resources:
+  - taskruns
+  - pipelineruns
+  verbs:
+  - create
+  - list
+  - delete
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: filter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: splitter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - ''
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - splitters
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - create
+  - update
+
+---
+
+# This role provides readonly access to "Source" duck types.
+# All the rules it contains get aggregated into the "source-observer" ClusterRole provided by Knative Eventing.
+# see https://github.com/knative/eventing/blob/release-0.26/docs/spec/sources.md#source-rbac
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-source-observer
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+    duck.knative.dev/source: 'true'
+rules:
+# +rbac-check
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources
+  - awscloudwatchsources
+  - awscodecommitsources
+  - awscognitoidentitysources
+  - awscognitouserpoolsources
+  - awsdynamodbsources
+  - awskinesissources
+  - awsperformanceinsightssources
+  - awss3sources
+  - awssnssources
+  - awssqssources
+  - azureactivitylogssources
+  - azureblobstoragesources
+  - azureeventgridsources
+  - azureeventhubsources
+  - azureiothubsources
+  - azurequeuestoragesources
+  - azureservicebusqueuesources
+  - azureservicebustopicsources
+  - cloudeventssources
+  - googlecloudauditlogssources
+  - googlecloudbillingsources
+  - googlecloudiotsources
+  - googlecloudpubsubsources
+  - googlecloudsourcerepositoriessources
+  - googlecloudstoragesources
+  - httppollersources
+  - ibmmqsources
+  - ocimetricssources
+  - salesforcesources
+  - slacksources
+  - twiliosources
+  - webhooksources
+  - zendesksources
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+
+# This aggregated role grants read-only access to Addressables.
+# It is intended mainly to allow sink resolvers to resolve URLs from object references.
+#
+# NOTE: This same role can also be found in Knative Eventing. It is duplicated here to allow running TriggerMesh in a
+# cluster which doesn't have Knative Eventing deployed.
+# Source:
+#   https://github.com/knative/eventing/blob/knative-v1.1.0/config/core/roles/addressable-resolvers-clusterrole.yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: addressable-resolver
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      duck.knative.dev/addressable: 'true'
+rules: []  # Rules are automatically filled in by the Kubernetes controller manager.
+
+---
+
+# This role provides readonly access to "Addressable" duck types.
+# All the rules it contains get aggregated into the "addressable-resolver" ClusterRole.
+# https://github.com/knative/eventing/blob/release-0.26/config/core/roles/addressable-resolvers-clusterrole.yaml#L15-L28
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-addressable-resolver
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+    duck.knative.dev/addressable: 'true'
+rules:
+# +rbac-check
+- apiGroups:
+  - targets.triggermesh.io
+  resources:
+  - alibabaosstargets
+  - awscomprehendtargets
+  - awsdynamodbtargets
+  - awseventbridgetargets
+  - awskinesistargets
+  - awslambdatargets
+  - awss3targets
+  - awssnstargets
+  - awssqstargets
+  - azureeventhubstargets
+  - confluenttargets
+  - datadogtargets
+  - elasticsearchtargets
+  - googlecloudfirestoretargets
+  - googlecloudstoragetargets
+  - googlecloudworkflowstargets
+  - googlesheettargets
+  - hasuratargets
+  - httptargets
+  - ibmmqtargets
+  - infratargets
+  - jiratargets
+  - logzmetricstargets
+  - logztargets
+  - oracletargets
+  - salesforcetargets
+  - sendgridtargets
+  - slacktargets
+  - splunktargets
+  - tektontargets
+  - twiliotargets
+  - uipathtargets
+  - zendesktargets
+  verbs:
+  - get
+  - list
+  - watch
+# +rbac-check
+- apiGroups:
+  - flow.triggermesh.io
+  resources:
+  - dataweavetransformations
+  - jqtransformations
+  - synchronizers
+  - transformations
+  - xmltojsontransformations
+  - xslttransformations
+  verbs:
+  - get
+  - list
+  - watch
+# +rbac-check
+- apiGroups:
+  - extensions.triggermesh.io
+  resources:
+  - functions
+  verbs:
+  - get
+  - list
+  - watch
+# +rbac-check
+- apiGroups:
+  - routing.triggermesh.io
+  resources:
+  - filters
+  - splitters
+  verbs:
+  - get
+  - list
+  - watch
+# Allow resolving URLs of a few additional common types which are not supplied by TriggerMesh.
+- apiGroups:
+  - ''
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - routes
+  - services
+  verbs:
+  - get
+  - list
+  - watch
