@@ -1,0 +1,130 @@
+# Copyright 2022 TriggerMesh Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-controller
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: triggermesh-controller
+
+---
+
+# Permissions not required by controllers directly, but granted to
+# receive-adapters via RoleBindings.
+#
+# Without them, the following error is thrown:
+#   "attempting to grant RBAC permissions not currently held"
+#
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: awssnssource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: awssnssource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: zendesksource-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: zendesksource-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tektontarget-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: tektontarget-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: filter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: filter-adapter
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: splitter-adapter
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: splitter-adapter
+
+---
+
+# Resolve sink URIs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-controller-addressable-resolver
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: addressable-resolver
