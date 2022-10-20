@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.oracle.cloud.monitoring" }
+        {
+          "type": "com.oracle.cloud.monitoring",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.oracle.cloud.monitoring.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

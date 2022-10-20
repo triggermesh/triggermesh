@@ -29,8 +29,8 @@ import (
 
 	workflows "cloud.google.com/go/workflows/apiv1beta"
 	executions "cloud.google.com/go/workflows/executions/apiv1beta"
+	"cloud.google.com/go/workflows/executions/apiv1beta/executionspb"
 	"google.golang.org/api/option"
-	executionspb "google.golang.org/genproto/googleapis/cloud/workflows/executions/v1beta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"

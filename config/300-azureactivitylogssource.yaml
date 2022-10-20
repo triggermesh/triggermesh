@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.microsoft.azure.monitor.activity-log" }
+        {
+          "type": "com.microsoft.azure.monitor.activity-log",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.microsoft.azure.monitor.activity-log.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

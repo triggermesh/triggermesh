@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.amazon.sqs.message" }
+        {
+          "type": "com.amazon.sqs.message",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.sqs.message.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

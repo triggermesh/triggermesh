@@ -24,8 +24,16 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.amazon.cloudwatch.metrics.message" },
-        { "type": "com.amazon.cloudwatch.metrics.metric" }
+        {
+          "type": "com.amazon.cloudwatch.metrics.message",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.cloudwatch.metrics.message.json",
+          "description": ""
+        },
+        {
+          "type": "com.amazon.cloudwatch.metrics.metric",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.cloudwatch.metrics.metric.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

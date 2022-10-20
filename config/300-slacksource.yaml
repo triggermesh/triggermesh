@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.slack.events" }
+        {
+          "type": "com.slack.events",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.slack.events.json",
+          "description": ""
+        }
       ]
 spec:
   group: sources.triggermesh.io

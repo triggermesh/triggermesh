@@ -53,7 +53,7 @@ type webhookHandler struct {
 	mt       *pkgadapter.MetricTag
 }
 
-// Start implements pkgadapter.Adapter.
+// Start implements pkgadapter.Adapter
 // Runs the server for receiving HTTP events until ctx gets cancelled.
 func (h *webhookHandler) Start(ctx context.Context) error {
 	ctx = pkgadapter.ContextWithMetricTag(ctx, h.mt)
@@ -70,7 +70,7 @@ func (h *webhookHandler) Start(ctx context.Context) error {
 	return runHandler(ctx, s)
 }
 
-// runHandler runs the HTTP event handler until ctx get cancelled.
+// runHandler runs the HTTP event handler until ctx gets cancelled.
 func runHandler(ctx context.Context, s *http.Server) error {
 	logging.FromContext(ctx).Info("Starting webhook event handler")
 
@@ -166,11 +166,17 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 			if h.extensionAttributesFrom.headers {
 				for k, v := range r.Header {
 					// Prevent Authorization header from being added
-					// as a CloudEvent atribute
+					// as a CloudEvent attribute
 					if k == "Authorization" {
 						continue
 					}
-
+					if k == "Ce-Id" {
+						if len(v) != 0 {
+							event.SetID(v[0])
+						}
+						continue
+					}
+          
 					if len(v) == 1 {
 						event.SetExtension(sanitizeCloudEventAttributeName(headerPrefix+k), v[0])
 					} else {
