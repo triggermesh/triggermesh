@@ -24,7 +24,7 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.kafka.message" }
+        { "type": "io.triggermesh.kafka.event" }
       ]
 spec:
   group: sources.triggermesh.io
