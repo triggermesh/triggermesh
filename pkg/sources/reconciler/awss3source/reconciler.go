@@ -36,7 +36,7 @@ import (
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
 	// Getter than can obtain clients for interacting with the S3 and SQS APIs
-	s3Cg s3client.ClientGetter
+	S3Cg s3client.ClientGetter
 
 	// SQS adapter
 	base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source, listersv1alpha1.AWSS3SourceNamespaceLister]
@@ -54,7 +54,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Sourc
 	// inject source into context for usage in reconciliation logic
 	ctx = commonv1alpha1.WithReconcilable(ctx, src)
 
-	s3Client, sqsClient, err := r.s3Cg.Get(src)
+	s3Client, sqsClient, err := r.S3Cg.Get(src)
 	if err != nil {
 		src.Status.MarkNotSubscribed(v1alpha1.AWSS3ReasonNoClient, "Cannot obtain AWS API clients")
 		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
@@ -78,7 +78,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSS3Source
 	// inject source into context for usage in finalization logic
 	ctx = commonv1alpha1.WithReconcilable(ctx, src)
 
-	s3Client, sqsClient, err := r.s3Cg.Get(src)
+	s3Client, sqsClient, err := r.S3Cg.Get(src)
 	switch {
 	case isNotFound(err):
 		// the finalizer is unlikely to recover from a missing Secret,
