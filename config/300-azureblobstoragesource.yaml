@@ -336,7 +336,6 @@ spec:
             required:
             - storageAccountID
             - endpoint
-            - auth
             - sink
           status:
             description: Reported status of the event source.

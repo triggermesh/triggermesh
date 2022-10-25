@@ -23,9 +23,9 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/profiles/preview/preview/monitor/mgmt/insights"
 	"github.com/Azure/azure-sdk-for-go/profiles/preview/preview/monitor/mgmt/insights/insightsapi"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/auth/azure"
 )
 
 // EventCategoriesClient is an alias for the EventCategoriesClientAPI interface.
@@ -60,9 +60,9 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureActivityLogsSource) (EventCategoriesClient, DiagnosticSettingsClient, error) {
-	authorizer, err := azure.NewAADAuthorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
+	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
-		return nil, nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
+		return nil, nil, fmt.Errorf("retrieving Azure credentials: %w", err)
 	}
 
 	eventCatCli := insights.NewEventCategoriesClient(src.Spec.SubscriptionID)

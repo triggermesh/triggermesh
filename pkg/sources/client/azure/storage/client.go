@@ -25,9 +25,9 @@ import (
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventgrid/mgmt/eventgrid/eventgridapi"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/eventhub/mgmt/eventhub/eventhubapi"
+	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/sources/auth/azure"
 )
 
 // EventSubscriptionsClient is an alias for the EventSubscriptionsClientAPI interface.
@@ -62,9 +62,9 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureBlobStorageSource) (EventSubscriptionsClient, EventHubsClient, error) {
-	authorizer, err := azure.NewAADAuthorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
+	authorizer, err := auth.NewAuthorizerFromEnvironment()
 	if err != nil {
-		return nil, nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
+		return nil, nil, fmt.Errorf("retrieving Azure credentials: %w", err)
 	}
 
 	eventSubsCli := eventgrid.NewEventSubscriptionsClient(src.Spec.StorageAccountID.SubscriptionID)

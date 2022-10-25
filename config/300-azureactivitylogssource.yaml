@@ -284,7 +284,6 @@ spec:
             required:
             - subscriptionID
             - destination
-            - auth
             - sink
           status:
             description: Reported status of the event source.

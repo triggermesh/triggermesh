@@ -242,7 +242,6 @@ spec:
                           format: int64
             required:
             - topicID
-            - auth
             - sink
           status:
             description: Reported status of the event source.

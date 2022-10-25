@@ -310,7 +310,6 @@ spec:
                           format: int64
             required:
             - eventHubID
-            - auth
             - sink
           status:
             description: Reported status of the event source.

@@ -314,7 +314,6 @@ spec:
                           format: int64
             required:
             - queueID
-            - auth
             - sink
           status:
             description: Reported status of the event source.
