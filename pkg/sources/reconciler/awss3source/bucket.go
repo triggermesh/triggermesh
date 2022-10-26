@@ -44,7 +44,7 @@ import (
 
 // ensureNotificationsEnabled ensures that event notifications are enabled in
 // the S3 bucket.
-func (r *Reconciler) ensureNotificationsEnabled(ctx context.Context, cli s3iface.S3API, queueARN string) error {
+func EnsureNotificationsEnabled(ctx context.Context, cli s3iface.S3API, queueARN string) error {
 	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
@@ -92,9 +92,9 @@ func (r *Reconciler) ensureNotificationsEnabled(ctx context.Context, cli s3iface
 	return nil
 }
 
-// ensureNotificationsDisabled ensures that event notifications are disabled in
+// EnsureNotificationsDisabled ensures that event notifications are disabled in
 // the S3 bucket.
-func (r *Reconciler) ensureNotificationsDisabled(ctx context.Context, cli s3iface.S3API) error {
+func EnsureNotificationsDisabled(ctx context.Context, cli s3iface.S3API) error {
 	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 

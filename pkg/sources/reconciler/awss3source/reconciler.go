@@ -36,10 +36,10 @@ import (
 // Reconciler implements controller.Reconciler for the event source type.
 type Reconciler struct {
 	// Getter than can obtain clients for interacting with the S3 and SQS APIs
-	S3Cg s3client.ClientGetter
+	s3Cg s3client.ClientGetter
 
 	// SQS adapter
-	Base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source, listersv1alpha1.AWSS3SourceNamespaceLister]
+	base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source, listersv1alpha1.AWSS3SourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 
@@ -54,23 +54,23 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Sourc
 	// inject source into context for usage in reconciliation logic
 	ctx = commonv1alpha1.WithReconcilable(ctx, src)
 
-	s3Client, sqsClient, err := r.S3Cg.Get(src)
+	s3Client, sqsClient, err := r.s3Cg.Get(src)
 	if err != nil {
 		src.Status.MarkNotSubscribed(v1alpha1.AWSS3ReasonNoClient, "Cannot obtain AWS API clients")
 		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedSubscribe,
 			"Error creating AWS API clients: %s", err))
 	}
 
-	queueARN, err := ensureQueue(ctx, sqsClient)
+	queueARN, err := EnsureQueue(ctx, sqsClient)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile SQS queue: %w", err)
 	}
 
-	if err := r.Base.ReconcileAdapter(ctx, r); err != nil {
+	if err := r.base.ReconcileAdapter(ctx, r); err != nil {
 		return fmt.Errorf("failed to reconcile SQS event source adapter: %w", err)
 	}
 
-	return r.ensureNotificationsEnabled(ctx, s3Client, queueARN)
+	return EnsureNotificationsEnabled(ctx, s3Client, queueARN)
 }
 
 // FinalizeKind is called when the resource is deleted.
@@ -78,7 +78,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSS3Source
 	// inject source into context for usage in finalization logic
 	ctx = commonv1alpha1.WithReconcilable(ctx, src)
 
-	s3Client, sqsClient, err := r.S3Cg.Get(src)
+	s3Client, sqsClient, err := r.s3Cg.Get(src)
 	switch {
 	case isNotFound(err):
 		// the finalizer is unlikely to recover from a missing Secret,
@@ -98,7 +98,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSS3Source
 	// The finalizer blocks the deletion of the source object until
 	// ensureNotificationsDisabled succeeds to ensure that we don't leave
 	// any dangling event notification configurations behind us.
-	return r.ensureNotificationsDisabled(ctx, s3Client)
+	return EnsureNotificationsDisabled(ctx, s3Client)
 }
 
 // sourceID returns an ID that identifies the given source instance in AWS
