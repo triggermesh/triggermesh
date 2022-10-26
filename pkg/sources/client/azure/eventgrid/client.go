@@ -31,6 +31,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/auth/azure"
 )
 
 // SystemTopicsClient wraps the eventgridapi.SystemTopicsClientAPI interface.
@@ -126,9 +127,20 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureEventGridSource) (
 	SystemTopicsClient, ProvidersClient, ResourceGroupsClient, EventSubscriptionsClient, EventHubsClient, error) {
 
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
-	if err != nil {
-		return nil, nil, nil, nil, nil, fmt.Errorf("retrieving Azure credentials: %w", err)
+	var authorizer autorest.Authorizer
+	var err error
+
+	if src.Spec.Auth.ServicePrincipal != nil {
+		authorizer, err = azure.NewAADAuthorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
+		if err != nil {
+			return nil, nil, nil, nil, nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
+		}
+	} else {
+		// Use Azure AKS Managed Identity
+		authorizer, err = auth.NewAuthorizerFromEnvironment()
+		if err != nil {
+			return nil, nil, nil, nil, nil, fmt.Errorf("retrieving Azure AKS Managed Identity: %w", err)
+		}
 	}
 
 	sysTopicsCli := &SystemTopicsClientImpl{

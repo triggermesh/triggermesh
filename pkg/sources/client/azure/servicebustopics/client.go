@@ -23,9 +23,11 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/servicebus/mgmt/servicebus"
 	"github.com/Azure/azure-sdk-for-go/profiles/latest/servicebus/mgmt/servicebus/servicebusapi"
+	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/sources/auth/azure"
 )
 
 // SubscriptionsClient is an alias for the SubscriptionsClientAPI interface.
@@ -57,9 +59,20 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AzureServiceBusTopicSource) (SubscriptionsClient, error) {
-	authorizer, err := auth.NewAuthorizerFromEnvironment()
-	if err != nil {
-		return nil, fmt.Errorf("retrieving Azure credentials: %w", err)
+	var authorizer autorest.Authorizer
+	var err error
+
+	if src.Spec.Auth.ServicePrincipal != nil {
+		authorizer, err = azure.NewAADAuthorizer(g.sg(src.Namespace), src.Spec.Auth.ServicePrincipal)
+		if err != nil {
+			return nil, fmt.Errorf("retrieving Azure service principal credentials: %w", err)
+		}
+	} else {
+		// Use Azure AKS Managed Identity
+		authorizer, err = auth.NewAuthorizerFromEnvironment()
+		if err != nil {
+			return nil, fmt.Errorf("retrieving Azure AKS Managed Identity: %w", err)
+		}
 	}
 
 	subsCli := servicebus.NewSubscriptionsClient(src.Spec.TopicID.SubscriptionID)
