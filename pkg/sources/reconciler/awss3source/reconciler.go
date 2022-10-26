@@ -39,7 +39,7 @@ type Reconciler struct {
 	S3Cg s3client.ClientGetter
 
 	// SQS adapter
-	base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source, listersv1alpha1.AWSS3SourceNamespaceLister]
+	Base       common.GenericDeploymentReconciler[*v1alpha1.AWSS3Source, listersv1alpha1.AWSS3SourceNamespaceLister]
 	adapterCfg *adapterConfig
 }
 
@@ -66,7 +66,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Sourc
 		return fmt.Errorf("failed to reconcile SQS queue: %w", err)
 	}
 
-	if err := r.base.ReconcileAdapter(ctx, r); err != nil {
+	if err := r.Base.ReconcileAdapter(ctx, r); err != nil {
 		return fmt.Errorf("failed to reconcile SQS event source adapter: %w", err)
 	}
 

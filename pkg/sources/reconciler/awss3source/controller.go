@@ -60,7 +60,7 @@ func NewController(
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.AWSS3Source](
+	r.Base = common.NewGenericDeploymentReconciler[*v1alpha1.AWSS3Source](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
