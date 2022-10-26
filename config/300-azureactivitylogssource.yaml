@@ -100,7 +100,7 @@ spec:
                   type: string
               auth:
                 description: Authentication method to interact with the Azure Monitor REST API. This event source only supports
-                  the Service Principal authentication.
+                  the Service Principal authentication. If it not present, it will try to use Azure AKS Managed Identity
                 type: object
                 properties:
                   servicePrincipal:
