@@ -61,7 +61,8 @@ spec:
                 type: string
                 pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}\/event[Hh]ubs\/[a-zA-Z0-9][\w.-]{0,49}$
               auth:
-                description: Authentication method to interact with the Azure Event Hubs REST API. If it not present, it will try to use Azure AKS Managed Identity
+                description: Authentication method to interact with the Azure Event Hubs REST API. If it not present, it will
+                  try to use Azure AKS Managed Identity
                 type: object
                 properties:
                   sasToken:
