@@ -86,7 +86,6 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 		if err != nil {
 			return nil, nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
 		}
-
 	} else {
 		iamCreds := stscreds.NewCredentials(sess, src.Spec.Auth.EksIAMRole.String())
 		cred, err := iamCreds.Get()
