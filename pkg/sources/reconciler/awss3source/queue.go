@@ -42,7 +42,7 @@ import (
 
 // ensureQueue ensures the existence of a SQS queue for sending S3 event
 // notifications.
-func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, error) {
+func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, error) {
 	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 

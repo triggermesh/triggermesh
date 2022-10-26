@@ -55,12 +55,12 @@ func NewController(
 	informer := informerv1alpha1.Get(ctx)
 
 	r := &Reconciler{
-		S3Cg:       s3.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
+		s3Cg:       s3.NewClientGetter(k8sclient.Get(ctx).CoreV1().Secrets),
 		adapterCfg: adapterCfg,
 	}
 	impl := reconcilerv1alpha1.NewImpl(ctx, r)
 
-	r.Base = common.NewGenericDeploymentReconciler[*v1alpha1.AWSS3Source](
+	r.base = common.NewGenericDeploymentReconciler[*v1alpha1.AWSS3Source](
 		ctx,
 		typ.GetGroupVersionKind(),
 		impl.Tracker,
