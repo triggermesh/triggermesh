@@ -103,7 +103,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudPu
 	// The finalizer blocks the deletion of the source object until
 	// ensureNoSubscription succeeds to ensure that we don't leave any
 	// dangling resources behind us.
-	return ensureNoSubscription(ctx, pubsubCli)
+	return EnsureNoSubscription(ctx, pubsubCli)
 }
 
 // isNoCredentials returns whether the given error indicates that some required

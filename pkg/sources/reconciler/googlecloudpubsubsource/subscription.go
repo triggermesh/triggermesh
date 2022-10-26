@@ -149,12 +149,12 @@ func ensureSubscription(ctx context.Context, cli *pubsub.Client) error {
 	return nil
 }
 
-// ensureNoSubscription ensures that the Pub/Sub subscription created for
+// EnsureNoSubscription ensures that the Pub/Sub subscription created for
 // receiving messages from the desired topic is deleted.
 // Required permissions:
 // - pubsub.subscriptions.get
 // - pubsub.subscriptions.delete
-func ensureNoSubscription(ctx context.Context, cli *pubsub.Client) error {
+func EnsureNoSubscription(ctx context.Context, cli *pubsub.Client) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
