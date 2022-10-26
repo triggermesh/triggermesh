@@ -172,16 +172,6 @@ var _ = Describe("Azure EventHubs", func() {
 		})
 
 		Specify("the API server rejects the creation of that object", func() {
-			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-empty-credentials", sink,
-					withSubscriptionID(subscriptionID),
-					withEventHubID(createEventhubID(subscriptionID, ns)),
-				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.auth: Required value`))
-			})
-
 			By("omitting the eventHubID", func() {
 				_, err := createSource(srcClient, ns, "test-missing-eventHubID", sink,
 					withServicePrincipal(),

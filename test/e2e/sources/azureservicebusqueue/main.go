@@ -175,8 +175,6 @@ var _ = Describe("Azure ServiceBusQueue", func() {
 	})
 
 	When("a client creates a source object with invalid specs", func() {
-		var fakeQueueID string
-
 		// Those tests do not require a real sink
 		BeforeEach(func() {
 			sink = &duckv1.Destination{
@@ -186,21 +184,9 @@ var _ = Describe("Azure ServiceBusQueue", func() {
 					Name:       "fake",
 				},
 			}
-
-			fakeQueueID = fmt.Sprintf("/subscriptions/%s/resourceGroups/%s/providers/Microsoft.ServiceBus/namespaces/%s/queues/%s", subscriptionID, ns, ns, "fakeQueue")
 		})
 
 		Specify("the API server rejects the creation of that object", func() {
-			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-empty-credentials", sink,
-					withSubscriptionID(subscriptionID),
-					withQueueID(fakeQueueID),
-				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.auth: Required value`))
-			})
-
 			By("setting an invalid queue name", func() {
 				_, err := createSource(srcClient, ns, "test-invalid-queueName", sink,
 					withSubscriptionID(subscriptionID),
