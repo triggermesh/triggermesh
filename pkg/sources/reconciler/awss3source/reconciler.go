@@ -91,7 +91,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSS3Source
 			"Error creating AWS API clients: %s", err)
 	}
 
-	if err := ensureNoQueue(ctx, sqsClient); err != nil {
+	if err := EnsureNoQueue(ctx, sqsClient); err != nil {
 		return fmt.Errorf("failed to finalize SQS queue: %w", err)
 	}
 
