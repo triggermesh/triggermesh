@@ -55,6 +55,7 @@ type AzureEventHubSourceSpec struct {
 	EventHubID AzureResourceID `json:"eventHubID"`
 
 	// Authentication method to interact with the Azure Event Hubs API.
+	// If it not present, it will try to use Azure AKS Managed Identity
 	Auth AzureAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.

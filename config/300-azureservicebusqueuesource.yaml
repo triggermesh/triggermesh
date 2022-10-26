@@ -65,7 +65,8 @@ spec:
                 type: string
                 pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.ServiceBus\/namespaces\/[A-Za-z0-9-]{6,50}\/queues\/[A-Za-z0-9][\w.~/-]{0,258}[A-Za-z0-9]$
               auth:
-                description: Authentication method to interact with the Azure Service Bus Queue.
+                description: Authentication method to interact with the Azure Service Bus Queue. If it not present, it will
+                  try to use Azure AKS Managed Identity
                 type: object
                 properties:
                   servicePrincipal:
@@ -314,7 +315,6 @@ spec:
                           format: int64
             required:
             - queueID
-            - auth
             - sink
           status:
             description: Reported status of the event source.
