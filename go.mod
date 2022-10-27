@@ -51,7 +51,7 @@ require (
 	github.com/google/cel-go v0.11.2
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
-	github.com/ibm-messaging/mq-golang/v5 v5.3.1
+	github.com/ibm-messaging/mq-golang/v5 v5.3.2
 	github.com/itchyny/gojq v0.12.9
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
