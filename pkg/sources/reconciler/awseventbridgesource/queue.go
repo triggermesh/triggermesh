@@ -42,17 +42,17 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/sqs"
 )
 
-// sqsQueueStruct wraps information about a SQS queue.
-type sqsQueue struct {
-	url    string
-	arn    string
-	policy string
+// SQSQueueStruct wraps information about a SQS queue.
+type SQSQueue struct {
+	URL    string
+	ARN    string
+	Policy string
 }
 
 // EnsureQueue ensures the existence of a SQS queue for sending EventBridge events.
-func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (*sqsQueue, error) {
+func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (*SQSQueue, error) {
 	if skip.Skip(ctx) {
-		return &sqsQueue{}, nil
+		return &SQSQueue{}, nil
 	}
 
 	src := commonv1alpha1.ReconcilableFromContext(ctx)
@@ -63,8 +63,8 @@ func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (*sqsQueue, error) {
 	if dest := typedSrc.Spec.Destination; dest != nil {
 		if userProvidedQueue := dest.SQS; userProvidedQueue != nil {
 			status.QueueARN = &userProvidedQueue.QueueARN
-			return &sqsQueue{
-				arn: userProvidedQueue.QueueARN.String(),
+			return &SQSQueue{
+				ARN: userProvidedQueue.QueueARN.String(),
 			}, nil
 		}
 	}
@@ -113,10 +113,10 @@ func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (*sqsQueue, error) {
 
 	queuePolicy := queueAttrs[awssqs.QueueAttributeNamePolicy]
 
-	return &sqsQueue{
-		url:    queueURL,
-		arn:    queueARN,
-		policy: queuePolicy,
+	return &SQSQueue{
+		URL:    queueURL,
+		ARN:    queueARN,
+		Policy: queuePolicy,
 	}, nil
 }
 
@@ -184,7 +184,7 @@ func EnsureNoQueue(ctx context.Context, cli sqsiface.SQSAPI, queueName string) e
 
 // EnsureQueuePolicy ensures that the correct access policy is applied to the
 // given SQS queue.
-func EnsureQueuePolicy(ctx context.Context, cli sqsiface.SQSAPI, queue *sqsQueue, ruleARN *apis.ARN) error {
+func EnsureQueuePolicy(ctx context.Context, cli sqsiface.SQSAPI, queue *SQSQueue, ruleARN *apis.ARN) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -200,10 +200,10 @@ func EnsureQueuePolicy(ctx context.Context, cli sqsiface.SQSAPI, queue *sqsQueue
 		}
 	}
 
-	currentPol := unmarshalQueuePolicy(queue.policy)
-	desiredPol := makeQueuePolicy(queue.arn, ruleARN.String(), typedSrc)
+	currentPol := unmarshalQueuePolicy(queue.Policy)
+	desiredPol := makeQueuePolicy(queue.ARN, ruleARN.String(), typedSrc)
 
-	err := syncQueuePolicy(cli, queue.url, currentPol, desiredPol)
+	err := syncQueuePolicy(cli, queue.URL, currentPol, desiredPol)
 	switch {
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.AWSEventBridgeReasonAPIError, "Request to SQS API got rejected")

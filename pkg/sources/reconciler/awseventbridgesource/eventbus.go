@@ -69,7 +69,7 @@ const awsTagOwner = "owned-by"
 // - events:PutRule
 // - events:TagResource
 func EnsureRule(ctx context.Context,
-	cli eventbridgeiface.EventBridgeAPI, queue *sqsQueue) (*apis.ARN /*rule*/, error) {
+	cli eventbridgeiface.EventBridgeAPI, queue *SQSQueue) (*apis.ARN /*rule*/, error) {
 
 	if skip.Skip(ctx) {
 		return nil, nil
@@ -80,7 +80,7 @@ func EnsureRule(ctx context.Context,
 
 	status := &typedSrc.Status
 
-	currentRule, err := getRule(ctx, cli, typedSrc, queue.arn)
+	currentRule, err := getRule(ctx, cli, typedSrc, queue.ARN)
 	switch {
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.AWSEventBridgeReasonNoEventBus, "Event bus does not exist")
