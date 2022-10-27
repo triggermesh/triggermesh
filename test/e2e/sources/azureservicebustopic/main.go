@@ -175,8 +175,6 @@ var _ = Describe("Azure ServiceBusTopic", func() {
 	})
 
 	When("a client creates a source object with invalid specs", func() {
-		var fakeTopicID string
-
 		// Those tests do not require a real sink
 		BeforeEach(func() {
 			sink = &duckv1.Destination{
@@ -186,21 +184,9 @@ var _ = Describe("Azure ServiceBusTopic", func() {
 					Name:       "fake",
 				},
 			}
-
-			fakeTopicID = fmt.Sprintf("/subscriptions/%s/resourceGroups/%s/providers/Microsoft.ServiceBus/namespaces/%s/topics/%s", subscriptionID, ns, ns, "fakeTopic")
 		})
 
 		Specify("the API server rejects the creation of that object", func() {
-			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-empty-credentials", sink,
-					withSubscriptionID(subscriptionID),
-					withTopicID(fakeTopicID),
-				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.auth: Required value`))
-			})
-
 			By("setting an invalid topic name", func() {
 				_, err := createSource(srcClient, ns, "test-invalid-topicName", sink,
 					withSubscriptionID(subscriptionID),

@@ -265,16 +265,6 @@ var _ = Describe("Azure Blob Storage source", func() {
 				Expect(err.Error()).To(ContainSubstring(`Unsupported value: "Microsoft.NotStorage.FakeEvent"`))
 			})
 
-			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
-					withStorageAccount(storageAccountID),
-					withEventHubsNamespaceID(eventHubsNamespaceID),
-				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.auth: Required value`))
-			})
-
 			By("omitting the Event Hubs endpoint", func() {
 				_, err := createSource(srcClient, ns, "test-no-eventhubs-", sink,
 					withServicePrincipal(),

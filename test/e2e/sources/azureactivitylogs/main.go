@@ -221,17 +221,6 @@ var _ = Describe("Azure Activity Logs source", func() {
 				Expect(err.Error()).To(ContainSubstring("spec.subscriptionID: Invalid value: "))
 			})
 
-			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
-					withSubscriptionID(subscriptionID),
-					withActivityCategories(activityCategories),
-					withEventHubsNamespaceID(eventHubsNamespaceID),
-				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.auth: Required value`))
-			})
-
 			By("omitting destination", func() {
 				_, err := createSource(srcClient, ns, "test-no-eventhubs-", sink,
 					withServicePrincipal(),
