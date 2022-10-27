@@ -75,7 +75,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSEventBr
 		return fmt.Errorf("failed to apply access policy to SQS queue: %w", err)
 	}
 
-	if err := SetRuleTarget(ctx, ebClient, ruleARN, queue.arn); err != nil {
+	if err := SetRuleTarget(ctx, ebClient, ruleARN, queue.ARN); err != nil {
 		return fmt.Errorf("failed to set target on event rule: %w", err)
 	}
 
