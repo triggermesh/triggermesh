@@ -75,7 +75,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudP
 			"Error obtaining Google Cloud client: %s", err))
 	}
 
-	if err := ensureSubscription(ctx, pubsubCli); err != nil {
+	if err := EnsureSubscription(ctx, pubsubCli); err != nil {
 		return fmt.Errorf("failed to reconcile Pub/Sub subscription: %w", err)
 	}
 
