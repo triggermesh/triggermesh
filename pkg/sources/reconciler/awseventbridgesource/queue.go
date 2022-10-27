@@ -49,8 +49,8 @@ type sqsQueue struct {
 	policy string
 }
 
-// ensureQueue ensures the existence of a SQS queue for sending EventBridge events.
-func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (*sqsQueue, error) {
+// EnsureQueue ensures the existence of a SQS queue for sending EventBridge events.
+func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (*sqsQueue, error) {
 	if skip.Skip(ctx) {
 		return &sqsQueue{}, nil
 	}
@@ -120,8 +120,8 @@ func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (*sqsQueue, error) {
 	}, nil
 }
 
-// ensureNoQueue ensures that the SQS queue used for sending EventBridge events is deleted.
-func ensureNoQueue(ctx context.Context, cli sqsiface.SQSAPI, queueName string) error {
+// EnsureNoQueue ensures that the SQS queue used for sending EventBridge events is deleted.
+func EnsureNoQueue(ctx context.Context, cli sqsiface.SQSAPI, queueName string) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -182,9 +182,9 @@ func ensureNoQueue(ctx context.Context, cli sqsiface.SQSAPI, queueName string) e
 	return nil
 }
 
-// ensureQueuePolicy ensures that the correct access policy is applied to the
+// EnsureQueuePolicy ensures that the correct access policy is applied to the
 // given SQS queue.
-func ensureQueuePolicy(ctx context.Context, cli sqsiface.SQSAPI, queue *sqsQueue, ruleARN *apis.ARN) error {
+func EnsureQueuePolicy(ctx context.Context, cli sqsiface.SQSAPI, queue *sqsQueue, ruleARN *apis.ARN) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
