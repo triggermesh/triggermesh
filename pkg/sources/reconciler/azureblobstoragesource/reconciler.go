@@ -72,7 +72,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureBlobSto
 			"Error obtaining Azure clients: %s", err))
 	}
 
-	eventHubResID, err := ensureEventHub(ctx, eventHubsCli)
+	eventHubResID, err := EnsureEventHub(ctx, eventHubsCli)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile Event Hub: %w", err)
 	}
@@ -81,7 +81,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureBlobSto
 		return fmt.Errorf("failed to reconcile Event Hubs event source adapter: %w", err)
 	}
 
-	return ensureEventSubscription(ctx, eventSubsCli, eventHubResID)
+	return EnsureEventSubscription(ctx, eventSubsCli, eventHubResID)
 }
 
 // FinalizeKind is called when the resource is deleted.
@@ -106,11 +106,11 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureBlobStor
 	// deletion of the event subscription and Event Hub succeed to ensure
 	// that we don't leave any dangling resources behind us.
 
-	if err := ensureNoEventSubscription(ctx, eventSubsCli); err != nil {
+	if err := EnsureNoEventSubscription(ctx, eventSubsCli); err != nil {
 		return fmt.Errorf("failed to finalize event subscription: %w", err)
 	}
 
-	return ensureNoEventHub(ctx, eventHubsCli)
+	return EnsureNoEventHub(ctx, eventHubsCli)
 }
 
 // isNoCredentials returns whether the given error indicates that some required
