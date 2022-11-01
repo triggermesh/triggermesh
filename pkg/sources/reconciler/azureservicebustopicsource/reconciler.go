@@ -72,7 +72,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureService
 			"Error obtaining Azure clients: %s", err))
 	}
 
-	if err := ensureSubscription(ctx, subsCli); err != nil {
+	if err := EnsureSubscription(ctx, subsCli); err != nil {
 		return fmt.Errorf("failed to reconcile Service Bus Subscription: %w", err)
 	}
 
@@ -101,7 +101,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureServiceB
 	// deletion of the Subscription succeeds to ensure that we don't leave
 	// any dangling resources behind us.
 
-	return ensureNoSubscription(ctx, subsCli)
+	return EnsureNoSubscription(ctx, subsCli)
 }
 
 // isNoCredentials returns whether the given error indicates that some required
