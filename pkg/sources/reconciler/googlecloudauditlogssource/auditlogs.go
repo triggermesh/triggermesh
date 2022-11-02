@@ -38,7 +38,7 @@ const (
 	publisherRole = "roles/pubsub.publisher"
 )
 
-func reconcileSink(ctx context.Context, lacli *logadmin.Client, pscli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
+func ReconcileSink(ctx context.Context, lacli *logadmin.Client, pscli *pubsub.Client, topicResName *v1alpha1.GCloudResourceName) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -137,11 +137,11 @@ func ensureSinkIsPublisher(ctx context.Context, sink *logadmin.Sink, cli *pubsub
 	return nil
 }
 
-// ensureNoSink looks at status.AuditLogSink and if non-empty will delete it
+// EnsureNoSink looks at status.AuditLogSink and if non-empty will delete it
 // Required permissions:
 // - logging.sinks.get
 // - logging.sinks.delete
-func (r *Reconciler) ensureNoSink(ctx context.Context, cli *logadmin.Client) error {
+func EnsureNoSink(ctx context.Context, cli *logadmin.Client) error {
 	if skip.Skip(ctx) {
 		return nil
 	}

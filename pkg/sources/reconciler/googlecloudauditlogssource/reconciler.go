@@ -76,12 +76,12 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudA
 			"Error obtaining Google Cloud clients: %s", err))
 	}
 
-	topic, err := ensurePubSub(ctx, pubsubCli)
+	topic, err := EnsurePubSub(ctx, pubsubCli)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile Pub/Sub resources: %w", err)
 	}
 
-	if err = reconcileSink(ctx, logadminCli, pubsubCli, topic); err != nil {
+	if err = ReconcileSink(ctx, logadminCli, pubsubCli, topic); err != nil {
 		return fmt.Errorf("failed to reconcile audit logs resources: %w", err)
 	}
 
@@ -110,11 +110,11 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudAu
 	// deletesink and ensureNoPubSub succeed to ensure that
 	// we don't leave any dangling resources behind us.
 
-	if err := r.ensureNoSink(ctx, logadminCli); err != nil {
+	if err := EnsureNoSink(ctx, logadminCli); err != nil {
 		return fmt.Errorf("failed to clean up AuditLogs Sink resource: %w", err)
 	}
 
-	if err := ensureNoPubSub(ctx, pubsubCli); err != nil {
+	if err := EnsureNoPubSub(ctx, pubsubCli); err != nil {
 		return fmt.Errorf("failed to clean up Pub/Sub resources: %w", err)
 	}
 
