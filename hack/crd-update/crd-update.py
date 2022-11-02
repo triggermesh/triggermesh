@@ -114,7 +114,7 @@ try:
               description: URI to use as the destination of events.
               type: string
               format: uri
-          oneOf:
+          anyOf:
           - required: [ref]
           - required: [uri]
         """
