@@ -36,12 +36,12 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
-// ensureNotificationConfig ensures the existence of a notification
+// EnsureNotificationConfig ensures the existence of a notification
 // configuration targetting the given Pub/Sub topic on a Cloud Storage bucket.
 // Required permissions:
 // - storage.buckets.get
 // - storage.buckets.update
-func ensureNotificationConfig(ctx context.Context, cli *storage.Client,
+func EnsureNotificationConfig(ctx context.Context, cli *storage.Client,
 	topicResName *v1alpha1.GCloudResourceName) error {
 
 	if skip.Skip(ctx) {
@@ -103,11 +103,11 @@ func ensureNotificationConfig(ctx context.Context, cli *storage.Client,
 	return nil
 }
 
-// ensureNoNotificationConfig ensures that the notification
+// EnsureNoNotificationConfig ensures that the notification
 // configuration is deleted.
 // Required permissions:
 // - storage.buckets.update
-func ensureNoNotificationConfig(ctx context.Context, cli *storage.Client) error {
+func EnsureNoNotificationConfig(ctx context.Context, cli *storage.Client) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
