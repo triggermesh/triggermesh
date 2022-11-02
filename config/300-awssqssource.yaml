@@ -169,7 +169,7 @@ spec:
                     description: URI to use as the destination of events.
                     type: string
                     format: uri
-                anyOf:
+                oneOf:
                 - required: [ref]
                 - required: [uri]
               adapterOverrides:
