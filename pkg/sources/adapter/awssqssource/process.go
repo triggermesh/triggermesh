@@ -54,7 +54,7 @@ func (a *adapter) runMessagesProcessor(ctx context.Context) {
 				continue
 			}
 
-			var sendError bool = false
+			sendError := false
 			for _, event := range events {
 				if err := sendSQSEvent(ctx, a.ceClient, event); err != nil {
 					a.logger.Errorw("Failed to send event to the sink", zap.Error(err))
