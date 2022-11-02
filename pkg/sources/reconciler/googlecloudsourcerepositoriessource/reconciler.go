@@ -76,7 +76,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudS
 			"Error obtaining Google Cloud clients: %s", err))
 	}
 
-	topic, err := ensurePubSub(ctx, pubsubCli)
+	topic, err := EnsurePubSub(ctx, pubsubCli)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile Pub/Sub resources: %w", err)
 	}
@@ -119,7 +119,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudSo
 		return fmt.Errorf("failed to clean up Repo notification: %w", err)
 	}
 
-	if err := ensureNoPubSub(ctx, pubsubCli); err != nil {
+	if err := EnsureNoPubSub(ctx, pubsubCli); err != nil {
 		return fmt.Errorf("failed to clean up Pub/Sub resources: %w", err)
 	}
 
