@@ -54,14 +54,17 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 
 	return common.NewAdapterKnService(trg, nil,
 		resource.Image(r.adapterCfg.Image),
-		resource.EnvVars(makeAppEnv(typedTrg)...),
-		resource.EnvVar("GCLOUD_PUBSUB_TOPIC", typedTrg.Spec.Topic.String()),
+		resource.EnvVars(MakeAppEnv(typedTrg)...),
 		resource.EnvVars(r.adapterCfg.obsConfig.ToEnvVars()...),
 	), nil
 }
 
-func makeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
+func MakeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
 	env := []corev1.EnvVar{
+		{
+			Name:  "GCLOUD_PUBSUB_TOPIC",
+			Value: o.Spec.Topic.String(),
+		},
 		{
 			Name: common.EnvGCloudSAKey,
 			ValueFrom: &corev1.EnvVarSource{
