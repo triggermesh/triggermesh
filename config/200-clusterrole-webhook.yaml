@@ -87,7 +87,6 @@ rules:
   - secrets
   verbs:
   - get
-  - create
   - update
   - list
   - watch

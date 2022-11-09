@@ -37,25 +37,17 @@ rules:
   resources:
   - deployments
   verbs:
-  - get
   - list
   - watch
   - create
   - update
-  - delete
-  - patch
 - apiGroups:
   - serving.knative.dev
   resources:
   - services
   verbs:
-  - get
-  - list
-  - watch
   - create
   - update
-  - delete
-  - patch
 
 # Read reconciled TriggerMesh resources and update their statuses
 # +rbac-check
