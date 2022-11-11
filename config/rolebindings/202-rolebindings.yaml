@@ -12,33 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Gives the triggermesh-controller access to namespaces in which this RoleBinding is created.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: triggermesh-webhook-namespaced
-  namespace: triggermesh
+  name: triggermesh-controller
   labels:
     app.kubernetes.io/part-of: triggermesh
 subjects:
 - kind: ServiceAccount
-  name: triggermesh-webhook
+  name: triggermesh-controller
   namespace: triggermesh
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: triggermesh-webhook-namespaced
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: triggermesh-webhook
-  labels:
-    app.kubernetes.io/part-of: triggermesh
-subjects:
-- kind: ServiceAccount
-  name: triggermesh-webhook
-  namespace: triggermesh
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: triggermesh-webhook
+  name: triggermesh-controller

@@ -15,7 +15,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: triggermesh-webhook
+  name: triggermesh-webhook-namespaced
   labels:
     app.kubernetes.io/part-of: triggermesh
 
@@ -92,6 +92,16 @@ rules:
   - list
   - watch
 
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-webhook
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+
+rules:
 # Validation webhook gets system namespace to use it as an owner.
 - apiGroups:
   - ''

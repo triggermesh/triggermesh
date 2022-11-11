@@ -15,6 +15,102 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  name: triggermesh-controller-watcher
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+
+rules:
+# List and watch receive-adapters
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - list
+  - watch
+
+# List and watch reconciled TriggerMesh resources
+# +rbac-check
+- apiGroups:
+  - sources.triggermesh.io
+  resources:
+  - awscloudwatchlogssources
+  - awscloudwatchsources
+  - awscodecommitsources
+  - awscognitoidentitysources
+  - awscognitouserpoolsources
+  - awsdynamodbsources
+  - awseventbridgesources
+  - awskinesissources
+  - awsperformanceinsightssources
+  - awss3sources
+  - awssnssources
+  - awssqssources
+  - azureactivitylogssources
+  - azureblobstoragesources
+  - azureeventgridsources
+  - azureeventhubsources
+  - azureiothubsources
+  - azurequeuestoragesources
+  - azureservicebusqueuesources
+  - azureservicebustopicsources
+  - cloudeventssources
+  - googlecloudauditlogssources
+  - googlecloudbillingsources
+  - googlecloudiotsources
+  - googlecloudpubsubsources
+  - googlecloudsourcerepositoriessources
+  - googlecloudstoragesources
+  - httppollersources
+  - ibmmqsources
+  - kafkasources
+  - ocimetricssources
+  - salesforcesources
+  - slacksources
+  - twiliosources
+  - webhooksources
+  - zendesksources
+  verbs:
+  - list
+  - watch
+
+# List and watch resource-specific ServiceAccounts and RoleBindings
+- apiGroups:
+  - ''
+  resources:
+  - serviceaccounts
+  - serviceaccounts/finalizers
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - list
+  - watch
+
+# Observe status of Pods and their ancestors
+- apiGroups:
+  - ''
+  resources:
+  - pods
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - list
+  - watch
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
   name: triggermesh-controller
   labels:
     app.kubernetes.io/part-of: triggermesh

@@ -32,6 +32,32 @@ Deploy the platform:
 kubectl apply -f https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh.yaml
 ```
 
+> By default the `triggermesh-controller` can manage resources in all namespaces, to explicitly specify the 
+> namespaces, first delete the default `triggermesh-controller` ClusterRoleBinding
+> 
+> ```shell
+> $ kubectl delete clusterrolebinding triggermesh-controller
+> ```
+> 
+> and create the following RoleBinding in the namespaces you want to be accessible by the `triggermesh-controller`
+> 
+> ```yaml
+> apiVersion: rbac.authorization.k8s.io/v1
+> kind: RoleBinding
+> metadata:
+>   name: triggermesh-controller
+>   labels:
+>     app.kubernetes.io/part-of: triggermesh
+> subjects:
+>   - kind: ServiceAccount
+>     name: triggermesh-controller
+>     namespace: triggermesh
+> roleRef:
+>   apiGroup: rbac.authorization.k8s.io
+>   kind: ClusterRole
+>   name: triggermesh-controller
+> ```
+
 ## Contributing
 
 Please refer to our [guidelines for contributors](CONTRIBUTING.md).
