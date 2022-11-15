@@ -110,7 +110,7 @@ jobs:
     # e.g. use 'gcloud' as a Git credential helper to interact with Google
     # Cloud Source Repositories.
     - name: Authenticate with Google Cloud
-      uses: google-github-actions/auth@v0
+      uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
 
