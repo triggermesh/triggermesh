@@ -41,7 +41,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.16.0
-	github.com/aws/aws-sdk-go v1.44.118
+	github.com/aws/aws-sdk-go v1.44.137
 	github.com/basgys/goxml2json v1.1.0
 	github.com/clbanning/mxj v1.8.4
 	github.com/devigned/tab v0.1.1
