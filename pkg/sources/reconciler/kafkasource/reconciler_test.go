@@ -74,7 +74,7 @@ func newEventSource() *v1alpha1.KafkaSource {
 	src := &v1alpha1.KafkaSource{
 		Spec: v1alpha1.KafkaSourceSpec{
 			BootstrapServers: []string{"localhost:9092"},
-			Topics:           []string{"test-topic"},
+			Topic:            "test-topic",
 			GroupID:          "test-consumer-group",
 			Auth: v1alpha1.KafkaSourceAuth{
 				SASLEnable:         true,

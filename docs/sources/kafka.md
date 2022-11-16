@@ -31,8 +31,7 @@ spec:
   groupID: test-consumer-group
   bootstrapServers:
     - kafka.example.com:9092
-  topics: 
-    - test-topic
+  topic: test-topic
   auth:
     saslEnable: true
     tlsEnable: false
@@ -72,8 +71,7 @@ spec:
   groupID: test-consumer-group
   bootstrapServers:
     - kafka.example.com:9093
-  topics: 
-    - test-topic
+  topic: test-topic
   auth:
     saslEnable: true
     tlsEnable: true
@@ -106,7 +104,7 @@ spec:
 In order to configure the adapter correctly the following fields are mandatory:
 
 - `boostrapservers`
-- `topics`
+- `topic`
 - `salsEnable`
 
 ### Status
