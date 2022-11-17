@@ -52,12 +52,9 @@ spec:
             description: Desired state of the event source.
             type: object
             properties:
-              topics:
+              topic:
                 description: Topic name to stream the target events to.
-                type: array
-                items:
-                  type: string
-                  minLength: 1
+                type: string
               bootstrapServers:
                 description: Array of Kafka servers used to bootstrap the connection.
                 type: array
@@ -327,7 +324,7 @@ spec:
                           format: int64
             required:
             - bootstrapServers
-            - topics
+            - topic
             - groupID
             - sink
           status:

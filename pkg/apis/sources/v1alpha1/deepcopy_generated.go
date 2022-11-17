@@ -3695,11 +3695,6 @@ func (in *KafkaSourceSpec) DeepCopyInto(out *KafkaSourceSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	if in.Topics != nil {
-		in, out := &in.Topics, &out.Topics
-		*out = make([]string, len(*in))
-		copy(*out, *in)
-	}
 	in.Auth.DeepCopyInto(&out.Auth)
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
