@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	billing "cloud.google.com/go/billing/budgets/apiv1"
-	budgets "google.golang.org/genproto/googleapis/cloud/billing/budgets/v1"
+	budgets "cloud.google.com/go/billing/budgets/apiv1/budgetspb"
 	corev1 "k8s.io/api/core/v1"
 	"knative.dev/pkg/controller"
 	"knative.dev/pkg/reconciler"
