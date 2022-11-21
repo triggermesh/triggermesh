@@ -57,8 +57,8 @@ require (
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
 	github.com/nukosuke/go-zendesk v0.13.1
-	github.com/onsi/ginkgo/v2 v2.4.0
-	github.com/onsi/gomega v1.22.1
+	github.com/onsi/ginkgo/v2 v2.5.1
+	github.com/onsi/gomega v1.24.0
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
@@ -221,7 +221,7 @@ require (
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/term v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
