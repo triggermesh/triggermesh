@@ -127,8 +127,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudAuditLogsSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudbillingsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudBillingSources().Informer()}, nil
-	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudiotsources"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudIoTSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudpubsubsources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().GoogleCloudPubSubSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("googlecloudsourcerepositoriessources"):
@@ -201,8 +199,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().HasuraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("ibmmqtargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().IBMMQTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("infratargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().InfraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("jiratargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().JiraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("kafkatargets"):
@@ -225,8 +221,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().TektonTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("twiliotargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().TwilioTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("uipathtargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().UiPathTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("zendesktargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().ZendeskTargets().Informer()}, nil
 

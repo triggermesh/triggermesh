@@ -51,7 +51,6 @@ type TargetsV1alpha1Interface interface {
 	HTTPTargetsGetter
 	HasuraTargetsGetter
 	IBMMQTargetsGetter
-	InfraTargetsGetter
 	JiraTargetsGetter
 	KafkaTargetsGetter
 	LogzMetricsTargetsGetter
@@ -63,7 +62,6 @@ type TargetsV1alpha1Interface interface {
 	SplunkTargetsGetter
 	TektonTargetsGetter
 	TwilioTargetsGetter
-	UiPathTargetsGetter
 	ZendeskTargetsGetter
 }
 
@@ -164,10 +162,6 @@ func (c *TargetsV1alpha1Client) IBMMQTargets(namespace string) IBMMQTargetInterf
 	return newIBMMQTargets(c, namespace)
 }
 
-func (c *TargetsV1alpha1Client) InfraTargets(namespace string) InfraTargetInterface {
-	return newInfraTargets(c, namespace)
-}
-
 func (c *TargetsV1alpha1Client) JiraTargets(namespace string) JiraTargetInterface {
 	return newJiraTargets(c, namespace)
 }
@@ -210,10 +204,6 @@ func (c *TargetsV1alpha1Client) TektonTargets(namespace string) TektonTargetInte
 
 func (c *TargetsV1alpha1Client) TwilioTargets(namespace string) TwilioTargetInterface {
 	return newTwilioTargets(c, namespace)
-}
-
-func (c *TargetsV1alpha1Client) UiPathTargets(namespace string) UiPathTargetInterface {
-	return newUiPathTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) ZendeskTargets(namespace string) ZendeskTargetInterface {

@@ -27,7 +27,7 @@ spec:
   broker: jira
   filter:
     attributes:
-      type: infra.type
+      type: jira.type
   subscriber:
     ref:
       apiVersion: targets.triggermesh.io/v1alpha1
@@ -44,7 +44,7 @@ spec:
   broker: jira
   filter:
     attributes:
-      type: infra.type
+      type: jira.type
   subscriber:
     ref:
       apiVersion: serving.knative.dev/v1

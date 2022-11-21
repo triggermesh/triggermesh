@@ -51,7 +51,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/cloudeventssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudauditlogssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudbillingsource"
-	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudiotsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudpubsubsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudsourcerepositoriessource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/googlecloudstoragesource"
@@ -87,7 +86,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/hasuratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/httptarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/ibmmqtarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/infratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/jiratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/kafkatarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/logzmetricstarget"
@@ -99,7 +97,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/splunktarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/tektontarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/twiliotarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/uipathtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
 )
 
@@ -129,7 +126,6 @@ func main() {
 		cloudeventssource.NewController,
 		googlecloudauditlogssource.NewController,
 		googlecloudbillingsource.NewController,
-		googlecloudiotsource.NewController,
 		googlecloudpubsubsource.NewController,
 		googlecloudsourcerepositoriessource.NewController,
 		googlecloudstoragesource.NewController,
@@ -167,7 +163,6 @@ func main() {
 		httptarget.NewController,
 		ibmmqtarget.NewController,
 		datadogtarget.NewController,
-		infratarget.NewController,
 		jiratarget.NewController,
 		kafkatarget.NewController,
 		logztarget.NewController,
@@ -179,7 +174,6 @@ func main() {
 		splunktarget.NewController,
 		tektontarget.NewController,
 		twiliotarget.NewController,
-		uipathtarget.NewController,
 		zendesktarget.NewController,
 		// flow
 		jqtransformation.NewController,

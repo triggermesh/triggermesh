@@ -85,7 +85,6 @@ rules:
   - cloudeventssources
   - googlecloudauditlogssources
   - googlecloudbillingsources
-  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
@@ -129,7 +128,6 @@ rules:
   - cloudeventssources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
-  - googlecloudiotsources/status
   - googlecloudpubsubsources/status
   - googlecloudsourcerepositoriessources/status
   - googlecloudstoragesources/status
@@ -171,7 +169,6 @@ rules:
   - hasuratargets
   - httptargets
   - ibmmqtargets
-  - infratargets
   - jiratargets
   - kafkatargets
   - logzmetricstargets
@@ -183,7 +180,6 @@ rules:
   - splunktargets
   - tektontargets
   - twiliotargets
-  - uipathtargets
   - zendesktargets
   verbs:
   - list
@@ -216,7 +212,6 @@ rules:
   - hasuratargets/status
   - httptargets/status
   - ibmmqtargets/status
-  - infratargets/status
   - jiratargets/status
   - kafkatargets/status
   - logzmetricstargets/status
@@ -228,7 +223,6 @@ rules:
   - splunktargets/status
   - tektontargets/status
   - twiliotargets/status
-  - uipathtargets/status
   - zendesktargets/status
   verbs:
   - update
@@ -322,7 +316,6 @@ rules:
   - cloudeventssources/finalizers
   - googlecloudauditlogssources/finalizers
   - googlecloudbillingsources/finalizers
-  - googlecloudiotsources/finalizers
   - googlecloudpubsubsources/finalizers
   - googlecloudsourcerepositoriessources/finalizers
   - googlecloudstoragesources/finalizers
@@ -364,7 +357,6 @@ rules:
   - hasuratargets/finalizers
   - httptargets/finalizers
   - ibmmqtargets/finalizers
-  - infratargets/finalizers
   - jiratargets/finalizers
   - kafkatargets/finalizers
   - logzmetricstargets/finalizers
@@ -376,7 +368,6 @@ rules:
   - splunktargets/finalizers
   - tektontargets/finalizers
   - twiliotargets/finalizers
-  - uipathtargets/finalizers
   - zendesktargets/finalizers
   verbs:
   - update
@@ -422,7 +413,6 @@ rules:
   - azureservicebustopicsources
   - googlecloudauditlogssources
   - googlecloudbillingsources
-  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
@@ -795,7 +785,6 @@ rules:
   - cloudeventssources
   - googlecloudauditlogssources
   - googlecloudbillingsources
-  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
@@ -836,7 +825,6 @@ rules:
   - azureservicebustopicsources/finalizers
   - googlecloudauditlogssources/finalizers
   - googlecloudbillingsources/finalizers
-  - googlecloudiotsources/finalizers
   - googlecloudpubsubsources/finalizers
   - googlecloudsourcerepositoriessources/finalizers
   - googlecloudstoragesources/finalizers
@@ -905,7 +893,6 @@ rules:
   - hasuratargets
   - httptargets
   - ibmmqtargets
-  - infratargets
   - jiratargets
   - kafkatargets
   - logzmetricstargets
@@ -917,7 +904,6 @@ rules:
   - splunktargets
   - tektontargets
   - twiliotargets
-  - uipathtargets
   - zendesktargets
   verbs:
   - get

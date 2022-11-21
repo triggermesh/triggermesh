@@ -259,11 +259,6 @@ func (l *Listers) GetGoogleCloudBillingSourceLister() sourceslistersv1alpha1.Goo
 	return sourceslistersv1alpha1.NewGoogleCloudBillingSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudBillingSource{}))
 }
 
-// GetGoogleCloudIoTSourceLister returns a Lister for GoogleCloudIoTSource objects.
-func (l *Listers) GetGoogleCloudIoTSourceLister() sourceslistersv1alpha1.GoogleCloudIoTSourceLister {
-	return sourceslistersv1alpha1.NewGoogleCloudIoTSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudIoTSource{}))
-}
-
 // GetGoogleCloudPubSubSourceLister returns a Lister for GoogleCloudPubSubSource objects.
 func (l *Listers) GetGoogleCloudPubSubSourceLister() sourceslistersv1alpha1.GoogleCloudPubSubSourceLister {
 	return sourceslistersv1alpha1.NewGoogleCloudPubSubSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudPubSubSource{}))
@@ -434,11 +429,6 @@ func (l *Listers) GetIBMMQTargetLister() targetslistersv1alpha1.IBMMQTargetListe
 	return targetslistersv1alpha1.NewIBMMQTargetLister(l.IndexerFor(&targetsv1alpha1.IBMMQTarget{}))
 }
 
-// GetInfraTargetLister returns a Lister for InfraTarget objects.
-func (l *Listers) GetInfraTargetLister() targetslistersv1alpha1.InfraTargetLister {
-	return targetslistersv1alpha1.NewInfraTargetLister(l.IndexerFor(&targetsv1alpha1.InfraTarget{}))
-}
-
 // GetJiraTargetLister returns a Lister for JiraTarget objects.
 func (l *Listers) GetJiraTargetLister() targetslistersv1alpha1.JiraTargetLister {
 	return targetslistersv1alpha1.NewJiraTargetLister(l.IndexerFor(&targetsv1alpha1.JiraTarget{}))
@@ -492,11 +482,6 @@ func (l *Listers) GetTektonTargetLister() targetslistersv1alpha1.TektonTargetLis
 // GetTwilioTargetLister returns a Lister for TwilioTarget objects.
 func (l *Listers) GetTwilioTargetLister() targetslistersv1alpha1.TwilioTargetLister {
 	return targetslistersv1alpha1.NewTwilioTargetLister(l.IndexerFor(&targetsv1alpha1.TwilioTarget{}))
-}
-
-// GetUiPathTargetLister returns a Lister for UiPathTarget objects.
-func (l *Listers) GetUiPathTargetLister() targetslistersv1alpha1.UiPathTargetLister { //nolint:stylecheck
-	return targetslistersv1alpha1.NewUiPathTargetLister(l.IndexerFor(&targetsv1alpha1.UiPathTarget{}))
 }
 
 // GetZendeskTargetLister returns a Lister for ZendeskTarget objects.

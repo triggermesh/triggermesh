@@ -120,10 +120,6 @@ func (c *FakeTargetsV1alpha1) IBMMQTargets(namespace string) v1alpha1.IBMMQTarge
 	return &FakeIBMMQTargets{c, namespace}
 }
 
-func (c *FakeTargetsV1alpha1) InfraTargets(namespace string) v1alpha1.InfraTargetInterface {
-	return &FakeInfraTargets{c, namespace}
-}
-
 func (c *FakeTargetsV1alpha1) JiraTargets(namespace string) v1alpha1.JiraTargetInterface {
 	return &FakeJiraTargets{c, namespace}
 }
@@ -166,10 +162,6 @@ func (c *FakeTargetsV1alpha1) TektonTargets(namespace string) v1alpha1.TektonTar
 
 func (c *FakeTargetsV1alpha1) TwilioTargets(namespace string) v1alpha1.TwilioTargetInterface {
 	return &FakeTwilioTargets{c, namespace}
-}
-
-func (c *FakeTargetsV1alpha1) UiPathTargets(namespace string) v1alpha1.UiPathTargetInterface {
-	return &FakeUiPathTargets{c, namespace}
 }
 
 func (c *FakeTargetsV1alpha1) ZendeskTargets(namespace string) v1alpha1.ZendeskTargetInterface {
