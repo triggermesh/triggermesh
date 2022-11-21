@@ -202,14 +202,6 @@ type GoogleCloudBillingSourceListerExpansion interface{}
 // GoogleCloudBillingSourceNamespaceLister.
 type GoogleCloudBillingSourceNamespaceListerExpansion interface{}
 
-// GoogleCloudIoTSourceListerExpansion allows custom methods to be added to
-// GoogleCloudIoTSourceLister.
-type GoogleCloudIoTSourceListerExpansion interface{}
-
-// GoogleCloudIoTSourceNamespaceListerExpansion allows custom methods to be added to
-// GoogleCloudIoTSourceNamespaceLister.
-type GoogleCloudIoTSourceNamespaceListerExpansion interface{}
-
 // GoogleCloudPubSubSourceListerExpansion allows custom methods to be added to
 // GoogleCloudPubSubSourceLister.
 type GoogleCloudPubSubSourceListerExpansion interface{}

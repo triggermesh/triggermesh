@@ -60,7 +60,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&KafkaSource{}, &KafkaSourceList{},
 		&GoogleCloudAuditLogsSource{}, &GoogleCloudAuditLogsSourceList{},
 		&GoogleCloudBillingSource{}, &GoogleCloudBillingSourceList{},
-		&GoogleCloudIoTSource{}, &GoogleCloudIoTSourceList{},
 		&GoogleCloudPubSubSource{}, &GoogleCloudPubSubSourceList{},
 		&GoogleCloudSourceRepositoriesSource{}, &GoogleCloudSourceRepositoriesSourceList{},
 		&GoogleCloudStorageSource{}, &GoogleCloudStorageSourceList{},

@@ -85,7 +85,6 @@ rules:
   - cloudeventssources
   - googlecloudauditlogssources
   - googlecloudbillingsources
-  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
@@ -129,7 +128,6 @@ rules:
   - cloudeventssources/status
   - googlecloudauditlogssources/status
   - googlecloudbillingsources/status
-  - googlecloudiotsources/status
   - googlecloudpubsubsources/status
   - googlecloudsourcerepositoriessources/status
   - googlecloudstoragesources/status
@@ -318,7 +316,6 @@ rules:
   - cloudeventssources/finalizers
   - googlecloudauditlogssources/finalizers
   - googlecloudbillingsources/finalizers
-  - googlecloudiotsources/finalizers
   - googlecloudpubsubsources/finalizers
   - googlecloudsourcerepositoriessources/finalizers
   - googlecloudstoragesources/finalizers
@@ -416,7 +413,6 @@ rules:
   - azureservicebustopicsources
   - googlecloudauditlogssources
   - googlecloudbillingsources
-  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
@@ -789,7 +785,6 @@ rules:
   - cloudeventssources
   - googlecloudauditlogssources
   - googlecloudbillingsources
-  - googlecloudiotsources
   - googlecloudpubsubsources
   - googlecloudsourcerepositoriessources
   - googlecloudstoragesources
@@ -830,7 +825,6 @@ rules:
   - azureservicebustopicsources/finalizers
   - googlecloudauditlogssources/finalizers
   - googlecloudbillingsources/finalizers
-  - googlecloudiotsources/finalizers
   - googlecloudpubsubsources/finalizers
   - googlecloudsourcerepositoriessources/finalizers
   - googlecloudstoragesources/finalizers

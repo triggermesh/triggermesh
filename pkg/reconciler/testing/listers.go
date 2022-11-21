@@ -259,11 +259,6 @@ func (l *Listers) GetGoogleCloudBillingSourceLister() sourceslistersv1alpha1.Goo
 	return sourceslistersv1alpha1.NewGoogleCloudBillingSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudBillingSource{}))
 }
 
-// GetGoogleCloudIoTSourceLister returns a Lister for GoogleCloudIoTSource objects.
-func (l *Listers) GetGoogleCloudIoTSourceLister() sourceslistersv1alpha1.GoogleCloudIoTSourceLister {
-	return sourceslistersv1alpha1.NewGoogleCloudIoTSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudIoTSource{}))
-}
-
 // GetGoogleCloudPubSubSourceLister returns a Lister for GoogleCloudPubSubSource objects.
 func (l *Listers) GetGoogleCloudPubSubSourceLister() sourceslistersv1alpha1.GoogleCloudPubSubSourceLister {
 	return sourceslistersv1alpha1.NewGoogleCloudPubSubSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudPubSubSource{}))
