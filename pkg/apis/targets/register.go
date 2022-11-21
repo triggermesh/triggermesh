@@ -137,11 +137,6 @@ var (
 		Group:    GroupName,
 		Resource: "ibmmqtargets",
 	}
-	// InfraTargetResource respresents Infra event target.
-	InfraTargetResource = schema.GroupResource{
-		Group:    GroupName,
-		Resource: "infratargets",
-	}
 	// JiraTargetResource respresents an event target for Jira.
 	JiraTargetResource = schema.GroupResource{
 		Group:    GroupName,
@@ -201,11 +196,6 @@ var (
 	TwilioTargetResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "twiliotargets",
-	}
-	// UiPathTargetResource respresents an event target for UiPath.
-	UiPathTargetResource = schema.GroupResource{ //nolint:stylecheck
-		Group:    GroupName,
-		Resource: "uipathtargets",
 	}
 	// ZendeskTargetResource respresents an event target for Zendesk.
 	ZendeskTargetResource = schema.GroupResource{

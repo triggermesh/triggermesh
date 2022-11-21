@@ -64,8 +64,6 @@ type HasuraTargetExpansion interface{}
 
 type IBMMQTargetExpansion interface{}
 
-type InfraTargetExpansion interface{}
-
 type JiraTargetExpansion interface{}
 
 type KafkaTargetExpansion interface{}
@@ -87,7 +85,5 @@ type SplunkTargetExpansion interface{}
 type TektonTargetExpansion interface{}
 
 type TwilioTargetExpansion interface{}
-
-type UiPathTargetExpansion interface{}
 
 type ZendeskTargetExpansion interface{}

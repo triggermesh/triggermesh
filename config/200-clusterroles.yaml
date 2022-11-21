@@ -171,7 +171,6 @@ rules:
   - hasuratargets
   - httptargets
   - ibmmqtargets
-  - infratargets
   - jiratargets
   - kafkatargets
   - logzmetricstargets
@@ -183,7 +182,6 @@ rules:
   - splunktargets
   - tektontargets
   - twiliotargets
-  - uipathtargets
   - zendesktargets
   verbs:
   - list
@@ -216,7 +214,6 @@ rules:
   - hasuratargets/status
   - httptargets/status
   - ibmmqtargets/status
-  - infratargets/status
   - jiratargets/status
   - kafkatargets/status
   - logzmetricstargets/status
@@ -228,7 +225,6 @@ rules:
   - splunktargets/status
   - tektontargets/status
   - twiliotargets/status
-  - uipathtargets/status
   - zendesktargets/status
   verbs:
   - update
@@ -364,7 +360,6 @@ rules:
   - hasuratargets/finalizers
   - httptargets/finalizers
   - ibmmqtargets/finalizers
-  - infratargets/finalizers
   - jiratargets/finalizers
   - kafkatargets/finalizers
   - logzmetricstargets/finalizers
@@ -376,7 +371,6 @@ rules:
   - splunktargets/finalizers
   - tektontargets/finalizers
   - twiliotargets/finalizers
-  - uipathtargets/finalizers
   - zendesktargets/finalizers
   verbs:
   - update
@@ -905,7 +899,6 @@ rules:
   - hasuratargets
   - httptargets
   - ibmmqtargets
-  - infratargets
   - jiratargets
   - kafkatargets
   - logzmetricstargets
@@ -917,7 +910,6 @@ rules:
   - splunktargets
   - tektontargets
   - twiliotargets
-  - uipathtargets
   - zendesktargets
   verbs:
   - get

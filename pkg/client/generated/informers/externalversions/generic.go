@@ -201,8 +201,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().HasuraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("ibmmqtargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().IBMMQTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("infratargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().InfraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("jiratargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().JiraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("kafkatargets"):
@@ -225,8 +223,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().TektonTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("twiliotargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().TwilioTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("uipathtargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().UiPathTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("zendesktargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().ZendeskTargets().Informer()}, nil
 

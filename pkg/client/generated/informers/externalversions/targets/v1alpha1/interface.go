@@ -70,8 +70,6 @@ type Interface interface {
 	HasuraTargets() HasuraTargetInformer
 	// IBMMQTargets returns a IBMMQTargetInformer.
 	IBMMQTargets() IBMMQTargetInformer
-	// InfraTargets returns a InfraTargetInformer.
-	InfraTargets() InfraTargetInformer
 	// JiraTargets returns a JiraTargetInformer.
 	JiraTargets() JiraTargetInformer
 	// KafkaTargets returns a KafkaTargetInformer.
@@ -94,8 +92,6 @@ type Interface interface {
 	TektonTargets() TektonTargetInformer
 	// TwilioTargets returns a TwilioTargetInformer.
 	TwilioTargets() TwilioTargetInformer
-	// UiPathTargets returns a UiPathTargetInformer.
-	UiPathTargets() UiPathTargetInformer
 	// ZendeskTargets returns a ZendeskTargetInformer.
 	ZendeskTargets() ZendeskTargetInformer
 }
@@ -226,11 +222,6 @@ func (v *version) IBMMQTargets() IBMMQTargetInformer {
 	return &iBMMQTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// InfraTargets returns a InfraTargetInformer.
-func (v *version) InfraTargets() InfraTargetInformer {
-	return &infraTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
 // JiraTargets returns a JiraTargetInformer.
 func (v *version) JiraTargets() JiraTargetInformer {
 	return &jiraTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -284,11 +275,6 @@ func (v *version) TektonTargets() TektonTargetInformer {
 // TwilioTargets returns a TwilioTargetInformer.
 func (v *version) TwilioTargets() TwilioTargetInformer {
 	return &twilioTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// UiPathTargets returns a UiPathTargetInformer.
-func (v *version) UiPathTargets() UiPathTargetInformer {
-	return &uiPathTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ZendeskTargets returns a ZendeskTargetInformer.

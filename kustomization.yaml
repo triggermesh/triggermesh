@@ -77,7 +77,6 @@ resources:
 - config/301-hasuratarget.yaml
 - config/301-httptarget.yaml
 - config/301-ibmmqtarget.yaml
-- config/301-infratarget.yaml
 - config/301-jiratarget.yaml
 - config/301-kafkatarget.yaml
 - config/301-logzmetricstarget.yaml
@@ -89,7 +88,6 @@ resources:
 - config/301-splunktarget.yaml
 - config/301-tektontarget.yaml
 - config/301-twiliotarget.yaml
-- config/301-uipathtarget.yaml
 - config/301-zendesktarget.yaml
 - config/302-filter.yaml
 - config/302-splitter.yaml
