@@ -2612,7 +2612,11 @@ func (in *GoogleCloudAuditLogsSourceSpec) DeepCopyInto(out *GoogleCloudAuditLogs
 		**out = **in
 	}
 	in.PubSub.DeepCopyInto(&out.PubSub)
-	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.ServiceAccountKey != nil {
+		in, out := &in.ServiceAccountKey, &out.ServiceAccountKey
+		*out = new(commonv1alpha1.ValueFromField)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
@@ -2729,7 +2733,11 @@ func (in *GoogleCloudBillingSourceSpec) DeepCopyInto(out *GoogleCloudBillingSour
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	in.PubSub.DeepCopyInto(&out.PubSub)
-	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.ServiceAccountKey != nil {
+		in, out := &in.ServiceAccountKey, &out.ServiceAccountKey
+		*out = new(commonv1alpha1.ValueFromField)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
@@ -2846,7 +2854,11 @@ func (in *GoogleCloudPubSubSourceSpec) DeepCopyInto(out *GoogleCloudPubSubSource
 		*out = new(string)
 		**out = **in
 	}
-	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.ServiceAccountKey != nil {
+		in, out := &in.ServiceAccountKey, &out.ServiceAccountKey
+		*out = new(commonv1alpha1.ValueFromField)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
@@ -2985,7 +2997,11 @@ func (in *GoogleCloudSourceRepositoriesSourceSpec) DeepCopyInto(out *GoogleCloud
 		*out = new(string)
 		**out = **in
 	}
-	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.ServiceAccountKey != nil {
+		in, out := &in.ServiceAccountKey, &out.ServiceAccountKey
+		*out = new(commonv1alpha1.ValueFromField)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
@@ -3102,7 +3118,11 @@ func (in *GoogleCloudStorageSourceSpec) DeepCopyInto(out *GoogleCloudStorageSour
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	in.ServiceAccountKey.DeepCopyInto(&out.ServiceAccountKey)
+	if in.ServiceAccountKey != nil {
+		in, out := &in.ServiceAccountKey, &out.ServiceAccountKey
+		*out = new(commonv1alpha1.ValueFromField)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)

@@ -191,7 +191,6 @@ spec:
                           format: int64
             required:
             - repository
-            - serviceAccountKey
             - sink
           status:
             description: Reported status of the event source.

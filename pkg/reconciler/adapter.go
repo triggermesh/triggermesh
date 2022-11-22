@@ -17,6 +17,7 @@ limitations under the License.
 package reconciler
 
 import (
+	"context"
 	"strconv"
 	"strings"
 	"time"
@@ -260,11 +261,17 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 
 // newServiceAccount returns a ServiceAccount object with its OwnerReferences
 // metadata attribute populated from the given owners.
-func newServiceAccount(rcl v1alpha1.Reconcilable, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
-	return resource.NewServiceAccount(rcl.GetNamespace(), ServiceAccountName(rcl),
+func newServiceAccount(ctx context.Context, rcl v1alpha1.Reconcilable, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
+	extraAnnotations := v1alpha1.ServiceAccountAnnotationsFromContext(ctx)
+
+	resource := resource.NewServiceAccount(rcl.GetNamespace(), ServiceAccountName(rcl),
 		resource.Owners(owners...),
 		resource.Labels(CommonObjectLabels(rcl)),
 	)
+
+	resource.Annotations = extraAnnotations
+
+	return resource
 }
 
 // newConfigWatchRoleBinding returns a RoleBinding object that binds a ServiceAccount

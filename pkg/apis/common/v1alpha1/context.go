@@ -33,3 +33,16 @@ func ReconcilableFromContext(ctx context.Context) Reconcilable {
 	}
 	return nil
 }
+
+type serviceAccountAnnotated struct{}
+
+func WithServiceAccountAnnotated(ctx context.Context, annotations map[string]string) context.Context {
+	return context.WithValue(ctx, serviceAccountAnnotated{}, annotations)
+}
+
+func ServiceAccountAnnotationsFromContext(ctx context.Context) map[string]string {
+	if a, ok := ctx.Value(serviceAccountAnnotated{}).(map[string]string); ok {
+		return a
+	}
+	return nil
+}

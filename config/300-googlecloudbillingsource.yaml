@@ -194,7 +194,6 @@ spec:
             - billingAccountId
             - budgetId
             - pubsub
-            - serviceAccountKey
             - sink
           status:
             description: Reported status of the event source.
