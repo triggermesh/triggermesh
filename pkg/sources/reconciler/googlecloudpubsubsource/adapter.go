@@ -64,10 +64,16 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudPubSubSource) []corev1.EnvVar {
 		subsName = sn.String()
 	}
 
-	return append(common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, o.Spec.ServiceAccountKey),
-		corev1.EnvVar{
+	var envVar []corev1.EnvVar
+	if o.Spec.ServiceAccountKey != nil {
+		envVar = common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *o.Spec.ServiceAccountKey)
+	}
+
+	return append(envVar, []corev1.EnvVar{
+		{
 			Name:  common.EnvGCloudPubSubSubscription,
 			Value: subsName,
 		},
+	}...,
 	)
 }

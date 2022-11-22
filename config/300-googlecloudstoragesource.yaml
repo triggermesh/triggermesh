@@ -203,7 +203,6 @@ spec:
             required:
             - bucket
             - pubsub
-            - serviceAccountKey
             - sink
           status:
             description: Reported status of the event source.
