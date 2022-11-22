@@ -264,14 +264,18 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 func newServiceAccount(ctx context.Context, rcl v1alpha1.Reconcilable, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
 	extraAnnotations := v1alpha1.ServiceAccountAnnotationsFromContext(ctx)
 
-	resource := resource.NewServiceAccount(rcl.GetNamespace(), ServiceAccountName(rcl),
+	opts := []resource.ObjectOption{
 		resource.Owners(owners...),
 		resource.Labels(CommonObjectLabels(rcl)),
+	}
+
+	for k, v := range extraAnnotations {
+		opts = append(opts, resource.Annotation(k, v))
+	}
+
+	return resource.NewServiceAccount(rcl.GetNamespace(), ServiceAccountName(rcl),
+		opts...,
 	)
-
-	resource.Annotations = extraAnnotations
-
-	return resource
 }
 
 // newConfigWatchRoleBinding returns a RoleBinding object that binds a ServiceAccount
