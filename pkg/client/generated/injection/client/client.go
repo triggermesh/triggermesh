@@ -3308,31 +3308,31 @@ func (w *wrapSourcesV1alpha1AzureEventGridSourceImpl) Watch(ctx context.Context,
 	return nil, errors.New("NYI: Watch")
 }
 
-func (w *wrapSourcesV1alpha1) AzureEventHubSources(namespace string) typedsourcesv1alpha1.AzureEventHubSourceInterface {
-	return &wrapSourcesV1alpha1AzureEventHubSourceImpl{
+func (w *wrapSourcesV1alpha1) AzureEventHubsSources(namespace string) typedsourcesv1alpha1.AzureEventHubsSourceInterface {
+	return &wrapSourcesV1alpha1AzureEventHubsSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
 			Group:    "sources.triggermesh.io",
 			Version:  "v1alpha1",
-			Resource: "azureeventhubsources",
+			Resource: "azureeventhubssources",
 		}),
 
 		namespace: namespace,
 	}
 }
 
-type wrapSourcesV1alpha1AzureEventHubSourceImpl struct {
+type wrapSourcesV1alpha1AzureEventHubsSourceImpl struct {
 	dyn dynamic.NamespaceableResourceInterface
 
 	namespace string
 }
 
-var _ typedsourcesv1alpha1.AzureEventHubSourceInterface = (*wrapSourcesV1alpha1AzureEventHubSourceImpl)(nil)
+var _ typedsourcesv1alpha1.AzureEventHubsSourceInterface = (*wrapSourcesV1alpha1AzureEventHubsSourceImpl)(nil)
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.AzureEventHubSource, opts v1.CreateOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.AzureEventHubsSource, opts v1.CreateOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "AzureEventHubSource",
+		Kind:    "AzureEventHubsSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3342,62 +3342,62 @@ func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Create(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.AzureEventHubSourceList, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.AzureEventHubsSourceList, error) {
 	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSourceList{}
+	out := &sourcesv1alpha1.AzureEventHubsSourceList{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.AzureEventHubSource, err error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.AzureEventHubsSource, err error) {
 	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.AzureEventHubSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.AzureEventHubsSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "AzureEventHubSource",
+		Kind:    "AzureEventHubsSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3407,18 +3407,18 @@ func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Update(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.AzureEventHubSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.AzureEventHubsSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "AzureEventHubSource",
+		Kind:    "AzureEventHubsSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3428,14 +3428,14 @@ func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) UpdateStatus(ctx context.Co
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return nil, errors.New("NYI: Watch")
 }
 

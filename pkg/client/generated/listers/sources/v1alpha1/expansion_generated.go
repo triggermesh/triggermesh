@@ -138,13 +138,13 @@ type AzureEventGridSourceListerExpansion interface{}
 // AzureEventGridSourceNamespaceLister.
 type AzureEventGridSourceNamespaceListerExpansion interface{}
 
-// AzureEventHubSourceListerExpansion allows custom methods to be added to
-// AzureEventHubSourceLister.
-type AzureEventHubSourceListerExpansion interface{}
+// AzureEventHubsSourceListerExpansion allows custom methods to be added to
+// AzureEventHubsSourceLister.
+type AzureEventHubsSourceListerExpansion interface{}
 
-// AzureEventHubSourceNamespaceListerExpansion allows custom methods to be added to
-// AzureEventHubSourceNamespaceLister.
-type AzureEventHubSourceNamespaceListerExpansion interface{}
+// AzureEventHubsSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureEventHubsSourceNamespaceLister.
+type AzureEventHubsSourceNamespaceListerExpansion interface{}
 
 // AzureIOTHubSourceListerExpansion allows custom methods to be added to
 // AzureIOTHubSourceLister.

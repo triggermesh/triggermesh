@@ -88,8 +88,8 @@ func (c *FakeSourcesV1alpha1) AzureEventGridSources(namespace string) v1alpha1.A
 	return &FakeAzureEventGridSources{c, namespace}
 }
 
-func (c *FakeSourcesV1alpha1) AzureEventHubSources(namespace string) v1alpha1.AzureEventHubSourceInterface {
-	return &FakeAzureEventHubSources{c, namespace}
+func (c *FakeSourcesV1alpha1) AzureEventHubsSources(namespace string) v1alpha1.AzureEventHubsSourceInterface {
+	return &FakeAzureEventHubsSources{c, namespace}
 }
 
 func (c *FakeSourcesV1alpha1) AzureIOTHubSources(namespace string) v1alpha1.AzureIOTHubSourceInterface {

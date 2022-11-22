@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package azureeventgridsource
+package azureeventhubssource
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
@@ -31,14 +31,11 @@ import (
 
 const healthPortName = "health"
 
-const envMessageProcessor = "EVENTHUB_MESSAGE_PROCESSOR"
-
 // adapterConfig contains properties used to configure the source's adapter.
 // These are automatically populated by envconfig.
 type adapterConfig struct {
 	// Container image
-	// Uses the adapter for Azure Event Hubs instead of a source-specific image.
-	Image string `envconfig:"AZUREEVENTHUBSSOURCE_IMAGE" default:"gcr.io/triggermesh/azureeventhubssource-adapter"`
+	Image string `default:"gcr.io/triggermesh/azureeventhubssource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }
@@ -48,7 +45,7 @@ var _ common.AdapterBuilder[*appsv1.Deployment] = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterBuilder.
 func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis.URL) (*appsv1.Deployment, error) {
-	typedSrc := src.(*v1alpha1.AzureEventGridSource)
+	typedSrc := src.(*v1alpha1.AzureEventHubsSource)
 
 	return common.NewAdapterDeployment(src, sinkURI,
 		resource.Image(r.adapterCfg.Image),
@@ -63,18 +60,13 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 
 // MakeAppEnv extracts environment variables from the object.
 // Exported to be used in external tools for local test environments.
-func MakeAppEnv(o *v1alpha1.AzureEventGridSource) []corev1.EnvVar {
-	// the user may or may not provide an Event Hub name in the source's
-	// spec, so the source's status is unfortunately our only source of
-	// truth here
-	var hubResID string
-	var hubName string
-	if ehID := o.Status.EventHubID; ehID != nil {
-		hubResID = ehID.String()
-		hubName = ehID.ResourceName
-	}
-
+func MakeAppEnv(o *v1alpha1.AzureEventHubsSource) []corev1.EnvVar {
 	var hubEnvs []corev1.EnvVar
+	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyName, sasAuth.KeyName)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubKeyValue, sasAuth.KeyValue)
+		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvHubConnStr, sasAuth.ConnectionString)
+	}
 	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
 		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADTenantID, spAuth.TenantID)
 		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientID, spAuth.ClientID)
@@ -85,16 +77,13 @@ func MakeAppEnv(o *v1alpha1.AzureEventGridSource) []corev1.EnvVar {
 		[]corev1.EnvVar{
 			{
 				Name:  common.EnvHubResourceID,
-				Value: hubResID,
+				Value: o.Spec.EventHubID.String(),
 			}, {
 				Name:  common.EnvHubNamespace,
-				Value: o.Spec.Endpoint.EventHubs.NamespaceID.ResourceName,
+				Value: o.Spec.EventHubID.Namespace,
 			}, {
 				Name:  common.EnvHubName,
-				Value: hubName,
-			}, {
-				Name:  envMessageProcessor,
-				Value: "eventgrid",
+				Value: o.Spec.EventHubID.ResourceName,
 			},
 		}...,
 	)

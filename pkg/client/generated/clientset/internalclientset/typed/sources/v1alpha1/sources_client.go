@@ -43,7 +43,7 @@ type SourcesV1alpha1Interface interface {
 	AzureActivityLogsSourcesGetter
 	AzureBlobStorageSourcesGetter
 	AzureEventGridSourcesGetter
-	AzureEventHubSourcesGetter
+	AzureEventHubsSourcesGetter
 	AzureIOTHubSourcesGetter
 	AzureQueueStorageSourcesGetter
 	AzureServiceBusQueueSourcesGetter
@@ -130,8 +130,8 @@ func (c *SourcesV1alpha1Client) AzureEventGridSources(namespace string) AzureEve
 	return newAzureEventGridSources(c, namespace)
 }
 
-func (c *SourcesV1alpha1Client) AzureEventHubSources(namespace string) AzureEventHubSourceInterface {
-	return newAzureEventHubSources(c, namespace)
+func (c *SourcesV1alpha1Client) AzureEventHubsSources(namespace string) AzureEventHubsSourceInterface {
+	return newAzureEventHubsSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) AzureIOTHubSources(namespace string) AzureIOTHubSourceInterface {
