@@ -33,7 +33,7 @@ resources:
 - config/300-azureactivitylogssource.yaml
 - config/300-azureblobstoragesource.yaml
 - config/300-azureeventgridsource.yaml
-- config/300-azureeventhubsource.yaml
+- config/300-azureeventhubssource.yaml
 - config/300-azureiothubsource.yaml
 - config/300-azurequeuestoragesource.yaml
 - config/300-azureservicebusqueuesource.yaml

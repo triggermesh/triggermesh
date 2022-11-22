@@ -224,9 +224,9 @@ func (l *Listers) GetAzureEventGridSourceLister() sourceslistersv1alpha1.AzureEv
 	return sourceslistersv1alpha1.NewAzureEventGridSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureEventGridSource{}))
 }
 
-// GetAzureEventHubSourceLister returns a Lister for AzureEventHubSource objects.
-func (l *Listers) GetAzureEventHubSourceLister() sourceslistersv1alpha1.AzureEventHubSourceLister {
-	return sourceslistersv1alpha1.NewAzureEventHubSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureEventHubSource{}))
+// GetAzureEventHubsSourceLister returns a Lister for AzureEventHubsSource objects.
+func (l *Listers) GetAzureEventHubsSourceLister() sourceslistersv1alpha1.AzureEventHubsSourceLister {
+	return sourceslistersv1alpha1.NewAzureEventHubsSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureEventHubsSource{}))
 }
 
 // GetAzureIOTHubSourceLister returns a Lister for AzureIOTHuSource objects.

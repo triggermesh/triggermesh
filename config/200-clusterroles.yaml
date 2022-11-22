@@ -77,7 +77,7 @@ rules:
   - azureactivitylogssources
   - azureblobstoragesources
   - azureeventgridsources
-  - azureeventhubsources
+  - azureeventhubssources
   - azureiothubsources
   - azurequeuestoragesources
   - azureservicebusqueuesources
@@ -120,7 +120,7 @@ rules:
   - azureactivitylogssources/status
   - azureblobstoragesources/status
   - azureeventgridsources/status
-  - azureeventhubsources/status
+  - azureeventhubssources/status
   - azureiothubsources/status
   - azurequeuestoragesources/status
   - azureservicebusqueuesources/status
@@ -308,7 +308,7 @@ rules:
   - azureactivitylogssources/finalizers
   - azureblobstoragesources/finalizers
   - azureeventgridsources/finalizers
-  - azureeventhubsources/finalizers
+  - azureeventhubssources/finalizers
   - azureiothubsources/finalizers
   - azurequeuestoragesources/finalizers
   - azureservicebusqueuesources/finalizers
@@ -777,7 +777,7 @@ rules:
   - azureactivitylogssources
   - azureblobstoragesources
   - azureeventgridsources
-  - azureeventhubsources
+  - azureeventhubssources
   - azureiothubsources
   - azurequeuestoragesources
   - azureservicebusqueuesources
@@ -818,7 +818,7 @@ rules:
   - azureactivitylogssources/finalizers
   - azureblobstoragesources/finalizers
   - azureeventgridsources/finalizers
-  - azureeventhubsources/finalizers
+  - azureeventhubssources/finalizers
   - azureiothubsources/finalizers
   - azurequeuestoragesources/finalizers
   - azureservicebusqueuesources/finalizers

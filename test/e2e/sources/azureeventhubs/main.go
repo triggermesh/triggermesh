@@ -67,16 +67,16 @@ var sourceAPIVersion = schema.GroupVersion{
 }
 
 const (
-	sourceKind     = "AzureEventHubSource"
-	sourceResource = "azureeventhubsource"
+	sourceKind     = "AzureEventHubsSource"
+	sourceResource = "azureeventhubssource"
 )
 
 /*
  Basic flow will resemble:
  * Create a resource group to contain our eventhub
  * Ensure our service principal can read/write from the eventhub
- * Instantiate the AzureEventHubSource
- * Send an event to the AzureEventHubSource and look for a response
+ * Instantiate the AzureEventHubsSource
+ * Send an event to the AzureEventHubsSource and look for a response
 */
 
 var _ = Describe("Azure EventHubs", func() {
@@ -198,7 +198,7 @@ var _ = Describe("Azure EventHubs", func() {
 
 type sourceOption func(*unstructured.Unstructured)
 
-// createSource creates an AzureEventHubSource object initialized with the test parameters
+// createSource creates an AzureEventHubsSource object initialized with the test parameters
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
 	src := &unstructured.Unstructured{}
