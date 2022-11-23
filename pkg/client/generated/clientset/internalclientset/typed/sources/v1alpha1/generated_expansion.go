@@ -48,7 +48,7 @@ type AzureBlobStorageSourceExpansion interface{}
 
 type AzureEventGridSourceExpansion interface{}
 
-type AzureEventHubSourceExpansion interface{}
+type AzureEventHubsSourceExpansion interface{}
 
 type AzureIOTHubSourceExpansion interface{}
 

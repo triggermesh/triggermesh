@@ -17,10 +17,10 @@
 # For a list and description of all available attributes, execute the following command against a cluster where this
 # Custom Resource Definition has been registered:
 #
-#   kubectl explain azureeventhubstargets.targets.triggermesh.io
+#   kubectl explain azureeventhubssources.sources.triggermesh.io
 
 apiVersion: sources.triggermesh.io/v1alpha1
-kind: AzureEventHubsTarget
+kind: AzureEventHubsSource
 metadata:
   name: sample
 spec:
@@ -41,21 +41,8 @@ spec:
           name: azure
           key: clientSecret
 
----
-
-# Sample deploying with a connectionn string
-
-
-apiVersion: targets.triggermesh.io/v1alpha1
-kind: AzureEventHubsTarget
-metadata:
-  name: sample
-spec:
-  eventHubID: /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyGroup/providers/Microsoft.EventHub/namespaces/MyNamespace/eventhubs/MyEvents
-
-  auth:
-    sasToken:
-      connectionString:
-        valueFromSecret:
-          name: azure
-          key: connectionString
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: default
