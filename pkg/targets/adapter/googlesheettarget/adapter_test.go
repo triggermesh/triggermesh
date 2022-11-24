@@ -183,11 +183,8 @@ func TestGetLatestSheetByName(t *testing.T) {
 			responseStatus: 500,
 			expectedSheet:  nil,
 			expectedError: &googleapi.Error{
-				Code:    500,
-				Message: "",
-				Body:    "{}",
-				Header:  http.Header{"Content-Type": []string{"application/json"}},
-				Errors:  []googleapi.ErrorItem(nil)},
+				Code: 500,
+			},
 		},
 	}
 
@@ -199,7 +196,10 @@ func TestGetLatestSheetByName(t *testing.T) {
 			httpmock.RegisterResponder("GET", mockURL, response)
 
 			sheet, err := adapter.getLatestSheetByName(sheetsPrefix)
-			assert.Equal(t, testCase.expectedError, err)
+
+			if err != nil {
+				assert.Equal(t, testCase.responseStatus, err.(*googleapi.Error).Code)
+			}
 
 			assert.Equal(t, testCase.expectedSheet, sheet)
 		})
@@ -248,11 +248,8 @@ func TestAppendValuesToSheet(t *testing.T) {
 			dataToInsert:   someData,
 			responseStatus: 500,
 			expectedError: &googleapi.Error{
-				Code:    500,
-				Message: "",
-				Body:    "{}",
-				Header:  http.Header{"Content-Type": []string{"application/json"}},
-				Errors:  []googleapi.ErrorItem(nil)},
+				Code: 500,
+			},
 		},
 	}
 
@@ -264,7 +261,14 @@ func TestAppendValuesToSheet(t *testing.T) {
 			httpmock.RegisterResponder("POST", mockURL, response)
 
 			err = adapter.appendDataToSheet(testCase.sheetToUpdate, testCase.dataToInsert)
-			assert.Equal(t, testCase.expectedError, err)
+			if err != nil {
+				if e, ok := err.(*googleapi.Error); ok {
+					assert.Equal(t, testCase.responseStatus, e.Code)
+				} else {
+					assert.Equal(t, testCase.expectedError, err)
+				}
+			}
+
 		})
 	}
 }
@@ -373,7 +377,13 @@ func TestCreateSheet(t *testing.T) {
 			)
 
 			sheet, err := adapter.createSheet(testCase.sheetName, testCase.sheetNumber)
-			assert.Equal(t, testCase.expectedError, err)
+			if err != nil {
+				if e, ok := err.(*googleapi.Error); ok {
+					assert.Equal(t, testCase.responseCreateStatus, e.Code)
+				} else {
+					assert.Equal(t, testCase.expectedError, err)
+				}
+			}
 
 			assert.Equal(t, testCase.expectedSheet, sheet)
 		})
