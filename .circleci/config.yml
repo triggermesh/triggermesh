@@ -101,14 +101,14 @@ jobs:
           name: Run gen-apidocs
           command:  TRIGGERMESH_COMMIT=${CIRCLE_TAG:-$CIRCLE_SHA1} make gen-apidocs
           environment:
-            DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/apis/
+            DOCS_OUTPUT_DIR: ~/project/tm-docs/docs/reference/
       - run:
           name: Committing updates to triggermesh/docs
           working_directory: tm-docs/
           command: |
             if ! git diff --exit-code --quiet; then
               git --no-pager diff
-              git add docs/
+              git add docs/reference/
               git commit -m "Generated with gen-crd-api-reference-docs on git commit ${CIRCLE_TAG:-${CIRCLE_SHA1}}"
               git push origin main
             fi
