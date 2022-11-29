@@ -343,15 +343,7 @@ func (r *reconcilerImpl) updateStatus(ctx context.Context, existing *v1alpha1.Az
 // updateFinalizersFiltered will update the Finalizers of the resource.
 // TODO: this method could be generic and sync all finalizers. For now it only
 // updates defaultFinalizerName or its override.
-func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource *v1alpha1.AzureEventHubsSource) (*v1alpha1.AzureEventHubsSource, error) {
-
-	getter := r.Lister.AzureEventHubsSources(resource.Namespace)
-
-	actual, err := getter.Get(resource.Name)
-	if err != nil {
-		return resource, err
-	}
-
+func (r *reconcilerImpl) updateFinalizersFiltered(ctx context.Context, resource *v1alpha1.AzureEventHubsSource, desiredFinalizers sets.String) (*v1alpha1.AzureEventHubsSource, error) {
 	// Don't modify the informers copy.
 	existing := resource.DeepCopy()
 
