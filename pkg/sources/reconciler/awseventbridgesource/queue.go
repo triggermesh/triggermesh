@@ -42,7 +42,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/sqs"
 )
 
-// SQSQueueStruct wraps information about a SQS queue.
+// SQSQueue wraps information about a SQS queue.
 type SQSQueue struct {
 	URL    string
 	ARN    string

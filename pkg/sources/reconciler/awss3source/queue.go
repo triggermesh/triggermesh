@@ -40,7 +40,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/sqs"
 )
 
-// ensureQueue ensures the existence of a SQS queue for sending S3 event
+// EnsureQueue ensures the existence of a SQS queue for sending S3 event
 // notifications.
 func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, error) {
 	src := commonv1alpha1.ReconcilableFromContext(ctx)

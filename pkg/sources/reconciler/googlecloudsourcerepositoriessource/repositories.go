@@ -32,7 +32,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
-// Ensures that the Repo has the topic associated.
+// EnsureTopicAssociated ensures that the Repo has the topic associated.
 // Required permissions:
 // - source.repos.updateRepoConfig
 // - iam.serviceAccounts.actAs

@@ -42,7 +42,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/reconciler/event"
 )
 
-// ensureNotificationsEnabled ensures that event notifications are enabled in
+// EnsureNotificationsEnabled ensures that event notifications are enabled in
 // the S3 bucket.
 func EnsureNotificationsEnabled(ctx context.Context, cli s3iface.S3API, queueARN string) error {
 	src := commonv1alpha1.ReconcilableFromContext(ctx)
