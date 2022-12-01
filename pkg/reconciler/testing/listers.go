@@ -224,9 +224,9 @@ func (l *Listers) GetAzureEventGridSourceLister() sourceslistersv1alpha1.AzureEv
 	return sourceslistersv1alpha1.NewAzureEventGridSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureEventGridSource{}))
 }
 
-// GetAzureEventHubSourceLister returns a Lister for AzureEventHubSource objects.
-func (l *Listers) GetAzureEventHubSourceLister() sourceslistersv1alpha1.AzureEventHubSourceLister {
-	return sourceslistersv1alpha1.NewAzureEventHubSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureEventHubSource{}))
+// GetAzureEventHubsSourceLister returns a Lister for AzureEventHubsSource objects.
+func (l *Listers) GetAzureEventHubsSourceLister() sourceslistersv1alpha1.AzureEventHubsSourceLister {
+	return sourceslistersv1alpha1.NewAzureEventHubsSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureEventHubsSource{}))
 }
 
 // GetAzureIOTHubSourceLister returns a Lister for AzureIOTHuSource objects.
@@ -257,11 +257,6 @@ func (l *Listers) GetGoogleCloudAuditLogsSourceLister() sourceslistersv1alpha1.G
 // GetGoogleCloudBillingSourceLister returns a Lister for GoogleCloudBillingSource objects.
 func (l *Listers) GetGoogleCloudBillingSourceLister() sourceslistersv1alpha1.GoogleCloudBillingSourceLister {
 	return sourceslistersv1alpha1.NewGoogleCloudBillingSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudBillingSource{}))
-}
-
-// GetGoogleCloudIoTSourceLister returns a Lister for GoogleCloudIoTSource objects.
-func (l *Listers) GetGoogleCloudIoTSourceLister() sourceslistersv1alpha1.GoogleCloudIoTSourceLister {
-	return sourceslistersv1alpha1.NewGoogleCloudIoTSourceLister(l.IndexerFor(&sourcesv1alpha1.GoogleCloudIoTSource{}))
 }
 
 // GetGoogleCloudPubSubSourceLister returns a Lister for GoogleCloudPubSubSource objects.
@@ -434,11 +429,6 @@ func (l *Listers) GetIBMMQTargetLister() targetslistersv1alpha1.IBMMQTargetListe
 	return targetslistersv1alpha1.NewIBMMQTargetLister(l.IndexerFor(&targetsv1alpha1.IBMMQTarget{}))
 }
 
-// GetInfraTargetLister returns a Lister for InfraTarget objects.
-func (l *Listers) GetInfraTargetLister() targetslistersv1alpha1.InfraTargetLister {
-	return targetslistersv1alpha1.NewInfraTargetLister(l.IndexerFor(&targetsv1alpha1.InfraTarget{}))
-}
-
 // GetJiraTargetLister returns a Lister for JiraTarget objects.
 func (l *Listers) GetJiraTargetLister() targetslistersv1alpha1.JiraTargetLister {
 	return targetslistersv1alpha1.NewJiraTargetLister(l.IndexerFor(&targetsv1alpha1.JiraTarget{}))
@@ -492,11 +482,6 @@ func (l *Listers) GetTektonTargetLister() targetslistersv1alpha1.TektonTargetLis
 // GetTwilioTargetLister returns a Lister for TwilioTarget objects.
 func (l *Listers) GetTwilioTargetLister() targetslistersv1alpha1.TwilioTargetLister {
 	return targetslistersv1alpha1.NewTwilioTargetLister(l.IndexerFor(&targetsv1alpha1.TwilioTarget{}))
-}
-
-// GetUiPathTargetLister returns a Lister for UiPathTarget objects.
-func (l *Listers) GetUiPathTargetLister() targetslistersv1alpha1.UiPathTargetLister { //nolint:stylecheck
-	return targetslistersv1alpha1.NewUiPathTargetLister(l.IndexerFor(&targetsv1alpha1.UiPathTarget{}))
 }
 
 // GetZendeskTargetLister returns a Lister for ZendeskTarget objects.

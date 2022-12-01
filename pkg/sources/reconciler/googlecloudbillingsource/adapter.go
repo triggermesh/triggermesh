@@ -65,21 +65,25 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudBillingSource) []corev1.EnvVar {
 		subsName = sn.String()
 	}
 
-	return append(common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, o.Spec.ServiceAccountKey),
-		[]corev1.EnvVar{
-			{
-				Name:  common.EnvGCloudPubSubSubscription,
-				Value: subsName,
-			}, {
-				Name:  common.EnvCESource,
-				Value: o.AsEventSource(),
-			}, {
-				Name:  common.EnvCEType,
-				Value: v1alpha1.GoogleCloudBillingGenericEventType,
-			}, {
-				Name:  adapter.EnvConfigCEOverrides,
-				Value: cloudevents.OverridesJSON(o.Spec.CloudEventOverrides),
-			},
-		}...,
+	var envVar []corev1.EnvVar
+	if o.Spec.ServiceAccountKey != nil {
+		envVar = common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *o.Spec.ServiceAccountKey)
+	}
+
+	return append(envVar, []corev1.EnvVar{
+		{
+			Name:  common.EnvGCloudPubSubSubscription,
+			Value: subsName,
+		}, {
+			Name:  common.EnvCESource,
+			Value: o.AsEventSource(),
+		}, {
+			Name:  common.EnvCEType,
+			Value: v1alpha1.GoogleCloudBillingGenericEventType,
+		}, {
+			Name:  adapter.EnvConfigCEOverrides,
+			Value: cloudevents.OverridesJSON(o.Spec.CloudEventOverrides),
+		},
+	}...,
 	)
 }

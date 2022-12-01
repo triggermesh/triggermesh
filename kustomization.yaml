@@ -33,7 +33,7 @@ resources:
 - config/300-azureactivitylogssource.yaml
 - config/300-azureblobstoragesource.yaml
 - config/300-azureeventgridsource.yaml
-- config/300-azureeventhubsource.yaml
+- config/300-azureeventhubssource.yaml
 - config/300-azureiothubsource.yaml
 - config/300-azurequeuestoragesource.yaml
 - config/300-azureservicebusqueuesource.yaml
@@ -41,7 +41,6 @@ resources:
 - config/300-cloudeventssource.yaml
 - config/300-googlecloudauditlogssource.yaml
 - config/300-googlecloudbillingsource.yaml
-- config/300-googlecloudiotsource.yaml
 - config/300-googlecloudpubsubsource.yaml
 - config/300-googlecloudsourcerepositoriessource.yaml
 - config/300-googlecloudstoragesource.yaml
@@ -77,7 +76,6 @@ resources:
 - config/301-hasuratarget.yaml
 - config/301-httptarget.yaml
 - config/301-ibmmqtarget.yaml
-- config/301-infratarget.yaml
 - config/301-jiratarget.yaml
 - config/301-kafkatarget.yaml
 - config/301-logzmetricstarget.yaml
@@ -89,7 +87,6 @@ resources:
 - config/301-splunktarget.yaml
 - config/301-tektontarget.yaml
 - config/301-twiliotarget.yaml
-- config/301-uipathtarget.yaml
 - config/301-zendesktarget.yaml
 - config/302-filter.yaml
 - config/302-splitter.yaml

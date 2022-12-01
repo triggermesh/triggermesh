@@ -26,8 +26,7 @@ metadata:
 spec:
   bootstrapServers:
   - kafka.example.com:9093
-  topics:
-  - test-topic
+  topic: test-topic
   groupID: test-consumer-group
   auth:
     saslEnable: true

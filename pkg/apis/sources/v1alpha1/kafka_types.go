@@ -38,8 +38,10 @@ type KafkaSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable = (*KafkaSource)(nil)
-	_ v1alpha1.EventSender  = (*KafkaSource)(nil)
+	_ v1alpha1.Reconcilable        = (*KafkaSource)(nil)
+	_ v1alpha1.EventSender         = (*KafkaSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*KafkaSource)(nil)
+	_ v1alpha1.EventSource         = (*KafkaSource)(nil)
 )
 
 // KafkaSourceSpec defines the desired state of the event source.
@@ -49,8 +51,8 @@ type KafkaSourceSpec struct {
 	// BootstrapServers holds the name of the Kafka Bootstrap server.
 	BootstrapServers []string `json:"bootstrapServers"`
 
-	// Topics holds the name of the Kafka Topics.
-	Topics []string `json:"topics"`
+	// Topic holds the name of the Kafka Topic.
+	Topic string `json:"topic"`
 
 	// GroupID holds the name of the Kafka Group ID.
 	GroupID string `json:"groupID"`

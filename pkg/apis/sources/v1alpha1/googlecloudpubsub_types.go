@@ -63,7 +63,7 @@ type GoogleCloudPubSubSourceSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-	ServiceAccountKey v1alpha1.ValueFromField `json:"serviceAccountKey"`
+	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional

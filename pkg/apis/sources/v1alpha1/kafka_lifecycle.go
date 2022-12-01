@@ -25,6 +25,18 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
+// Managed event types
+const (
+	KafkaSourceEventType = "io.triggermesh.kafka.event"
+)
+
+// GetEventTypes implements EventSource.
+func (*KafkaSource) GetEventTypes() []string {
+	return []string{
+		KafkaSourceEventType,
+	}
+}
+
 // GetGroupVersionKind implements kmeta.OwnerRefable.
 func (*KafkaSource) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("KafkaSource")
@@ -51,4 +63,14 @@ func (s *KafkaSource) GetStatusManager() *v1alpha1.StatusManager {
 		ConditionSet: s.GetConditionSet(),
 		Status:       &s.Status,
 	}
+}
+
+// AsEventSource implements EventSource.
+func (s *KafkaSource) AsEventSource() string {
+	return s.Spec.Topic
+}
+
+// GetAdapterOverrides implements AdapterConfigurable.
+func (s *KafkaSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
+	return s.Spec.AdapterOverrides
 }

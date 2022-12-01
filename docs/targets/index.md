@@ -10,7 +10,6 @@
 - [Hasura](hasura.md)
 - [HTTP](http.md)
 - [Jira](jira.md)
-- [Infra](infra.md)
 - [Logz](logz.md)
 - [Oracle Cloud](oracle.md)
 - [SalesForce](salesforce.md)
@@ -18,5 +17,4 @@
 - [Slack](slack.md)
 - [Tekton](tekton.md)
 - [Twilio](twilio.md)
-- [UiPath](uipath.md)
 - [Zendesk](zendesk.md)

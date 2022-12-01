@@ -41,7 +41,7 @@ type envConfig struct {
 
 	SubscriptionResourceName GCloudResourceName `envconfig:"GCLOUD_PUBSUB_SUBSCRIPTION" required:"true"`
 
-	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
+	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"false"`
 
 	// Allows overriding common CloudEvents attributes.
 	CEOverrideSource string `envconfig:"CE_SOURCE"`
@@ -83,11 +83,21 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envConfig)
 
-	psCli, err := pubsub.NewClient(ctx, env.SubscriptionResourceName.Project,
-		option.WithCredentialsJSON(env.ServiceAccountKey),
-	)
-	if err != nil {
-		logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
+	var psCli *pubsub.Client
+	var err error
+
+	if env.ServiceAccountKey != nil {
+		psCli, err = pubsub.NewClient(ctx, env.SubscriptionResourceName.Project,
+			option.WithCredentialsJSON(env.ServiceAccountKey),
+		)
+		if err != nil {
+			logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
+		}
+	} else {
+		psCli, err = pubsub.NewClient(ctx, env.SubscriptionResourceName.Project)
+		if err != nil {
+			logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
+		}
 	}
 
 	subsCli := psCli.Subscription(env.SubscriptionResourceName.Resource)

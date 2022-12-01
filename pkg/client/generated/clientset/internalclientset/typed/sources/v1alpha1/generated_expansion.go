@@ -48,7 +48,7 @@ type AzureBlobStorageSourceExpansion interface{}
 
 type AzureEventGridSourceExpansion interface{}
 
-type AzureEventHubSourceExpansion interface{}
+type AzureEventHubsSourceExpansion interface{}
 
 type AzureIOTHubSourceExpansion interface{}
 
@@ -63,8 +63,6 @@ type CloudEventsSourceExpansion interface{}
 type GoogleCloudAuditLogsSourceExpansion interface{}
 
 type GoogleCloudBillingSourceExpansion interface{}
-
-type GoogleCloudIoTSourceExpansion interface{}
 
 type GoogleCloudPubSubSourceExpansion interface{}
 

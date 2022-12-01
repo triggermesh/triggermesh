@@ -26,7 +26,7 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// JiraTarget is the Schema for the Infra JS Target.
+// JiraTarget is the Schema for the Jira Target.
 type JiraTarget struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
