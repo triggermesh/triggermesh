@@ -35,7 +35,7 @@ import (
 
 const (
 	envBootstrapServers   = "BOOTSTRAP_SERVERS"
-	envTopics             = "TOPICS"
+	envTopic              = "TOPIC"
 	envGroupID            = "GROUP_ID"
 	envUsername           = "USERNAME"
 	envPassword           = "PASSWORD"
@@ -122,8 +122,8 @@ func MakeAppEnv(o *v1alpha1.KafkaSource) []corev1.EnvVar {
 			Value: strings.Join(o.Spec.BootstrapServers, ","),
 		},
 		{
-			Name:  envTopics,
-			Value: strings.Join(o.Spec.Topics, ","),
+			Name:  envTopic,
+			Value: o.Spec.Topic,
 		},
 		{
 			Name:  envSaslEnable,

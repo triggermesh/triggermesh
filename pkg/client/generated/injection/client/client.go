@@ -3308,31 +3308,31 @@ func (w *wrapSourcesV1alpha1AzureEventGridSourceImpl) Watch(ctx context.Context,
 	return nil, errors.New("NYI: Watch")
 }
 
-func (w *wrapSourcesV1alpha1) AzureEventHubSources(namespace string) typedsourcesv1alpha1.AzureEventHubSourceInterface {
-	return &wrapSourcesV1alpha1AzureEventHubSourceImpl{
+func (w *wrapSourcesV1alpha1) AzureEventHubsSources(namespace string) typedsourcesv1alpha1.AzureEventHubsSourceInterface {
+	return &wrapSourcesV1alpha1AzureEventHubsSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
 			Group:    "sources.triggermesh.io",
 			Version:  "v1alpha1",
-			Resource: "azureeventhubsources",
+			Resource: "azureeventhubssources",
 		}),
 
 		namespace: namespace,
 	}
 }
 
-type wrapSourcesV1alpha1AzureEventHubSourceImpl struct {
+type wrapSourcesV1alpha1AzureEventHubsSourceImpl struct {
 	dyn dynamic.NamespaceableResourceInterface
 
 	namespace string
 }
 
-var _ typedsourcesv1alpha1.AzureEventHubSourceInterface = (*wrapSourcesV1alpha1AzureEventHubSourceImpl)(nil)
+var _ typedsourcesv1alpha1.AzureEventHubsSourceInterface = (*wrapSourcesV1alpha1AzureEventHubsSourceImpl)(nil)
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.AzureEventHubSource, opts v1.CreateOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.AzureEventHubsSource, opts v1.CreateOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "AzureEventHubSource",
+		Kind:    "AzureEventHubsSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3342,62 +3342,62 @@ func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Create(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.AzureEventHubSourceList, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.AzureEventHubsSourceList, error) {
 	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSourceList{}
+	out := &sourcesv1alpha1.AzureEventHubsSourceList{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.AzureEventHubSource, err error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.AzureEventHubsSource, err error) {
 	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.AzureEventHubSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.AzureEventHubsSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "AzureEventHubSource",
+		Kind:    "AzureEventHubsSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3407,18 +3407,18 @@ func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Update(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.AzureEventHubSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubSource, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.AzureEventHubsSource, opts v1.UpdateOptions) (*sourcesv1alpha1.AzureEventHubsSource, error) {
 	in.SetGroupVersionKind(schema.GroupVersionKind{
 		Group:   "sources.triggermesh.io",
 		Version: "v1alpha1",
-		Kind:    "AzureEventHubSource",
+		Kind:    "AzureEventHubsSource",
 	})
 	uo := &unstructured.Unstructured{}
 	if err := convert(in, uo); err != nil {
@@ -3428,14 +3428,14 @@ func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) UpdateStatus(ctx context.Co
 	if err != nil {
 		return nil, err
 	}
-	out := &sourcesv1alpha1.AzureEventHubSource{}
+	out := &sourcesv1alpha1.AzureEventHubsSource{}
 	if err := convert(uo, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (w *wrapSourcesV1alpha1AzureEventHubSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+func (w *wrapSourcesV1alpha1AzureEventHubsSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return nil, errors.New("NYI: Watch")
 }
 
@@ -4353,137 +4353,6 @@ func (w *wrapSourcesV1alpha1GoogleCloudBillingSourceImpl) UpdateStatus(ctx conte
 }
 
 func (w *wrapSourcesV1alpha1GoogleCloudBillingSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return nil, errors.New("NYI: Watch")
-}
-
-func (w *wrapSourcesV1alpha1) GoogleCloudIoTSources(namespace string) typedsourcesv1alpha1.GoogleCloudIoTSourceInterface {
-	return &wrapSourcesV1alpha1GoogleCloudIoTSourceImpl{
-		dyn: w.dyn.Resource(schema.GroupVersionResource{
-			Group:    "sources.triggermesh.io",
-			Version:  "v1alpha1",
-			Resource: "googlecloudiotsources",
-		}),
-
-		namespace: namespace,
-	}
-}
-
-type wrapSourcesV1alpha1GoogleCloudIoTSourceImpl struct {
-	dyn dynamic.NamespaceableResourceInterface
-
-	namespace string
-}
-
-var _ typedsourcesv1alpha1.GoogleCloudIoTSourceInterface = (*wrapSourcesV1alpha1GoogleCloudIoTSourceImpl)(nil)
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.GoogleCloudIoTSource, opts v1.CreateOptions) (*sourcesv1alpha1.GoogleCloudIoTSource, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "sources.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "GoogleCloudIoTSource",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &sourcesv1alpha1.GoogleCloudIoTSource{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.GoogleCloudIoTSource, error) {
-	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &sourcesv1alpha1.GoogleCloudIoTSource{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.GoogleCloudIoTSourceList, error) {
-	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &sourcesv1alpha1.GoogleCloudIoTSourceList{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.GoogleCloudIoTSource, err error) {
-	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &sourcesv1alpha1.GoogleCloudIoTSource{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.GoogleCloudIoTSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudIoTSource, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "sources.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "GoogleCloudIoTSource",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &sourcesv1alpha1.GoogleCloudIoTSource{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.GoogleCloudIoTSource, opts v1.UpdateOptions) (*sourcesv1alpha1.GoogleCloudIoTSource, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "sources.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "GoogleCloudIoTSource",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &sourcesv1alpha1.GoogleCloudIoTSource{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapSourcesV1alpha1GoogleCloudIoTSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return nil, errors.New("NYI: Watch")
 }
 
@@ -9087,137 +8956,6 @@ func (w *wrapTargetsV1alpha1IBMMQTargetImpl) Watch(ctx context.Context, opts v1.
 	return nil, errors.New("NYI: Watch")
 }
 
-func (w *wrapTargetsV1alpha1) InfraTargets(namespace string) typedtargetsv1alpha1.InfraTargetInterface {
-	return &wrapTargetsV1alpha1InfraTargetImpl{
-		dyn: w.dyn.Resource(schema.GroupVersionResource{
-			Group:    "targets.triggermesh.io",
-			Version:  "v1alpha1",
-			Resource: "infratargets",
-		}),
-
-		namespace: namespace,
-	}
-}
-
-type wrapTargetsV1alpha1InfraTargetImpl struct {
-	dyn dynamic.NamespaceableResourceInterface
-
-	namespace string
-}
-
-var _ typedtargetsv1alpha1.InfraTargetInterface = (*wrapTargetsV1alpha1InfraTargetImpl)(nil)
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.InfraTarget, opts v1.CreateOptions) (*targetsv1alpha1.InfraTarget, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "targets.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "InfraTarget",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.InfraTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.InfraTarget, error) {
-	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.InfraTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.InfraTargetList, error) {
-	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.InfraTargetList{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.InfraTarget, err error) {
-	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.InfraTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.InfraTarget, opts v1.UpdateOptions) (*targetsv1alpha1.InfraTarget, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "targets.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "InfraTarget",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.InfraTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.InfraTarget, opts v1.UpdateOptions) (*targetsv1alpha1.InfraTarget, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "targets.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "InfraTarget",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.InfraTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1InfraTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return nil, errors.New("NYI: Watch")
-}
-
 func (w *wrapTargetsV1alpha1) JiraTargets(namespace string) typedtargetsv1alpha1.JiraTargetInterface {
 	return &wrapTargetsV1alpha1JiraTargetImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{
@@ -10656,137 +10394,6 @@ func (w *wrapTargetsV1alpha1TwilioTargetImpl) UpdateStatus(ctx context.Context, 
 }
 
 func (w *wrapTargetsV1alpha1TwilioTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
-	return nil, errors.New("NYI: Watch")
-}
-
-func (w *wrapTargetsV1alpha1) UiPathTargets(namespace string) typedtargetsv1alpha1.UiPathTargetInterface {
-	return &wrapTargetsV1alpha1UiPathTargetImpl{
-		dyn: w.dyn.Resource(schema.GroupVersionResource{
-			Group:    "targets.triggermesh.io",
-			Version:  "v1alpha1",
-			Resource: "uipathtargets",
-		}),
-
-		namespace: namespace,
-	}
-}
-
-type wrapTargetsV1alpha1UiPathTargetImpl struct {
-	dyn dynamic.NamespaceableResourceInterface
-
-	namespace string
-}
-
-var _ typedtargetsv1alpha1.UiPathTargetInterface = (*wrapTargetsV1alpha1UiPathTargetImpl)(nil)
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.UiPathTarget, opts v1.CreateOptions) (*targetsv1alpha1.UiPathTarget, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "targets.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "UiPathTarget",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.UiPathTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
-	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
-	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.UiPathTarget, error) {
-	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.UiPathTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.UiPathTargetList, error) {
-	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.UiPathTargetList{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.UiPathTarget, err error) {
-	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.UiPathTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.UiPathTarget, opts v1.UpdateOptions) (*targetsv1alpha1.UiPathTarget, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "targets.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "UiPathTarget",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.UiPathTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.UiPathTarget, opts v1.UpdateOptions) (*targetsv1alpha1.UiPathTarget, error) {
-	in.SetGroupVersionKind(schema.GroupVersionKind{
-		Group:   "targets.triggermesh.io",
-		Version: "v1alpha1",
-		Kind:    "UiPathTarget",
-	})
-	uo := &unstructured.Unstructured{}
-	if err := convert(in, uo); err != nil {
-		return nil, err
-	}
-	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
-	if err != nil {
-		return nil, err
-	}
-	out := &targetsv1alpha1.UiPathTarget{}
-	if err := convert(uo, out); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (w *wrapTargetsV1alpha1UiPathTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return nil, errors.New("NYI: Watch")
 }
 

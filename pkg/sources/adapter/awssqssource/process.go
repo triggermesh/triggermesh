@@ -54,11 +54,17 @@ func (a *adapter) runMessagesProcessor(ctx context.Context) {
 				continue
 			}
 
+			sendError := false
 			for _, event := range events {
 				if err := sendSQSEvent(ctx, a.ceClient, event); err != nil {
 					a.logger.Errorw("Failed to send event to the sink", zap.Error(err))
-					continue
+					sendError = true
+					break
 				}
+			}
+
+			if sendError {
+				continue
 			}
 
 			a.deleteQueue <- msg

@@ -115,10 +115,10 @@ var (
 		Resource: "azureeventgridsources",
 	}
 
-	// AzureEventHubSourceResource respresents an event source for Azure Event Hub.
-	AzureEventHubSourceResource = schema.GroupResource{
+	// AzureEventHubsSourceResource respresents an event source for Azure Event Hub.
+	AzureEventHubsSourceResource = schema.GroupResource{
 		Group:    GroupName,
-		Resource: "azureeventhubsources",
+		Resource: "azureeventhubssources",
 	}
 
 	// AzureIOTHubSourceResource respresents an event source for Azure IOT Hub.
@@ -171,13 +171,6 @@ var (
 	GoogleCloudBillingSourceResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "googlecloudbillingsources",
-	}
-
-	// GoogleCloudIoTSourceResource respresents an event source for Google
-	// Cloud IoT.
-	GoogleCloudIoTSourceResource = schema.GroupResource{
-		Group:    GroupName,
-		Resource: "googlecloudiotsources",
 	}
 
 	// GoogleCloudPubSubSourceResource respresents an event source for Google Cloud

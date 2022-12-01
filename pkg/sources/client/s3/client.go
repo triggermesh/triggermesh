@@ -24,6 +24,7 @@ import (
 
 	awscore "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
@@ -72,13 +73,27 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, SQSClient, error) {
-	if src.Spec.Auth.Credentials == nil {
+	if src.Spec.Auth.Credentials == nil && src.Spec.Auth.EksIAMRole == nil {
 		return nil, nil, errors.New("AWS security credentials were not specified")
 	}
 
-	creds, err := aws.Credentials(g.sg(src.Namespace), src.Spec.Auth.Credentials)
-	if err != nil {
-		return nil, nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
+	sess := session.Must(session.NewSession(awscore.NewConfig()))
+
+	var creds *credentials.Value
+	var err error
+	if src.Spec.Auth.Credentials != nil {
+		creds, err = aws.Credentials(g.sg(src.Namespace), src.Spec.Auth.Credentials)
+		if err != nil {
+			return nil, nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
+		}
+
+	} else {
+		iamCreds := stscreds.NewCredentials(sess, src.Spec.Auth.EksIAMRole.String())
+		cred, err := iamCreds.Get()
+		if err != nil {
+			return nil, nil, fmt.Errorf("retrieving AWS IAM Role: %w", err)
+		}
+		creds = &cred
 	}
 
 	// The ARN of a S3 bucket differs from other ARNs because it doesn't
@@ -107,10 +122,9 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 		src.Spec.ARN.AccountID = accID
 	}
 
-	sess := session.Must(session.NewSession(awscore.NewConfig().
+	sess.Config.
 		WithRegion(src.Spec.ARN.Region).
-		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
-	))
+		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds))
 
 	return s3.New(sess), sqs.New(sess), nil
 }

@@ -79,7 +79,7 @@ func newEventSource() *v1alpha1.GoogleCloudPubSubSource {
 				Collection: pubsubCollectionTopics,
 				Resource:   "my-topic",
 			},
-			ServiceAccountKey: commonv1alpha1.ValueFromField{
+			ServiceAccountKey: &commonv1alpha1.ValueFromField{
 				Value: "{}",
 			},
 		},

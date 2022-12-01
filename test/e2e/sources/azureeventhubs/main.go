@@ -67,16 +67,16 @@ var sourceAPIVersion = schema.GroupVersion{
 }
 
 const (
-	sourceKind     = "AzureEventHubSource"
-	sourceResource = "azureeventhubsource"
+	sourceKind     = "AzureEventHubsSource"
+	sourceResource = "azureeventhubssource"
 )
 
 /*
  Basic flow will resemble:
  * Create a resource group to contain our eventhub
  * Ensure our service principal can read/write from the eventhub
- * Instantiate the AzureEventHubSource
- * Send an event to the AzureEventHubSource and look for a response
+ * Instantiate the AzureEventHubsSource
+ * Send an event to the AzureEventHubsSource and look for a response
 */
 
 var _ = Describe("Azure EventHubs", func() {
@@ -172,16 +172,6 @@ var _ = Describe("Azure EventHubs", func() {
 		})
 
 		Specify("the API server rejects the creation of that object", func() {
-			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-empty-credentials", sink,
-					withSubscriptionID(subscriptionID),
-					withEventHubID(createEventhubID(subscriptionID, ns)),
-				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.auth: Required value`))
-			})
-
 			By("omitting the eventHubID", func() {
 				_, err := createSource(srcClient, ns, "test-missing-eventHubID", sink,
 					withServicePrincipal(),
@@ -208,7 +198,7 @@ var _ = Describe("Azure EventHubs", func() {
 
 type sourceOption func(*unstructured.Unstructured)
 
-// createSource creates an AzureEventHubSource object initialized with the test parameters
+// createSource creates an AzureEventHubsSource object initialized with the test parameters
 func createSource(srcClient dynamic.ResourceInterface, namespace, namePrefix string,
 	sink *duckv1.Destination, opts ...sourceOption) (*unstructured.Unstructured, error) {
 	src := &unstructured.Unstructured{}

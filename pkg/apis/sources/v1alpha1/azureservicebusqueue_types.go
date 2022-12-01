@@ -55,6 +55,7 @@ type AzureServiceBusQueueSourceSpec struct {
 	QueueID AzureResourceID `json:"queueID"`
 
 	// Authentication method to interact with Azure Service Bus.
+	// If it not present, it will try to use Azure AKS Managed Identity
 	Auth AzureAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.

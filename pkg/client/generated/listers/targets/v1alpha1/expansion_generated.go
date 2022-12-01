@@ -202,14 +202,6 @@ type IBMMQTargetListerExpansion interface{}
 // IBMMQTargetNamespaceLister.
 type IBMMQTargetNamespaceListerExpansion interface{}
 
-// InfraTargetListerExpansion allows custom methods to be added to
-// InfraTargetLister.
-type InfraTargetListerExpansion interface{}
-
-// InfraTargetNamespaceListerExpansion allows custom methods to be added to
-// InfraTargetNamespaceLister.
-type InfraTargetNamespaceListerExpansion interface{}
-
 // JiraTargetListerExpansion allows custom methods to be added to
 // JiraTargetLister.
 type JiraTargetListerExpansion interface{}
@@ -297,14 +289,6 @@ type TwilioTargetListerExpansion interface{}
 // TwilioTargetNamespaceListerExpansion allows custom methods to be added to
 // TwilioTargetNamespaceLister.
 type TwilioTargetNamespaceListerExpansion interface{}
-
-// UiPathTargetListerExpansion allows custom methods to be added to
-// UiPathTargetLister.
-type UiPathTargetListerExpansion interface{}
-
-// UiPathTargetNamespaceListerExpansion allows custom methods to be added to
-// UiPathTargetNamespaceLister.
-type UiPathTargetNamespaceListerExpansion interface{}
 
 // ZendeskTargetListerExpansion allows custom methods to be added to
 // ZendeskTargetLister.

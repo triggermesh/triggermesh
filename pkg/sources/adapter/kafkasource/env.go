@@ -34,7 +34,7 @@ type envAccessor struct {
 	BootstrapServers []string `envconfig:"BOOTSTRAP_SERVERS" required:"true"`
 	Username         string   `envconfig:"USERNAME" required:"false"`
 	Password         string   `envconfig:"PASSWORD" required:"false"`
-	Topics           []string `envconfig:"TOPICS" required:"true"`
+	Topic            string   `envconfig:"TOPIC" required:"true"`
 	GroupID          string   `envconfig:"GROUP_ID" required:"false"`
 
 	SecurityMechanisms  string `envconfig:"SECURITY_MECHANISMS" required:"true"`

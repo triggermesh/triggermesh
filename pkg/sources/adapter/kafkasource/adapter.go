@@ -40,7 +40,7 @@ type kafkasourceAdapter struct {
 	mt       *pkgadapter.MetricTag
 
 	kafkaClient sarama.ConsumerGroup
-	topics      []string
+	topic       string
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
@@ -111,7 +111,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &kafkasourceAdapter{
 		kafkaClient: kc,
-		topics:      env.Topics,
+		topic:       env.Topic,
 
 		ceClient: ceClient,
 		logger:   logger,
@@ -130,7 +130,7 @@ func (a *kafkasourceAdapter) Start(ctx context.Context) error {
 		// `Consume` should be called inside an infinite loop, when a
 		// server-side rebalance happens, the consumer session will need to be
 		// recreated to get the new claims.
-		if err := a.kafkaClient.Consume(ctx, a.topics, consumerGroup); err != nil {
+		if err := a.kafkaClient.Consume(ctx, []string{a.topic}, consumerGroup); err != nil {
 			return err
 		}
 		if ctx.Err() != nil {

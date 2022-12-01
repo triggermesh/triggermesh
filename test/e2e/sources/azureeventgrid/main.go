@@ -230,16 +230,6 @@ var _ = Describe("Azure Event Grid source", func() {
 				Expect(err.Error()).To(ContainSubstring("spec.scope: Invalid value: "))
 			})
 
-			By("omitting credentials", func() {
-				_, err := createSource(srcClient, ns, "test-nocreds-", sink,
-					withEventScope(eventScope),
-					withEventHubsNamespaceID(eventHubsNamespaceID),
-				)
-				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring(
-					`spec.auth: Required value`))
-			})
-
 			By("omitting the Event Hubs endpoint", func() {
 				_, err := createSource(srcClient, ns, "test-no-eventhubs-", sink,
 					withServicePrincipal(),

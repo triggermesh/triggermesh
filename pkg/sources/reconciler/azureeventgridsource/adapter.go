@@ -38,7 +38,7 @@ const envMessageProcessor = "EVENTHUB_MESSAGE_PROCESSOR"
 type adapterConfig struct {
 	// Container image
 	// Uses the adapter for Azure Event Hubs instead of a source-specific image.
-	Image string `envconfig:"AZUREEVENTHUBSOURCE_IMAGE" default:"gcr.io/triggermesh/azureeventhubsource-adapter"`
+	Image string `envconfig:"AZUREEVENTHUBSSOURCE_IMAGE" default:"gcr.io/triggermesh/azureeventhubssource-adapter"`
 	// Configuration accessor for logging/metrics/tracing
 	configs source.ConfigAccessor
 }

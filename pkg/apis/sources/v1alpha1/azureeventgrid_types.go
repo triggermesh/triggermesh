@@ -76,6 +76,7 @@ type AzureEventGridSourceSpec struct {
 
 	// Authentication method to interact with the Azure REST API.
 	// This event source only supports the ServicePrincipal authentication.
+	// If it not present, it will try to use Azure AKS Managed Identity
 	Auth AzureAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.

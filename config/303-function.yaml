@@ -97,7 +97,7 @@ spec:
                 description: The destination of events emitted by the component. If left empty, the events will be sent back
                   to the sender.
                 type: object
-                oneOf:
+                anyOf:
                 - required: [ref]
                 - required: [uri]
                 properties:

@@ -80,8 +80,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/awssnssource-adapter
         - name: AWSSQSSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awssqssource-adapter
-        - name: AZUREEVENTHUBSOURCE_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubsource-adapter
+        - name: AZUREEVENTHUBSSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/azureeventhubssource-adapter
         - name: AZUREIOTHUBSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/azureiothubsource-adapter
         - name: AZUREQUEUESTORAGESOURCE_IMAGE
@@ -153,8 +153,6 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/hasuratarget-adapter
         - name: HTTPTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/httptarget-adapter
-        - name: INFRATARGET_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/infratarget-adapter
         - name: JIRATARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/jiratarget-adapter
         - name: KAFKATARGET_IMAGE
@@ -177,8 +175,6 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
         - name: TWILIOTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
-        - name: UIPATHTARGET_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/uipathtarget-adapter
         - name: ZENDESKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesktarget-adapter
         # Flow adapters

@@ -162,7 +162,8 @@ spec:
                 - eventHubs
               auth:
                 description: Authentication method to interact with the Azure Storage and Azure Event Hubs REST APIs. This
-                  event source only supports the Service Principal authentication.
+                  event source only supports the Service Principal authentication. If it not present, it will try to use Azure
+                  AKS Managed Identity
                 type: object
                 properties:
                   servicePrincipal:
@@ -268,7 +269,7 @@ spec:
                     description: URI to use as the destination of events.
                     type: string
                     format: uri
-                oneOf:
+                anyOf:
                 - required: [ref]
                 - required: [uri]
               adapterOverrides:
@@ -336,7 +337,6 @@ spec:
             required:
             - storageAccountID
             - endpoint
-            - auth
             - sink
           status:
             description: Reported status of the event source.

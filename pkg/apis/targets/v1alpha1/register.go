@@ -86,8 +86,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&JiraTargetList{},
 		&KafkaTarget{},
 		&KafkaTargetList{},
-		&InfraTarget{},
-		&InfraTargetList{},
 		&LogzMetricsTarget{},
 		&LogzMetricsTargetList{},
 		&LogzTarget{},
@@ -106,8 +104,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&TektonTargetList{},
 		&TwilioTarget{},
 		&TwilioTargetList{},
-		&UiPathTarget{},
-		&UiPathTargetList{},
 		&ZendeskTarget{},
 		&ZendeskTargetList{},
 	)
