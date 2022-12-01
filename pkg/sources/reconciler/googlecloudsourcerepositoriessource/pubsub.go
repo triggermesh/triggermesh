@@ -46,9 +46,9 @@ const (
 	pubsubLabelOwnerName      = "io-triggermesh_owner-name"
 )
 
-// ensurePubSub ensures the existence of a Pub/Sub topic and associated
+// EnsurePubSub ensures the existence of a Pub/Sub topic and associated
 // subscription for receiving change notifications from a Cloud Source Repositories resource.
-func ensurePubSub(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudResourceName /*topic*/, error) {
+func EnsurePubSub(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudResourceName /*topic*/, error) {
 	if skip.Skip(ctx) {
 		return nil, nil
 	}
@@ -65,9 +65,9 @@ func ensurePubSub(ctx context.Context, cli *pubsub.Client) (*v1alpha1.GCloudReso
 	return topic, nil
 }
 
-// ensureNoPubSub ensures the Pub/Sub topic and associated subscription used
+// EnsureNoPubSub ensures the Pub/Sub topic and associated subscription used
 // for receiving change notifications from a Cloud Source Repositories resource are deleted.
-func ensureNoPubSub(ctx context.Context, cli *pubsub.Client) error {
+func EnsureNoPubSub(ctx context.Context, cli *pubsub.Client) error {
 	if skip.Skip(ctx) {
 		return nil
 	}

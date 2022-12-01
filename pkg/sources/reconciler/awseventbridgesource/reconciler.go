@@ -61,21 +61,21 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSEventBr
 			"Error creating AWS API clients: %s", err))
 	}
 
-	queue, err := ensureQueue(ctx, sqsClient)
+	queue, err := EnsureQueue(ctx, sqsClient)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile SQS queue: %w", err)
 	}
 
-	ruleARN, err := ensureRule(ctx, ebClient, queue)
+	ruleARN, err := EnsureRule(ctx, ebClient, queue)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile event rule: %w", err)
 	}
 
-	if err := ensureQueuePolicy(ctx, sqsClient, queue, ruleARN); err != nil {
+	if err := EnsureQueuePolicy(ctx, sqsClient, queue, ruleARN); err != nil {
 		return fmt.Errorf("failed to apply access policy to SQS queue: %w", err)
 	}
 
-	if err := setRuleTarget(ctx, ebClient, ruleARN, queue.arn); err != nil {
+	if err := SetRuleTarget(ctx, ebClient, ruleARN, queue.ARN); err != nil {
 		return fmt.Errorf("failed to set target on event rule: %w", err)
 	}
 
@@ -108,12 +108,12 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSEventBri
 	// ensureNoRule and ensureQueue succeed to ensure that we don't leave
 	// any dangling EventBridge event rule behind us.
 
-	queueName, err := ensureNoRule(ctx, ebClient, sqsClient)
+	queueName, err := EnsureNoRule(ctx, ebClient, sqsClient)
 	if err != nil {
 		return fmt.Errorf("failed to finalize event rule: %w", err)
 	}
 
-	if err := ensureNoQueue(ctx, sqsClient, queueName); err != nil {
+	if err := EnsureNoQueue(ctx, sqsClient, queueName); err != nil {
 		return fmt.Errorf("failed to finalize SQS queue: %w", err)
 	}
 

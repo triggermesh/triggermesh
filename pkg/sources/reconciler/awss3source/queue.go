@@ -40,9 +40,9 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/aws/sqs"
 )
 
-// ensureQueue ensures the existence of a SQS queue for sending S3 event
+// EnsureQueue ensures the existence of a SQS queue for sending S3 event
 // notifications.
-func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, error) {
+func EnsureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, error) {
 	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 
@@ -112,9 +112,9 @@ func ensureQueue(ctx context.Context, cli sqsiface.SQSAPI) (string /*arn*/, erro
 	return queueARN, nil
 }
 
-// ensureNoQueue ensures that the SQS queue created for sending S3 event
+// EnsureNoQueue ensures that the SQS queue created for sending S3 event
 // notifications is deleted.
-func ensureNoQueue(ctx context.Context, cli sqsiface.SQSAPI) error {
+func EnsureNoQueue(ctx context.Context, cli sqsiface.SQSAPI) error {
 	src := commonv1alpha1.ReconcilableFromContext(ctx)
 	typedSrc := src.(*v1alpha1.AWSS3Source)
 

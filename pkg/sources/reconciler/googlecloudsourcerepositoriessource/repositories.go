@@ -32,11 +32,11 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
-// Ensures that the Repo has the topic associated.
+// EnsureTopicAssociated ensures that the Repo has the topic associated.
 // Required permissions:
 // - source.repos.updateRepoConfig
 // - iam.serviceAccounts.actAs
-func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service,
+func EnsureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service,
 	topicResName *v1alpha1.GCloudResourceName, publishServiceAccount string) error {
 
 	if skip.Skip(ctx) {
@@ -85,11 +85,11 @@ func ensureTopicAssociated(ctx context.Context, cli *gsourcerepo.Service,
 	return err
 }
 
-// ensureNoTopicAssociated looks at status.Repositories and if non-empty will delete it
+// EnsureNoTopicAssociated looks at status.Repositories and if non-empty will delete it
 // Required permissions:
 // - source.repos.updateRepoConfig
 // - iam.serviceAccounts.actAs
-func (r *Reconciler) ensureNoTopicAssociated(ctx context.Context, cli *gsourcerepo.Service) error {
+func EnsureNoTopicAssociated(ctx context.Context, cli *gsourcerepo.Service) error {
 	if skip.Skip(ctx) {
 		return nil
 	}

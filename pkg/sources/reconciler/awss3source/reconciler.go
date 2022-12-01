@@ -61,7 +61,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Sourc
 			"Error creating AWS API clients: %s", err))
 	}
 
-	queueARN, err := ensureQueue(ctx, sqsClient)
+	queueARN, err := EnsureQueue(ctx, sqsClient)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile SQS queue: %w", err)
 	}
@@ -70,7 +70,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, src *v1alpha1.AWSS3Sourc
 		return fmt.Errorf("failed to reconcile SQS event source adapter: %w", err)
 	}
 
-	return r.ensureNotificationsEnabled(ctx, s3Client, queueARN)
+	return EnsureNotificationsEnabled(ctx, s3Client, queueARN)
 }
 
 // FinalizeKind is called when the resource is deleted.
@@ -91,14 +91,14 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, src *v1alpha1.AWSS3Source
 			"Error creating AWS API clients: %s", err)
 	}
 
-	if err := ensureNoQueue(ctx, sqsClient); err != nil {
+	if err := EnsureNoQueue(ctx, sqsClient); err != nil {
 		return fmt.Errorf("failed to finalize SQS queue: %w", err)
 	}
 
 	// The finalizer blocks the deletion of the source object until
 	// ensureNotificationsDisabled succeeds to ensure that we don't leave
 	// any dangling event notification configurations behind us.
-	return r.ensureNotificationsDisabled(ctx, s3Client)
+	return EnsureNotificationsDisabled(ctx, s3Client)
 }
 
 // sourceID returns an ID that identifies the given source instance in AWS

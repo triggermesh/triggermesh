@@ -60,7 +60,7 @@ const (
 
 const awsTagOwner = "owned-by"
 
-// ensureRule ensures that an EventBrige event rule exists for the event bus.
+// EnsureRule ensures that an EventBrige event rule exists for the event bus.
 //
 // Required permissions:
 // - events:ListRuleNamesByTarget
@@ -68,8 +68,8 @@ const awsTagOwner = "owned-by"
 // - events:DescribeRule
 // - events:PutRule
 // - events:TagResource
-func ensureRule(ctx context.Context,
-	cli eventbridgeiface.EventBridgeAPI, queue *sqsQueue) (*apis.ARN /*rule*/, error) {
+func EnsureRule(ctx context.Context,
+	cli eventbridgeiface.EventBridgeAPI, queue *SQSQueue) (*apis.ARN /*rule*/, error) {
 
 	if skip.Skip(ctx) {
 		return nil, nil
@@ -80,7 +80,7 @@ func ensureRule(ctx context.Context,
 
 	status := &typedSrc.Status
 
-	currentRule, err := getRule(ctx, cli, typedSrc, queue.arn)
+	currentRule, err := getRule(ctx, cli, typedSrc, queue.ARN)
 	switch {
 	case isNotFound(err):
 		status.MarkNotSubscribed(v1alpha1.AWSEventBridgeReasonNoEventBus, "Event bus does not exist")
@@ -149,12 +149,12 @@ func ensureRule(ctx context.Context,
 	return ruleARN, nil
 }
 
-// setRuleTarget applies a SQS target to the given rule.
+// SetRuleTarget applies a SQS target to the given rule.
 //
 // Required permissions:
 // - events:ListTargetsByRule
 // - events:PutTargets
-func setRuleTarget(ctx context.Context, cli eventbridgeiface.EventBridgeAPI, ruleARN *apis.ARN, queueARN string) error {
+func SetRuleTarget(ctx context.Context, cli eventbridgeiface.EventBridgeAPI, ruleARN *apis.ARN, queueARN string) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -210,7 +210,7 @@ func setRuleTarget(ctx context.Context, cli eventbridgeiface.EventBridgeAPI, rul
 	return nil
 }
 
-// ensureNoRule ensures that the EventBrige event rule is removed from the
+// EnsureNoRule ensures that the EventBrige event rule is removed from the
 // event bus.
 //
 // Required permissions:
@@ -222,7 +222,7 @@ func setRuleTarget(ctx context.Context, cli eventbridgeiface.EventBridgeAPI, rul
 // - events:ListTargetsByRule
 // - events:RemoveTargets
 // - events:DeleteRule
-func ensureNoRule(ctx context.Context, cli eventbridgeiface.EventBridgeAPI,
+func EnsureNoRule(ctx context.Context, cli eventbridgeiface.EventBridgeAPI,
 	sqsCli sqsiface.SQSAPI) (string /*queue name*/, error) {
 
 	if skip.Skip(ctx) {
