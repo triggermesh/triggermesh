@@ -5,19 +5,20 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/triggermesh/triggermesh)](https://goreportcard.com/report/github.com/triggermesh/triggermesh)
 [![Slack](https://img.shields.io/badge/Slack-Join%20chat-4a154b?style=flat&logo=slack)](https://join.slack.com/t/triggermesh-community/shared_invite/zt-1kngevosm-MY7kqn9h6bT08hWh8PeltA)
 
-The TriggerMesh Cloud Native Integration Platform consists of a set of APIs which allows you to build event-driven
-applications. Implemented as a set of Kubernetes CRDs and a Kubernetes controller, it gives you a way to declaratively
-define your event sources and event targets, in addition to potential actions needed in your applications: content-based
-event filtering, event splitting, event transformation and event processing via functions.
+TriggerMesh is an open-source alternative to AWS EventBridge. It lets you easily capture events from many sources, uniformily transform and route them, and reliably deliver them to event consumers. 
+
+TriggerMesh comes in two main flavours. This repository provides TriggerMesh on Kubernetes, implemented as a set of Kubernetes CRDs and a Kubernetes controller. It gives you a way to declaratively define your event sources and event targets, transformation and routing.
+
+TriggerMesh also provides a command line interface called [tmctl](https://github.com/triggermesh/tmctl) which makes it easy to run TriggerMesh locally, on any laptop with just Docker as a prerequisite. 
 
 ## Getting Started
 
-* [Guides](https://docs.triggermesh.io/guides/creatingasource/)
+* For first-time users, we recommend the [Quickstart with tmctl](https://docs.triggermesh.io/get-started/quickstart/)
 * [Documentation](https://docs.triggermesh.io)
 
 ## Installation
 
-To install TriggerMesh, follow the [installation instructions](https://docs.triggermesh.io/guides/installation/).
+To install TriggerMesh on Kubernetes, follow the [installation instructions](https://docs.triggermesh.io/installation/).
 
 ### TL;DR
 
