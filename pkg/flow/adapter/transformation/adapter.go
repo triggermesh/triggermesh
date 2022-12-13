@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 	"strings"
 	"time"
 
@@ -31,7 +32,6 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
@@ -48,8 +48,8 @@ type envConfig struct {
 
 // adapter contains Pipelines for CE transformations and CloudEvents client.
 type adapter struct {
-	ContextPipeline *Pipeline
-	DataPipeline    *Pipeline
+	ContextPipeline []v1alpha1.Transform
+	DataPipeline    []v1alpha1.Transform
 
 	mt *pkgadapter.MetricTag
 	sr *metrics.EventProcessingStatsReporter
@@ -94,30 +94,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Fatalf("Cannot unmarshal data transformation env variable: %v", err)
 	}
 
-	contextPl, err := newPipeline(trnContext)
-	if err != nil {
-		logger.Fatalf("Cannot create context transformation pipeline: %v", err)
-	}
-
-	dataPl, err := newPipeline(trnData)
-	if err != nil {
-		logger.Fatalf("Cannot create data transformation pipeline: %v", err)
-	}
-
-	sharedStorage := storage.New()
-	contextPl.setStorage(sharedStorage)
-	dataPl.setStorage(sharedStorage)
-
 	return &adapter{
-		ContextPipeline: contextPl,
-		DataPipeline:    dataPl,
-
-		mt: mt,
-		sr: metrics.MustNewEventProcessingStatsReporter(mt),
-
-		sink:   env.Sink,
-		client: ceClient,
-		logger: logger,
+		mt:              mt,
+		sr:              metrics.MustNewEventProcessingStatsReporter(mt),
+		ContextPipeline: trnContext,
+		DataPipeline:    trnData,
+		sink:            env.Sink,
+		client:          ceClient,
+		logger:          logger,
 	}
 }
 
@@ -182,6 +166,22 @@ func (t *adapter) receiveAndSend(ctx context.Context, event cloudevents.Event) e
 }
 
 func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
+	contextPl, err := newPipeline(t.ContextPipeline)
+	if err != nil {
+		t.logger.Fatalf("Cannot create context transformation pipeline: %v", err)
+	}
+
+	dataPl, err := newPipeline(t.DataPipeline)
+	if err != nil {
+		t.logger.Fatalf("Cannot create data transformation pipeline: %v", err)
+	}
+
+	// set shared storage, scoped too the application function
+	sharedStorage := storage.New()
+
+	contextPl.setStorage(sharedStorage)
+	dataPl.setStorage(sharedStorage)
+
 	// HTTPTargets sets content type from HTTP headers, i.e.:
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality
@@ -207,17 +207,17 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	var errs []error
 
 	// Run init step such as load Pipeline variables first
-	eventContext, err := t.ContextPipeline.apply(localContextBytes, init)
+	eventContext, err := contextPl.apply(localContextBytes, init)
 	if err != nil {
 		errs = append(errs, err)
 	}
-	eventPayload, err := t.DataPipeline.apply(event.Data(), init)
+	eventPayload, err := dataPl.apply(event.Data(), init)
 	if err != nil {
 		errs = append(errs, err)
 	}
 
 	// CE Context transformation
-	if eventContext, err = t.ContextPipeline.apply(eventContext, !init); err != nil {
+	if eventContext, err = contextPl.apply(eventContext, !init); err != nil {
 		errs = append(errs, err)
 	}
 	if err := json.Unmarshal(eventContext, &localContext); err != nil {
@@ -233,7 +233,7 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	}
 
 	// CE Data transformation
-	if eventPayload, err = t.DataPipeline.apply(eventPayload, !init); err != nil {
+	if eventPayload, err = dataPl.apply(eventPayload, !init); err != nil {
 		errs = append(errs, err)
 	}
 	if err = event.SetData(cloudevents.ApplicationJSON, eventPayload); err != nil {
