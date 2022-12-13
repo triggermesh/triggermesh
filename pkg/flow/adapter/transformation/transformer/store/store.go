@@ -66,6 +66,7 @@ func (s *Store) New(key, value string) transformer.Transformer {
 	return &Store{
 		Path:  key,
 		Value: value,
+
 		variables: s.variables,
 	}
 }
