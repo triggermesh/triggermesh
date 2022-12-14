@@ -37,19 +37,17 @@ type AWSS3Target struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSS3Target)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSS3Target)(nil)
-	_ v1alpha1.EventReceiver       = (*AWSS3Target)(nil)
-	_ v1alpha1.EventSource         = (*AWSS3Target)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSS3Target)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSS3Target)(nil)
+	_ v1alpha1.EventReceiver          = (*AWSS3Target)(nil)
+	_ v1alpha1.EventSource            = (*AWSS3Target)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSS3Target)(nil)
 )
 
 // AWSS3TargetSpec holds the desired state of the even target.
 type AWSS3TargetSpec struct {
-	// AWS account Key
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	AWSAuth
 
 	// Amazon Resource Name of the S3 bucket.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazons3.html#amazons3-resources-for-iam-policies

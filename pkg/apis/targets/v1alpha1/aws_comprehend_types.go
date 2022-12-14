@@ -37,18 +37,16 @@ type AWSComprehendTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSComprehendTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSComprehendTarget)(nil)
-	_ v1alpha1.EventSource         = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.EventSource            = (*AWSComprehendTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSComprehendTarget)(nil)
 )
 
 // AWSComprehendTargetSpec defines the desired state of the event target.
 type AWSComprehendTargetSpec struct {
-	// AWS account Key.
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key.
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	AWSAuth
 
 	// Region to use for calling into Comprehend API.
 	Region string `json:"region"`

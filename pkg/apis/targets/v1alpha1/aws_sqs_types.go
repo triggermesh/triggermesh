@@ -37,17 +37,15 @@ type AWSSQSTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSSQSTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSSQSTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSSQSTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSSQSTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSSQSTarget)(nil)
 )
 
 // AWSSQSTargetSpec defines the desired state of the event target.
 type AWSSQSTargetSpec struct {
-	// AWS account Key
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	AWSAuth
 
 	// Amazon Resource Name of the SQS queue.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies

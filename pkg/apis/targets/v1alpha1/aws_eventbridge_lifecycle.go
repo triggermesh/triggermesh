@@ -23,6 +23,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 // Returned event types
@@ -76,4 +77,20 @@ func (t *AWSEventBridgeTarget) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *AWSEventBridgeTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// WantsOwnServiceAccount implements ServiceAccountProvider.
+func (s *AWSEventBridgeTarget) WantsOwnServiceAccount() bool {
+	return s.Spec.EksIAMRole != nil
+}
+
+// ServiceAccountOptions implements ServiceAccountProvider.
+func (s *AWSEventBridgeTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
+
+	if iamRole := s.Spec.EksIAMRole; iamRole != nil {
+		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
+	}
+
+	return saOpts
 }

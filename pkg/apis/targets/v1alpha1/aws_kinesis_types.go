@@ -37,17 +37,15 @@ type AWSKinesisTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSKinesisTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSKinesisTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSKinesisTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSKinesisTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSKinesisTarget)(nil)
 )
 
 // AWSKinesisTargetSpec defines the desired state of the event target.
 type AWSKinesisTargetSpec struct {
-	// AWS account Key
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	AWSAuth
 
 	// Amazon Resource Name of the Kinesis stream.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonkinesis.html#amazonkinesis-resources-for-iam-policies

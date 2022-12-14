@@ -55,6 +55,12 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
+              iamRole:
+                description: (Amazon EKS only) The ARN of an IAM role which can be impersonated to obtain AWS permissions.
+                  For more information about IAM roles for service accounts, please refer to the Amazon EKS User Guide
+                  at https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+                type: string
+                pattern: ^arn:aws(-cn|-us-gov)?:iam::\d{12}:role\/.+$
               awsApiKey:
                 description: API Key to interact with the Amazon EventBridge API. For more information about AWS security
                   credentials, please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
@@ -155,10 +161,16 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-            required:
-            - arn
-            - awsApiSecret
-            - awsApiKey
+            oneOf:
+            - required:
+              - region
+              - language
+              - awsApiSecret
+              - awsApiKey
+            - required:
+              - region
+              - language
+              - iamRole
           status:
             type: object
             description: Reported status of the event target.

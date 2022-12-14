@@ -23,6 +23,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -51,4 +52,20 @@ func (t *AWSSNSTarget) GetStatusManager() *v1alpha1.StatusManager {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *AWSSNSTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// WantsOwnServiceAccount implements ServiceAccountProvider.
+func (s *AWSSNSTarget) WantsOwnServiceAccount() bool {
+	return s.Spec.EksIAMRole != nil
+}
+
+// ServiceAccountOptions implements ServiceAccountProvider.
+func (s *AWSSNSTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
+
+	if iamRole := s.Spec.EksIAMRole; iamRole != nil {
+		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
+	}
+
+	return saOpts
 }
