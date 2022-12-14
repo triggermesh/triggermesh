@@ -17,8 +17,6 @@ limitations under the License.
 package awscomphrehendtarget
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -30,12 +28,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	AWSApiKey string `envconfig:"AWS_ACCESS_KEY_ID" required:"true"`
-
-	AWSApiSecret string `envconfig:"AWS_SECRET_ACCESS_KEY" required:"true"`
-
-	Region string `envconfig:"COMPREHEND_REGION" required:"true"`
-
+	Region   string `envconfig:"COMPREHEND_REGION" required:"true"`
 	Language string `envconfig:"COMPREHEND_LANGUAGE" required:"true"`
 
 	// CloudEvents responses parametrization
@@ -43,13 +36,10 @@ type envAccessor struct {
 
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
-}
 
-func (e *envAccessor) GetAwsConfig(region string) *aws.Config {
-	creds := credentials.NewStaticCredentials(e.AWSApiKey, e.AWSApiSecret, "")
-	config := aws.NewConfig()
-	config.WithRegion(region)
-	config.WithCredentials(creds)
-
-	return config
+	// The environment variables below aren't read from the envConfig struct
+	// by the AWS SDK, but rather directly using os.Getenv().
+	// They are nevertheless listed here for documentation purposes.
+	_ string `envconfig:"AWS_ACCESS_KEY_ID"`
+	_ string `envconfig:"AWS_SECRET_ACCESS_KEY"`
 }

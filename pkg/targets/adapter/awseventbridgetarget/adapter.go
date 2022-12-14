@@ -53,10 +53,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	eventBridgeSession := session.Must(session.NewSession(
-		env.GetAwsConfig().
-			WithRegion(a.Region).
-			WithMaxRetries(5)))
+	eventBridgeSession := session.Must(session.NewSession(aws.NewConfig().
+		WithRegion(a.Region).
+		WithMaxRetries(5)))
 
 	return &adapter{
 		awsArnString:      env.AwsTargetArn,

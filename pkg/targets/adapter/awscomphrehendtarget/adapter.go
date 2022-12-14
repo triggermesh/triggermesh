@@ -52,6 +52,11 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
+	cfg := session.Must(session.NewSession(aws.NewConfig().
+		WithRegion(env.Region).
+		WithMaxRetries(5),
+	))
+
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
 		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeAWSComprehendResult),
@@ -61,7 +66,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	return &comprehendAdapter{
-		config: env.GetAwsConfig(env.Region),
+		comprehend: comprehend.New(cfg),
 
 		language: env.Language,
 		ceClient: ceClient,
@@ -75,12 +80,10 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*comprehendAdapter)(nil)
 
 type comprehendAdapter struct {
-	comprehend comprehendiface.ComprehendAPI
 	language   string
+	comprehend comprehendiface.ComprehendAPI
 
 	replier  *targetce.Replier
-	config   *aws.Config
-	session  *session.Session
 	ceClient cloudevents.Client
 	logger   *zap.SugaredLogger
 
@@ -90,9 +93,6 @@ type comprehendAdapter struct {
 // Start implements pkgadapter.Adapter.
 func (a *comprehendAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting The AWS Comprehend Target Adapter")
-	s := session.Must(session.NewSession(a.config))
-	a.session = s
-	a.comprehend = comprehend.New(s)
 	if err := a.ceClient.StartReceiver(ctx, a.dispatch); err != nil {
 		return err
 	}

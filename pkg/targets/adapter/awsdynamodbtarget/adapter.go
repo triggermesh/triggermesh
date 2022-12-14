@@ -28,6 +28,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -54,10 +55,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	session := session.Must(session.NewSession(
-		env.GetAwsConfig().
-			WithRegion(a.Region).
-			WithMaxRetries(5)))
+	session := session.Must(session.NewSession(aws.NewConfig().
+		WithRegion(a.Region).
+		WithMaxRetries(5)))
 
 	var dynamodbTable string
 	if a.Service == dynamodb.ServiceName {
