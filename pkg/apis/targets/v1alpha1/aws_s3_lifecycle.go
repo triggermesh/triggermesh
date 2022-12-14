@@ -87,15 +87,15 @@ func (t *AWSS3Target) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
-func (s *AWSS3Target) WantsOwnServiceAccount() bool {
-	return s.Spec.EksIAMRole != nil
+func (t *AWSS3Target) WantsOwnServiceAccount() bool {
+	return t.Spec.EksIAMRole != nil
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
-func (s *AWSS3Target) ServiceAccountOptions() []resource.ServiceAccountOption {
+func (t *AWSS3Target) ServiceAccountOptions() []resource.ServiceAccountOption {
 	var saOpts []resource.ServiceAccountOption
 
-	if iamRole := s.Spec.EksIAMRole; iamRole != nil {
+	if iamRole := t.Spec.EksIAMRole; iamRole != nil {
 		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
 	}
 

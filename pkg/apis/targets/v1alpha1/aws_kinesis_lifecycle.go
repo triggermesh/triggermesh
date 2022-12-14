@@ -55,15 +55,15 @@ func (t *AWSKinesisTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
-func (s *AWSKinesisTarget) WantsOwnServiceAccount() bool {
-	return s.Spec.EksIAMRole != nil
+func (t *AWSKinesisTarget) WantsOwnServiceAccount() bool {
+	return t.Spec.EksIAMRole != nil
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
-func (s *AWSKinesisTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+func (t *AWSKinesisTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
 	var saOpts []resource.ServiceAccountOption
 
-	if iamRole := s.Spec.EksIAMRole; iamRole != nil {
+	if iamRole := t.Spec.EksIAMRole; iamRole != nil {
 		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
 	}
 
