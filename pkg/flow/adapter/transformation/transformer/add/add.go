@@ -44,6 +44,9 @@ var InitStep bool = false
 // operationName is used to identify this transformation.
 var operationName string = "add"
 
+// separator is used to split the incoming data
+const separator string = "."
+
 // Register adds this transformation to the map which will
 // be used to create Transformation pipeline.
 func Register(m map[string]transformer.Transformer) {
@@ -74,7 +77,7 @@ func (a *Add) New(key, value string) transformer.Transformer {
 // Apply is a main method of Transformation that adds any type of
 // variables into existing JSON.
 func (a *Add) Apply(data []byte) ([]byte, error) {
-	input := convert.SliceToMap(strings.Split(a.Path, "."), a.composeValue())
+	input := convert.SliceToMap(strings.Split(a.Path, separator), a.composeValue())
 	var event interface{}
 	if err := json.Unmarshal(data, &event); err != nil {
 		return data, err
@@ -103,8 +106,18 @@ func (a *Add) composeValue() interface{} {
 		if index == -1 {
 			continue
 		}
+		// return value if it exists, or properly nil for references to empty values
 		if result == key {
-			return a.retrieveVariable(key)
+			if v := a.retrieveVariable(key); v == key {
+				return nil
+			} else {
+				return v
+			}
+		}
+		// no variable assigned to key in multi-path assignment, remove from path
+		if a.retrieveVariable(key) == key {
+			result = strings.TrimSuffix(result[:index], separator)
+			continue
 		}
 		result = fmt.Sprintf("%s%v%s", result[:index], a.retrieveVariable(key), result[index+len(key):])
 	}
