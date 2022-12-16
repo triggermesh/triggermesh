@@ -55,7 +55,7 @@ type AWSKinesisSourceSpec struct {
 	ARN apis.ARN `json:"arn"`
 
 	// Authentication method to interact with the Amazon Kinesis API.
-	Auth AWSAuth `json:"auth"`
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional

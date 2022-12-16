@@ -46,7 +46,7 @@ var (
 // AWSComprehendTargetSpec defines the desired state of the event target.
 type AWSComprehendTargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Region to use for calling into Comprehend API.
 	Region string `json:"region"`

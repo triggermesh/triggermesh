@@ -46,7 +46,7 @@ var (
 // AWSDynamoDBTargetSpec defines the desired state of the event target.
 type AWSDynamoDBTargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Table ARN
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazondynamodb.html#amazondynamodb-resources-for-iam-policies

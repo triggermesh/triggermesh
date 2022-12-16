@@ -45,7 +45,7 @@ var (
 // AWSEventBridgeTargetSpec defines the desired state of the event target.
 type AWSEventBridgeTargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the EventBridge Event Bus.
 	// https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoneventbridge.html

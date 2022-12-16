@@ -18,11 +18,3 @@ metadata:
   name: triggermesh-aws-dynamodb
 spec:
   arn: arn:aws:dynamodb:us-west-1:<PROJECT_ID>:table/test
-  awsApiKey:
-    secretKeyRef:
-      name: aws
-      key: AWS_ACCESS_KEY_ID
-  awsApiSecret:
-    secretKeyRef:
-      name: aws
-      key: AWS_SECRET_ACCESS_KEY

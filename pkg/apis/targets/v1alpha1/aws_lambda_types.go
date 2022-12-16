@@ -45,7 +45,7 @@ var (
 // AWSLambdaTargetSpec defines the desired state of the event target.
 type AWSLambdaTargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the Lambda function.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_awslambda.html#awslambda-resources-for-iam-policies

@@ -18,11 +18,13 @@ metadata:
   name: triggermesh-aws-s3-test
 spec:
   arn: arn:aws:s3:::bucket
-  awsApiKey:
-    secretKeyRef:
-      name: aws
-      key: AWS_ACCESS_KEY_ID
-  awsApiSecret:
-    secretKeyRef:
-      name: aws
-      key: AWS_SECRET_ACCESS_KEY
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: aws
+          key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        valueFromSecret:
+          name: aws
+          key: AWS_SECRET_ACCESS_KEY

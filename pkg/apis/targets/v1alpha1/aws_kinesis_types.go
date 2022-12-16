@@ -45,7 +45,7 @@ var (
 // AWSKinesisTargetSpec defines the desired state of the event target.
 type AWSKinesisTargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the Kinesis stream.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonkinesis.html#amazonkinesis-resources-for-iam-policies

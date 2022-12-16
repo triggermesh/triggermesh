@@ -63,7 +63,7 @@ type AWSCloudWatchLogsSourceSpec struct {
 	PollingInterval *apis.Duration `json:"pollingInterval,omitempty"`
 
 	// Authentication method to interact with the Amazon CloudWatch Logs API.
-	Auth AWSAuth `json:"auth"`
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional

@@ -81,15 +81,15 @@ func (t *AWSEventBridgeTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides 
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (t *AWSEventBridgeTarget) WantsOwnServiceAccount() bool {
-	return t.Spec.EksIAMRole != nil
+	return t.Spec.Auth.EksIAMRole != nil
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (t *AWSEventBridgeTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
 	var saOpts []resource.ServiceAccountOption
 
-	if iamRole := t.Spec.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
+	if iamRole := t.Spec.Auth.EksIAMRole; iamRole != nil {
+		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
 	}
 
 	return saOpts

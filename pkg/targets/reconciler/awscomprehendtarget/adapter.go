@@ -27,6 +27,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const (
@@ -61,25 +62,16 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 // MakeAppEnv extracts environment variables from the object.
 // Exported to be used in external tools for local test environments.
 func MakeAppEnv(o *v1alpha1.AWSComprehendTarget) []corev1.EnvVar {
-	env := []corev1.EnvVar{
-		{
-			Name:  envRegion,
-			Value: o.Spec.Region,
-		}, {
-			Name:  envLanguage,
-			Value: o.Spec.Language,
-		}, {
-			Name: common.EnvAccessKeyID,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.AWSApiKey.SecretKeyRef,
+	env := append(reconciler.MakeAWSAuthEnvVars(o.Spec.Auth),
+		[]corev1.EnvVar{
+			{
+				Name:  envRegion,
+				Value: o.Spec.Region,
+			}, {
+				Name:  envLanguage,
+				Value: o.Spec.Language,
 			},
-		}, {
-			Name: common.EnvSecretAccessKey,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.AWSApiSecret.SecretKeyRef,
-			},
-		},
-	}
+		}...)
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{

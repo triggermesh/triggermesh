@@ -55,38 +55,67 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
-              iamRole:
-                description: (Amazon EKS only) The ARN of an IAM role which can be impersonated to obtain AWS permissions.
-                  For more information about IAM roles for service accounts, please refer to the Amazon EKS User Guide at
-                  https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
-                type: string
-                pattern: ^arn:aws(-cn|-us-gov)?:iam::\d{12}:role\/.+$
-              awsApiKey:
-                description: API Key to interact with the Amazon SQS API. For more information about AWS security credentials,
-                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+              auth:
+                description: Authentication method to interact with the Amazon API.
                 type: object
                 properties:
-                  secretKeyRef:
-                    description: A reference to a Kubernetes Secret object containing the access key ID.
+                  credentials:
+                    description: Security credentials authentication. For more information about AWS security credentials,
+                      please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html.
                     type: object
                     properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
-              awsApiSecret:
-                description: API Secret to interact with the Amazon SQS API. For more information about AWS security credentials,
-                  please refer to the AWS General Reference at https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
-                type: object
-                properties:
-                  secretKeyRef:
-                    description: A reference to a Kubernetes Secret object containing the secret access key.
-                    type: object
-                    properties:
-                      key:
-                        type: string
-                      name:
-                        type: string
+                      accessKeyID:
+                        description: Access key ID.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the access key ID.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the access key ID.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      secretAccessKey:
+                        description: Secret access key.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the secret access key.
+                            type: string
+                            format: password
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the secret access key.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                  iamRole:
+                    description: (Amazon EKS only) The ARN of an IAM role which can be impersonated to obtain AWS permissions.
+                      For more information about IAM roles for service accounts, please refer to the Amazon EKS User Guide
+                      at https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+                    type: string
+                    pattern: ^arn:aws(-cn|-us-gov)?:iam::\d{12}:role\/.+$
+                oneOf:
+                - required: [credentials]
+                - required: [iamRole]
               arn:
                 description: ARN of the SQS queue that will receive events. The expected format is documented at https://docs.aws.amazon.com/service-authorization/latest/reference/list_awslambda.html
                 type: string
@@ -164,16 +193,9 @@ spec:
                           description: Period of time a toleration of effect NoExecute tolerates the taint.
                           type: integer
                           format: int64
-            oneOf:
-            - required:
-              - region
-              - language
-              - awsApiSecret
-              - awsApiKey
-            - required:
-              - region
-              - language
-              - iamRole
+            required:
+            - arn
+            - auth
           status:
             type: object
             description: Reported status of the event target.

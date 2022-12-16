@@ -45,7 +45,7 @@ var (
 // AWSSNSTargetSpec defines the desired state of the event target.
 type AWSSNSTargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the SNS topic.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsns.html#amazonsns-resources-for-iam-policies

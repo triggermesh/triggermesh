@@ -45,7 +45,7 @@ var (
 // AWSSQSTargetSpec defines the desired state of the event target.
 type AWSSQSTargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the SQS queue.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsqs.html#amazonsqs-resources-for-iam-policies

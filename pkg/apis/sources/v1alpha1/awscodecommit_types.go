@@ -60,7 +60,7 @@ type AWSCodeCommitSourceSpec struct {
 	EventTypes []string `json:"eventTypes"`
 
 	// Authentication method to interact with the Amazon CodeCommit API.
-	Auth AWSAuth `json:"auth"`
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional

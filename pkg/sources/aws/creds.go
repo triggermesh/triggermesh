@@ -26,7 +26,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 // Credentials returns the AWS security credentials referenced in a source's

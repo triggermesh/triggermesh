@@ -47,7 +47,7 @@ var (
 // AWSS3TargetSpec holds the desired state of the even target.
 type AWSS3TargetSpec struct {
 	// AWS-specific authentication methods.
-	AWSAuth
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the S3 bucket.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazons3.html#amazons3-resources-for-iam-policies

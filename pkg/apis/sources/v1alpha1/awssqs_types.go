@@ -64,11 +64,11 @@ type AWSSQSSourceSpec struct {
 	MessageProcessor *string `json:"messageProcessor,omitempty"`
 
 	// Authentication method to interact with the Amazon SQS API.
-	Auth AWSAuth `json:"auth"`
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Customizations of the AWS REST API endpoint.
 	// +optional
-	Endpoint *AWSEndpoint `json:"endpoint,omitempty"`
+	Endpoint *v1alpha1.AWSEndpoint `json:"endpoint,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional

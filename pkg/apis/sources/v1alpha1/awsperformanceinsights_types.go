@@ -65,7 +65,7 @@ type AWSPerformanceInsightsSourceSpec struct {
 	Metrics []string `json:"metrics"`
 
 	// Authentication method to interact with the Amazon RDS and Performance Insights APIs.
-	Auth AWSAuth `json:"auth"`
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional
