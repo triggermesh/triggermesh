@@ -235,7 +235,7 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 		resource.PodLabel(appPartOfLabel, partOf),
 		resource.PodLabel(appManagedByLabel, managedBy),
 
-		resource.ServiceAccount(MTAdapterObjectName(rcl)),
+		resource.ServiceAccount(ServiceAccountName(rcl)),
 
 		resource.EnvVar(envComponent, app),
 		resource.EnvVar(envSinkTimeout, strconv.FormatInt(int64(defaultSinkTimeout.Seconds()), 10)),
