@@ -62,7 +62,7 @@ func (d *Delete) InitStep() bool {
 }
 
 // New returns a new instance of Delete object.
-func (d *Delete) New(key, value string) transformer.Transformer {
+func (d *Delete) New(key, value string, _ string) transformer.Transformer {
 	return &Delete{
 		Path:  key,
 		Value: value,

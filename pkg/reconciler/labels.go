@@ -33,14 +33,14 @@ const (
 
 // Common label values
 const (
-	partOf           = "triggermesh"
-	managedBy        = "triggermesh-controller"
+	partOf           = "fianu"
+	managedBy        = "fianu-controller"
 	componentAdapter = "adapter"
 )
 
 // labelsPropagationList is a list of labels that, if present on the parent
 // object, should be propagated to the adapters.
 var labelsPropagationList = []string{
-	"bridges.triggermesh.io/id",
-	"flow.triggermesh.io/created-by",
+	"bridges.fianulabs.io/id",
+	"flow.fianulabs.io/created-by",
 }

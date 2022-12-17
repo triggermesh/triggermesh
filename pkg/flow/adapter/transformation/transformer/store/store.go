@@ -30,8 +30,9 @@ var _ transformer.Transformer = (*Store)(nil)
 
 // Store object implements Transformer interface.
 type Store struct {
-	Path  string
-	Value string
+	Path      string
+	Value     string
+	Separator string
 
 	variables *storage.Storage
 }
@@ -62,10 +63,11 @@ func (s *Store) InitStep() bool {
 }
 
 // New returns a new instance of Store object.
-func (s *Store) New(key, value string) transformer.Transformer {
+func (s *Store) New(key, value, sep string) transformer.Transformer {
 	return &Store{
-		Path:  key,
-		Value: value,
+		Path:      key,
+		Value:     value,
+		Separator: sep,
 
 		variables: s.variables,
 	}
@@ -74,7 +76,7 @@ func (s *Store) New(key, value string) transformer.Transformer {
 // Apply is a main method of Transformation that stores JSON values
 // into variables that can be used by other Transformations in a pipeline.
 func (s *Store) Apply(data []byte) ([]byte, error) {
-	path := convert.SliceToMap(strings.Split(s.Value, "."), "")
+	path := convert.SliceToMap(strings.Split(s.Value, s.Separator), "")
 
 	var event interface{}
 	if err := json.Unmarshal(data, &event); err != nil {

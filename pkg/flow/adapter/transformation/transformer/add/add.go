@@ -65,7 +65,7 @@ func (a *Add) InitStep() bool {
 }
 
 // New returns a new instance of Add object.
-func (a *Add) New(key, value string) transformer.Transformer {
+func (a *Add) New(key, value string, _ string) transformer.Transformer {
 	return &Add{
 		Path:  key,
 		Value: value,
@@ -93,10 +93,7 @@ func (a *Add) Apply(data []byte) ([]byte, error) {
 }
 
 func (a *Add) retrieveVariable(key string) interface{} {
-	if value := a.variables.Get(key); value != nil {
-		return value
-	}
-	return key
+	return a.variables.Get(key)
 }
 
 func (a *Add) composeValue() interface{} {
@@ -107,19 +104,19 @@ func (a *Add) composeValue() interface{} {
 			continue
 		}
 		// return value if it exists, or properly nil for references to empty values
+		storedValue := a.retrieveVariable(key)
+
 		if result == key {
-			if v := a.retrieveVariable(key); v == key {
-				return nil
-			} else {
-				return v
-			}
+			return storedValue
 		}
+
 		// no variable assigned to key in multi-path assignment, remove from path
-		if a.retrieveVariable(key) == key {
-			result = strings.TrimSuffix(result[:index], separator)
-			continue
+		if storedValue == nil {
+			// result = fmt.Sprintf("%s", result[:index-1])
+			result = fmt.Sprintf("%s%s", result[:index], result[index+len(key):])
+		} else {
+			result = fmt.Sprintf("%s%v%s", result[:index], storedValue, result[index+len(key):])
 		}
-		result = fmt.Sprintf("%s%v%s", result[:index], a.retrieveVariable(key), result[index+len(key):])
 	}
 	return result
 }

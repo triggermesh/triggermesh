@@ -23,7 +23,7 @@ import (
 // Transformer is an interface that contains common methods
 // to work with JSON data.
 type Transformer interface {
-	New(string, string) Transformer
+	New(string, string, string) Transformer
 	Apply([]byte) ([]byte, error)
 	SetStorage(*storage.Storage)
 	InitStep() bool

@@ -30,6 +30,10 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/transformer/store"
 )
 
+const (
+	DefaultEventPathSeparator = "."
+)
+
 // Pipeline is a set of Transformations that are
 // sequentially applied to JSON data.
 type Pipeline struct {
@@ -60,7 +64,12 @@ func newPipeline(transformations []v1alpha1.Transform) (*Pipeline, error) {
 			return nil, fmt.Errorf("transformation %q not found", transformation.Operation)
 		}
 		for _, kv := range transformation.Paths {
-			pipeline = append(pipeline, operation.New(kv.Key, kv.Value))
+			sep := DefaultEventPathSeparator
+			if kv.Separator != "" {
+				sep = kv.Separator
+			}
+
+			pipeline = append(pipeline, operation.New(kv.Key, kv.Value, sep))
 		}
 	}
 
