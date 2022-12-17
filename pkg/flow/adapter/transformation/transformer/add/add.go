@@ -99,23 +99,24 @@ func (a *Add) retrieveVariable(key string) interface{} {
 func (a *Add) composeValue() interface{} {
 	result := a.Value
 	for _, key := range a.variables.ListKeys() {
-		index := strings.Index(result, key)
-		if index == -1 {
-			continue
-		}
-		// return value if it exists, or properly nil for references to empty values
-		storedValue := a.retrieveVariable(key)
+		for strings.Index(result, key) != -1 {
+			index := strings.Index(result, key)
+			if index == -1 {
+				continue
+			}
+			// return value if it exists, or properly nil for references to empty values
+			storedValue := a.retrieveVariable(key)
 
-		if result == key {
-			return storedValue
-		}
+			if result == key {
+				return storedValue
+			}
 
-		// no variable assigned to key in multi-path assignment, remove from path
-		if storedValue == nil {
-			// result = fmt.Sprintf("%s", result[:index-1])
-			result = fmt.Sprintf("%s%s", result[:index], result[index+len(key):])
-		} else {
-			result = fmt.Sprintf("%s%v%s", result[:index], storedValue, result[index+len(key):])
+			// no variable assigned to key in multi-path assignment, remove from path
+			if storedValue == nil {
+				result = fmt.Sprintf("%s", result[:index-1])
+			} else {
+				result = fmt.Sprintf("%s%v%s", result[:index], storedValue, result[index+len(key):])
+			}
 		}
 	}
 	return result
