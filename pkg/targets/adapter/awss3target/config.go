@@ -17,9 +17,6 @@ limitations under the License.
 package awss3target
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -31,18 +28,13 @@ func NewEnvConfig() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	AWSApiKey    string `envconfig:"AWS_ACCESS_KEY_ID" required:"true"`
-	AWSApiSecret string `envconfig:"AWS_SECRET_ACCESS_KEY" required:"true"`
 	AwsTargetArn string `envconfig:"ARN" required:"true"`
 
 	DiscardCEContext bool `envconfig:"AWS_DISCARD_CE_CONTEXT"`
-}
 
-func (e *envAccessor) GetAwsConfig() *aws.Config {
-	creds := credentials.NewStaticCredentials(e.AWSApiKey, e.AWSApiSecret, "")
-	config := aws.NewConfig()
-
-	config.WithCredentials(creds)
-
-	return config
+	// The environment variables below aren't read from the envConfig struct
+	// by the AWS SDK, but rather directly using os.Getenv().
+	// They are nevertheless listed here for documentation purposes.
+	_ string `envconfig:"AWS_ACCESS_KEY_ID"`
+	_ string `envconfig:"AWS_SECRET_ACCESS_KEY"`
 }

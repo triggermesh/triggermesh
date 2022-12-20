@@ -29,6 +29,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 // adapterConfig contains properties used to configure the target's adapter.
@@ -57,25 +58,14 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 // MakeAppEnv extracts environment variables from the object.
 // Exported to be used in external tools for local test environments.
 func MakeAppEnv(o *v1alpha1.AWSLambdaTarget) []corev1.EnvVar {
-	envs := []corev1.EnvVar{
-		{
-			Name: common.EnvAccessKeyID,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.AWSApiKey.SecretKeyRef,
+	return append(reconciler.MakeAWSAuthEnvVars(o.Spec.Auth),
+		[]corev1.EnvVar{
+			{
+				Name:  common.EnvARN,
+				Value: o.Spec.ARN,
+			}, {
+				Name:  "AWS_DISCARD_CE_CONTEXT",
+				Value: strconv.FormatBool(o.Spec.DiscardCEContext),
 			},
-		}, {
-			Name: common.EnvSecretAccessKey,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.AWSApiSecret.SecretKeyRef,
-			},
-		}, {
-			Name:  common.EnvARN,
-			Value: o.Spec.ARN,
-		}, {
-			Name:  "AWS_DISCARD_CE_CONTEXT",
-			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
-		},
-	}
-
-	return envs
+		}...)
 }

@@ -37,17 +37,15 @@ type AWSSNSTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSSNSTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSSNSTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSSNSTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSSNSTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSSNSTarget)(nil)
 )
 
 // AWSSNSTargetSpec defines the desired state of the event target.
 type AWSSNSTargetSpec struct {
-	// AWS account Key
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the SNS topic.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsns.html#amazonsns-resources-for-iam-policies

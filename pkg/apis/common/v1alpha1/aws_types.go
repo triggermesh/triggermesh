@@ -17,13 +17,18 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	pkgapis "knative.dev/pkg/apis"
 
 	"github.com/triggermesh/triggermesh/pkg/apis"
-	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 // AWSAuth contains multiple authentication methods for AWS services.
+//
+// +k8s:deepcopy-gen=true
 type AWSAuth struct {
 	// Security credentials allow AWS to authenticate and authorize
 	// requests based on a signature composed of an access key ID and a
@@ -40,16 +45,30 @@ type AWSAuth struct {
 }
 
 // AWSSecurityCredentials represents a set of AWS security credentials.
+//
+// +k8s:deepcopy-gen=true
 type AWSSecurityCredentials struct {
-	AccessKeyID     v1alpha1.ValueFromField `json:"accessKeyID"`
-	SecretAccessKey v1alpha1.ValueFromField `json:"secretAccessKey"`
+	AccessKeyID     ValueFromField `json:"accessKeyID"`
+	SecretAccessKey ValueFromField `json:"secretAccessKey"`
 }
 
 // AWSEndpoint contains parameters which are used to override the destination
 // of REST API calls to AWS services.
 // It allows, for example, to target API-compatible alternatives to the public
 // AWS cloud (Localstack, Minio, ElasticMQ, ...).
+//
+// +k8s:deepcopy-gen=true
 type AWSEndpoint struct {
 	// URL of the endpoint.
 	URL *pkgapis.URL `json:"url,omitempty"`
+}
+
+const annotationEksIAMRole = "eks.amazonaws.com/role-arn"
+
+// AwsIamRoleAnnotation returns a functional option that sets the EKS role-arn
+// annotation on a ServiceAccount.
+func AwsIamRoleAnnotation(iamRole apis.ARN) resource.ServiceAccountOption {
+	return func(sa *corev1.ServiceAccount) {
+		metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationEksIAMRole, iamRole.String())
+	}
 }

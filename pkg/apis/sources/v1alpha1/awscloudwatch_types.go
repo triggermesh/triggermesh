@@ -68,7 +68,7 @@ type AWSCloudWatchSourceSpec struct {
 	MetricQueries []AWSCloudWatchMetricQuery `json:"metricQueries,omitempty"`
 
 	// Authentication method to interact with the Amazon CloudWatch API.
-	Auth AWSAuth `json:"auth"`
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional

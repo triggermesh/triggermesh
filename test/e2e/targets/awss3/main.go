@@ -26,12 +26,10 @@ import (
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
 
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
-	clientset "k8s.io/client-go/kubernetes"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -62,9 +60,6 @@ const (
 	targetResource = "awss3targets"
 )
 
-const awsAccessKeyIDSecretKey = "awsApiKey"
-const awsSecretAccessKeySecretKey = "awsApiSecret"
-
 var _ = Describe("AWS S3 target", func() {
 	f := framework.New("awss3target")
 	region := os.Getenv("AWS_REGION")
@@ -72,9 +67,9 @@ var _ = Describe("AWS S3 target", func() {
 	var ns string
 
 	var trgtClient dynamic.ResourceInterface
+	var awsCreds credentials.Value
 
 	var bucketARN string
-	var awsSecret *corev1.Secret
 
 	BeforeEach(func() {
 		ns = f.UniqueName
@@ -95,8 +90,7 @@ var _ = Describe("AWS S3 target", func() {
 			sess := session.Must(session.NewSession())
 			s3Client = s3.New(sess)
 
-			awsCreds := readAWSCredentials(sess)
-			awsSecret = createAWSCredsSecret(f.KubeClient, ns, awsCreds)
+			awsCreds = readAWSCredentials(sess)
 
 			By("creating a S3 bucket", func() {
 				bucketName = e2es3.CreateBucket(s3Client, f, region)
@@ -115,7 +109,7 @@ var _ = Describe("AWS S3 target", func() {
 				By("creating an AWSS3Target object", func() {
 					trgt, err := createTarget(trgtClient, ns, "test-",
 						withARN(bucketARN),
-						withCredentials(awsSecret.Name),
+						withCredentials(awsCreds),
 					)
 					Expect(err).ToNot(HaveOccurred())
 
@@ -210,7 +204,7 @@ var _ = Describe("AWS S3 target", func() {
 				By("creating an AWSS3Target object with discardCEContext enabled", func() {
 					trgt, err := createTarget(trgtClient, ns, "test-",
 						withARN(bucketARN),
-						withCredentials(awsSecret.Name),
+						withCredentials(awsCreds),
 						withDiscardCEContext(),
 					)
 					Expect(err).ToNot(HaveOccurred())
@@ -257,7 +251,10 @@ var _ = Describe("AWS S3 target", func() {
 		// Those tests do not require a real bucketARN or awsSecret
 		BeforeEach(func() {
 			bucketARN = "arn:aws:s3:::test"
-			awsSecret = &corev1.Secret{}
+			awsCreds = credentials.Value{
+				AccessKeyID:     "fake",
+				SecretAccessKey: "fake",
+			}
 		})
 
 		// Here we use
@@ -272,7 +269,7 @@ var _ = Describe("AWS S3 target", func() {
 
 				_, err := createTarget(trgtClient, ns, "test-invalid-arn",
 					withARN(invalidBucketARN),
-					withCredentials(awsSecret.Name),
+					withCredentials(awsCreds),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.arn: Invalid value: "))
@@ -280,7 +277,7 @@ var _ = Describe("AWS S3 target", func() {
 
 			By("omitting the bucket ARN", func() {
 				_, err := createTarget(trgtClient, ns, "test-no-arn",
-					withCredentials(awsSecret.Name),
+					withCredentials(awsCreds),
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("spec.arn: Required value"))
@@ -292,7 +289,7 @@ var _ = Describe("AWS S3 target", func() {
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(
-					"spec.awsApiSecret: Required value, spec.awsApiKey: Required value"))
+					"spec.auth: Required value"))
 			})
 		})
 	})
@@ -332,52 +329,23 @@ func withDiscardCEContext() targetOption {
 	}
 }
 
-func withCredentials(secretName string) targetOption {
-	apiKeySecretRef := map[string]interface{}{
-		"secretKeyRef": map[string]interface{}{
-			"name": secretName,
-			"key":  awsAccessKeyIDSecretKey,
-		},
+func withCredentials(creds credentials.Value) targetOption {
+	credsMap := map[string]interface{}{
+		"accessKeyID":     map[string]interface{}{},
+		"secretAccessKey": map[string]interface{}{},
+	}
+	if creds.AccessKeyID != "" {
+		credsMap["accessKeyID"] = map[string]interface{}{"value": creds.AccessKeyID}
+	}
+	if creds.SecretAccessKey != "" {
+		credsMap["secretAccessKey"] = map[string]interface{}{"value": creds.SecretAccessKey}
 	}
 
-	apiSecretSecretRef := map[string]interface{}{
-		"secretKeyRef": map[string]interface{}{
-			"name": secretName,
-			"key":  awsSecretAccessKeySecretKey,
-		},
-	}
-
-	return func(trgt *unstructured.Unstructured) {
-		if err := unstructured.SetNestedMap(trgt.Object, apiKeySecretRef, "spec", awsAccessKeyIDSecretKey); err != nil {
-			framework.FailfWithOffset(2, "Failed to set spec.accessToken field: %s", err)
-		}
-		if err := unstructured.SetNestedMap(trgt.Object, apiSecretSecretRef, "spec", awsSecretAccessKeySecretKey); err != nil {
-			framework.FailfWithOffset(2, "Failed to set spec.secretToken field: %s", err)
+	return func(src *unstructured.Unstructured) {
+		if err := unstructured.SetNestedMap(src.Object, credsMap, "spec", "auth", "credentials"); err != nil {
+			framework.FailfWithOffset(3, "Failed to set spec.auth.credentials field: %s", err)
 		}
 	}
-}
-
-// createAWSCredsSecret creates a Kubernetes Secret containing a AWS credentials.
-func createAWSCredsSecret(c clientset.Interface, namespace string, creds credentials.Value) *corev1.Secret {
-	secret := &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace:    namespace,
-			GenerateName: "aws-creds-",
-		},
-		StringData: map[string]string{
-			awsAccessKeyIDSecretKey:     creds.AccessKeyID,
-			awsSecretAccessKeySecretKey: creds.SecretAccessKey,
-		},
-	}
-
-	var err error
-
-	secret, err = c.CoreV1().Secrets(namespace).Create(context.Background(), secret, metav1.CreateOptions{})
-	if err != nil {
-		framework.FailfWithOffset(2, "Failed to create Secret: %s", err)
-	}
-
-	return secret
 }
 
 func readAWSCredentials(sess *session.Session) credentials.Value {

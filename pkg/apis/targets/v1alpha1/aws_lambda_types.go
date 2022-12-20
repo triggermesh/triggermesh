@@ -37,17 +37,15 @@ type AWSLambdaTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSLambdaTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSLambdaTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSLambdaTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSLambdaTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSLambdaTarget)(nil)
 )
 
 // AWSLambdaTargetSpec defines the desired state of the event target.
 type AWSLambdaTargetSpec struct {
-	// AWS account Key
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the Lambda function.
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_awslambda.html#awslambda-resources-for-iam-policies

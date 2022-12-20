@@ -18,11 +18,13 @@ metadata:
   name: triggermesh-aws-eventbridge
 spec:
   arn: arn:aws:events:us-west-2:<PROJECT_ID>:event-bus/cab-knative-event-test
-  awsApiKey:
-    secretKeyRef:
-      name: aws
-      key: AWS_ACCESS_KEY_ID
-  awsApiSecret:
-    secretKeyRef:
-      name: aws
-      key: AWS_SECRET_ACCESS_KEY
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: aws
+          key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        valueFromSecret:
+          name: aws
+          key: AWS_SECRET_ACCESS_KEY

@@ -87,7 +87,7 @@ func (s *AWSEventBridgeSource) ServiceAccountOptions() []resource.ServiceAccount
 	var saOpts []resource.ServiceAccountOption
 
 	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, iamRoleAnnotation(*iamRole))
+		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
 	}
 
 	return saOpts

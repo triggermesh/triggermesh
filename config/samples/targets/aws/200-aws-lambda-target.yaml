@@ -18,11 +18,13 @@ metadata:
   name: triggermesh-aws-lambda
 spec:
   arn: arn:aws:lambda:us-west-2:<PROJECT_ID>:function:lambdadumper
-  awsApiKey:
-    secretKeyRef:
-      name: aws
-      key: AWS_ACCESS_KEY_ID
-  awsApiSecret:
-    secretKeyRef:
-      name: aws
-      key: AWS_SECRET_ACCESS_KEY
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: aws
+          key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        valueFromSecret:
+          name: aws
+          key: AWS_SECRET_ACCESS_KEY

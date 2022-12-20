@@ -29,8 +29,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 
-	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
-	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
 func TestCredentials(t *testing.T) {
@@ -53,10 +52,10 @@ func TestCredentials(t *testing.T) {
 		{
 			name: "Both from value",
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: commonv1alpha1.ValueFromField{
+				AccessKeyID: v1alpha1.ValueFromField{
 					Value: accessKeyIDVal,
 				},
-				SecretAccessKey: commonv1alpha1.ValueFromField{
+				SecretAccessKey: v1alpha1.ValueFromField{
 					Value: secretAccessKeyVal,
 				},
 			},
@@ -74,10 +73,10 @@ func TestCredentials(t *testing.T) {
 				}),
 			},
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: commonv1alpha1.ValueFromField{
+				AccessKeyID: v1alpha1.ValueFromField{
 					Value: accessKeyIDVal,
 				},
-				SecretAccessKey: commonv1alpha1.ValueFromField{
+				SecretAccessKey: v1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -101,7 +100,7 @@ func TestCredentials(t *testing.T) {
 				}),
 			},
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: commonv1alpha1.ValueFromField{
+				AccessKeyID: v1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -109,7 +108,7 @@ func TestCredentials(t *testing.T) {
 						Key: accessKeyIDKey,
 					},
 				},
-				SecretAccessKey: commonv1alpha1.ValueFromField{
+				SecretAccessKey: v1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -135,7 +134,7 @@ func TestCredentials(t *testing.T) {
 				}),
 			},
 			input: v1alpha1.AWSSecurityCredentials{
-				AccessKeyID: commonv1alpha1.ValueFromField{
+				AccessKeyID: v1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret1",
@@ -143,7 +142,7 @@ func TestCredentials(t *testing.T) {
 						Key: accessKeyIDKey,
 					},
 				},
-				SecretAccessKey: commonv1alpha1.ValueFromField{
+				SecretAccessKey: v1alpha1.ValueFromField{
 					ValueFromSecret: &corev1.SecretKeySelector{
 						LocalObjectReference: corev1.LocalObjectReference{
 							Name: "secret2",

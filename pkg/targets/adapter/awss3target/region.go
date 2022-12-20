@@ -17,6 +17,7 @@ limitations under the License.
 package awss3target
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -28,7 +29,7 @@ const defaultS3Region = "us-east-1"
 
 // getBucketRegion retrieves the region the provided bucket resides in.
 func getBucketRegion(bucketName string, env *envAccessor) (string, error) {
-	sess := session.Must(session.NewSession(env.GetAwsConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(defaultS3Region)))
 
 	resp, err := s3.New(sess).GetBucketLocation(&s3.GetBucketLocationInput{

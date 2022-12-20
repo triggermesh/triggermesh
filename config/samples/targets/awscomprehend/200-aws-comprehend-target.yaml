@@ -19,11 +19,13 @@ metadata:
 spec:
   region: us-west-1
   language: en
-  awsApiKey:
-    secretKeyRef:
-      name: aws
-      key: AWS_ACCESS_KEY_ID
-  awsApiSecret:
-    secretKeyRef:
-      name: aws
-      key: AWS_SECRET_ACCESS_KEY
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: aws
+          key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        valueFromSecret:
+          name: aws
+          key: AWS_SECRET_ACCESS_KEY

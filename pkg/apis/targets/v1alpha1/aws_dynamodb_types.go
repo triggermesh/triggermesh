@@ -37,18 +37,16 @@ type AWSDynamoDBTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSDynamoDBTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSDynamoDBTarget)(nil)
-	_ v1alpha1.EventSource         = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.EventSource            = (*AWSDynamoDBTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSDynamoDBTarget)(nil)
 )
 
 // AWSDynamoDBTargetSpec defines the desired state of the event target.
 type AWSDynamoDBTargetSpec struct {
-	// AWS account Key
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Table ARN
 	// https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazondynamodb.html#amazondynamodb-resources-for-iam-policies

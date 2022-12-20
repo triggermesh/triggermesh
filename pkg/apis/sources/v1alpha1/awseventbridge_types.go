@@ -69,7 +69,7 @@ type AWSEventBridgeSourceSpec struct {
 	Destination *AWSEventBridgeSourceDestination `json:"destination,omitempty"`
 
 	// Authentication method to interact with the Amazon S3 and SQS APIs.
-	Auth AWSAuth `json:"auth"`
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional

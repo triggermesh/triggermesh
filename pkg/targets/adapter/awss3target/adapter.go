@@ -30,6 +30,7 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -60,10 +61,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error getting bucket region: %v", err)
 	}
 
-	s3Session := session.Must(session.NewSession(
-		env.GetAwsConfig().
-			WithRegion(region).
-			WithMaxRetries(5)))
+	s3Session := session.Must(session.NewSession(aws.NewConfig().
+		WithRegion(region).
+		WithMaxRetries(5)))
 
 	return &adapter{
 		awsArnString: env.AwsTargetArn,

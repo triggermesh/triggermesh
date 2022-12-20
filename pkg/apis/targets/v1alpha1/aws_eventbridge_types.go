@@ -37,17 +37,15 @@ type AWSEventBridgeTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AWSEventBridgeTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AWSEventBridgeTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*AWSEventBridgeTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*AWSEventBridgeTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*AWSEventBridgeTarget)(nil)
 )
 
 // AWSEventBridgeTargetSpec defines the desired state of the event target.
 type AWSEventBridgeTargetSpec struct {
-	// AWS account Key
-	AWSApiKey SecretValueFromSource `json:"awsApiKey"`
-
-	// AWS account secret key
-	AWSApiSecret SecretValueFromSource `json:"awsApiSecret"`
+	// AWS-specific authentication methods.
+	Auth v1alpha1.AWSAuth `json:"auth"`
 
 	// Amazon Resource Name of the EventBridge Event Bus.
 	// https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoneventbridge.html

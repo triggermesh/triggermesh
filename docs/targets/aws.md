@@ -56,7 +56,7 @@ stringData:
 
 Once the AWS Target Controller has been deployed, a target for Lambdas, SNS, SQS, and s3
 can be created by defining their respective object. Most will be similar to below
-where the `arn`, `awsApiKey`, and `awsApiSecret` will be required while the kind will
+where the `arn`, `accessKeyID`, and `secretAccessKey` will be required while the kind will
 be one of:
 
   * AWSLambdaTarget
@@ -73,13 +73,16 @@ metadata:
 spec:
   arn: arn:aws:lambda:us-west-2:043455440429:function:snslistener
   awsApiKey:
-    secretKeyRef:
-      name: aws
-      key: AWS_ACCESS_KEY_ID
-  awsApiSecret:
-    secretKeyRef:
-      name: aws
-      key: AWS_SECRET_ACCESS_KEY
+  auth:
+    credentials:
+      accessKeyID:
+        valueFromSecret:
+          name: aws
+          key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        valueFromSecret:
+          name: aws
+          key: AWS_SECRET_ACCESS_KEY
 ```
 
 For more details, consult the [target samples](samples/aws).
