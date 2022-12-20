@@ -113,11 +113,11 @@ roleRef:
 
 ---
 
-# Resolve sink URIs
+# Resolve sink URIs when Knative is installed
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: triggermesh-controller-addressable-resolver
+  name: triggermesh-controller-addressable-resolver-from-knative
   labels:
     app.kubernetes.io/part-of: triggermesh
 subjects:
@@ -128,3 +128,21 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: addressable-resolver
+
+---
+
+# Resolve sink URIs when TriggerMesh Core is installed
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-controller-addressable-resolver-from-triggermesh
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+- kind: ServiceAccount
+  name: triggermesh-controller
+  namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: addressable-resolver-triggermesh
