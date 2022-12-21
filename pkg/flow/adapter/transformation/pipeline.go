@@ -34,6 +34,7 @@ import (
 // sequentially applied to JSON data.
 type Pipeline struct {
 	Transformers []transformer.Transformer
+	Storage      *storage.Storage
 }
 
 // register loads available Transformation into a named map.
@@ -50,7 +51,7 @@ func register() map[string]transformer.Transformer {
 }
 
 // newPipeline loads available Transformations and creates a Pipeline.
-func newPipeline(transformations []v1alpha1.Transform) (*Pipeline, error) {
+func newPipeline(transformations []v1alpha1.Transform, storage *storage.Storage) (*Pipeline, error) {
 	availableTransformers := register()
 	pipeline := []transformer.Transformer{}
 
@@ -60,29 +61,25 @@ func newPipeline(transformations []v1alpha1.Transform) (*Pipeline, error) {
 			return nil, fmt.Errorf("transformation %q not found", transformation.Operation)
 		}
 		for _, kv := range transformation.Paths {
-			pipeline = append(pipeline, operation.New(kv.Key, kv.Value))
+			transformer := operation.New(kv.Key, kv.Value)
+			transformer.SetStorage(storage)
+			pipeline = append(pipeline, transformer)
 		}
 	}
 
 	return &Pipeline{
 		Transformers: pipeline,
+		Storage:      storage,
 	}, nil
 }
 
-// SetStorage injects shared storage with Pipeline vars.
-func (p *Pipeline) setStorage(s *storage.Storage) {
-	for _, v := range p.Transformers {
-		v.SetStorage(s)
-	}
-}
-
 // Apply applies Pipeline transformations.
-func (p *Pipeline) apply(data []byte, init bool) ([]byte, error) {
+func (p *Pipeline) apply(eventID string, data []byte, init bool) ([]byte, error) {
 	var err error
 	var errs []string
 	for _, v := range p.Transformers {
 		if init == v.InitStep() {
-			if data, err = v.Apply(data); err != nil {
+			if data, err = v.Apply(eventID, data); err != nil {
 				errs = append(errs, err.Error())
 			}
 		}

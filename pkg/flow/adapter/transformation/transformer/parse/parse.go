@@ -74,7 +74,7 @@ func (p *Parse) New(key, value string) transformer.Transformer {
 
 // Apply is a main method of Transformation that parse JSON values
 // into variables that can be used by other Transformations in a pipeline.
-func (p *Parse) Apply(data []byte) ([]byte, error) {
+func (p *Parse) Apply(eventID string, data []byte) ([]byte, error) {
 	path := convert.SliceToMap(strings.Split(p.Path, "."), "")
 
 	switch p.Value {

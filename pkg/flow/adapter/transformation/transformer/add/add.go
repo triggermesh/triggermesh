@@ -73,8 +73,8 @@ func (a *Add) New(key, value string) transformer.Transformer {
 
 // Apply is a main method of Transformation that adds any type of
 // variables into existing JSON.
-func (a *Add) Apply(data []byte) ([]byte, error) {
-	input := convert.SliceToMap(strings.Split(a.Path, "."), a.composeValue())
+func (a *Add) Apply(eventID string, data []byte) ([]byte, error) {
+	input := convert.SliceToMap(strings.Split(a.Path, "."), a.composeValue(eventID))
 	var event interface{}
 	if err := json.Unmarshal(data, &event); err != nil {
 		return data, err
@@ -89,24 +89,24 @@ func (a *Add) Apply(data []byte) ([]byte, error) {
 	return output, nil
 }
 
-func (a *Add) retrieveVariable(key string) interface{} {
-	if value := a.variables.Get(key); value != nil {
+func (a *Add) retrieveVariable(eventID, key string) interface{} {
+	if value := a.variables.Get(eventID, key); value != nil {
 		return value
 	}
 	return key
 }
 
-func (a *Add) composeValue() interface{} {
+func (a *Add) composeValue(eventID string) interface{} {
 	result := a.Value
-	for _, key := range a.variables.ListKeys() {
+	for _, key := range a.variables.ListEventVariables(eventID) {
 		index := strings.Index(result, key)
 		if index == -1 {
 			continue
 		}
 		if result == key {
-			return a.retrieveVariable(key)
+			return a.retrieveVariable(eventID, key)
 		}
-		result = fmt.Sprintf("%s%v%s", result[:index], a.retrieveVariable(key), result[index+len(key):])
+		result = fmt.Sprintf("%s%v%s", result[:index], a.retrieveVariable(eventID, key), result[index+len(key):])
 	}
 	return result
 }

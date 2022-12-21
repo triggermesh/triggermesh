@@ -81,7 +81,7 @@ func (s *Shift) New(key, value string) transformer.Transformer {
 
 // Apply is a main method of Transformation that moves existing
 // values to a new locations.
-func (s *Shift) Apply(data []byte) ([]byte, error) {
+func (s *Shift) Apply(eventID string, data []byte) ([]byte, error) {
 	oldPath := convert.SliceToMap(strings.Split(s.Path, "."), "")
 
 	var event interface{}
@@ -91,7 +91,7 @@ func (s *Shift) Apply(data []byte) ([]byte, error) {
 
 	newEvent, value := extractValue(event, oldPath)
 	if s.Value != "" {
-		if !equal(s.retrieveInterface(s.Value), value) {
+		if !equal(s.retrieveInterface(eventID, s.Value), value) {
 			return data, nil
 		}
 	}
@@ -109,8 +109,8 @@ func (s *Shift) Apply(data []byte) ([]byte, error) {
 	return output, nil
 }
 
-func (s *Shift) retrieveInterface(key string) interface{} {
-	if value := s.variables.Get(key); value != nil {
+func (s *Shift) retrieveInterface(eventID, key string) interface{} {
+	if value := s.variables.Get(eventID, key); value != nil {
 		return value
 	}
 	return key

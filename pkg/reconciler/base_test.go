@@ -18,9 +18,10 @@ package reconciler
 
 import (
 	"context"
-	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"testing"
 	"time"
+
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
