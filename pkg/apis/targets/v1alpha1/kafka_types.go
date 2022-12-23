@@ -58,7 +58,8 @@ type KafkaTargetSpec struct {
 	BootstrapServers []string `json:"bootstrapServers"`
 
 	// Auth contains Authentication method used to interact with Kafka.
-	Auth KafkaTargetAuth `json:"auth"`
+	// +optional
+	Auth *KafkaTargetAuth `json:"auth"`
 
 	// Whether to omit CloudEvent context attributes in messages sent to Kafka.
 	// When this property is false (default), the entire CloudEvent payload is included.

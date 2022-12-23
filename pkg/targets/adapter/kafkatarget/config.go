@@ -28,7 +28,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
-	SASLEnable bool `envconfig:"SASL_ENABLE" required:"true"`
+	SASLEnable bool `envconfig:"SASL_ENABLE" required:"false"`
 	TLSEnable  bool `envconfig:"TLS_ENABLE" required:"false"`
 
 	BootstrapServers   []string `envconfig:"BOOTSTRAP_SERVERS" required:"true"`
@@ -36,7 +36,7 @@ type envAccessor struct {
 	Password           string   `envconfig:"PASSWORD" required:"false"`
 	Topic              string   `envconfig:"TOPIC" required:"true"`
 	GroupID            string   `envconfig:"GROUP_ID" required:"false" `
-	SecurityMechanisms string   `envconfig:"SECURITY_MECHANISMS" required:"true"`
+	SecurityMechanisms string   `envconfig:"SECURITY_MECHANISMS" required:"false"`
 
 	KerberosConfigPath  string `envconfig:"KERBEROS_CONFIG_PATH" required:"false" `
 	KerberosServiceName string `envconfig:"KERBEROS_SERVICE_NAME" required:"false" `
