@@ -19,6 +19,8 @@ package transformation
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -28,6 +30,7 @@ import (
 	logtesting "knative.dev/pkg/logging/testing"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 )
 
 var availableTransformations = []v1alpha1.Transform{
@@ -38,12 +41,15 @@ var availableTransformations = []v1alpha1.Transform{
 }
 
 func TestStart(t *testing.T) {
+	pipeline, err := newPipeline(availableTransformations, storage.New())
+	assert.NoError(t, err)
+
 	ceClient, err := cloudevents.NewClientHTTP()
 	assert.NoError(t, err)
 
 	a := &adapter{
-		ContextPipeline: availableTransformations,
-		DataPipeline:    availableTransformations,
+		ContextPipeline: pipeline,
+		DataPipeline:    pipeline,
 
 		client: ceClient,
 		logger: logtesting.TestLogger(t),
@@ -330,9 +336,14 @@ func TestReceiveAndTransform(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			pipeline, err := newPipeline(tc.data, storage.New())
+			assert.NoError(t, err)
+
+			// pipeline.setStorage(storage.New())
+
 			a := &adapter{
-				DataPipeline:    tc.data,
-				ContextPipeline: tc.data,
+				DataPipeline:    pipeline,
+				ContextPipeline: pipeline,
 				logger:          logtesting.TestLogger(t),
 			}
 
@@ -342,4 +353,153 @@ func TestReceiveAndTransform(t *testing.T) {
 			assert.Equal(t, tc.expectedEventData, string(transformedEvent.Data()))
 		})
 	}
+}
+
+func TestConcurrentStore(t *testing.T) {
+	sharedStorage := storage.New()
+
+	contextPipeline, err := newPipeline([]v1alpha1.Transform{
+		{
+			Operation: "store",
+			Paths: []v1alpha1.Path{
+				{
+					Key:   "$id",
+					Value: "id",
+				},
+			},
+		},
+	}, sharedStorage)
+	assert.NoError(t, err)
+	dataPipeline, err := newPipeline([]v1alpha1.Transform{
+		{
+			Operation: "add",
+			Paths: []v1alpha1.Path{
+				{
+					Key:   "id",
+					Value: "$id",
+				},
+			},
+		},
+	}, sharedStorage)
+	assert.NoError(t, err)
+
+	a := &adapter{
+		DataPipeline:    dataPipeline,
+		ContextPipeline: contextPipeline,
+		logger:          logtesting.TestLogger(t),
+	}
+
+	transformationRequests := make(chan cloudevents.Event, 10)
+	transformationResponses := make(chan cloudevents.Event, 10)
+
+	// start 3 transformation workers
+	for i := 0; i < 3; i++ {
+		go func() {
+			for event := range transformationRequests {
+				result, err := a.applyTransformations(event)
+				assert.NoError(t, err)
+				transformationResponses <- *result
+			}
+		}()
+	}
+
+	// send 10 events
+	for i := 0; i < 10; i++ {
+		event := cloudevents.NewEvent(cloudevents.VersionV1)
+		assert.NoError(t, event.SetData(cloudevents.ApplicationJSON, "{}"))
+		event.SetID(fmt.Sprint(i))
+		event.SetType("mock-event")
+		event.SetSource("concurrency-test")
+		assert.NoError(t, event.Validate())
+		transformationRequests <- event
+	}
+
+	type data struct {
+		ID string `json:"id"`
+	}
+
+	// receive transformed events
+	counter := 0
+	for result := range transformationResponses {
+		var resultData data
+		assert.NoError(t, result.DataAs(&resultData))
+
+		if resultData.ID != result.ID() {
+			assert.Failf(t, "transformation shared store race condition", "expected string: %v, actual string: %v", result.ID(), resultData.ID)
+		}
+
+		if counter++; counter == 10 {
+			close(transformationResponses)
+			close(transformationRequests)
+		}
+	}
+
+	// ensure that the storage is being flushed properly
+	assert.True(t, (len(a.ContextPipeline.Storage.ListEventIDs()) == 0) && (len(a.DataPipeline.Storage.ListEventIDs()) == 0))
+}
+
+func BenchmarkStorage(b *testing.B) {
+	sharedStorage := storage.New()
+
+	contextPipeline, _ := newPipeline([]v1alpha1.Transform{
+		{
+			Operation: "store",
+			Paths: []v1alpha1.Path{
+				{
+					Key:   "$id",
+					Value: "id",
+				},
+			},
+		},
+	}, sharedStorage)
+
+	dataPipeline, _ := newPipeline([]v1alpha1.Transform{
+		{
+			Operation: "add",
+			Paths: []v1alpha1.Path{
+				{
+					Key:   "id",
+					Value: "$id",
+				},
+			},
+		},
+	}, sharedStorage)
+
+	a := &adapter{
+		DataPipeline:    dataPipeline,
+		ContextPipeline: contextPipeline,
+
+		logger: logtesting.TestLogger(b),
+	}
+
+	transformationRequests := make(chan cloudevents.Event)
+
+	var wg sync.WaitGroup
+	wg.Add(b.N)
+
+	// start 10 transformation workers
+	for i := 0; i < 10; i++ {
+		go func() {
+			for event := range transformationRequests {
+				if _, err := a.applyTransformations(event); err != nil {
+					b.Logf("transformation error: %v", err)
+				}
+				wg.Done()
+			}
+		}()
+	}
+
+	for i := 0; i < b.N; i++ {
+		event := cloudevents.NewEvent(cloudevents.VersionV1)
+		if err := event.SetData(cloudevents.ApplicationJSON, "{}"); err != nil {
+			b.Logf("CE data error: %v", err)
+			continue
+		}
+		event.SetType("mock-event")
+		event.SetSource("benchmark-test")
+		event.SetID(fmt.Sprint(i))
+
+		transformationRequests <- event
+	}
+	wg.Wait()
 }

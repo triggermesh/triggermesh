@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 	"strings"
 	"time"
 
@@ -32,6 +31,7 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/flow/adapter/transformation/common/storage"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
@@ -48,8 +48,8 @@ type envConfig struct {
 
 // adapter contains Pipelines for CE transformations and CloudEvents client.
 type adapter struct {
-	ContextPipeline []v1alpha1.Transform
-	DataPipeline    []v1alpha1.Transform
+	ContextPipeline *Pipeline
+	DataPipeline    *Pipeline
 
 	mt *pkgadapter.MetricTag
 	sr *metrics.EventProcessingStatsReporter
@@ -94,14 +94,28 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Fatalf("Cannot unmarshal data transformation env variable: %v", err)
 	}
 
+	sharedStorage := storage.New()
+
+	contextPl, err := newPipeline(trnContext, sharedStorage)
+	if err != nil {
+		logger.Fatalf("Cannot create context transformation pipeline: %v", err)
+	}
+
+	dataPl, err := newPipeline(trnData, sharedStorage)
+	if err != nil {
+		logger.Fatalf("Cannot create data transformation pipeline: %v", err)
+	}
+
 	return &adapter{
-		mt:              mt,
-		sr:              metrics.MustNewEventProcessingStatsReporter(mt),
-		ContextPipeline: trnContext,
-		DataPipeline:    trnData,
-		sink:            env.Sink,
-		client:          ceClient,
-		logger:          logger,
+		ContextPipeline: contextPl,
+		DataPipeline:    dataPl,
+
+		mt: mt,
+		sr: metrics.MustNewEventProcessingStatsReporter(mt),
+
+		sink:   env.Sink,
+		client: ceClient,
+		logger: logger,
 	}
 }
 
@@ -166,22 +180,6 @@ func (t *adapter) receiveAndSend(ctx context.Context, event cloudevents.Event) e
 }
 
 func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Event, error) {
-	contextPl, err := newPipeline(t.ContextPipeline)
-	if err != nil {
-		t.logger.Fatalf("Cannot create context transformation pipeline: %v", err)
-	}
-
-	dataPl, err := newPipeline(t.DataPipeline)
-	if err != nil {
-		t.logger.Fatalf("Cannot create data transformation pipeline: %v", err)
-	}
-
-	// set shared storage, scoped too the application function
-	sharedStorage := storage.New()
-
-	contextPl.setStorage(sharedStorage)
-	dataPl.setStorage(sharedStorage)
-
 	// HTTPTargets sets content type from HTTP headers, i.e.:
 	// "datacontenttype: application/json; charset=utf-8"
 	// so we must use "contains" instead of strict equality
@@ -206,18 +204,24 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	var init = true
 	var errs []error
 
+	eventUniqueID := fmt.Sprintf("%s-%s", event.ID(), event.Source())
+
+	// remove event-related variables after the transformation is done.
+	// since the storage is shared, flush can be done for one pipeline.
+	defer t.ContextPipeline.Storage.Flush(eventUniqueID)
+
 	// Run init step such as load Pipeline variables first
-	eventContext, err := contextPl.apply(localContextBytes, init)
+	eventContext, err := t.ContextPipeline.apply(eventUniqueID, localContextBytes, init)
 	if err != nil {
 		errs = append(errs, err)
 	}
-	eventPayload, err := dataPl.apply(event.Data(), init)
+	eventPayload, err := t.DataPipeline.apply(eventUniqueID, event.Data(), init)
 	if err != nil {
 		errs = append(errs, err)
 	}
 
 	// CE Context transformation
-	if eventContext, err = contextPl.apply(eventContext, !init); err != nil {
+	if eventContext, err = t.ContextPipeline.apply(eventUniqueID, eventContext, !init); err != nil {
 		errs = append(errs, err)
 	}
 	if err := json.Unmarshal(eventContext, &localContext); err != nil {
@@ -233,7 +237,7 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	}
 
 	// CE Data transformation
-	if eventPayload, err = dataPl.apply(eventPayload, !init); err != nil {
+	if eventPayload, err = t.DataPipeline.apply(eventUniqueID, eventPayload, !init); err != nil {
 		errs = append(errs, err)
 	}
 	if err = event.SetData(cloudevents.ApplicationJSON, eventPayload); err != nil {

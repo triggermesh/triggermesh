@@ -73,8 +73,8 @@ func (d *Delete) New(key, value string) transformer.Transformer {
 
 // Apply is a main method of Transformation that removed any type of
 // variables from existing JSON.
-func (d *Delete) Apply(data []byte) ([]byte, error) {
-	d.Value = d.retrieveString(d.Value)
+func (d *Delete) Apply(eventID string, data []byte) ([]byte, error) {
+	d.Value = d.retrieveString(eventID, d.Value)
 
 	result, err := d.parse(data, "", "")
 	if err != nil {
@@ -89,8 +89,8 @@ func (d *Delete) Apply(data []byte) ([]byte, error) {
 	return output, nil
 }
 
-func (d *Delete) retrieveString(key string) string {
-	if value := d.variables.Get(key); value != nil {
+func (d *Delete) retrieveString(eventID, key string) string {
+	if value := d.variables.Get(eventID, key); value != nil {
 		if str, ok := value.(string); ok {
 			return str
 		}

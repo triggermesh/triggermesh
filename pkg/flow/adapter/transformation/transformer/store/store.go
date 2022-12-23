@@ -73,7 +73,7 @@ func (s *Store) New(key, value string) transformer.Transformer {
 
 // Apply is a main method of Transformation that stores JSON values
 // into variables that can be used by other Transformations in a pipeline.
-func (s *Store) Apply(data []byte) ([]byte, error) {
+func (s *Store) Apply(eventID string, data []byte) ([]byte, error) {
 	path := convert.SliceToMap(strings.Split(s.Value, "."), "")
 
 	var event interface{}
@@ -83,7 +83,7 @@ func (s *Store) Apply(data []byte) ([]byte, error) {
 
 	value := common.ReadValue(event, path)
 
-	s.variables.Set(s.Path, value)
+	s.variables.Set(eventID, s.Path, value)
 
 	return data, nil
 }
