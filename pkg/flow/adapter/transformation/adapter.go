@@ -205,6 +205,11 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	var errs []error
 
 	eventUniqueID := fmt.Sprintf("%s-%s", event.ID(), event.Source())
+
+	// remove event-related variables after the transformation is done.
+	// since the storage is shared, flush can be done for one pipeline.
+	defer t.ContextPipeline.Storage.Flush(eventUniqueID)
+
 	// Run init step such as load Pipeline variables first
 	eventContext, err := t.ContextPipeline.apply(eventUniqueID, localContextBytes, init)
 	if err != nil {
@@ -244,10 +249,6 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	if len(errs) != 0 {
 		t.logger.Errorw("Event transformation errors", zap.Errors("errors", errs))
 	}
-
-	// remove event-related variables after the transformation is done.
-	// since the storage is shared, flush can be done for one pipeline.
-	t.ContextPipeline.Storage.Flush(eventUniqueID)
 
 	return &event, nil
 }
