@@ -28,7 +28,7 @@ func NewEnvConfig() adapter.EnvConfigAccessor {
 type envAccessor struct {
 	adapter.EnvConfig
 
-	SASLEnable bool `envconfig:"SASL_ENABLE" required:"true"`
+	SASLEnable bool `envconfig:"SASL_ENABLE" required:"false"`
 	TLSEnable  bool `envconfig:"TLS_ENABLE" required:"false"`
 
 	BootstrapServers []string `envconfig:"BOOTSTRAP_SERVERS" required:"true"`
@@ -37,7 +37,7 @@ type envAccessor struct {
 	Topic            string   `envconfig:"TOPIC" required:"true"`
 	GroupID          string   `envconfig:"GROUP_ID" required:"false"`
 
-	SecurityMechanisms  string `envconfig:"SECURITY_MECHANISMS" required:"true"`
+	SecurityMechanisms  string `envconfig:"SECURITY_MECHANISMS" required:"false"`
 	KerberosConfigPath  string `envconfig:"KERBEROS_CONFIG_PATH" required:"false" `
 	KerberosServiceName string `envconfig:"KERBEROS_SERVICE_NAME" required:"false" `
 	KerberosKeytabPath  string `envconfig:"KERBEROS_KEYTAB_PATH" required:"false"`
