@@ -12,12 +12,12 @@ event filtering, event splitting, event transformation and event processing via 
 
 ## Getting Started
 
-* [Guides](https://docs.triggermesh.io/guides/creatingasource/)
+* [Guides](https://docs.triggermesh.io/guides/creatingadls/)
 * [Documentation](https://docs.triggermesh.io)
 
 ## Installation
 
-To install TriggerMesh, follow the [installation instructions](https://docs.triggermesh.io/guides/installation/).
+To install TriggerMesh, follow the [installation instructions](https://docs.triggermesh.io/installation/).
 
 ### TL;DR
 
