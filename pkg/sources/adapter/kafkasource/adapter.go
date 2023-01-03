@@ -46,6 +46,7 @@ type kafkasourceAdapter struct {
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
 func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+	sarama.Logger = zap.NewStdLog(logger.Named("sarama").Desugar())
 
 	mt := &pkgadapter.MetricTag{
 		ResourceGroup: sources.CloudEventsSourceResource.String(),
