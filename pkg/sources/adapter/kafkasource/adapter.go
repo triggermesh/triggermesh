@@ -58,7 +58,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	var err error
 
 	config := sarama.NewConfig()
-	tlsCfg := &tls.Config{}
 
 	if env.SASLEnable {
 		config.Net.SASL.Enable = env.SASLEnable
@@ -69,11 +68,19 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	if env.TLSEnable {
 		config.Net.TLS.Enable = env.TLSEnable
-		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
-		if err != nil {
-			logger.Panicw("Could not create the TLS Certificates Config", err)
+
+		tlsCfg := &tls.Config{}
+		if env.CA != "" {
+			addCAConfig(tlsCfg, env.CA)
 		}
-		tlsCfg = newTLSRootCAConfig(tlsCfg, env.CA)
+
+		if env.ClientCert != "" || env.ClientKey != "" {
+
+			if err := addTLSCerts(tlsCfg, env.ClientCert, env.ClientKey); err != nil {
+				logger.Panicw("Could not parse the TLS Certificates", zap.Error(err))
+			}
+		}
+
 		config.Net.TLS.Config = tlsCfg
 		config.Net.TLS.Config.InsecureSkipVerify = env.SkipVerify
 	}
@@ -99,14 +106,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	err = config.Validate()
 	if err != nil {
-		logger.Panicw("Config not valid", err)
+		logger.Panicw("Config not valid", zap.Error(err))
 	}
 
 	kc, err := sarama.NewConsumerGroup(
 		env.BootstrapServers,
 		env.GroupID, config)
 	if err != nil {
-		logger.Panicw("Error creating Kafka Consumer", err)
+		logger.Panicw("Error creating Kafka Consumer", zap.Error(err))
 	}
 
 	return &kafkasourceAdapter{
@@ -139,23 +146,17 @@ func (a *kafkasourceAdapter) Start(ctx context.Context) error {
 	}
 }
 
-func newTLSCertificatesConfig(tlsConfig *tls.Config, clientCert, clientKey string) (*tls.Config, error) {
-	if clientCert != "" && clientKey != "" {
-		cert, err := tls.LoadX509KeyPair(clientCert, clientKey)
-		if err != nil {
-			return tlsConfig, err
-		}
+func addCAConfig(tlsConfig *tls.Config, caCert string) {
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM([]byte(caCert))
+	tlsConfig.RootCAs = caCertPool
+}
+
+func addTLSCerts(tlsConfig *tls.Config, clientCert, clientKey string) error {
+	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
+	if err == nil {
 		tlsConfig.Certificates = []tls.Certificate{cert}
 	}
 
-	return tlsConfig, nil
-}
-
-func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
-	if caCertFile != "" {
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM([]byte(caCertFile))
-		tlsConfig.RootCAs = caCertPool
-	}
-	return tlsConfig
+	return err
 }
