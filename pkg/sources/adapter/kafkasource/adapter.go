@@ -18,6 +18,8 @@ package kafkasource
 
 import (
 	"context"
+	"crypto/sha256"
+	"crypto/sha512"
 	"crypto/tls"
 	"crypto/x509"
 
@@ -61,8 +63,19 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	config := sarama.NewConfig()
 
 	if env.SASLEnable {
+		mechanism := sarama.SASLMechanism(env.SecurityMechanisms)
+
+		// If the SASL SCRAM mechanism a SCRAM generator must be provided pointing
+		// to a corresponding hash generator function.
+		switch mechanism {
+		case sarama.SASLTypeSCRAMSHA256:
+			config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: sha256.New} }
+		case sarama.SASLTypeSCRAMSHA512:
+			config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: sha512.New} }
+		}
+
 		config.Net.SASL.Enable = env.SASLEnable
-		config.Net.SASL.Mechanism = sarama.SASLMechanism(env.SecurityMechanisms)
+		config.Net.SASL.Mechanism = mechanism
 		config.Net.SASL.User = env.Username
 		config.Net.SASL.Password = env.Password
 	}
