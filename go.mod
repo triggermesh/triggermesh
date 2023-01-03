@@ -64,7 +64,7 @@ require (
 	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.8.1
 	github.com/tektoncd/pipeline v0.40.2
-	github.com/tidwall/gjson v1.14.3
+	github.com/tidwall/gjson v1.14.4
 	github.com/wamuir/go-xslt v0.1.4
 	github.com/xdg-go/scram v1.1.2
 	go.opencensus.io v0.24.0
