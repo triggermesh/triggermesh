@@ -66,6 +66,7 @@ require (
 	github.com/tektoncd/pipeline v0.40.2
 	github.com/tidwall/gjson v1.14.3
 	github.com/wamuir/go-xslt v0.1.4
+	github.com/xdg-go/scram v1.1.2
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.29.0
 	go.opentelemetry.io/otel v1.11.0
@@ -213,7 +214,6 @@ require (
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
-	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	go.opentelemetry.io/otel/internal/metric v0.27.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
