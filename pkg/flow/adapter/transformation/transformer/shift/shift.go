@@ -29,9 +29,10 @@ var _ transformer.Transformer = (*Shift)(nil)
 
 // Shift object implements Transformer interface.
 type Shift struct {
-	Path    string
-	NewPath string
-	Value   string
+	Path      string
+	NewPath   string
+	Value     string
+	Separator string
 
 	variables *storage.Storage
 }
@@ -64,16 +65,17 @@ func (s *Shift) InitStep() bool {
 }
 
 // New returns a new instance of Shift object.
-func (s *Shift) New(key, value string) transformer.Transformer {
+func (s *Shift) New(key, value, separator string) transformer.Transformer {
 	// doubtful scheme, review needed
 	keys := strings.Split(key, delimeter)
 	if len(keys) != 2 {
 		return nil
 	}
 	return &Shift{
-		Path:    keys[0],
-		NewPath: keys[1],
-		Value:   value,
+		Path:      keys[0],
+		NewPath:   keys[1],
+		Value:     value,
+		Separator: separator,
 
 		variables: s.variables,
 	}
@@ -82,7 +84,7 @@ func (s *Shift) New(key, value string) transformer.Transformer {
 // Apply is a main method of Transformation that moves existing
 // values to a new locations.
 func (s *Shift) Apply(eventID string, data []byte) ([]byte, error) {
-	oldPath := convert.SliceToMap(strings.Split(s.Path, "."), "")
+	oldPath := convert.SliceToMap(strings.Split(s.Path, s.Separator), "")
 
 	var event interface{}
 	if err := json.Unmarshal(data, &event); err != nil {
@@ -99,7 +101,7 @@ func (s *Shift) Apply(eventID string, data []byte) ([]byte, error) {
 		return data, nil
 	}
 
-	newPath := convert.SliceToMap(strings.Split(s.NewPath, "."), value)
+	newPath := convert.SliceToMap(strings.Split(s.NewPath, s.Separator), value)
 	result := convert.MergeJSONWithMap(newEvent, newPath)
 	output, err := json.Marshal(result)
 	if err != nil {

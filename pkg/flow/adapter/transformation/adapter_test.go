@@ -97,6 +97,102 @@ func TestReceiveAndTransform(t *testing.T) {
 		data              []v1alpha1.Transform
 	}{
 		{
+			name: "Conditional Add 1",
+			originalEvent: setData(t, newEvent(),
+				json.RawMessage(`{"name":"John"}`)),
+			expectedEventData: `{"id":"John"}`,
+			data: []v1alpha1.Transform{
+				{
+					Operation: "store",
+					Paths: []v1alpha1.Path{
+						{
+							Key:   "$name",
+							Value: "name",
+						}, {
+							Key:   "$surname",
+							Value: "surname",
+						},
+					},
+				}, {
+					Operation: "delete",
+					Paths: []v1alpha1.Path{
+						{
+							Key: "",
+						},
+					},
+				}, {
+					Operation: "add",
+					Paths: []v1alpha1.Path{
+						{
+							Key:   "id",
+							Value: `$name(.$surname)`,
+						},
+					},
+				},
+			},
+		}, {
+			name: "Conditional Add 2",
+			originalEvent: setData(t, newEvent(),
+				json.RawMessage(`{"day":"01","month":"01","year":"1970"}`)),
+			expectedEventData: `{"date":"01/01/1970/1970"}`,
+			data: []v1alpha1.Transform{
+				{
+					Operation: "store",
+					Paths: []v1alpha1.Path{
+						{
+							Key:   "$day",
+							Value: "day",
+						}, {
+							Key:   "$month",
+							Value: "month",
+						}, {
+							Key:   "$year",
+							Value: "year",
+						},
+					},
+				}, {
+					Operation: "delete",
+					Paths: []v1alpha1.Path{
+						{
+							Key: "",
+						},
+					},
+				}, {
+					Operation: "add",
+					Paths: []v1alpha1.Path{
+						{
+							Key:   "date",
+							Value: `($day)(/$month)(/$year)/$year`,
+						},
+					},
+				},
+			},
+		}, {
+			name: "Custom separator",
+			originalEvent: setData(t, newEvent(),
+				json.RawMessage(`{"field.1":"value"}`)),
+			expectedEventData: `{"nested":{"field.1":"value"},"not.nested":"foo"}`,
+			data: []v1alpha1.Transform{
+				{
+					Operation: "shift",
+					Paths: []v1alpha1.Path{
+						{
+							Key:       "field.1:nested/field.1",
+							Separator: "/",
+						},
+					},
+				}, {
+					Operation: "add",
+					Paths: []v1alpha1.Path{
+						{
+							Key:       "not.nested",
+							Value:     "foo",
+							Separator: ":",
+						},
+					},
+				},
+			},
+		}, {
 			name: "Add operation",
 			originalEvent: setData(t, newEvent(),
 				json.RawMessage(`{"foo":"bar","blah":[{"bleh":"huh?"}]}`)),
@@ -338,8 +434,6 @@ func TestReceiveAndTransform(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			pipeline, err := newPipeline(tc.data, storage.New())
 			assert.NoError(t, err)
-
-			// pipeline.setStorage(storage.New())
 
 			a := &adapter{
 				DataPipeline:    pipeline,
