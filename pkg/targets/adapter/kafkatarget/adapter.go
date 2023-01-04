@@ -18,6 +18,8 @@ package kafkatarget
 
 import (
 	"context"
+	"crypto/sha256"
+	"crypto/sha512"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -39,6 +41,7 @@ import (
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
+	sarama.Logger = zap.NewStdLog(logger.Named("sarama").Desugar())
 
 	mt := &pkgadapter.MetricTag{
 		ResourceGroup: targets.KafkaTargetResource.String(),
@@ -54,22 +57,40 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	var err error
 
 	config := sarama.NewConfig()
-	tlsCfg := &tls.Config{}
 
 	if env.SASLEnable {
+		mechanism := sarama.SASLMechanism(env.SecurityMechanisms)
+
+		// If the SASL SCRAM mechanism a SCRAM generator must be provided pointing
+		// to a corresponding hash generator function.
+		switch mechanism {
+		case sarama.SASLTypeSCRAMSHA256:
+			config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: sha256.New} }
+		case sarama.SASLTypeSCRAMSHA512:
+			config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: sha512.New} }
+		}
+
 		config.Net.SASL.Enable = env.SASLEnable
-		config.Net.SASL.Mechanism = sarama.SASLMechanism(env.SecurityMechanisms)
+		config.Net.SASL.Mechanism = mechanism
 		config.Net.SASL.User = env.Username
 		config.Net.SASL.Password = env.Password
 	}
 
 	if env.TLSEnable {
-		config.Net.TLS.Enable = true
-		tlsCfg, err = newTLSCertificatesConfig(tlsCfg, env.ClientCert, env.ClientKey)
-		if err != nil {
-			logger.Panicf("Could not create the TLS Certificates Config: %v", err)
+		config.Net.TLS.Enable = env.TLSEnable
+
+		tlsCfg := &tls.Config{}
+		if env.CA != "" {
+			addCAConfig(tlsCfg, env.CA)
 		}
-		tlsCfg = newTLSRootCAConfig(tlsCfg, env.CA)
+
+		if env.ClientCert != "" || env.ClientKey != "" {
+
+			if err := addTLSCerts(tlsCfg, env.ClientCert, env.ClientKey); err != nil {
+				logger.Panicw("Could not parse the TLS Certificates", zap.Error(err))
+			}
+		}
+
 		config.Net.TLS.Config = tlsCfg
 		config.Net.TLS.Config.InsecureSkipVerify = env.SkipVerify
 	}
@@ -95,7 +116,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	config.Producer.Return.Successes = true
 	err = config.Validate()
 	if err != nil {
-		logger.Panicf("Config not valid: %v", err)
+		logger.Panicw("Config not valid", zap.Error(err))
 	}
 
 	sc, err = sarama.NewClient(
@@ -103,17 +124,17 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		config,
 	)
 	if err != nil {
-		logger.Panicf("Error creating Sarama Client: %v", err)
+		logger.Panicw("Error creating Kafka Client", zap.Error(err))
 	}
 
 	sac, err := sarama.NewClusterAdminFromClient(sc)
 	if err != nil {
-		logger.Panicf("Error creating Sarama Admin Client: %v", err)
+		logger.Panicw("Error creating Kafka Admin Client", zap.Error(err))
 	}
 
 	kc, err := sarama.NewSyncProducerFromClient(sc)
 	if err != nil {
-		logger.Panicf("Error creating Kafka Producer: %v", err)
+		logger.Panicw("Error creating Kafka Producer", zap.Error(err))
 	}
 
 	return &kafkaAdapter{
@@ -215,28 +236,6 @@ func (a *kafkaAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 	return cloudevents.ResultACK
 }
 
-func newTLSCertificatesConfig(tlsConfig *tls.Config, clientCert, clientKey string) (*tls.Config, error) {
-	if clientCert != "" && clientKey != "" {
-		cert, err := tls.LoadX509KeyPair(clientCert, clientKey)
-		if err != nil {
-			return tlsConfig, err
-		}
-		tlsConfig.Certificates = []tls.Certificate{cert}
-	}
-
-	return tlsConfig, nil
-}
-
-func newTLSRootCAConfig(tlsConfig *tls.Config, caCertFile string) *tls.Config {
-	if caCertFile != "" {
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM([]byte(caCertFile))
-		tlsConfig.RootCAs = caCertPool
-	}
-
-	return tlsConfig
-}
-
 // ensureTopic creates a topic if the received topic does not exists.
 func (a *kafkaAdapter) ensureTopic(admin sarama.ClusterAdmin, topicName string) (string, error) {
 	topicDetail := &sarama.TopicDetail{
@@ -250,4 +249,19 @@ func (a *kafkaAdapter) ensureTopic(admin sarama.ClusterAdmin, topicName string) 
 	}
 
 	return topicName, createTopicError
+}
+
+func addCAConfig(tlsConfig *tls.Config, caCert string) {
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM([]byte(caCert))
+	tlsConfig.RootCAs = caCertPool
+}
+
+func addTLSCerts(tlsConfig *tls.Config, clientCert, clientKey string) error {
+	cert, err := tls.X509KeyPair([]byte(clientCert), []byte(clientKey))
+	if err == nil {
+		tlsConfig.Certificates = []tls.Certificate{cert}
+	}
+
+	return err
 }

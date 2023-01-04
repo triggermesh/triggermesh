@@ -127,7 +127,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		env.BootstrapServers,
 		env.GroupID, config)
 	if err != nil {
-		logger.Panicw("Error creating Kafka Consumer", zap.Error(err))
+		logger.Panicw("Error creating Kafka Consumer Group", zap.Error(err))
 	}
 
 	return &kafkasourceAdapter{
