@@ -70,8 +70,9 @@ type Transform struct {
 
 // Path is a key-value pair that represents JSON object path
 type Path struct {
-	Key   string `json:"key,omitempty"`
-	Value string `json:"value,omitempty"`
+	Key       string `json:"key,omitempty"`
+	Value     string `json:"value,omitempty"`
+	Separator string `json:"separator,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

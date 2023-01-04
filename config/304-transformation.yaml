@@ -79,6 +79,10 @@ spec:
                             description: JSON path or variable name. Depends on the operation type.
                             nullable: true
                             type: string
+                          separator:
+                            description: JSON path separator symbol. "." is used by default.
+                            nullable: true
+                            type: string
                   required:
                   - operation
               data:

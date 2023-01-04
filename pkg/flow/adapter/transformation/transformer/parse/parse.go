@@ -31,8 +31,9 @@ var _ transformer.Transformer = (*Parse)(nil)
 
 // Parse object implements Transformer interface.
 type Parse struct {
-	Path  string
-	Value string
+	Path      string
+	Value     string
+	Separator string
 
 	variables *storage.Storage
 }
@@ -63,10 +64,11 @@ func (p *Parse) InitStep() bool {
 }
 
 // New returns a new instance of Parse object.
-func (p *Parse) New(key, value string) transformer.Transformer {
+func (p *Parse) New(key, value, separator string) transformer.Transformer {
 	return &Parse{
-		Path:  key,
-		Value: value,
+		Path:      key,
+		Value:     value,
+		Separator: separator,
 
 		variables: p.variables,
 	}
@@ -75,7 +77,7 @@ func (p *Parse) New(key, value string) transformer.Transformer {
 // Apply is a main method of Transformation that parse JSON values
 // into variables that can be used by other Transformations in a pipeline.
 func (p *Parse) Apply(eventID string, data []byte) ([]byte, error) {
-	path := convert.SliceToMap(strings.Split(p.Path, "."), "")
+	path := convert.SliceToMap(strings.Split(p.Path, p.Separator), "")
 
 	switch p.Value {
 	case "json", "JSON":
@@ -87,7 +89,7 @@ func (p *Parse) Apply(eventID string, data []byte) ([]byte, error) {
 		if err != nil {
 			return data, err
 		}
-		newObject := convert.SliceToMap(strings.Split(p.Path, "."), jsonValue)
+		newObject := convert.SliceToMap(strings.Split(p.Path, p.Separator), jsonValue)
 		return json.Marshal(convert.MergeJSONWithMap(event, newObject))
 	default:
 		return data, fmt.Errorf("parse operation does not support %q type of value", p.Value)

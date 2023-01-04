@@ -29,9 +29,10 @@ var _ transformer.Transformer = (*Delete)(nil)
 
 // Delete object implements Transformer interface.
 type Delete struct {
-	Path  string
-	Value string
-	Type  string
+	Path      string
+	Value     string
+	Type      string
+	Separator string
 
 	variables *storage.Storage
 }
@@ -62,10 +63,11 @@ func (d *Delete) InitStep() bool {
 }
 
 // New returns a new instance of Delete object.
-func (d *Delete) New(key, value string) transformer.Transformer {
+func (d *Delete) New(key, value, separator string) transformer.Transformer {
 	return &Delete{
-		Path:  key,
-		Value: value,
+		Path:      key,
+		Value:     value,
+		Separator: separator,
 
 		variables: d.variables,
 	}
@@ -158,7 +160,7 @@ func (d *Delete) filter(path string, value interface{}) bool {
 }
 
 func (d *Delete) filterPath(path string) bool {
-	return "."+d.Path == path
+	return d.Separator+d.Path == path
 }
 
 func (d *Delete) filterValue(value interface{}) bool {

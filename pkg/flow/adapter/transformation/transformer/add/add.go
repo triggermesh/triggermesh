@@ -30,8 +30,9 @@ var _ transformer.Transformer = (*Add)(nil)
 
 // Add object implements Transformer interface.
 type Add struct {
-	Path  string
-	Value string
+	Path      string
+	Value     string
+	Separator string
 
 	variables *storage.Storage
 }
@@ -62,10 +63,11 @@ func (a *Add) InitStep() bool {
 }
 
 // New returns a new instance of Add object.
-func (a *Add) New(key, value string) transformer.Transformer {
+func (a *Add) New(key, value, separator string) transformer.Transformer {
 	return &Add{
-		Path:  key,
-		Value: value,
+		Path:      key,
+		Value:     value,
+		Separator: separator,
 
 		variables: a.variables,
 	}
@@ -74,7 +76,7 @@ func (a *Add) New(key, value string) transformer.Transformer {
 // Apply is a main method of Transformation that adds any type of
 // variables into existing JSON.
 func (a *Add) Apply(eventID string, data []byte) ([]byte, error) {
-	input := convert.SliceToMap(strings.Split(a.Path, "."), a.composeValue(eventID))
+	input := convert.SliceToMap(strings.Split(a.Path, a.Separator), a.composeValue(eventID))
 	var event interface{}
 	if err := json.Unmarshal(data, &event); err != nil {
 		return data, err
@@ -99,14 +101,57 @@ func (a *Add) retrieveVariable(eventID, key string) interface{} {
 func (a *Add) composeValue(eventID string) interface{} {
 	result := a.Value
 	for _, key := range a.variables.ListEventVariables(eventID) {
-		index := strings.Index(result, key)
-		if index == -1 {
-			continue
+		// limit the number of iterations to prevent the loop if
+		// "add" variable is not updating the result (variable is not defined).
+		variableKeysInResult := strings.Count(result, key)
+		for i := 0; i <= variableKeysInResult; i++ {
+			keyIndex := strings.Index(result, key)
+			if keyIndex == -1 {
+				continue
+			}
+
+			storedValue := a.retrieveVariable(eventID, key)
+
+			if result == key {
+				return storedValue
+			}
+
+			openingBracketIndex := -1
+			closingBracketIndex := -1
+			for i := keyIndex; i >= 0; i-- {
+				if string(result[i]) == "(" {
+					openingBracketIndex = i
+					break
+				}
+			}
+			for i := keyIndex; i < len(result); i++ {
+				if string(result[i]) == ")" {
+					closingBracketIndex = i
+					break
+				}
+			}
+
+			// there is no brackets in the value
+			if (openingBracketIndex == -1 || closingBracketIndex == -1) ||
+				// brackets are screened with "\" symbol
+				((openingBracketIndex > 0 && string(result[openingBracketIndex-1]) == "\\") ||
+					string(result[closingBracketIndex-1]) == "\\") ||
+				// brackets are not surrounding the key
+				!(openingBracketIndex < keyIndex && closingBracketIndex >= keyIndex+len(key)) {
+				result = fmt.Sprintf("%s%v%s", result[:keyIndex], storedValue, result[keyIndex+len(key):])
+				continue
+			}
+
+			if storedValue == key {
+				// stored value that equals the variable key means no stored value is available
+				result = fmt.Sprintf("%s%s", result[:openingBracketIndex], result[closingBracketIndex+1:])
+				continue
+			}
+
+			result = result[:openingBracketIndex] + result[openingBracketIndex+1:]
+			result = result[:closingBracketIndex-1] + result[closingBracketIndex:]
+			result = fmt.Sprintf("%s%v%s", result[:keyIndex-1], storedValue, result[keyIndex+len(key)-1:])
 		}
-		if result == key {
-			return a.retrieveVariable(eventID, key)
-		}
-		result = fmt.Sprintf("%s%v%s", result[:index], a.retrieveVariable(eventID, key), result[index+len(key):])
 	}
 	return result
 }
