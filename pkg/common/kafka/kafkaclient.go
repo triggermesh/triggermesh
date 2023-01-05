@@ -80,7 +80,10 @@ func NewSaramaCachedClient(ctx context.Context, bootstrapServers []string, cfg *
 			for {
 				select {
 				case <-time.After(*scc.refresh):
-					scc.RefreshProducerClients()
+					if err := scc.RefreshProducerClients(); err != nil {
+						logger.Error("Could not refresh kafka clients", zap.Error(err))
+					}
+
 				case <-ctx.Done():
 					return
 				}
