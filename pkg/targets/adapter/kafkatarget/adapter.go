@@ -113,6 +113,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	config.Producer.Return.Successes = true
+	config.ClientID = "triggermesh-kafkatarget"
 
 	scc, err := kafka.NewSaramaCachedClient(ctx, env.BootstrapServers, config,
 		logger.Named("sarama").Desugar(),
