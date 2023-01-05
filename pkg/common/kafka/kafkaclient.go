@@ -26,6 +26,24 @@ import (
 	"go.uber.org/zap"
 )
 
+// SaramaCachedClient wraps a sarama kafka client, exposing
+// common used methods at sources and targets.
+//
+// If a method fails it will try to re-connect and try again
+// before failing.
+type SaramaCachedClient struct {
+	bootstrapServers []string
+	cfg              *sarama.Config
+
+	client       sarama.Client
+	admin        sarama.ClusterAdmin
+	syncProducer sarama.SyncProducer
+
+	refresh *time.Duration
+
+	m sync.RWMutex
+}
+
 type SaramaCachedClientOption func(*SaramaCachedClient)
 
 func WithSaramaCachedClientRefresh(d time.Duration) SaramaCachedClientOption {
@@ -71,19 +89,6 @@ func NewSaramaCachedClient(ctx context.Context, bootstrapServers []string, cfg *
 	}
 
 	return scc, nil
-}
-
-type SaramaCachedClient struct {
-	bootstrapServers []string
-	cfg              *sarama.Config
-
-	client       sarama.Client
-	admin        sarama.ClusterAdmin
-	syncProducer sarama.SyncProducer
-
-	refresh *time.Duration
-
-	m sync.RWMutex
 }
 
 func (sc *SaramaCachedClient) Close() error {
