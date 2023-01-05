@@ -17,6 +17,8 @@ limitations under the License.
 package kafkatarget
 
 import (
+	"time"
+
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 )
 
@@ -49,6 +51,11 @@ type envAccessor struct {
 	ClientCert string `envconfig:"CLIENT_CERT" required:"false"`
 	ClientKey  string `envconfig:"CLIENT_KEY" required:"false"`
 	SkipVerify bool   `envconfig:"SKIP_VERIFY" required:"false"`
+
+	// The connection refresh routine will discard the existing connection and create a new
+	// one. The Kafka broker is usually configured to close idle connections at its side after 10 minutes,
+	// 5 minutes is a safe guess for most instances.
+	ConnectionRefreshPeriod time.Duration `envconfig:"CONNECTION_REFRESH_PERIOD" default:"5m"`
 
 	// This set of variables are experimental and not graduated to the CRD.
 	CreateTopicIfMissing        bool  `envconfig:"CREATE_MISSING_TOPIC" default:"true"`

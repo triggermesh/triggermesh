@@ -35,13 +35,13 @@ import (
 	"github.com/Shopify/sarama"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/common/kafka"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
 )
 
 // NewTarget adapter implementation
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	logger := logging.FromContext(ctx)
-	sarama.Logger = zap.NewStdLog(logger.Named("sarama").Desugar())
 
 	mt := &pkgadapter.MetricTag{
 		ResourceGroup: targets.KafkaTargetResource.String(),
@@ -53,7 +53,6 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
-	var sc sarama.Client
 	var err error
 
 	config := sarama.NewConfig()
@@ -114,33 +113,17 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	config.Producer.Return.Successes = true
-	err = config.Validate()
-	if err != nil {
-		logger.Panicw("Config not valid", zap.Error(err))
-	}
 
-	sc, err = sarama.NewClient(
-		env.BootstrapServers,
-		config,
+	scc, err := kafka.NewSaramaCachedClient(ctx, env.BootstrapServers, config,
+		logger.Named("sarama").Desugar(),
+		kafka.WithSaramaCachedClientRefresh(env.ConnectionRefreshPeriod),
 	)
 	if err != nil {
-		logger.Panicw("Error creating Kafka Client", zap.Error(err))
-	}
-
-	sac, err := sarama.NewClusterAdminFromClient(sc)
-	if err != nil {
-		logger.Panicw("Error creating Kafka Admin Client", zap.Error(err))
-	}
-
-	kc, err := sarama.NewSyncProducerFromClient(sc)
-	if err != nil {
-		logger.Panicw("Error creating Kafka Producer", zap.Error(err))
+		logger.Panicw("Error creating kafka client", zap.Error(err))
 	}
 
 	return &kafkaAdapter{
-		saramaClient:              sc,
-		saramaAdminClient:         sac,
-		kafkaClient:               kc,
+		saramaCachedClient:        scc,
 		topic:                     env.Topic,
 		createTopicIfMissing:      env.CreateTopicIfMissing,
 		flushTimeout:              env.FlushOnExitTimeoutMillisecs,
@@ -160,10 +143,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*kafkaAdapter)(nil)
 
 type kafkaAdapter struct {
-	saramaClient      sarama.Client
-	saramaAdminClient sarama.ClusterAdmin
-	kafkaClient       sarama.SyncProducer
-	topic             string
+	saramaCachedClient *kafka.SaramaCachedClient
+	topic              string
 
 	createTopicIfMissing bool
 
@@ -183,8 +164,14 @@ type kafkaAdapter struct {
 func (a *kafkaAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Kafka adapter")
 
+	if err := a.saramaCachedClient.EnsureTopic(a.topic, a.newTopicReplicationFactor, a.newTopicPartitions); err != nil {
+		return err
+	}
+
 	defer func() {
-		a.kafkaClient.Close()
+		if err := a.saramaCachedClient.Close(); err != nil {
+			a.logger.Warnw("could not close kafka connections", zap.Error(err))
+		}
 	}()
 
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
@@ -213,42 +200,19 @@ func (a *kafkaAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 		msgVal = jsonEvent
 	}
 
-	topic, err := a.ensureTopic(a.saramaAdminClient, a.topic)
-	if err != nil {
-		a.logger.Errorw("Error Ensuring Kafka Topic", zap.String("msg", string(msgVal)), zap.Error(err))
-		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
-		return err
-	}
-
 	msg := &sarama.ProducerMessage{
-		Topic: topic,
+		Topic: a.topic,
 		Key:   sarama.StringEncoder(event.ID()),
 		Value: sarama.ByteEncoder(msgVal),
 	}
 
-	_, _, err = a.kafkaClient.SendMessage(msg)
-	if err != nil {
+	if err := a.saramaCachedClient.SendMessageSync(msg); err != nil {
 		a.logger.Errorw("Error producing Kafka message", zap.String("msg", string(msgVal)), zap.Error(err))
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return err
 	}
 
 	return cloudevents.ResultACK
-}
-
-// ensureTopic creates a topic if the received topic does not exists.
-func (a *kafkaAdapter) ensureTopic(admin sarama.ClusterAdmin, topicName string) (string, error) {
-	topicDetail := &sarama.TopicDetail{
-		ReplicationFactor: a.newTopicReplicationFactor,
-		NumPartitions:     a.newTopicPartitions,
-	}
-
-	createTopicError := admin.CreateTopic(topicName, topicDetail, false)
-	if err, ok := createTopicError.(*sarama.TopicError); ok && err.Err == sarama.ErrTopicAlreadyExists {
-		return topicName, nil
-	}
-
-	return topicName, createTopicError
 }
 
 func addCAConfig(tlsConfig *tls.Config, caCert string) {
