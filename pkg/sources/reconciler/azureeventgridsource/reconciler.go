@@ -72,12 +72,12 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureEventGr
 			"Error obtaining Azure clients: %s", err))
 	}
 
-	sysTopicResID, err := ensureSystemTopic(ctx, sysTopicsCli, providersCli, resGroupsCli)
+	sysTopicResID, err := EnsureSystemTopic(ctx, sysTopicsCli, providersCli, resGroupsCli)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile Event Grid system topic: %w", err)
 	}
 
-	eventHubResID, err := ensureEventHub(ctx, eventHubsCli)
+	eventHubResID, err := EnsureEventHub(ctx, eventHubsCli)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile Event Hub: %w", err)
 	}
@@ -86,7 +86,7 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureEventGr
 		return fmt.Errorf("failed to reconcile Event Hubs event source adapter: %w", err)
 	}
 
-	return ensureEventSubscription(ctx, eventSubsCli, sysTopicResID, eventHubResID)
+	return EnsureEventSubscription(ctx, eventSubsCli, sysTopicResID, eventHubResID)
 }
 
 // FinalizeKind is called when the resource is deleted.
@@ -111,7 +111,7 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureEventGri
 	// deletion of the event subscription, Event Hub, and system topic
 	// succeed to ensure that we don't leave any dangling resources behind us.
 
-	systemTopic, err := findSystemTopic(ctx, sysTopicsCli, o)
+	systemTopic, err := FindSystemTopic(ctx, sysTopicsCli, o)
 	switch {
 	case isDenied(err):
 		// it is unlikely that we recover from auth errors in the
@@ -122,15 +122,15 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.AzureEventGri
 		return fmt.Errorf("looking up system topic: %w", err)
 	}
 
-	if err := ensureNoEventSubscription(ctx, eventSubsCli, systemTopic); err != nil {
+	if err := EnsureNoEventSubscription(ctx, eventSubsCli, systemTopic); err != nil {
 		return fmt.Errorf("failed to finalize event subscription: %w", err)
 	}
 
-	if err := ensureNoEventHub(ctx, eventHubsCli); err != nil {
+	if err := EnsureNoEventHub(ctx, eventHubsCli); err != nil {
 		return fmt.Errorf("failed to finalize Event Hub: %w", err)
 	}
 
-	if err := ensureNoSystemTopic(ctx, sysTopicsCli, eventSubsCli, systemTopic); err != nil {
+	if err := EnsureNoSystemTopic(ctx, sysTopicsCli, eventSubsCli, systemTopic); err != nil {
 		return fmt.Errorf("failed to finalize event subscription: %w", err)
 	}
 
