@@ -32,12 +32,12 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/reconciler/skip"
 )
 
-// ensureBudgetNotification ensures the existence of a notification
+// EnsureBudgetNotification ensures the existence of a notification
 // configuration targetting the given Pub/Sub topic on a Cloud Billing budget.
 // Required permissions:
 // - billing.budgets.get
 // - billing.budgets.update
-func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, topicResName *v1alpha1.GCloudResourceName) error {
+func EnsureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, topicResName *v1alpha1.GCloudResourceName) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
@@ -94,12 +94,12 @@ func ensureBudgetNotification(ctx context.Context, cli *billing.BudgetClient, to
 	return nil
 }
 
-// ensureNoBudgetNotification ensures that the notification
+// EnsureNoBudgetNotification ensures that the notification
 // configuration is deleted.
 // Required permissions:
 // - billing.budgets.get
 // - billing.budgets.update
-func ensureNoBudgetNotification(ctx context.Context, cli *billing.BudgetClient) error {
+func EnsureNoBudgetNotification(ctx context.Context, cli *billing.BudgetClient) error {
 	if skip.Skip(ctx) {
 		return nil
 	}
