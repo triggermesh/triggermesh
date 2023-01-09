@@ -58,6 +58,7 @@ type KafkaSourceSpec struct {
 	GroupID string `json:"groupID"`
 
 	// Auth contains Authentication method used to interact with Kafka.
+	// +optional
 	Auth KafkaSourceAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
