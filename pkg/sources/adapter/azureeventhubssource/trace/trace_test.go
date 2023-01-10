@@ -80,7 +80,7 @@ func TestNoOpTracerWithLogger_Logger(t *testing.T) {
 			// difficult to handle in tests. WriteThenNoop is
 			// unfortunately explicitly rejected by zap on Fatal,
 			// so we fallback to WriteThenPanic and call recover().
-			zap.OnFatal(zapcore.WriteThenPanic),
+			zap.WithFatalHook(zapcore.WriteThenPanic),
 		)
 		logger := tracer.FromContext(ctx).Logger()
 
