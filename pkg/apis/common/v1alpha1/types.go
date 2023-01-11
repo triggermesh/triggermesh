@@ -46,4 +46,6 @@ type AdapterOverrides struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 	// Environment variables applied on adapter container.
 	Env []corev1.EnvVar `json:"env,omitempty"`
+	// Labels applied on adapter container.
+	Labels map[string]string `json:"labels,omitempty"`
 }

@@ -404,6 +404,10 @@ func adapterOverrideOptions(overrides *v1alpha1.AdapterOverrides) []resource.Obj
 		opts = append(opts, resource.EnvVar(t.Name, t.Value))
 	}
 
+	for k, v := range overrides.Labels {
+		opts = append(opts, resource.Label(k, v))
+		opts = append(opts, resource.PodLabel(k, v))
+	}
 	return opts
 }
 
