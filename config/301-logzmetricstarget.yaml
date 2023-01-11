@@ -113,6 +113,11 @@ spec:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
                 properties:
+                  labels:
+                    description: Adapter labels.
+                    type: object
+                    additionalProperties:
+                      type: string
                   env:
                     description: Adapter environment variables.
                     type: array
