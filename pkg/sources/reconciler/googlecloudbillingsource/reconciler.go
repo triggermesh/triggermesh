@@ -80,12 +80,12 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudB
 			"Error obtaining Google Cloud clients: %s", err))
 	}
 
-	topic, err := ensurePubSub(ctx, pubsubCli)
+	topic, err := EnsurePubSub(ctx, pubsubCli)
 	if err != nil {
 		return fmt.Errorf("failed to reconcile Pub/Sub resources: %w", err)
 	}
 
-	if err = ensureBudgetNotification(ctx, biCli, topic); err != nil {
+	if err = EnsureBudgetNotification(ctx, biCli, topic); err != nil {
 		return fmt.Errorf("failed to reconcile Billing notification: %w", err)
 	}
 
@@ -114,11 +114,11 @@ func (r *Reconciler) FinalizeKind(ctx context.Context, o *v1alpha1.GoogleCloudBi
 	// ensureNoBudgetNotification and ensureNoPubSub succeed to ensure that
 	// we don't leave any dangling resources behind us.
 
-	if err := ensureNoBudgetNotification(ctx, biCli); err != nil {
+	if err := EnsureNoBudgetNotification(ctx, biCli); err != nil {
 		return fmt.Errorf("failed to clean up Billing notification: %w", err)
 	}
 
-	if err := ensureNoPubSub(ctx, pubsubCli); err != nil {
+	if err := EnsureNoPubSub(ctx, pubsubCli); err != nil {
 		return fmt.Errorf("failed to clean up Pub/Sub resources: %w", err)
 	}
 

@@ -46,11 +46,11 @@ const (
 
 const resourceTypeEventHubs = "eventhubs"
 
-// ensureEventHub ensures the existence of an Event Hub for sending events.
+// EnsureEventHub ensures the existence of an Event Hub for sending events.
 // Required permissions:
 //   - Microsoft.EventHub/namespaces/eventhubs/read
 //   - Microsoft.EventHub/namespaces/eventhubs/write
-func ensureEventHub(ctx context.Context, cli eventgrid.EventHubsClient) (string /*resource ID*/, error) {
+func EnsureEventHub(ctx context.Context, cli eventgrid.EventHubsClient) (string /*resource ID*/, error) {
 	if skip.Skip(ctx) {
 		return "", nil
 	}
@@ -131,11 +131,11 @@ func makeEventHubID(namespaceID *v1alpha1.AzureResourceID, hubName string) *v1al
 	return &hubID
 }
 
-// ensureNoEventHub ensures that the Event Hub created for sending events
+// EnsureNoEventHub ensures that the Event Hub created for sending events
 // is deleted.
 // Required permissions:
 //   - Microsoft.EventHub/namespaces/eventhubs/delete
-func ensureNoEventHub(ctx context.Context, cli eventgrid.EventHubsClient) error {
+func EnsureNoEventHub(ctx context.Context, cli eventgrid.EventHubsClient) error {
 	src := commonv1alpha1.ReconcilableFromContext(ctx).(*v1alpha1.AzureEventGridSource)
 
 	if userProvidedHub := src.Spec.Endpoint.EventHubs.HubName; userProvidedHub != nil {

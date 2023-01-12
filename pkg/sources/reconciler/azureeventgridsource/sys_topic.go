@@ -59,7 +59,7 @@ const (
 	defaultResourceGroupRegion = "westus2"
 )
 
-// ensureSystemTopic ensures a system topic exists with the expected configuration.
+// EnsureSystemTopic ensures a system topic exists with the expected configuration.
 // Required permissions:
 //   - Microsoft.EventGrid/systemTopics/read
 //   - Microsoft.EventGrid/systemTopics/write
@@ -67,7 +67,7 @@ const (
 //   - Microsoft.Resources/subscriptions/resourceGroups/read
 //   - Microsoft.Resources/subscriptions/resourceGroups/write
 //     Additionally, for regional resources, "read" permission on the resource (scope).
-func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
+func EnsureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	providersCli eventgrid.ProvidersClient,
 	resGroupsCli eventgrid.ResourceGroupsClient) (*v1alpha1.AzureResourceID /*sysTopicResID*/, error) {
 
@@ -82,7 +82,7 @@ func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 
 	scope := typedSrc.Spec.Scope.String()
 
-	sysTopic, err := findSystemTopic(ctx, cli, typedSrc)
+	sysTopic, err := FindSystemTopic(ctx, cli, typedSrc)
 	switch {
 	case isDenied(err):
 		status.MarkNotSubscribed(v1alpha1.AzureReasonAPIError, "Access denied to system topic API: "+toErrMsg(err))
@@ -201,11 +201,11 @@ func ensureSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	return sysTopicResID, nil
 }
 
-// ensureNoSystemTopic ensures the system topic is removed.
+// EnsureNoSystemTopic ensures the system topic is removed.
 // Required permissions:
 //   - Microsoft.EventGrid/systemTopics/read
 //   - Microsoft.EventGrid/systemTopics/delete
-func ensureNoSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
+func EnsureNoSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	eventSubsCli eventgrid.EventSubscriptionsClient, sysTopic *azureeventgrid.SystemTopic) reconciler.Event {
 
 	if skip.Skip(ctx) {
@@ -302,10 +302,10 @@ func ensureNoSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	return nil
 }
 
-// findSystemTopic returns the system topic that matches the scope of the given
+// FindSystemTopic returns the system topic that matches the scope of the given
 // source, if such system topic exists.
 // If no system topic matches the description, nil is returned.
-func findSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
+func FindSystemTopic(ctx context.Context, cli eventgrid.SystemTopicsClient,
 	src *v1alpha1.AzureEventGridSource) (*azureeventgrid.SystemTopic, error) {
 
 	restCtx, cancel := context.WithTimeout(ctx, crudTimeout)
