@@ -146,7 +146,7 @@ func (a *ceAdapter) Start(ctx context.Context) error {
 	return a.listenClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *ceAdapter) dispatch(ctx context.Context, event cloudevents.Event) cloudevents.Result {
+func (a *ceAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	ceTypeTag := metrics.TagEventType(event.Type())
 	ceSrcTag := metrics.TagEventSource(event.Source())
 
@@ -162,15 +162,16 @@ func (a *ceAdapter) dispatch(ctx context.Context, event cloudevents.Event) cloud
 		err := fmt.Errorf("CloudEvents client not intialized. Please, make sure that authentication secret is available")
 		a.logger.Errorw("Failed to send event", zap.Error(err))
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
-		return err
+		return nil, err
 	}
 
-	r := a.senderClient.Send(ctx, event)
+	re, r := a.senderClient.Request(ctx, event)
 	if cloudevents.IsNACK(r) {
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		a.logger.Errorw("Could not send event to destination", zap.Error(r))
+	} else {
+		a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
 	}
 
-	a.sr.ReportProcessingSuccess(ceTypeTag, ceSrcTag)
-	return r
+	return re, r
 }
