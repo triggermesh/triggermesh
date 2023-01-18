@@ -124,7 +124,8 @@ func TestCloudEventsDispatch(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			res := adapter.dispatch(ctx, tc.ce)
+			evres, res := adapter.dispatch(ctx, tc.ce)
+			assert.Nil(t, evres, "got a response but expected nil")
 
 			metricstest.CheckDistributionCount(t,
 				"event_processing_latencies",
