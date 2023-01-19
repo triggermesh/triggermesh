@@ -449,6 +449,11 @@ func (l *Listers) GetLogzTargetLister() targetslistersv1alpha1.LogzTargetLister 
 	return targetslistersv1alpha1.NewLogzTargetLister(l.IndexerFor(&targetsv1alpha1.LogzTarget{}))
 }
 
+// GetMongoDBTargetLister returns a Lister for MongoDBTarget objects.
+func (l *Listers) GetMongoDBTargetLister() targetslistersv1alpha1.MongoDBTargetLister {
+	return targetslistersv1alpha1.NewMongoDBTargetLister(l.IndexerFor(&targetsv1alpha1.MongoDBTarget{}))
+}
+
 // GetOracleTargetLister returns a Lister for OracleTarget objects.
 func (l *Listers) GetOracleTargetLister() targetslistersv1alpha1.OracleTargetLister {
 	return targetslistersv1alpha1.NewOracleTargetLister(l.IndexerFor(&targetsv1alpha1.OracleTarget{}))

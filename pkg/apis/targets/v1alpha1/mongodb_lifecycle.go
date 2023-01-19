@@ -64,6 +64,13 @@ func (*MongoDBTarget) AcceptedEventTypes() []string {
 	}
 }
 
+// GetEventTypes implements EventSource.
+func (t *MongoDBTarget) GetEventTypes() []string {
+	return []string{
+		EventTypeMongoDBStaticResponse,
+	}
+}
+
 // AsEventSource implements EventSource.
 func (t *MongoDBTarget) AsEventSource() string {
 	return t.Spec.Collection
