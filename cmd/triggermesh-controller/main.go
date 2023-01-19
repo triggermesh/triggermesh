@@ -90,6 +90,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/kafkatarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/logzmetricstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/logztarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/mongodbtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/oracletarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/salesforcetarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/sendgridtarget"
@@ -166,6 +167,7 @@ func main() {
 		jiratarget.NewController,
 		kafkatarget.NewController,
 		logztarget.NewController,
+		mongodbtarget.NewController,
 		logzmetricstarget.NewController,
 		oracletarget.NewController,
 		salesforcetarget.NewController,
