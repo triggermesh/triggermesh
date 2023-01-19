@@ -173,6 +173,7 @@ rules:
   - kafkatargets
   - logzmetricstargets
   - logztargets
+  - mongodbtargets
   - oracletargets
   - salesforcetargets
   - sendgridtargets
@@ -216,6 +217,7 @@ rules:
   - kafkatargets/status
   - logzmetricstargets/status
   - logztargets/status
+  - mongodbtargets/status
   - oracletargets/status
   - salesforcetargets/status
   - sendgridtargets/status
@@ -361,6 +363,7 @@ rules:
   - kafkatargets/finalizers
   - logzmetricstargets/finalizers
   - logztargets/finalizers
+  - mongodbtargets/finalizers
   - oracletargets/finalizers
   - salesforcetargets/finalizers
   - sendgridtargets/finalizers
@@ -897,6 +900,7 @@ rules:
   - kafkatargets
   - logzmetricstargets
   - logztargets
+  - mongodbtargets
   - oracletargets
   - salesforcetargets
   - sendgridtargets
