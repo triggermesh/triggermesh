@@ -143,12 +143,12 @@ func (h *Handler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (h *Handler) split(path string, e *event.Event) []*event.Event {
-	var result []*event.Event
-
 	val := gjson.Get(string(e.Data()), path)
 	if !val.IsArray() {
-		return result
+		val = gjson.Parse("[" + val.Raw + "]")
 	}
+
+	var result []*event.Event
 	for _, v := range val.Array() {
 		newCE := cloudevents.NewEvent()
 		if err := newCE.SetData(cloudevents.ApplicationJSON, []byte(v.Raw)); err != nil {

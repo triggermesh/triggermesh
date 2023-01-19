@@ -110,6 +110,12 @@ var tCases = map[string]struct {
 			}`,
 		numberOfParts: 3,
 	},
+	"event4": {
+		input: `{
+			"items":"not-an-array"
+			}`,
+		numberOfParts: 1,
+	},
 }
 
 func TestAdapter(t *testing.T) {
