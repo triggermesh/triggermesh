@@ -78,6 +78,8 @@ type Interface interface {
 	LogzMetricsTargets() LogzMetricsTargetInformer
 	// LogzTargets returns a LogzTargetInformer.
 	LogzTargets() LogzTargetInformer
+	// MongoDBTargets returns a MongoDBTargetInformer.
+	MongoDBTargets() MongoDBTargetInformer
 	// OracleTargets returns a OracleTargetInformer.
 	OracleTargets() OracleTargetInformer
 	// SalesforceTargets returns a SalesforceTargetInformer.
@@ -240,6 +242,11 @@ func (v *version) LogzMetricsTargets() LogzMetricsTargetInformer {
 // LogzTargets returns a LogzTargetInformer.
 func (v *version) LogzTargets() LogzTargetInformer {
 	return &logzTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// MongoDBTargets returns a MongoDBTargetInformer.
+func (v *version) MongoDBTargets() MongoDBTargetInformer {
+	return &mongoDBTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // OracleTargets returns a OracleTargetInformer.

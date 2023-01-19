@@ -234,6 +234,14 @@ type LogzTargetListerExpansion interface{}
 // LogzTargetNamespaceLister.
 type LogzTargetNamespaceListerExpansion interface{}
 
+// MongoDBTargetListerExpansion allows custom methods to be added to
+// MongoDBTargetLister.
+type MongoDBTargetListerExpansion interface{}
+
+// MongoDBTargetNamespaceListerExpansion allows custom methods to be added to
+// MongoDBTargetNamespaceLister.
+type MongoDBTargetNamespaceListerExpansion interface{}
+
 // OracleTargetListerExpansion allows custom methods to be added to
 // OracleTargetLister.
 type OracleTargetListerExpansion interface{}
