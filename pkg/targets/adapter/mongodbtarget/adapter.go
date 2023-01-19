@@ -34,6 +34,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
+	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
 )
@@ -51,7 +52,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
-		targetce.ReplierWithStaticResponseType("io.triggermesh.mongodb.response"),
+		targetce.ReplierWithStaticResponseType(v1alpha1.EventTypeMongoDBStaticResponse),
 		targetce.ReplierWithPayloadPolicy(targetce.PayloadPolicy(env.CloudEventPayloadPolicy)))
 	if err != nil {
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
@@ -106,13 +107,13 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 	}()
 
 	switch typ := event.Type(); typ {
-	case "io.triggermesh.mongodb.insert":
+	case v1alpha1.EventTypeMongoDBInsert:
 		if err := a.insert(event, ctx); err != nil {
 			a.logger.Errorw("invoking .insert: ", zap.Error(err))
 			a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
-	case "io.triggermesh.mongodb.query.kv":
+	case v1alpha1.EventTypeMongoDBQueryKV:
 		resp, err := a.kvQuery(event, ctx)
 		if err != nil {
 			a.logger.Errorw("invoking .query.kv: ", zap.Error(err))
@@ -120,7 +121,7 @@ func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudev
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
 		return resp, nil
-	case "io.triggermesh.mongodb.update":
+	case v1alpha1.EventTypeMongoDBUpdate:
 		if err := a.update(event, ctx); err != nil {
 			a.logger.Errorw("invoking .update: ", zap.Error(err))
 			a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
