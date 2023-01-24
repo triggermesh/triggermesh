@@ -21,12 +21,12 @@ metadata:
     triggermesh.io/crd-install: 'true'
     duck.knative.dev/addressable: 'true'
   annotations:
-      registry.knative.dev/eventTypes: |
+    registry.knative.dev/eventTypes: |
       [
         {
           "type": "io.triggermesh.mongodb.response",
           "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.mongodb.response.json",
-          "description": ""
+          "description": "the gneric response to all requests"
         }
       ]
     registry.triggermesh.io/acceptedEventTypes: |
@@ -68,6 +68,7 @@ spec:
                 minLength: 1
               defaultCollection:
                 description: Define the default (over-writeable at runtime) collection to write new events to.
+                type: string
                 minLength: 1
               connectionString:
                 description: The connection string containing the endpoint for the MongoDB Server and the Username + Password to connect with the instance. EX. mongodb+srv://<user>:<password>@<database_url>/?retryWrites=true&w=majority.
