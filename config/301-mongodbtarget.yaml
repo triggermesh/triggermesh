@@ -63,7 +63,7 @@ spec:
             type: object
             properties:
               defaultDatabase:
-                description: Define the default (over-writeable at runtime) database to write new events to. 
+                description: Define the default (over-writeable at runtime) database to write new events to.
                 type: string
                 minLength: 1
               defaultCollection:
@@ -71,26 +71,27 @@ spec:
                 type: string
                 minLength: 1
               connectionString:
-                description: The connection string containing the endpoint for the MongoDB Server and the Username + Password to connect with the instance. EX. mongodb+srv://<user>:<password>@<database_url>/?retryWrites=true&w=majority.
+                description: The connection string containing the endpoint for the MongoDB Server and the Username + Password
+                  to connect with the instance. EX. mongodb+srv://<user>:<password>@<database_url>/?retryWrites=true&w=majority.
                 type: object
                 properties:
                   value:
-                    description: 
+                    description:
                     type: string
-                  valueFromSecret: 
+                  valueFromSecret:
                     description: A reference to a Kubernetes Secret object containing the connection string.
                     type: object
                     properties:
                       name:
                         type: string
-                      key: 
+                      key:
                         type: string
                     required:
-                      - name
-                      - key
+                    - name
+                    - key
                 oneOf:
-                  - required: [value]
-                  - required: [valueFromSecret]
+                - required: [value]
+                - required: [valueFromSecret]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
