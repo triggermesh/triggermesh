@@ -1,0 +1,167 @@
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "1"
+        },
+        "creationTimestamp": "2020-04-26T13:23:03Z",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/component": "adapter",
+            "app.kubernetes.io/instance": "sample",
+            "app.kubernetes.io/managed-by": "foo-sources-controller",
+            "app.kubernetes.io/name": "foosource",
+            "app.kubernetes.io/part-of": "foo-sources"
+        },
+        "name": "foosource-sample",
+        "namespace": "dev",
+        "ownerReferences": [
+            {
+                "apiVersion": "sources.triggermesh.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "FooSource",
+                "name": "sample",
+                "uid": "eb046145-ca7e-4f14-a208-5a70affe6dec"
+            }
+        ],
+        "resourceVersion": "588997",
+        "selfLink": "/apis/apps/v1/namespaces/dev/deployments/foosource-sample",
+        "uid": "c949ce89-9953-4ad7-958e-9adaef9a5d83"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app.kubernetes.io/instance": "sample",
+                "app.kubernetes.io/name": "foosource"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app.kubernetes.io/component": "adapter",
+                    "app.kubernetes.io/instance": "sample",
+                    "app.kubernetes.io/managed-by": "foo-sources-controller",
+                    "app.kubernetes.io/name": "foosource",
+                    "app.kubernetes.io/part-of": "foo-sources"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "COMPONENT",
+                                "value": "foo"
+                            },
+                            {
+                                "name": "METRICS_PROMETHEUS_PORT",
+                                "value": "9092"
+                            },
+                            {
+                                "name": "NAMESPACE",
+                                "value": "dev"
+                            },
+                            {
+                                "name": "NAME",
+                                "value": "sample"
+                            },
+                            {
+                                "name": "K_SINK",
+                                "value": "http://broker-ingress.knative-eventing.svc.cluster.local/dev/default"
+                            },
+                            {
+                                "name": "K_LOGGING_CONFIG",
+                                "value": "{\"zap-logger-config\":\"{\\n  \\\"level\\\": \\\"info\\\",\\n  \\\"development\\\": false,\\n  \\\"outputPaths\\\": [\\\"stdout\\\"],\\n  \\\"errorOutputPaths\\\": [\\\"stderr\\\"],\\n  \\\"encoding\\\": \\\"json\\\",\\n  \\\"encoderConfig\\\": {\\n    \\\"timeKey\\\": \\\"ts\\\",\\n    \\\"levelKey\\\": \\\"level\\\",\\n    \\\"nameKey\\\": \\\"logger\\\",\\n    \\\"callerKey\\\": \\\"caller\\\",\\n    \\\"messageKey\\\": \\\"msg\\\",\\n    \\\"stacktraceKey\\\": \\\"stacktrace\\\",\\n    \\\"lineEnding\\\": \\\"\\\",\\n    \\\"levelEncoder\\\": \\\"\\\",\\n    \\\"timeEncoder\\\": \\\"iso8601\\\",\\n    \\\"durationEncoder\\\": \\\"\\\",\\n    \\\"callerEncoder\\\": \\\"\\\"\\n  }\\n}\\n\"}"
+                            },
+                            {
+                                "name": "K_METRICS_CONFIG",
+                                "value": "{\"Domain\":\"triggermesh.io/source\",\"Component\":\"foosource\",\"PrometheusPort\":0,\"ConfigMap\":{}}"
+                            }
+                        ],
+                        "image": "gcr.io/triggermesh/foosource",
+                        "imagePullPolicy": "Always",
+                        "name": "adapter",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "health",
+                                "protocol": "TCP"
+                            },
+                            {
+                                "containerPort": 9092,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": "health",
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "1",
+                                "memory": "45Mi"
+                            },
+                            "requests": {
+                                "cpu": "90m",
+                                "memory": "30Mi"
+                            }
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "FallbackToLogsOnError"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {},
+                "terminationGracePeriodSeconds": 30
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 1,
+        "conditions": [
+            {
+                "lastTransitionTime": "2020-04-26T13:23:03Z",
+                "lastUpdateTime": "2020-04-26T13:23:27Z",
+                "message": "ReplicaSet \"foosource-sample-5774c7984d\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            },
+            {
+                "lastTransitionTime": "2020-04-26T13:24:53Z",
+                "lastUpdateTime": "2020-04-26T13:24:53Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            }
+        ],
+        "observedGeneration": 1,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "updatedReplicas": 1
+    }
+}
