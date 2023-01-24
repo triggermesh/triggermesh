@@ -82,7 +82,7 @@ jobs:
 
         git_status="$(git status --porcelain)"
         if [[ ${git_status} ]]; then
-            echo -e 'Third-party licenses are out-of-date. Please run `go-licenses save`\n'
+            echo -e 'Third-party licenses are out-of-date. Please run `go-licenses save ./... --save_path LICENSES/vendor/ --force`\n'
             echo "${git_status}"
             exit 1
         fi
