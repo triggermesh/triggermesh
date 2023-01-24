@@ -31,10 +31,10 @@ metadata:
       ]
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "*" },
         { "type":  "io.triggermesh.mongodb.insert" },
         { "type":  "io.triggermesh.mongodb.query.kv" },
         { "type":  "io.triggermesh.mongodb.update" },
+        { "type": "*" }
       ]
 spec:
   group: targets.triggermesh.io
