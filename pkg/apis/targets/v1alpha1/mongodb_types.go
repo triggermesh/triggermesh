@@ -45,7 +45,7 @@ var (
 // MongoDBTargetSpec defines the desired state of the event target.
 type MongoDBTargetSpec struct {
 	// ConnectionString defines the MongoDB connection string.
-	ConnectionString SecretValueFromSource `json:"connectionString"`
+	ConnectionString v1alpha1.ValueFromField `json:"connectionString"`
 	// Database defines the MongoDB database.
 	Database string `json:"database"`
 	// Collection defines the MongoDB collection.

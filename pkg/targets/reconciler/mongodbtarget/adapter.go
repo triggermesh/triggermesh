@@ -73,7 +73,7 @@ func MakeAppEnv(trg *v1alpha1.MongoDBTarget) []corev1.EnvVar {
 		{
 			Name: envServerURL,
 			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: trg.Spec.ConnectionString.SecretKeyRef,
+				SecretKeyRef: trg.Spec.ConnectionString.ValueFromSecret,
 			},
 		},
 	}
