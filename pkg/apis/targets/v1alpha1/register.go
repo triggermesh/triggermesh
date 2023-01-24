@@ -90,6 +90,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&LogzMetricsTargetList{},
 		&LogzTarget{},
 		&LogzTargetList{},
+		&MongoDBTargetList{},
 		&MongoDBTarget{},
 		&MongoDBTargetList{},
 		&OracleTarget{},

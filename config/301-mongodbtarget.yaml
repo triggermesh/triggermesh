@@ -162,8 +162,7 @@ spec:
                           type: integer
                           format: int64
             required:
-            - bootstrapServers
-            - topic
+            - connectionString
           status:
             type: object
             description: Reported status of the event target.
