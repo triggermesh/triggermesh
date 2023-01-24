@@ -23,7 +23,6 @@ spec:
   defaultCollection: dummycol
   # A refrence to a kubernetes secret containing a connection string I.E mongodb+srv://<user>:<password>@<database_url>/?retryWrites=true&w=majority
   connectionString:
-    secretKeyRef:
+    valueFromSecret:  
       name: mongo-db-connection-string
       key: connection-string
-
