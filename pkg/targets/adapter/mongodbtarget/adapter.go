@@ -159,10 +159,8 @@ func (a *adapter) kvQuery(e cloudevents.Event, ctx context.Context) (*cloudevent
 	if err := e.DataAs(qpd); err != nil {
 		return nil, err
 	}
-	var col string
-	var db string
-	col = a.defaultCollection
-	db = a.defaultDatabase
+	col := a.defaultCollection
+	db := a.defaultDatabase
 	if qpd.Collection != "" {
 		col = qpd.Collection
 	}

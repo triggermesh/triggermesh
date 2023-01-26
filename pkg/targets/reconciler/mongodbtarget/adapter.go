@@ -42,7 +42,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `envconfig:"MONGODBTARGET_IMAGE" default:"gcr.io/triggermesh/mongodbtarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/mongodbtarget-adapter"`
 }
 
 // Verify that Reconciler implements common.AdapterBuilder.

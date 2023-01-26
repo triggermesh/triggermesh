@@ -19,7 +19,7 @@ metadata:
 spec:
   # The database to use by default if a `database` parameter is missing from the event payload(s)
   defaultDatabase: dummydb
-  # The collection to use by default if a `database` paramter is missing from the event payload(s)
+  # The collection to use by default if a `database` parameter is missing from the event payload(s)
   defaultCollection: dummycol
   # A refrence to a kubernetes secret containing a connection string I.E mongodb+srv://<user>:<password>@<database_url>/?retryWrites=true&w=majority
   connectionString:
