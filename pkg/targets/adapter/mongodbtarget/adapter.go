@@ -43,6 +43,7 @@ import (
 func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClient cloudevents.Client) pkgadapter.Adapter {
 	env := envAcc.(*envAccessor)
 	logger := logging.FromContext(ctx)
+	metrics.MustRegisterEventProcessingStatsView()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(env.ServerURL))
 	if err != nil {
@@ -63,8 +64,6 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		Namespace:     envAcc.GetNamespace(),
 		Name:          envAcc.GetName(),
 	}
-
-	metrics.MustRegisterEventProcessingStatsView()
 
 	return &adapter{
 		mclient:           client,

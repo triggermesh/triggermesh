@@ -1,25 +1,6 @@
 # MongoDBTarget
 
 The MongoDBTarget exposes several methods, via event types, that can be used to interact with the MongoDB database.
-The MongoDBTarget can currently be deployed via [Koby](https://github.com/triggermesh/koby)
-
-## Deploying with Koby
-### Prerequisites
-* Ensure that you have installed [Koby](https://github.com/triggermesh/koby) on the target cluster.
-* A pre-existing MongoDB database with its associated connection string.
-
-### Configuring the MongoDBTarget CRD with Koby
-The MongoDBTarget CRD can be configured with Koby by applying the provided manifest in `/config/100-registration.yaml`
-```cmd
-kubectl apply -f /config/100-registration.yaml
-```
-
-### Deploying an instance of the MongoDBTarget
-After providing a valid connection string for the MongoDB database under the `mongodb_server_url` spec field,
-the MongoDBTarget can now be deployed by applying the provided manifest in `/config/200-deployment.yaml`.
-```cmd
-kubectl apply -f /config/200-deployment.yaml
-```
 
 # Interacting with the Event Target
 ## Arbitrary Event Types
