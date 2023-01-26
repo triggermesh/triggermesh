@@ -17,7 +17,7 @@ kind: MongoDBTarget
 metadata:
   name: mongo-db-target
 spec:
-  # The database to use by default if a `database` paramter is missing from the event payload(s)
+  # The database to use by default if a `database` parameter is missing from the event payload(s)
   defaultDatabase: dummydb
   # The collection to use by default if a `database` paramter is missing from the event payload(s)
   defaultCollection: dummycol
