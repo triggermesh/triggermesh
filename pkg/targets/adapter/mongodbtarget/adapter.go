@@ -208,8 +208,8 @@ func (a *adapter) insert(e cloudevents.Event, ctx context.Context) error {
 	}
 
 	collection := a.mclient.Database(db).Collection(col)
-	if ipd.JsonMessage != nil {
-		_, err := collection.InsertOne(ctx, ipd.JsonMessage)
+	if ipd.JSONMessage != nil {
+		_, err := collection.InsertOne(ctx, ipd.JSONMessage)
 		if err != nil {
 			return err
 		}
