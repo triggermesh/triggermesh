@@ -43,7 +43,7 @@ curl -v  http://localhost:8080 \
        -H "Ce-Type: io.triggermesh.mongodb.insert" \
        -H "Ce-Source: sample/source" \
        -H "Content-Type: application/json" \
-       -d '{"database":"test","collection": "test","mapStrVal":{"test":"testdd1","test2":"test3"}}'
+       -d '{"database":"test","collection": "test","jsonMessage":{"test":"testdd1","test2":"test3"}}'
 ```
 
 #### This type expects a JSON payload with the following properties:
@@ -52,8 +52,8 @@ curl -v  http://localhost:8080 \
 |---|---|---|
 | **database** | string | The name of the database.  |
 | **collection** | string | The value of the collection. |
-| **itemName** | string | This value will be used to assing a Key.  |
-| **mapStrVal** | map[string]string | This value will be used to assing a Value. |
+| **key** | string | This value will be used to assing a Key.  |
+| **jsonMessage** | map[string]string | This value will be used to assing a Value. |
 
 **Note** the `database` and `collection` fields are not required. If not provided, the `defaultDatabase` and `defaultCollection` spec fields will be used.
 

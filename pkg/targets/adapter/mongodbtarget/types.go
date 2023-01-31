@@ -16,12 +16,12 @@ limitations under the License.
 
 package mongodbtarget
 
-// InsertPayload defines the expected data structure found at the event payload.
+// InsertPayload defines the expected data structure found at the "io.triggermesh.mongodb.insert" payload.
 type InsertPayload struct {
-	Database   string            `json:"database"`
-	Collection string            `json:"collection"`
-	StrValue   string            `json:"strValue"`
-	MapStrVal  map[string]string `json:"mapStrVal"`
+	Database    string            `json:"database"`
+	Collection  string            `json:"collection"`
+	Key         string            `json:"key"`
+	JsonMessage map[string]string `json:"jsonMessage"`
 }
 
 // QueryPayload defines the expected data found at the "io.triggermesh.mongodb.query" payload.

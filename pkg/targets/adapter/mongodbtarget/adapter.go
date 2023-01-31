@@ -47,7 +47,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(env.ServerURL))
 	if err != nil {
-		logger.Fatal("error connecting to mongodb", err)
+		logger.Panicw("error connecting to mongodb", zap.Error(err))
 		return nil
 	}
 
@@ -95,8 +95,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
-func (a *adapter) dispatch(event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	ctx := context.Background()
+func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	ceTypeTag := metrics.TagEventType(event.Type())
 	ceSrcTag := metrics.TagEventSource(event.Source())
 	a.logger.Debug("Processing event:" + event.Type())
@@ -173,13 +172,13 @@ func (a *adapter) kvQuery(e cloudevents.Event, ctx context.Context) (*cloudevent
 		return nil, err
 	}
 
-	var episodesFiltered []bson.M
-	if err = filterCursor.All(ctx, &episodesFiltered); err != nil {
+	var itemsFiltered []bson.M
+	if err = filterCursor.All(ctx, &itemsFiltered); err != nil {
 		return nil, err
 	}
 
 	responseEvent := cloudevents.NewEvent(cloudevents.VersionV1)
-	err = responseEvent.SetData(cloudevents.ApplicationJSON, episodesFiltered)
+	err = responseEvent.SetData(cloudevents.ApplicationJSON, itemsFiltered)
 	if err != nil {
 		return nil, err
 	}
@@ -209,8 +208,8 @@ func (a *adapter) insert(e cloudevents.Event, ctx context.Context) error {
 	}
 
 	collection := a.mclient.Database(db).Collection(col)
-	if ipd.MapStrVal != nil {
-		_, err := collection.InsertOne(ctx, ipd.MapStrVal)
+	if ipd.JsonMessage != nil {
+		_, err := collection.InsertOne(ctx, ipd.JsonMessage)
 		if err != nil {
 			return err
 		}

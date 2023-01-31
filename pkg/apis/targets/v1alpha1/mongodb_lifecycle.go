@@ -73,7 +73,7 @@ func (t *MongoDBTarget) GetEventTypes() []string {
 
 // AsEventSource implements EventSource.
 func (t *MongoDBTarget) AsEventSource() string {
-	return t.Spec.Collection
+	return t.Spec.Database
 }
 
 // GetAdapterOverrides implements AdapterConfigurable.

@@ -164,6 +164,8 @@ spec:
                           format: int64
             required:
             - connectionString
+            - defaultCollection
+            - defaultDatabase
           status:
             type: object
             description: Reported status of the event target.
