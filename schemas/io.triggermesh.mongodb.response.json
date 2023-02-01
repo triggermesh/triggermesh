@@ -1,0 +1,64 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://triggermesh.io/schemas/mongodb.response.json",
+    "type": "object",
+    "title": "MongoDB Target Response",
+    "description": "Response payload of a MongoDB search query. This schema is used to validate the response of a MongoDB search query. The response is a JSON object with a single property named 'collection'. The value of this property is an array of documents. Each document is a JSON object with a single property named '_id'. The value of this property is the ID of the document. The rest of the properties are the fields of the document.",
+    "default": {},
+    "examples": [
+        {
+            "collection": {
+                "_id":"63c829397c2fdbfebdd93883",
+                "partStore": "test"
+            }
+        },
+        {
+            "collection": [
+                {
+                    "_id":"63c829397c2fdbfebdd93883",
+                    "key1": "test",
+                    "key2": "test"
+                },
+                {
+                    "_id":"63c829397c2fdbfebdd93884",
+                    "key1": "test1",
+                    "key2": "test2"
+                }
+            ]
+        }
+    ],
+    "required": [
+        "collection"
+    ],
+    "properties": {
+        "collection": {
+            "$id": "#/properties/collection",
+            "type": "object",
+            "title": "Collection",
+            "description": "Collection of documents",
+            "default": {},
+            "examples": [
+                {
+                    "_id":"63c829397c2fdbfebdd93883",
+                    "partStore": "test"
+                }
+            ],
+            "required": [
+                "_id"
+            ],
+            "properties": {
+                "_id": {
+                    "$id": "#/properties/collection/properties/_id",
+                    "type": "string",
+                    "title": "ID",
+                    "description": "ID of the document",
+                    "default": "",
+                    "examples": [
+                        "63c829397c2fdbfebdd93883"
+                    ]
+                }
+            }
+        }
+    },
+    "additionalProperties": true
+}
