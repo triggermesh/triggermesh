@@ -59,16 +59,19 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
+	an := envAcc.GetName()
+
 	mt := &pkgadapter.MetricTag{
 		ResourceGroup: targets.MongoDBTargetResource.String(),
 		Namespace:     envAcc.GetNamespace(),
-		Name:          envAcc.GetName(),
+		Name:          an,
 	}
 
 	return &adapter{
 		mclient:           client,
 		defaultDatabase:   env.DefaultDatabase,
 		defaultCollection: env.DefaultCollection,
+		adapterName:       an,
 
 		replier:  replier,
 		ceClient: ceClient,
@@ -83,6 +86,7 @@ type adapter struct {
 	mclient           *mongo.Client
 	defaultDatabase   string
 	defaultCollection string
+	adapterName       string
 
 	replier  *targetce.Replier
 	ceClient cloudevents.Client
@@ -184,7 +188,7 @@ func (a *adapter) kvQuery(e cloudevents.Event, ctx context.Context) (*cloudevent
 	}
 
 	responseEvent.SetType(v1alpha1.EventTypeMongoDBQueryResponse)
-	responseEvent.SetSource(fmt.Sprintf("%s/%s", db, col))
+	responseEvent.SetSource(fmt.Sprintf("%s/%s/%s", a.adapterName, db, col))
 	responseEvent.SetSubject("query-result")
 	responseEvent.SetDataContentType(cloudevents.ApplicationJSON)
 	return &responseEvent, nil
