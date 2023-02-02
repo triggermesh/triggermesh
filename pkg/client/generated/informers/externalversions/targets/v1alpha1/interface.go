@@ -40,16 +40,12 @@ type Interface interface {
 	AWSSNSTargets() AWSSNSTargetInformer
 	// AWSSQSTargets returns a AWSSQSTargetInformer.
 	AWSSQSTargets() AWSSQSTargetInformer
-	// AlibabaOSSTargets returns a AlibabaOSSTargetInformer.
-	AlibabaOSSTargets() AlibabaOSSTargetInformer
 	// AzureEventHubsTargets returns a AzureEventHubsTargetInformer.
 	AzureEventHubsTargets() AzureEventHubsTargetInformer
 	// AzureSentinelTargets returns a AzureSentinelTargetInformer.
 	AzureSentinelTargets() AzureSentinelTargetInformer
 	// CloudEventsTargets returns a CloudEventsTargetInformer.
 	CloudEventsTargets() CloudEventsTargetInformer
-	// ConfluentTargets returns a ConfluentTargetInformer.
-	ConfluentTargets() ConfluentTargetInformer
 	// DatadogTargets returns a DatadogTargetInformer.
 	DatadogTargets() DatadogTargetInformer
 	// ElasticsearchTargets returns a ElasticsearchTargetInformer.
@@ -66,8 +62,6 @@ type Interface interface {
 	GoogleSheetTargets() GoogleSheetTargetInformer
 	// HTTPTargets returns a HTTPTargetInformer.
 	HTTPTargets() HTTPTargetInformer
-	// HasuraTargets returns a HasuraTargetInformer.
-	HasuraTargets() HasuraTargetInformer
 	// IBMMQTargets returns a IBMMQTargetInformer.
 	IBMMQTargets() IBMMQTargetInformer
 	// JiraTargets returns a JiraTargetInformer.
@@ -90,8 +84,6 @@ type Interface interface {
 	SlackTargets() SlackTargetInformer
 	// SplunkTargets returns a SplunkTargetInformer.
 	SplunkTargets() SplunkTargetInformer
-	// TektonTargets returns a TektonTargetInformer.
-	TektonTargets() TektonTargetInformer
 	// TwilioTargets returns a TwilioTargetInformer.
 	TwilioTargets() TwilioTargetInformer
 	// ZendeskTargets returns a ZendeskTargetInformer.
@@ -149,11 +141,6 @@ func (v *version) AWSSQSTargets() AWSSQSTargetInformer {
 	return &aWSSQSTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// AlibabaOSSTargets returns a AlibabaOSSTargetInformer.
-func (v *version) AlibabaOSSTargets() AlibabaOSSTargetInformer {
-	return &alibabaOSSTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
 // AzureEventHubsTargets returns a AzureEventHubsTargetInformer.
 func (v *version) AzureEventHubsTargets() AzureEventHubsTargetInformer {
 	return &azureEventHubsTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -167,11 +154,6 @@ func (v *version) AzureSentinelTargets() AzureSentinelTargetInformer {
 // CloudEventsTargets returns a CloudEventsTargetInformer.
 func (v *version) CloudEventsTargets() CloudEventsTargetInformer {
 	return &cloudEventsTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// ConfluentTargets returns a ConfluentTargetInformer.
-func (v *version) ConfluentTargets() ConfluentTargetInformer {
-	return &confluentTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // DatadogTargets returns a DatadogTargetInformer.
@@ -212,11 +194,6 @@ func (v *version) GoogleSheetTargets() GoogleSheetTargetInformer {
 // HTTPTargets returns a HTTPTargetInformer.
 func (v *version) HTTPTargets() HTTPTargetInformer {
 	return &hTTPTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// HasuraTargets returns a HasuraTargetInformer.
-func (v *version) HasuraTargets() HasuraTargetInformer {
-	return &hasuraTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // IBMMQTargets returns a IBMMQTargetInformer.
@@ -272,11 +249,6 @@ func (v *version) SlackTargets() SlackTargetInformer {
 // SplunkTargets returns a SplunkTargetInformer.
 func (v *version) SplunkTargets() SplunkTargetInformer {
 	return &splunkTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// TektonTargets returns a TektonTargetInformer.
-func (v *version) TektonTargets() TektonTargetInformer {
-	return &tektonTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // TwilioTargets returns a TwilioTargetInformer.

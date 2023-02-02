@@ -38,7 +38,6 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.12
 	github.com/Shopify/sarama v1.37.2
 	github.com/ZachtimusPrime/Go-Splunk-HTTP/splunk/v2 v2.0.2
-	github.com/aliyun/aliyun-oss-go-sdk v2.2.6+incompatible
 	github.com/amenzhinsky/iothub v0.9.0
 	github.com/andygrunwald/go-jira v1.16.0
 	github.com/aws/aws-sdk-go v1.44.137
@@ -63,7 +62,6 @@ require (
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.8.1
-	github.com/tektoncd/pipeline v0.40.2
 	github.com/tidwall/gjson v1.14.4
 	github.com/wamuir/go-xslt v0.1.4
 	github.com/xdg-go/scram v1.1.2
@@ -80,7 +78,6 @@ require (
 	google.golang.org/genproto v0.0.0-20221227171554-f9683d7f8bef
 	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.1
-	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.8.2
 	k8s.io/api v0.23.9
 	k8s.io/apimachinery v0.23.9
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
@@ -123,7 +120,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cloudevents/sdk-go/observability/opencensus/v2 v2.6.1 // indirect
 	github.com/cloudevents/sdk-go/sql/v2 v2.8.0 // indirect
-	github.com/confluentinc/confluent-kafka-go v1.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/eapache/go-resiliency v1.3.0 // indirect
@@ -221,6 +217,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.11.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
+	go.uber.org/goleak v1.1.12 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect

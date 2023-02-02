@@ -36,11 +36,9 @@ type TargetsV1alpha1Interface interface {
 	AWSS3TargetsGetter
 	AWSSNSTargetsGetter
 	AWSSQSTargetsGetter
-	AlibabaOSSTargetsGetter
 	AzureEventHubsTargetsGetter
 	AzureSentinelTargetsGetter
 	CloudEventsTargetsGetter
-	ConfluentTargetsGetter
 	DatadogTargetsGetter
 	ElasticsearchTargetsGetter
 	GoogleCloudFirestoreTargetsGetter
@@ -49,7 +47,6 @@ type TargetsV1alpha1Interface interface {
 	GoogleCloudWorkflowsTargetsGetter
 	GoogleSheetTargetsGetter
 	HTTPTargetsGetter
-	HasuraTargetsGetter
 	IBMMQTargetsGetter
 	JiraTargetsGetter
 	KafkaTargetsGetter
@@ -61,7 +58,6 @@ type TargetsV1alpha1Interface interface {
 	SendGridTargetsGetter
 	SlackTargetsGetter
 	SplunkTargetsGetter
-	TektonTargetsGetter
 	TwilioTargetsGetter
 	ZendeskTargetsGetter
 }
@@ -103,10 +99,6 @@ func (c *TargetsV1alpha1Client) AWSSQSTargets(namespace string) AWSSQSTargetInte
 	return newAWSSQSTargets(c, namespace)
 }
 
-func (c *TargetsV1alpha1Client) AlibabaOSSTargets(namespace string) AlibabaOSSTargetInterface {
-	return newAlibabaOSSTargets(c, namespace)
-}
-
 func (c *TargetsV1alpha1Client) AzureEventHubsTargets(namespace string) AzureEventHubsTargetInterface {
 	return newAzureEventHubsTargets(c, namespace)
 }
@@ -117,10 +109,6 @@ func (c *TargetsV1alpha1Client) AzureSentinelTargets(namespace string) AzureSent
 
 func (c *TargetsV1alpha1Client) CloudEventsTargets(namespace string) CloudEventsTargetInterface {
 	return newCloudEventsTargets(c, namespace)
-}
-
-func (c *TargetsV1alpha1Client) ConfluentTargets(namespace string) ConfluentTargetInterface {
-	return newConfluentTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) DatadogTargets(namespace string) DatadogTargetInterface {
@@ -153,10 +141,6 @@ func (c *TargetsV1alpha1Client) GoogleSheetTargets(namespace string) GoogleSheet
 
 func (c *TargetsV1alpha1Client) HTTPTargets(namespace string) HTTPTargetInterface {
 	return newHTTPTargets(c, namespace)
-}
-
-func (c *TargetsV1alpha1Client) HasuraTargets(namespace string) HasuraTargetInterface {
-	return newHasuraTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) IBMMQTargets(namespace string) IBMMQTargetInterface {
@@ -201,10 +185,6 @@ func (c *TargetsV1alpha1Client) SlackTargets(namespace string) SlackTargetInterf
 
 func (c *TargetsV1alpha1Client) SplunkTargets(namespace string) SplunkTargetInterface {
 	return newSplunkTargets(c, namespace)
-}
-
-func (c *TargetsV1alpha1Client) TektonTargets(namespace string) TektonTargetInterface {
-	return newTektonTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) TwilioTargets(namespace string) TwilioTargetInterface {

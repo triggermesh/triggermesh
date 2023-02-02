@@ -34,15 +34,11 @@ type AWSSNSTargetExpansion interface{}
 
 type AWSSQSTargetExpansion interface{}
 
-type AlibabaOSSTargetExpansion interface{}
-
 type AzureEventHubsTargetExpansion interface{}
 
 type AzureSentinelTargetExpansion interface{}
 
 type CloudEventsTargetExpansion interface{}
-
-type ConfluentTargetExpansion interface{}
 
 type DatadogTargetExpansion interface{}
 
@@ -59,8 +55,6 @@ type GoogleCloudWorkflowsTargetExpansion interface{}
 type GoogleSheetTargetExpansion interface{}
 
 type HTTPTargetExpansion interface{}
-
-type HasuraTargetExpansion interface{}
 
 type IBMMQTargetExpansion interface{}
 
@@ -83,8 +77,6 @@ type SendGridTargetExpansion interface{}
 type SlackTargetExpansion interface{}
 
 type SplunkTargetExpansion interface{}
-
-type TektonTargetExpansion interface{}
 
 type TwilioTargetExpansion interface{}
 

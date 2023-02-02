@@ -53,7 +53,6 @@ resources:
 - config/300-twiliosource.yaml
 - config/300-webhooksource.yaml
 - config/300-zendesksource.yaml
-- config/301-alibabaosstarget.yaml
 - config/301-awscomprehendtarget.yaml
 - config/301-awsdynamodbtarget.yaml
 - config/301-awseventbridgetarget.yaml
@@ -65,7 +64,6 @@ resources:
 - config/301-azureeventhubstarget.yaml
 - config/301-azuresentineltarget.yaml
 - config/301-cloudeventstarget.yaml
-- config/301-confluenttarget.yaml
 - config/301-datadogtarget.yaml
 - config/301-elasticsearchtarget.yaml
 - config/301-googlecloudstoragetarget.yaml
@@ -73,7 +71,6 @@ resources:
 - config/301-googlecloudfirestoretarget.yaml
 - config/301-googlecloudpubsubtarget.yaml
 - config/301-googlesheettarget.yaml
-- config/301-hasuratarget.yaml
 - config/301-httptarget.yaml
 - config/301-ibmmqtarget.yaml
 - config/301-jiratarget.yaml
@@ -86,7 +83,6 @@ resources:
 - config/301-sendgridtarget.yaml
 - config/301-slacktarget.yaml
 - config/301-splunktarget.yaml
-- config/301-tektontarget.yaml
 - config/301-twiliotarget.yaml
 - config/301-zendesktarget.yaml
 - config/302-filter.yaml

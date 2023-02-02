@@ -60,10 +60,6 @@ func (c *FakeTargetsV1alpha1) AWSSQSTargets(namespace string) v1alpha1.AWSSQSTar
 	return &FakeAWSSQSTargets{c, namespace}
 }
 
-func (c *FakeTargetsV1alpha1) AlibabaOSSTargets(namespace string) v1alpha1.AlibabaOSSTargetInterface {
-	return &FakeAlibabaOSSTargets{c, namespace}
-}
-
 func (c *FakeTargetsV1alpha1) AzureEventHubsTargets(namespace string) v1alpha1.AzureEventHubsTargetInterface {
 	return &FakeAzureEventHubsTargets{c, namespace}
 }
@@ -74,10 +70,6 @@ func (c *FakeTargetsV1alpha1) AzureSentinelTargets(namespace string) v1alpha1.Az
 
 func (c *FakeTargetsV1alpha1) CloudEventsTargets(namespace string) v1alpha1.CloudEventsTargetInterface {
 	return &FakeCloudEventsTargets{c, namespace}
-}
-
-func (c *FakeTargetsV1alpha1) ConfluentTargets(namespace string) v1alpha1.ConfluentTargetInterface {
-	return &FakeConfluentTargets{c, namespace}
 }
 
 func (c *FakeTargetsV1alpha1) DatadogTargets(namespace string) v1alpha1.DatadogTargetInterface {
@@ -110,10 +102,6 @@ func (c *FakeTargetsV1alpha1) GoogleSheetTargets(namespace string) v1alpha1.Goog
 
 func (c *FakeTargetsV1alpha1) HTTPTargets(namespace string) v1alpha1.HTTPTargetInterface {
 	return &FakeHTTPTargets{c, namespace}
-}
-
-func (c *FakeTargetsV1alpha1) HasuraTargets(namespace string) v1alpha1.HasuraTargetInterface {
-	return &FakeHasuraTargets{c, namespace}
 }
 
 func (c *FakeTargetsV1alpha1) IBMMQTargets(namespace string) v1alpha1.IBMMQTargetInterface {
@@ -158,10 +146,6 @@ func (c *FakeTargetsV1alpha1) SlackTargets(namespace string) v1alpha1.SlackTarge
 
 func (c *FakeTargetsV1alpha1) SplunkTargets(namespace string) v1alpha1.SplunkTargetInterface {
 	return &FakeSplunkTargets{c, namespace}
-}
-
-func (c *FakeTargetsV1alpha1) TektonTargets(namespace string) v1alpha1.TektonTargetInterface {
-	return &FakeTektonTargets{c, namespace}
 }
 
 func (c *FakeTargetsV1alpha1) TwilioTargets(namespace string) v1alpha1.TwilioTargetInterface {

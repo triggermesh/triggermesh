@@ -5,13 +5,14 @@ This event target integrates with Kafka, where any Cloud Event received are publ
 ## Contents
 
 - [Kafka event target](#kafka-event-target)
+  - [Contents](#contents)
   - [Prerequisites](#prerequisites)
-  - [Creating a KafkaTarget](#creating-a-kafka-target)
+  - [Creating a KafkaTarget](#creating-a-kafkatarget)
     - [SASL-PLAIN](#sasl-plain)
     - [Kerberos-SSL](#kerberos-ssl)
   - [Status](#status)
-  - [KafkaTarget as an event Sink](#kafka-target-as-an-event-sink)
-  - [Sending messages to the KafkaTarget](#sending-messages-to-the-kafka-target)
+    - [KafkaTarget as an event Sink](#kafkatarget-as-an-event-sink)
+    - [Sending messages to the KafkaTarget](#sending-messages-to-the-kafkatarget)
 
 ## Prerequisites
 
@@ -151,7 +152,7 @@ spec:
 
  A KafkaTarget will, by default, accept any CloudEvent and pass the entire event into a message body.
 
-`curl` can be used from a container in the cluster pointing to the `ConfluentTarget` exposed URL:
+`curl` can be used from a container in the cluster pointing to the `KafkaTarget` exposed URL:
 
 ```console
 curl -v http://kafkatarget-int1-9fg4abc7d44bdd0204bd0a221bea9453k.default.svc.cluster.local

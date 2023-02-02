@@ -69,21 +69,6 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: tektontarget-adapter
-  labels:
-    app.kubernetes.io/part-of: triggermesh
-subjects:
-- kind: ServiceAccount
-  name: triggermesh-controller
-  namespace: triggermesh
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: tektontarget-adapter
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
   name: filter-adapter
   labels:
     app.kubernetes.io/part-of: triggermesh
