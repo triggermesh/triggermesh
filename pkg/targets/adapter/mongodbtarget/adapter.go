@@ -184,7 +184,7 @@ func (a *adapter) kvQuery(e cloudevents.Event, ctx context.Context) (*cloudevent
 	}
 
 	responseEvent.SetType(v1alpha1.EventTypeMongoDBQueryResponse)
-	responseEvent.SetSource(fmt.Sprintf("%s/%s", a.defaultDatabase, a.defaultCollection))
+	responseEvent.SetSource(fmt.Sprintf("%s/%s", db, col))
 	responseEvent.SetSubject("query-result")
 	responseEvent.SetDataContentType(cloudevents.ApplicationJSON)
 	return &responseEvent, nil
