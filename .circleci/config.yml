@@ -4,6 +4,7 @@ orbs:
   aws-eks: circleci/aws-eks@1
   gcp-cli: circleci/gcp-cli@1
   go: circleci/go@1
+  docker: circleci/docker@1.4.0
 
 jobs:
   gomod-cache:
@@ -137,6 +138,15 @@ jobs:
       - setup_remote_docker:
           version: 20.10.11
           docker_layer_caching: true
+      - docker/check
+      - run:
+          name: Publishing container images to Docker Hub
+          environment:
+            KO_DOCKER_REPO: docker.io/triggermesh
+            KOFLAGS: --jobs=4
+            DIST_DIR: /tmp/dist/
+          command: |
+            IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
       - run:
           name: Publishing container images and creating release manifests
           environment:
