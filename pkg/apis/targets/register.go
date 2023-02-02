@@ -157,6 +157,11 @@ var (
 		Group:    GroupName,
 		Resource: "logzmetricstargets",
 	}
+	// MongoDBTargetResource respresents an event target for MongoDB.
+	MongoDBTargetResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "mongodbtargets",
+	}
 	// OpenTelemetryTargetResource respresents an event target for OpenTelemetry.
 	OpenTelemetryTargetResource = schema.GroupResource{
 		Group:    GroupName,

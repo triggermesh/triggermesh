@@ -159,6 +159,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/kafkatarget-adapter
         - name: LOGZTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/logztarget-adapter
+        - name: MONGODBTARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/mongodbtarget-adapter
         - name: OPENTELEMETRYTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/opentelemetrytarget-adapter
         - name: ORACLETARGET_IMAGE

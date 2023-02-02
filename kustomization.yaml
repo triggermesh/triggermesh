@@ -79,6 +79,7 @@ resources:
 - config/301-jiratarget.yaml
 - config/301-kafkatarget.yaml
 - config/301-logzmetricstarget.yaml
+- config/301-mongodbtarget.yaml
 - config/301-logztarget.yaml
 - config/301-oracletarget.yaml
 - config/301-salesforcetarget.yaml

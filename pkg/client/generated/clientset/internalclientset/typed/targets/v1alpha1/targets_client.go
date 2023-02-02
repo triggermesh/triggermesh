@@ -55,6 +55,7 @@ type TargetsV1alpha1Interface interface {
 	KafkaTargetsGetter
 	LogzMetricsTargetsGetter
 	LogzTargetsGetter
+	MongoDBTargetsGetter
 	OracleTargetsGetter
 	SalesforceTargetsGetter
 	SendGridTargetsGetter
@@ -176,6 +177,10 @@ func (c *TargetsV1alpha1Client) LogzMetricsTargets(namespace string) LogzMetrics
 
 func (c *TargetsV1alpha1Client) LogzTargets(namespace string) LogzTargetInterface {
 	return newLogzTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) MongoDBTargets(namespace string) MongoDBTargetInterface {
+	return newMongoDBTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) OracleTargets(namespace string) OracleTargetInterface {

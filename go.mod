@@ -67,6 +67,7 @@ require (
 	github.com/tidwall/gjson v1.14.4
 	github.com/wamuir/go-xslt v0.1.4
 	github.com/xdg-go/scram v1.1.2
+	go.mongodb.org/mongo-driver v1.5.1
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.29.0
 	go.opentelemetry.io/otel v1.11.0
@@ -214,6 +215,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
+	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opentelemetry.io/otel/internal/metric v0.27.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
 	go.opentelemetry.io/otel/trace v1.11.0 // indirect

@@ -72,6 +72,8 @@ type LogzMetricsTargetExpansion interface{}
 
 type LogzTargetExpansion interface{}
 
+type MongoDBTargetExpansion interface{}
+
 type OracleTargetExpansion interface{}
 
 type SalesforceTargetExpansion interface{}
