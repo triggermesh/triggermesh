@@ -30,6 +30,7 @@ const (
 	EventTypeMongoDBUpdate  = "io.triggermesh.mongodb.update"
 
 	EventTypeMongoDBStaticResponse = "io.triggermesh.mongodb.response"
+	EventTypeMongoDBQueryResponse  = "io.triggermesh.mongodb.query.response"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -68,6 +69,7 @@ func (*MongoDBTarget) AcceptedEventTypes() []string {
 func (t *MongoDBTarget) GetEventTypes() []string {
 	return []string{
 		EventTypeMongoDBStaticResponse,
+		EventTypeMongoDBQueryResponse,
 	}
 }
 

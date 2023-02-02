@@ -24,8 +24,8 @@ metadata:
     registry.knative.dev/eventTypes: |
       [
         {
-          "type": "io.triggermesh.mongodb.response",
-          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.mongodb.response.json",
+          "type": "io.triggermesh.mongodb.query.response",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.mongodb.query.response.json",
           "description": "the gneric response to all requests"
         }
       ]

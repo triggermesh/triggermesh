@@ -183,8 +183,8 @@ func (a *adapter) kvQuery(e cloudevents.Event, ctx context.Context) (*cloudevent
 		return nil, err
 	}
 
-	responseEvent.SetType("io.triggermesh.mongodb.query.kv.result")
-	responseEvent.SetSource("io.triggermesh.mongodb")
+	responseEvent.SetType(v1alpha1.EventTypeMongoDBQueryResponse)
+	responseEvent.SetSource(fmt.Sprintf("%s/%s", a.defaultDatabase, a.defaultCollection))
 	responseEvent.SetSubject("query-result")
 	responseEvent.SetDataContentType(cloudevents.ApplicationJSON)
 	return &responseEvent, nil
@@ -208,8 +208,8 @@ func (a *adapter) insert(e cloudevents.Event, ctx context.Context) error {
 	}
 
 	collection := a.mclient.Database(db).Collection(col)
-	if ipd.JSONMessage != nil {
-		_, err := collection.InsertOne(ctx, ipd.JSONMessage)
+	if ipd.Document != nil {
+		_, err := collection.InsertOne(ctx, ipd.Document)
 		if err != nil {
 			return err
 		}
