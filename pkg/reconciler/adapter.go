@@ -71,6 +71,10 @@ func MTAdapterObjectName(o kmeta.OwnerRefable) string {
 // with the given component instance.
 func ServiceAccountName(rcl v1alpha1.Reconcilable) string {
 	if v1alpha1.WantsOwnServiceAccount(rcl) {
+		if name := v1alpha1.AlphaCustomServiceAccountName(rcl); name != "" {
+			return name
+		}
+
 		rclName := rcl.GetName()
 
 		// Edge case: we need to make sure some characters are inserted

@@ -84,6 +84,8 @@ func (s *AWSSQSSource) ServiceAccountOptions() []resource.ServiceAccountOption {
 		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
 	}
 
+	saOpts = append(saOpts, v1alpha1.AlphaAwsIamRoleCustomServiceAccountName(s))
+
 	return saOpts
 }
 

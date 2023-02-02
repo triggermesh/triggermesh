@@ -72,3 +72,29 @@ func AwsIamRoleAnnotation(iamRole apis.ARN) resource.ServiceAccountOption {
 		metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationEksIAMRole, iamRole.String())
 	}
 }
+
+const annotationAlphaIamRoleServiceAccount = "alpha.triggermesh.io/aws-iam-service-account"
+
+// AlphaAwsIamRoleCustomServiceAccountName returns a functional option that
+// sets a custom name on a ServiceAccount, if requested by the component.
+// Alpha feature, only relevant for components with IAM Role authentication.
+func AlphaAwsIamRoleCustomServiceAccountName(r Reconcilable) resource.ServiceAccountOption {
+	if name := AlphaCustomServiceAccountName(r); name != "" {
+		return func(sa *corev1.ServiceAccount) {
+			sa.SetName(name)
+		}
+	}
+
+	return func(*corev1.ServiceAccount) {}
+}
+
+// AlphaCustomServiceAccountName returns a custom name for a ServiceAccount, if
+// requested by the component.
+// Alpha feature, only relevant for components with IAM Role authentication.
+func AlphaCustomServiceAccountName(r Reconcilable) string {
+	if WantsOwnServiceAccount(r) {
+		return r.GetAnnotations()[annotationAlphaIamRoleServiceAccount]
+	}
+
+	return ""
+}

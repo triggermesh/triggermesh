@@ -535,7 +535,7 @@ func resolveSinkURL(ctx context.Context, r *resolver.URIResolver) (*apis.URL, er
 	return r.URIFromDestinationV1(ctx, *sink, rcl)
 }
 
-// serviceAccountOwners returns a list of OwnerRefable to be set as a the
+// serviceAccountOwners returns a list of OwnerRefable to be set as the
 // OwnerReferences metadata attribute of a ServiceAccount.
 //
 // By setting multiple owners on a single ServiceAccount object, we ensure that
@@ -544,7 +544,7 @@ func resolveSinkURL(ctx context.Context, r *resolver.URIResolver) (*apis.URL, er
 // collected by Kubernetes as soon as the last instance of that component type
 // gets deleted from the namespace.
 //
-// The result is  the following chain of ownership:
+// The result is the following chain of ownership:
 //
 //	FooComponent/instance-a, FooComponent/instance-b, FooComponent/instance-c, ...
 //	└─ServiceAccount/foocomponent-adapter
