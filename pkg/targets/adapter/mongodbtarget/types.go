@@ -23,7 +23,7 @@ type InsertPayload struct {
 	Database   string          `json:"database"`
 	Collection string          `json:"collection"`
 	Key        string          `json:"key"`
-	Document   json.RawMessage `json:"Document"`
+	Document   json.RawMessage `json:"document"`
 }
 
 // QueryPayload defines the expected data found at the "io.triggermesh.mongodb.query" payload.
