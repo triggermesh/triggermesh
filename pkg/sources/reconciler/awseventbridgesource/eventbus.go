@@ -56,6 +56,8 @@ import (
 const (
 	eventbusARNResourcePrefix = "event-bus/"
 	ruleARNResourcePrefix     = "rule/"
+
+	eventbusNameDefault = "default"
 )
 
 const awsTagOwner = "owned-by"
@@ -334,11 +336,11 @@ func EnsureNoRule(ctx context.Context, cli eventbridgeiface.EventBridgeAPI,
 	switch {
 	case isDenied(err):
 		event.Warn(ctx, ReasonFailedUnsubscribe,
-			"Authorization error getting targets for rule %q. Ignoring: %s", ruleName, toErrMsg(err))
+			"Authorization error deleting rule %q. Ignoring: %s", ruleName, toErrMsg(err))
 		return queueName, nil
 	case err != nil:
 		return "", fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
-			"Error getting current targets for rule %q: %s", ruleName, toErrMsg(err)))
+			"Error deleting rule %q: %s", ruleName, toErrMsg(err)))
 	}
 
 	event.Normal(ctx, ReasonUnsubscribed,
@@ -594,7 +596,13 @@ func eventbusName(arn apis.ARN) string {
 
 // ruleName extracts the name of the EventBrige event rule from its given ARN.
 func ruleName(arn apis.ARN, eventbusName string) string {
-	return strings.TrimPrefix(arn.Resource, ruleARNResourcePrefix+eventbusName+"/")
+	// Rules for default and custom event buses have a different ARN scheme.
+	// https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoneventbridge.html#amazoneventbridge-resources-for-iam-policies
+	resPrefix := ruleARNResourcePrefix
+	if eventbusName != eventbusNameDefault {
+		resPrefix += eventbusName + "/"
+	}
+	return strings.TrimPrefix(arn.Resource, resPrefix)
 }
 
 // currentQueueTarget returns the ARN of the SQS queue that is currently used
