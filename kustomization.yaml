@@ -88,7 +88,6 @@ resources:
 - config/302-filter.yaml
 - config/302-splitter.yaml
 - config/303-function.yaml
-- config/304-dataweavetransformation.yaml
 - config/304-jqtransformation.yaml
 - config/304-synchronizer.yaml
 - config/304-transformation.yaml

@@ -224,7 +224,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - dataweavetransformations
   - jqtransformations
   - synchronizers
   - transformations
@@ -238,7 +237,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - dataweavetransformations/status
   - jqtransformations/status
   - synchronizers/status
   - transformations/status
@@ -366,7 +364,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - dataweavetransformations/finalizers
   - jqtransformations/finalizers
   - synchronizers/finalizers
   - transformations/finalizers
@@ -881,7 +878,6 @@ rules:
 - apiGroups:
   - flow.triggermesh.io
   resources:
-  - dataweavetransformations
   - jqtransformations
   - synchronizers
   - transformations

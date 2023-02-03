@@ -129,11 +129,6 @@ func (l *Listers) GetRoleBindingLister() rbaclistersv1.RoleBindingLister {
 	return rbaclistersv1.NewRoleBindingLister(l.IndexerFor(&rbacv1.RoleBinding{}))
 }
 
-// GetDataWeaveTransformationLister returns a Lister for DataWeaveTransformation objects.
-func (l *Listers) GetDataWeaveTransformationLister() flowlistersv1alpha1.DataWeaveTransformationLister {
-	return flowlistersv1alpha1.NewDataWeaveTransformationLister(l.IndexerFor(&flowv1alpha1.DataWeaveTransformation{}))
-}
-
 // GetJQTransformationLister returns a Lister for JQTransformation objects.
 func (l *Listers) GetJQTransformationLister() flowlistersv1alpha1.JQTransformationLister {
 	return flowlistersv1alpha1.NewJQTransformationLister(l.IndexerFor(&flowv1alpha1.JQTransformation{}))

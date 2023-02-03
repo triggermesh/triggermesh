@@ -22,8 +22,8 @@ OUTPUT_DIR        ?= $(BASE_DIR)/_output
 COMMANDS          := $(notdir $(wildcard cmd/*))
 
 # Commands and images that require custom build proccess
-CUSTOM_BUILD_BINARIES := ibmmqsource-adapter ibmmqtarget-adapter xslttransformation-adapter dataweavetransformation-adapter
-CUSTOM_BUILD_IMAGES   := ibmmqsource-adapter ibmmqtarget-adapter xslttransformation-adapter dataweavetransformation-adapter
+CUSTOM_BUILD_BINARIES := ibmmqsource-adapter ibmmqtarget-adapter xslttransformation-adapter
+CUSTOM_BUILD_IMAGES   := ibmmqsource-adapter ibmmqtarget-adapter xslttransformation-adapter
 
 BIN_OUTPUT_DIR    ?= $(OUTPUT_DIR)
 DOCS_OUTPUT_DIR   ?= $(OUTPUT_DIR)
@@ -106,9 +106,6 @@ build: $(COMMANDS)  ## Build all artifacts
 
 $(filter-out $(CUSTOM_BUILD_BINARIES), $(COMMANDS)): ## Build artifact
 	$(GO) build -ldflags "$(LDFLAGS_STATIC)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
-
-dataweavetransformation-adapter: ## Builds DataWeave
-	$(GO) build -ldflags "$(LDFLAGS)" -o $(BIN_OUTPUT_DIR)/$@ ./cmd/$@
 
 deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster
 	$(KO) resolve -f $(BASE_DIR)/config > $(BASE_DIR)/triggermesh-$(IMAGE_TAG).yaml

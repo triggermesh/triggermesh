@@ -41,15 +41,6 @@ jobs:
           name: Install libxml2
           command: sudo apt-get update && sudo apt install -y libxml2-dev libxslt1-dev liblzma-dev zlib1g-dev
       - run:
-          # DataWeaveTransformation needs dw cli
-          name: Install DataWeave CLI
-          command: |
-            mkdir /tmp/dw
-            curl -sSLO https://github.com/mulesoft-labs/data-weave-cli/releases/download/v$DW_VERSION/dw-$DW_VERSION-Linux
-            unzip -p dw-$DW_VERSION-Linux 'bin/dw' > dw && chmod +x dw && mv dw $(go env GOPATH)/bin/
-          environment:
-            DW_VERSION: 1.0.19
-      - run:
           name: Run test/cover
           command: WITH_DEPENDENCIES=true make cover
           environment:

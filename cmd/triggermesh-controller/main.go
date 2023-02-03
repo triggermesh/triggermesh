@@ -20,7 +20,6 @@ import (
 	"knative.dev/pkg/injection/sharedmain"
 
 	"github.com/triggermesh/triggermesh/pkg/extensions/reconciler/function"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/dataweavetransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation"
@@ -147,7 +146,6 @@ func main() {
 		azureeventhubstarget.NewController,
 		azuresentineltarget.NewController,
 		cloudeventstarget.NewController,
-		dataweavetransformation.NewController,
 		elasticsearchtarget.NewController,
 		googlecloudstoragetarget.NewController,
 		googlecloudfirestoretarget.NewController,

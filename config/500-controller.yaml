@@ -193,8 +193,6 @@ spec:
         - name: RUNTIME_KLR_RUBY
           value: gcr.io/triggermesh/knative-lambda-ruby25:v1.19.0
         # Custom build adapters
-        - name: DATAWEAVETRANSFORMATION_IMAGE
-          value: gcr.io/triggermesh/dataweavetransformation-adapter:latest
         - name: IBMMQSOURCE_IMAGE
           value: gcr.io/triggermesh/ibmmqsource-adapter:latest
         - name: IBMMQTARGET_IMAGE
