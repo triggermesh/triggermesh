@@ -82,7 +82,7 @@ ifeq ($(OS),$(filter $(OS),Darwin FreeBSD NetBSD))
     SED           += ''
 endif
 
-.PHONY: help all build release vm-images test lint fmt fmt-test images clean install-gotestsum install-golangci-lint deploy undeploy
+.PHONY: help all build release test lint fmt fmt-test images clean install-gotestsum install-golangci-lint deploy undeploy
 
 .DEFAULT_GOAL := build
 
@@ -126,9 +126,6 @@ deploy: ## Deploy TriggerMesh stack to default Kubernetes cluster
 
 undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster
 	$(KO) delete -f $(BASE_DIR)/config
-
-vm-images:
-	@$(MAKE) -C packer/
 
 release: ## Publish container images and generate release manifests
 	@mkdir -p $(DIST_DIR)
