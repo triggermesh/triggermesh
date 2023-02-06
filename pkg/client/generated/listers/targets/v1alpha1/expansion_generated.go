@@ -82,14 +82,6 @@ type AWSSQSTargetListerExpansion interface{}
 // AWSSQSTargetNamespaceLister.
 type AWSSQSTargetNamespaceListerExpansion interface{}
 
-// AlibabaOSSTargetListerExpansion allows custom methods to be added to
-// AlibabaOSSTargetLister.
-type AlibabaOSSTargetListerExpansion interface{}
-
-// AlibabaOSSTargetNamespaceListerExpansion allows custom methods to be added to
-// AlibabaOSSTargetNamespaceLister.
-type AlibabaOSSTargetNamespaceListerExpansion interface{}
-
 // AzureEventHubsTargetListerExpansion allows custom methods to be added to
 // AzureEventHubsTargetLister.
 type AzureEventHubsTargetListerExpansion interface{}
@@ -113,14 +105,6 @@ type CloudEventsTargetListerExpansion interface{}
 // CloudEventsTargetNamespaceListerExpansion allows custom methods to be added to
 // CloudEventsTargetNamespaceLister.
 type CloudEventsTargetNamespaceListerExpansion interface{}
-
-// ConfluentTargetListerExpansion allows custom methods to be added to
-// ConfluentTargetLister.
-type ConfluentTargetListerExpansion interface{}
-
-// ConfluentTargetNamespaceListerExpansion allows custom methods to be added to
-// ConfluentTargetNamespaceLister.
-type ConfluentTargetNamespaceListerExpansion interface{}
 
 // DatadogTargetListerExpansion allows custom methods to be added to
 // DatadogTargetLister.
@@ -185,14 +169,6 @@ type HTTPTargetListerExpansion interface{}
 // HTTPTargetNamespaceListerExpansion allows custom methods to be added to
 // HTTPTargetNamespaceLister.
 type HTTPTargetNamespaceListerExpansion interface{}
-
-// HasuraTargetListerExpansion allows custom methods to be added to
-// HasuraTargetLister.
-type HasuraTargetListerExpansion interface{}
-
-// HasuraTargetNamespaceListerExpansion allows custom methods to be added to
-// HasuraTargetNamespaceLister.
-type HasuraTargetNamespaceListerExpansion interface{}
 
 // IBMMQTargetListerExpansion allows custom methods to be added to
 // IBMMQTargetLister.
@@ -281,14 +257,6 @@ type SplunkTargetListerExpansion interface{}
 // SplunkTargetNamespaceListerExpansion allows custom methods to be added to
 // SplunkTargetNamespaceLister.
 type SplunkTargetNamespaceListerExpansion interface{}
-
-// TektonTargetListerExpansion allows custom methods to be added to
-// TektonTargetLister.
-type TektonTargetListerExpansion interface{}
-
-// TektonTargetNamespaceListerExpansion allows custom methods to be added to
-// TektonTargetNamespaceLister.
-type TektonTargetNamespaceListerExpansion interface{}
 
 // TwilioTargetListerExpansion allows custom methods to be added to
 // TwilioTargetLister.

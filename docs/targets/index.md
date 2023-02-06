@@ -1,13 +1,10 @@
 # Per-target Documentation
 
-- [Alibaba OSS](alibabaoss.md)
 - [AWS](aws.md)
-- [Confluent](confluent.md)
 - [Datadog](datadog.md)
 - [Elasticsearch](elasticsearch.md)
 - [Google Sheet](googlesheet.md)
 - [Google Storage](googlestorage.md)
-- [Hasura](hasura.md)
 - [HTTP](http.md)
 - [Jira](jira.md)
 - [Logz](logz.md)
@@ -15,6 +12,5 @@
 - [SalesForce](salesforce.md)
 - [SendGrid](sendgrid.md)
 - [Slack](slack.md)
-- [Tekton](tekton.md)
 - [Twilio](twilio.md)
 - [Zendesk](zendesk.md)

@@ -129,11 +129,6 @@ func (l *Listers) GetRoleBindingLister() rbaclistersv1.RoleBindingLister {
 	return rbaclistersv1.NewRoleBindingLister(l.IndexerFor(&rbacv1.RoleBinding{}))
 }
 
-// GetDataWeaveTransformationLister returns a Lister for DataWeaveTransformation objects.
-func (l *Listers) GetDataWeaveTransformationLister() flowlistersv1alpha1.DataWeaveTransformationLister {
-	return flowlistersv1alpha1.NewDataWeaveTransformationLister(l.IndexerFor(&flowv1alpha1.DataWeaveTransformation{}))
-}
-
 // GetJQTransformationLister returns a Lister for JQTransformation objects.
 func (l *Listers) GetJQTransformationLister() flowlistersv1alpha1.JQTransformationLister {
 	return flowlistersv1alpha1.NewJQTransformationLister(l.IndexerFor(&flowv1alpha1.JQTransformation{}))
@@ -314,11 +309,6 @@ func (l *Listers) GetZendeskSourceLister() sourceslistersv1alpha1.ZendeskSourceL
 	return sourceslistersv1alpha1.NewZendeskSourceLister(l.IndexerFor(&sourcesv1alpha1.ZendeskSource{}))
 }
 
-// GetAlibabaOSSTargetLister returns a Lister for AlibabaOSSTarget objects.
-func (l *Listers) GetAlibabaOSSTargetLister() targetslistersv1alpha1.AlibabaOSSTargetLister {
-	return targetslistersv1alpha1.NewAlibabaOSSTargetLister(l.IndexerFor(&targetsv1alpha1.AlibabaOSSTarget{}))
-}
-
 // GetAWSComprehendTargetLister returns a Lister for AWSComprehendTarget objects.
 func (l *Listers) GetAWSComprehendTargetLister() targetslistersv1alpha1.AWSComprehendTargetLister {
 	return targetslistersv1alpha1.NewAWSComprehendTargetLister(l.IndexerFor(&targetsv1alpha1.AWSComprehendTarget{}))
@@ -374,11 +364,6 @@ func (l *Listers) GetCloudEventsTargetLister() targetslistersv1alpha1.CloudEvent
 	return targetslistersv1alpha1.NewCloudEventsTargetLister(l.IndexerFor(&targetsv1alpha1.CloudEventsTarget{}))
 }
 
-// GetConfluentTargetLister returns a Lister for ConfluentTarget objects.
-func (l *Listers) GetConfluentTargetLister() targetslistersv1alpha1.ConfluentTargetLister {
-	return targetslistersv1alpha1.NewConfluentTargetLister(l.IndexerFor(&targetsv1alpha1.ConfluentTarget{}))
-}
-
 // GetDatadogTargetLister returns a Lister for DatadogTarget objects.
 func (l *Listers) GetDatadogTargetLister() targetslistersv1alpha1.DatadogTargetLister {
 	return targetslistersv1alpha1.NewDatadogTargetLister(l.IndexerFor(&targetsv1alpha1.DatadogTarget{}))
@@ -412,11 +397,6 @@ func (l *Listers) GetGoogleCloudWorkflowsTargetLister() targetslistersv1alpha1.G
 // GetGoogleSheetTargetLister returns a Lister for GoogleSheetTarget objects.
 func (l *Listers) GetGoogleSheetTargetLister() targetslistersv1alpha1.GoogleSheetTargetLister {
 	return targetslistersv1alpha1.NewGoogleSheetTargetLister(l.IndexerFor(&targetsv1alpha1.GoogleSheetTarget{}))
-}
-
-// GetHasuraTargetLister returns a Lister for HasuraTarget objects.
-func (l *Listers) GetHasuraTargetLister() targetslistersv1alpha1.HasuraTargetLister {
-	return targetslistersv1alpha1.NewHasuraTargetLister(l.IndexerFor(&targetsv1alpha1.HasuraTarget{}))
 }
 
 // GetHTTPTargetLister returns a Lister for HTTPTarget objects.
@@ -477,11 +457,6 @@ func (l *Listers) GetSlackTargetLister() targetslistersv1alpha1.SlackTargetListe
 // GetSplunkTargetLister returns a Lister for SplunkTarget objects.
 func (l *Listers) GetSplunkTargetLister() targetslistersv1alpha1.SplunkTargetLister {
 	return targetslistersv1alpha1.NewSplunkTargetLister(l.IndexerFor(&targetsv1alpha1.SplunkTarget{}))
-}
-
-// GetTektonTargetLister returns a Lister for TektonTarget objects.
-func (l *Listers) GetTektonTargetLister() targetslistersv1alpha1.TektonTargetLister {
-	return targetslistersv1alpha1.NewTektonTargetLister(l.IndexerFor(&targetsv1alpha1.TektonTarget{}))
 }
 
 // GetTwilioTargetLister returns a Lister for TwilioTarget objects.

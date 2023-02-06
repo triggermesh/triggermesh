@@ -109,8 +109,6 @@ spec:
         - name: ZENDESKSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/zendesksource-adapter
         # Target adapters
-        - name: ALIBABAOSSTARGET_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/alibabaosstarget-adapter
         - name: AWSCOMPREHENDTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/awscomprehendtarget-adapter
         - name: AWSDYNAMODBTARGET_IMAGE
@@ -133,8 +131,6 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/azuresentineltarget-adapter
         - name: CLOUDEVENTSTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/cloudeventstarget-adapter
-        - name: CONFLUENTTARGET_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/confluenttarget-adapter
         - name: DATADOGTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/datadogtarget-adapter
         - name: ELASTICSEARCHTARGET_IMAGE
@@ -149,8 +145,6 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/googlecloudpubsubtarget-adapter
         - name: GOOGLESHEETTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/googlesheettarget-adapter
-        - name: HASURATARGET_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/hasuratarget-adapter
         - name: HTTPTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/httptarget-adapter
         - name: JIRATARGET_IMAGE
@@ -173,8 +167,6 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter
         - name: SPLUNKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
-        - name: TEKTONTARGET_IMAGE
-          value: ko://github.com/triggermesh/triggermesh/cmd/tektontarget-adapter
         - name: TWILIOTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliotarget-adapter
         - name: ZENDESKTARGET_IMAGE
@@ -200,12 +192,7 @@ spec:
           value: gcr.io/triggermesh/knative-lambda-node10:v1.19.0
         - name: RUNTIME_KLR_RUBY
           value: gcr.io/triggermesh/knative-lambda-ruby25:v1.19.0
-        # Type-specific options
-        - name: TEKTONTARGET_REAPING_INTERVAL
-          value: 2m
         # Custom build adapters
-        - name: DATAWEAVETRANSFORMATION_IMAGE
-          value: gcr.io/triggermesh/dataweavetransformation-adapter:latest
         - name: IBMMQSOURCE_IMAGE
           value: gcr.io/triggermesh/ibmmqsource-adapter:latest
         - name: IBMMQTARGET_IMAGE

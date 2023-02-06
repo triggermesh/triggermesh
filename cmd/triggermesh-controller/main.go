@@ -20,7 +20,6 @@ import (
 	"knative.dev/pkg/injection/sharedmain"
 
 	"github.com/triggermesh/triggermesh/pkg/extensions/reconciler/function"
-	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/dataweavetransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/synchronizer"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/transformation"
@@ -63,7 +62,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/twiliosource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/webhooksource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/alibabaosstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awscomprehendtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awsdynamodbtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/awseventbridgetarget"
@@ -75,7 +73,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/azureeventhubstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/azuresentineltarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/cloudeventstarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/confluenttarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/datadogtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/elasticsearchtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudfirestoretarget"
@@ -83,7 +80,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudstoragetarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlecloudworkflowstarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/googlesheettarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/hasuratarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/httptarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/ibmmqtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/jiratarget"
@@ -96,7 +92,6 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/sendgridtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/slacktarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/splunktarget"
-	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/tektontarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/twiliotarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
 )
@@ -140,7 +135,6 @@ func main() {
 		webhooksource.NewController,
 		zendesksource.NewController,
 		// targets
-		alibabaosstarget.NewController,
 		awscomprehendtarget.NewController,
 		awsdynamodbtarget.NewController,
 		awseventbridgetarget.NewController,
@@ -152,15 +146,12 @@ func main() {
 		azureeventhubstarget.NewController,
 		azuresentineltarget.NewController,
 		cloudeventstarget.NewController,
-		confluenttarget.NewController,
-		dataweavetransformation.NewController,
 		elasticsearchtarget.NewController,
 		googlecloudstoragetarget.NewController,
 		googlecloudfirestoretarget.NewController,
 		googlecloudworkflowstarget.NewController,
 		googlecloudpubsubtarget.NewController,
 		googlesheettarget.NewController,
-		hasuratarget.NewController,
 		httptarget.NewController,
 		ibmmqtarget.NewController,
 		datadogtarget.NewController,
@@ -174,7 +165,6 @@ func main() {
 		sendgridtarget.NewController,
 		slacktarget.NewController,
 		splunktarget.NewController,
-		tektontarget.NewController,
 		twiliotarget.NewController,
 		zendesktarget.NewController,
 		// flow

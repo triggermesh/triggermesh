@@ -18,14 +18,6 @@ limitations under the License.
 
 package v1alpha1
 
-// DataWeaveTransformationListerExpansion allows custom methods to be added to
-// DataWeaveTransformationLister.
-type DataWeaveTransformationListerExpansion interface{}
-
-// DataWeaveTransformationNamespaceListerExpansion allows custom methods to be added to
-// DataWeaveTransformationNamespaceLister.
-type DataWeaveTransformationNamespaceListerExpansion interface{}
-
 // JQTransformationListerExpansion allows custom methods to be added to
 // JQTransformationLister.
 type JQTransformationListerExpansion interface{}

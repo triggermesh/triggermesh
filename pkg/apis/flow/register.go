@@ -24,12 +24,6 @@ const (
 )
 
 var (
-	// DataWeaveTransformationResource respresents a DataWeave transformation.
-	DataWeaveTransformationResource = schema.GroupResource{
-		Group:    GroupName,
-		Resource: "dataweavetransformations",
-	}
-
 	// JQTransformationResource respresents a JQ transformation.
 	JQTransformationResource = schema.GroupResource{
 		Group:    GroupName,

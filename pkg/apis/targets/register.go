@@ -22,11 +22,6 @@ import "k8s.io/apimachinery/pkg/runtime/schema"
 const GroupName = "targets.triggermesh.io"
 
 var (
-	// AlibabaOSSTargetResource respresents an event target for Alibaba OSS.
-	AlibabaOSSTargetResource = schema.GroupResource{
-		Group:    GroupName,
-		Resource: "alibabaosstargets",
-	}
 	// AWSComprehendTargetResource respresents an event target for AWS Comprehend.
 	AWSComprehendTargetResource = schema.GroupResource{
 		Group:    GroupName,
@@ -82,11 +77,6 @@ var (
 		Group:    GroupName,
 		Resource: "cloudeventstargets",
 	}
-	// ConfluentTargetResource respresents an event target for Confluent.
-	ConfluentTargetResource = schema.GroupResource{
-		Group:    GroupName,
-		Resource: "confluenttargets",
-	}
 	// DatadogTargetResource respresents an event target for Datadog.
 	DatadogTargetResource = schema.GroupResource{
 		Group:    GroupName,
@@ -121,11 +111,6 @@ var (
 	GoogleSheetTargetResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "googlesheettargets",
-	}
-	// HasuraTargetResource respresents an event target for Hasura.
-	HasuraTargetResource = schema.GroupResource{
-		Group:    GroupName,
-		Resource: "hasuratargets",
 	}
 	// HTTPTargetResource respresents an event target for HTTP endpoint.
 	HTTPTargetResource = schema.GroupResource{
@@ -191,11 +176,6 @@ var (
 	SplunkTargetResource = schema.GroupResource{
 		Group:    GroupName,
 		Resource: "splunktargets",
-	}
-	// TektonTargetResource respresents an event target for Tekton.
-	TektonTargetResource = schema.GroupResource{
-		Group:    GroupName,
-		Resource: "tektontargets",
 	}
 	// TwilioTargetResource respresents an event target for Twilio.
 	TwilioTargetResource = schema.GroupResource{

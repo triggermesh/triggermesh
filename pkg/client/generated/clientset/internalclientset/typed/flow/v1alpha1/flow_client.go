@@ -28,7 +28,6 @@ import (
 
 type FlowV1alpha1Interface interface {
 	RESTClient() rest.Interface
-	DataWeaveTransformationsGetter
 	JQTransformationsGetter
 	SynchronizersGetter
 	TransformationsGetter
@@ -39,10 +38,6 @@ type FlowV1alpha1Interface interface {
 // FlowV1alpha1Client is used to interact with features provided by the flow.triggermesh.io group.
 type FlowV1alpha1Client struct {
 	restClient rest.Interface
-}
-
-func (c *FlowV1alpha1Client) DataWeaveTransformations(namespace string) DataWeaveTransformationInterface {
-	return newDataWeaveTransformations(c, namespace)
 }
 
 func (c *FlowV1alpha1Client) JQTransformations(namespace string) JQTransformationInterface {

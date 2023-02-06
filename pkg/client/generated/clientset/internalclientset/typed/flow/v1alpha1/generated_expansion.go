@@ -18,8 +18,6 @@ limitations under the License.
 
 package v1alpha1
 
-type DataWeaveTransformationExpansion interface{}
-
 type JQTransformationExpansion interface{}
 
 type SynchronizerExpansion interface{}

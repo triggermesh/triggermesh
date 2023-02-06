@@ -61,8 +61,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Extensions().V1alpha1().Functions().Informer()}, nil
 
 		// Group=flow.triggermesh.io, Version=v1alpha1
-	case flowv1alpha1.SchemeGroupVersion.WithResource("dataweavetransformations"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().DataWeaveTransformations().Informer()}, nil
 	case flowv1alpha1.SchemeGroupVersion.WithResource("jqtransformations"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Flow().V1alpha1().JQTransformations().Informer()}, nil
 	case flowv1alpha1.SchemeGroupVersion.WithResource("synchronizers"):
@@ -169,16 +167,12 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AWSSNSTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("awssqstargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AWSSQSTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("alibabaosstargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AlibabaOSSTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("azureeventhubstargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AzureEventHubsTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("azuresentineltargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().AzureSentinelTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("cloudeventstargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().CloudEventsTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("confluenttargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().ConfluentTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("datadogtargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().DatadogTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("elasticsearchtargets"):
@@ -195,8 +189,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().GoogleSheetTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("httptargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().HTTPTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("hasuratargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().HasuraTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("ibmmqtargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().IBMMQTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("jiratargets"):
@@ -219,8 +211,6 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().SlackTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("splunktargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().SplunkTargets().Informer()}, nil
-	case targetsv1alpha1.SchemeGroupVersion.WithResource("tektontargets"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().TektonTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("twiliotargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().TwilioTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("zendesktargets"):

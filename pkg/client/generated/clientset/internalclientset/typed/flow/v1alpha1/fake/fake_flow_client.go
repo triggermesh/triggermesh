@@ -28,10 +28,6 @@ type FakeFlowV1alpha1 struct {
 	*testing.Fake
 }
 
-func (c *FakeFlowV1alpha1) DataWeaveTransformations(namespace string) v1alpha1.DataWeaveTransformationInterface {
-	return &FakeDataWeaveTransformations{c, namespace}
-}
-
 func (c *FakeFlowV1alpha1) JQTransformations(namespace string) v1alpha1.JQTransformationInterface {
 	return &FakeJQTransformations{c, namespace}
 }
