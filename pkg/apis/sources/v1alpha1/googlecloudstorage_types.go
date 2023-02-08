@@ -38,10 +38,11 @@ type GoogleCloudStorageSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudStorageSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudStorageSource)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudStorageSource)(nil)
-	_ v1alpha1.EventSender         = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.EventSender            = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudStorageSource)(nil)
 )
 
 // GoogleCloudStorageSourceSpec defines the desired state of the event source.
@@ -67,6 +68,10 @@ type GoogleCloudStorageSourceSpec struct {
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
+
+	// GCP Service account for Workload Identity.
+	// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+	GCPServiceAccount *string `json:"gcpServiceAccount,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional

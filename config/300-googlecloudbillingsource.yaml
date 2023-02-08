@@ -101,6 +101,11 @@ spec:
                 oneOf:
                 - required: [value]
                 - required: [valueFromSecret]
+              gcpServiceAccount:
+                description: GCP Service account name to impersonate Identity and Access Management (IAM) service accounts
+                  to access Google Cloud services.
+                pattern: ^[a-z][a-z0-9-]+@[a-z0-9-]+\.[a-z]+\.[a-z]{2,63}$
+                type: string
               sink:
                 description: The destination of events received via change notifications.
                 type: object

@@ -65,38 +65,24 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudAuditLogsSou
 		pubsubProject = topic.Project
 	}
 
-	var psCli *pubsub.Client
-	var laCli *logadmin.Client
-	var err error
+	creds := make([]option.ClientOption, 0)
 	if src.Spec.ServiceAccountKey != nil {
 		requestedSecrets, err := secret.NewGetter(g.sg(src.Namespace)).Get(*src.Spec.ServiceAccountKey)
 		if err != nil {
 			return nil, nil, fmt.Errorf("retrieving Google Cloud service account key: %w", err)
 		}
-
 		saKey := []byte(requestedSecrets[0])
-		credsCliOpt := option.WithCredentialsJSON(saKey)
+		creds = append(creds, option.WithCredentialsJSON(saKey))
+	}
 
-		psCli, err = pubsub.NewClient(ctx, pubsubProject, credsCliOpt)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Pub/Sub API client: %w", err)
-		}
+	psCli, err := pubsub.NewClient(ctx, pubsubProject, creds...)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating Google Cloud Pub/Sub API client: %w", err)
+	}
 
-		laCli, err = logadmin.NewClient(ctx, pubsubProject, credsCliOpt)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Log Admin API client: %w", err)
-		}
-	} else {
-		psCli, err = pubsub.NewClient(ctx, pubsubProject)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Pub/Sub API client: %w", err)
-		}
-
-		laCli, err = logadmin.NewClient(ctx, pubsubProject)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Log Admin API client: %w", err)
-		}
-
+	laCli, err := logadmin.NewClient(ctx, pubsubProject, creds...)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating Google Cloud Log Admin API client: %w", err)
 	}
 
 	return psCli, laCli, nil

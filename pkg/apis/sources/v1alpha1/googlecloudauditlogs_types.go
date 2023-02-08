@@ -38,10 +38,11 @@ type GoogleCloudAuditLogsSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudAuditLogsSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudAuditLogsSource)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudAuditLogsSource)(nil)
-	_ v1alpha1.EventSender         = (*GoogleCloudAuditLogsSource)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudAuditLogsSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudAuditLogsSource)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudAuditLogsSource)(nil)
+	_ v1alpha1.EventSender            = (*GoogleCloudAuditLogsSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudAuditLogsSource)(nil)
 )
 
 // GoogleCloudAuditLogsSourceSpec defines the desired state of the event source.
@@ -73,6 +74,10 @@ type GoogleCloudAuditLogsSourceSpec struct {
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
+
+	// GCP Service account for Workload Identity.
+	// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+	GCPServiceAccount *string `json:"gcpServiceAccount,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional

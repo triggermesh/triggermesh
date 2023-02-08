@@ -2551,6 +2551,11 @@ func (in *GoogleCloudAuditLogsSourceSpec) DeepCopyInto(out *GoogleCloudAuditLogs
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.GCPServiceAccount != nil {
+		in, out := &in.GCPServiceAccount, &out.GCPServiceAccount
+		*out = new(string)
+		**out = **in
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
@@ -2672,6 +2677,11 @@ func (in *GoogleCloudBillingSourceSpec) DeepCopyInto(out *GoogleCloudBillingSour
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.GCPServiceAccount != nil {
+		in, out := &in.GCPServiceAccount, &out.GCPServiceAccount
+		*out = new(string)
+		**out = **in
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
@@ -2792,6 +2802,11 @@ func (in *GoogleCloudPubSubSourceSpec) DeepCopyInto(out *GoogleCloudPubSubSource
 		in, out := &in.ServiceAccountKey, &out.ServiceAccountKey
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.GCPServiceAccount != nil {
+		in, out := &in.GCPServiceAccount, &out.GCPServiceAccount
+		*out = new(string)
+		**out = **in
 	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
@@ -2936,6 +2951,11 @@ func (in *GoogleCloudSourceRepositoriesSourceSpec) DeepCopyInto(out *GoogleCloud
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.GCPServiceAccount != nil {
+		in, out := &in.GCPServiceAccount, &out.GCPServiceAccount
+		*out = new(string)
+		**out = **in
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
@@ -3056,6 +3076,11 @@ func (in *GoogleCloudStorageSourceSpec) DeepCopyInto(out *GoogleCloudStorageSour
 		in, out := &in.ServiceAccountKey, &out.ServiceAccountKey
 		*out = new(commonv1alpha1.ValueFromField)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.GCPServiceAccount != nil {
+		in, out := &in.GCPServiceAccount, &out.GCPServiceAccount
+		*out = new(string)
+		**out = **in
 	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides

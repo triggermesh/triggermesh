@@ -83,21 +83,13 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envConfig)
 
-	var psCli *pubsub.Client
-	var err error
-
+	opts := make([]option.ClientOption, 0)
 	if env.ServiceAccountKey != nil {
-		psCli, err = pubsub.NewClient(ctx, env.SubscriptionResourceName.Project,
-			option.WithCredentialsJSON(env.ServiceAccountKey),
-		)
-		if err != nil {
-			logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
-		}
-	} else {
-		psCli, err = pubsub.NewClient(ctx, env.SubscriptionResourceName.Project)
-		if err != nil {
-			logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
-		}
+		opts = append(opts, option.WithCredentialsJSON(env.ServiceAccountKey))
+	}
+	psCli, err := pubsub.NewClient(ctx, env.SubscriptionResourceName.Project, opts...)
+	if err != nil {
+		logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
 	}
 
 	subsCli := psCli.Subscription(env.SubscriptionResourceName.Resource)

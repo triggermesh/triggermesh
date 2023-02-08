@@ -23,6 +23,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -61,6 +62,21 @@ func (s *GoogleCloudPubSubSource) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *GoogleCloudPubSubSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// WantsOwnServiceAccount implements ServiceAccountProvider.
+func (s *GoogleCloudPubSubSource) WantsOwnServiceAccount() bool {
+	return s.Spec.GCPServiceAccount != nil
+}
+
+// ServiceAccountOptions implements ServiceAccountProvider.
+func (s *GoogleCloudPubSubSource) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
+
+	if gcpSA := s.Spec.GCPServiceAccount; gcpSA != nil {
+		saOpts = append(saOpts, v1alpha1.GcpServiceAccountAnnotation(*gcpSA))
+	}
+	return saOpts
 }
 
 // Supported event types

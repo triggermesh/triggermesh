@@ -63,10 +63,6 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.GoogleCloudS
 	// inject source into context for usage in reconciliation logic
 	ctx = commonv1alpha1.WithReconcilable(ctx, o)
 
-	if o.Annotations != nil {
-		ctx = commonv1alpha1.WithServiceAccountAnnotated(ctx, o.Annotations)
-	}
-
 	pubsubCli, repoCli, err := r.cg.Get(o)
 	switch {
 	case isNoCredentials(err):

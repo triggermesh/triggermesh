@@ -38,10 +38,11 @@ type GoogleCloudBillingSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudBillingSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudBillingSource)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudBillingSource)(nil)
-	_ v1alpha1.EventSender         = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.EventSender            = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudBillingSource)(nil)
 )
 
 // GoogleCloudBillingSourceSpec defines the desired state of the event source.
@@ -62,6 +63,10 @@ type GoogleCloudBillingSourceSpec struct {
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
+
+	// GCP Service account for Workload Identity.
+	// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+	GCPServiceAccount *string `json:"gcpServiceAccount,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional
