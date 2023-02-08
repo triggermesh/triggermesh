@@ -90,8 +90,8 @@ spec:
                   - OBJECT_DELETE
                   - OBJECT_ARCHIVE
               serviceAccountKey:
-                description: Service account key used to authenticate the event source and allow it to interact with Google
-                  Cloud APIs. Only the JSON format is supported.
+                description: Deprecated - please use spec.auth.serviceAccountKey. Service account key used to authenticate
+                  the event source and allow it to interact with Google Cloud APIs. Only the JSON format is supported.
                 type: object
                 properties:
                   value:
@@ -111,11 +111,40 @@ spec:
                 oneOf:
                 - required: [value]
                 - required: [valueFromSecret]
-              gcpServiceAccount:
-                description: GCP Service account name to impersonate Identity and Access Management (IAM) service accounts
-                  to access Google Cloud services.
-                pattern: ^[a-z][a-z0-9-]+@[a-z0-9-]+\.[a-z]+\.[a-z]{2,63}$
-                type: string
+              auth:
+                description:
+                type: object
+                properties:
+                  serviceAccountKey:
+                    description: Service account key used to authenticate the event source and allow it to interact with Google
+                      Cloud APIs. Only the JSON format is supported.
+                    type: object
+                    properties:
+                      value:
+                        description: Literal value of the service account key.
+                        type: string
+                      valueFromSecret:
+                        description: A reference to a Kubernetes Secret object containing the service account key.
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          key:
+                            type: string
+                        required:
+                        - name
+                        - key
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
+                  gcpServiceAccount:
+                    description: GCP Service account name to impersonate Identity and Access Management (IAM) service accounts
+                      to access Google Cloud services.
+                    pattern: ^[a-z][a-z0-9-]+@[a-z0-9-]+\.[a-z]+\.[a-z]{2,63}$
+                    type: string
+                oneOf:
+                - required: [serviceAccountKey]
+                - required: [gcpServiceAccount]
               sink:
                 description: The destination of events received via change notifications.
                 type: object

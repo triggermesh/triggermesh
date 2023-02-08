@@ -66,14 +66,16 @@ func (s *GoogleCloudStorageSource) GetAdapterOverrides() *v1alpha1.AdapterOverri
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *GoogleCloudStorageSource) WantsOwnServiceAccount() bool {
-	return s.Spec.GCPServiceAccount != nil
+	return s.Spec.Auth != nil && s.Spec.Auth.GCPServiceAccount != nil
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (s *GoogleCloudStorageSource) ServiceAccountOptions() []resource.ServiceAccountOption {
-	var saOpts []resource.ServiceAccountOption
-
-	if gcpSA := s.Spec.GCPServiceAccount; gcpSA != nil {
+	saOpts := []resource.ServiceAccountOption{}
+	if s.Spec.Auth == nil {
+		return saOpts
+	}
+	if gcpSA := s.Spec.Auth.GCPServiceAccount; gcpSA != nil {
 		saOpts = append(saOpts, v1alpha1.GcpServiceAccountAnnotation(*gcpSA))
 	}
 	return saOpts
