@@ -24,4 +24,3 @@ spec:
     username: solace
     password:
       value: password
-
