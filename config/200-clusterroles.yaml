@@ -94,6 +94,7 @@ rules:
   - ocimetricssources
   - salesforcesources
   - slacksources
+  - solacesources
   - twiliosources
   - webhooksources
   - zendesksources
@@ -137,6 +138,7 @@ rules:
   - ocimetricssources/status
   - salesforcesources/status
   - slacksources/status
+  - solacesources/status
   - twiliosources/status
   - webhooksources/status
   - zendesksources/status
@@ -175,6 +177,7 @@ rules:
   - salesforcetargets
   - sendgridtargets
   - slacktargets
+  - solacetargets
   - splunktargets
   - twiliotargets
   - zendesktargets
@@ -215,6 +218,7 @@ rules:
   - salesforcetargets/status
   - sendgridtargets/status
   - slacktargets/status
+  - solacetargets/status
   - splunktargets/status
   - twiliotargets/status
   - zendesktargets/status
@@ -317,6 +321,7 @@ rules:
   - ocimetricssources/finalizers
   - salesforcesources/finalizers
   - slacksources/finalizers
+  - solacesources/finalizers
   - twiliosources/finalizers
   - webhooksources/finalizers
   - zendesksources/finalizers
@@ -355,6 +360,7 @@ rules:
   - salesforcetargets/finalizers
   - sendgridtargets/finalizers
   - slacktargets/finalizers
+  - solacetargets/finalizers
   - splunktargets/finalizers
   - twiliotargets/finalizers
   - zendesktargets/finalizers
@@ -762,6 +768,7 @@ rules:
   - ocimetricssources
   - salesforcesources
   - slacksources
+  - solacesources
   - twiliosources
   - webhooksources
   - zendesksources
@@ -867,6 +874,7 @@ rules:
   - salesforcetargets
   - sendgridtargets
   - slacktargets
+  - solacetargets
   - splunktargets
   - twiliotargets
   - zendesktargets

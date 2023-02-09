@@ -59,6 +59,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ocimetricssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/salesforcesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/slacksource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/solacesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/twiliosource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/webhooksource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/zendesksource"
@@ -91,6 +92,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/salesforcetarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/sendgridtarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/slacktarget"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/solacetarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/splunktarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/twiliotarget"
 	"github.com/triggermesh/triggermesh/pkg/targets/reconciler/zendesktarget"
@@ -131,6 +133,7 @@ func main() {
 		ocimetricssource.NewController,
 		salesforcesource.NewController,
 		slacksource.NewController,
+		solacesource.NewController,
 		twiliosource.NewController,
 		webhooksource.NewController,
 		zendesksource.NewController,
@@ -164,6 +167,7 @@ func main() {
 		salesforcetarget.NewController,
 		sendgridtarget.NewController,
 		slacktarget.NewController,
+		solacetarget.NewController,
 		splunktarget.NewController,
 		twiliotarget.NewController,
 		zendesktarget.NewController,

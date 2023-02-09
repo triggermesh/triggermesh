@@ -88,6 +88,8 @@ type Interface interface {
 	SalesforceSources() SalesforceSourceInformer
 	// SlackSources returns a SlackSourceInformer.
 	SlackSources() SlackSourceInformer
+	// SolaceSources returns a SolaceSourceInformer.
+	SolaceSources() SolaceSourceInformer
 	// TwilioSources returns a TwilioSourceInformer.
 	TwilioSources() TwilioSourceInformer
 	// WebhookSources returns a WebhookSourceInformer.
@@ -265,6 +267,11 @@ func (v *version) SalesforceSources() SalesforceSourceInformer {
 // SlackSources returns a SlackSourceInformer.
 func (v *version) SlackSources() SlackSourceInformer {
 	return &slackSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// SolaceSources returns a SolaceSourceInformer.
+func (v *version) SolaceSources() SolaceSourceInformer {
+	return &solaceSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // TwilioSources returns a TwilioSourceInformer.

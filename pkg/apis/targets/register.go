@@ -172,6 +172,11 @@ var (
 		Group:    GroupName,
 		Resource: "slacktargets",
 	}
+	// SolaceTargetResource respresents an event target for Solace.
+	SolaceTargetResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "solacetargets",
+	}
 	// SplunkTargetResource respresents an event target for Splunk.
 	SplunkTargetResource = schema.GroupResource{
 		Group:    GroupName,

@@ -85,6 +85,7 @@ require (
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 	knative.dev/networking v0.0.0-20220412163509-1145ec58c8be
 	nhooyr.io/websocket v1.8.7
+	pack.ag/amqp v0.12.5
 )
 
 require (

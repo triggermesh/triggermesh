@@ -274,6 +274,14 @@ type SlackSourceListerExpansion interface{}
 // SlackSourceNamespaceLister.
 type SlackSourceNamespaceListerExpansion interface{}
 
+// SolaceSourceListerExpansion allows custom methods to be added to
+// SolaceSourceLister.
+type SolaceSourceListerExpansion interface{}
+
+// SolaceSourceNamespaceListerExpansion allows custom methods to be added to
+// SolaceSourceNamespaceLister.
+type SolaceSourceNamespaceListerExpansion interface{}
+
 // TwilioSourceListerExpansion allows custom methods to be added to
 // TwilioSourceLister.
 type TwilioSourceListerExpansion interface{}

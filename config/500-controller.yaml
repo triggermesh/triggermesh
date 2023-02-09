@@ -102,6 +102,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/salesforcesource-adapter
         - name: SLACKSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/slacksource-adapter
+        - name: SOLACESOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/solacesource-adapter
         - name: TWILIOSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/twiliosource-adapter
         - name: WEBHOOKSOURCE_IMAGE
@@ -165,6 +167,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/sendgridtarget-adapter
         - name: SLACKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/slacktarget-adapter
+        - name: SOLACETARGET_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/solacetarget-adapter
         - name: SPLUNKTARGET_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/splunktarget-adapter
         - name: TWILIOTARGET_IMAGE

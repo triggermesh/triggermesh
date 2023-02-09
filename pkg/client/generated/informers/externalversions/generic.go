@@ -143,6 +143,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().SalesforceSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("slacksources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().SlackSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("solacesources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().SolaceSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("twiliosources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().TwilioSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("webhooksources"):
@@ -209,6 +211,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().SendGridTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("slacktargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().SlackTargets().Informer()}, nil
+	case targetsv1alpha1.SchemeGroupVersion.WithResource("solacetargets"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().SolaceTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("splunktargets"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Targets().V1alpha1().SplunkTargets().Informer()}, nil
 	case targetsv1alpha1.SchemeGroupVersion.WithResource("twiliotargets"):

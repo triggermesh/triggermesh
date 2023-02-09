@@ -294,6 +294,11 @@ func (l *Listers) GetSlackSourceLister() sourceslistersv1alpha1.SlackSourceListe
 	return sourceslistersv1alpha1.NewSlackSourceLister(l.IndexerFor(&sourcesv1alpha1.SlackSource{}))
 }
 
+// GetSolaceSourceLister returns a Lister for SolaceSource objects.
+func (l *Listers) GetSolaceSourceLister() sourceslistersv1alpha1.SolaceSourceLister {
+	return sourceslistersv1alpha1.NewSolaceSourceLister(l.IndexerFor(&sourcesv1alpha1.SolaceSource{}))
+}
+
 // GetTwilioSourceLister returns a Lister for TwilioSource objects.
 func (l *Listers) GetTwilioSourceLister() sourceslistersv1alpha1.TwilioSourceLister {
 	return sourceslistersv1alpha1.NewTwilioSourceLister(l.IndexerFor(&sourcesv1alpha1.TwilioSource{}))
@@ -452,6 +457,11 @@ func (l *Listers) GetSendGridTargetLister() targetslistersv1alpha1.SendGridTarge
 // GetSlackTargetLister returns a Lister for SlackTarget objects.
 func (l *Listers) GetSlackTargetLister() targetslistersv1alpha1.SlackTargetLister {
 	return targetslistersv1alpha1.NewSlackTargetLister(l.IndexerFor(&targetsv1alpha1.SlackTarget{}))
+}
+
+// GetSolaceTargetLister returns a Lister for SolaceTarget objects.
+func (l *Listers) GetSolaceTargetLister() targetslistersv1alpha1.SolaceTargetLister {
+	return targetslistersv1alpha1.NewSolaceTargetLister(l.IndexerFor(&targetsv1alpha1.SolaceTarget{}))
 }
 
 // GetSplunkTargetLister returns a Lister for SplunkTarget objects.

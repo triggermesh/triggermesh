@@ -224,6 +224,12 @@ var (
 		Resource: "slacksources",
 	}
 
+	// SolaceSourceResource represents an event source for Solace.
+	SolaceSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "solacesources",
+	}
+
 	// TwilioSourceResource represents an event source for Twilio.
 	TwilioSourceResource = schema.GroupResource{
 		Group:    GroupName,

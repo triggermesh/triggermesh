@@ -76,6 +76,8 @@ type SendGridTargetExpansion interface{}
 
 type SlackTargetExpansion interface{}
 
+type SolaceTargetExpansion interface{}
+
 type SplunkTargetExpansion interface{}
 
 type TwilioTargetExpansion interface{}
