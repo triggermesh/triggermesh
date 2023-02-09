@@ -145,7 +145,7 @@ func (a *solaceAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 	// Open a session
 	session, err := a.amqpClient.NewSession()
 	if err != nil {
-		return err
+		log.Fatal("Creating amqp session")
 	}
 
 	// Create a sender

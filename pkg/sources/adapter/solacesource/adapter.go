@@ -129,14 +129,18 @@ func (a *solacesourceAdapter) Start(ctx context.Context) error {
 		// Receive message
 		msg, err := receiver.Receive(ctx)
 		if err != nil {
-			return err
+			a.logger.Panicw("Error receiving messages", zap.Error(err))
 		}
 
-		msg.Accept()
+		err = msg.Accept()
+		if err != nil {
+			a.logger.Panicw("Error accepting messages", zap.Error(err))
+
+		}
 
 		err = a.emitEvent(ctx, msg)
 		if err != nil {
-			return err
+			a.logger.Panicw("Error sending event", zap.Error(err))
 		}
 
 		if ctx.Err() != nil {
