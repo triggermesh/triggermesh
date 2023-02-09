@@ -157,8 +157,8 @@ spec:
                           unless custom verification is used. This should be used only for testing.
                         type: boolean
               discardCloudEventContext:
-                description: Whether to omit CloudEvent context attributes in messages sent to Solace. When this property is
-                  false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
+                description: Whether to omit CloudEvent context attributes in messages sent to Solace. When this property
+                  is false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
                   data is included.
                 type: boolean
               adapterOverrides:

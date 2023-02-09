@@ -115,7 +115,6 @@ func (a *solacesourceAdapter) Start(ctx context.Context) error {
 	// Create a receiver
 	receiver, err := session.NewReceiver(
 		amqp.LinkSourceAddress(a.queueName),
-		amqp.LinkCredit(10),
 	)
 	if err != nil {
 		return err
