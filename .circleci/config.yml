@@ -134,7 +134,7 @@ jobs:
           name: Publishing container images to Docker Hub
           environment:
             KO_DOCKER_REPO: docker.io/triggermesh
-            KOFLAGS: --jobs=4 --platform=linux/amd64,linux/arm64
+            KOFLAGS: --jobs=4
             DIST_DIR: /tmp/dist/
           command: |
             IMAGE_TAG=${CIRCLE_TAG:-${CIRCLE_SHA1}} make release
@@ -142,7 +142,7 @@ jobs:
           name: Publishing container images and creating release manifests
           environment:
             KO_DOCKER_REPO: gcr.io/triggermesh
-            KOFLAGS: --jobs=4 --platform=linux/amd64,linux/arm64 # adjust based on resource_class
+            KOFLAGS: --jobs=4 # adjust based on resource_class
             DIST_DIR: /tmp/dist/
           command: |
             pushd hack/manifest-cleaner
