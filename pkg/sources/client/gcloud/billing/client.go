@@ -65,37 +65,28 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudBillingSourc
 		pubsubProject = topic.Project
 	}
 
-	var psCli *pubsub.Client
-	var biCli *billing.BudgetClient
-	var err error
-	if src.Spec.ServiceAccountKey != nil {
-		requestedSecrets, err := secret.NewGetter(g.sg(src.Namespace)).Get(*src.Spec.ServiceAccountKey)
+	creds := make([]option.ClientOption, 0)
+	saKeyRef := src.Spec.ServiceAccountKey
+	if src.Spec.Auth != nil && src.Spec.Auth.ServiceAccountKey != nil {
+		saKeyRef = src.Spec.Auth.ServiceAccountKey
+	}
+	if saKeyRef != nil {
+		requestedSecrets, err := secret.NewGetter(g.sg(src.Namespace)).Get(*saKeyRef)
 		if err != nil {
 			return nil, nil, fmt.Errorf("retrieving Google Cloud service account key: %w", err)
 		}
-
 		saKey := []byte(requestedSecrets[0])
-		credsCliOpt := option.WithCredentialsJSON(saKey)
+		creds = append(creds, option.WithCredentialsJSON(saKey))
+	}
 
-		psCli, err = pubsub.NewClient(ctx, pubsubProject, credsCliOpt)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Pub/Sub API client: %w", err)
-		}
+	psCli, err := pubsub.NewClient(ctx, pubsubProject, creds...)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating Google Cloud Pub/Sub API client: %w", err)
+	}
 
-		biCli, err = billing.NewBudgetClient(ctx, credsCliOpt)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Billing Budget API client: %w", err)
-		}
-	} else {
-		psCli, err = pubsub.NewClient(ctx, pubsubProject)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Pub/Sub API client: %w", err)
-		}
-
-		biCli, err = billing.NewBudgetClient(ctx)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating Google Cloud Billing Budget API client: %w", err)
-		}
+	biCli, err := billing.NewBudgetClient(ctx, creds...)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating Google Cloud Billing Budget API client: %w", err)
 	}
 
 	return psCli, biCli, nil

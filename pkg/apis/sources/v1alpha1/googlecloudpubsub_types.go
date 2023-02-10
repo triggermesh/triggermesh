@@ -38,10 +38,11 @@ type GoogleCloudPubSubSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudPubSubSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudPubSubSource)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudPubSubSource)(nil)
-	_ v1alpha1.EventSender         = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.EventSender            = (*GoogleCloudPubSubSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudPubSubSource)(nil)
 )
 
 // GoogleCloudPubSubSourceSpec defines the desired state of the event source.
@@ -63,7 +64,11 @@ type GoogleCloudPubSubSourceSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
+	// Deprecated, use Auth object instead.
 	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
+
+	// Different authentication methods available in sources on GCP.
+	Auth *GoogleCloudSourceAuth `json:"auth,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional

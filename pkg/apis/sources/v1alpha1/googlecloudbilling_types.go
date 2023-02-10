@@ -38,10 +38,11 @@ type GoogleCloudBillingSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudBillingSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudBillingSource)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudBillingSource)(nil)
-	_ v1alpha1.EventSender         = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.EventSender            = (*GoogleCloudBillingSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudBillingSource)(nil)
 )
 
 // GoogleCloudBillingSourceSpec defines the desired state of the event source.
@@ -61,7 +62,11 @@ type GoogleCloudBillingSourceSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
+	// Deprecated, use Auth object instead.
 	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
+
+	// Different authentication methods available in sources on GCP.
+	Auth *GoogleCloudSourceAuth `json:"auth,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional

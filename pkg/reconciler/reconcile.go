@@ -297,7 +297,7 @@ func (r *GenericRBACReconciler[T, L]) reconcileRBAC(ctx context.Context,
 
 	rcl := v1alpha1.ReconcilableFromContext(ctx)
 
-	desiredSA := newServiceAccount(ctx, rcl, owners)
+	desiredSA := newServiceAccount(rcl, owners)
 	for _, m := range serviceAccountMutations(rcl) {
 		m(desiredSA)
 	}

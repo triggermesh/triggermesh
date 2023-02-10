@@ -38,10 +38,11 @@ type GoogleCloudStorageSource struct {
 
 // Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudStorageSource)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudStorageSource)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudStorageSource)(nil)
-	_ v1alpha1.EventSender         = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.EventSender            = (*GoogleCloudStorageSource)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudStorageSource)(nil)
 )
 
 // GoogleCloudStorageSourceSpec defines the desired state of the event source.
@@ -66,7 +67,11 @@ type GoogleCloudStorageSourceSpec struct {
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
+	// Deprecated, use Auth object instead.
 	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
+
+	// Different authentication methods available in sources on GCP.
+	Auth *GoogleCloudSourceAuth `json:"auth,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional
