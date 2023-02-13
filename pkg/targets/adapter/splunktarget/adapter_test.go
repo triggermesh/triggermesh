@@ -19,6 +19,7 @@ package splunktarget
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -104,4 +105,35 @@ func newEvent(t *testing.T) cloudevents.Event {
 	}
 
 	return ce
+}
+
+func TestCustomURLPath(t *testing.T) {
+	testCases := map[string]struct {
+		url      string
+		expected string
+	}{
+		"Default URL": {
+			url:      "https://mysplunk.example.com:8088",
+			expected: "https://mysplunk.example.com:8088/services/collector/event/1.0",
+		},
+		"Default URL with trailing /": {
+			url:      "https://mysplunk.example.com:8088/",
+			expected: "https://mysplunk.example.com:8088/services/collector/event/1.0",
+		},
+		"Custom URL": {
+			url:      "https://mysplunk.example.com:8088/services/collector/event",
+			expected: "https://mysplunk.example.com:8088/services/collector/event",
+		},
+	}
+
+	for name, tc := range testCases {
+		//nolint:scopelint
+		t.Run(name, func(t *testing.T) {
+			u, err := url.Parse(tc.url)
+			assert.NoError(t, err, "Parsing test URL")
+
+			sc := newClient(*u, "", "", "", false)
+			assert.Equal(t, tc.expected, sc.URL, "Unexpected URL at Splunk client")
+		})
+	}
 }
