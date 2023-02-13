@@ -163,7 +163,7 @@ func (a *adapter) receive(ctx context.Context, event cloudevents.Event) cloudeve
 
 	err := a.spClient.LogEvent(e)
 	if err != nil {
-		a.logger.Debugw("Failed to send event to HEC", zap.Error(err))
+		a.logger.Errorw("Failed to send event to HEC", zap.Error(err))
 		return cloudevents.NewHTTPResult(a.extractHTTPStatus(err), "failed to send event to HEC: %s", err)
 	}
 
