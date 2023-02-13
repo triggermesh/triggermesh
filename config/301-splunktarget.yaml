@@ -52,8 +52,8 @@ spec:
             properties:
               endpoint:
                 type: string
-                description: URL of the HTTP Event Collector (HEC). Only the scheme, hostname, and port (optionally) are evaluated,
-                  the URL path is trimmed if present. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#Enable_HTTP_Event_Collector.
+                description: URL of the HTTP Event Collector (HEC). Only the scheme, hostname, and port (optionally) are evaluated.
+                  When the URL path is not present, the one documented at Splunk is automatically used. See https://docs.splunk.com/Documentation/Splunk/latest/Data/UsetheHTTPEventCollector#Enable_HTTP_Event_Collector.
                 format: url
                 pattern: ^https?:\/\/.+$
               token:

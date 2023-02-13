@@ -121,7 +121,9 @@ func newClient(hecURL url.URL, hecToken, index, hostname string, skipTLSVerify b
 		Transport: httpTransport,
 	}
 
-	hecURL.Path = eventURLPath
+	if hecURL.Path == "" || hecURL.Path == "/" {
+		hecURL.Path = eventURLPath
+	}
 
 	return &splunk.Client{
 		HTTPClient: httpClient,
