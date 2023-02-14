@@ -53,6 +53,8 @@ type adapter struct {
 	defaultIndex string
 
 	sr *metrics.EventProcessingStatsReporter
+
+	discardCEContext bool
 }
 
 var _ pkgadapter.Adapter = (*adapter)(nil)
@@ -65,7 +67,8 @@ type envConfig struct {
 	HECToken    string `envconfig:"SPLUNK_HEC_TOKEN" required:"true"`
 	Index       string `envconfig:"SPLUNK_INDEX"`
 
-	SkipTLSVerify bool `envconfig:"SPLUNK_SKIP_TLS_VERIFY"`
+	SkipTLSVerify    bool `envconfig:"SPLUNK_SKIP_TLS_VERIFY"`
+	DiscardCEContext bool `envconfig:"DISCARD_CE_CONTEXT" default:"false"`
 }
 
 // NewEnvConfig returns an accessor for the source's adapter envConfig.
@@ -106,6 +109,8 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		defaultIndex: env.Index,
 
 		sr: metrics.MustNewEventProcessingStatsReporter(mt),
+
+		discardCEContext: env.DiscardCEContext,
 	}
 }
 
@@ -160,6 +165,9 @@ func (a *adapter) receive(ctx context.Context, event cloudevents.Event) cloudeve
 		event.Type(),
 		a.defaultIndex,
 	)
+	if a.discardCEContext {
+		e.Event = event.Data()
+	}
 
 	err := a.spClient.LogEvent(e)
 	if err != nil {

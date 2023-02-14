@@ -82,6 +82,11 @@ spec:
               skipTLSVerify:
                 description: Control whether the target should verify the SSL/TLS certificate used by the event collector.
                 type: boolean
+              discardCloudEventContext:
+                description: Whether to omit CloudEvent context attributes in messages sent to Splunk. When this property
+                  is false (default), the entire CloudEvent payload is included. When this property is true, only the CloudEvent
+                  data is included.
+                type: boolean
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
