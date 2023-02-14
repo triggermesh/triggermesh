@@ -74,6 +74,10 @@ func MakeAppEnv(o *v1alpha1.SplunkTarget) []corev1.EnvVar {
 			Name:  envHECEndpoint,
 			Value: hecURL.String(),
 		},
+		{
+			Name:  "DISCARD_CE_CONTEXT",
+			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
+		},
 	}
 
 	env = common.MaybeAppendValueFromEnvVar(env, envHECToken, o.Spec.Token)

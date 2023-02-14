@@ -64,6 +64,11 @@ type SplunkTargetSpec struct {
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
+
+	// Whether to omit CloudEvent context attributes in messages sent to Splunk.
+	// When this property is false (default), the entire CloudEvent payload is included.
+	// When this property is true, only the CloudEvent data is included.
+	DiscardCEContext bool `json:"discardCloudEventContext"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
