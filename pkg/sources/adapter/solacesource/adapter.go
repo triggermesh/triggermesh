@@ -123,12 +123,11 @@ func (a *solacesourceAdapter) Start(ctx context.Context) error {
 	for {
 		// Receive message
 		msg, err := receiver.Receive(ctx)
-		if err != nil {
-			return err
-		}
-
 		if ctx.Err() != nil {
 			return nil
+		}
+		if err != nil {
+			return err
 		}
 
 		err = a.emitEvent(ctx, msg)
