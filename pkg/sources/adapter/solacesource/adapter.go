@@ -58,10 +58,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envAccessor)
 
-	connOption := amqp.ConnSASLAnonymous()
+	amqpOpts := []amqp.ConnOption{
+		amqp.ConnIdleTimeout(0),
+	}
 
 	if env.SASLEnable {
-		connOption = amqp.ConnSASLPlain(env.Username, env.Password)
+		amqpOpts = append(amqpOpts, amqp.ConnSASLPlain(env.Username, env.Password))
+	} else {
+		amqpOpts = append(amqpOpts, amqp.ConnSASLAnonymous())
 	}
 
 	if env.TLSEnable {
@@ -69,21 +73,15 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		if env.CA != "" {
 			addCAConfig(tlsCfg, env.CA)
 		}
-
 		if env.ClientCert != "" || env.ClientKey != "" {
 			if err := addTLSCerts(tlsCfg, env.ClientCert, env.ClientKey); err != nil {
 				logger.Panicw("Could not parse the TLS Certificates", zap.Error(err))
 			}
 		}
-
 		tlsCfg.InsecureSkipVerify = env.SkipVerify
-		connOption = amqp.ConnTLSConfig(tlsCfg)
+		amqpOpts = append(amqpOpts, amqp.ConnTLSConfig(tlsCfg))
 	}
 
-	amqpOpts := []amqp.ConnOption{
-		amqp.ConnIdleTimeout(0),
-		connOption,
-	}
 	// Create amqp Client
 	amqpClient, err := amqp.Dial(env.URL, amqpOpts...)
 	if err != nil {

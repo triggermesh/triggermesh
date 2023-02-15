@@ -49,31 +49,27 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
-	connOption := amqp.ConnSASLAnonymous()
-
-	if env.SASLEnable {
-		connOption = amqp.ConnSASLPlain(env.Username, env.Password)
+	amqpOpts := []amqp.ConnOption{
+		amqp.ConnIdleTimeout(0),
 	}
 
+	if env.SASLEnable {
+		amqpOpts = append(amqpOpts, amqp.ConnSASLPlain(env.Username, env.Password))
+	} else {
+		amqpOpts = append(amqpOpts, amqp.ConnSASLAnonymous())
+	}
 	if env.TLSEnable {
 		tlsCfg := &tls.Config{}
 		if env.CA != "" {
 			addCAConfig(tlsCfg, env.CA)
 		}
-
 		if env.ClientCert != "" || env.ClientKey != "" {
 			if err := addTLSCerts(tlsCfg, env.ClientCert, env.ClientKey); err != nil {
 				logger.Panicw("Could not parse the TLS Certificates", zap.Error(err))
 			}
 		}
-
 		tlsCfg.InsecureSkipVerify = env.SkipVerify
-		connOption = amqp.ConnTLSConfig(tlsCfg)
-	}
-
-	amqpOpts := []amqp.ConnOption{
-		amqp.ConnIdleTimeout(0),
-		connOption,
+		amqpOpts = append(amqpOpts, amqp.ConnTLSConfig(tlsCfg))
 	}
 
 	// Create amqp Client
