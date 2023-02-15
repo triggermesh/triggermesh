@@ -21,6 +21,11 @@ spec:
   queueName: test
   auth:
     saslEnable: true
-    username: solace
+    username:
+      valueFromSecret:
+        name: solace-secret
+        key: username
     password:
-      value: password
+      valueFromSecret:
+        name: solace-secret
+        key: password

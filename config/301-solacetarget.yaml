@@ -58,9 +58,6 @@ spec:
               queueName:
                 description: Queue name to stream the target events to.
                 type: string
-              idleTimeout:
-                description: Idle Timeout specifies the maximum period between receiving frames. Default to 1 min.
-                type: integer
               auth:
                 description: Authentication method used to interact with Solace.
                 type: object

@@ -54,10 +54,6 @@ type SolaceSourceSpec struct {
 	// QueueName
 	QueueName string `json:"queueName"`
 
-	// Idle Timeout
-	// +optional
-	IdleTimeout *int `json:"idleTimeout,omitempty"`
-
 	// Auth contains Authentication method used to interact with Solace.
 	// +optional
 	Auth *SolaceSourceAuth `json:"auth,omitempty"`

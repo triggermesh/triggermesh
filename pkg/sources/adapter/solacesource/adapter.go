@@ -43,7 +43,6 @@ type solacesourceAdapter struct {
 	mt       *pkgadapter.MetricTag
 
 	amqpClient *amqp.Client
-	amqpOpts   []amqp.ConnOption
 	queueName  string
 }
 
@@ -59,7 +58,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envAccessor)
 
-	idleTimeout := time.Duration(env.IdleTimeout) * time.Minute
 	connOption := amqp.ConnSASLAnonymous()
 
 	if env.SASLEnable {
@@ -83,7 +81,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	}
 
 	amqpOpts := []amqp.ConnOption{
-		amqp.ConnIdleTimeout(idleTimeout),
+		amqp.ConnIdleTimeout(0),
 		connOption,
 	}
 	// Create amqp Client
@@ -94,7 +92,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	return &solacesourceAdapter{
 		amqpClient: amqpClient,
-		amqpOpts:   amqpOpts,
 		queueName:  env.QueueName,
 
 		ceClient: ceClient,
@@ -120,7 +117,7 @@ func (a *solacesourceAdapter) Start(ctx context.Context) error {
 		return err
 	}
 	defer func() {
-		ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 		receiver.Close(ctx)
 		cancel()
 	}()
@@ -129,22 +126,21 @@ func (a *solacesourceAdapter) Start(ctx context.Context) error {
 		// Receive message
 		msg, err := receiver.Receive(ctx)
 		if err != nil {
-			a.logger.Panicw("Error receiving messages", zap.Error(err))
+			return err
+		}
+
+		if ctx.Err() != nil {
+			return nil
+		}
+
+		err = a.emitEvent(ctx, msg)
+		if err != nil {
+			return err
 		}
 
 		err = msg.Accept()
 		if err != nil {
 			a.logger.Panicw("Error accepting messages", zap.Error(err))
-
-		}
-
-		err = a.emitEvent(ctx, msg)
-		if err != nil {
-			a.logger.Panicw("Error sending event", zap.Error(err))
-		}
-
-		if ctx.Err() != nil {
-			return nil
 		}
 	}
 }

@@ -21,7 +21,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"log"
 	"time"
 
 	"go.uber.org/zap"
@@ -50,7 +49,6 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
-	idleTimeout := time.Duration(env.IdleTimeout) * time.Minute
 	connOption := amqp.ConnSASLAnonymous()
 
 	if env.SASLEnable {
@@ -74,7 +72,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	amqpOpts := []amqp.ConnOption{
-		amqp.ConnIdleTimeout(idleTimeout),
+		amqp.ConnIdleTimeout(0),
 		connOption,
 	}
 
@@ -86,7 +84,6 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	return &solaceAdapter{
 		amqpClient: amqpClient,
-		amqpOpts:   amqpOpts,
 		queueName:  env.QueueName,
 
 		discardCEContext: env.DiscardCEContext,
@@ -102,9 +99,8 @@ var _ pkgadapter.Adapter = (*solaceAdapter)(nil)
 
 type solaceAdapter struct {
 	amqpClient *amqp.Client
-	amqpOpts   []amqp.ConnOption
+	amqpSender *amqp.Sender
 	queueName  string
-	// createTopicIfMissing bool
 
 	discardCEContext bool
 
@@ -116,6 +112,19 @@ type solaceAdapter struct {
 
 func (a *solaceAdapter) Start(ctx context.Context) error {
 	a.logger.Info("Starting Solace adapter")
+
+	// Open a session
+	session, err := a.amqpClient.NewSession()
+	if err != nil {
+		return err
+	}
+
+	// Create a sender
+	a.amqpSender, err = session.NewSender(amqp.LinkTargetAddress(a.queueName))
+	if err != nil {
+		return err
+	}
+
 	return a.ceClient.StartReceiver(ctx, a.dispatch)
 }
 
@@ -142,20 +151,8 @@ func (a *solaceAdapter) dispatch(event cloudevents.Event) cloudevents.Result {
 		msgVal = jsonEvent
 	}
 
-	// Open a session
-	session, err := a.amqpClient.NewSession()
-	if err != nil {
-		log.Fatal("Creating amqp session")
-	}
-
-	// Create a sender
-	sender, err := session.NewSender(amqp.LinkTargetAddress(a.queueName))
-	if err != nil {
-		log.Fatal("Creating sender link:", err)
-	}
-
 	// Send message
-	if err := sender.Send(context.Background(), amqp.NewMessage(msgVal)); err != nil {
+	if err := a.amqpSender.Send(context.Background(), amqp.NewMessage(msgVal)); err != nil {
 		a.logger.Errorw("Error producing Solace message", zap.String("msg", string(msgVal)), zap.Error(err))
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return err

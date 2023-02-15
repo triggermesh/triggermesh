@@ -4077,11 +4077,6 @@ func (in *SolaceSourceList) DeepCopyObject() runtime.Object {
 func (in *SolaceSourceSpec) DeepCopyInto(out *SolaceSourceSpec) {
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
-	if in.IdleTimeout != nil {
-		in, out := &in.IdleTimeout, &out.IdleTimeout
-		*out = new(int)
-		**out = **in
-	}
 	if in.Auth != nil {
 		in, out := &in.Auth, &out.Auth
 		*out = new(SolaceSourceAuth)

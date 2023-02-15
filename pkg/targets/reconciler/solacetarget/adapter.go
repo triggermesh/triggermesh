@@ -32,15 +32,14 @@ import (
 )
 
 const (
-	envURL         = "URL"
-	envQueueName   = "QUEUE_NAME"
-	envIdleTimeout = "IDLE_TIMEOUT"
-	envUsername    = "USERNAME"
-	envPassword    = "PASSWORD"
-	envCA          = "CA"
-	envClientCert  = "CLIENT_CERT"
-	envClientKey   = "CLIENT_KEY"
-	envSkipVerify  = "SKIP_VERIFY"
+	envURL        = "URL"
+	envQueueName  = "QUEUE_NAME"
+	envUsername   = "USERNAME"
+	envPassword   = "PASSWORD"
+	envCA         = "CA"
+	envClientCert = "CLIENT_CERT"
+	envClientKey  = "CLIENT_KEY"
+	envSkipVerify = "SKIP_VERIFY"
 
 	envSaslEnable = "SASL_ENABLE"
 	envTLSEnable  = "TLS_ENABLE"
@@ -90,13 +89,6 @@ func MakeAppEnv(o *v1alpha1.SolaceTarget) []corev1.EnvVar {
 			Name:  "DISCARD_CE_CONTEXT",
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
 		},
-	}
-
-	if o.Spec.IdleTimeout != nil {
-		env = append(env, corev1.EnvVar{
-			Name:  envIdleTimeout,
-			Value: strconv.Itoa(*o.Spec.IdleTimeout),
-		})
 	}
 
 	if o.Spec.Auth != nil {

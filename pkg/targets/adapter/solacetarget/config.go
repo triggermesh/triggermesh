@@ -31,11 +31,10 @@ type envAccessor struct {
 	SASLEnable bool `envconfig:"SASL_ENABLE" required:"false"`
 	TLSEnable  bool `envconfig:"TLS_ENABLE" required:"false"`
 
-	URL         string `envconfig:"URL" required:"true"`
-	QueueName   string `envconfig:"QUEUE_NAME" required:"true"`
-	IdleTimeout int    `envconfig:"IDLE_TIMEOUT" default:"1"`
-	Username    string `envconfig:"USERNAME" required:"false"`
-	Password    string `envconfig:"PASSWORD" required:"false"`
+	URL       string `envconfig:"URL" required:"true"`
+	QueueName string `envconfig:"QUEUE_NAME" required:"true"`
+	Username  string `envconfig:"USERNAME" required:"false"`
+	Password  string `envconfig:"PASSWORD" required:"false"`
 
 	CA         string `envconfig:"CA" required:"false"`
 	ClientCert string `envconfig:"CLIENT_CERT" required:"false"`

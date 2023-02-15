@@ -26,12 +26,16 @@ metadata:
 spec:
   url: amqp://192.168.1.1:5672
   queueName: test
-  idleTimeout: 10
   auth:
     saslEnable: true
-    username: solace
+    username:
+      valueFromSecret:
+        name: solace-secret
+        key: username
     password:
-      value: password
+      valueFromSecret:
+        name: solace-secret
+        key: password
   sink:
     ref:
       apiVersion: eventing.knative.dev/v1
