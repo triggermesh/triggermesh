@@ -22,6 +22,7 @@ import (
 	"crypto/sha512"
 	"crypto/tls"
 	"crypto/x509"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -32,6 +33,19 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
+)
+
+const (
+	// Errors for the last 40 seconds will be taken into consideration.
+	errorAccumulationTolerance = time.Second * 40
+	// First 10 errors will be retried right away.
+	errorAccumulationSupportedCount = 10
+	// Next 10 errors will be delayed, after a total of
+	// 20 errors have been accumulated for the tolerance perior, the
+	// adapter will exit.
+	errorAccumulationDelayedCount = 20
+	// Delayed consumer retries will wait this duration.
+	errorAccumulationDelay = time.Second
 )
 
 var _ pkgadapter.Adapter = (*kafkasourceAdapter)(nil)
@@ -147,17 +161,36 @@ func (a *kafkasourceAdapter) Start(ctx context.Context) error {
 		adapter: a,
 	}
 
-	for {
+	errorList := NewStaleList(errorAccumulationTolerance)
+
+	// while the context is not done, run the loop.
+	for ctx.Err() == nil {
 		// `Consume` should be called inside an infinite loop, when a
 		// server-side rebalance happens, the consumer session will need to be
-		// recreated to get the new claims.
+		// recreated to get the new claims
 		if err := a.kafkaClient.Consume(ctx, []string{a.topic}, consumerGroup); err != nil {
-			return err
-		}
-		if ctx.Err() != nil {
-			return nil
+			a.logger.Error("Error setting up the consumer client", zap.Error(err))
+
+			// Safety net mechanism, we try to re-consume and avoid exiting the adapter.
+			// This is mainly due to the adapter not being used at environments where
+			// a restart can be configured (?)
+			errNum := errorList.AddAndCount(err)
+			switch {
+			case errNum < errorAccumulationSupportedCount:
+				// If errors are occasional let it retry to consume fast.
+				continue
+			case errNum < errorAccumulationDelayedCount:
+				// If errors pile up, we add pauses between retries
+				a.logger.Info("Slowing down consumer connection loop, too many errors")
+				time.Sleep(errorAccumulationDelay)
+			default:
+				a.logger.Info("Giving up on consumer connection retries, too many errors")
+				return err
+			}
 		}
 	}
+
+	return nil
 }
 
 func addCAConfig(tlsConfig *tls.Config, caCert string) {
