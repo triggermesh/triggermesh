@@ -68,6 +68,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&OCIMetricsSource{}, &OCIMetricsSourceList{},
 		&SalesforceSource{}, &SalesforceSourceList{},
 		&SlackSource{}, &SlackSourceList{},
+		&SolaceSource{}, &SolaceSourceList{},
 		&TwilioSource{}, &TwilioSourceList{},
 		&WebhookSource{}, &WebhookSourceList{},
 		&ZendeskSource{}, &ZendeskSourceList{},

@@ -156,6 +156,10 @@ func (c *FakeSourcesV1alpha1) SlackSources(namespace string) v1alpha1.SlackSourc
 	return &FakeSlackSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) SolaceSources(namespace string) v1alpha1.SolaceSourceInterface {
+	return &FakeSolaceSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) TwilioSources(namespace string) v1alpha1.TwilioSourceInterface {
 	return &FakeTwilioSources{c, namespace}
 }

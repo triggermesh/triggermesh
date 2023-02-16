@@ -94,6 +94,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&SendGridTargetList{},
 		&SlackTarget{},
 		&SlackTargetList{},
+		&SolaceTarget{},
+		&SolaceTargetList{},
 		&SplunkTarget{},
 		&SplunkTargetList{},
 		&TwilioTarget{},

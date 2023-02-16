@@ -50,6 +50,7 @@ resources:
 - config/300-ocimetricssource.yaml
 - config/300-salesforcesource.yaml
 - config/300-slacksource.yaml
+- config/300-solacesource.yaml
 - config/300-twiliosource.yaml
 - config/300-webhooksource.yaml
 - config/300-zendesksource.yaml
@@ -82,6 +83,7 @@ resources:
 - config/301-salesforcetarget.yaml
 - config/301-sendgridtarget.yaml
 - config/301-slacktarget.yaml
+- config/301-solacetarget.yaml
 - config/301-splunktarget.yaml
 - config/301-twiliotarget.yaml
 - config/301-zendesktarget.yaml

@@ -57,6 +57,7 @@ type TargetsV1alpha1Interface interface {
 	SalesforceTargetsGetter
 	SendGridTargetsGetter
 	SlackTargetsGetter
+	SolaceTargetsGetter
 	SplunkTargetsGetter
 	TwilioTargetsGetter
 	ZendeskTargetsGetter
@@ -181,6 +182,10 @@ func (c *TargetsV1alpha1Client) SendGridTargets(namespace string) SendGridTarget
 
 func (c *TargetsV1alpha1Client) SlackTargets(namespace string) SlackTargetInterface {
 	return newSlackTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) SolaceTargets(namespace string) SolaceTargetInterface {
+	return newSolaceTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) SplunkTargets(namespace string) SplunkTargetInterface {

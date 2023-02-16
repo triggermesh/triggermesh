@@ -60,6 +60,7 @@ type SourcesV1alpha1Interface interface {
 	OCIMetricsSourcesGetter
 	SalesforceSourcesGetter
 	SlackSourcesGetter
+	SolaceSourcesGetter
 	TwilioSourcesGetter
 	WebhookSourcesGetter
 	ZendeskSourcesGetter
@@ -196,6 +197,10 @@ func (c *SourcesV1alpha1Client) SalesforceSources(namespace string) SalesforceSo
 
 func (c *SourcesV1alpha1Client) SlackSources(namespace string) SlackSourceInterface {
 	return newSlackSources(c, namespace)
+}
+
+func (c *SourcesV1alpha1Client) SolaceSources(namespace string) SolaceSourceInterface {
+	return newSolaceSources(c, namespace)
 }
 
 func (c *SourcesV1alpha1Client) TwilioSources(namespace string) TwilioSourceInterface {

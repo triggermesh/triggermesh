@@ -250,6 +250,14 @@ type SlackTargetListerExpansion interface{}
 // SlackTargetNamespaceLister.
 type SlackTargetNamespaceListerExpansion interface{}
 
+// SolaceTargetListerExpansion allows custom methods to be added to
+// SolaceTargetLister.
+type SolaceTargetListerExpansion interface{}
+
+// SolaceTargetNamespaceListerExpansion allows custom methods to be added to
+// SolaceTargetNamespaceLister.
+type SolaceTargetNamespaceListerExpansion interface{}
+
 // SplunkTargetListerExpansion allows custom methods to be added to
 // SplunkTargetLister.
 type SplunkTargetListerExpansion interface{}

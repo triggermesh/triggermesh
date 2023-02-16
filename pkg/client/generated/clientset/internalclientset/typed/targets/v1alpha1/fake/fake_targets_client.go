@@ -144,6 +144,10 @@ func (c *FakeTargetsV1alpha1) SlackTargets(namespace string) v1alpha1.SlackTarge
 	return &FakeSlackTargets{c, namespace}
 }
 
+func (c *FakeTargetsV1alpha1) SolaceTargets(namespace string) v1alpha1.SolaceTargetInterface {
+	return &FakeSolaceTargets{c, namespace}
+}
+
 func (c *FakeTargetsV1alpha1) SplunkTargets(namespace string) v1alpha1.SplunkTargetInterface {
 	return &FakeSplunkTargets{c, namespace}
 }

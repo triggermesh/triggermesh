@@ -82,6 +82,8 @@ type SalesforceSourceExpansion interface{}
 
 type SlackSourceExpansion interface{}
 
+type SolaceSourceExpansion interface{}
+
 type TwilioSourceExpansion interface{}
 
 type WebhookSourceExpansion interface{}

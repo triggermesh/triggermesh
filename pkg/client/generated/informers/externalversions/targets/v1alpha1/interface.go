@@ -82,6 +82,8 @@ type Interface interface {
 	SendGridTargets() SendGridTargetInformer
 	// SlackTargets returns a SlackTargetInformer.
 	SlackTargets() SlackTargetInformer
+	// SolaceTargets returns a SolaceTargetInformer.
+	SolaceTargets() SolaceTargetInformer
 	// SplunkTargets returns a SplunkTargetInformer.
 	SplunkTargets() SplunkTargetInformer
 	// TwilioTargets returns a TwilioTargetInformer.
@@ -244,6 +246,11 @@ func (v *version) SendGridTargets() SendGridTargetInformer {
 // SlackTargets returns a SlackTargetInformer.
 func (v *version) SlackTargets() SlackTargetInformer {
 	return &slackTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// SolaceTargets returns a SolaceTargetInformer.
+func (v *version) SolaceTargets() SolaceTargetInformer {
+	return &solaceTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // SplunkTargets returns a SplunkTargetInformer.
