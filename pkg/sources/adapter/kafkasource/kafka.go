@@ -22,6 +22,7 @@ import (
 
 	"github.com/Shopify/sarama"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"go.uber.org/zap"
 )
 
 const (
@@ -51,16 +52,30 @@ func (a *kafkasourceAdapter) emitEvent(ctx context.Context, msg sarama.ConsumerM
 
 // ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages().
 func (c consumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	ctx := context.Background()
-	for msg := range claim.Messages() {
-		err := c.adapter.emitEvent(ctx, *msg)
-		if err != nil {
-			c.adapter.logger.Errorf("Failed to emit event: %v", err)
+	for {
+		select {
+		case msg, ok := <-claim.Messages():
+			if !ok {
+				return nil
+			}
+			if err := c.adapter.emitEvent(session.Context(), *msg); err != nil {
+				c.adapter.logger.Errorw("Failed to emit event: %v", zap.Error(err))
+				// do not mark message
+				continue
+			}
+			session.MarkMessage(msg, "")
+
+		case <-session.Context().Done():
+			c.adapter.logger.Infow("Context closed, exiting consumer")
+			return nil
 		}
 	}
+}
+
+func (c consumerGroupHandler) Setup(sarama.ConsumerGroupSession) error {
 	return nil
 }
 
-func (consumerGroupHandler) Setup(sarama.ConsumerGroupSession) error { return nil }
-
-func (consumerGroupHandler) Cleanup(sarama.ConsumerGroupSession) error { return nil }
+func (c consumerGroupHandler) Cleanup(sarama.ConsumerGroupSession) error {
+	return nil
+}
