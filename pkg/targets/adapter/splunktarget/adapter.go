@@ -19,6 +19,7 @@ package splunktarget
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"time"
@@ -166,7 +167,10 @@ func (a *adapter) receive(ctx context.Context, event cloudevents.Event) cloudeve
 		a.defaultIndex,
 	)
 	if a.discardCEContext {
-		e.Event = event.Data()
+		e.Event = string(event.Data())
+		if event.DataContentType() == cloudevents.ApplicationJSON {
+			e.Event = json.RawMessage(event.Data())
+		}
 	}
 
 	err := a.spClient.LogEvent(e)
