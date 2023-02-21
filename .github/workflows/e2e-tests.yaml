@@ -41,9 +41,9 @@ jobs:
       uses: container-tools/kind-action@v2
       with:
         version: v0.13.0
-        knative_eventing: v1.4.0
-        knative_serving: v1.4.0
-        knative_kourier: v1.4.0
+        knative_eventing: v1.6.0
+        knative_serving: v1.6.0
+        knative_kourier: v1.6.0
         # ko loads images directly into KinD's container runtime when
         # KO_DOCKER_REPO is set to the rogue value "kind.local", so we have no
         # use for a container registry.
