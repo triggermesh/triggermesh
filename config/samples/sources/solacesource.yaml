@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Sample SolaceTarget object.
+# Sample SolaceSource object.
 #
 # For a list and description of all available attributes, execute the following command against a cluster where this
 # Custom Resource Definition has been registered:
 #
-#   kubectl explain solacetargets.targets.triggermesh.io
+#   kubectl explain solacesources.sources.triggermesh.io
 
-apiVersion: targets.triggermesh.io/v1alpha1
-kind: SolaceTarget
+apiVersion: sources.triggermesh.io/v1alpha1
+kind: SolaceSource
 metadata:
   name: sample
 spec:
