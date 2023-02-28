@@ -67,6 +67,7 @@ func CreateSimpleApplication(c clientset.Interface, namespace string,
 
 	WaitUntilAvailable(c, depl)
 	WaitUntilEndpointsPopulated(c, svc)
+	time.Sleep(10 * time.Second)
 
 	return depl, svc
 }
