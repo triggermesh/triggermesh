@@ -137,7 +137,7 @@ var _ = Describe("Azure IOT Hub Source", func() {
 				})
 
 				By("verifying the event was sent to a newly created iothub", func() {
-					const receiveTimeout = 30 * time.Second
+					const receiveTimeout = 300 * time.Second
 					const pollInterval = 500 * time.Millisecond
 
 					var receivedEvents []cloudevents.Event

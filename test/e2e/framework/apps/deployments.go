@@ -66,6 +66,7 @@ func CreateSimpleApplication(c clientset.Interface, namespace string,
 	}
 
 	WaitUntilAvailable(c, depl)
+	WaitUntilEndpointsPopulated(c, svc)
 
 	return depl, svc
 }
@@ -129,6 +130,45 @@ func WaitUntilAvailable(c clientset.Interface, d *appsv1.Deployment) {
 	_, err := watchtools.UntilWithSync(ctx, lw, &appsv1.Deployment{}, nil, isDeploymentAvailable)
 	if err != nil {
 		framework.FailfWithOffset(2, "Error waiting for %s %q to become available: %s", gr, d.Name, err)
+	}
+}
+
+// WaitUntilEndpointsPopulated waits until the service's endpoints are populated.
+func WaitUntilEndpointsPopulated(c clientset.Interface, s *corev1.Service) {
+	fieldSelector := fields.OneTermEqualSelector("metadata.name", s.Name).String()
+
+	lw := &cache.ListWatch{
+		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+			options.FieldSelector = fieldSelector
+			return c.CoreV1().Endpoints(s.Namespace).List(context.Background(), options)
+		},
+		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			options.FieldSelector = fieldSelector
+			return c.CoreV1().Endpoints(s.Namespace).Watch(context.Background(), options)
+		},
+	}
+
+	gr := schema.GroupResource{Group: "", Resource: "endpoints"}
+
+	// checks whether the Endpoints referenced in the given watch.Event is available.
+	var areEndpointsAvailable watchtools.ConditionFunc = func(e watch.Event) (bool, error) {
+		if e.Type == watch.Deleted {
+			return false, apierrors.NewNotFound(gr, s.Name)
+		}
+
+		if ep, ok := e.Object.(*corev1.Endpoints); ok {
+			return duck.EndpointsAreAvailable(ep), nil
+		}
+
+		return false, nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	_, err := watchtools.UntilWithSync(ctx, lw, &corev1.Endpoints{}, nil, areEndpointsAvailable)
+	if err != nil {
+		framework.FailfWithOffset(2, "Error waiting for %s %q to become available: %s", gr, s.Name, err)
 	}
 }
 

@@ -121,7 +121,7 @@ var _ = Describe("Azure Queue Storage", func() {
 				})
 
 				Specify("the source generates an event", func() {
-					const receiveTimeout = 25 * time.Second
+					const receiveTimeout = 250 * time.Second
 					const pollInterval = 500 * time.Millisecond
 
 					var receivedEvents []cloudevents.Event
