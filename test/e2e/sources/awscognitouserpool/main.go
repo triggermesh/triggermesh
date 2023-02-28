@@ -128,7 +128,7 @@ var _ = Describe("AWS Cognito UserPool source", func() {
 			})
 
 			Specify("the source generates an event for created user", func() {
-				const receiveTimeout = 10 * time.Second
+				const receiveTimeout = 100 * time.Second
 				const pollInterval = 500 * time.Millisecond
 
 				var receivedEvents []cloudevents.Event

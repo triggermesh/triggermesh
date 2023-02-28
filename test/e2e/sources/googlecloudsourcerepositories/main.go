@@ -129,7 +129,7 @@ var _ = Describe("Google Cloud Source Repositories source", func() {
 			})
 
 			Specify("the source generates an event", func() {
-				const receiveTimeout = 15 * time.Second
+				const receiveTimeout = 150 * time.Second
 				const pollInterval = 500 * time.Millisecond
 
 				var receivedEvents []cloudevents.Event

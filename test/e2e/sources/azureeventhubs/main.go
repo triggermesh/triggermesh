@@ -136,7 +136,7 @@ var _ = Describe("Azure EventHubs", func() {
 				err = hub.Send(ctx, ev, eventhubs.SendWithMessageID("12345"))
 				Expect(err).ToNot(HaveOccurred())
 
-				const receiveTimeout = 15 * time.Second // it takes events a little longer to flow in from azure
+				const receiveTimeout = 150 * time.Second // it takes events a little longer to flow in from azure
 				const pollInterval = 500 * time.Millisecond
 
 				var receivedEvents []cloudevents.Event

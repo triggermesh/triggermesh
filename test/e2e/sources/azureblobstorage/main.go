@@ -183,7 +183,7 @@ var _ = Describe("Azure Blob Storage source", func() {
 				})
 
 				By("asserting that a BlobCreated event is received", func() {
-					const receiveTimeout = 15 * time.Second
+					const receiveTimeout = 150 * time.Second
 					const pollInterval = 500 * time.Millisecond
 
 					var receivedEvents []cloudevents.Event
