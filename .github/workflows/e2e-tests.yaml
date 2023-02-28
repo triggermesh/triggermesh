@@ -91,7 +91,7 @@ jobs:
     - name: Deploy TriggerMesh
       run: |
         sed -i config/500-*.yaml \
-          -e "s|ko://github.com/triggermesh/triggermesh/cmd/\(.*$\)|gcr.io/triggermesh/\1:${{ github.event.client_payload.commit_sha }}|g"
+          -e "s|ko://github.com/triggermesh/triggermesh/cmd/\(.*$\)|gcr.io/triggermesh/\1:${{ github.event.client_payload.image_tag }}|g"
 
         kubectl apply -f config/namespace/
         kubectl apply -f config/
