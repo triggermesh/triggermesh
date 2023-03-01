@@ -37,7 +37,7 @@ import (
 
 const (
 	gitDefaultRemoteName = "origin"
-	gitDefaultBranchName = "master"
+	gitDefaultBranchName = "main"
 
 	gitCommitterName  = "TriggerMesh e2e"
 	gitCommitterEmail = "dev@triggermesh.com"
