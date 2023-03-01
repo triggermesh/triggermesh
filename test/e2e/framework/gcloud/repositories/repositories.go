@@ -112,9 +112,14 @@ func InitRepoAndCommit(repoURL string) {
 
 	runCmdInDir(tmpdir, "git", "add", ".")
 	runCmdInDir(tmpdir, "git", "commit", "-m", "Update README.md", "--no-gpg-sign")
-	defaultBranch := strings.TrimSpace(runCmdInDirAndReturnOutput(tmpdir, "git", "config", "--global", "--get", "init.defaultBranch"))
-	if defaultBranch == "" {
+
+	// GitHub actions environment fails when trying this command, but local environmnets need it
+	// to know the default branch.
+	defaultBranch, err := runCmdInDirAndReturnOutputAndError(tmpdir, "git", "config", "--global", "--get", "init.defaultBranch")
+	if err != nil || defaultBranch == "" {
 		defaultBranch = gitDefaultBranch
+	} else {
+		defaultBranch = strings.TrimSpace(defaultBranch)
 	}
 	runCmdInDir(tmpdir, "git", "push", "--set-upstream", gitDefaultRemoteName, defaultBranch)
 
@@ -125,6 +130,16 @@ func runCmdInDir(dir, name string, args ...string) {
 }
 
 func runCmdInDirAndReturnOutput(dir, name string, args ...string) string {
+	output, err := runCmdInDirAndReturnOutputAndError(dir, name, args...)
+	if err != nil {
+		framework.FailfWithOffset(3, "Failed to run command %q: %s",
+			strings.Join(append([]string{name}, args...), " "), err)
+	}
+
+	return output
+}
+
+func runCmdInDirAndReturnOutputAndError(dir, name string, args ...string) (string, error) {
 	var stderr bytes.Buffer
 	var stdout bytes.Buffer
 
@@ -134,16 +149,11 @@ func runCmdInDirAndReturnOutput(dir, name string, args ...string) string {
 
 	if err := cmd.Run(); err != nil {
 		if stderr := stderr.String(); stderr != "" {
-			err = fmt.Errorf(stderr+": %w", err)
+			return stdout.String(), fmt.Errorf(stderr+": %w", err)
 		}
-
-		framework.FailfWithOffset(3, "Failed to run command %q: %s",
-			strings.Join(append([]string{name}, args...), " "), err)
-		return ""
 	}
 
-	return stdout.String()
-
+	return stdout.String(), nil
 }
 
 func urlSchemeAndHost(fullURL string) string {
