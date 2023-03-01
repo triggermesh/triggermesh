@@ -37,7 +37,7 @@ import (
 
 const (
 	gitDefaultRemoteName = "origin"
-	gitDefaultBranchName = "main"
+	gitDefaultBranch     = "master"
 
 	gitCommitterName  = "TriggerMesh e2e"
 	gitCommitterEmail = "dev@triggermesh.com"
@@ -112,15 +112,25 @@ func InitRepoAndCommit(repoURL string) {
 
 	runCmdInDir(tmpdir, "git", "add", ".")
 	runCmdInDir(tmpdir, "git", "commit", "-m", "Update README.md", "--no-gpg-sign")
-	runCmdInDir(tmpdir, "git", "push", "--set-upstream", gitDefaultRemoteName, gitDefaultBranchName)
+	defaultBranch := strings.TrimSpace(runCmdInDirAndReturnOutput(tmpdir, "git", "config", "--global", "--get", "init.defaultBranch"))
+	if defaultBranch == "" {
+		defaultBranch = gitDefaultBranch
+	}
+	runCmdInDir(tmpdir, "git", "push", "--set-upstream", gitDefaultRemoteName, defaultBranch)
+
 }
 
 func runCmdInDir(dir, name string, args ...string) {
+	_ = runCmdInDirAndReturnOutput(dir, name, args...)
+}
+
+func runCmdInDirAndReturnOutput(dir, name string, args ...string) string {
 	var stderr bytes.Buffer
+	var stdout bytes.Buffer
 
 	cmd := exec.Command(name, args...)
 	cmd.Dir = dir
-	cmd.Stderr = &stderr
+	cmd.Stderr, cmd.Stdout = &stderr, &stdout
 
 	if err := cmd.Run(); err != nil {
 		if stderr := stderr.String(); stderr != "" {
@@ -129,7 +139,11 @@ func runCmdInDir(dir, name string, args ...string) {
 
 		framework.FailfWithOffset(3, "Failed to run command %q: %s",
 			strings.Join(append([]string{name}, args...), " "), err)
+		return ""
 	}
+
+	return stdout.String()
+
 }
 
 func urlSchemeAndHost(fullURL string) string {
