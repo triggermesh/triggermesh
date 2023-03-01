@@ -81,6 +81,13 @@ func MakeAppEnv(o *v1alpha1.AzureBlobStorageSource) []corev1.EnvVar {
 		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
+	if o.Spec.Endpoint.EventHubs.ConsumerGroup != nil {
+		hubEnvs = append(hubEnvs, corev1.EnvVar{
+			Name:  common.EnvHubConsumerGroup,
+			Value: *o.Spec.Endpoint.EventHubs.ConsumerGroup,
+		})
+	}
+
 	return append(hubEnvs, []corev1.EnvVar{
 		{
 			Name:  common.EnvHubResourceID,

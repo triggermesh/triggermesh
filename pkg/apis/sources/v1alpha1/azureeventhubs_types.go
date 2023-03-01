@@ -54,6 +54,9 @@ type AzureEventHubsSourceSpec struct {
 	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
 	EventHubID AzureResourceID `json:"eventHubID"`
 
+	// Name of the Event Hubs' Consumer Group that will be used by the source to read the event stream.
+	ConsumerGroup *string `json:"consumerGroup,omitempty"`
+
 	// Authentication method to interact with the Azure Event Hubs API.
 	// If it not present, it will try to use Azure AKS Managed Identity
 	Auth AzureAuth `json:"auth"`

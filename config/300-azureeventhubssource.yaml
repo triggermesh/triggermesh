@@ -220,6 +220,11 @@ spec:
                 oneOf:
                 - required: [sasToken]
                 - required: [servicePrincipal]
+              consumerGroup:
+                description: A view (state, position, or offset) of an entire event hub. Consumer groups enable consuming
+                  applications to each have a separate view of the event stream. They read the stream independently at their
+                  own pace and with their own offsets. For more information about Event Hubs components, please refer to https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-about#key-architecture-components
+                type: string
               sink:
                 description: The destination of events sourced from Azure Event Hubs.
                 type: object

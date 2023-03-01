@@ -97,6 +97,12 @@ spec:
                           instance is created on behalf of the user.
                         type: string
                         pattern: ^[A-Za-z0-9][\w.-]{0,49}$
+                      consumerGroup:
+                        description: A view (state, position, or offset) of an entire event hub. Consumer groups enable consuming
+                          applications to each have a separate view of the event stream. They read the stream independently
+                          at their own pace and with their own offsets. For more information about Event Hubs Consumer Groups,
+                          please refer to https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-features#consumer-groups.
+                        type: string
                     required:
                     - namespaceID
                 required:

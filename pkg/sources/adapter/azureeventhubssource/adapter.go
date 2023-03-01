@@ -54,6 +54,9 @@ type envConfig struct {
 	// Used to set the 'source' context attribute of CloudEvents.
 	HubResourceID string `envconfig:"EVENTHUB_RESOURCE_ID" required:"true"`
 
+	// Consumer group name to be used by the source.
+	ConsumerGroup string `envconfig:"EVENTHUB_CONSUMER_GROUP"`
+
 	// Name of a message processor which takes care of converting Event
 	// Hubs messages to CloudEvents.
 	//
@@ -87,7 +90,8 @@ type adapter struct {
 	ehClient *eventhub.Hub
 	ceClient cloudevents.Client
 
-	msgPrcsr MessageProcessor
+	ehConsumerGroup string
+	msgPrcsr        MessageProcessor
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -139,6 +143,11 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
+	consumerGroup := eventhub.DefaultConsumerGroup
+	if env.ConsumerGroup != "" {
+		consumerGroup = env.ConsumerGroup
+	}
+
 	// The Event Hubs client uses the default "NoOpTracer" tab.Tracer
 	// implementation, which does not produce any log message. We register
 	// a custom implementation so that event handling errors are logged via
@@ -149,8 +158,10 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger: logger,
 		mt:     mt,
 
-		ehClient: hub,
 		ceClient: ceClient,
+		ehClient: hub,
+
+		ehConsumerGroup: consumerGroup,
 
 		msgPrcsr: msgPrcsr,
 	}
@@ -179,7 +190,8 @@ func (a *adapter) Start(ctx context.Context) error {
 	// listen to each partition of the Event Hub
 	for _, partitionID := range runtimeInfo.PartitionIDs {
 		connCtx, cancel := context.WithTimeout(ctx, connTimeout)
-		_, err := a.ehClient.Receive(connCtx, partitionID, a.handleMessage, eventhub.ReceiveWithLatestOffset())
+		_, err := a.ehClient.Receive(connCtx, partitionID, a.handleMessage,
+			eventhub.ReceiveWithLatestOffset(), eventhub.ReceiveWithConsumerGroup(a.ehConsumerGroup))
 		cancel()
 		if err != nil {
 			a.logger.Errorw("An error occurred while starting message receivers. "+

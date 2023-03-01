@@ -102,6 +102,9 @@ type AzureEventGridSourceDestinationEventHubs struct {
 	// omitted, an Event Hubs instance is created on behalf of the user.
 	// +optional
 	HubName *string `json:"hubName,omitempty"`
+
+	// Name of the Event Hubs' Consumer Group that will be used by the source to read the event stream.
+	ConsumerGroup *string `json:"consumerGroup,omitempty"`
 }
 
 // AzureEventGridSourceStatus defines the observed state of the event source.

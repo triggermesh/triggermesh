@@ -73,6 +73,13 @@ func MakeAppEnv(o *v1alpha1.AzureEventHubsSource) []corev1.EnvVar {
 		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
+	if o.Spec.ConsumerGroup != nil {
+		hubEnvs = append(hubEnvs, corev1.EnvVar{
+			Name:  common.EnvHubConsumerGroup,
+			Value: *o.Spec.ConsumerGroup,
+		})
+	}
+
 	return append(hubEnvs,
 		[]corev1.EnvVar{
 			{
