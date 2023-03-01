@@ -62,11 +62,11 @@ spec:
             description: Desired state of event target.
             type: object
             properties:
-              defaultDatabase:
+              database:
                 description: Define the default (over-writeable at runtime) database to write new events to.
                 type: string
                 minLength: 1
-              defaultCollection:
+              collection:
                 description: Define the default (over-writeable at runtime) collection to write new events to.
                 type: string
                 minLength: 1
