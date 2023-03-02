@@ -95,6 +95,9 @@ type AzureActivityLogsSourceDestinationEventHubs struct {
 	// +optional
 	HubName *string `json:"hubName,omitempty"`
 
+	// Name of the Event Hubs' Consumer Group that will be used by the source to read the event stream.
+	ConsumerGroup *string `json:"consumerGroup,omitempty"`
+
 	// Name of a SAS policy with Manage permissions inside the Event Hubs
 	// namespace referenced in the EventHubID field.
 	//

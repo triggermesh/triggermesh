@@ -90,6 +90,13 @@ func MakeAppEnv(o *v1alpha1.AzureActivityLogsSource) []corev1.EnvVar {
 		hubEnvs = common.MaybeAppendValueFromEnvVar(hubEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
 	}
 
+	if o.Spec.Destination.EventHubs.ConsumerGroup != nil {
+		hubEnvs = append(hubEnvs, corev1.EnvVar{
+			Name:  common.EnvHubConsumerGroup,
+			Value: *o.Spec.Destination.EventHubs.ConsumerGroup,
+		})
+	}
+
 	ceType := v1alpha1.AzureEventType(sources.AzureServiceMonitor, v1alpha1.AzureActivityLogsActivityLogEventType)
 	ceOverridesStr := cloudevents.OverridesJSON(o.Spec.CloudEventOverrides)
 

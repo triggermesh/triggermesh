@@ -1425,6 +1425,11 @@ func (in *AzureActivityLogsSourceDestinationEventHubs) DeepCopyInto(out *AzureAc
 		*out = new(string)
 		**out = **in
 	}
+	if in.ConsumerGroup != nil {
+		in, out := &in.ConsumerGroup, &out.ConsumerGroup
+		*out = new(string)
+		**out = **in
+	}
 	if in.SASPolicy != nil {
 		in, out := &in.SASPolicy, &out.SASPolicy
 		*out = new(string)
@@ -1698,6 +1703,11 @@ func (in *AzureEventGridSourceDestinationEventHubs) DeepCopyInto(out *AzureEvent
 		*out = new(string)
 		**out = **in
 	}
+	if in.ConsumerGroup != nil {
+		in, out := &in.ConsumerGroup, &out.ConsumerGroup
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 
@@ -1884,6 +1894,11 @@ func (in *AzureEventHubsSourceSpec) DeepCopyInto(out *AzureEventHubsSourceSpec) 
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	out.EventHubID = in.EventHubID
+	if in.ConsumerGroup != nil {
+		in, out := &in.ConsumerGroup, &out.ConsumerGroup
+		*out = new(string)
+		**out = **in
+	}
 	in.Auth.DeepCopyInto(&out.Auth)
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
