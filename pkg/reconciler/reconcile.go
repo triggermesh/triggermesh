@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"strings"
+	"sort"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -384,11 +384,17 @@ func (r *GenericRBACReconciler[T, L]) syncAdapterServiceAccount(ctx context.Cont
 	// upon creation of a ServiceAccount. We need to preserve the reference
 	// to this secret during updates, otherwise Kubernetes generates a new
 	// secret without garbage collecting the old one(s).
-	for _, secr := range currentSA.Secrets {
-		if strings.HasPrefix(secr.Name, desiredSA.Name+"-token-") {
-			desiredSA.Secrets = append(desiredSA.Secrets, secr)
-		}
-	}
+	//
+	// Update: although the paragraph above keeps true, secrets might have been
+	// added by some other controller, we are updatin this function to remove the
+	// check that only keeps the "-token-" secrets.
+	// This will also override any secret that we might add at the desired structure
+	// during reconciliation, which at the time of writting this are none, and
+	// we don't expect to manage these secrets anytime soon.
+	desiredSA.Secrets = currentSA.Secrets
+
+	// Keep image pull secrets that users might have configured.
+	desiredSA.ImagePullSecrets = currentSA.ImagePullSecrets
 
 	sa, err := r.SAClient(desiredSA.Namespace).Update(ctx, desiredSA, metav1.UpdateOptions{})
 	if err != nil {
@@ -562,6 +568,11 @@ func serviceAccountOwners[T kmeta.OwnerRefable](rcl v1alpha1.Reconcilable, l Lis
 	for i := range ts {
 		ownerRefables[i] = ts[i]
 	}
+
+	// Make semantic comparisons more accurate.
+	sort.SliceStable(ownerRefables, func(i, j int) bool {
+		return ownerRefables[i].GetObjectMeta().GetName() < ownerRefables[j].GetObjectMeta().GetName()
+	})
 
 	return ownerRefables, nil
 }
