@@ -1,0 +1,46 @@
+name: API Docs
+
+on:
+  workflow_dispatch:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v*']
+
+jobs:
+  gen-apidocs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19.x
+
+    - name: Checkout triggermesh/docs
+      uses: actions/checkout@v3
+      with:
+        path: 'tm-docs'
+        ref: 'main'
+        repository: 'triggermesh/docs'
+        token: ${{ secrets.TM_DOCS_TOKEN }}
+
+    - name: Run gen-apidocs
+      run: TRIGGERMESH_COMMIT=${{github.ref_name}} make gen-apidocs
+      env:
+        DOCS_OUTPUT_DIR: ${GITHUB_WORKSPACE}/tm-docs/docs/reference/
+
+    - name: Commit and push changes
+      working-directory: tm-docs
+      run: |
+        git add -A
+        git status --porcelain
+        if [[ $(git status --porcelain | wc -l) -gt 0 ]]; then
+          git config --global user.name 'TriggerMesh Bot'
+          git config --global user.email 'bot@triggermesh.com'
+          git commit -m "Generated from commit ${{github.sha}} on triggermesh/triggermesh"
+          git push
+        fi
