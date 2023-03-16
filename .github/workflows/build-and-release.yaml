@@ -1,0 +1,151 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+    branches:
+      - 'v*-stable'
+  push:
+    branches:
+      - 'v*-stable'
+    tags:
+      - 'v*'
+  pull_request:
+
+jobs:
+  publish-images:
+    name: Build and publish images
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.19'
+
+    - name: Go caches
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/go/pkg/mod
+        key: ${{ github.job }}-${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ github.job }}-${{ runner.os }}-go-
+
+    - name: Installing ko
+      run: go install github.com/google/ko@v0.11.2
+
+    - name: Login to Docker Hub
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Login to GCR
+      uses: docker/login-action@v2
+      with:
+        registry: gcr.io
+        username: _json_key
+        password: ${{ secrets.GCLOUD_GCR_SERVICEACCOUNT_KEY }}
+
+    - name: Set IMAGE_TAG
+      id: image-tag
+      run: |
+        IMAGE_TAG=${GITHUB_SHA}
+        [[ ${GITHUB_REF_TYPE} == "tag" ]] && IMAGE_TAG=${GITHUB_REF_NAME}
+        echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+    - name: Publish container images to DockerHub
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      env:
+        KO_DOCKER_REPO: docker.io/triggermesh
+        KOFLAGS: --jobs=4 --platform=linux/amd64 --push=${{ github.event_name != 'pull_request' }}
+        DIST_DIR: /tmp/dist
+      run: |
+        IMAGE_TAG=${{ steps.image-tag.outputs.IMAGE_TAG }} make release
+
+    - name: Publish container images to GCR
+      env:
+        KO_DOCKER_REPO: gcr.io/triggermesh
+        KOFLAGS: --jobs=4 --platform=linux/amd64 --push=${{ github.event_name != 'pull_request' }}
+        DIST_DIR: /tmp/dist
+      run: |
+        pushd hack/manifest-cleaner
+        go install .
+        popd
+
+        IMAGE_TAG=${{ steps.image-tag.outputs.IMAGE_TAG }} make release
+
+        declare -a release_files=(
+          triggermesh-crds.yaml
+          triggermesh.yaml
+        )
+
+        for f in "${release_files[@]}"; do
+          manifest-cleaner <"${DIST_DIR}/${f}" >"${DIST_DIR}/${f}.clean"
+          mv "${DIST_DIR}/${f}.clean" "${DIST_DIR}/${f}"
+        done
+
+    - name: Upload artifact
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+      uses: actions/upload-artifact@master
+      with:
+        name: manifests
+        path: /tmp/dist
+
+  create-release:
+    name: Create Release
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    needs: publish-images
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Download artifact
+      uses: actions/download-artifact@master
+      with:
+        name: manifests
+        path: /tmp/dist
+
+    - name: Preparing Release Notes
+      run: |
+        ./hack/release-notes.sh ${GITHUB_REF_NAME} > release-notes.md
+
+    - name: Creating Release
+      uses: ncipollo/release-action@v1
+      with:
+        makeLatest: false
+        bodyFile: "release-notes.md"
+        artifacts: "/tmp/dist/*"
+
+  trigger-e2e:
+    name: Trigger E2E Tests
+    if: github.event_name != 'pull_request'
+    needs: publish-images
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set IMAGE_TAG
+      id: image-tag
+      run: |
+        IMAGE_TAG=${GITHUB_SHA}
+        [[ ${GITHUB_REF_TYPE} == "tag" ]] && IMAGE_TAG=${GITHUB_REF_NAME}
+        echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
+    - name: Send dispatch event
+      run: |
+        curl \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: token ${{ secrets.GH_DISPATCH_TOKEN }}" \
+          https://api.github.com/repos/triggermesh/triggermesh/dispatches \
+          -d '{"event_type":"e2e-test","client_payload":{"commit_sha":"'${GITHUB_SHA}'", "image_tag":"'${{ steps.image-tag.outputs.IMAGE_TAG }}'"}}'
