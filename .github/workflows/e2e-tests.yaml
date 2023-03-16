@@ -112,7 +112,7 @@ jobs:
     - name: Authenticate with Google Cloud
       uses: google-github-actions/auth@v1
       with:
-        credentials_json: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
+        credentials_json: ${{ secrets.GCLOUD_E2E_SERVICEACCOUNT_KEY }}
 
     - name: Run e2e tests
       id: e2e
@@ -120,7 +120,7 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        GCLOUD_SERVICEACCOUNT_KEY: ${{ secrets.GCLOUD_SERVICEACCOUNT_KEY }}
+        GCLOUD_SERVICEACCOUNT_KEY: ${{ secrets.GCLOUD_E2E_SERVICEACCOUNT_KEY }}
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
