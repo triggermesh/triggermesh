@@ -66,7 +66,7 @@ require (
 	github.com/tidwall/gjson v1.14.4
 	github.com/wamuir/go-xslt v0.1.4
 	github.com/xdg-go/scram v1.1.2
-	go.mongodb.org/mongo-driver v1.5.1
+	go.mongodb.org/mongo-driver v1.11.2
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.29.0
 	go.opentelemetry.io/otel v1.11.0
@@ -184,6 +184,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/montanaflynn/stats v0.6.6 // indirect
 	github.com/openzipkin/zipkin-go v0.3.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
