@@ -62,14 +62,14 @@ require (
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	github.com/tidwall/gjson v1.14.4
 	github.com/wamuir/go-xslt v0.1.4
 	github.com/xdg-go/scram v1.1.2
 	go.mongodb.org/mongo-driver v1.11.2
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/exporters/metric/cortex v0.29.0
-	go.opentelemetry.io/otel v1.11.0
+	go.opentelemetry.io/otel v1.14.0
 	go.opentelemetry.io/otel/metric v0.27.0
 	go.opentelemetry.io/otel/sdk/metric v0.27.0
 	go.uber.org/zap v1.24.0
@@ -216,7 +216,7 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opentelemetry.io/otel/internal/metric v0.27.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.4.1 // indirect
-	go.opentelemetry.io/otel/trace v1.11.0 // indirect
+	go.opentelemetry.io/otel/trace v1.14.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/goleak v1.1.12 // indirect
