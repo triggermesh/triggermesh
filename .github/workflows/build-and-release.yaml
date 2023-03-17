@@ -43,12 +43,11 @@ jobs:
       env:
         TEST_OUTPUT_DIR: /tmp/test-results/
         COVER_OUTPUT_DIR: /tmp/cover-results/
-        DW_HOME: /tmp/dw
 
   publish-images:
     name: Build and publish images
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-cores
     needs: test
 
     steps:
@@ -97,7 +96,7 @@ jobs:
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       env:
         KO_DOCKER_REPO: docker.io/triggermesh
-        KOFLAGS: --jobs=4 --platform=linux/amd64 --push=${{ github.event_name != 'pull_request' }}
+        KOFLAGS: --jobs=8 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}
         DIST_DIR: /tmp/dist
       run: |
         IMAGE_TAG=${{ steps.image-tag.outputs.IMAGE_TAG }} make release
@@ -105,7 +104,7 @@ jobs:
     - name: Publish container images to GCR
       env:
         KO_DOCKER_REPO: gcr.io/triggermesh
-        KOFLAGS: --jobs=4 --platform=linux/amd64 --push=${{ github.event_name != 'pull_request' }}
+        KOFLAGS: --jobs=8 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}
         DIST_DIR: /tmp/dist
       run: |
         pushd hack/manifest-cleaner
