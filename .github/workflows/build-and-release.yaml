@@ -124,11 +124,11 @@ jobs:
         done
 
     - name: Upload artifact
-      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       uses: actions/upload-artifact@master
       with:
         name: manifests
         path: /tmp/dist
+        retention-days: 14
 
   update-config:
     if: ${{ github.event_name != 'pull_request' }}
