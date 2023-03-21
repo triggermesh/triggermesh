@@ -62,7 +62,7 @@ require (
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	github.com/tidwall/gjson v1.14.4
 	github.com/wamuir/go-xslt v0.1.4
 	github.com/xdg-go/scram v1.1.2
