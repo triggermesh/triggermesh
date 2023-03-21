@@ -3,10 +3,10 @@ name: Build and Release
 on:
   workflow_dispatch:
     branches:
-      - main
+      - 'v*-stable'
   push:
     branches:
-      - main
+      - 'v*-stable'
     tags:
       - 'v*'
   pull_request:
@@ -212,6 +212,7 @@ jobs:
       with:
         bodyFile: "release-notes.md"
         artifacts: "/tmp/dist/*"
+        makeLatest: true
 
   trigger-e2e:
     name: Trigger E2E Tests
