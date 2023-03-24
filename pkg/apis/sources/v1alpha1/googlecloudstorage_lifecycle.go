@@ -76,7 +76,7 @@ func (s *GoogleCloudStorageSource) ServiceAccountOptions() []resource.ServiceAcc
 		return saOpts
 	}
 	if gcpSA := s.Spec.Auth.GCPServiceAccount; gcpSA != nil {
-		saOpts = append(saOpts, v1alpha1.GcpServiceAccountAnnotation(*gcpSA))
+		saOpts = append(saOpts, v1alpha1.GcpServiceAccountAnnotation(*gcpSA, *s.Spec.Auth.KubernetesServiceAccount))
 	}
 	return saOpts
 }

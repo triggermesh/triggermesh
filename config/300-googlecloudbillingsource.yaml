@@ -132,6 +132,9 @@ spec:
                       to access Google Cloud services.
                     pattern: ^[a-z][a-z0-9-]+@[a-z0-9-]+\.[a-z]+\.[a-z]{2,63}$
                     type: string
+                  kubernetesServiceAccount:
+                    description: Kubernetes Service account name bound to the gcpServiceAccount to act as an IAM service account. Optional, by default the kubernetes service account will be created with the same names as gcpServiceAccount.
+                    type: string
                 oneOf:
                 - required: [serviceAccountKey]
                 - required: [gcpServiceAccount]
