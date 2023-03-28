@@ -88,7 +88,7 @@ try:
                     type: integer
                     format: int64
             nodeSelector:
-              description: NodeSelector is a selector which must be true for the pod to fit on a node, as documented at
+              description: NodeSelector only allow the object pods to be created at nodes where all selector labels are present, as documented at
                 https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector.
               type: object
               additionalProperties:
