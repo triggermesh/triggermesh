@@ -103,6 +103,9 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 					Tolerations: []corev1.Toleration{{
 						Key: "taint", Operator: "Exists",
 					}},
+					NodeSelector: map[string]string{
+						"disktype": "ssd",
+					},
 					Containers: []corev1.Container{{
 						Name:  defaultContainerName,
 						Image: tImg,

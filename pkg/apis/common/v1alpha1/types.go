@@ -44,6 +44,8 @@ type AdapterOverrides struct {
 	Resources *corev1.ResourceRequirements `json:"resources,omitempty"`
 	// Pod tolerations.
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+	// NodeSelector to control which nodes the pod can be scheduled on.
+	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 	// Environment variables applied on adapter container.
 	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Labels applied on adapter container.
