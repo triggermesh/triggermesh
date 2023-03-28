@@ -86,6 +86,28 @@ func Toleration(t corev1.Toleration) ObjectOption {
 	}
 }
 
+// NodeSelector sets a NodeSelector on a PodSpecable.
+func NodeSelector(selector map[string]string) ObjectOption {
+	return func(object interface{}) {
+		var nodeSelector *map[string]string
+
+		switch o := object.(type) {
+		case *appsv1.Deployment:
+			nodeSelector = &o.Spec.Template.Spec.NodeSelector
+		case *servingv1.Service:
+			nodeSelector = &o.Spec.Template.Spec.NodeSelector
+		}
+
+		if *nodeSelector == nil {
+			*nodeSelector = make(map[string]string, len(selector))
+		}
+
+		for k, v := range selector {
+			(*nodeSelector)[k] = v
+		}
+	}
+}
+
 // Volumes attaches Volumes to a PodSpecable.
 func Volumes(vs ...corev1.Volume) ObjectOption {
 	return func(object interface{}) {

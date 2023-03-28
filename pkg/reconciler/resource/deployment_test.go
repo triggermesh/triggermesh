@@ -69,6 +69,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		Limits(&cpuRes, nil),
 		TerminationErrorToLogs,
 		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
+		NodeSelector(map[string]string{"disktype": "ssd"}),
 		Volumes(v),
 		VolumeMounts(vm),
 	)
@@ -103,6 +104,9 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 					Tolerations: []corev1.Toleration{{
 						Key: "taint", Operator: "Exists",
 					}},
+					NodeSelector: map[string]string{
+						"disktype": "ssd",
+					},
 					Containers: []corev1.Container{{
 						Name:  defaultContainerName,
 						Image: tImg,

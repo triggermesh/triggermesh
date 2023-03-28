@@ -87,6 +87,12 @@ try:
                     description: Period of time a toleration of effect NoExecute tolerates the taint.
                     type: integer
                     format: int64
+            nodeSelector:
+              description: NodeSelector only allow the object pods to be created at nodes where all selector labels are present, as documented at
+                https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector.
+              type: object
+              additionalProperties:
+                type: string
         """
     )
 except (scanner.ScannerError) as e:
