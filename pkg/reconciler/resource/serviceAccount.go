@@ -39,3 +39,9 @@ func NewServiceAccount(ns, name string, opts ...ObjectOption) *corev1.ServiceAcc
 
 	return sa
 }
+
+func SetServiceAccountName(name string) ServiceAccountOption {
+	return func(sa *corev1.ServiceAccount) {
+		sa.SetName(name)
+	}
+}

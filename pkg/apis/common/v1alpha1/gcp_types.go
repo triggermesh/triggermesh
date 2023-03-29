@@ -25,12 +25,8 @@ import (
 const annotationGcpSA = "iam.gke.io/gcp-service-account"
 
 // GcpServiceAccountAnnotation returns a functional option that sets the GCP
-// Service Account annotation on Kubernetes ServiceAccount.
-func GcpServiceAccountAnnotation(gcpSA string, k8sSA string) resource.ServiceAccountOption {
+func GcpServiceAccountAnnotation(gcpSA string) resource.ServiceAccountOption {
 	return func(sa *corev1.ServiceAccount) {
-		if k8sSA != "" {
-			sa.ObjectMeta.Name = k8sSA
-		}
 		metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationGcpSA, gcpSA)
 	}
 }
