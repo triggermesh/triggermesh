@@ -49,6 +49,25 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		MountPath: "/myvol",
 	}
 
+	affinity := corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			PreferredDuringSchedulingIgnoredDuringExecution: []corev1.PreferredSchedulingTerm{
+				{
+					Weight: 1,
+					Preference: corev1.NodeSelectorTerm{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "zone",
+								Operator: corev1.NodeSelectorOpIn,
+								Values:   []string{"zone-a"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
 	ksvc := NewKnService(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Port("health", 8081),
@@ -67,6 +86,7 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		Limits(&cpuRes, nil),
 		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
 		NodeSelector(map[string]string{"disktype": "ssd"}),
+		Affinity(affinity),
 		VisibilityClusterLocal,
 		Volumes(v),
 		VolumeMounts(vm),
@@ -99,6 +119,24 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 							}},
 							NodeSelector: map[string]string{
 								"disktype": "ssd",
+							},
+							Affinity: &corev1.Affinity{
+								NodeAffinity: &corev1.NodeAffinity{
+									PreferredDuringSchedulingIgnoredDuringExecution: []corev1.PreferredSchedulingTerm{
+										{
+											Weight: 1,
+											Preference: corev1.NodeSelectorTerm{
+												MatchExpressions: []corev1.NodeSelectorRequirement{
+													{
+														Key:      "zone",
+														Operator: corev1.NodeSelectorOpIn,
+														Values:   []string{"zone-a"},
+													},
+												},
+											},
+										},
+									},
+								},
 							},
 							Containers: []corev1.Container{{
 								Name:  defaultContainerName,

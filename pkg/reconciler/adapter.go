@@ -393,6 +393,10 @@ func adapterOverrideOptions(overrides *v1alpha1.AdapterOverrides) []resource.Obj
 		opts = append(opts, resource.NodeSelector(map[string]string{k: v}))
 	}
 
+	if overrides.Affinity != nil {
+		opts = append(opts, resource.Affinity(*overrides.Affinity))
+	}
+
 	for _, t := range overrides.Env {
 		opts = append(opts, resource.EnvVar(t.Name, t.Value))
 	}
