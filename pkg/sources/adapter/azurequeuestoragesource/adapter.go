@@ -61,7 +61,7 @@ type adapter struct {
 	messagesURL       azqueue.MessagesURL
 	ceClient          cloudevents.Client
 	eventsource       string
-	visibilityTimeout *string
+	visibilityTimeout string
 	logger            *zap.SugaredLogger
 	mt                *pkgadapter.MetricTag
 }
@@ -104,7 +104,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		messagesURL:       messagesURL,
 		ceClient:          ceClient,
 		eventsource:       queueURL.String(),
-		visibilityTimeout: &env.VisibilityTimeout,
+		visibilityTimeout: env.VisibilityTimeout,
 		logger:            logger,
 		mt:                mt,
 	}
@@ -150,7 +150,7 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 				popReceipt := msg.PopReceipt // This message's most-recent pop receipt
 
 				// Parse visibilityTimeout from ISO 8601 format
-				visibilityTimeoutDuration, err := period.Parse(*h.visibilityTimeout)
+				visibilityTimeoutDuration, err := period.Parse(h.visibilityTimeout)
 				if err != nil {
 					h.logger.Errorw("Unable to parse visibilityTimeout", zap.Error(err))
 					return
