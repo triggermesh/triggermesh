@@ -62,7 +62,7 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 		EnvVars(makeEnvVars(2, "MULTI_ENV", "val")...),
 		EnvVar("TEST_ENV2", "val2"),
 		Label("test.label/2", "val2"),
-		ServiceAccount("god-mode"),
+		ServiceAccount(&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: "god-mode"}}),
 		Requests(&cpuRes, &memRes),
 		Limits(&cpuRes, nil),
 		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
