@@ -26,7 +26,7 @@ metadata:
       [
         {
           "type": "com.amazon.cognito-identity.sync_trigger",
-          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.cognito-identity.sync_trigger.json",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.cognitoidentity.sync_trigger.json",
           "description": ""
         }
       ]

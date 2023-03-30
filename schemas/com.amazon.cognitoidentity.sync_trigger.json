@@ -1,0 +1,146 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/CognitoIdentitySyncEvent",
+	"definitions": {
+		"CognitoIdentitySyncEvent": {
+			"required": [
+				"CreationDate",
+				"DataStorage",
+				"DatasetName",
+				"IdentityID",
+				"LastModifiedBy",
+				"LastModifiedDate",
+				"NumRecords",
+				"EventType",
+				"Region",
+				"IdentityPoolID",
+				"DatasetRecords"
+			],
+			"properties": {
+				"CreationDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"DataStorage": {
+					"type": "integer"
+				},
+				"DatasetName": {
+					"type": "string"
+				},
+				"DatasetRecords": {
+					"items": {
+						"$schema": "http://json-schema.org/draft-04/schema#",
+						"$ref": "#/definitions/Record"
+					},
+					"type": "array"
+				},
+				"EventType": {
+					"type": "string"
+				},
+				"IdentityID": {
+					"type": "string"
+				},
+				"IdentityPoolID": {
+					"type": "string"
+				},
+				"LastModifiedBy": {
+					"type": "string"
+				},
+				"LastModifiedDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"NumRecords": {
+					"type": "integer"
+				},
+				"Region": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"Record": {
+			"required": [
+				"DeviceLastModifiedDate",
+				"Key",
+				"LastModifiedBy",
+				"LastModifiedDate",
+				"SyncCount",
+				"Value"
+			],
+			"properties": {
+				"DeviceLastModifiedDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"Key": {
+					"type": "string"
+				},
+				"LastModifiedBy": {
+					"type": "string"
+				},
+				"LastModifiedDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"SyncCount": {
+					"type": "integer"
+				},
+				"Value": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"CreationDate": "2022-03-29T13:00:00Z",
+		"DataStorage": 500,
+		"DatasetName": "myDataset",
+		"DatasetRecords": [{
+				"DeviceLastModifiedDate": "2022-03-28T16:30:00Z",
+				"Key": "record1",
+				"LastModifiedBy": "user1",
+				"LastModifiedDate": "2022-03-28T17:00:00Z",
+				"SyncCount": 1,
+				"Value": "data1"
+			},
+			{
+				"DeviceLastModifiedDate": "2022-03-29T09:45:00Z",
+				"Key": "record2",
+				"LastModifiedBy": "user2",
+				"LastModifiedDate": "2022-03-29T10:00:00Z",
+				"SyncCount": 2,
+				"Value": "data2"
+			}
+		],
+		"EventType": "SyncTrigger",
+		"IdentityID": "us-east-1:12345678-1234-5678-9012-123456789012",
+		"IdentityPoolID": "us-east-1:12345678-1234-5678-9012-123456789012",
+		"LastModifiedBy": "user2",
+		"LastModifiedDate": "2022-03-29T10:30:00Z",
+		"NumRecords": 2,
+		"Region": "us-east-1"
+	}, {
+		"CreationDate": "2022-03-28T10:00:00Z",
+		"DataStorage": 1000,
+		"DatasetName": "myDataset",
+		"DatasetRecords": [{
+			"DeviceLastModifiedDate": "2022-03-28T11:30:00Z",
+			"Key": "record1",
+			"LastModifiedBy": "user1",
+			"LastModifiedDate": "2022-03-28T12:00:00Z",
+			"SyncCount": 1,
+			"Value": "data1"
+		}],
+		"EventType": "SyncTrigger",
+		"IdentityID": "us-east-1:98765432-9876-5432-1098-987654321098",
+		"IdentityPoolID": "us-east-1:98765432-9876-5432-1098-987654321098",
+		"LastModifiedBy": "user1",
+		"LastModifiedDate": "2022-03-28T12:30:00Z",
+		"NumRecords": 1,
+		"Region": "us-east-1"
+	}]
+}

@@ -1,188 +1,260 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$ref": "#/definitions/PullRequest",
-  "definitions": {
-    "ApprovalRule": {
-      "required": [
-        "ApprovalRuleContent",
-        "ApprovalRuleId",
-        "ApprovalRuleName",
-        "CreationDate",
-        "LastModifiedDate",
-        "LastModifiedUser",
-        "OriginApprovalRuleTemplate",
-        "RuleContentSha256"
-      ],
-      "properties": {
-        "ApprovalRuleContent": {
-          "type": "string"
-        },
-        "ApprovalRuleId": {
-          "type": "string"
-        },
-        "ApprovalRuleName": {
-          "type": "string"
-        },
-        "CreationDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "LastModifiedDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "LastModifiedUser": {
-          "type": "string"
-        },
-        "OriginApprovalRuleTemplate": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/OriginApprovalRuleTemplate"
-        },
-        "RuleContentSha256": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "MergeMetadata": {
-      "required": [
-        "IsMerged",
-        "MergeCommitId",
-        "MergeOption",
-        "MergedBy"
-      ],
-      "properties": {
-        "IsMerged": {
-          "type": "boolean"
-        },
-        "MergeCommitId": {
-          "type": "string"
-        },
-        "MergeOption": {
-          "type": "string"
-        },
-        "MergedBy": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "OriginApprovalRuleTemplate": {
-      "required": [
-        "ApprovalRuleTemplateId",
-        "ApprovalRuleTemplateName"
-      ],
-      "properties": {
-        "ApprovalRuleTemplateId": {
-          "type": "string"
-        },
-        "ApprovalRuleTemplateName": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "PullRequest": {
-      "required": [
-        "ApprovalRules",
-        "AuthorArn",
-        "ClientRequestToken",
-        "CreationDate",
-        "Description",
-        "LastActivityDate",
-        "PullRequestId",
-        "PullRequestStatus",
-        "PullRequestTargets",
-        "RevisionId",
-        "Title"
-      ],
-      "properties": {
-        "ApprovalRules": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/ApprovalRule"
-          },
-          "type": "array"
-        },
-        "AuthorArn": {
-          "type": "string"
-        },
-        "ClientRequestToken": {
-          "type": "string"
-        },
-        "CreationDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "Description": {
-          "type": "string"
-        },
-        "LastActivityDate": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "PullRequestId": {
-          "type": "string"
-        },
-        "PullRequestStatus": {
-          "type": "string"
-        },
-        "PullRequestTargets": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/PullRequestTarget"
-          },
-          "type": "array"
-        },
-        "RevisionId": {
-          "type": "string"
-        },
-        "Title": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "PullRequestTarget": {
-      "required": [
-        "DestinationCommit",
-        "DestinationReference",
-        "MergeBase",
-        "MergeMetadata",
-        "RepositoryName",
-        "SourceCommit",
-        "SourceReference"
-      ],
-      "properties": {
-        "DestinationCommit": {
-          "type": "string"
-        },
-        "DestinationReference": {
-          "type": "string"
-        },
-        "MergeBase": {
-          "type": "string"
-        },
-        "MergeMetadata": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/MergeMetadata"
-        },
-        "RepositoryName": {
-          "type": "string"
-        },
-        "SourceCommit": {
-          "type": "string"
-        },
-        "SourceReference": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/PullRequest",
+	"definitions": {
+		"ApprovalRule": {
+			"required": [
+				"ApprovalRuleContent",
+				"ApprovalRuleId",
+				"ApprovalRuleName",
+				"CreationDate",
+				"LastModifiedDate",
+				"LastModifiedUser",
+				"OriginApprovalRuleTemplate",
+				"RuleContentSha256"
+			],
+			"properties": {
+				"ApprovalRuleContent": {
+					"type": "string"
+				},
+				"ApprovalRuleId": {
+					"type": "string"
+				},
+				"ApprovalRuleName": {
+					"type": "string"
+				},
+				"CreationDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"LastModifiedDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"LastModifiedUser": {
+					"type": "string"
+				},
+				"OriginApprovalRuleTemplate": {
+					"$schema": "http://json-schema.org/draft-04/schema#",
+					"$ref": "#/definitions/OriginApprovalRuleTemplate"
+				},
+				"RuleContentSha256": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"MergeMetadata": {
+			"required": [
+				"IsMerged",
+				"MergeCommitId",
+				"MergeOption",
+				"MergedBy"
+			],
+			"properties": {
+				"IsMerged": {
+					"type": "boolean"
+				},
+				"MergeCommitId": {
+					"type": "string"
+				},
+				"MergeOption": {
+					"type": "string"
+				},
+				"MergedBy": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"OriginApprovalRuleTemplate": {
+			"required": [
+				"ApprovalRuleTemplateId",
+				"ApprovalRuleTemplateName"
+			],
+			"properties": {
+				"ApprovalRuleTemplateId": {
+					"type": "string"
+				},
+				"ApprovalRuleTemplateName": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"PullRequest": {
+			"required": [
+				"ApprovalRules",
+				"AuthorArn",
+				"ClientRequestToken",
+				"CreationDate",
+				"Description",
+				"LastActivityDate",
+				"PullRequestId",
+				"PullRequestStatus",
+				"PullRequestTargets",
+				"RevisionId",
+				"Title"
+			],
+			"properties": {
+				"ApprovalRules": {
+					"items": {
+						"$schema": "http://json-schema.org/draft-04/schema#",
+						"$ref": "#/definitions/ApprovalRule"
+					},
+					"type": "array"
+				},
+				"AuthorArn": {
+					"type": "string"
+				},
+				"ClientRequestToken": {
+					"type": "string"
+				},
+				"CreationDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"Description": {
+					"type": "string"
+				},
+				"LastActivityDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"PullRequestId": {
+					"type": "string"
+				},
+				"PullRequestStatus": {
+					"type": "string"
+				},
+				"PullRequestTargets": {
+					"items": {
+						"$schema": "http://json-schema.org/draft-04/schema#",
+						"$ref": "#/definitions/PullRequestTarget"
+					},
+					"type": "array"
+				},
+				"RevisionId": {
+					"type": "string"
+				},
+				"Title": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"PullRequestTarget": {
+			"required": [
+				"DestinationCommit",
+				"DestinationReference",
+				"MergeBase",
+				"MergeMetadata",
+				"RepositoryName",
+				"SourceCommit",
+				"SourceReference"
+			],
+			"properties": {
+				"DestinationCommit": {
+					"type": "string"
+				},
+				"DestinationReference": {
+					"type": "string"
+				},
+				"MergeBase": {
+					"type": "string"
+				},
+				"MergeMetadata": {
+					"$schema": "http://json-schema.org/draft-04/schema#",
+					"$ref": "#/definitions/MergeMetadata"
+				},
+				"RepositoryName": {
+					"type": "string"
+				},
+				"SourceCommit": {
+					"type": "string"
+				},
+				"SourceReference": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"ApprovalRules": [{
+				"ApprovalRuleContent": "Test approval rule content",
+				"ApprovalRuleId": "123",
+				"ApprovalRuleName": "Test Approval Rule",
+				"CreationDate": "2023-03-30T12:00:00Z",
+				"LastModifiedDate": "2023-03-30T13:00:00Z",
+				"LastModifiedUser": "user123",
+				"OriginApprovalRuleTemplate": {
+					"ApprovalRuleTemplateId": "456",
+					"ApprovalRuleTemplateName": "Test Approval Rule Template"
+				},
+				"RuleContentSha256": "abcdef123456"
+			},
+			{
+				"ApprovalRuleContent": "Another approval rule",
+				"ApprovalRuleId": "789",
+				"ApprovalRuleName": "Another Approval Rule",
+				"CreationDate": "2023-03-29T12:00:00Z",
+				"LastModifiedDate": "2023-03-29T13:00:00Z",
+				"LastModifiedUser": "user456",
+				"OriginApprovalRuleTemplate": {
+					"ApprovalRuleTemplateId": "101112",
+					"ApprovalRuleTemplateName": "Another Approval Rule Template"
+				},
+				"RuleContentSha256": "xyz123456"
+			}
+		],
+		"AuthorArn": "arn:aws:iam::123456789012:user/testuser",
+		"ClientRequestToken": "1234567890",
+		"CreationDate": "2023-03-28T15:30:00Z",
+		"Description": "This is a test pull request",
+		"LastActivityDate": "2023-03-30T14:00:00Z",
+		"PullRequestId": "111",
+		"PullRequestStatus": "OPEN",
+		"PullRequestTargets": [{
+			"DestinationCommit": "commit123",
+			"DestinationReference": "refs/heads/main",
+			"MergeBase": "commit456",
+			"MergeMetadata": {
+				"IsMerged": true,
+				"MergeCommitId": "commit789",
+				"MergeOption": "FAST_FORWARD_MERGE",
+				"MergedBy": "user789"
+			},
+			"RepositoryName": "test-repo",
+			"SourceCommit": "commit012",
+			"SourceReference": "refs/heads/feature-branch"
+		}],
+		"RevisionId": "revision123",
+		"Title": "Test Pull Request"
+	}, {
+		"ApprovalRules": [],
+		"AuthorArn": "arn:aws:iam::123456789012:user/testuser",
+		"ClientRequestToken": "2345678901",
+		"CreationDate": "2023-03-29T10:00:00Z",
+		"Description": "Another test pull request",
+		"LastActivityDate": "2023-03-29T11:00:00Z",
+		"PullRequestId": "222",
+		"PullRequestStatus": "OPEN",
+		"PullRequestTargets": [{
+			"DestinationCommit": "commit789",
+			"DestinationReference": "refs/heads/develop",
+			"MergeBase": "commit012",
+			"MergeMetadata": null,
+			"RepositoryName": "test-repo",
+			"SourceCommit": "commit345",
+			"SourceReference": "refs/heads/feature-branch"
+		}],
+		"RevisionId": "revision456",
+		"Title": "Another Test Pull Request"
+	}]
 }

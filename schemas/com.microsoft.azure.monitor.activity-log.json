@@ -1,70 +1,101 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$ref": "#/definitions/Event",
-  "definitions": {
-    "Event": {
-      "required": [
-        "Data",
-        "PartitionKey",
-        "Properties",
-        "ID",
-        "SystemProperties"
-      ],
-      "properties": {
-        "Data": {
-          "type": "string"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "PartitionKey": {
-          "type": "string"
-        },
-        "Properties": {
-          "patternProperties": {
-            ".*": {
-              "additionalProperties": true,
-              "type": "object"
-            }
-          },
-          "type": "object"
-        },
-        "SystemProperties": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/SystemProperties"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "SystemProperties": {
-      "required": [
-        "SequenceNumber",
-        "EnqueuedTime",
-        "Offset",
-        "PartitionID",
-        "PartitionKey"
-      ],
-      "properties": {
-        "EnqueuedTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "Offset": {
-          "type": "integer"
-        },
-        "PartitionID": {
-          "type": "integer"
-        },
-        "PartitionKey": {
-          "type": "string"
-        },
-        "SequenceNumber": {
-          "type": "integer"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/Event",
+	"definitions": {
+		"Event": {
+			"required": [
+				"Data",
+				"PartitionKey",
+				"Properties",
+				"ID",
+				"SystemProperties"
+			],
+			"properties": {
+				"Data": {
+					"type": "string"
+				},
+				"ID": {
+					"type": "string"
+				},
+				"PartitionKey": {
+					"type": "string"
+				},
+				"Properties": {
+					"patternProperties": {
+						".*": {
+							"additionalProperties": true,
+							"type": "object"
+						}
+					},
+					"type": "object"
+				},
+				"SystemProperties": {
+					"$schema": "http://json-schema.org/draft-04/schema#",
+					"$ref": "#/definitions/SystemProperties"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"SystemProperties": {
+			"required": [
+				"SequenceNumber",
+				"EnqueuedTime",
+				"Offset",
+				"PartitionID",
+				"PartitionKey"
+			],
+			"properties": {
+				"EnqueuedTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"Offset": {
+					"type": "integer"
+				},
+				"PartitionID": {
+					"type": "integer"
+				},
+				"PartitionKey": {
+					"type": "string"
+				},
+				"SequenceNumber": {
+					"type": "integer"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"Data": "Hello world!",
+		"PartitionKey": "my-partition-key",
+		"Properties": {
+			"key1": "value1",
+			"key2": {
+				"nestedKey1": "nestedValue1",
+				"nestedKey2": 123
+			}
+		},
+		"ID": "123456",
+		"SystemProperties": {
+			"SequenceNumber": 123456,
+			"EnqueuedTime": "2023-03-30T12:34:56Z",
+			"Offset": 789,
+			"PartitionID": 1,
+			"PartitionKey": "my-partition-key"
+		}
+	}, {
+		"Data": "{\"name\": \"John\", \"age\": 30}",
+		"PartitionKey": "another-partition-key",
+		"Properties": {},
+		"ID": "789012",
+		"SystemProperties": {
+			"SequenceNumber": 789012,
+			"EnqueuedTime": "2023-03-30T12:45:00Z",
+			"Offset": 101112,
+			"PartitionID": 2,
+			"PartitionKey": "another-partition-key"
+		}
+	}]
 }

@@ -24,7 +24,10 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.microsoft.azure.iothub.message" }
+        { 
+          "type": "com.microsoft.azure.iothub.message",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.microsoft.azure.iothub.message.json"
+        }
       ]
 spec:
   group: sources.triggermesh.io

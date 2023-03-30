@@ -25,8 +25,8 @@ metadata:
     registry.knative.dev/eventTypes: |
       [
         {
-          "type": "com.amazon.logs.log",
-          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.logs.log.json",
+          "type": "com.amazon.cloudwatch.logs.log",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.cloudwatch.logs.log.json",
           "description": ""
         }
       ]

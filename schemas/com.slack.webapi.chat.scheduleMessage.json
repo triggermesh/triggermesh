@@ -1,0 +1,25 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"channel": {
+			"type": "string"
+		},
+		"text": {
+			"type": "string"
+		},
+		"post_at": {
+			"type": "integer"
+		}
+	},
+	"required": [
+		"channel",
+		"text",
+		"post_at"
+	],
+	"examples": [{
+		"channel": "C01112A09FT",
+		"text": "Hello from scheduled TriggerMesh!",
+		"post_at": 1593430770
+	}]
+}

@@ -1,0 +1,60 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"properties": {
+		"event": {
+			"properties": {
+				"createdDate": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"replayId": {
+					"type": "integer"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"schema": {
+			"type": "string"
+		},
+		"sobject": true,
+		"payload": true
+	},
+	"additionalProperties": false,
+	"type": "object",
+	"examples": [{
+		"event": {
+			"createdDate": "2022-06-01T12:00:00Z",
+			"replayId": 12345,
+			"type": "customer_created"
+		},
+		"schema": "v1",
+		"sobject": true,
+		"payload": {
+			"customerId": "123456789",
+			"name": "John Smith",
+			"email": "john.smith@example.com"
+		}
+	}, {
+		"event": {
+			"createdDate": "2022-06-01T13:00:00Z",
+			"replayId": 12346,
+			"type": "order_placed"
+		},
+		"schema": "v1",
+		"sobject": true,
+		"payload": {
+			"orderId": "987654321",
+			"customerId": "123456789",
+			"total": 49.99,
+			"items": [{
+				"name": "Widget",
+				"quantity": 2,
+				"price": 24.99
+			}]
+		}
+	}]
+}

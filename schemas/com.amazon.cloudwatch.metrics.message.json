@@ -18,5 +18,15 @@
       "additionalProperties": false,
       "type": "object"
     }
-  }
+  },
+  "examples": [
+    {
+      "Code": "500",
+      "Value": "Internal Server Error"
+    },
+    {
+      "Code": "200",
+      "Value": "OK"
+    }
+  ]
 }

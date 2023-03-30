@@ -1,180 +1,245 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "ticket": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "external_id": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string",
-          "format": "uri"
-        },
-        "description": {
-          "type": "string"
-        },
-        "via": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "priority": {
-          "type": "string"
-        },
-        "ticket_type": {
-          "type": "string"
-        },
-        "group_name": {
-          "type": "string"
-        },
-        "brand_name": {
-          "type": "string"
-        },
-        "due_date": {
-          "type": "string",
-          "format": "date"
-        },
-        "account": {
-          "type": "string"
-        },
-        "assignee": {
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "name": {
-            "type": "string"
-          },
-          "first_name": {
-            "type": "string"
-          },
-          "last_name": {
-            "type": "string"
-          }
-        },
-        "requester": {
-          "name": {
-            "type": "string"
-          },
-          "first_name": {
-            "type": "string"
-          },
-          "last_name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "language": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "external_id": {
-            "type": "string"
-          },
-          "field": {
-            "type": "string"
-          },
-          "details": {
-            "type": "string"
-          }
-        },
-        "organization": {
-          "name": {
-            "type": "string"
-          },
-          "external_id": {
-            "type": "string"
-          },
-          "details": {
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          }
-        },
-        "ccs": {
-          "type": "string"
-        },
-        "cc_names": {
-          "type": "string"
-        },
-        "tags": {
-          "type": "string"
-        },
-        "current_holiday_name": {
-          "type": "string"
-        },
-        "ticket_field_id": {
-          "type": "string"
-        },
-        "ticket_field_option_title_id": {
-          "type": "string"
-        }
-      }
-    },
-    "current_user": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "first_name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "organization": {
-          "name": {
-            "type": "string"
-          },
-          "notes": {
-            "type": "string"
-          },
-          "details": {
-            "type": "string"
-          }
-        },
-        "external_id": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "details": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        },
-        "language": {
-          "type": "string"
-        }
-      }
-    },
-    "satisfaction": {
-      "type": "object",
-      "properties": {
-        "current_rating": {
-          "type": "string"
-        },
-        "current_comment": {
-          "type": "string"
-        }
-      }
-    }
-  }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"ticket": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"external_id": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string",
+					"format": "uri"
+				},
+				"description": {
+					"type": "string"
+				},
+				"via": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"priority": {
+					"type": "string"
+				},
+				"ticket_type": {
+					"type": "string"
+				},
+				"group_name": {
+					"type": "string"
+				},
+				"brand_name": {
+					"type": "string"
+				},
+				"due_date": {
+					"type": "string",
+					"format": "date"
+				},
+				"account": {
+					"type": "string"
+				},
+				"assignee": {
+					"email": {
+						"type": "string",
+						"format": "email"
+					},
+					"name": {
+						"type": "string"
+					},
+					"first_name": {
+						"type": "string"
+					},
+					"last_name": {
+						"type": "string"
+					}
+				},
+				"requester": {
+					"name": {
+						"type": "string"
+					},
+					"first_name": {
+						"type": "string"
+					},
+					"last_name": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"language": {
+						"type": "string"
+					},
+					"phone": {
+						"type": "string"
+					},
+					"external_id": {
+						"type": "string"
+					},
+					"field": {
+						"type": "string"
+					},
+					"details": {
+						"type": "string"
+					}
+				},
+				"organization": {
+					"name": {
+						"type": "string"
+					},
+					"external_id": {
+						"type": "string"
+					},
+					"details": {
+						"type": "string"
+					},
+					"notes": {
+						"type": "string"
+					}
+				},
+				"ccs": {
+					"type": "string"
+				},
+				"cc_names": {
+					"type": "string"
+				},
+				"tags": {
+					"type": "string"
+				},
+				"current_holiday_name": {
+					"type": "string"
+				},
+				"ticket_field_id": {
+					"type": "string"
+				},
+				"ticket_field_option_title_id": {
+					"type": "string"
+				}
+			}
+		},
+		"current_user": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"first_name": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"organization": {
+					"name": {
+						"type": "string"
+					},
+					"notes": {
+						"type": "string"
+					},
+					"details": {
+						"type": "string"
+					}
+				},
+				"external_id": {
+					"type": "string"
+				},
+				"phone": {
+					"type": "string"
+				},
+				"details": {
+					"type": "string"
+				},
+				"notes": {
+					"type": "string"
+				},
+				"language": {
+					"type": "string"
+				}
+			}
+		},
+		"satisfaction": {
+			"type": "object",
+			"properties": {
+				"current_rating": {
+					"type": "string"
+				},
+				"current_comment": {
+					"type": "string"
+				}
+			}
+		}
+	},
+	"examples": [{
+		"ticket": {
+			"id": 123,
+			"external_id": "TKT-456",
+			"title": "Issue with logging in",
+			"url": "https://example.com/tickets/123",
+			"description": "I'm unable to log in to my account",
+			"via": "Web form",
+			"status": "Open",
+			"priority": "High",
+			"ticket_type": "Incident",
+			"group_name": "Support",
+			"brand_name": "Example",
+			"due_date": "2023-04-10",
+			"account": "example.com",
+			"assignee": {
+				"email": "jane@example.com",
+				"name": "Jane Doe",
+				"first_name": "Jane",
+				"last_name": "Doe"
+			},
+			"requester": {
+				"name": "John Smith",
+				"first_name": "John",
+				"last_name": "Smith",
+				"email": "john@example.com",
+				"language": "en",
+				"phone": "123-456-7890",
+				"external_id": "USR-789",
+				"field": "Account ID",
+				"details": "12345"
+			},
+			"organization": {
+				"name": "Example Inc.",
+				"external_id": "ORG-123",
+				"details": "Some details about the organization",
+				"notes": "Some notes about the organization"
+			},
+			"ccs": "jane@example.com, john@example.com",
+			"cc_names": "Jane Doe, John Smith",
+			"tags": "login, issue",
+			"current_holiday_name": "Easter",
+			"ticket_field_id": "1234",
+			"ticket_field_option_title_id": "5678"
+		},
+		"current_user": {
+			"name": "Joe Smith",
+			"first_name": "Joe",
+			"email": "joe@example.com",
+			"organization": {
+				"name": "Example Inc.",
+				"notes": "Some notes about the organization",
+				"details": "Some details about the organization"
+			},
+			"external_id": "USR-123",
+			"phone": "123-456-7890",
+			"details": "Some details about the user",
+			"notes": "Some notes about the user",
+			"language": "en"
+		},
+		"satisfaction": {
+			"current_rating": "Satisfied",
+			"current_comment": "The support team was very helpful and resolved my issue quickly."
+		}
+	}]
 }
