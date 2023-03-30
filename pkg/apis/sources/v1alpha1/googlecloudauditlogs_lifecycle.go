@@ -91,7 +91,7 @@ func (s *GoogleCloudAuditLogsSource) ServiceAccountOptions() []resource.ServiceA
 		saOpts = append(saOpts, v1alpha1.GcpServiceAccountAnnotation(*gcpSA))
 	}
 	if k8sSA := s.Spec.Auth.KubernetesServiceAccount; k8sSA != nil {
-		saOpts = append(saOpts, resource.SetServiceAccountName(*k8sSA))
+		saOpts = append(saOpts, v1alpha1.K8sServiceAccountName(*k8sSA))
 	}
 	return saOpts
 }

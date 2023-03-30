@@ -39,10 +39,3 @@ func NewServiceAccount(ns, name string, opts ...ObjectOption) *corev1.ServiceAcc
 
 	return sa
 }
-
-// SetServiceAccountName sets the name for the ServiceAccount object that will be created.
-func SetServiceAccountName(name string) ServiceAccountOption {
-	return func(sa *corev1.ServiceAccount) {
-		sa.SetName(name)
-	}
-}
