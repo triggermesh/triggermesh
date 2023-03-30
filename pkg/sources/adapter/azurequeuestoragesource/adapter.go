@@ -25,6 +25,7 @@ import (
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/rickb777/date/period"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
@@ -40,9 +41,10 @@ import (
 type envConfig struct {
 	pkgadapter.EnvConfig
 
-	AccountName string `envconfig:"AZURE_ACCOUNT_NAME"`
-	AccountKey  string `envconfig:"AZURE_ACCOUNT_KEY"`
-	QueueName   string `envconfig:"AZURE_QUEUE_NAME"`
+	AccountName       string `envconfig:"AZURE_ACCOUNT_NAME"`
+	AccountKey        string `envconfig:"AZURE_ACCOUNT_KEY"`
+	QueueName         string `envconfig:"AZURE_QUEUE_NAME"`
+	VisibilityTimeout string `envconfig:"AZURE_VISIBILITY_TIMEOUT" default:"PT20S"`
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -56,11 +58,12 @@ const (
 
 // adapter implements the source's adapter.
 type adapter struct {
-	messagesURL azqueue.MessagesURL
-	ceClient    cloudevents.Client
-	eventsource string
-	logger      *zap.SugaredLogger
-	mt          *pkgadapter.MetricTag
+	messagesURL       azqueue.MessagesURL
+	ceClient          cloudevents.Client
+	eventsource       string
+	visibilityTimeout *string
+	logger            *zap.SugaredLogger
+	mt                *pkgadapter.MetricTag
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
@@ -98,11 +101,12 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	messagesURL := queueURL.NewMessagesURL()
 
 	return &adapter{
-		messagesURL: messagesURL,
-		ceClient:    ceClient,
-		eventsource: queueURL.String(),
-		logger:      logger,
-		mt:          mt,
+		messagesURL:       messagesURL,
+		ceClient:          ceClient,
+		eventsource:       queueURL.String(),
+		visibilityTimeout: &env.VisibilityTimeout,
+		logger:            logger,
+		mt:                mt,
 	}
 }
 
@@ -145,7 +149,16 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 				msgIDURL := h.messagesURL.NewMessageIDURL(msg.ID)
 				popReceipt := msg.PopReceipt // This message's most-recent pop receipt
 
-				update, err := msgIDURL.Update(ctx, popReceipt, time.Second*20, msg.Text)
+				// Parse visibilityTimeout from ISO 8601 format
+				visibilityTimeoutDuration, err := period.Parse(*h.visibilityTimeout)
+				if err != nil {
+					h.logger.Errorw("Unable to parse visibilityTimeout", zap.Error(err))
+					return
+				}
+
+				// Convert visibilityTimeoutDuration to time.Duration
+				visibilityTimeout := visibilityTimeoutDuration.DurationApprox()
+				update, err := msgIDURL.Update(ctx, popReceipt, visibilityTimeout, msg.Text)
 				if err != nil {
 					h.logger.Errorw("Unable to update the message", zap.Error(err))
 					return

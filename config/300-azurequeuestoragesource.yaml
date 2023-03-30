@@ -76,6 +76,14 @@ spec:
                     required:
                     - name
                     - key
+              visibilityTimeout:
+                description: Specifies the new visibility timeout value, in seconds, relative to server time.
+                  The new value must be larger than or equal to 0, and can't be larger than 7 days.
+                  The visibility timeout of a message can't be set to a value later than the expiry time.
+                  You can update a message until it has been deleted or has expired. Default PT20S (20s)
+                  More information on Duration format - https://www.iso.org/iso-8601-date-and-time-format.html - https://en.wikipedia.org/wiki/ISO_8601
+                type: string
+                pattern: '^P(?:([0-6]D)?(?:T(?:([0-9]|1[0-9]|2[0-3])H)?(?:([0-5]?[0-9])M)?(?:([0-5]?[0-9]|60)S)?)?|7D)$'
               sink:
                 description: The destination of events sourced from Azure Storage.
                 type: object

@@ -2068,6 +2068,11 @@ func (in *AzureQueueStorageSourceSpec) DeepCopyInto(out *AzureQueueStorageSource
 	*out = *in
 	in.SourceSpec.DeepCopyInto(&out.SourceSpec)
 	in.AccountKey.DeepCopyInto(&out.AccountKey)
+	if in.VisibilityTimeout != nil {
+		in, out := &in.VisibilityTimeout, &out.VisibilityTimeout
+		*out = new(string)
+		**out = **in
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
