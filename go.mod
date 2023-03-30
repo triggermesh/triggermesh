@@ -60,6 +60,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.8.0
 	github.com/onsi/gomega v1.25.0
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
+	github.com/rickb777/date v1.13.0
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
 	github.com/stretchr/testify v1.8.2
@@ -197,7 +198,6 @@ require (
 	github.com/prometheus/prometheus v1.8.2-0.20210928085443-fafb309d4027 // indirect
 	github.com/prometheus/statsd_exporter v0.21.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
-	github.com/rickb777/date v1.13.0 // indirect
 	github.com/rickb777/plural v1.2.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect

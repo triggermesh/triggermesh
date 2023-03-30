@@ -61,7 +61,7 @@ type adapter struct {
 	messagesURL       azqueue.MessagesURL
 	ceClient          cloudevents.Client
 	eventsource       string
-	visibilityTimeout string
+	visibilityTimeout time.Duration
 	logger            *zap.SugaredLogger
 	mt                *pkgadapter.MetricTag
 }
@@ -100,11 +100,26 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	// This returns a MessagesURL object that wraps the queue's messages URL and a request pipeline (inherited from queueURL)
 	messagesURL := queueURL.NewMessagesURL()
 
+	// Parse visibilityTimeout from ISO 8601 format
+	visibilityTimeoutPeriod, err := period.Parse(env.VisibilityTimeout)
+	if err != nil {
+		logger.Fatal("Unable to parse visibilityTimeout: ", err)
+	}
+
+	// Convert visibilityTimeoutDuration to time.Duration
+	visibilityTimeoutDuration := visibilityTimeoutPeriod.DurationApprox()
+
+	// Check if visibilityTimeoutDuration is greater than 7 days
+	maxDuration := 7 * 24 * time.Hour
+	if visibilityTimeoutDuration > maxDuration {
+		logger.Fatal("visibilityTimeout cannot be greater than 7 days")
+	}
+
 	return &adapter{
 		messagesURL:       messagesURL,
 		ceClient:          ceClient,
 		eventsource:       queueURL.String(),
-		visibilityTimeout: env.VisibilityTimeout,
+		visibilityTimeout: visibilityTimeoutDuration,
 		logger:            logger,
 		mt:                mt,
 	}
@@ -149,16 +164,7 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 				msgIDURL := h.messagesURL.NewMessageIDURL(msg.ID)
 				popReceipt := msg.PopReceipt // This message's most-recent pop receipt
 
-				// Parse visibilityTimeout from ISO 8601 format
-				visibilityTimeoutDuration, err := period.Parse(h.visibilityTimeout)
-				if err != nil {
-					h.logger.Errorw("Unable to parse visibilityTimeout", zap.Error(err))
-					return
-				}
-
-				// Convert visibilityTimeoutDuration to time.Duration
-				visibilityTimeout := visibilityTimeoutDuration.DurationApprox()
-				update, err := msgIDURL.Update(ctx, popReceipt, visibilityTimeout, msg.Text)
+				update, err := msgIDURL.Update(ctx, popReceipt, h.visibilityTimeout, msg.Text)
 				if err != nil {
 					h.logger.Errorw("Unable to update the message", zap.Error(err))
 					return
