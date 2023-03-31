@@ -175,4 +175,7 @@ type GoogleCloudSourceAuth struct {
 	// GCP Service account for Workload Identity.
 	// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 	GCPServiceAccount *string `json:"gcpServiceAccount,omitempty"`
+
+	// Name of the kubernetes service account bound to the gcpServiceAccount to act as an IAM service account.
+	KubernetesServiceAccount *string `json:"kubernetesServiceAccount,omitempty"`
 }

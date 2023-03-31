@@ -55,7 +55,7 @@ func Container(c *corev1.Container) ObjectOption {
 }
 
 // ServiceAccount sets the ServiceAccount name of a PodSpecable.
-func ServiceAccount(sa string) ObjectOption {
+func ServiceAccount(sa *corev1.ServiceAccount) ObjectOption {
 	return func(object interface{}) {
 		var saName *string
 
@@ -66,7 +66,7 @@ func ServiceAccount(sa string) ObjectOption {
 			saName = &o.Spec.Template.Spec.ServiceAccountName
 		}
 
-		*saName = sa
+		*saName = sa.Name
 	}
 }
 

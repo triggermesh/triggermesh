@@ -31,3 +31,11 @@ func GcpServiceAccountAnnotation(gcpSA string) resource.ServiceAccountOption {
 		metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationGcpSA, gcpSA)
 	}
 }
+
+// K8sServiceAccountName returns a functional option that overwrites the
+// Kubernetes Service Account name.
+func K8sServiceAccountName(name string) resource.ServiceAccountOption {
+	return func(sa *corev1.ServiceAccount) {
+		sa.SetName(name)
+	}
+}
