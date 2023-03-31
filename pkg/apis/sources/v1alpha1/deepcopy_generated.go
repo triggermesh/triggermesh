@@ -2876,6 +2876,11 @@ func (in *GoogleCloudSourceAuth) DeepCopyInto(out *GoogleCloudSourceAuth) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.KubernetesServiceAccount != nil {
+		in, out := &in.KubernetesServiceAccount, &out.KubernetesServiceAccount
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 
