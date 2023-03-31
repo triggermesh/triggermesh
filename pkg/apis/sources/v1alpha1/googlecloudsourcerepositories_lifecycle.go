@@ -78,6 +78,9 @@ func (s *GoogleCloudSourceRepositoriesSource) ServiceAccountOptions() []resource
 	if gcpSA := s.Spec.Auth.GCPServiceAccount; gcpSA != nil {
 		saOpts = append(saOpts, v1alpha1.GcpServiceAccountAnnotation(*gcpSA))
 	}
+	if k8sSA := s.Spec.Auth.KubernetesServiceAccount; k8sSA != nil {
+		saOpts = append(saOpts, v1alpha1.K8sServiceAccountName(*k8sSA))
+	}
 	return saOpts
 }
 

@@ -146,7 +146,7 @@ func commonAdapterDeploymentOptions(rcl v1alpha1.Reconcilable) []resource.Object
 		resource.PodLabel(appPartOfLabel, partOf),
 		resource.PodLabel(appManagedByLabel, managedBy),
 
-		resource.ServiceAccount(ServiceAccountName(rcl)),
+		resource.ServiceAccount(serviceAccount(rcl)),
 
 		resource.EnvVar(envComponent, app),
 		resource.EnvVar(envSinkTimeout, strconv.FormatInt(int64(defaultSinkTimeout.Seconds()), 10)),
@@ -234,7 +234,7 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 		resource.PodLabel(appPartOfLabel, partOf),
 		resource.PodLabel(appManagedByLabel, managedBy),
 
-		resource.ServiceAccount(ServiceAccountName(rcl)),
+		resource.ServiceAccount(serviceAccount(rcl)),
 
 		resource.EnvVar(envComponent, app),
 		resource.EnvVar(envSinkTimeout, strconv.FormatInt(int64(defaultSinkTimeout.Seconds()), 10)),
@@ -258,13 +258,17 @@ func commonAdapterKnServiceOptions(rcl v1alpha1.Reconcilable) []resource.ObjectO
 	return objectOptions
 }
 
-// newServiceAccount returns a ServiceAccount object with its OwnerReferences
+// serviceAccount returns a ServiceAccount object with its OwnerReferences
 // metadata attribute populated from the given owners.
-func newServiceAccount(rcl v1alpha1.Reconcilable, owners []kmeta.OwnerRefable) *corev1.ServiceAccount {
-	return resource.NewServiceAccount(rcl.GetNamespace(), ServiceAccountName(rcl),
+func serviceAccount(rcl v1alpha1.Reconcilable, owners ...kmeta.OwnerRefable) *corev1.ServiceAccount {
+	sa := resource.NewServiceAccount(rcl.GetNamespace(), ServiceAccountName(rcl),
 		resource.Owners(owners...),
 		resource.Labels(CommonObjectLabels(rcl)),
 	)
+	for _, m := range serviceAccountMutations(rcl) {
+		m(sa)
+	}
+	return sa
 }
 
 // newConfigWatchRoleBinding returns a RoleBinding object that binds a ServiceAccount
