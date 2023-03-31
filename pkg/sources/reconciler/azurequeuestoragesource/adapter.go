@@ -57,7 +57,7 @@ func (r *Reconciler) BuildAdapter(src commonv1alpha1.Reconcilable, sinkURI *apis
 func MakeAppEnv(o *v1alpha1.AzureQueueStorageSource) []corev1.EnvVar {
 	storageQueueEnvs := common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, "AZURE_ACCOUNT_KEY", o.Spec.AccountKey)
 
-	return append(storageQueueEnvs, []corev1.EnvVar{
+	envs := append(storageQueueEnvs, []corev1.EnvVar{
 		{
 			Name:  "AZURE_ACCOUNT_NAME",
 			Value: o.Spec.AccountName,
@@ -65,6 +65,14 @@ func MakeAppEnv(o *v1alpha1.AzureQueueStorageSource) []corev1.EnvVar {
 			Name:  "AZURE_QUEUE_NAME",
 			Value: o.Spec.QueueName,
 		},
-	}...,
-	)
+	}...)
+
+	if o.Spec.VisibilityTimeout != nil {
+		envs = append(envs, corev1.EnvVar{
+			Name:  "AZURE_VISIBILITY_TIMEOUT",
+			Value: *o.Spec.VisibilityTimeout,
+		})
+	}
+
+	return envs
 }

@@ -40,9 +40,10 @@ import (
 type envConfig struct {
 	pkgadapter.EnvConfig
 
-	AccountName string `envconfig:"AZURE_ACCOUNT_NAME"`
-	AccountKey  string `envconfig:"AZURE_ACCOUNT_KEY"`
-	QueueName   string `envconfig:"AZURE_QUEUE_NAME"`
+	AccountName       string         `envconfig:"AZURE_ACCOUNT_NAME"`
+	AccountKey        string         `envconfig:"AZURE_ACCOUNT_KEY"`
+	QueueName         string         `envconfig:"AZURE_QUEUE_NAME"`
+	VisibilityTimeout *time.Duration `envconfig:"AZURE_VISIBILITY_TIMEOUT" default:"20s"`
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -56,11 +57,12 @@ const (
 
 // adapter implements the source's adapter.
 type adapter struct {
-	messagesURL azqueue.MessagesURL
-	ceClient    cloudevents.Client
-	eventsource string
-	logger      *zap.SugaredLogger
-	mt          *pkgadapter.MetricTag
+	messagesURL       azqueue.MessagesURL
+	ceClient          cloudevents.Client
+	eventsource       string
+	visibilityTimeout time.Duration
+	logger            *zap.SugaredLogger
+	mt                *pkgadapter.MetricTag
 }
 
 // NewAdapter satisfies pkgadapter.AdapterConstructor.
@@ -97,12 +99,19 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	// This returns a MessagesURL object that wraps the queue's messages URL and a request pipeline (inherited from queueURL)
 	messagesURL := queueURL.NewMessagesURL()
 
+	// Check if visibilityTimeout is greater than 7 days
+	maxDuration := 7 * 24 * time.Hour
+	if *env.VisibilityTimeout > maxDuration {
+		logger.Fatal("visibilityTimeout cannot be greater than 7 days")
+	}
+
 	return &adapter{
-		messagesURL: messagesURL,
-		ceClient:    ceClient,
-		eventsource: queueURL.String(),
-		logger:      logger,
-		mt:          mt,
+		messagesURL:       messagesURL,
+		ceClient:          ceClient,
+		eventsource:       queueURL.String(),
+		visibilityTimeout: *env.VisibilityTimeout,
+		logger:            logger,
+		mt:                mt,
 	}
 }
 
@@ -145,7 +154,7 @@ func (h *adapter) processQueueEvents(ctx context.Context, msgCh chan *azqueue.De
 				msgIDURL := h.messagesURL.NewMessageIDURL(msg.ID)
 				popReceipt := msg.PopReceipt // This message's most-recent pop receipt
 
-				update, err := msgIDURL.Update(ctx, popReceipt, time.Second*20, msg.Text)
+				update, err := msgIDURL.Update(ctx, popReceipt, h.visibilityTimeout, msg.Text)
 				if err != nil {
 					h.logger.Errorw("Unable to update the message", zap.Error(err))
 					return

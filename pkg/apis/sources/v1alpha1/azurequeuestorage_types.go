@@ -51,6 +51,8 @@ type AzureQueueStorageSourceSpec struct {
 	AccountName string                  `json:"accountName"`
 	QueueName   string                  `json:"queueName"`
 	AccountKey  v1alpha1.ValueFromField `json:"accountKey"`
+	// +optional
+	VisibilityTimeout *string `json:"visibilityTimeout,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional
