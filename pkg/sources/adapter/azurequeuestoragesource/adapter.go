@@ -25,7 +25,6 @@ import (
 	"go.uber.org/zap"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/rickb777/date/period"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
@@ -41,10 +40,10 @@ import (
 type envConfig struct {
 	pkgadapter.EnvConfig
 
-	AccountName       string `envconfig:"AZURE_ACCOUNT_NAME"`
-	AccountKey        string `envconfig:"AZURE_ACCOUNT_KEY"`
-	QueueName         string `envconfig:"AZURE_QUEUE_NAME"`
-	VisibilityTimeout string `envconfig:"AZURE_VISIBILITY_TIMEOUT" default:"PT20S"`
+	AccountName       string         `envconfig:"AZURE_ACCOUNT_NAME"`
+	AccountKey        string         `envconfig:"AZURE_ACCOUNT_KEY"`
+	QueueName         string         `envconfig:"AZURE_QUEUE_NAME"`
+	VisibilityTimeout *time.Duration `envconfig:"AZURE_VISIBILITY_TIMEOUT" default:"20s"`
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -100,18 +99,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	// This returns a MessagesURL object that wraps the queue's messages URL and a request pipeline (inherited from queueURL)
 	messagesURL := queueURL.NewMessagesURL()
 
-	// Parse visibilityTimeout from ISO 8601 format
-	visibilityTimeoutPeriod, err := period.Parse(env.VisibilityTimeout)
-	if err != nil {
-		logger.Fatal("Unable to parse visibilityTimeout: ", err)
-	}
-
-	// Convert visibilityTimeoutDuration to time.Duration
-	visibilityTimeoutDuration := visibilityTimeoutPeriod.DurationApprox()
-
-	// Check if visibilityTimeoutDuration is greater than 7 days
+	// Check if visibilityTimeout is greater than 7 days
 	maxDuration := 7 * 24 * time.Hour
-	if visibilityTimeoutDuration > maxDuration {
+	if *env.VisibilityTimeout > maxDuration {
 		logger.Fatal("visibilityTimeout cannot be greater than 7 days")
 	}
 
@@ -119,7 +109,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		messagesURL:       messagesURL,
 		ceClient:          ceClient,
 		eventsource:       queueURL.String(),
-		visibilityTimeout: visibilityTimeoutDuration,
+		visibilityTimeout: *env.VisibilityTimeout,
 		logger:            logger,
 		mt:                mt,
 	}
