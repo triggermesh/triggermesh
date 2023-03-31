@@ -76,6 +76,13 @@ spec:
                     required:
                     - name
                     - key
+              visibilityTimeout:
+                description: Specifies the new visibility timeout value, in seconds, relative to server time. The new value
+                  must be larger than or equal to 0, and can't be larger than 7 days. The visibility timeout of a message
+                  can't be set to a value later than the expiry time. You can update a message until it has been deleted or
+                  has expired. Expressed as a duration string, which format is documented at https://pkg.go.dev/time#ParseDuration.
+                  Default 20s.
+                type: string
               sink:
                 description: The destination of events sourced from Azure Storage.
                 type: object
