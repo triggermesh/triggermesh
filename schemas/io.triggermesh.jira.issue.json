@@ -1,0 +1,1237 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/andygrunwald/go-jira/issue",
+    "$ref": "#/$defs/Issue",
+    "$defs": {
+      "AffectsVersion": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "released": {
+            "type": "boolean"
+          },
+          "releaseDate": {
+            "type": "string"
+          },
+          "userReleaseDate": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "integer"
+          },
+          "startDate": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Attachment": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/$defs/User"
+          },
+          "created": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "AvatarUrls": {
+        "properties": {
+          "48x48": {
+            "type": "string"
+          },
+          "24x24": {
+            "type": "string"
+          },
+          "16x16": {
+            "type": "string"
+          },
+          "32x32": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Changelog": {
+        "properties": {
+          "histories": {
+            "items": {
+              "$ref": "#/$defs/ChangelogHistory"
+            },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "ChangelogHistory": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/$defs/User"
+          },
+          "created": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/ChangelogItems"
+            },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "author",
+          "created",
+          "items"
+        ]
+      },
+      "ChangelogItems": {
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "fieldtype": {
+            "type": "string"
+          },
+          "from": true,
+          "fromString": {
+            "type": "string"
+          },
+          "to": true,
+          "toString": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "field",
+          "fieldtype",
+          "from",
+          "fromString",
+          "to",
+          "toString"
+        ]
+      },
+      "Comment": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/$defs/User"
+          },
+          "body": {
+            "type": "string"
+          },
+          "updateAuthor": {
+            "$ref": "#/$defs/User"
+          },
+          "updated": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "visibility": {
+            "$ref": "#/$defs/CommentVisibility"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "CommentVisibility": {
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Comments": {
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/$defs/Comment"
+            },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Component": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Date": {
+        "properties": {},
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "EntityProperty": {
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": true
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "value"
+        ]
+      },
+      "Epic": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "key": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "key",
+          "self",
+          "name",
+          "summary",
+          "done"
+        ]
+      },
+      "FixVersion": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "released": {
+            "type": "boolean"
+          },
+          "releaseDate": {
+            "type": "string"
+          },
+          "userReleaseDate": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "integer"
+          },
+          "startDate": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Issue": {
+        "properties": {
+          "expand": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "fields": {
+            "$ref": "#/$defs/IssueFields"
+          },
+          "renderedFields": {
+            "$ref": "#/$defs/IssueRenderedFields"
+          },
+          "changelog": {
+            "$ref": "#/$defs/Changelog"
+          },
+          "transitions": {
+            "items": {
+              "$ref": "#/$defs/Transition"
+            },
+            "type": "array"
+          },
+          "names": {
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "IssueFields": {
+        "properties": {
+          "expand": {
+            "type": "string"
+          },
+          "issuetype": {
+            "$ref": "#/$defs/IssueType"
+          },
+          "project": {
+            "$ref": "#/$defs/Project"
+          },
+          "environment": {
+            "type": "string"
+          },
+          "resolution": {
+            "$ref": "#/$defs/Resolution"
+          },
+          "priority": {
+            "$ref": "#/$defs/Priority"
+          },
+          "resolutiondate": {
+            "$ref": "#/$defs/Time"
+          },
+          "created": {
+            "$ref": "#/$defs/Time"
+          },
+          "duedate": {
+            "$ref": "#/$defs/Date"
+          },
+          "watches": {
+            "$ref": "#/$defs/Watches"
+          },
+          "assignee": {
+            "$ref": "#/$defs/User"
+          },
+          "updated": {
+            "$ref": "#/$defs/Time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "Creator": {
+            "$ref": "#/$defs/User"
+          },
+          "reporter": {
+            "$ref": "#/$defs/User"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/$defs/Component"
+            },
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/$defs/Status"
+          },
+          "progress": {
+            "$ref": "#/$defs/Progress"
+          },
+          "aggregateprogress": {
+            "$ref": "#/$defs/Progress"
+          },
+          "timetracking": {
+            "$ref": "#/$defs/TimeTracking"
+          },
+          "timespent": {
+            "type": "integer"
+          },
+          "timeestimate": {
+            "type": "integer"
+          },
+          "timeoriginalestimate": {
+            "type": "integer"
+          },
+          "worklog": {
+            "$ref": "#/$defs/Worklog"
+          },
+          "issuelinks": {
+            "items": {
+              "$ref": "#/$defs/IssueLink"
+            },
+            "type": "array"
+          },
+          "comment": {
+            "$ref": "#/$defs/Comments"
+          },
+          "fixVersions": {
+            "items": {
+              "$ref": "#/$defs/FixVersion"
+            },
+            "type": "array"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/$defs/AffectsVersion"
+            },
+            "type": "array"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "subtasks": {
+            "items": {
+              "$ref": "#/$defs/Subtasks"
+            },
+            "type": "array"
+          },
+          "attachment": {
+            "items": {
+              "$ref": "#/$defs/Attachment"
+            },
+            "type": "array"
+          },
+          "epic": {
+            "$ref": "#/$defs/Epic"
+          },
+          "sprint": {
+            "$ref": "#/$defs/Sprint"
+          },
+          "parent": {
+            "$ref": "#/$defs/Parent"
+          },
+          "aggregatetimeoriginalestimate": {
+            "type": "integer"
+          },
+          "aggregatetimespent": {
+            "type": "integer"
+          },
+          "aggregatetimeestimate": {
+            "type": "integer"
+          },
+          "Unknowns": {
+            "$ref": "#/$defs/MarshalMap"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "Unknowns"
+        ]
+      },
+      "IssueLink": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/$defs/IssueLinkType"
+          },
+          "outwardIssue": {
+            "$ref": "#/$defs/Issue"
+          },
+          "inwardIssue": {
+            "$ref": "#/$defs/Issue"
+          },
+          "comment": {
+            "$ref": "#/$defs/Comment"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "type",
+          "outwardIssue",
+          "inwardIssue"
+        ]
+      },
+      "IssueLinkType": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "inward": {
+            "type": "string"
+          },
+          "outward": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "inward",
+          "outward"
+        ]
+      },
+      "IssueRenderedFields": {
+        "properties": {
+          "resolutiondate": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "duedate": {
+            "type": "string"
+          },
+          "updated": {
+            "type": "string"
+          },
+          "comment": {
+            "$ref": "#/$defs/Comments"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "IssueType": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subtask": {
+            "type": "boolean"
+          },
+          "avatarId": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "MarshalMap": {
+        "type": "object"
+      },
+      "Parent": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Priority": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "statusColor": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Progress": {
+        "properties": {
+          "progress": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "percent": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "progress",
+          "total",
+          "percent"
+        ]
+      },
+      "Project": {
+        "properties": {
+          "expand": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "lead": {
+            "$ref": "#/$defs/User"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/$defs/ProjectComponent"
+            },
+            "type": "array"
+          },
+          "issueTypes": {
+            "items": {
+              "$ref": "#/$defs/IssueType"
+            },
+            "type": "array"
+          },
+          "url": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "assigneeType": {
+            "type": "string"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/$defs/Version"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "roles": {
+            "patternProperties": {
+              ".*": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "avatarUrls": {
+            "$ref": "#/$defs/AvatarUrls"
+          },
+          "projectCategory": {
+            "$ref": "#/$defs/ProjectCategory"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "ProjectCategory": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "self",
+          "id",
+          "name",
+          "description"
+        ]
+      },
+      "ProjectComponent": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "lead": {
+            "$ref": "#/$defs/User"
+          },
+          "assigneeType": {
+            "type": "string"
+          },
+          "assignee": {
+            "$ref": "#/$defs/User"
+          },
+          "realAssigneeType": {
+            "type": "string"
+          },
+          "realAssignee": {
+            "$ref": "#/$defs/User"
+          },
+          "isAssigneeTypeValid": {
+            "type": "boolean"
+          },
+          "project": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "self",
+          "id",
+          "name",
+          "description",
+          "assigneeType",
+          "assignee",
+          "realAssigneeType",
+          "realAssignee",
+          "isAssigneeTypeValid",
+          "project",
+          "projectId"
+        ]
+      },
+      "Resolution": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "self",
+          "id",
+          "description",
+          "name"
+        ]
+      },
+      "Sprint": {
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "completeDate": {
+            "$ref": "#/$defs/Time"
+          },
+          "endDate": {
+            "$ref": "#/$defs/Time"
+          },
+          "startDate": {
+            "$ref": "#/$defs/Time"
+          },
+          "originBoardId": {
+            "type": "integer"
+          },
+          "self": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "completeDate",
+          "endDate",
+          "startDate",
+          "originBoardId",
+          "self",
+          "state"
+        ]
+      },
+      "Status": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "iconUrl": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "statusCategory": {
+            "$ref": "#/$defs/StatusCategory"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "self",
+          "description",
+          "iconUrl",
+          "name",
+          "id",
+          "statusCategory"
+        ]
+      },
+      "StatusCategory": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "colorName": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "self",
+          "id",
+          "name",
+          "key",
+          "colorName"
+        ]
+      },
+      "Subtasks": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "self": {
+            "type": "string"
+          },
+          "fields": {
+            "$ref": "#/$defs/IssueFields"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "key",
+          "self",
+          "fields"
+        ]
+      },
+      "Time": {
+        "properties": {},
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "TimeTracking": {
+        "properties": {
+          "originalEstimate": {
+            "type": "string"
+          },
+          "remainingEstimate": {
+            "type": "string"
+          },
+          "timeSpent": {
+            "type": "string"
+          },
+          "originalEstimateSeconds": {
+            "type": "integer"
+          },
+          "remainingEstimateSeconds": {
+            "type": "integer"
+          },
+          "timeSpentSeconds": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Transition": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "to": {
+            "$ref": "#/$defs/Status"
+          },
+          "fields": {
+            "patternProperties": {
+              ".*": {
+                "$ref": "#/$defs/TransitionField"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "to",
+          "fields"
+        ]
+      },
+      "TransitionField": {
+        "properties": {
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "required"
+        ]
+      },
+      "User": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "accountType": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "emailAddress": {
+            "type": "string"
+          },
+          "avatarUrls": {
+            "$ref": "#/$defs/AvatarUrls"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "string"
+          },
+          "applicationKeys": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Version": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "archived": {
+            "type": "boolean"
+          },
+          "released": {
+            "type": "boolean"
+          },
+          "releaseDate": {
+            "type": "string"
+          },
+          "userReleaseDate": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "integer"
+          },
+          "startDate": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Watcher": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "accountId": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Watches": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "watchCount": {
+            "type": "integer"
+          },
+          "isWatching": {
+            "type": "boolean"
+          },
+          "watchers": {
+            "items": {
+              "$ref": "#/$defs/Watcher"
+            },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "Worklog": {
+        "properties": {
+          "startAt": {
+            "type": "integer"
+          },
+          "maxResults": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "worklogs": {
+            "items": {
+              "$ref": "#/$defs/WorklogRecord"
+            },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "startAt",
+          "maxResults",
+          "total",
+          "worklogs"
+        ]
+      },
+      "WorklogRecord": {
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/$defs/User"
+          },
+          "updateAuthor": {
+            "$ref": "#/$defs/User"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "created": {
+            "$ref": "#/$defs/Time"
+          },
+          "updated": {
+            "$ref": "#/$defs/Time"
+          },
+          "started": {
+            "$ref": "#/$defs/Time"
+          },
+          "timeSpent": {
+            "type": "string"
+          },
+          "timeSpentSeconds": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "issueId": {
+            "type": "string"
+          },
+          "properties": {
+            "items": {
+              "$ref": "#/$defs/EntityProperty"
+            },
+            "type": "array"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      }
+    }
+  }
+  

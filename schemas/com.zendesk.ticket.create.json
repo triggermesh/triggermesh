@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/TicketComment",
+	"$defs": {
+		"TicketComment": {
+			"properties": {
+				"subject": {
+					"type": "string"
+				},
+				"body": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"subject": "Can't access my account",
+		"body": "I've been trying to log in to my account but keep getting an error message. Can someone please help?"
+	}]
+}

@@ -1,0 +1,54 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/EventPayload",
+	"$defs": {
+		"EventPayload": {
+			"properties": {
+				"collection": {
+					"type": "string"
+				},
+				"document": {
+					"type": "string"
+				},
+				"data": {
+					"type": "object"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"collection",
+				"document",
+				"data"
+			]
+		}
+	},
+	"examples": [{
+			"collection": "users",
+			"document": "123",
+			"data": {
+				"name": "John Doe",
+				"email": "johndoe@example.com",
+				"age": 30
+			}
+		},
+		{
+			"collection": "products",
+			"document": "ABC123",
+			"data": {
+				"name": "Widget",
+				"description": "A high-quality widget",
+				"price": 19.99
+			}
+		},
+		{
+			"collection": "orders",
+			"document": "XYZ789",
+			"data": {
+				"customer_id": "456",
+				"product_id": "ABC123",
+				"quantity": 2
+			}
+		}
+	]
+}

@@ -1,0 +1,27 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/aws/aws-sdk-go/service/sns/publish-output",
+	"$ref": "#/$defs/PublishOutput",
+	"$defs": {
+		"PublishOutput": {
+			"properties": {
+				"MessageId": {
+					"type": "string"
+				},
+				"SequenceNumber": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"MessageId",
+				"SequenceNumber"
+			]
+		}
+	},
+	"examples": [{
+		"MessageId": "b4f7c4a9-9a7e-4062-a003-7c8db12a75a7",
+		"SequenceNumber": "1234567890"
+	}]
+}

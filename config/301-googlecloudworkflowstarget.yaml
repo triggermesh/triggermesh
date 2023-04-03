@@ -23,7 +23,10 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.trigermesh.google.workflows.run" }
+        {
+          "type": "io.trigermesh.google.workflows.run",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.trigermesh.google.workflows.run.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

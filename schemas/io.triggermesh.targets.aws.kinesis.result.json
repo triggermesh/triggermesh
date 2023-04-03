@@ -1,0 +1,36 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/aws/aws-sdk-go/service/kinesis/put-record-output",
+	"$ref": "#/$defs/PutRecordOutput",
+	"$defs": {
+		"PutRecordOutput": {
+			"properties": {
+				"EncryptionType": {
+					"type": "string"
+				},
+				"SequenceNumber": {
+					"type": "string"
+				},
+				"ShardId": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"EncryptionType",
+				"SequenceNumber",
+				"ShardId"
+			]
+		}
+	},
+	"examples": [{
+		"EncryptionType": "AES256",
+		"SequenceNumber": "49545115243490985018280067714973144582180062593244200961",
+		"ShardId": "shardId-000000000001"
+	}, {
+		"EncryptionType": "NONE",
+		"SequenceNumber": "49545115243490985018280067714973144582180062593244200962",
+		"ShardId": "shardId-000000000002"
+	}]
+}

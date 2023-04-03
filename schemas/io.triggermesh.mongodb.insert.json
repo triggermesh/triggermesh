@@ -1,0 +1,55 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/InsertPayload",
+	"$defs": {
+		"InsertPayload": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"collection": {
+					"type": "string"
+				},
+				"key": {
+					"type": "string"
+				},
+				"document": true
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"database",
+				"collection",
+				"key",
+				"document"
+			]
+		}
+	},
+	"examples": [{
+		"database": "mydb",
+		"collection": "users",
+		"key": "user123",
+		"document": {
+			"name": "John Doe",
+			"email": "jdoe@example.com",
+			"age": 35
+		}
+	}, {
+		"database": "mydb",
+		"collection": "orders",
+		"key": "order789",
+		"document": {
+			"customer": "user123",
+			"items": [{
+					"product": "product456",
+					"quantity": 2
+				},
+				{
+					"product": "product789",
+					"quantity": 1
+				}
+			],
+			"total": 29.97
+		}
+	}]
+}

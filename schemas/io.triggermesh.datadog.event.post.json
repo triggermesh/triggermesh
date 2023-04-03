@@ -1,0 +1,89 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/EventData",
+	"$defs": {
+		"EventData": {
+			"properties": {
+				"alert_type": {
+					"type": "string"
+				},
+				"date_happened": {
+					"type": "integer"
+				},
+				"device_name": {
+					"type": "string"
+				},
+				"host": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"priority": {
+					"type": "string"
+				},
+				"related_event_id": {
+					"type": "integer"
+				},
+				"source_type_name": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"tags": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"text": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"text",
+				"title"
+			]
+		}
+	},
+	"examples": [{
+			"alert_type": "warning",
+			"date_happened": 1649131200,
+			"device_name": "web-server-1",
+			"host": "example.com",
+			"id": 12345,
+			"priority": "low",
+			"related_event_id": 67890,
+			"source_type_name": "server",
+			"status": "resolved",
+			"tags": ["web-server", "security"],
+			"text": "High CPU usage detected on web-server-1",
+			"title": "CPU Alert",
+			"url": "https://example.com/alerts/12345"
+		},
+		{
+			"alert_type": "error",
+			"date_happened": 1649139000,
+			"device_name": "database-1",
+			"host": "example.com",
+			"id": 67890,
+			"priority": "high",
+			"related_event_id": 0,
+			"source_type_name": "database",
+			"status": "triggered",
+			"tags": ["database", "performance"],
+			"text": "Database connection timed out on database-1",
+			"title": "Database Connection Failure",
+			"url": "https://example.com/alerts/67890"
+		}
+	]
+}

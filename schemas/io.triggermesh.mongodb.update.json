@@ -1,0 +1,55 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/UpdatePayload",
+	"$defs": {
+		"UpdatePayload": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"collection": {
+					"type": "string"
+				},
+				"searchKey": {
+					"type": "string"
+				},
+				"searchValue": {
+					"type": "string"
+				},
+				"updateKey": {
+					"type": "string"
+				},
+				"updateValue": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"database",
+				"collection",
+				"searchKey",
+				"searchValue",
+				"updateKey",
+				"updateValue"
+			]
+		}
+	},
+	"examples": [{
+			"database": "my_db",
+			"collection": "users",
+			"searchKey": "id",
+			"searchValue": "1234",
+			"updateKey": "name",
+			"updateValue": "John Doe"
+		},
+		{
+			"database": "sales_db",
+			"collection": "orders",
+			"searchKey": "order_id",
+			"searchValue": "ORD-123",
+			"updateKey": "status",
+			"updateValue": "Shipped"
+		}
+	]
+}

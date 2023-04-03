@@ -66,7 +66,7 @@ func TwilioSourceName(namespace, name string) string {
 
 // Supported event types.
 const (
-	TwilioSourceGenericEventType = "com.triggermesh.twilio.sms"
+	TwilioSourceGenericEventType = "com.twilio.sms"
 )
 
 // GetEventTypes implements EventSource.
