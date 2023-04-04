@@ -1,0 +1,41 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/SMSMessage",
+	"$defs": {
+		"SMSMessage": {
+			"properties": {
+				"message": {
+					"type": "string"
+				},
+				"media_urls": {
+					"items": {
+						"type": "string",
+						"format": "uri"
+					},
+					"type": "array"
+				},
+				"from": {
+					"type": "string"
+				},
+				"to": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"message": "Don't forget our meeting at 2 pm today!",
+		"from": "+1555555555",
+		"to": "+1444444444"
+	}, {
+		"message": "Hello, this is a test SMS message!",
+		"media_urls": [
+			"https://example.com/image1.jpg",
+			"https://example.com/image2.jpg"
+		],
+		"from": "+1234567890",
+		"to": "+1987654321"
+	}]
+}

@@ -22,7 +22,10 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.azure.sentinel.incident" }
+        {
+          "type": "io.triggermesh.azure.sentinel.incident",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.azure.sentinel.incident.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

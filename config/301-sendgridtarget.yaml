@@ -23,7 +23,10 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.sendgrid.email.send" }
+        {
+          "type": "io.triggermesh.sendgrid.email.send",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.sendgrid.email.send.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

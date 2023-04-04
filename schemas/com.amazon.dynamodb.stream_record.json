@@ -1,184 +1,252 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$ref": "#/definitions/Record",
-  "definitions": {
-    "AttributeValue": {
-      "required": [
-        "B",
-        "BOOL",
-        "BS",
-        "L",
-        "M",
-        "N",
-        "NS",
-        "NULL",
-        "S",
-        "SS"
-      ],
-      "properties": {
-        "B": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          }
-        },
-        "BOOL": {
-          "type": "boolean"
-        },
-        "BS": {
-          "items": {
-            "type": "string",
-            "media": {
-              "binaryEncoding": "base64"
-            }
-          },
-          "type": "array"
-        },
-        "L": {
-          "items": {
-            "$ref": "#/definitions/AttributeValue"
-          },
-          "type": "array"
-        },
-        "M": {
-          "patternProperties": {
-            ".*": {
-              "$ref": "#/definitions/AttributeValue"
-            }
-          },
-          "type": "object"
-        },
-        "N": {
-          "type": "string"
-        },
-        "NS": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "NULL": {
-          "type": "boolean"
-        },
-        "S": {
-          "type": "string"
-        },
-        "SS": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "Identity": {
-      "required": [
-        "PrincipalId",
-        "Type"
-      ],
-      "properties": {
-        "PrincipalId": {
-          "type": "string"
-        },
-        "Type": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "Record": {
-      "required": [
-        "AwsRegion",
-        "Dynamodb",
-        "EventID",
-        "EventName",
-        "EventSource",
-        "EventVersion",
-        "UserIdentity"
-      ],
-      "properties": {
-        "AwsRegion": {
-          "type": "string"
-        },
-        "Dynamodb": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/StreamRecord"
-        },
-        "EventID": {
-          "type": "string"
-        },
-        "EventName": {
-          "type": "string"
-        },
-        "EventSource": {
-          "type": "string"
-        },
-        "EventVersion": {
-          "type": "string"
-        },
-        "UserIdentity": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/Identity"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "StreamRecord": {
-      "required": [
-        "ApproximateCreationDateTime",
-        "Keys",
-        "NewImage",
-        "OldImage",
-        "SequenceNumber",
-        "SizeBytes",
-        "StreamViewType"
-      ],
-      "properties": {
-        "ApproximateCreationDateTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "Keys": {
-          "patternProperties": {
-            ".*": {
-              "$schema": "http://json-schema.org/draft-04/schema#",
-              "$ref": "#/definitions/AttributeValue"
-            }
-          },
-          "type": "object"
-        },
-        "NewImage": {
-          "patternProperties": {
-            ".*": {
-              "$ref": "#/definitions/AttributeValue"
-            }
-          },
-          "type": "object"
-        },
-        "OldImage": {
-          "patternProperties": {
-            ".*": {
-              "$ref": "#/definitions/AttributeValue"
-            }
-          },
-          "type": "object"
-        },
-        "SequenceNumber": {
-          "type": "string"
-        },
-        "SizeBytes": {
-          "type": "integer"
-        },
-        "StreamViewType": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/Record",
+	"definitions": {
+		"AttributeValue": {
+			"required": [
+				"B",
+				"BOOL",
+				"BS",
+				"L",
+				"M",
+				"N",
+				"NS",
+				"NULL",
+				"S",
+				"SS"
+			],
+			"properties": {
+				"B": {
+					"type": "string",
+					"media": {
+						"binaryEncoding": "base64"
+					}
+				},
+				"BOOL": {
+					"type": "boolean"
+				},
+				"BS": {
+					"items": {
+						"type": "string",
+						"media": {
+							"binaryEncoding": "base64"
+						}
+					},
+					"type": "array"
+				},
+				"L": {
+					"items": {
+						"$ref": "#/definitions/AttributeValue"
+					},
+					"type": "array"
+				},
+				"M": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/definitions/AttributeValue"
+						}
+					},
+					"type": "object"
+				},
+				"N": {
+					"type": "string"
+				},
+				"NS": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"NULL": {
+					"type": "boolean"
+				},
+				"S": {
+					"type": "string"
+				},
+				"SS": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"Identity": {
+			"required": [
+				"PrincipalId",
+				"Type"
+			],
+			"properties": {
+				"PrincipalId": {
+					"type": "string"
+				},
+				"Type": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"Record": {
+			"required": [
+				"AwsRegion",
+				"Dynamodb",
+				"EventID",
+				"EventName",
+				"EventSource",
+				"EventVersion",
+				"UserIdentity"
+			],
+			"properties": {
+				"AwsRegion": {
+					"type": "string"
+				},
+				"Dynamodb": {
+					"$schema": "http://json-schema.org/draft-04/schema#",
+					"$ref": "#/definitions/StreamRecord"
+				},
+				"EventID": {
+					"type": "string"
+				},
+				"EventName": {
+					"type": "string"
+				},
+				"EventSource": {
+					"type": "string"
+				},
+				"EventVersion": {
+					"type": "string"
+				},
+				"UserIdentity": {
+					"$schema": "http://json-schema.org/draft-04/schema#",
+					"$ref": "#/definitions/Identity"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"StreamRecord": {
+			"required": [
+				"ApproximateCreationDateTime",
+				"Keys",
+				"NewImage",
+				"OldImage",
+				"SequenceNumber",
+				"SizeBytes",
+				"StreamViewType"
+			],
+			"properties": {
+				"ApproximateCreationDateTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"Keys": {
+					"patternProperties": {
+						".*": {
+							"$schema": "http://json-schema.org/draft-04/schema#",
+							"$ref": "#/definitions/AttributeValue"
+						}
+					},
+					"type": "object"
+				},
+				"NewImage": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/definitions/AttributeValue"
+						}
+					},
+					"type": "object"
+				},
+				"OldImage": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/definitions/AttributeValue"
+						}
+					},
+					"type": "object"
+				},
+				"SequenceNumber": {
+					"type": "string"
+				},
+				"SizeBytes": {
+					"type": "integer"
+				},
+				"StreamViewType": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"AwsRegion": "us-west-2",
+		"EventID": "1234567890",
+		"EventName": "INSERT",
+		"EventSource": "aws:dynamodb",
+		"EventVersion": "1.0",
+		"UserIdentity": {
+			"PrincipalId": "user123",
+			"Type": "Service"
+		},
+		"Dynamodb": {
+			"ApproximateCreationDateTime": "2023-03-30T12:00:00Z",
+			"Keys": {
+				"id": {
+					"N": "123"
+				}
+			},
+			"NewImage": {
+				"id": {
+					"N": "123"
+				},
+				"enabled": {
+					"BOOL": true
+				}
+			},
+			"OldImage": null,
+			"SequenceNumber": "12345678901234567890",
+			"SizeBytes": 100,
+			"StreamViewType": "NEW_IMAGE"
+		}
+	}, {
+		"AwsRegion": "us-west-2",
+		"EventID": "0987654321",
+		"EventName": "MODIFY",
+		"EventSource": "aws:dynamodb",
+		"EventVersion": "1.0",
+		"UserIdentity": {
+			"PrincipalId": "user456",
+			"Type": "Service"
+		},
+		"Dynamodb": {
+			"ApproximateCreationDateTime": "2023-03-29T12:00:00Z",
+			"Keys": {
+				"id": {
+					"N": "456"
+				}
+			},
+			"NewImage": {
+				"id": {
+					"N": "456"
+				},
+				"colors": {
+					"SS": ["red", "green", "blue"]
+				}
+			},
+			"OldImage": {
+				"id": {
+					"N": "456"
+				},
+				"colors": {
+					"SS": ["red", "green"]
+				}
+			},
+			"SequenceNumber": "09876543210987654321",
+			"SizeBytes": 200,
+			"StreamViewType": "NEW_AND_OLD_IMAGES"
+		}
+	}]
 }

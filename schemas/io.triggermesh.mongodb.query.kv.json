@@ -1,0 +1,41 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/QueryPayload",
+	"$defs": {
+		"QueryPayload": {
+			"properties": {
+				"database": {
+					"type": "string"
+				},
+				"collection": {
+					"type": "string"
+				},
+				"key": {
+					"type": "string"
+				},
+				"value": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"database",
+				"collection",
+				"key",
+				"value"
+			]
+		}
+	},
+	"examples": [{
+		"database": "mydb",
+		"collection": "users",
+		"key": "age",
+		"value": "35"
+	}, {
+		"database": "mydb",
+		"collection": "products",
+		"key": "price",
+		"value": "<10"
+	}]
+}

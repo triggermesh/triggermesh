@@ -1,0 +1,85 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/IssueGetRequest",
+	"$defs": {
+		"GetQueryOptions": {
+			"properties": {
+				"Fields": {
+					"type": "string"
+				},
+				"Expand": {
+					"type": "string"
+				},
+				"Properties": {
+					"type": "string"
+				},
+				"FieldsByKeys": {
+					"type": "boolean"
+				},
+				"UpdateHistory": {
+					"type": "boolean"
+				},
+				"ProjectKeys": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"Fields",
+				"Expand",
+				"Properties",
+				"FieldsByKeys",
+				"UpdateHistory",
+				"ProjectKeys"
+			]
+		},
+		"IssueGetRequest": {
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"options": {
+					"$ref": "#/$defs/GetQueryOptions"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"id",
+				"options"
+			]
+		}
+	},
+	"examples": [{
+		"id": "1234",
+		"options": {
+			"Fields": "*",
+			"Expand": "*",
+			"Properties": "*",
+			"FieldsByKeys": false,
+			"UpdateHistory": false,
+			"ProjectKeys": ""
+		}
+	}, {
+		"id": "5678",
+		"options": {
+			"Fields": "summary,description",
+			"Expand": "",
+			"Properties": "",
+			"FieldsByKeys": false,
+			"UpdateHistory": false,
+			"ProjectKeys": ""
+		}
+	}, {
+		"id": "9012",
+		"options": {
+			"Fields": "*",
+			"Expand": "projects",
+			"Properties": "",
+			"FieldsByKeys": false,
+			"UpdateHistory": false,
+			"ProjectKeys": ""
+		}
+	}]
+}

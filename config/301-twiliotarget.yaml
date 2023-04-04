@@ -23,7 +23,10 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.twilio.sms.send" }
+        {
+          "type": "io.triggermesh.twilio.sms.send",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.twilio.sms.send.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

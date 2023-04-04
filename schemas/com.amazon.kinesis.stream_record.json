@@ -1,38 +1,45 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$ref": "#/definitions/Record",
-  "definitions": {
-    "Record": {
-      "required": [
-        "ApproximateArrivalTimestamp",
-        "Data",
-        "EncryptionType",
-        "PartitionKey",
-        "SequenceNumber"
-      ],
-      "properties": {
-        "ApproximateArrivalTimestamp": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "Data": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          }
-        },
-        "EncryptionType": {
-          "type": "string"
-        },
-        "PartitionKey": {
-          "type": "string"
-        },
-        "SequenceNumber": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/Record",
+	"definitions": {
+		"Record": {
+			"required": [
+				"ApproximateArrivalTimestamp",
+				"Data",
+				"EncryptionType",
+				"PartitionKey",
+				"SequenceNumber"
+			],
+			"properties": {
+				"ApproximateArrivalTimestamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"Data": {
+					"type": "string",
+					"media": {
+						"binaryEncoding": "base64"
+					}
+				},
+				"EncryptionType": {
+					"type": "string"
+				},
+				"PartitionKey": {
+					"type": "string"
+				},
+				"SequenceNumber": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"ApproximateArrivalTimestamp": "2022-02-01T10:30:00Z",
+		"Data": "SGVsbG8gV29ybGQh",
+		"EncryptionType": "AES-256",
+		"PartitionKey": "my-partition-key",
+		"SequenceNumber": "1234567890"
+	}]
 }

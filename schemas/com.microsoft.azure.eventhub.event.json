@@ -1,0 +1,81 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/Azure/azure-event-hubs-go/event",
+	"$ref": "#/$defs/Event",
+	"$defs": {
+		"Event": {
+			"properties": {
+				"Data": {
+					"type": "string",
+					"contentEncoding": "base64"
+				},
+				"PartitionKey": {
+					"type": "string"
+				},
+				"Properties": {
+					"type": "object"
+				},
+				"ID": {
+					"type": "string"
+				},
+				"SystemProperties": {
+					"$ref": "#/$defs/SystemProperties"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"Data",
+				"PartitionKey",
+				"Properties",
+				"ID",
+				"SystemProperties"
+			]
+		},
+		"SystemProperties": {
+			"properties": {
+				"SequenceNumber": {
+					"type": "integer"
+				},
+				"EnqueuedTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"Offset": {
+					"type": "integer"
+				},
+				"PartitionID": {
+					"type": "integer"
+				},
+				"PartitionKey": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"SequenceNumber",
+				"EnqueuedTime",
+				"Offset",
+				"PartitionID",
+				"PartitionKey"
+			]
+		}
+	},
+	"examples": [{
+		"Data": "SGVsbG8gV29ybGQ=",
+		"PartitionKey": "my_partition_key",
+		"Properties": {
+			"key1": "value1",
+			"key2": "value2"
+		},
+		"ID": "my_event_id",
+		"SystemProperties": {
+			"SequenceNumber": 123,
+			"EnqueuedTime": "2022-03-30T09:12:34Z",
+			"Offset": 456,
+			"PartitionID": 0,
+			"PartitionKey": "my_partition_key"
+		}
+	}]
+}

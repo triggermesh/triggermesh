@@ -1,0 +1,63 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/Azure/azure-storage-queue-go/azqueue/dequeued-message",
+	"$ref": "#/$defs/DequeuedMessage",
+	"$defs": {
+		"DequeuedMessage": {
+			"properties": {
+				"ID": {
+					"type": "string"
+				},
+				"InsertionTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"ExpirationTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"PopReceipt": {
+					"type": "string"
+				},
+				"NextVisibleTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"DequeueCount": {
+					"type": "integer"
+				},
+				"Text": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"ID",
+				"InsertionTime",
+				"ExpirationTime",
+				"PopReceipt",
+				"NextVisibleTime",
+				"DequeueCount",
+				"Text"
+			]
+		}
+	},
+	"examples": [{
+		"ID": "message-1",
+		"InsertionTime": "2023-03-30T10:00:00Z",
+		"ExpirationTime": "2023-03-30T11:00:00Z",
+		"PopReceipt": "pop-receipt-1",
+		"NextVisibleTime": "2023-03-30T11:05:00Z",
+		"DequeueCount": 2,
+		"Text": "This is message 1"
+	}, {
+		"ID": "message-2",
+		"InsertionTime": "2023-03-30T10:30:00Z",
+		"ExpirationTime": "2023-03-30T11:30:00Z",
+		"PopReceipt": "pop-receipt-2",
+		"NextVisibleTime": "2023-03-30T11:35:00Z",
+		"DequeueCount": 1,
+		"Text": "This is message 2"
+	}]
+}

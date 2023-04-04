@@ -29,9 +29,12 @@ import (
 
 // Accepted event types
 const (
-	// EventTypeSlackAPI represents any type of Slack API method.
-	// https://api.slack.com/methods
-	EventTypeSlackAPI = "com.slack.webapi.*"
+	// EventTypeSlackPostMessage represents Post message Slack API request.
+	EventTypeSlackPostMessage = "com.slack.webapi.chat.postMessage"
+	// EventTypeSlackScheduleMessage represents Schedule message Slack API request.
+	EventTypeSlackScheduleMessage = "com.slack.webapi.chat.scheduleMessage"
+	// EventTypeSlackUpdateMessage represents Update message Slack API request.
+	EventTypeSlackUpdateMessage = "com.slack.webapi.chat.update"
 )
 
 // GetGroupVersionKind implements kmeta.OwnerRefable.
@@ -60,7 +63,9 @@ func (t *SlackTarget) GetStatusManager() *v1alpha1.StatusManager {
 // AcceptedEventTypes implements IntegrationTarget.
 func (*SlackTarget) AcceptedEventTypes() []string {
 	return []string{
-		EventTypeSlackAPI,
+		EventTypeSlackPostMessage,
+		EventTypeSlackScheduleMessage,
+		EventTypeSlackUpdateMessage,
 	}
 }
 

@@ -1,0 +1,26 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/event",
+	"$defs": {
+		"event": {
+			"properties": {
+				"metric": {
+					"type": "string"
+				},
+				"value": {
+					"type": "number"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"metric",
+				"value"
+			]
+		}
+	},
+	"examples": [{
+		"metric": "latency",
+		"value": 25.3
+	}]
+}

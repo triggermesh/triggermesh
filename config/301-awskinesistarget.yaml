@@ -27,7 +27,10 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.targets.aws.kinesis.result" }
+        {
+          "type": "io.triggermesh.targets.aws.kinesis.result",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.targets.aws.kinesis.result.json"
+        }
       ]
 spec:
   group: targets.triggermesh.io

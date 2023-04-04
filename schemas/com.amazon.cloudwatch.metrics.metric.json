@@ -1,65 +1,117 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$ref": "#/definitions/MetricDataResult",
-  "definitions": {
-    "MessageData": {
-      "required": [
-        "Code",
-        "Value"
-      ],
-      "properties": {
-        "Code": {
-          "type": "string"
-        },
-        "Value": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "MetricDataResult": {
-      "required": [
-        "Id",
-        "Label",
-        "Messages",
-        "StatusCode",
-        "Timestamps",
-        "Values"
-      ],
-      "properties": {
-        "Id": {
-          "type": "string"
-        },
-        "Label": {
-          "type": "string"
-        },
-        "Messages": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/MessageData"
-          },
-          "type": "array"
-        },
-        "StatusCode": {
-          "type": "string"
-        },
-        "Timestamps": {
-          "items": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "type": "array"
-        },
-        "Values": {
-          "items": {
-            "type": "number"
-          },
-          "type": "array"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/MetricDataResult",
+	"definitions": {
+		"MessageData": {
+			"required": [
+				"Code",
+				"Value"
+			],
+			"properties": {
+				"Code": {
+					"type": "string"
+				},
+				"Value": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"MetricDataResult": {
+			"required": [
+				"Id",
+				"Label",
+				"Messages",
+				"StatusCode",
+				"Timestamps",
+				"Values"
+			],
+			"properties": {
+				"Id": {
+					"type": "string"
+				},
+				"Label": {
+					"type": "string"
+				},
+				"Messages": {
+					"items": {
+						"$schema": "http://json-schema.org/draft-04/schema#",
+						"$ref": "#/definitions/MessageData"
+					},
+					"type": "array"
+				},
+				"StatusCode": {
+					"type": "string"
+				},
+				"Timestamps": {
+					"items": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"type": "array"
+				},
+				"Values": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"Id": "metric_1",
+		"Label": "Number of users",
+		"Messages": [{
+			"Code": "SUCCESS",
+			"Value": "The metric was retrieved successfully."
+		}],
+		"StatusCode": "200",
+		"Timestamps": [
+			"2022-03-29T10:00:00Z",
+			"2022-03-29T11:00:00Z",
+			"2022-03-29T12:00:00Z"
+		],
+		"Values": [
+			100,
+			150,
+			200
+		]
+	}, {
+		"Id": "metric_2",
+		"Label": "CPU usage",
+		"Messages": [{
+			"Code": "ERROR",
+			"Value": "The metric could not be retrieved."
+		}],
+		"StatusCode": "500",
+		"Timestamps": [
+			"2022-03-29T10:00:00Z",
+			"2022-03-29T11:00:00Z",
+			"2022-03-29T12:00:00Z"
+		],
+		"Values": [
+			70,
+			null,
+			80
+		]
+	}, {
+		"Id": "metric_3",
+		"Label": "Response time",
+		"Messages": [],
+		"StatusCode": "200",
+		"Timestamps": [
+			"2022-03-29T10:00:00Z",
+			"2022-03-29T11:00:00Z",
+			"2022-03-29T12:00:00Z"
+		],
+		"Values": [
+			100,
+			150,
+			200
+		]
+	}]
 }

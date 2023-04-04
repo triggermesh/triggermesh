@@ -1,0 +1,46 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/Response",
+	"$defs": {
+		"Response": {
+			"properties": {
+				"positive": {
+					"type": "number"
+				},
+				"negative": {
+					"type": "number"
+				},
+				"mixed": {
+					"type": "number"
+				},
+				"result": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"positive",
+				"negative",
+				"mixed",
+				"result"
+			]
+		}
+	},
+	"examples": [{
+		"positive": 8,
+		"negative": 2,
+		"mixed": 0,
+		"result": "The product was very good."
+	}, {
+		"positive": 0,
+		"negative": 1,
+		"mixed": 4,
+		"result": "The movie had mixed reviews."
+	}, {
+		"positive": 20,
+		"negative": 0,
+		"mixed": 0,
+		"result": "The event was a huge success!"
+	}]
+}

@@ -23,13 +23,25 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.jira.issue.create" },
-        { "type": "io.triggermesh.jira.issue.get" },
-        { "type": "io.triggermesh.jira.custom" }
+        {
+          "type": "io.triggermesh.jira.issue.create",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.jira.issue.create.json"
+        },
+        {
+          "type": "io.triggermesh.jira.issue.get",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.jira.issue.get.json"
+        },
+        {
+          "type": "io.triggermesh.jira.custom",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.jira.custom.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.jira.issue" },
+        {
+          "type": "io.triggermesh.jira.issue",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.jira.issue.json"
+        },
         { "type": "io.triggermesh.jira.custom.response" }
       ]
 spec:
