@@ -24,7 +24,7 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { 
+        {
           "type": "com.salesforce.stream.message",
           "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.salesforce.stream.message.json"
         }

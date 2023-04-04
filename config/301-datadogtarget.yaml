@@ -26,7 +26,7 @@ metadata:
         {
           "type": "io.triggermesh.datadog.metric.submit",
           "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.datadog.metric.submit.json"
-        },{ 
+        },{
           "type": "io.triggermesh.datadog.event.post",
           "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.datadog.event.post.json"
         },{

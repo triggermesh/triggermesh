@@ -27,7 +27,7 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
-        { 
+        {
           "type": "io.triggermesh.targets.aws.comprehend.result",
           "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.targets.aws.comprehend.result.json"
         }
