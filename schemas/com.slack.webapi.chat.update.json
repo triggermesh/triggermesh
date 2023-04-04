@@ -1,0 +1,25 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"channel": {
+			"type": "string"
+		},
+		"text": {
+			"type": "string"
+		},
+		"ts": {
+			"type": "string"
+		}
+	},
+	"required": [
+		"channel",
+		"text",
+		"ts"
+	],
+	"examples": [{
+		"channel": "C01112A09FT",
+		"text": "Hello from updated TriggerMesh!",
+		"ts": "1593430770.001300"
+	}]
+}

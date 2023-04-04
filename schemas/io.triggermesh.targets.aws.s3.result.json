@@ -1,0 +1,87 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/aws/aws-sdk-go/service/s3/put-object-output",
+	"$ref": "#/$defs/PutObjectOutput",
+	"$defs": {
+		"PutObjectOutput": {
+			"properties": {
+				"BucketKeyEnabled": {
+					"type": "boolean"
+				},
+				"ChecksumCRC32": {
+					"type": "string"
+				},
+				"ChecksumCRC32C": {
+					"type": "string"
+				},
+				"ChecksumSHA1": {
+					"type": "string"
+				},
+				"ChecksumSHA256": {
+					"type": "string"
+				},
+				"ETag": {
+					"type": "string"
+				},
+				"Expiration": {
+					"type": "string"
+				},
+				"RequestCharged": {
+					"type": "string"
+				},
+				"SSECustomerAlgorithm": {
+					"type": "string"
+				},
+				"SSECustomerKeyMD5": {
+					"type": "string"
+				},
+				"SSEKMSEncryptionContext": {
+					"type": "string"
+				},
+				"SSEKMSKeyId": {
+					"type": "string"
+				},
+				"ServerSideEncryption": {
+					"type": "string"
+				},
+				"VersionId": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"BucketKeyEnabled",
+				"ChecksumCRC32",
+				"ChecksumCRC32C",
+				"ChecksumSHA1",
+				"ChecksumSHA256",
+				"ETag",
+				"Expiration",
+				"RequestCharged",
+				"SSECustomerAlgorithm",
+				"SSECustomerKeyMD5",
+				"SSEKMSEncryptionContext",
+				"SSEKMSKeyId",
+				"ServerSideEncryption",
+				"VersionId"
+			]
+		}
+	},
+	"examples": [{
+		"BucketKeyEnabled": true,
+		"ChecksumCRC32": "ABCD1234",
+		"ChecksumCRC32C": "EFGH5678",
+		"ChecksumSHA1": "ijklmnop",
+		"ChecksumSHA256": "qrstuvwxyz",
+		"ETag": "etag1234",
+		"Expiration": "2024-04-03T12:00:00Z",
+		"RequestCharged": "requestCharged",
+		"SSECustomerAlgorithm": "SSECustomerAlgorithm",
+		"SSECustomerKeyMD5": "SSECustomerKeyMD5",
+		"SSEKMSEncryptionContext": "SSEKMSEncryptionContext",
+		"SSEKMSKeyId": "SSEKMSKeyId",
+		"ServerSideEncryption": "AES256",
+		"VersionId": "versionId1234"
+	}]
+}

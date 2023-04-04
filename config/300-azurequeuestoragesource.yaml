@@ -24,7 +24,10 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.microsoft.azure.queuestorage" }
+        {
+          "type": "com.microsoft.azure.queuestorage",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.microsoft.azure.queuestorage.json"
+        }
       ]
 spec:
   group: sources.triggermesh.io

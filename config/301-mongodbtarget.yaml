@@ -31,9 +31,18 @@ metadata:
       ]
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type":  "io.triggermesh.mongodb.insert" },
-        { "type":  "io.triggermesh.mongodb.query.kv" },
-        { "type":  "io.triggermesh.mongodb.update" },
+        {
+          "type": "io.triggermesh.mongodb.insert",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.mongodb.insert.json"
+        },
+        {
+          "type": "io.triggermesh.mongodb.query.kv",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.mongodb.query.kv.json"
+        },
+        {
+          "type": "io.triggermesh.mongodb.update",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.mongodb.update.json"
+        },
         { "type": "*" }
       ]
 spec:

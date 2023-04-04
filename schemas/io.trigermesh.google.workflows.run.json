@@ -1,0 +1,33 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/RunJobEvent",
+	"$defs": {
+		"RunJobEvent": {
+			"properties": {
+				"parent": {
+					"type": "string"
+				},
+				"executionName": {
+					"type": "string"
+				},
+				"argument": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"parent",
+				"executionName"
+			]
+		}
+	},
+	"examples": [{
+		"parent": "123",
+		"executionName": "job-1"
+	}, {
+		"parent": "456",
+		"executionName": "job-2",
+		"argument": "--verbose"
+	}]
+}

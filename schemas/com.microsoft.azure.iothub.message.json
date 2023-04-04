@@ -1,0 +1,118 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/amenzhinsky/iothub/iotservice/event",
+	"$ref": "#/$defs/Event",
+	"$defs": {
+		"ConnectionAuthMethod": {
+			"properties": {
+				"scope": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"issuer": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"scope",
+				"type",
+				"issuer"
+			]
+		},
+		"Event": {
+			"properties": {
+				"MessageId": {
+					"type": "string"
+				},
+				"To": {
+					"type": "string"
+				},
+				"ExpiryTimeUtc": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"EnqueuedTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"CorrelationId": {
+					"type": "string"
+				},
+				"UserId": {
+					"type": "string"
+				},
+				"ConnectionDeviceId": {
+					"type": "string"
+				},
+				"ConnectionDeviceGenerationId": {
+					"type": "string"
+				},
+				"ConnectionAuthMethod": {
+					"$ref": "#/$defs/ConnectionAuthMethod"
+				},
+				"MessageSource": {
+					"type": "string"
+				},
+				"Payload": {
+					"type": "string",
+					"contentEncoding": "base64"
+				},
+				"Properties": {
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"MessageId": "123",
+		"To": "device1",
+		"ExpiryTimeUtc": "2023-04-01T00:00:00Z",
+		"EnqueuedTime": "2023-03-30T08:00:00Z",
+		"CorrelationId": "456",
+		"UserId": "user1",
+		"ConnectionDeviceId": "device1",
+		"ConnectionDeviceGenerationId": "gen1",
+		"ConnectionAuthMethod": {
+			"scope": "scope1",
+			"type": "type1",
+			"issuer": "issuer1"
+		},
+		"MessageSource": "source1",
+		"Payload": "c29tZSBwYXlsb2Fk",
+		"Properties": {
+			"key1": "value1",
+			"key2": "value2"
+		}
+	}, {
+		"MessageId": "789",
+		"To": "device2",
+		"ExpiryTimeUtc": "2023-04-02T00:00:00Z",
+		"EnqueuedTime": "2023-03-31T08:00:00Z",
+		"CorrelationId": "012",
+		"UserId": "user2",
+		"ConnectionDeviceId": "device2",
+		"ConnectionDeviceGenerationId": "gen2",
+		"ConnectionAuthMethod": {
+			"scope": "scope2",
+			"type": "type2",
+			"issuer": "issuer2"
+		},
+		"MessageSource": "source2",
+		"Payload": "aW5zdGFsbCBwYXlsb2Fk",
+		"Properties": {
+			"key3": "value3",
+			"key4": "value4"
+		}
+	}]
+}

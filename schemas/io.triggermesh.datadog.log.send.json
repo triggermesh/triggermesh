@@ -1,0 +1,47 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/LogData",
+	"$defs": {
+		"LogData": {
+			"properties": {
+				"ddsource": {
+					"type": "string"
+				},
+				"ddtags": {
+					"type": "string"
+				},
+				"hostname": {
+					"type": "string"
+				},
+				"message": {
+					"type": "string"
+				},
+				"service": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"ddsource",
+				"ddtags",
+				"hostname",
+				"message",
+				"service"
+			]
+		}
+	},
+	"examples": [{
+		"ddsource": "application_logs",
+		"ddtags": "env:prod,app:web",
+		"hostname": "webserver01",
+		"message": "Application started successfully",
+		"service": "mywebapp"
+	}, {
+		"ddsource": "system_logs",
+		"ddtags": "env:staging,app:api",
+		"hostname": "apiserver01",
+		"message": "CPU usage spiked to 90%",
+		"service": "myapi"
+	}]
+}

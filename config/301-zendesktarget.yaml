@@ -23,8 +23,14 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "com.zendesk.ticket.create" },
-        { "type": "com.zendesk.ticket.tag.add" }
+        {
+          "type": "com.zendesk.ticket.create",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.zendesk.ticket.create.json"
+        },
+        {
+          "type": "com.zendesk.ticket.tag.add",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.zendesk.ticket.tag.add.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

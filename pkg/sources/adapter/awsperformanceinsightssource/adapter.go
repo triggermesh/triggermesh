@@ -210,8 +210,7 @@ func (a *adapter) PollMetrics(ctx context.Context, priorTime time.Time, currentT
 				event.SetType(v1alpha1.AWSPerformanceInsightsGenericEventType)
 				event.SetSource(a.arn.String())
 				event.SetExtension("pimetric", d.Key.Metric)
-				ceer := event.SetData(cloudevents.ApplicationJSON, e)
-				if ceer != nil {
+				if err := event.SetData(cloudevents.ApplicationJSON, e); err != nil {
 					a.logger.Errorw("Failed to set event data", zap.Error(err))
 					return
 				}

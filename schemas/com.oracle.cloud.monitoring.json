@@ -1,84 +1,173 @@
 {
-  "items": {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "$ref": "#/definitions/MetricData"
-  },
-  "type": "array",
-  "definitions": {
-    "AggregatedDatapoint": {
-      "required": [
-        "timestamp",
-        "value"
-      ],
-      "properties": {
-        "timestamp": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/SDKTime"
-        },
-        "value": {
-          "type": "number"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "MetricData": {
-      "required": [
-        "namespace",
-        "compartmentId",
-        "name",
-        "dimensions",
-        "aggregatedDatapoints",
-        "resourceGroup",
-        "metadata",
-        "resolution"
-      ],
-      "properties": {
-        "aggregatedDatapoints": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/AggregatedDatapoint"
-          },
-          "type": "array"
-        },
-        "compartmentId": {
-          "type": "string"
-        },
-        "dimensions": {
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
-        "metadata": {
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
-        "name": {
-          "type": "string"
-        },
-        "namespace": {
-          "type": "string"
-        },
-        "resolution": {
-          "type": "string"
-        },
-        "resourceGroup": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "SDKTime": {
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"items": {
+		"$schema": "http://json-schema.org/draft-04/schema#",
+		"$ref": "#/definitions/MetricData"
+	},
+	"type": "array",
+	"definitions": {
+		"AggregatedDatapoint": {
+			"required": [
+				"timestamp",
+				"value"
+			],
+			"properties": {
+				"timestamp": {
+					"$schema": "http://json-schema.org/draft-04/schema#",
+					"$ref": "#/definitions/SDKTime"
+				},
+				"value": {
+					"type": "number"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"MetricData": {
+			"required": [
+				"namespace",
+				"compartmentId",
+				"name",
+				"dimensions",
+				"aggregatedDatapoints",
+				"resourceGroup",
+				"metadata",
+				"resolution"
+			],
+			"properties": {
+				"aggregatedDatapoints": {
+					"items": {
+						"$schema": "http://json-schema.org/draft-04/schema#",
+						"$ref": "#/definitions/AggregatedDatapoint"
+					},
+					"type": "array"
+				},
+				"compartmentId": {
+					"type": "string"
+				},
+				"dimensions": {
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				},
+				"metadata": {
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				},
+				"name": {
+					"type": "string"
+				},
+				"namespace": {
+					"type": "string"
+				},
+				"resolution": {
+					"type": "string"
+				},
+				"resourceGroup": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"SDKTime": {
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [
+		[{
+			"namespace": "aws/ec2",
+			"compartmentId": "compartment-1234",
+			"name": "CPUUtilization",
+			"dimensions": {
+				"InstanceID": "i-0abcdef1234567890",
+				"Region": "us-west-2"
+			},
+			"aggregatedDatapoints": [{
+				"timestamp": {
+					"epochSeconds": 1648713600,
+					"nanoSeconds": 0
+				},
+				"value": 75.2
+			}, {
+				"timestamp": {
+					"epochSeconds": 1648713660,
+					"nanoSeconds": 0
+				},
+				"value": 73.8
+			}],
+			"resourceGroup": "resource-group-1234",
+			"metadata": {
+				"Description": "CPU utilization of EC2 instance",
+				"Owner": "John Doe"
+			},
+			"resolution": "1m"
+		}],
+		[{
+				"namespace": "aws/s3",
+				"compartmentId": "compartment-5678",
+				"name": "BucketSizeBytes",
+				"dimensions": {
+					"BucketName": "my-bucket",
+					"Region": "us-east-1"
+				},
+				"aggregatedDatapoints": [{
+					"timestamp": {
+						"epochSeconds": 1648713600,
+						"nanoSeconds": 0
+					},
+					"value": 1024
+				}, {
+					"timestamp": {
+						"epochSeconds": 1648713660,
+						"nanoSeconds": 0
+					},
+					"value": 2048
+				}],
+				"resourceGroup": "resource-group-5678",
+				"metadata": {
+					"Description": "Size of S3 bucket in bytes",
+					"Owner": "Jane Smith"
+				},
+				"resolution": "5m"
+			},
+			{
+				"namespace": "aws/s3",
+				"compartmentId": "compartment-5678",
+				"name": "NumberOfObjects",
+				"dimensions": {
+					"BucketName": "my-bucket",
+					"Region": "us-east-1"
+				},
+				"aggregatedDatapoints": [{
+						"timestamp": {
+							"epochSeconds": 1648713600,
+							"nanoSeconds": 0
+						},
+						"value": 1000
+					},
+					{
+						"timestamp": {
+							"epochSeconds": 1648713660,
+							"nanoSeconds": 0
+						},
+						"value": 1050
+					}
+				],
+				"resourceGroup": "resource-group-5678",
+				"metadata": {
+					"Description": "Number of objects in S3 bucket",
+					"Owner": "Jane Smith"
+				},
+				"resolution": "5m"
+			}
+		]
+	]
 }

@@ -1,0 +1,131 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/Message",
+	"definitions": {
+		"Message": {
+			"required": [
+				"message_sid",
+				"sms_status",
+				"from_country",
+				"num_segments",
+				"to_zip",
+				"num_meda",
+				"account_sid",
+				"sms_message_sid",
+				"api_version",
+				"to_country",
+				"to_city",
+				"from_zip",
+				"sms_sid",
+				"from_state",
+				"body",
+				"from",
+				"from_city",
+				"to",
+				"to_state"
+			],
+			"properties": {
+				"account_sid": {
+					"type": "string"
+				},
+				"api_version": {
+					"type": "string"
+				},
+				"body": {
+					"type": "string"
+				},
+				"from": {
+					"type": "string"
+				},
+				"from_city": {
+					"type": "string"
+				},
+				"from_country": {
+					"type": "string"
+				},
+				"from_state": {
+					"type": "string"
+				},
+				"from_zip": {
+					"type": "string"
+				},
+				"message_sid": {
+					"type": "string"
+				},
+				"num_meda": {
+					"type": "string"
+				},
+				"num_segments": {
+					"type": "string"
+				},
+				"sms_message_sid": {
+					"type": "string"
+				},
+				"sms_sid": {
+					"type": "string"
+				},
+				"sms_status": {
+					"type": "string"
+				},
+				"to": {
+					"type": "string"
+				},
+				"to_city": {
+					"type": "string"
+				},
+				"to_country": {
+					"type": "string"
+				},
+				"to_state": {
+					"type": "string"
+				},
+				"to_zip": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"message_sid": "MS123456789",
+		"sms_status": "sent",
+		"from_country": "US",
+		"num_segments": "1",
+		"to_zip": "90210",
+		"num_meda": "0",
+		"account_sid": "AC123456789",
+		"sms_message_sid": "SM123456789",
+		"api_version": "2010-04-01",
+		"to_country": "CA",
+		"to_city": "Toronto",
+		"from_zip": "94107",
+		"sms_sid": "SM123456789",
+		"from_state": "CA",
+		"body": "Hello, this is a test message!",
+		"from": "+14155552671",
+		"from_city": "San Francisco",
+		"to": "+14155552672",
+		"to_state": "ON"
+	}, {
+		"message_sid": "MS987654321",
+		"sms_status": "delivered",
+		"from_country": "GB",
+		"num_segments": "1",
+		"to_zip": "SW1A 2AA",
+		"num_meda": "0",
+		"account_sid": "AC987654321",
+		"sms_message_sid": "SM987654321",
+		"api_version": "2010-04-01",
+		"to_country": "GB",
+		"to_city": "London",
+		"from_zip": "W1D 5LB",
+		"sms_sid": "SM987654321",
+		"from_state": "",
+		"body": "Hey, how's it going?",
+		"from": "+447700900000",
+		"from_city": "London",
+		"to": "+447700900001",
+		"to_state": ""
+	}]
+}

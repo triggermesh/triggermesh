@@ -25,8 +25,8 @@ metadata:
     registry.knative.dev/eventTypes: |
       [
         {
-          "type": "com.triggermesh.twilio.sms",
-          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.triggermesh.twilio.sms.json",
+          "type": "com.twilio.sms",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.twilio.sms.json",
           "description": ""
         }
       ]

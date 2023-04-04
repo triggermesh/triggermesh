@@ -23,7 +23,18 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "com.slack.webapi.*" }
+        {
+          "type": "com.slack.webapi.chat.postMessage",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.slack.webapi.chat.postMessage.json"
+        },
+        {
+          "type": "com.slack.webapi.chat.scheduleMessage",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.slack.webapi.chat.scheduleMessage.json"
+        },
+        {
+          "type": "com.slack.webapi.chat.update",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.slack.webapi.chat.update.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

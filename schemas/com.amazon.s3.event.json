@@ -1,203 +1,284 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/MessageData",
-  "definitions": {
-    "MessageData": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "eventVersion": {
-          "type": "string"
-        },
-        "eventSource": {
-          "type": "string"
-        },
-        "awsRegion": {
-          "type": "string"
-        },
-        "eventTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "eventName": {
-          "type": "string"
-        },
-        "userIdentity": {
-          "$ref": "#/definitions/userIdentity"
-        },
-        "requestParameters": {
-          "$ref": "#/definitions/requestParameters"
-        },
-        "responseElements": {
-          "$ref": "#/definitions/responseElements"
-        },
-        "s3": {
-          "$ref": "#/definitions/s3"
-        },
-        "glacierEventData": {
-          "$ref": "#/definitions/glacierEventData"
-        }
-      },
-      "required": [
-        "eventVersion",
-        "eventSource",
-        "awsRegion",
-        "eventTime",
-        "eventName",
-        "userIdentity",
-        "requestParameters",
-        "responseElements",
-        "s3"
-      ]
-    },
-    "userIdentity": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "principalId": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "principalId"
-      ]
-    },
-    "requestParameters": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "sourceIPAddress": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "sourceIPAddress"
-      ]
-    },
-    "responseElements": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "x-amz-request-id": {
-          "type": "string"
-        },
-        "x-amz-id-2": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "x-amz-request-id",
-        "x-amz-id-2"
-      ]
-    },
-    "s3": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "s3SchemaVersion": {
-          "type": "string"
-        },
-        "configurationId": {
-          "type": "string"
-        },
-        "bucket": {
-          "$ref": "#/definitions/s3_bucket"
-        },
-        "object": {
-          "$ref": "#/definitions/s3_object"
-        }
-      },
-      "required": [
-        "s3SchemaVersion",
-        "configurationId",
-        "bucket",
-        "object"
-      ]
-    },
-    "s3_bucket": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "ownerIdentity": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "principalId": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "principalId"
-          ]
-        },
-        "arn": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "ownerIdentity",
-        "arn"
-      ]
-    },
-    "s3_object": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "size": {
-          "type": "integer"
-        },
-        "eTag": {
-          "type": "string"
-        },
-        "versionId": {
-          "type": "string"
-        },
-        "sequencer": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "key",
-        "size",
-        "eTag",
-        "sequencer"
-      ]
-    },
-    "glacierEventData": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "restoreEventData": {
-          "$ref": "#/definitions/glacierEventData_restoreEventData"
-        }
-      },
-      "required": [
-        "restoreEventData"
-      ]
-    },
-    "glacierEventData_restoreEventData": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "lifecycleRestorationExpiryTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "lifecycleRestoreStorageClass": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "lifecycleRestorationExpiryTime",
-        "lifecycleRestoreStorageClass"
-      ]
-    }
-  }
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$ref": "#/definitions/MessageData",
+	"definitions": {
+		"MessageData": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"eventVersion": {
+					"type": "string"
+				},
+				"eventSource": {
+					"type": "string"
+				},
+				"awsRegion": {
+					"type": "string"
+				},
+				"eventTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"eventName": {
+					"type": "string"
+				},
+				"userIdentity": {
+					"$ref": "#/definitions/userIdentity"
+				},
+				"requestParameters": {
+					"$ref": "#/definitions/requestParameters"
+				},
+				"responseElements": {
+					"$ref": "#/definitions/responseElements"
+				},
+				"s3": {
+					"$ref": "#/definitions/s3"
+				},
+				"glacierEventData": {
+					"$ref": "#/definitions/glacierEventData"
+				}
+			},
+			"required": [
+				"eventVersion",
+				"eventSource",
+				"awsRegion",
+				"eventTime",
+				"eventName",
+				"userIdentity",
+				"requestParameters",
+				"responseElements",
+				"s3"
+			]
+		},
+		"userIdentity": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"principalId": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"principalId"
+			]
+		},
+		"requestParameters": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"sourceIPAddress": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"sourceIPAddress"
+			]
+		},
+		"responseElements": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"x-amz-request-id": {
+					"type": "string"
+				},
+				"x-amz-id-2": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"x-amz-request-id",
+				"x-amz-id-2"
+			]
+		},
+		"s3": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"s3SchemaVersion": {
+					"type": "string"
+				},
+				"configurationId": {
+					"type": "string"
+				},
+				"bucket": {
+					"$ref": "#/definitions/s3_bucket"
+				},
+				"object": {
+					"$ref": "#/definitions/s3_object"
+				}
+			},
+			"required": [
+				"s3SchemaVersion",
+				"configurationId",
+				"bucket",
+				"object"
+			]
+		},
+		"s3_bucket": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"ownerIdentity": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"principalId": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"principalId"
+					]
+				},
+				"arn": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"ownerIdentity",
+				"arn"
+			]
+		},
+		"s3_object": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"key": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"eTag": {
+					"type": "string"
+				},
+				"versionId": {
+					"type": "string"
+				},
+				"sequencer": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"key",
+				"size",
+				"eTag",
+				"sequencer"
+			]
+		},
+		"glacierEventData": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"restoreEventData": {
+					"$ref": "#/definitions/glacierEventData_restoreEventData"
+				}
+			},
+			"required": [
+				"restoreEventData"
+			]
+		},
+		"glacierEventData_restoreEventData": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"lifecycleRestorationExpiryTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"lifecycleRestoreStorageClass": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"lifecycleRestorationExpiryTime",
+				"lifecycleRestoreStorageClass"
+			]
+		}
+	},
+	"examples": [{
+		"eventVersion": "2.0",
+		"eventSource": "aws:s3",
+		"awsRegion": "us-west-2",
+		"eventTime": "2022-03-30T12:32:05Z",
+		"eventName": "ObjectCreated:Put",
+		"userIdentity": {
+			"principalId": "EXAMPLE"
+		},
+		"requestParameters": {
+			"sourceIPAddress": "10.10.10.10"
+		},
+		"responseElements": {
+			"x-amz-request-id": "EXAMPLE123",
+			"x-amz-id-2": "EXAMPLE456"
+		},
+		"s3": {
+			"s3SchemaVersion": "1.0",
+			"configurationId": "EXAMPLE789",
+			"bucket": {
+				"name": "example-bucket",
+				"ownerIdentity": {
+					"principalId": "EXAMPLE"
+				},
+				"arn": "arn:aws:s3:::example-bucket"
+			},
+			"object": {
+				"key": "example-object",
+				"size": 12345,
+				"eTag": "EXAMPLEETAG",
+				"versionId": "EXAMPLEVERSIONID",
+				"sequencer": "EXAMPLESEQUENCER"
+			}
+		},
+		"glacierEventData": {
+			"restoreEventData": {
+				"lifecycleRestorationExpiryTime": "2023-03-30T12:32:05Z",
+				"lifecycleRestoreStorageClass": "GLACIER"
+			}
+		}
+	}, {
+		"eventVersion": "2.0",
+		"eventSource": "aws:s3",
+		"awsRegion": "us-east-1",
+		"eventTime": "2022-03-29T21:45:10Z",
+		"eventName": "ObjectRemoved:Delete",
+		"userIdentity": {
+			"principalId": "EXAMPLE"
+		},
+		"requestParameters": {
+			"sourceIPAddress": "10.20.30.40"
+		},
+		"responseElements": {
+			"x-amz-request-id": "EXAMPLE123",
+			"x-amz-id-2": "EXAMPLE456"
+		},
+		"s3": {
+			"s3SchemaVersion": "1.0",
+			"configurationId": "EXAMPLE789",
+			"bucket": {
+				"name": "another-bucket",
+				"ownerIdentity": {
+					"principalId": "EXAMPLE"
+				},
+				"arn": "arn:aws:s3:::another-bucket"
+			},
+			"object": {
+				"key": "another-object",
+				"size": 67890,
+				"eTag": "ANOTHERETAG",
+				"versionId": "ANOTHERVERSIONID",
+				"sequencer": "ANOTHERSEQUENCER"
+			}
+		},
+		"glacierEventData": {
+			"restoreEventData": {
+				"lifecycleRestorationExpiryTime": "2023-03-29T21:45:10Z",
+				"lifecycleRestoreStorageClass": "GLACIER"
+			}
+		}
+	}]
 }

@@ -1,0 +1,97 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/MetricData",
+	"$defs": {
+		"MetricData": {
+			"properties": {
+				"series": {
+					"items": {
+						"$ref": "#/$defs/Series"
+					},
+					"type": "array"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"series"
+			]
+		},
+		"Series": {
+			"properties": {
+				"host": {
+					"type": "string"
+				},
+				"interval": {
+					"type": "integer"
+				},
+				"metric": {
+					"type": "string"
+				},
+				"points": {
+					"items": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"type": "array"
+				},
+				"tags": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"metric",
+				"points"
+			]
+		}
+	},
+	"examples": [{
+		"series": [{
+				"host": "server-01",
+				"interval": 60,
+				"metric": "cpu_usage",
+				"points": [
+					["2022-04-02T12:01:00Z", "98.2"],
+					["2022-04-02T12:02:00Z", "95.1"],
+					["2022-04-02T12:03:00Z", "97.8"],
+					["2022-04-02T12:04:00Z", "96.5"],
+					["2022-04-02T12:05:00Z", "98.9"]
+				],
+				"tags": [
+					"datacenter:us-west",
+					"environment:production",
+					"service:web"
+				],
+				"type": "gauge"
+			},
+			{
+				"host": "server-02",
+				"interval": 60,
+				"metric": "memory_usage",
+				"points": [
+					["2022-04-02T12:01:00Z", "4355"],
+					["2022-04-02T12:02:00Z", "4189"],
+					["2022-04-02T12:03:00Z", "4256"],
+					["2022-04-02T12:04:00Z", "4123"],
+					["2022-04-02T12:05:00Z", "4045"]
+				],
+				"tags": [
+					"datacenter:us-west",
+					"environment:production",
+					"service:web"
+				],
+				"type": "gauge"
+			}
+		]
+	}]
+}

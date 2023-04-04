@@ -23,7 +23,10 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.googlesheet.append" },
+        {
+          "type": "io.triggermesh.googlesheet.append",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.googlesheet.append.json"
+        },
         { "type": "*" }
       ]
     registry.knative.dev/eventTypes: |

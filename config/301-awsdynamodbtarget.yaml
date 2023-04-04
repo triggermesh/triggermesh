@@ -27,7 +27,10 @@ metadata:
       ]
     registry.knative.dev/eventTypes: |
       [
-        { "type": "io.triggermesh.targets.aws.dynamodb.result" }
+        {
+          "type": "io.triggermesh.targets.aws.dynamodb.result",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.targets.aws.dynamodb.result.json"
+        }
       ]
 spec:
   group: targets.triggermesh.io

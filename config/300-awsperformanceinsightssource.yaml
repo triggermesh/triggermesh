@@ -24,7 +24,10 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.amazon.rds.pi.metric" }
+        {
+          "type": "com.amazon.rds.pi.metric",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.amazon.performanceinsights.metric.json"
+        }
       ]
 spec:
   group: sources.triggermesh.io

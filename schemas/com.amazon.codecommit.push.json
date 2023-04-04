@@ -1,66 +1,115 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$ref": "#/definitions/Commit",
-  "definitions": {
-    "Commit": {
-      "required": [
-        "AdditionalData",
-        "Author",
-        "CommitId",
-        "Committer",
-        "Message",
-        "Parents",
-        "TreeId"
-      ],
-      "properties": {
-        "AdditionalData": {
-          "type": "string"
-        },
-        "Author": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/UserInfo"
-        },
-        "CommitId": {
-          "type": "string"
-        },
-        "Committer": {
-          "$ref": "#/definitions/UserInfo"
-        },
-        "Message": {
-          "type": "string"
-        },
-        "Parents": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "TreeId": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "UserInfo": {
-      "required": [
-        "Date",
-        "Email",
-        "Name"
-      ],
-      "properties": {
-        "Date": {
-          "type": "string"
-        },
-        "Email": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$ref": "#/definitions/Commit",
+	"definitions": {
+		"Commit": {
+			"required": [
+				"AdditionalData",
+				"Author",
+				"CommitId",
+				"Committer",
+				"Message",
+				"Parents",
+				"TreeId"
+			],
+			"properties": {
+				"AdditionalData": {
+					"type": "string"
+				},
+				"Author": {
+					"$schema": "http://json-schema.org/draft-04/schema#",
+					"$ref": "#/definitions/UserInfo"
+				},
+				"CommitId": {
+					"type": "string"
+				},
+				"Committer": {
+					"$ref": "#/definitions/UserInfo"
+				},
+				"Message": {
+					"type": "string"
+				},
+				"Parents": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"TreeId": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"UserInfo": {
+			"required": [
+				"Date",
+				"Email",
+				"Name"
+			],
+			"properties": {
+				"Date": {
+					"type": "string"
+				},
+				"Email": {
+					"type": "string"
+				},
+				"Name": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"AdditionalData": "some additional data",
+		"Author": {
+			"Date": "2022-12-01T12:00:00Z",
+			"Email": "johndoe@example.com",
+			"Name": "John Doe"
+		},
+		"CommitId": "a1b2c3d4e5f6",
+		"Committer": {
+			"Date": "2022-12-01T12:00:00Z",
+			"Email": "janedoe@example.com",
+			"Name": "Jane Doe"
+		},
+		"Message": "Initial commit",
+		"Parents": [],
+		"TreeId": "b7a8d4f9e1c2"
+	}, {
+		"AdditionalData": "",
+		"Author": {
+			"Date": "2022-12-02T09:30:00Z",
+			"Email": "johndoe@example.com",
+			"Name": "John Doe"
+		},
+		"CommitId": "b4e5c6a7f8d9",
+		"Committer": {
+			"Date": "2022-12-02T09:30:00Z",
+			"Email": "janedoe@example.com",
+			"Name": "Jane Doe"
+		},
+		"Message": "Add new feature",
+		"Parents": ["a1b2c3d4e5f6"],
+		"TreeId": "d3e4f5a6b7c8"
+	}, {
+		"AdditionalData": "some more additional data",
+		"Author": {
+			"Date": "2022-12-03T15:45:00Z",
+			"Email": "johndoe@example.com",
+			"Name": "John Doe"
+		},
+		"CommitId": "c5b6a7d8e9f0",
+		"Committer": {
+			"Date": "2022-12-03T15:45:00Z",
+			"Email": "janedoe@example.com",
+			"Name": "Jane Doe"
+		},
+		"Message": "Bug fix",
+		"Parents": ["b4e5c6a7f8d9"],
+		"TreeId": "e5f6a7b8c9d0"
+	}]
 }

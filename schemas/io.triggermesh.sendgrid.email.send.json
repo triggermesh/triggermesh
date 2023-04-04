@@ -1,0 +1,49 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/EmailMessage",
+	"$defs": {
+		"EmailMessage": {
+			"properties": {
+				"message": {
+					"type": "string"
+				},
+				"media_urls": {
+					"items": {
+						"type": "string",
+						"format": "uri"
+					},
+					"type": "array"
+				},
+				"fromname": {
+					"type": "string"
+				},
+				"fromemail": {
+					"type": "string"
+				},
+				"toname": {
+					"type": "string"
+				},
+				"toemail": {
+					"type": "string"
+				},
+				"subject": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"message": "Hello, this is a test email!",
+		"media_urls": [
+			"https://example.com/image1.jpg",
+			"https://example.com/image2.jpg"
+		],
+		"fromname": "John Doe",
+		"fromemail": "johndoe@example.com",
+		"toname": "Jane Smith",
+		"toemail": "janesmith@example.com",
+		"subject": "Test email"
+	}]
+}

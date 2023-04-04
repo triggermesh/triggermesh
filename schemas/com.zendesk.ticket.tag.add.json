@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/TicketTag",
+	"$defs": {
+		"TicketTag": {
+			"properties": {
+				"tag": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"tag": "urgent",
+		"id": 12345
+	}]
+}

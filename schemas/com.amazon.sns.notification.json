@@ -1,88 +1,110 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/MessageData",
-  "definitions": {
-    "MessageData": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Type": {
-          "type": "string",
-          "enum": [
-            "Notification"
-          ]
-        },
-        "MessageId": {
-          "type": "string"
-        },
-        "TopicArn": {
-          "type": "string"
-        },
-        "Subject": {
-          "type": "string"
-        },
-        "Message": {
-          "type": "string"
-        },
-        "Timestamp": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "SignatureVersion": {
-          "type": "string"
-        },
-        "Signature": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          }
-        },
-        "SigningCertURL": {
-          "type": "string",
-          "format": "uri"
-        },
-        "UnsubscribeURL": {
-          "type": "string",
-          "format": "uri"
-        },
-        "MessageAttributes": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/MessageAttribute"
-          }
-        }
-      },
-      "required": [
-        "Type",
-        "MessageId",
-        "TopicArn",
-        "Message",
-        "Timestamp",
-        "SignatureVersion",
-        "Signature",
-        "SigningCertURL",
-        "UnsubscribeURL"
-      ]
-    },
-    "MessageAttribute": {
-      "required": [
-        "Type",
-        "Value"
-      ],
-      "properties": {
-        "Type": {
-          "type": "string",
-          "enum": [
-            "String",
-            "String.Array",
-            "Number",
-            "Binary"
-          ]
-        },
-        "Value": {
-          "type": "string"
-        }
-      }
-    }
-  }
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$ref": "#/definitions/MessageData",
+	"definitions": {
+		"MessageData": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"Type": {
+					"type": "string",
+					"enum": [
+						"Notification"
+					]
+				},
+				"MessageId": {
+					"type": "string"
+				},
+				"TopicArn": {
+					"type": "string"
+				},
+				"Subject": {
+					"type": "string"
+				},
+				"Message": {
+					"type": "string"
+				},
+				"Timestamp": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"SignatureVersion": {
+					"type": "string"
+				},
+				"Signature": {
+					"type": "string",
+					"media": {
+						"binaryEncoding": "base64"
+					}
+				},
+				"SigningCertURL": {
+					"type": "string",
+					"format": "uri"
+				},
+				"UnsubscribeURL": {
+					"type": "string",
+					"format": "uri"
+				},
+				"MessageAttributes": {
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/MessageAttribute"
+					}
+				}
+			},
+			"required": [
+				"Type",
+				"MessageId",
+				"TopicArn",
+				"Message",
+				"Timestamp",
+				"SignatureVersion",
+				"Signature",
+				"SigningCertURL",
+				"UnsubscribeURL"
+			]
+		},
+		"MessageAttribute": {
+			"required": [
+				"Type",
+				"Value"
+			],
+			"properties": {
+				"Type": {
+					"type": "string",
+					"enum": [
+						"String",
+						"String.Array",
+						"Number",
+						"Binary"
+					]
+				},
+				"Value": {
+					"type": "string"
+				}
+			}
+		}
+	},
+	"examples": [{
+		"Type": "Notification",
+		"MessageId": "1234-5678-9012-3456",
+		"TopicArn": "arn:aws:sns:us-east-1:123456789012:my-topic",
+		"Subject": "New message",
+		"Message": "Hello world!",
+		"Timestamp": "2023-03-30T12:34:56Z",
+		"SignatureVersion": "1",
+		"Signature": "abcde12345",
+		"SigningCertURL": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-abcdef.pem",
+		"UnsubscribeURL": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:123456789012:my-topic:abcd-ef12-3456-7890",
+		"MessageAttributes": {
+			"attribute1": {
+				"Type": "String",
+				"Value": "value1"
+			},
+			"attribute2": {
+				"Type": "Number",
+				"Value": "12345"
+			}
+		}
+	}]
 }

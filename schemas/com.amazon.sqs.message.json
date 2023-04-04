@@ -1,111 +1,140 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/Message",
-  "definitions": {
-    "Message": {
-      "required": [
-        "Attributes",
-        "Body",
-        "MD5OfBody",
-        "MD5OfMessageAttributes",
-        "MessageAttributes",
-        "MessageId",
-        "ReceiptHandle"
-      ],
-      "properties": {
-        "Attributes": {
-          "type": "object",
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
-          }
-        },
-        "Body": {
-          "type": "string"
-        },
-        "MD5OfBody": {
-          "type": "string"
-        },
-        "MD5OfMessageAttributes": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "MessageAttributes": {
-          "type": [
-            "object",
-            "null"
-          ],
-          "patternProperties": {
-            ".*": {
-              "$schema": "http://json-schema.org/draft-04/schema#",
-              "$ref": "#/definitions/MessageAttributeValue"
-            }
-          }
-        },
-        "MessageId": {
-          "type": "string"
-        },
-        "ReceiptHandle": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "MessageAttributeValue": {
-      "required": [
-        "BinaryListValues",
-        "BinaryValue",
-        "DataType",
-        "StringListValues",
-        "StringValue"
-      ],
-      "properties": {
-        "BinaryListValues": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string",
-            "media": {
-              "binaryEncoding": "base64"
-            }
-          }
-        },
-        "BinaryValue": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "media": {
-            "binaryEncoding": "base64"
-          }
-        },
-        "DataType": {
-          "type": "string"
-        },
-        "StringListValues": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "StringValue": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    }
-  }
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$ref": "#/definitions/Message",
+	"definitions": {
+		"Message": {
+			"required": [
+				"Attributes",
+				"Body",
+				"MD5OfBody",
+				"MD5OfMessageAttributes",
+				"MessageAttributes",
+				"MessageId",
+				"ReceiptHandle"
+			],
+			"properties": {
+				"Attributes": {
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					}
+				},
+				"Body": {
+					"type": "string"
+				},
+				"MD5OfBody": {
+					"type": "string"
+				},
+				"MD5OfMessageAttributes": {
+					"type": [
+						"string",
+						"null"
+					]
+				},
+				"MessageAttributes": {
+					"type": [
+						"object",
+						"null"
+					],
+					"patternProperties": {
+						".*": {
+							"$schema": "http://json-schema.org/draft-04/schema#",
+							"$ref": "#/definitions/MessageAttributeValue"
+						}
+					}
+				},
+				"MessageId": {
+					"type": "string"
+				},
+				"ReceiptHandle": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		},
+		"MessageAttributeValue": {
+			"required": [
+				"BinaryListValues",
+				"BinaryValue",
+				"DataType",
+				"StringListValues",
+				"StringValue"
+			],
+			"properties": {
+				"BinaryListValues": {
+					"type": [
+						"array",
+						"null"
+					],
+					"items": {
+						"type": "string",
+						"media": {
+							"binaryEncoding": "base64"
+						}
+					}
+				},
+				"BinaryValue": {
+					"type": [
+						"string",
+						"null"
+					],
+					"media": {
+						"binaryEncoding": "base64"
+					}
+				},
+				"DataType": {
+					"type": "string"
+				},
+				"StringListValues": {
+					"type": [
+						"array",
+						"null"
+					],
+					"items": {
+						"type": "string"
+					}
+				},
+				"StringValue": {
+					"type": [
+						"string",
+						"null"
+					]
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+		"Attributes": {
+			"SenderId": "123456",
+			"SentTimestamp": "1648690300000"
+		},
+		"Body": "Hello world!",
+		"MD5OfBody": "b10a8db164e0754105b7a99be72e3fe5",
+		"MD5OfMessageAttributes": "3d7c036e80fd262f7c88d77fb1f7d23c",
+		"MessageAttributes": {
+			"Type": {
+				"BinaryValue": null,
+				"DataType": "String",
+				"StringValue": "Greeting"
+			}
+		},
+		"MessageId": "d7b35830-afc6-4bb6-9d6d-57d59ed9db02",
+		"ReceiptHandle": "AQEB4hRSPf+Y2ExzF69uTJySxOnft9X3AdqT4sNlt4pq4O/Dv+adgGsAztIMaORteECLxS/3XOqxE3/67A6Mm/D69gn0Dm/CYm6ZjNyULJQdlt2ioU6XSwU6+5BG5a2n+QR5vRhycwYzic/nlHJy+1ptOrTk9rqW7F8llZdswVZPcyMv+CzY7qMHSy1+H7TpymoRbDX2tB8vDqJNGY8AYjFrZakopAarEkvExgXaL8O55OuNtVx1v5Sc5Yw8c/T5Qgb7ERI5vzh6U5ZwU="
+	}, {
+		"Attributes": {
+			"SenderId": "789012",
+			"SentTimestamp": "1648690400000"
+		},
+		"Body": "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}",
+		"MD5OfBody": "047adbb7ba523c52f0e7fca8b825dbcd",
+		"MD5OfMessageAttributes": null,
+		"MessageAttributes": null,
+		"MessageId": "66ca8b20-08b9-4cf1-9887-d20c2a88d7e2",
+		"ReceiptHandle": "AQEB4hRSPf+Y2ExzF69uTJySxOnft9X3AdqT4sNlt4pq4O/Dv+adgGsAztIMaORteECLxS/3XOqxE3/67A6Mm/D69gn0Dm/CYm6ZjNyULJQdlt2ioU6XSwU6+5BG5a2n+QR5vRhycwYzic/nlHJy+1ptOrTk9rqW7F8llZdswVZPcyMv+CzY7qMHSy1+H7TpymoRbDX2tB8vDqJNGY8AYjFrZakopAarEkvExgXaL8O55OuNtVx1v5Sc5Yw8c/T5Qgb7ERI5vzh6U5ZwU="
+	}]
 }

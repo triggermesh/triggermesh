@@ -1,0 +1,84 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/triggermesh/triggermesh/pkg/targets/adapter/salesforcetarget/client/salesforce-api-request",
+	"$ref": "#/$defs/SalesforceAPIRequest",
+	"$defs": {
+		"SalesforceAPIRequest": {
+			"properties": {
+				"action": {
+					"type": "string"
+				},
+				"resource": {
+					"type": "string"
+				},
+				"object": {
+					"type": "string"
+				},
+				"record": {
+					"type": "string"
+				},
+				"query": {
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				},
+				"payload": true
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"action",
+				"resource",
+				"object",
+				"record",
+				"query",
+				"payload"
+			]
+		}
+	},
+	"examples": [{
+		"action": "create",
+		"resource": "contacts",
+		"object": "Contact",
+		"record": "001XXXXXXXXXXXXXXX",
+		"query": {
+			"email": "john.doe@example.com"
+		},
+		"payload": {
+			"firstName": "John",
+			"lastName": "Doe",
+			"email": "john.doe@example.com",
+			"phone": "123-456-7890"
+		}
+	}, {
+		"action": "update",
+		"resource": "accounts",
+		"object": "Account",
+		"record": "001XXXXXXXXXXXXXXX",
+		"query": {
+			"name": "Acme Inc."
+		},
+		"payload": {
+			"name": "Acme Inc.",
+			"phone": "555-555-1212",
+			"billingAddress": {
+				"street": "123 Main St",
+				"city": "San Francisco",
+				"state": "CA",
+				"zip": "94105"
+			}
+		}
+	}, {
+		"action": "delete",
+		"resource": "opportunities",
+		"object": "Opportunity",
+		"record": "001XXXXXXXXXXXXXXX",
+		"query": {
+			"stage": "Closed Won"
+		},
+		"payload": null
+	}]
+}

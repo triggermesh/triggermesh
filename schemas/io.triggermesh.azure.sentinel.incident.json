@@ -1,0 +1,166 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/Incident",
+	"$defs": {
+		"Incident": {
+			"properties": {
+				"etag": {
+					"type": "string"
+				},
+				"properties": {
+					"properties": {
+						"lastActivityTimeUtc": {
+							"type": "string"
+						},
+						"firstActivityTimeUtc": {
+							"type": "string"
+						},
+						"labels": {
+							"items": {
+								"$ref": "#/$defs/IncidentLabel"
+							},
+							"type": "array"
+						},
+						"owner": {
+							"$ref": "#/$defs/IncidentOwnerInfo"
+						},
+						"providerIncidentId": {
+							"type": "string"
+						},
+						"severity": {
+							"type": "string"
+						},
+						"status": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"additionalData": {
+							"properties": {
+								"alertProductNames": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								}
+							},
+							"additionalProperties": false,
+							"type": "object",
+							"required": [
+								"alertProductNames"
+							]
+						}
+					},
+					"additionalProperties": false,
+					"type": "object",
+					"required": [
+						"lastActivityTimeUtc",
+						"firstActivityTimeUtc",
+						"labels",
+						"owner",
+						"providerIncidentId",
+						"severity",
+						"status",
+						"title",
+						"description",
+						"additionalData"
+					]
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"etag",
+				"properties"
+			]
+		},
+		"IncidentLabel": {
+			"properties": {
+				"labelName": {
+					"type": "string"
+				},
+				"labelType": {
+					"$ref": "#/$defs/IncidentLabelType"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"labelName",
+				"labelType"
+			]
+		},
+		"IncidentLabelType": {
+			"items": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": false,
+				"type": "object",
+				"required": [
+					"name",
+					"type"
+				]
+			},
+			"type": "array"
+		},
+		"IncidentOwnerInfo": {
+			"properties": {
+				"assignedTo": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"assignedTo"
+			]
+		}
+	},
+	"examples": [{
+		"etag": "fa0534ad-8aa1-4f7e-81e6-9a9c5d6e23a5",
+		"properties": {
+			"lastActivityTimeUtc": "2023-04-02T18:45:01.000Z",
+			"firstActivityTimeUtc": "2023-04-02T18:30:01.000Z",
+			"labels": [{
+					"labelName": "High Priority",
+					"labelType": {
+						"name": "priority",
+						"type": "string"
+					}
+				},
+				{
+					"labelName": "Server Down",
+					"labelType": {
+						"name": "issue",
+						"type": "string"
+					}
+				}
+			],
+			"owner": {
+				"assignedTo": "John Doe"
+			},
+			"providerIncidentId": "INC001",
+			"severity": "High",
+			"status": "Active",
+			"title": "Server Down",
+			"description": "The server is down and cannot be accessed.",
+			"additionalData": {
+				"alertProductNames": [
+					"AWS CloudWatch",
+					"AWS SNS",
+					"AWS Lambda"
+				]
+			}
+		}
+	}]
+}

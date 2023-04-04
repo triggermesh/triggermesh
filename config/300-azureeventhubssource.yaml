@@ -24,7 +24,10 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.azure.eventhub.event" }
+        {
+          "type": "com.azure.eventhub.event",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/com.microsoft.azure.eventhub.event.json"
+        }
       ]
 spec:
   group: sources.triggermesh.io

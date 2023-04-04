@@ -1,0 +1,67 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/JiraAPIRequest",
+	"$defs": {
+		"JiraAPIRequest": {
+			"properties": {
+				"method": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"query": {
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				},
+				"payload": true
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"method",
+				"path",
+				"query",
+				"payload"
+			]
+		}
+	},
+	"examples": [{
+		"method": "POST",
+		"path": "/rest/api/3/issue",
+		"query": {},
+		"payload": {
+			"fields": {
+				"summary": "New issue summary",
+				"description": "New issue description",
+				"issuetype": {
+					"name": "Bug"
+				},
+				"project": {
+					"key": "PROJ"
+				}
+			}
+		}
+	}, {
+		"method": "PUT",
+		"path": "/rest/api/3/issue/ABC-123/transitions",
+		"query": {},
+		"payload": {
+			"transition": {
+				"id": "21"
+			}
+		}
+	}, {
+		"method": "GET",
+		"path": "/rest/api/3/search",
+		"query": {
+			"jql": "project = PROJ AND issuetype = Story ORDER BY priority DESC",
+			"maxResults": "10"
+		},
+		"payload": null
+	}]
+}

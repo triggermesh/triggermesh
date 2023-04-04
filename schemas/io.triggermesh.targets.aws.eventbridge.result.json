@@ -1,0 +1,76 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/aws/aws-sdk-go/service/eventbridge/put-events-output",
+	"$ref": "#/$defs/PutEventsOutput",
+	"$defs": {
+		"PutEventsOutput": {
+			"properties": {
+				"Entries": {
+					"items": {
+						"$ref": "#/$defs/PutEventsResultEntry"
+					},
+					"type": "array"
+				},
+				"FailedEntryCount": {
+					"type": "integer"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"Entries",
+				"FailedEntryCount"
+			]
+		},
+		"PutEventsResultEntry": {
+			"properties": {
+				"ErrorCode": {
+					"type": "string"
+				},
+				"ErrorMessage": {
+					"type": "string"
+				},
+				"EventId": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"ErrorCode",
+				"ErrorMessage",
+				"EventId"
+			]
+		}
+	},
+	"examples": [{
+		"Entries": [{
+				"ErrorCode": null,
+				"ErrorMessage": null,
+				"EventId": "abc123"
+			},
+			{
+				"ErrorCode": null,
+				"ErrorMessage": null,
+				"EventId": "def456"
+			}
+		],
+		"FailedEntryCount": 0
+	}, {
+		"Entries": [{
+				"ErrorCode": "InvalidParameter",
+				"ErrorMessage": "Invalid parameter value for 'name'",
+				"EventId": null
+			},
+			{
+				"ErrorCode": "AccessDenied",
+				"ErrorMessage": "You do not have permission to publish events to this event bus",
+				"EventId": null
+			}
+		],
+		"FailedEntryCount": 2
+	}, {
+		"Entries": [],
+		"FailedEntryCount": 0
+	}]
+}

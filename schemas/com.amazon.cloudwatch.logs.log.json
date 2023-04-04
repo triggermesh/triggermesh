@@ -22,5 +22,22 @@
       "additionalProperties": false,
       "type": "object"
     }
-  }
+  },
+  "examples": [
+    {
+        "ingestionTime": 1396035394997,
+        "timestamp": 1396035378988,
+        "message": "Example log event 1"
+    },
+      {
+        "ingestionTime": 1396035394997,
+        "timestamp": 1396035378988,
+        "message": "Example log event 2"
+    },
+      {
+        "ingestionTime": 1396035394997,
+        "timestamp": 1396035378989,
+        "message": "Example log event 3"
+    }
+  ]
 }

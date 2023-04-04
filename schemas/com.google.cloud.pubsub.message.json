@@ -1,49 +1,82 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/Message",
-  "definitions": {
-    "Message": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "ID",
-        "Data",
-        "Attributes",
-        "PublishTime",
-        "OrderingKey"
-      ],
-      "properties": {
-        "ID": {
-          "type": "string"
-        },
-        "Data": {
-          "type": [
-            "string",
-            "object"
-          ]
-        },
-        "Attributes": {
-          "type": "object",
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
-          }
-        },
-        "PublishTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "DeliveryAttempt": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
-        "OrderingKey": {
-          "type": "string"
-        }
-      }
-    }
-  }
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$ref": "#/definitions/Message",
+	"definitions": {
+		"Message": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": [
+				"ID",
+				"Data",
+				"Attributes",
+				"PublishTime",
+				"OrderingKey"
+			],
+			"properties": {
+				"ID": {
+					"type": "string"
+				},
+				"Data": {
+					"type": [
+						"string",
+						"object"
+					]
+				},
+				"Attributes": {
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					}
+				},
+				"PublishTime": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"DeliveryAttempt": {
+					"type": [
+						"integer",
+						"null"
+					]
+				},
+				"OrderingKey": {
+					"type": "string"
+				}
+			}
+		}
+	},
+	"examples": [{
+		"ID": "msg001",
+		"Data": "Hello world!",
+		"Attributes": {
+			"foo": "bar",
+			"baz": "qux"
+		},
+		"PublishTime": "2022-01-01T12:00:00Z",
+		"DeliveryAttempt": null,
+		"OrderingKey": "key001"
+	}, {
+		"ID": "msg002",
+		"Data": {
+			"user_id": 123,
+			"action": "login"
+		},
+		"Attributes": {
+			"ip_address": "127.0.0.1",
+			"user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
+		},
+		"PublishTime": "2022-01-02T13:30:00Z",
+		"DeliveryAttempt": 2,
+		"OrderingKey": "key002"
+	}, {
+		"ID": "msg003",
+		"Data": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+		"Attributes": {
+			"source": "website",
+			"author": "John Doe"
+		},
+		"PublishTime": "2022-01-03T15:45:00Z",
+		"OrderingKey": "key003"
+	}]
 }

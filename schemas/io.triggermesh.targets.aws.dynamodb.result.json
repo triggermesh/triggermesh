@@ -1,0 +1,263 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/aws/aws-sdk-go/service/dynamodb/put-item-output",
+	"$ref": "#/$defs/PutItemOutput",
+	"$defs": {
+		"AttributeValue": {
+			"properties": {
+				"B": {
+					"type": "string",
+					"contentEncoding": "base64"
+				},
+				"BOOL": {
+					"type": "boolean"
+				},
+				"BS": {
+					"items": {
+						"type": "string",
+						"contentEncoding": "base64"
+					},
+					"type": "array"
+				},
+				"L": {
+					"items": {
+						"$ref": "#/$defs/AttributeValue"
+					},
+					"type": "array"
+				},
+				"M": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/$defs/AttributeValue"
+						}
+					},
+					"type": "object"
+				},
+				"N": {
+					"type": "string"
+				},
+				"NS": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"NULL": {
+					"type": "boolean"
+				},
+				"S": {
+					"type": "string"
+				},
+				"SS": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"B",
+				"BOOL",
+				"BS",
+				"L",
+				"M",
+				"N",
+				"NS",
+				"NULL",
+				"S",
+				"SS"
+			]
+		},
+		"Capacity": {
+			"properties": {
+				"CapacityUnits": {
+					"type": "number"
+				},
+				"ReadCapacityUnits": {
+					"type": "number"
+				},
+				"WriteCapacityUnits": {
+					"type": "number"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"CapacityUnits",
+				"ReadCapacityUnits",
+				"WriteCapacityUnits"
+			]
+		},
+		"ConsumedCapacity": {
+			"properties": {
+				"CapacityUnits": {
+					"type": "number"
+				},
+				"GlobalSecondaryIndexes": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/$defs/Capacity"
+						}
+					},
+					"type": "object"
+				},
+				"LocalSecondaryIndexes": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/$defs/Capacity"
+						}
+					},
+					"type": "object"
+				},
+				"ReadCapacityUnits": {
+					"type": "number"
+				},
+				"Table": {
+					"$ref": "#/$defs/Capacity"
+				},
+				"TableName": {
+					"type": "string"
+				},
+				"WriteCapacityUnits": {
+					"type": "number"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"CapacityUnits",
+				"GlobalSecondaryIndexes",
+				"LocalSecondaryIndexes",
+				"ReadCapacityUnits",
+				"Table",
+				"TableName",
+				"WriteCapacityUnits"
+			]
+		},
+		"ItemCollectionMetrics": {
+			"properties": {
+				"ItemCollectionKey": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/$defs/AttributeValue"
+						}
+					},
+					"type": "object"
+				},
+				"SizeEstimateRangeGB": {
+					"items": {
+						"type": "number"
+					},
+					"type": "array"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"ItemCollectionKey",
+				"SizeEstimateRangeGB"
+			]
+		},
+		"PutItemOutput": {
+			"properties": {
+				"Attributes": {
+					"patternProperties": {
+						".*": {
+							"$ref": "#/$defs/AttributeValue"
+						}
+					},
+					"type": "object"
+				},
+				"ConsumedCapacity": {
+					"$ref": "#/$defs/ConsumedCapacity"
+				},
+				"ItemCollectionMetrics": {
+					"$ref": "#/$defs/ItemCollectionMetrics"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"Attributes",
+				"ConsumedCapacity",
+				"ItemCollectionMetrics"
+			]
+		}
+	},
+	"examples": [{
+			"Attributes": {
+				"title": {
+					"S": "The Great Gatsby"
+				},
+				"author": {
+					"S": "F. Scott Fitzgerald"
+				},
+				"year": {
+					"N": "1925"
+				}
+			},
+			"ConsumedCapacity": {
+				"CapacityUnits": 1,
+				"Table": {
+					"CapacityUnits": 1
+				}
+			},
+			"ItemCollectionMetrics": {
+				"ItemCollectionKey": {
+					"title": {
+						"S": "The Great Gatsby"
+					}
+				},
+				"SizeEstimateRangeGB": [
+					0.5,
+					1.0
+				]
+			}
+		},
+		{
+			"Attributes": {
+				"name": {
+					"S": "John Smith"
+				},
+				"age": {
+					"N": "30"
+				},
+				"isMarried": {
+					"BOOL": true
+				},
+				"address": {
+					"M": {
+						"street": {
+							"S": "123 Main St"
+						},
+						"city": {
+							"S": "New York"
+						},
+						"state": {
+							"S": "NY"
+						}
+					}
+				}
+			},
+			"ConsumedCapacity": {
+				"CapacityUnits": 0.5,
+				"Table": {
+					"CapacityUnits": 0.5
+				}
+			},
+			"ItemCollectionMetrics": {
+				"ItemCollectionKey": {
+					"name": {
+						"S": "John Smith"
+					}
+				},
+				"SizeEstimateRangeGB": [
+					0.1,
+					0.5
+				]
+			}
+		}
+	]
+}

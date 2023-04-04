@@ -23,9 +23,16 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.datadog.metric.submit" },
-        { "type": "io.triggermesh.datadog.event.post" },
-        { "type": "io.triggermesh.datadog.log.send" }
+        {
+          "type": "io.triggermesh.datadog.metric.submit",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.datadog.metric.submit.json"
+        },{
+          "type": "io.triggermesh.datadog.event.post",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.datadog.event.post.json"
+        },{
+          "type": "io.triggermesh.datadog.log.send",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.datadog.log.send.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

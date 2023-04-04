@@ -23,9 +23,18 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.google.firestore.write" },
-        { "type": "io.triggermesh.google.firestore.query.tables" },
-        { "type": "io.triggermesh.google.firestore.query.table" },
+        {
+          "type": "io.triggermesh.google.firestore.write",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.google.firestore.write.json"
+        },
+        {
+          "type": "io.triggermesh.google.firestore.query.tables",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.google.firestore.query.tables.json"
+        },
+        {
+          "type": "io.triggermesh.google.firestore.query.table",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.google.firestore.query.table.json"
+        },
         { "type": "*" }
       ]
     registry.knative.dev/eventTypes: |

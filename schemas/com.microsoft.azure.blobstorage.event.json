@@ -1,71 +1,123 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$comment": "Reference: https://docs.microsoft.com/en-us/azure/event-grid/event-schema-blob-storage?tabs=cloud-event-schema#event-properties",
-  "type": "object",
-  "properties": {
-    "api": {
-      "type": "string"
-    },
-    "clientRequestId": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "requestId": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "eTag": {
-      "type": "string"
-    },
-    "contentType": {
-      "type": "string",
-      "format": "mimetype"
-    },
-    "contentLength": {
-      "type": "integer"
-    },
-    "blobType": {
-      "type": "string",
-      "enum": [
-        "BlockBlob",
-        "PageBlob"
-      ]
-    },
-    "contentOffset": {
-      "type": "number"
-    },
-    "destinationUrl": {
-      "type": "string",
-      "format": "uri"
-    },
-    "sourceUrl": {
-      "type": "string",
-      "format": "uri"
-    },
-    "url": {
-      "type": "string",
-      "format": "uri"
-    },
-    "recursive": {
-      "type": "string",
-      "enum": [
-        "true",
-        "false"
-      ]
-    },
-    "sequencer": {
-      "type": "string"
-    },
-    "storageDiagnostics": {
-      "type": "object"
-    }
-  },
-  "additionalProperties": false,
-  "required": [
-    "api",
-    "clientRequestId",
-    "requestId",
-    "url",
-    "sequencer"
-  ]
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$comment": "Reference: https://docs.microsoft.com/en-us/azure/event-grid/event-schema-blob-storage?tabs=cloud-event-schema#event-properties",
+	"type": "object",
+	"properties": {
+		"api": {
+			"type": "string"
+		},
+		"clientRequestId": {
+			"type": "string",
+			"format": "uuid"
+		},
+		"requestId": {
+			"type": "string",
+			"format": "uuid"
+		},
+		"eTag": {
+			"type": "string"
+		},
+		"contentType": {
+			"type": "string",
+			"format": "mimetype"
+		},
+		"contentLength": {
+			"type": "integer"
+		},
+		"blobType": {
+			"type": "string",
+			"enum": [
+				"BlockBlob",
+				"PageBlob"
+			]
+		},
+		"contentOffset": {
+			"type": "number"
+		},
+		"destinationUrl": {
+			"type": "string",
+			"format": "uri"
+		},
+		"sourceUrl": {
+			"type": "string",
+			"format": "uri"
+		},
+		"url": {
+			"type": "string",
+			"format": "uri"
+		},
+		"recursive": {
+			"type": "string",
+			"enum": [
+				"true",
+				"false"
+			]
+		},
+		"sequencer": {
+			"type": "string"
+		},
+		"storageDiagnostics": {
+			"type": "object"
+		}
+	},
+	"additionalProperties": false,
+	"required": [
+		"api",
+		"clientRequestId",
+		"requestId",
+		"url",
+		"sequencer"
+	],
+	"examples": [{
+		"api": "PUT Blob",
+		"clientRequestId": "79d4e4de-1f74-4ba3-aa5d-ead3b73b5b5c",
+		"requestId": "c375a8f1-a9a1-48d3-9143-c98b5f5b08c5",
+		"eTag": "0x8D9BCC2E4835E90",
+		"contentType": "image/png",
+		"contentLength": 20000,
+		"blobType": "BlockBlob",
+		"contentOffset": 0,
+		"destinationUrl": "https://myaccount.blob.core.windows.net/mycontainer/myblob",
+		"sourceUrl": "https://example.com/images/myimage.png",
+		"url": "https://myaccount.blob.core.windows.net/mycontainer/myblob",
+		"recursive": "false",
+		"sequencer": "000000000000000000000000000064200000000000001a3",
+		"storageDiagnostics": {
+			"batchId": "b68529f3-68cd-4744-baa4-3c0498ec19f0"
+		}
+	}, {
+		"api": "DELETE Blob",
+		"clientRequestId": "9bdf334f-98e5-4d8e-a50f-f0eefae08d44",
+		"requestId": "9a42280c-f880-00a1-6f8c-22994e000000",
+		"eTag": "0x8D9BCC2E4835E90",
+		"contentType": "application/json",
+		"contentLength": 0,
+		"blobType": "BlockBlob",
+		"contentOffset": 0,
+		"destinationUrl": "https://myaccount.blob.core.windows.net/mycontainer/myblob",
+		"sourceUrl": "",
+		"url": "https://myaccount.blob.core.windows.net/mycontainer/myblob",
+		"recursive": "false",
+		"sequencer": "000000000000000000000000000064210000000000014b",
+		"storageDiagnostics": {
+			"batchId": "b68529f3-68cd-4744-baa4-3c0498ec19f0"
+		}
+	}, {
+		"api": "GET Blob",
+		"clientRequestId": "126369aa-e83d-4457-af4c-ccad7ff4d4a4",
+		"requestId": "f0e667ab-401e-00b7-548c-22c1f2000000",
+		"eTag": "0x8D9BCC2E4835E90",
+		"contentType": "text/plain",
+		"contentLength": 5120,
+		"blobType": "BlockBlob",
+		"contentOffset": 0,
+		"destinationUrl": "",
+		"sourceUrl": "https://myaccount.blob.core.windows.net/mycontainer/myblob",
+		"url": "https://myaccount.blob.core.windows.net/mycontainer/myblob",
+		"recursive": "false",
+		"sequencer": "0000000000000000000000000000642200000000000017",
+		"storageDiagnostics": {
+			"batchId": "b68529f3-68cd-4744-baa4-3c0498ec19f0"
+		}
+	}]
 }

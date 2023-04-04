@@ -23,7 +23,10 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "io.triggermesh.salesforce.apicall" }
+        {
+          "type": "io.triggermesh.salesforce.apicall",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.salesforce.apicall.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

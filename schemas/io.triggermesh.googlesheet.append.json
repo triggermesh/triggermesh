@@ -1,0 +1,36 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/SpreadsheetEvent",
+	"$defs": {
+		"SpreadsheetEvent": {
+			"properties": {
+				"sheet_name": {
+					"type": "string"
+				},
+				"message": {
+					"type": "string"
+				},
+				"rows": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"sheet_name"
+			]
+		}
+	},
+	"examples": [{
+		"sheet_name": "Sheet1",
+		"message": "This is a message",
+		"rows": [
+			"Row 1",
+			"Row 2",
+			"Row 3"
+		]
+	}]
+}
