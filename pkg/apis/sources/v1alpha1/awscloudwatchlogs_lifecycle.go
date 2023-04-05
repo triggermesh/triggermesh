@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -90,4 +92,13 @@ func (s *AWSCloudWatchLogsSource) ServiceAccountOptions() []resource.ServiceAcco
 	}
 
 	return saOpts
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AWSCloudWatchLogsSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AWSCloudWatchLogsSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

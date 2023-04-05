@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"sort"
 	"strings"
 
@@ -56,6 +57,15 @@ func (s *AWSS3Source) GetStatusManager() *v1alpha1.StatusManager {
 		ConditionSet: s.GetConditionSet(),
 		Status:       &s.Status.Status,
 	}
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AWSS3Source) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AWSS3Source) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }
 
 // Supported event types (see AWSS3SourceSpec)

@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -77,4 +79,13 @@ func (s *AzureQueueStorageSource) GetEventTypes() []string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureQueueStorageSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureQueueStorageSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureQueueStorageSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

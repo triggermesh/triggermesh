@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -145,4 +146,13 @@ func (s *FunctionStatus) MarkConfigMapAvailable(cmapName, resourceVersion string
 func (s *FunctionStatus) MarkConfigMapUnavailable(reason, msg string) {
 	functionConditionSet.Manage(s).MarkFalse(FunctionConditionConfigMapReady,
 		reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *Function) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *Function) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

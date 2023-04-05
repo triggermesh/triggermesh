@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -114,4 +116,13 @@ func (s *GoogleCloudSourceRepositoriesSourceStatus) MarkSubscribed() {
 // reason and message.
 func (s *GoogleCloudSourceRepositoriesSourceStatus) MarkNotSubscribed(reason, msg string) {
 	googleCloudSourceRepoSourceConditionSet.Manage(s).MarkFalse(GoogleCloudSourceRepoConditionSubscribed, reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *GoogleCloudSourceRepositoriesSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *GoogleCloudSourceRepositoriesSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

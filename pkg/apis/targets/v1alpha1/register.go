@@ -20,6 +20,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"knative.dev/pkg/apis"
+	"knative.dev/pkg/kmeta"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 )
@@ -33,76 +35,63 @@ var (
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
+// ObjectWebhook is an interface to use in the webhook.
+type ObjectWebhook interface {
+	runtime.Object
+	apis.Validatable
+	apis.Defaultable
+	kmeta.OwnerRefable
+}
+
+type Objects struct {
+	Single ObjectWebhook
+	List   runtime.Object
+}
+
+// AllTypes is a list of all the types defined in this package.
+var AllTypes = []Objects{
+	{&AWSComprehendTarget{}, &AWSComprehendTargetList{}},
+	{&AWSDynamoDBTarget{}, &AWSDynamoDBTargetList{}},
+	{&AWSEventBridgeTarget{}, &AWSEventBridgeTargetList{}},
+	{&AWSKinesisTarget{}, &AWSKinesisTargetList{}},
+	{&AWSLambdaTarget{}, &AWSLambdaTargetList{}},
+	{&AWSS3Target{}, &AWSS3TargetList{}},
+	{&AWSSNSTarget{}, &AWSSNSTargetList{}},
+	{&AWSSQSTarget{}, &AWSSQSTargetList{}},
+	{&AzureEventHubsTarget{}, &AzureEventHubsTargetList{}},
+	{&AzureSentinelTarget{}, &AzureSentinelTargetList{}},
+	{&CloudEventsTarget{}, &CloudEventsTargetList{}},
+	{&DatadogTarget{}, &DatadogTargetList{}},
+	{&ElasticsearchTarget{}, &ElasticsearchTargetList{}},
+	{&GoogleCloudFirestoreTarget{}, &GoogleCloudFirestoreTargetList{}},
+	{&GoogleCloudStorageTarget{}, &GoogleCloudStorageTargetList{}},
+	{&GoogleCloudWorkflowsTarget{}, &GoogleCloudWorkflowsTargetList{}},
+	{&GoogleCloudPubSubTarget{}, &GoogleCloudPubSubTargetList{}},
+	{&GoogleSheetTarget{}, &GoogleSheetTargetList{}},
+	{&HTTPTarget{}, &HTTPTargetList{}},
+	{&IBMMQTarget{}, &IBMMQTargetList{}},
+	{&JiraTarget{}, &JiraTargetList{}},
+	{&KafkaTarget{}, &KafkaTargetList{}},
+	{&LogzMetricsTarget{}, &LogzMetricsTargetList{}},
+	{&LogzTarget{}, &LogzTargetList{}},
+	{&MongoDBTarget{}, &MongoDBTargetList{}},
+	{&OracleTarget{}, &OracleTargetList{}},
+	{&SalesforceTarget{}, &SalesforceTargetList{}},
+	{&SendGridTarget{}, &SendGridTargetList{}},
+	{&SlackTarget{}, &SlackTargetList{}},
+	{&SolaceTarget{}, &SolaceTargetList{}},
+	{&SplunkTarget{}, &SplunkTargetList{}},
+	{&TwilioTarget{}, &TwilioTargetList{}},
+	{&ZendeskTarget{}, &ZendeskTargetList{}},
+}
+
 // addKnownTypes adds all this custom API's types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(SchemeGroupVersion,
-		&AWSComprehendTarget{},
-		&AWSComprehendTargetList{},
-		&AWSDynamoDBTarget{},
-		&AWSDynamoDBTargetList{},
-		&AWSEventBridgeTarget{},
-		&AWSEventBridgeTargetList{},
-		&AWSKinesisTarget{},
-		&AWSKinesisTargetList{},
-		&AWSLambdaTarget{},
-		&AWSLambdaTargetList{},
-		&AWSS3Target{},
-		&AWSS3TargetList{},
-		&AWSSNSTarget{},
-		&AWSSNSTargetList{},
-		&AWSSQSTarget{},
-		&AWSSQSTargetList{},
-		&AzureEventHubsTarget{},
-		&AzureEventHubsTargetList{},
-		&AzureSentinelTarget{},
-		&AzureSentinelTargetList{},
-		&CloudEventsTarget{},
-		&CloudEventsTargetList{},
-		&DatadogTarget{},
-		&DatadogTargetList{},
-		&ElasticsearchTarget{},
-		&ElasticsearchTargetList{},
-		&GoogleCloudFirestoreTarget{},
-		&GoogleCloudFirestoreTargetList{},
-		&GoogleCloudStorageTarget{},
-		&GoogleCloudStorageTargetList{},
-		&GoogleCloudWorkflowsTarget{},
-		&GoogleCloudWorkflowsTargetList{},
-		&GoogleCloudPubSubTarget{},
-		&GoogleCloudPubSubTargetList{},
-		&GoogleSheetTarget{},
-		&GoogleSheetTargetList{},
-		&HTTPTarget{},
-		&HTTPTargetList{},
-		&IBMMQTarget{},
-		&IBMMQTargetList{},
-		&JiraTarget{},
-		&JiraTargetList{},
-		&KafkaTarget{},
-		&KafkaTargetList{},
-		&LogzMetricsTarget{},
-		&LogzMetricsTargetList{},
-		&LogzTarget{},
-		&LogzTargetList{},
-		&MongoDBTarget{},
-		&MongoDBTargetList{},
-		&OracleTarget{},
-		&OracleTargetList{},
-		&SalesforceTarget{},
-		&SalesforceTargetList{},
-		&SendGridTarget{},
-		&SendGridTargetList{},
-		&SlackTarget{},
-		&SlackTargetList{},
-		&SolaceTarget{},
-		&SolaceTargetList{},
-		&SplunkTarget{},
-		&SplunkTargetList{},
-		&TwilioTarget{},
-		&TwilioTargetList{},
-		&ZendeskTarget{},
-		&ZendeskTargetList{},
-	)
+	allTypes := make([]runtime.Object, 0, len(AllTypes)*2)
+	for _, t := range AllTypes {
+		allTypes = append(allTypes, t.Single, t.List)
+	}
+	scheme.AddKnownTypes(SchemeGroupVersion, allTypes...)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

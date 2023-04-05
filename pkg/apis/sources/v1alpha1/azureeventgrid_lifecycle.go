@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"sort"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -110,4 +111,13 @@ func (s *AzureEventGridSourceStatus) MarkSubscribed() {
 // reason and message.
 func (s *AzureEventGridSourceStatus) MarkNotSubscribed(reason, msg string) {
 	azureEventGridSourceConditionSet.Manage(s).MarkFalse(AzureEventGridConditionSubscribed, reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureEventGridSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureEventGridSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

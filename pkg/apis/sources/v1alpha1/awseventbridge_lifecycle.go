@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -129,4 +131,13 @@ func (s *AWSEventBridgeSourceStatus) MarkSubscribed(ruleARN tmapis.ARN) {
 func (s *AWSEventBridgeSourceStatus) MarkNotSubscribed(reason, msg string) {
 	awsEventBridgeSourceConditionSet.Manage(s).MarkFalse(AWSEventBridgeConditionSubscribed,
 		reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AWSEventBridgeSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AWSEventBridgeSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

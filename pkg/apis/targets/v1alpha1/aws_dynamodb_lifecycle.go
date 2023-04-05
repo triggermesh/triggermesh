@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -86,4 +88,13 @@ func (t *AWSDynamoDBTarget) ServiceAccountOptions() []resource.ServiceAccountOpt
 	}
 
 	return saOpts
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AWSDynamoDBTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AWSDynamoDBTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

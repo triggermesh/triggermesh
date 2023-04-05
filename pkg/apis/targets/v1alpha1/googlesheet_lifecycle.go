@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -79,4 +80,13 @@ func (t *GoogleSheetTarget) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *GoogleSheetTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *GoogleSheetTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *GoogleSheetTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

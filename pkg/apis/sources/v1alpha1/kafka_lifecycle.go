@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -73,4 +75,13 @@ func (s *KafkaSource) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *KafkaSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *KafkaSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *KafkaSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

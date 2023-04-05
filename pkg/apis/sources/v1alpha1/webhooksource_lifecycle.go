@@ -17,9 +17,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	pkgapis "knative.dev/pkg/apis"
+	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
@@ -31,7 +33,7 @@ func (*WebhookSource) GetGroupVersionKind() schema.GroupVersionKind {
 }
 
 // GetConditionSet implements duckv1.KRShaped.
-func (s *WebhookSource) GetConditionSet() pkgapis.ConditionSet {
+func (s *WebhookSource) GetConditionSet() apis.ConditionSet {
 	return v1alpha1.EventSenderConditionSet
 }
 
@@ -77,4 +79,13 @@ func (s *WebhookSource) GetEventTypes() []string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *WebhookSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *WebhookSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *WebhookSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

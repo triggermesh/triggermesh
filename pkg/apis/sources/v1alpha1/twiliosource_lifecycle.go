@@ -17,9 +17,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	pkgapis "knative.dev/pkg/apis"
+	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
@@ -31,7 +33,7 @@ func (*TwilioSource) GetGroupVersionKind() schema.GroupVersionKind {
 }
 
 // GetConditionSet implements duckv1.KRShaped.
-func (s *TwilioSource) GetConditionSet() pkgapis.ConditionSet {
+func (s *TwilioSource) GetConditionSet() apis.ConditionSet {
 	return v1alpha1.EventSenderConditionSet
 }
 
@@ -79,4 +81,13 @@ func (s *TwilioSource) GetEventTypes() []string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *TwilioSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *TwilioSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *TwilioSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

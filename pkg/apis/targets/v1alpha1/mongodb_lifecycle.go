@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/apis"
@@ -81,4 +83,13 @@ func (t *MongoDBTarget) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *MongoDBTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *MongoDBTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *MongoDBTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

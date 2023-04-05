@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -75,4 +76,13 @@ func (s *IBMMQSource) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *IBMMQSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *IBMMQSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *IBMMQSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }
