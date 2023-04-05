@@ -96,10 +96,10 @@ func (t *GoogleCloudFirestoreTarget) GetAdapterOverrides() *v1alpha1.AdapterOver
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *GoogleCloudFirestoreTarget) SetDefaults(ctx context.Context) {
+func (t *GoogleCloudFirestoreTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *GoogleCloudFirestoreTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *GoogleCloudFirestoreTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

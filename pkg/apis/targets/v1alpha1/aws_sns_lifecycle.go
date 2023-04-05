@@ -73,10 +73,10 @@ func (t *AWSSNSTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AWSSNSTarget) SetDefaults(ctx context.Context) {
+func (t *AWSSNSTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AWSSNSTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AWSSNSTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

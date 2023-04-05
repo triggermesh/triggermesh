@@ -83,10 +83,10 @@ func (t *ElasticsearchTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *ElasticsearchTarget) SetDefaults(ctx context.Context) {
+func (t *ElasticsearchTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *ElasticsearchTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *ElasticsearchTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

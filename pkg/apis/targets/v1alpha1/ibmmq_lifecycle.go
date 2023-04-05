@@ -83,10 +83,10 @@ func (t *IBMMQTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *IBMMQTarget) SetDefaults(ctx context.Context) {
+func (t *IBMMQTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *IBMMQTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *IBMMQTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

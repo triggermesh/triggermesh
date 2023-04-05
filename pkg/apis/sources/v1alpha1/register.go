@@ -43,13 +43,15 @@ type ObjectWebhook interface {
 	kmeta.OwnerRefable
 }
 
-type objects struct {
+// Objects holds instances of ObjectWebhook and runtime.Objects List.
+// +k8s:deepcopy-gen=false
+type Objects struct {
 	Single ObjectWebhook
 	List   runtime.Object
 }
 
 // AllTypes is a list of all the types defined in this package.
-var AllTypes = []objects{
+var AllTypes = []Objects{
 	{&AWSCloudWatchSource{}, &AWSCloudWatchSourceList{}},
 	{&AWSCloudWatchLogsSource{}, &AWSCloudWatchLogsSourceList{}},
 	{&AWSCodeCommitSource{}, &AWSCodeCommitSourceList{}},

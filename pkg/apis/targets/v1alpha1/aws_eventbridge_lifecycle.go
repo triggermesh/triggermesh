@@ -98,10 +98,10 @@ func (t *AWSEventBridgeTarget) ServiceAccountOptions() []resource.ServiceAccount
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AWSEventBridgeTarget) SetDefaults(ctx context.Context) {
+func (t *AWSEventBridgeTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AWSEventBridgeTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AWSEventBridgeTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

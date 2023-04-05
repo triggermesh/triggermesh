@@ -149,10 +149,10 @@ func (s *FunctionStatus) MarkConfigMapUnavailable(reason, msg string) {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *Function) SetDefaults(ctx context.Context) {
+func (f *Function) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *Function) Validate(ctx context.Context) *apis.FieldError {
+func (f *Function) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

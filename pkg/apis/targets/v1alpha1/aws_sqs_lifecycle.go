@@ -73,10 +73,10 @@ func (t *AWSSQSTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AWSSQSTarget) SetDefaults(ctx context.Context) {
+func (t *AWSSQSTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AWSSQSTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AWSSQSTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

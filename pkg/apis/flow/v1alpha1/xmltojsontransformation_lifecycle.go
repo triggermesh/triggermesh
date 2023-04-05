@@ -69,10 +69,10 @@ func (t *XMLToJSONTransformation) GetAdapterOverrides() *v1alpha1.AdapterOverrid
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *XMLToJSONTransformation) SetDefaults(ctx context.Context) {
+func (t *XMLToJSONTransformation) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *XMLToJSONTransformation) Validate(ctx context.Context) *apis.FieldError {
+func (t *XMLToJSONTransformation) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

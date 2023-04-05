@@ -83,10 +83,10 @@ func (t *SalesforceTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *SalesforceTarget) SetDefaults(ctx context.Context) {
+func (t *SalesforceTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *SalesforceTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *SalesforceTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

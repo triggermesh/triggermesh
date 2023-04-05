@@ -43,6 +43,8 @@ type ObjectWebhook interface {
 	kmeta.OwnerRefable
 }
 
+// Objects holds instances of ObjectWebhook and runtime.Objects List.
+// +k8s:deepcopy-gen=false
 type Objects struct {
 	Single ObjectWebhook
 	List   runtime.Object

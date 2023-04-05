@@ -84,10 +84,10 @@ func (t *SlackTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *SlackTarget) SetDefaults(ctx context.Context) {
+func (t *SlackTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *SlackTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *SlackTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

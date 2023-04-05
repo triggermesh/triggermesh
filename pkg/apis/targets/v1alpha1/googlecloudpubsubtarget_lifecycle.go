@@ -80,10 +80,10 @@ func (t *GoogleCloudPubSubTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrid
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *GoogleCloudPubSubTarget) SetDefaults(ctx context.Context) {
+func (t *GoogleCloudPubSubTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *GoogleCloudPubSubTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *GoogleCloudPubSubTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

@@ -84,10 +84,10 @@ func (t *GoogleCloudWorkflowsTarget) GetAdapterOverrides() *v1alpha1.AdapterOver
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *GoogleCloudWorkflowsTarget) SetDefaults(ctx context.Context) {
+func (t *GoogleCloudWorkflowsTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *GoogleCloudWorkflowsTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *GoogleCloudWorkflowsTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

@@ -75,10 +75,10 @@ func (t *LogzTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *LogzTarget) SetDefaults(ctx context.Context) {
+func (t *LogzTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *LogzTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *LogzTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

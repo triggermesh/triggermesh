@@ -82,10 +82,10 @@ func (t *AzureSentinelTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AzureSentinelTarget) SetDefaults(ctx context.Context) {
+func (t *AzureSentinelTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AzureSentinelTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AzureSentinelTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

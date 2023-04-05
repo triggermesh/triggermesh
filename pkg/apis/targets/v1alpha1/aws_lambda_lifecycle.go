@@ -73,10 +73,10 @@ func (t *AWSLambdaTarget) ServiceAccountOptions() []resource.ServiceAccountOptio
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AWSLambdaTarget) SetDefaults(ctx context.Context) {
+func (t *AWSLambdaTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AWSLambdaTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AWSLambdaTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

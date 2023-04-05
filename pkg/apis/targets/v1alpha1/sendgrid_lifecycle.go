@@ -86,10 +86,10 @@ func (t *SendGridTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *SendGridTarget) SetDefaults(ctx context.Context) {
+func (t *SendGridTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *SendGridTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *SendGridTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

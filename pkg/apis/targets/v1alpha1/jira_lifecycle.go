@@ -90,10 +90,10 @@ func (t *JiraTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *JiraTarget) SetDefaults(ctx context.Context) {
+func (t *JiraTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *JiraTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *JiraTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

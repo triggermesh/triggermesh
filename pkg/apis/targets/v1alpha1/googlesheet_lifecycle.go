@@ -83,10 +83,10 @@ func (t *GoogleSheetTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *GoogleSheetTarget) SetDefaults(ctx context.Context) {
+func (t *GoogleSheetTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *GoogleSheetTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *GoogleSheetTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

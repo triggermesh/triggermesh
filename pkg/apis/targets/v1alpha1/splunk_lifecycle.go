@@ -56,10 +56,10 @@ func (t *SplunkTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *SplunkTarget) SetDefaults(ctx context.Context) {
+func (t *SplunkTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *SplunkTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *SplunkTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

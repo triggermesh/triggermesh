@@ -88,10 +88,10 @@ func (t *DatadogTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *DatadogTarget) SetDefaults(ctx context.Context) {
+func (t *DatadogTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *DatadogTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *DatadogTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

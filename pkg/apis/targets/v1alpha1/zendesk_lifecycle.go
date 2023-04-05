@@ -85,10 +85,10 @@ func (t *ZendeskTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *ZendeskTarget) SetDefaults(ctx context.Context) {
+func (t *ZendeskTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *ZendeskTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *ZendeskTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

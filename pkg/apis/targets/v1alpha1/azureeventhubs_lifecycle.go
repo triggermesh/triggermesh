@@ -82,10 +82,10 @@ func (t *AzureEventHubsTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides 
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AzureEventHubsTarget) SetDefaults(ctx context.Context) {
+func (t *AzureEventHubsTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AzureEventHubsTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AzureEventHubsTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

@@ -91,10 +91,10 @@ func (t *AWSDynamoDBTarget) ServiceAccountOptions() []resource.ServiceAccountOpt
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AWSDynamoDBTarget) SetDefaults(ctx context.Context) {
+func (t *AWSDynamoDBTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AWSDynamoDBTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AWSDynamoDBTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

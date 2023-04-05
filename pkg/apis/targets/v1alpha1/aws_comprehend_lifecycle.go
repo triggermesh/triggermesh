@@ -93,10 +93,10 @@ func (t *AWSComprehendTarget) ServiceAccountOptions() []resource.ServiceAccountO
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *AWSComprehendTarget) SetDefaults(ctx context.Context) {
+func (t *AWSComprehendTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *AWSComprehendTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *AWSComprehendTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

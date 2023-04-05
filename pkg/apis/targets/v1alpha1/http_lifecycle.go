@@ -56,10 +56,10 @@ func (t *HTTPTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *HTTPTarget) SetDefaults(ctx context.Context) {
+func (t *HTTPTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *HTTPTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *HTTPTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

@@ -56,10 +56,10 @@ func (t *CloudEventsTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *CloudEventsTarget) SetDefaults(ctx context.Context) {
+func (t *CloudEventsTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *CloudEventsTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *CloudEventsTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

@@ -56,10 +56,10 @@ func (t *KafkaTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *KafkaTarget) SetDefaults(ctx context.Context) {
+func (t *KafkaTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *KafkaTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *KafkaTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

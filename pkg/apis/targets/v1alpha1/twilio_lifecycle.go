@@ -86,10 +86,10 @@ func (t *TwilioTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *TwilioTarget) SetDefaults(ctx context.Context) {
+func (t *TwilioTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *TwilioTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *TwilioTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

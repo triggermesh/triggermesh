@@ -85,10 +85,10 @@ func (t *GoogleCloudStorageTarget) GetAdapterOverrides() *v1alpha1.AdapterOverri
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *GoogleCloudStorageTarget) SetDefaults(ctx context.Context) {
+func (t *GoogleCloudStorageTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *GoogleCloudStorageTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *GoogleCloudStorageTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

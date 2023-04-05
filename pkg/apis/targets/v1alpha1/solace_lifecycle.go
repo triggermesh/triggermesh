@@ -56,10 +56,10 @@ func (t *SolaceTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *SolaceTarget) SetDefaults(ctx context.Context) {
+func (t *SolaceTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *SolaceTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *SolaceTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

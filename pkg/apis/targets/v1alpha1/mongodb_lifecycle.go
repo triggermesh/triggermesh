@@ -86,10 +86,10 @@ func (t *MongoDBTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *MongoDBTarget) SetDefaults(ctx context.Context) {
+func (t *MongoDBTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *MongoDBTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *MongoDBTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }

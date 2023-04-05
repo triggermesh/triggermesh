@@ -68,10 +68,10 @@ func (t *LogzMetricsTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // SetDefaults implements apis.Defaultable
-func (s *LogzMetricsTarget) SetDefaults(ctx context.Context) {
+func (t *LogzMetricsTarget) SetDefaults(ctx context.Context) {
 }
 
 // Validate implements apis.Validatable
-func (s *LogzMetricsTarget) Validate(ctx context.Context) *apis.FieldError {
+func (t *LogzMetricsTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
 }
