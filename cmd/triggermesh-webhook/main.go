@@ -37,7 +37,12 @@ import (
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
-var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{}
+var defaultingTypes = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
+	sourcesv1alpha1.SchemeGroupVersion.WithKind("CloudEventsSource"): &sourcesv1alpha1.CloudEventsSource{},
+	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):            &routingv1alpha1.Filter{},
+	flowv1alpha1.SchemeGroupVersion.WithKind("XSLTTransformation"):   &flowv1alpha1.XSLTTransformation{},
+}
+var validationTypes = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{}
 var callbacks = map[schema.GroupVersionKind]validation.Callback{}
 
 // NewDefaultingAdmissionController returns defaulting webhook controller implementation.
@@ -50,7 +55,7 @@ func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher
 		"/defaulting",
 
 		// The resources to default.
-		types,
+		defaultingTypes,
 
 		// A function that infuses the context passed to Validate/SetDefaults with custom metadata.
 		func(ctx context.Context) context.Context {
@@ -72,7 +77,7 @@ func NewValidationAdmissionController(ctx context.Context, cmw configmap.Watcher
 		"/validation",
 
 		// The resources to validate.
-		types,
+		validationTypes,
 
 		// A function that infuses the context passed to Validate/SetDefaults with custom metadata.
 		func(ctx context.Context) context.Context {
@@ -98,19 +103,19 @@ func main() {
 	})
 
 	for _, s := range sourcesv1alpha1.AllTypes {
-		types[s.Single.GetGroupVersionKind()] = s.Single
+		validationTypes[s.Single.GetGroupVersionKind()] = s.Single
 	}
 	for _, t := range targetsv1alpha1.AllTypes {
-		types[t.Single.GetGroupVersionKind()] = t.Single
+		validationTypes[t.Single.GetGroupVersionKind()] = t.Single
 	}
 	for _, r := range routingv1alpha1.AllTypes {
-		types[r.Single.GetGroupVersionKind()] = r.Single
+		validationTypes[r.Single.GetGroupVersionKind()] = r.Single
 	}
 	for _, f := range flowv1alpha1.AllTypes {
-		types[f.Single.GetGroupVersionKind()] = f.Single
+		validationTypes[f.Single.GetGroupVersionKind()] = f.Single
 	}
 	for _, e := range extensionsv1alpha1.AllTypes {
-		types[e.Single.GetGroupVersionKind()] = e.Single
+		validationTypes[e.Single.GetGroupVersionKind()] = e.Single
 	}
 	sharedmain.MainWithContext(ctx, webhookName,
 		certificates.NewController,
