@@ -104,12 +104,17 @@ jobs:
     - name: Publish container images to GCR
       env:
         KO_DOCKER_REPO: gcr.io/triggermesh
-        KOFLAGS: --jobs=8 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}
         DIST_DIR: /tmp/dist
       run: |
         pushd hack/manifest-cleaner
         go install .
         popd
+
+        if [[ ${GITHUB_REF_TYPE} == "tag" ]]; then
+          export KOFLAGS='--jobs=8 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}'
+        else
+          export KOFLAGS='--jobs=8 --platform=linux/amd64 --push=${{ github.event_name != 'pull_request' }}'
+        fi
 
         IMAGE_TAG=${{ steps.image-tag.outputs.IMAGE_TAG }} make release
 
