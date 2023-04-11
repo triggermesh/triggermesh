@@ -81,8 +81,16 @@ func setData(t *testing.T, event cloudevents.Event, data interface{}) cloudevent
 	return event
 }
 
+func setExtensions(event cloudevents.Event, extensions map[string]interface{}) cloudevents.Event {
+	for k, v := range extensions {
+		event.SetExtension(k, v)
+	}
+	return event
+}
+
 func newEvent() cloudevents.Event {
 	emptyV1Event := cloudevents.NewEvent(cloudevents.VersionV1)
+	emptyV1Event.SetDataContentType(cloudevents.ApplicationJSON)
 	emptyV1Event.SetID("123")
 	emptyV1Event.SetSource("test")
 	emptyV1Event.SetType("test")
@@ -91,10 +99,12 @@ func newEvent() cloudevents.Event {
 
 func TestReceiveAndTransform(t *testing.T) {
 	testCases := []struct {
-		name              string
-		originalEvent     cloudevents.Event
-		expectedEventData string
-		data              []v1alpha1.Transform
+		name                    string
+		originalEvent           cloudevents.Event
+		expectedEventData       string
+		expectedEventExtensions string
+		data                    []v1alpha1.Transform
+		context                 []v1alpha1.Transform
 	}{
 		{
 			name: "Conditional Add 1",
@@ -383,8 +393,31 @@ func TestReceiveAndTransform(t *testing.T) {
 					},
 				},
 			},
-		},
-		{
+		}, {
+			name: "Transform extensions",
+			originalEvent: setExtensions(newEvent(),
+				map[string]interface{}{"ext1": "value1", "ext2": 2}),
+			expectedEventExtensions: `{"ext2":2,"ext3":"value3"}`,
+			context: []v1alpha1.Transform{
+				{
+					Operation: "add",
+					Paths: []v1alpha1.Path{
+						{
+							Key:   "Extensions.ext3",
+							Value: "value3",
+						},
+					},
+				},
+				{
+					Operation: "delete",
+					Paths: []v1alpha1.Path{
+						{
+							Key: "Extensions.ext1",
+						},
+					},
+				},
+			},
+		}, {
 			name: "Ignore errors", //ensure that errored transformation won't affect the event
 			originalEvent: setData(t, newEvent(),
 				json.RawMessage(`{"key1":"value1","object":{"foo":"bar"}}`)),
@@ -432,12 +465,16 @@ func TestReceiveAndTransform(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			pipeline, err := newPipeline(tc.data, storage.New())
+			storage := storage.New()
+			dataPipeline, err := newPipeline(tc.data, storage)
+			assert.NoError(t, err)
+
+			contextPipeline, err := newPipeline(tc.context, storage)
 			assert.NoError(t, err)
 
 			a := &adapter{
-				DataPipeline:    pipeline,
-				ContextPipeline: pipeline,
+				DataPipeline:    dataPipeline,
+				ContextPipeline: contextPipeline,
 				logger:          logtesting.TestLogger(t),
 			}
 
@@ -445,6 +482,12 @@ func TestReceiveAndTransform(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.Equal(t, tc.expectedEventData, string(transformedEvent.Data()))
+
+			if tc.expectedEventExtensions != "" {
+				ext, err := json.Marshal(transformedEvent.Extensions())
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedEventExtensions, string(ext))
+			}
 		})
 	}
 }
