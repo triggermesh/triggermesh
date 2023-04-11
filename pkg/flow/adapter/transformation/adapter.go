@@ -224,12 +224,14 @@ func (t *adapter) applyTransformations(event cloudevents.Event) (*cloudevents.Ev
 	if eventContext, err = t.ContextPipeline.apply(eventUniqueID, eventContext, !init); err != nil {
 		errs = append(errs, err)
 	}
-	if err := json.Unmarshal(eventContext, &localContext); err != nil {
+
+	newContext := ceContext{}
+	if err := json.Unmarshal(eventContext, &newContext); err != nil {
 		t.logger.Errorw("Cannot decode CE new context", zap.Error(err))
 		return nil, fmt.Errorf("cannot decode CE new context: %w", err)
 	}
-	event.Context = localContext
-	for k, v := range localContext.Extensions {
+	event.Context = newContext
+	for k, v := range newContext.Extensions {
 		if err := event.Context.SetExtension(k, v); err != nil {
 			t.logger.Errorw("Cannot set CE extension", zap.Error(err))
 			return nil, fmt.Errorf("cannot set CE extension: %w", err)
