@@ -65,6 +65,7 @@ try:
             tolerations:
               description: Pod tolerations, as documented at
                 https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+                Tolerations only works on kubernetes deployment-based components, not on knative-based components.
               type: array
               items:
                 type: object
@@ -90,12 +91,14 @@ try:
             nodeSelector:
               description: NodeSelector only allow the object pods to be created at nodes where all selector labels are present, as documented at
                 https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector.
+                NodeSelector only works on kubernetes deployment-based components, not on knative-based components.
               type: object
               additionalProperties:
                 type: string
             affinity:
               description: Scheduling constraints of the pod. More info at
                 https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity.
+                Affinity only works on kubernetes deployment-based components, not on knative-based components.
               type: object
               x-kubernetes-preserve-unknown-fields: true
         """
