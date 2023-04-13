@@ -40,7 +40,7 @@ const (
 
 	tID          = "abc123"
 	tContentType = "application/json"
-	tCEType      = "test.type"
+	tCEType      = "io.triggermesh.http.request"
 	tCESource    = "test.source"
 )
 

@@ -23,7 +23,10 @@ metadata:
   annotations:
     registry.triggermesh.io/acceptedEventTypes: |
       [
-        { "type": "*" }
+        {
+          "type": "io.triggermesh.http.request",
+          "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.http.request.json"
+        }
       ]
     registry.knative.dev/eventTypes: |
       [

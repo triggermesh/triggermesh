@@ -28,6 +28,9 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
 
+// EventTypeHTTPTargetRequest is the event type for HTTP target request.
+const EventTypeHTTPTargetRequest = "io.triggermesh.http.request"
+
 // GetGroupVersionKind implements kmeta.OwnerRefable.
 func (*HTTPTarget) GetGroupVersionKind() schema.GroupVersionKind {
 	return SchemeGroupVersion.WithKind("HTTPTarget")
@@ -68,7 +71,7 @@ func (t *HTTPTarget) Validate(ctx context.Context) *apis.FieldError {
 // AcceptedEventTypes implements IntegrationTarget.
 func (*HTTPTarget) AcceptedEventTypes() []string {
 	return []string{
-		EventTypeWildcard,
+		EventTypeHTTPTargetRequest,
 	}
 }
 
