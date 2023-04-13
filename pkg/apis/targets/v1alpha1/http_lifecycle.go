@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"context"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
@@ -62,4 +63,32 @@ func (t *HTTPTarget) SetDefaults(ctx context.Context) {
 // Validate implements apis.Validatable
 func (t *HTTPTarget) Validate(ctx context.Context) *apis.FieldError {
 	return nil
+}
+
+// AcceptedEventTypes implements IntegrationTarget.
+func (*HTTPTarget) AcceptedEventTypes() []string {
+	return []string{
+		EventTypeWildcard,
+	}
+}
+
+// GetEventTypes implements EventSource.
+func (t *HTTPTarget) GetEventTypes() []string {
+	eventType := EventTypeResponse
+	if t.Spec.Response.EventType != "" {
+		eventType = t.Spec.Response.EventType
+	}
+	return []string{
+		eventType,
+	}
+}
+
+// AsEventSource implements EventSource.
+func (t *HTTPTarget) AsEventSource() string {
+	eventSource := t.Spec.Response.EventSource
+	if eventSource == "" {
+		kind := strings.ToLower(t.GetGroupVersionKind().Kind)
+		eventSource = "io.triggermesh." + kind + "." + t.Namespace + "." + t.Name
+	}
+	return eventSource
 }

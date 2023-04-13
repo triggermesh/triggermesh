@@ -17,6 +17,7 @@ limitations under the License.
 package httptarget
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
@@ -24,7 +25,6 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"strings"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -164,7 +164,7 @@ func (a *httpAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*c
 		u.Path = path.Join(u.Path, rd.PathSuffix)
 	}
 
-	req, err := http.NewRequest(a.method, u.String(), strings.NewReader(rd.Body))
+	req, err := http.NewRequest(a.method, u.String(), bytes.NewBuffer(rd.Body))
 	if err != nil {
 		return nil, a.errorHTTPResult(http.StatusInternalServerError, "Could not create HTTP request: %w", err)
 	}

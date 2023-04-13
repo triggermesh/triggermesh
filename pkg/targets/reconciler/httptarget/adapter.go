@@ -80,19 +80,18 @@ func MakeAppEnv(o *v1alpha1.HTTPTarget) []corev1.EnvVar {
 		skipVerify = *o.Spec.SkipVerify
 	}
 
-	eventSource := o.Spec.Response.EventSource
-	if eventSource == "" {
-		kind := strings.ToLower(o.GetGroupVersionKind().Kind)
-		eventSource = "io.triggermesh." + kind + "." + o.Namespace + "." + o.Name
+	eventType := v1alpha1.EventTypeResponse
+	if o.Spec.Response.EventType != "" {
+		eventType = o.Spec.Response.EventType
 	}
 
 	env := []corev1.EnvVar{
 		{
 			Name:  envHTTPEventType,
-			Value: o.Spec.Response.EventType,
+			Value: eventType,
 		}, {
 			Name:  envHTTPEventSource,
-			Value: eventSource,
+			Value: o.AsEventSource(),
 		}, {
 			Name:  envHTTPURL,
 			Value: o.Spec.Endpoint.String(),

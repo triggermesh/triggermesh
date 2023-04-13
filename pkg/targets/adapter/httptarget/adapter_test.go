@@ -244,7 +244,7 @@ func TestHTTPRequests(t *testing.T) {
 			rd := RequestData{
 				Query:      tc.query,
 				PathSuffix: tc.pathsuffix,
-				Body:       string(body),
+				Body:       body,
 				Headers:    tc.reqHeaders,
 			}
 

@@ -56,6 +56,7 @@ spec:
             description: Desired state of event target.
             properties:
               response:
+                description: HTTP target response event attributes.
                 type: object
                 properties:
                   eventType:
@@ -218,6 +219,18 @@ spec:
               observedGeneration:
                 type: integer
                 format: int64
+              ceAttributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    source:
+                      type: string
+                  required:
+                  - type
+                  - source
               conditions:
                 type: array
                 items:
