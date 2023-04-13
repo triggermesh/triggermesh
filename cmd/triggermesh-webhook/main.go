@@ -18,6 +18,7 @@ package main
 
 import (
 	"context"
+	"reflect"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"knative.dev/pkg/configmap"
@@ -30,18 +31,15 @@ import (
 	"knative.dev/pkg/webhook/resourcesemantics/defaulting"
 	"knative.dev/pkg/webhook/resourcesemantics/validation"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	extensionsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/extensions/v1alpha1"
 	flowv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/flow/v1alpha1"
 	routingv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/routing/v1alpha1"
 	sourcesv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
-var types = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
-	sourcesv1alpha1.SchemeGroupVersion.WithKind("CloudEventsSource"): &sourcesv1alpha1.CloudEventsSource{},
-	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):            &routingv1alpha1.Filter{},
-	flowv1alpha1.SchemeGroupVersion.WithKind("XSLTTransformation"):   &flowv1alpha1.XSLTTransformation{},
-}
-
-var callbacks = map[schema.GroupVersionKind]validation.Callback{}
+var admissibleTypes = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{}
 
 // NewDefaultingAdmissionController returns defaulting webhook controller implementation.
 func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher) *controller.Impl {
@@ -53,7 +51,7 @@ func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher
 		"/defaulting",
 
 		// The resources to default.
-		types,
+		admissibleTypes,
 
 		// A function that infuses the context passed to Validate/SetDefaults with custom metadata.
 		func(ctx context.Context) context.Context {
@@ -75,7 +73,7 @@ func NewValidationAdmissionController(ctx context.Context, cmw configmap.Watcher
 		"/validation",
 
 		// The resources to validate.
-		types,
+		admissibleTypes,
 
 		// A function that infuses the context passed to Validate/SetDefaults with custom metadata.
 		func(ctx context.Context) context.Context {
@@ -84,9 +82,6 @@ func NewValidationAdmissionController(ctx context.Context, cmw configmap.Watcher
 
 		// Whether to disallow unknown fields.
 		true,
-
-		// Extra validating callbacks to be applied to resources.
-		callbacks,
 	)
 }
 
@@ -100,9 +95,25 @@ func main() {
 		SecretName:  webhookName + "-certs",
 	})
 
+	registerAdmissibleType(sourcesv1alpha1.SchemeGroupVersion, sourcesv1alpha1.AllTypes)
+	registerAdmissibleType(targetsv1alpha1.SchemeGroupVersion, targetsv1alpha1.AllTypes)
+	registerAdmissibleType(flowv1alpha1.SchemeGroupVersion, flowv1alpha1.AllTypes)
+	registerAdmissibleType(extensionsv1alpha1.SchemeGroupVersion, extensionsv1alpha1.AllTypes)
+	registerAdmissibleType(routingv1alpha1.SchemeGroupVersion, routingv1alpha1.AllTypes)
+
 	sharedmain.MainWithContext(ctx, webhookName,
 		certificates.NewController,
 		NewDefaultingAdmissionController,
 		NewValidationAdmissionController,
 	)
+}
+
+// registerAdmissibleType registers components in the admission controller.
+func registerAdmissibleType(gv schema.GroupVersion, objects []v1alpha1.GroupObject) {
+	for _, object := range objects {
+		t := reflect.TypeOf(object.Single)
+		if admissible, ok := object.Single.(resourcesemantics.GenericCRD); ok {
+			admissibleTypes[gv.WithKind(t.Elem().Name())] = admissible
+		}
+	}
 }

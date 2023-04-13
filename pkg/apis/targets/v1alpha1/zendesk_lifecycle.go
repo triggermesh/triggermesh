@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -81,4 +82,13 @@ func (t *ZendeskTarget) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *ZendeskTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (t *ZendeskTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (t *ZendeskTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -92,4 +94,13 @@ func (s *AzureServiceBusTopicSourceStatus) MarkSubscribed() {
 // reason and message.
 func (s *AzureServiceBusTopicSourceStatus) MarkNotSubscribed(reason, msg string) {
 	azureServiceBusTopicSourceConditionSet.Manage(s).MarkFalse(AzureServiceBusTopicConditionSubscribed, reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureServiceBusTopicSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureServiceBusTopicSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

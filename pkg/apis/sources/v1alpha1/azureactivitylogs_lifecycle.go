@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -102,4 +104,13 @@ func (s *AzureActivityLogsSourceStatus) MarkSubscribed() {
 // reason and message.
 func (s *AzureActivityLogsSourceStatus) MarkNotSubscribed(reason, msg string) {
 	azureActivityLogsSourceConditionSet.Manage(s).MarkFalse(AzureActivityLogsConditionSubscribed, reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureActivityLogsSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureActivityLogsSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

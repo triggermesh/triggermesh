@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -90,4 +92,13 @@ func (s *AWSSQSSource) ServiceAccountOptions() []resource.ServiceAccountOption {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *AWSSQSSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AWSSQSSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AWSSQSSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

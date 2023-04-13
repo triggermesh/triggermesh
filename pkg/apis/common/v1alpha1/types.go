@@ -16,7 +16,10 @@ limitations under the License.
 
 package v1alpha1
 
-import corev1 "k8s.io/api/core/v1"
+import (
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+)
 
 // ValueFromField is a struct field that can have its value either defined
 // explicitly or sourced from another entity.
@@ -46,8 +49,17 @@ type AdapterOverrides struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 	// NodeSelector to control which nodes the pod can be scheduled on.
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
+	// Pod affinity.
+	Affinity *corev1.Affinity `json:"affinity,omitempty"`
 	// Environment variables applied on adapter container.
 	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Labels applied on adapter container.
 	Labels map[string]string `json:"labels,omitempty"`
+}
+
+// GroupObject holds the API group object types.
+//
+// +k8s:deepcopy-gen=false
+type GroupObject struct {
+	Single, List runtime.Object
 }

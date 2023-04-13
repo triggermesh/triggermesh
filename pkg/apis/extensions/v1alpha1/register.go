@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/extensions"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,12 +45,16 @@ var (
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
+// AllTypes is a list of all the types defined in this package.
+var AllTypes = []v1alpha1.GroupObject{
+	{Single: &Function{}, List: &FunctionList{}},
+}
+
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(SchemeGroupVersion,
-		&Function{},
-		&FunctionList{},
-	)
+	for _, t := range AllTypes {
+		scheme.AddKnownTypes(SchemeGroupVersion, t.Single, t.List)
+	}
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

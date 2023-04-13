@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -89,4 +90,13 @@ func (t *AWSComprehendTarget) ServiceAccountOptions() []resource.ServiceAccountO
 	}
 
 	return saOpts
+}
+
+// SetDefaults implements apis.Defaultable
+func (t *AWSComprehendTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (t *AWSComprehendTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

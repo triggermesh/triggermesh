@@ -49,6 +49,25 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		MountPath: "/myvol",
 	}
 
+	affinity := corev1.Affinity{
+		NodeAffinity: &corev1.NodeAffinity{
+			PreferredDuringSchedulingIgnoredDuringExecution: []corev1.PreferredSchedulingTerm{
+				{
+					Weight: 1,
+					Preference: corev1.NodeSelectorTerm{
+						MatchExpressions: []corev1.NodeSelectorRequirement{
+							{
+								Key:      "zone",
+								Operator: corev1.NodeSelectorOpIn,
+								Values:   []string{"zone-a"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
 	depl := NewDeployment(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
 		Selector("test.selector/1", "val1"),
@@ -70,6 +89,7 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 		TerminationErrorToLogs,
 		Toleration(corev1.Toleration{Key: "taint", Operator: corev1.TolerationOpExists}),
 		NodeSelector(map[string]string{"disktype": "ssd"}),
+		Affinity(affinity),
 		Volumes(v),
 		VolumeMounts(vm),
 	)
@@ -106,6 +126,24 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 					}},
 					NodeSelector: map[string]string{
 						"disktype": "ssd",
+					},
+					Affinity: &corev1.Affinity{
+						NodeAffinity: &corev1.NodeAffinity{
+							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.PreferredSchedulingTerm{
+								{
+									Weight: 1,
+									Preference: corev1.NodeSelectorTerm{
+										MatchExpressions: []corev1.NodeSelectorRequirement{
+											{
+												Key:      "zone",
+												Operator: corev1.NodeSelectorOpIn,
+												Values:   []string{"zone-a"},
+											},
+										},
+									},
+								},
+							},
+						},
 					},
 					Containers: []corev1.Container{{
 						Name:  defaultContainerName,

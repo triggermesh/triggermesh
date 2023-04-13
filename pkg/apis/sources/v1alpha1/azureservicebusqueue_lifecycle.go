@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -74,4 +76,13 @@ func (s *AzureServiceBusQueueSource) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureServiceBusQueueSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureServiceBusQueueSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureServiceBusQueueSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

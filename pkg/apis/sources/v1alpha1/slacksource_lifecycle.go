@@ -17,9 +17,11 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	pkgapis "knative.dev/pkg/apis"
+	"knative.dev/pkg/apis"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
@@ -31,7 +33,7 @@ func (*SlackSource) GetGroupVersionKind() schema.GroupVersionKind {
 }
 
 // GetConditionSet implements duckv1.KRShaped.
-func (*SlackSource) GetConditionSet() pkgapis.ConditionSet {
+func (*SlackSource) GetConditionSet() apis.ConditionSet {
 	return v1alpha1.EventSenderConditionSet
 }
 
@@ -73,4 +75,13 @@ func (*SlackSource) GetEventTypes() []string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *SlackSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *SlackSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *SlackSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

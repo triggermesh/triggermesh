@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"sort"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -126,4 +127,13 @@ func (s *AzureBlobStorageSourceStatus) MarkSubscribed() {
 // reason and message.
 func (s *AzureBlobStorageSourceStatus) MarkNotSubscribed(reason, msg string) {
 	azureBlobStorageSourceConditionSet.Manage(s).MarkFalse(AzureBlobStorageConditionSubscribed, reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureBlobStorageSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureBlobStorageSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

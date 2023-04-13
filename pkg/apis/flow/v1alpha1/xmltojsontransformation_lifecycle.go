@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -64,4 +66,13 @@ func (t *XMLToJSONTransformation) GetSink() *duckv1.Destination {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *XMLToJSONTransformation) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (t *XMLToJSONTransformation) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (t *XMLToJSONTransformation) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

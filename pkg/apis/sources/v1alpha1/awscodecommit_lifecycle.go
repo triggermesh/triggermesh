@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -89,4 +91,13 @@ func (s *AWSCodeCommitSource) ServiceAccountOptions() []resource.ServiceAccountO
 	}
 
 	return saOpts
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AWSCodeCommitSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AWSCodeCommitSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

@@ -21,6 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 )
 
@@ -33,46 +34,51 @@ var (
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
+// AllTypes is a list of all the types defined in this package.
+var AllTypes = []v1alpha1.GroupObject{
+	{Single: &AWSCloudWatchSource{}, List: &AWSCloudWatchSourceList{}},
+	{Single: &AWSCloudWatchLogsSource{}, List: &AWSCloudWatchLogsSourceList{}},
+	{Single: &AWSCodeCommitSource{}, List: &AWSCodeCommitSourceList{}},
+	{Single: &AWSCognitoIdentitySource{}, List: &AWSCognitoIdentitySourceList{}},
+	{Single: &AWSCognitoUserPoolSource{}, List: &AWSCognitoUserPoolSourceList{}},
+	{Single: &AWSDynamoDBSource{}, List: &AWSDynamoDBSourceList{}},
+	{Single: &AWSEventBridgeSource{}, List: &AWSEventBridgeSourceList{}},
+	{Single: &AWSKinesisSource{}, List: &AWSKinesisSourceList{}},
+	{Single: &AWSS3Source{}, List: &AWSS3SourceList{}},
+	{Single: &AWSSNSSource{}, List: &AWSSNSSourceList{}},
+	{Single: &AWSSQSSource{}, List: &AWSSQSSourceList{}},
+	{Single: &AWSPerformanceInsightsSource{}, List: &AWSPerformanceInsightsSourceList{}},
+	{Single: &AzureActivityLogsSource{}, List: &AzureActivityLogsSourceList{}},
+	{Single: &AzureBlobStorageSource{}, List: &AzureBlobStorageSourceList{}},
+	{Single: &AzureEventGridSource{}, List: &AzureEventGridSourceList{}},
+	{Single: &AzureEventHubsSource{}, List: &AzureEventHubsSourceList{}},
+	{Single: &AzureIOTHubSource{}, List: &AzureIOTHubSourceList{}},
+	{Single: &AzureQueueStorageSource{}, List: &AzureQueueStorageSourceList{}},
+	{Single: &AzureServiceBusQueueSource{}, List: &AzureServiceBusQueueSourceList{}},
+	{Single: &AzureServiceBusTopicSource{}, List: &AzureServiceBusTopicSourceList{}},
+	{Single: &CloudEventsSource{}, List: &CloudEventsSourceList{}},
+	{Single: &KafkaSource{}, List: &KafkaSourceList{}},
+	{Single: &GoogleCloudAuditLogsSource{}, List: &GoogleCloudAuditLogsSourceList{}},
+	{Single: &GoogleCloudBillingSource{}, List: &GoogleCloudBillingSourceList{}},
+	{Single: &GoogleCloudPubSubSource{}, List: &GoogleCloudPubSubSourceList{}},
+	{Single: &GoogleCloudSourceRepositoriesSource{}, List: &GoogleCloudSourceRepositoriesSourceList{}},
+	{Single: &GoogleCloudStorageSource{}, List: &GoogleCloudStorageSourceList{}},
+	{Single: &HTTPPollerSource{}, List: &HTTPPollerSourceList{}},
+	{Single: &IBMMQSource{}, List: &IBMMQSourceList{}},
+	{Single: &OCIMetricsSource{}, List: &OCIMetricsSourceList{}},
+	{Single: &SalesforceSource{}, List: &SalesforceSourceList{}},
+	{Single: &SlackSource{}, List: &SlackSourceList{}},
+	{Single: &SolaceSource{}, List: &SolaceSourceList{}},
+	{Single: &TwilioSource{}, List: &TwilioSourceList{}},
+	{Single: &WebhookSource{}, List: &WebhookSourceList{}},
+	{Single: &ZendeskSource{}, List: &ZendeskSourceList{}},
+}
+
 // addKnownTypes adds all this custom API's types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(SchemeGroupVersion,
-		&AWSCloudWatchSource{}, &AWSCloudWatchSourceList{},
-		&AWSCloudWatchLogsSource{}, &AWSCloudWatchLogsSourceList{},
-		&AWSCodeCommitSource{}, &AWSCodeCommitSourceList{},
-		&AWSCognitoIdentitySource{}, &AWSCognitoIdentitySourceList{},
-		&AWSCognitoUserPoolSource{}, &AWSCognitoUserPoolSourceList{},
-		&AWSDynamoDBSource{}, &AWSDynamoDBSourceList{},
-		&AWSEventBridgeSource{}, &AWSEventBridgeSourceList{},
-		&AWSKinesisSource{}, &AWSKinesisSourceList{},
-		&AWSS3Source{}, &AWSS3SourceList{},
-		&AWSSNSSource{}, &AWSSNSSourceList{},
-		&AWSSQSSource{}, &AWSSQSSourceList{},
-		&AWSPerformanceInsightsSource{}, &AWSPerformanceInsightsSourceList{},
-		&AzureActivityLogsSource{}, &AzureActivityLogsSourceList{},
-		&AzureBlobStorageSource{}, &AzureBlobStorageSourceList{},
-		&AzureEventGridSource{}, &AzureEventGridSourceList{},
-		&AzureEventHubsSource{}, &AzureEventHubsSourceList{},
-		&AzureIOTHubSource{}, &AzureIOTHubSourceList{},
-		&AzureQueueStorageSource{}, &AzureQueueStorageSourceList{},
-		&AzureServiceBusQueueSource{}, &AzureServiceBusQueueSourceList{},
-		&AzureServiceBusTopicSource{}, &AzureServiceBusTopicSourceList{},
-		&CloudEventsSource{}, &CloudEventsSourceList{},
-		&KafkaSource{}, &KafkaSourceList{},
-		&GoogleCloudAuditLogsSource{}, &GoogleCloudAuditLogsSourceList{},
-		&GoogleCloudBillingSource{}, &GoogleCloudBillingSourceList{},
-		&GoogleCloudPubSubSource{}, &GoogleCloudPubSubSourceList{},
-		&GoogleCloudSourceRepositoriesSource{}, &GoogleCloudSourceRepositoriesSourceList{},
-		&GoogleCloudStorageSource{}, &GoogleCloudStorageSourceList{},
-		&HTTPPollerSource{}, &HTTPPollerSourceList{},
-		&IBMMQSource{}, &IBMMQSourceList{},
-		&OCIMetricsSource{}, &OCIMetricsSourceList{},
-		&SalesforceSource{}, &SalesforceSourceList{},
-		&SlackSource{}, &SlackSourceList{},
-		&SolaceSource{}, &SolaceSourceList{},
-		&TwilioSource{}, &TwilioSourceList{},
-		&WebhookSource{}, &WebhookSourceList{},
-		&ZendeskSource{}, &ZendeskSourceList{},
-	)
+	for _, t := range AllTypes {
+		scheme.AddKnownTypes(SchemeGroupVersion, t.Single, t.List)
+	}
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

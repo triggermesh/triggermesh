@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/flow"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,20 +45,20 @@ var (
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
+// AllTypes is a list of all the types defined in this package.
+var AllTypes = []v1alpha1.GroupObject{
+	{Single: &JQTransformation{}, List: &JQTransformationList{}},
+	{Single: &Synchronizer{}, List: &SynchronizerList{}},
+	{Single: &Transformation{}, List: &TransformationList{}},
+	{Single: &XMLToJSONTransformation{}, List: &XMLToJSONTransformationList{}},
+	{Single: &XSLTTransformation{}, List: &XSLTTransformationList{}},
+}
+
 // Adds the list of known types to Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(SchemeGroupVersion,
-		&JQTransformation{},
-		&JQTransformationList{},
-		&Synchronizer{},
-		&SynchronizerList{},
-		&Transformation{},
-		&TransformationList{},
-		&XMLToJSONTransformation{},
-		&XMLToJSONTransformationList{},
-		&XSLTTransformation{},
-		&XSLTTransformationList{},
-	)
+	for _, t := range AllTypes {
+		scheme.AddKnownTypes(SchemeGroupVersion, t.Single, t.List)
+	}
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

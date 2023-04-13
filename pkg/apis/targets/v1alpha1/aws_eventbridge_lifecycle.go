@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -93,4 +95,13 @@ func (t *AWSEventBridgeTarget) ServiceAccountOptions() []resource.ServiceAccount
 	}
 
 	return saOpts
+}
+
+// SetDefaults implements apis.Defaultable
+func (t *AWSEventBridgeTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (t *AWSEventBridgeTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

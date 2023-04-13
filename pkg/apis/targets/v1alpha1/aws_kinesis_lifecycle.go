@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -68,4 +70,13 @@ func (t *AWSKinesisTarget) ServiceAccountOptions() []resource.ServiceAccountOpti
 	}
 
 	return saOpts
+}
+
+// SetDefaults implements apis.Defaultable
+func (t *AWSKinesisTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (t *AWSKinesisTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

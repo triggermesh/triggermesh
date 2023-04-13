@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -51,4 +53,13 @@ func (t *KafkaTarget) GetStatusManager() *v1alpha1.StatusManager {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *KafkaTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (t *KafkaTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (t *KafkaTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

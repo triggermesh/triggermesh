@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -82,4 +83,13 @@ func (t *SendGridTarget) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *SendGridTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (t *SendGridTarget) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (t *SendGridTarget) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

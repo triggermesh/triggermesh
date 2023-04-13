@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -126,4 +128,13 @@ func (s *AWSSNSSourceStatus) MarkSubscribed(subARN string) {
 func (s *AWSSNSSourceStatus) MarkNotSubscribed(reason, msg string) {
 	awsSNSSourceConditionSet.Manage(s).MarkFalse(AWSSNSConditionSubscribed,
 		reason, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AWSSNSSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AWSSNSSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

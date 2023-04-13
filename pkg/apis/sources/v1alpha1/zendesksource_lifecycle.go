@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -113,4 +115,13 @@ func (s *ZendeskSourceStatus) MarkTargetSynced() {
 func (s *ZendeskSourceStatus) MarkTargetNotSynced(reason, msg string) {
 	zendeskSourceConditionSet.Manage(s).MarkFalse(ZendeskConditionTargetSynced,
 		ZendeskReasonFailedSync, msg)
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *ZendeskSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *ZendeskSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

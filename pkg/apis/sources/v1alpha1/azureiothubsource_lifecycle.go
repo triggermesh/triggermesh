@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
@@ -80,4 +82,13 @@ func AzureIOTHubSourceName(namespace, name string) string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureIOTHubSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureIOTHubSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureIOTHubSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"knative.dev/pkg/apis"
@@ -74,4 +76,13 @@ func (s *AzureEventHubsSource) GetEventTypes() []string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (s *AzureEventHubsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return s.Spec.AdapterOverrides
+}
+
+// SetDefaults implements apis.Defaultable
+func (s *AzureEventHubsSource) SetDefaults(ctx context.Context) {
+}
+
+// Validate implements apis.Validatable
+func (s *AzureEventHubsSource) Validate(ctx context.Context) *apis.FieldError {
+	return nil
 }

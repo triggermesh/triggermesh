@@ -108,6 +108,18 @@ func NodeSelector(selector map[string]string) ObjectOption {
 	}
 }
 
+// Affinity sets an Affinity on a PodSpecable.
+func Affinity(affinity corev1.Affinity) ObjectOption {
+	return func(object interface{}) {
+		switch o := object.(type) {
+		case *appsv1.Deployment:
+			o.Spec.Template.Spec.Affinity = &affinity
+		case *servingv1.Service:
+			o.Spec.Template.Spec.Affinity = &affinity
+		}
+	}
+}
+
 // Volumes attaches Volumes to a PodSpecable.
 func Volumes(vs ...corev1.Volume) ObjectOption {
 	return func(object interface{}) {
