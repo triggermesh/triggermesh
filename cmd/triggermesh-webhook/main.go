@@ -39,7 +39,12 @@ import (
 	targetsv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 )
 
-var admissibleTypes = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{}
+var validationTypes = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{}
+var defaultingTypes = map[schema.GroupVersionKind]resourcesemantics.GenericCRD{
+	sourcesv1alpha1.SchemeGroupVersion.WithKind("CloudEventsSource"): &sourcesv1alpha1.CloudEventsSource{},
+	routingv1alpha1.SchemeGroupVersion.WithKind("Filter"):            &routingv1alpha1.Filter{},
+	flowv1alpha1.SchemeGroupVersion.WithKind("XSLTTransformation"):   &flowv1alpha1.XSLTTransformation{},
+}
 
 // NewDefaultingAdmissionController returns defaulting webhook controller implementation.
 func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher) *controller.Impl {
@@ -51,7 +56,7 @@ func NewDefaultingAdmissionController(ctx context.Context, cmw configmap.Watcher
 		"/defaulting",
 
 		// The resources to default.
-		admissibleTypes,
+		defaultingTypes,
 
 		// A function that infuses the context passed to Validate/SetDefaults with custom metadata.
 		func(ctx context.Context) context.Context {
@@ -73,7 +78,7 @@ func NewValidationAdmissionController(ctx context.Context, cmw configmap.Watcher
 		"/validation",
 
 		// The resources to validate.
-		admissibleTypes,
+		validationTypes,
 
 		// A function that infuses the context passed to Validate/SetDefaults with custom metadata.
 		func(ctx context.Context) context.Context {
@@ -95,11 +100,11 @@ func main() {
 		SecretName:  webhookName + "-certs",
 	})
 
-	registerAdmissibleType(sourcesv1alpha1.SchemeGroupVersion, sourcesv1alpha1.AllTypes)
-	registerAdmissibleType(targetsv1alpha1.SchemeGroupVersion, targetsv1alpha1.AllTypes)
-	registerAdmissibleType(flowv1alpha1.SchemeGroupVersion, flowv1alpha1.AllTypes)
-	registerAdmissibleType(extensionsv1alpha1.SchemeGroupVersion, extensionsv1alpha1.AllTypes)
-	registerAdmissibleType(routingv1alpha1.SchemeGroupVersion, routingv1alpha1.AllTypes)
+	registerValidationType(sourcesv1alpha1.SchemeGroupVersion, sourcesv1alpha1.AllTypes)
+	registerValidationType(targetsv1alpha1.SchemeGroupVersion, targetsv1alpha1.AllTypes)
+	registerValidationType(flowv1alpha1.SchemeGroupVersion, flowv1alpha1.AllTypes)
+	registerValidationType(extensionsv1alpha1.SchemeGroupVersion, extensionsv1alpha1.AllTypes)
+	registerValidationType(routingv1alpha1.SchemeGroupVersion, routingv1alpha1.AllTypes)
 
 	sharedmain.MainWithContext(ctx, webhookName,
 		certificates.NewController,
@@ -108,12 +113,12 @@ func main() {
 	)
 }
 
-// registerAdmissibleType registers components in the admission controller.
-func registerAdmissibleType(gv schema.GroupVersion, objects []v1alpha1.GroupObject) {
+// registerValidationType registers components in the validation controller.
+func registerValidationType(gv schema.GroupVersion, objects []v1alpha1.GroupObject) {
 	for _, object := range objects {
 		t := reflect.TypeOf(object.Single)
 		if admissible, ok := object.Single.(resourcesemantics.GenericCRD); ok {
-			admissibleTypes[gv.WithKind(t.Elem().Name())] = admissible
+			validationTypes[gv.WithKind(t.Elem().Name())] = admissible
 		}
 	}
 }
