@@ -40,7 +40,7 @@ const (
 
 	tID          = "abc123"
 	tContentType = "application/json"
-	tCEType      = "test.type"
+	tCEType      = "io.triggermesh.http.request"
 	tCESource    = "test.source"
 )
 
@@ -244,7 +244,7 @@ func TestHTTPRequests(t *testing.T) {
 			rd := RequestData{
 				Query:      tc.query,
 				PathSuffix: tc.pathsuffix,
-				Body:       string(body),
+				Body:       body,
 				Headers:    tc.reqHeaders,
 			}
 

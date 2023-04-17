@@ -1,0 +1,43 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$ref": "#/$defs/RequestData",
+	"$defs": {
+		"RequestData": {
+			"properties": {
+				"query_string": {
+					"type": "string"
+				},
+				"path_suffix": {
+					"type": "string"
+				},
+				"body": true,
+				"headers": {
+					"patternProperties": {
+						".*": {
+							"type": "string"
+						}
+					},
+					"type": "object"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object"
+		}
+	},
+	"examples": [{
+			"path_suffix": "/send",
+			"body": "Hello from TriggerMesh!",
+			"headers": {
+				"User-Agent": "Mozilla/5.0",
+				"Accept": "application/json"
+			}
+		},
+		{
+			"path_suffix": "/items/1234",
+			"body": {
+				"name": "Apple",
+				"price": 2.99
+			}
+		}
+	]
+}
