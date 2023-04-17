@@ -38,6 +38,8 @@ type HTTPTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
+	_ v1alpha1.EventSource         = (*HTTPTarget)(nil)
+	_ v1alpha1.EventReceiver       = (*HTTPTarget)(nil)
 	_ v1alpha1.Reconcilable        = (*HTTPTarget)(nil)
 	_ v1alpha1.AdapterConfigurable = (*HTTPTarget)(nil)
 )
