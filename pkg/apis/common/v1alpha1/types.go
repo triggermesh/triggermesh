@@ -55,6 +55,8 @@ type AdapterOverrides struct {
 	Env []corev1.EnvVar `json:"env,omitempty"`
 	// Labels applied on adapter container.
 	Labels map[string]string `json:"labels,omitempty"`
+	// Annotations applied on adapter container.
+	Annotations map[string]string `json:"annotations,omitempty"`
 }
 
 // GroupObject holds the API group object types.
