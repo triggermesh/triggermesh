@@ -70,17 +70,21 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 
 	ksvc := NewKnService(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
+		PodAnnotation("test.podannotation/2", "val2"),
 		Port("health", 8081),
 		Image(tImg),
 		PodLabel("test.podlabel/1", "val1"),
+		PodAnnotation("test.podannotation/1", "val1"),
 		EnvVar("TEST_ENV1", "val1"),
 		Port("h2c", 8080), // overrides previously defined port
 		Label("test.label/1", "val1"),
+		Annotation("test.annotation/1", "val1"),
 		Probe("/health", "health"),             // port is ignored
 		StartupProbe("/initialized", "health"), // port is ignored
 		EnvVars(makeEnvVars(2, "MULTI_ENV", "val")...),
 		EnvVar("TEST_ENV2", "val2"),
 		Label("test.label/2", "val2"),
+		Annotation("test.annotation/2", "val2"),
 		ServiceAccount(&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: "god-mode"}}),
 		Requests(&cpuRes, &memRes),
 		Limits(&cpuRes, nil),
@@ -101,6 +105,10 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 				"test.label/2":                      "val2",
 				"networking.knative.dev/visibility": "cluster-local",
 			},
+			Annotations: map[string]string{
+				"test.annotation/1": "val1",
+				"test.annotation/2": "val2",
+			},
 		},
 		Spec: servingv1.ServiceSpec{
 			ConfigurationSpec: servingv1.ConfigurationSpec{
@@ -109,6 +117,10 @@ func TestNewServiceWithDefaultContainer(t *testing.T) {
 						Labels: map[string]string{
 							"test.podlabel/1": "val1",
 							"test.podlabel/2": "val2",
+						},
+						Annotations: map[string]string{
+							"test.podannotation/1": "val1",
+							"test.podannotation/2": "val2",
 						},
 					},
 					Spec: servingv1.RevisionSpec{

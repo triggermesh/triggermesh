@@ -40,6 +40,22 @@ func PodLabel(key, val string) ObjectOption {
 	}
 }
 
+// PodAnnotation sets the value of a Annotation of a PodSpecable's Pod template.
+func PodAnnotation(key, val string) ObjectOption {
+	return func(object interface{}) {
+		var metaObj metav1.Object
+
+		switch o := object.(type) {
+		case *appsv1.Deployment:
+			metaObj = &o.Spec.Template
+		case *servingv1.Service:
+			metaObj = &o.Spec.Template
+		}
+
+		Annotation(key, val)(metaObj)
+	}
+}
+
 // Container adds a container to a PodSpecable's Pod template.
 func Container(c *corev1.Container) ObjectOption {
 	return func(object interface{}) {

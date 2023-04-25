@@ -70,19 +70,23 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 
 	depl := NewDeployment(tNs, tName,
 		PodLabel("test.podlabel/2", "val2"),
+		PodAnnotation("test.podannotation/2", "val2"),
 		Selector("test.selector/1", "val1"),
 		Port("h2c", 8080),
 		Image(tImg),
 		PodLabel("test.podlabel/1", "val1"),
+		PodAnnotation("test.podannotation/1", "val1"),
 		EnvVar("TEST_ENV1", "val1"),
 		Selector("test.selector/2", "val2"),
 		Port("health", 8081),
 		Label("test.label/1", "val1"),
+		Annotation("test.annotation/1", "val1"),
 		Probe("/health", "health"),
 		StartupProbe("/initialized", "health"),
 		EnvVars(makeEnvVars(2, "MULTI_ENV", "val")...),
 		EnvVar("TEST_ENV2", "val2"),
 		Label("test.label/2", "val2"),
+		Annotation("test.annotation/2", "val2"),
 		ServiceAccount(&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: "god-mode"}}),
 		Requests(&cpuRes, &memRes),
 		Limits(&cpuRes, nil),
@@ -102,6 +106,10 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 				"test.label/1": "val1",
 				"test.label/2": "val2",
 			},
+			Annotations: map[string]string{
+				"test.annotation/1": "val1",
+				"test.annotation/2": "val2",
+			},
 		},
 		Spec: appsv1.DeploymentSpec{
 			Selector: &metav1.LabelSelector{
@@ -117,6 +125,10 @@ func TestNewDeploymentWithDefaultContainer(t *testing.T) {
 						"test.selector/2": "val2",
 						"test.podlabel/1": "val1",
 						"test.podlabel/2": "val2",
+					},
+					Annotations: map[string]string{
+						"test.podannotation/1": "val1",
+						"test.podannotation/2": "val2",
 					},
 				},
 				Spec: corev1.PodSpec{

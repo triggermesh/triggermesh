@@ -17,6 +17,11 @@ try:
           description: Kubernetes object parameters to apply on top of default adapter values.
           type: object
           properties:
+            annotations:
+              description: Adapter annotations.
+              type: object
+              additionalProperties:
+                type: string
             labels:
               description: Adapter labels.
               type: object
