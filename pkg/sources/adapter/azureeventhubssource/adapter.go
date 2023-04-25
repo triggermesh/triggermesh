@@ -133,13 +133,6 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		logger.Panicw("Unable to create Event Hub client", zap.Error(err))
 	}
 
-	defer func() {
-		err := consumerClient.Close(ctx)
-		if err != nil {
-			logger.Errorw("Unable to close Event Hub client", zap.Error(err))
-		}
-	}()
-
 	ceSource := env.HubResourceID
 	if ceOverrideSource := env.CEOverrideSource; ceOverrideSource != "" {
 		ceSource = ceOverrideSource
@@ -194,6 +187,13 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 func (a *adapter) Start(ctx context.Context) error {
 	go health.Start(ctx)
 
+	defer func() {
+		err := a.ehClient.Close(ctx)
+		if err != nil {
+			a.logger.Errorw("Unable to close Event Hub client", zap.Error(err))
+		}
+	}()
+
 	runtimeInfo, err := a.ehClient.GetEventHubProperties(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("getting Event Hub runtime information: %w", err)
@@ -234,11 +234,10 @@ func (a *adapter) processPartition(ctx context.Context, partitionID string) {
 	}
 	defer partitionClient.Close(ctx)
 
-loop:
 	for {
 		select {
 		case <-ctx.Done():
-			break loop
+			continue
 		default:
 			receiveCtx, cancel := context.WithTimeout(ctx, connTimeout)
 

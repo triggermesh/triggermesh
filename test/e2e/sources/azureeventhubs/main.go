@@ -148,7 +148,7 @@ var _ = Describe("Azure EventHubs", func() {
 				batch, err := producerClient.NewEventDataBatch(ctx, &azeventhubs.EventDataBatchOptions{})
 				Expect(err).ToNot(HaveOccurred())
 
-				for i := 0; i < len(events); i++ {
+				for i := range events {
 					err = batch.AddEventData(events[i], nil)
 					Expect(err).ToNot(HaveOccurred())
 				}
