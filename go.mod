@@ -55,7 +55,7 @@ require (
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
-	github.com/logzio/logzio-go v0.0.0-20200316143903-ac8fc0e2910e
+	github.com/logzio/logzio-go v1.1.1-alpha
 	github.com/nukosuke/go-zendesk v0.14.2
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.4
@@ -202,7 +202,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/sendgrid/rest v2.6.5+incompatible // indirect
-	github.com/shirou/gopsutil v3.21.9+incompatible // indirect
+	github.com/shirou/gopsutil/v3 v3.21.6 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
