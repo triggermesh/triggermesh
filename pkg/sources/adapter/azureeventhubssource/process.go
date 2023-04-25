@@ -22,12 +22,13 @@ import (
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 )
 
 // MessageProcessor converts an Event Hubs message to a CloudEvent.
 type MessageProcessor interface {
-	Process(*eventhub.Event) ([]*cloudevents.Event, error)
+	// Process(*eventhub.Event) ([]*cloudevents.Event, error)
+	Process(*azeventhubs.ReceivedEventData) ([]*cloudevents.Event, error)
 }
 
 var (
@@ -42,7 +43,7 @@ type defaultMessageProcessor struct {
 }
 
 // Process implements MessageProcessor.
-func (p *defaultMessageProcessor) Process(msg *eventhub.Event) ([]*cloudevents.Event, error) {
+func (p *defaultMessageProcessor) Process(msg *azeventhubs.ReceivedEventData) ([]*cloudevents.Event, error) {
 	event, err := makeEventHubsEvent(msg, p.ceSource, p.ceType)
 	if err != nil {
 		return nil, fmt.Errorf("creating CloudEvent from Event Hubs message: %w", err)
@@ -52,10 +53,10 @@ func (p *defaultMessageProcessor) Process(msg *eventhub.Event) ([]*cloudevents.E
 }
 
 // makeEventHubsEvent returns a CloudEvent for a generic Event Hubs message.
-func makeEventHubsEvent(msg *eventhub.Event, srcAttr, typeAttr string) (*cloudevents.Event, error) {
-	ceData := toCloudEventData(msg)
+func makeEventHubsEvent(msg *azeventhubs.ReceivedEventData, srcAttr, typeAttr string) (*cloudevents.Event, error) {
+	ceData := toCloudEventData(&msg.EventData)
 
-	event := cloudevents.NewEvent(cloudevents.VersionV1)
+	event := cloudevents.NewEvent()
 	event.SetSource(srcAttr)
 	event.SetType(typeAttr)
 	if err := event.SetData(cloudevents.ApplicationJSON, ceData); err != nil {
@@ -67,18 +68,18 @@ func makeEventHubsEvent(msg *eventhub.Event, srcAttr, typeAttr string) (*cloudev
 
 // toCloudEventData returns a eventhub.Event in a shape that is suitable for
 // JSON serialization inside some CloudEvent data.
-func toCloudEventData(e *eventhub.Event) interface{} {
+func toCloudEventData(e *azeventhubs.EventData) interface{} {
 	var data interface{}
 	data = e
 
-	// if event.Data contains raw JSON data, type it as json.RawMessage so
+	// if event.Body contains raw JSON data, type it as json.RawMessage so
 	// it doesn't get encoded to base64 during the serialization of the
 	// CloudEvent data.
 	var rawData json.RawMessage
-	if err := json.Unmarshal(e.Data, &rawData); err == nil {
-		data = EventWithRawData{
-			Data:  rawData,
-			Event: e,
+	if err := json.Unmarshal(e.Body, &rawData); err == nil {
+		data = &EventWithRawData{
+			Body:      rawData,
+			EventData: e,
 		}
 	}
 
@@ -87,8 +88,8 @@ func toCloudEventData(e *eventhub.Event) interface{} {
 
 // EventWithRawData is an eventhub.Event with RawMessage-typed data.
 type EventWithRawData struct {
-	Data json.RawMessage
-	*eventhub.Event
+	Body json.RawMessage
+	*azeventhubs.EventData
 }
 
 // eventGridMessageProcessor processes events originating from Azure Event Grid.
@@ -107,10 +108,10 @@ type eventGridMessageProcessor struct {
 //
 // Expected structure of events in a slice:
 // https://docs.microsoft.com/en-us/azure/event-grid/cloud-event-schema
-func (p *eventGridMessageProcessor) Process(msg *eventhub.Event) ([]*cloudevents.Event, error) {
+func (p *eventGridMessageProcessor) Process(msg *azeventhubs.ReceivedEventData) ([]*cloudevents.Event, error) {
 	events := make([]*cloudevents.Event, 0)
 
-	if err := json.Unmarshal(msg.Data, &events); err != nil {
+	if err := json.Unmarshal(msg.Body, &events); err != nil {
 		// the message didn't originate from Event Grid, fall back to
 		// the default processor's behaviour
 		event, err := makeEventHubsEvent(msg, p.ceSourceFallback, p.ceTypeFallback)

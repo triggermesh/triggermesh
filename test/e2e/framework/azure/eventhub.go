@@ -19,7 +19,6 @@ package azure
 import (
 	"context"
 
-	eventhubs "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub"
@@ -27,15 +26,15 @@ import (
 	"github.com/triggermesh/triggermesh/test/e2e/framework"
 )
 
-func CreateEventHubNamespaceOnly(ctx context.Context, subscriptionID, name, region, rg string) *eventhubs.Hub {
+func CreateEventHubNamespaceOnly(ctx context.Context, subscriptionID, name, region, rg string) *armeventhub.Eventhub {
 	return CreateEventHubCommon(ctx, subscriptionID, name, region, rg, true)
 }
 
-func CreateEventHubComponents(ctx context.Context, subscriptionID, name, region, rg string) *eventhubs.Hub {
+func CreateEventHubComponents(ctx context.Context, subscriptionID, name, region, rg string) *armeventhub.Eventhub {
 	return CreateEventHubCommon(ctx, subscriptionID, name, region, rg, false)
 }
 
-func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg string, omitHub bool) *eventhubs.Hub {
+func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg string, omitHub bool) *armeventhub.Eventhub {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		framework.FailfWithOffset(1, "Unable to authenticate: %s", err)
@@ -77,7 +76,7 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 		ehResp, err := ehClient.CreateOrUpdate(ctx, rg, name, name, armeventhub.Eventhub{
 			Properties: &armeventhub.Properties{
 				MessageRetentionInDays: to.Ptr[int64](1),
-				PartitionCount:         to.Ptr[int64](2),
+				PartitionCount:         to.Ptr[int64](1),
 			},
 		}, nil)
 
@@ -86,13 +85,7 @@ func CreateEventHubCommon(ctx context.Context, subscriptionID, name, region, rg 
 			return nil
 		}
 
-		hub, err := eventhubs.NewHubWithNamespaceNameAndEnvironment(*ehResp.Name, name)
-		if err != nil {
-			framework.FailfWithOffset(1, "Unable to create eventhub client: %s", err)
-			return nil
-		}
-
-		return hub
+		return &ehResp.Eventhub
 	}
 
 	return nil

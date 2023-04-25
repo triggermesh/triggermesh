@@ -24,14 +24,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/Azure/azure-event-hubs-go/v3/persist"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	eventhubs "github.com/Azure/azure-event-hubs-go/v3"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 
@@ -82,7 +82,7 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 	Context("a target is deployed", func() {
 		var rg string
-		var hub *eventhubs.Hub
+		var consumerClient *azeventhubs.ConsumerClient
 
 		subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
 		region := os.Getenv("AZURE_REGION")
@@ -103,7 +103,21 @@ var _ = Describe("Azure Event Hubs target", func() {
 			})
 
 			By("creating an Azure Event Hub", func() {
-				hub = azure.CreateEventHubComponents(ctx, subscriptionID, ns, region, rg)
+				azure.CreateEventHubComponents(ctx, subscriptionID, ns, region, rg)
+			})
+
+			By("creating Azure Event Hub Consumer Client", func() {
+				defaultAzureCred, err := azidentity.NewDefaultAzureCredential(nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				nsfqdn := fmt.Sprintf("%s.servicebus.windows.net", ns)
+				consumerClient, err = azeventhubs.NewConsumerClient(nsfqdn, ns, azeventhubs.DefaultConsumerGroup, defaultAzureCred, nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				DeferCleanup(func() {
+					err = consumerClient.Close(ctx)
+					Expect(err).ToNot(HaveOccurred())
+				})
 			})
 		})
 
@@ -126,30 +140,16 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 			It("receives an event on the Event Hub", func() {
 				var event *cloudevents.Event
+				var receivedEvents []*azeventhubs.ReceivedEventData
 				var partitionIDs []string
-				var eventHandler eventhubs.Handler
 				var evCtx context.Context // Used to set a timeout for reading events
-				var payload []byte
-
-				eventReceivedChannel := make(chan bool)
 
 				By("retrieving Event Hub partition details", func() {
-					info, err := hub.GetRuntimeInformation(ctx)
+					info, err := consumerClient.GetEventHubProperties(ctx, nil)
 					Expect(err).NotTo(HaveOccurred())
 
 					partitionIDs = info.PartitionIDs
-					Expect(len(partitionIDs)).To(BeNumerically(">", 0))
-				})
-
-				By("setting up a handler to verify the received event", func() {
-					eventHandler = func(ctx context.Context, ev *eventhubs.Event) error {
-						payload = ev.Data
-
-						// Pass the bool to the channel to terminate the receiver
-						eventReceivedChannel <- true
-
-						return nil
-					}
+					Expect(len(partitionIDs)).To(Equal(1))
 				})
 
 				By("starting the handler to consume events", func() {
@@ -157,19 +157,22 @@ var _ = Describe("Azure Event Hubs target", func() {
 					var evCancel context.CancelFunc // Used to cancel the reading context
 					evCtx, evCancel = context.WithTimeout(ctx, time.Second*15)
 
-					for _, pID := range partitionIDs {
-						_, err := hub.Receive(
-							ctx,
-							pID,
-							eventHandler,
-							eventhubs.ReceiveWithStartingOffset(persist.StartOfStream),
-						)
+					partitionClient, err := consumerClient.NewPartitionClient(partitionIDs[0], nil)
+					Expect(err).ToNot(HaveOccurred())
 
+					go func() {
+						receivedEvents, err = partitionClient.ReceiveEvents(
+							evCtx,
+							1,
+							nil,
+						)
 						Expect(err).ToNot(HaveOccurred())
-					}
+					}()
 
 					DeferCleanup(func() {
 						evCancel()
+						err = partitionClient.Close(ctx)
+						Expect(err).ToNot(HaveOccurred())
 					})
 				})
 
@@ -180,20 +183,14 @@ var _ = Describe("Azure Event Hubs target", func() {
 					apps.WaitForCompletion(f.KubeClient, j)
 				})
 
-				By("waiting for the event to be received", func() {
-					// don't exit till event is received by handler or times out
-					select {
-					case <-eventReceivedChannel:
-					case <-evCtx.Done():
-						framework.FailfWithOffset(2, "timed out while waiting for event")
-					}
-				})
-
 				By("verifying the sent event", func() {
-					Expect(len(payload)).To(BeNumerically(">", 0))
+					if receivedEvents == nil {
+						framework.FailfWithOffset(2, "no events received")
+					}
+					Expect(len(receivedEvents)).To(BeNumerically(">", 0))
 					var ce cloudevents.Event
 
-					err := json.Unmarshal(payload, &ce)
+					err := json.Unmarshal(receivedEvents[0].Body, &ce)
 					Expect(err).ToNot(HaveOccurred())
 
 					Expect(ce.Data()).To(Equal(event.Data()))
@@ -227,30 +224,16 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 			It("receives an event on the Event Hub", func() {
 				var event *cloudevents.Event
+				var receivedEvents []*azeventhubs.ReceivedEventData
 				var partitionIDs []string
-				var eventHandler eventhubs.Handler
 				var evCtx context.Context // Used to set a timeout for reading events
-				var payload []byte
-
-				eventReceivedChannel := make(chan bool)
 
 				By("retrieving Event Hub partition details", func() {
-					info, err := hub.GetRuntimeInformation(ctx)
+					info, err := consumerClient.GetEventHubProperties(ctx, nil)
 					Expect(err).NotTo(HaveOccurred())
 
 					partitionIDs = info.PartitionIDs
-					Expect(len(partitionIDs)).To(BeNumerically(">", 0))
-				})
-
-				By("setting up a handler to verify the received event", func() {
-					eventHandler = func(ctx context.Context, ev *eventhubs.Event) error {
-						payload = ev.Data
-
-						// Pass the bool to the channel to terminate the receiver
-						eventReceivedChannel <- true
-
-						return nil
-					}
+					Expect(len(partitionIDs)).To(Equal(1))
 				})
 
 				By("starting the handler to consume events", func() {
@@ -258,16 +241,19 @@ var _ = Describe("Azure Event Hubs target", func() {
 					var evCancel context.CancelFunc // Used to cancel the reading context
 					evCtx, evCancel = context.WithTimeout(ctx, time.Second*15)
 
-					for _, pID := range partitionIDs {
-						_, err := hub.Receive(
-							ctx,
-							pID,
-							eventHandler,
-							eventhubs.ReceiveWithStartingOffset(persist.StartOfStream),
+					partitionClient, err := consumerClient.NewPartitionClient(partitionIDs[0], nil)
+					Expect(err).ToNot(HaveOccurred())
+					go func() {
+						events, err := partitionClient.ReceiveEvents(
+							evCtx,
+							1,
+							nil,
 						)
-
 						Expect(err).ToNot(HaveOccurred())
-					}
+						if len(events) > 0 {
+							receivedEvents = append(receivedEvents, events...)
+						}
+					}()
 
 					DeferCleanup(func() {
 						evCancel()
@@ -276,22 +262,17 @@ var _ = Describe("Azure Event Hubs target", func() {
 
 				By("sending an event", func() {
 					event = e2ece.NewHelloEvent(f)
-
 					j := e2ece.RunEventSender(f.KubeClient, ns, tgtURL.String(), event)
 					apps.WaitForCompletion(f.KubeClient, j)
 				})
 
-				By("waiting for the event to be received", func() {
-					// don't exit till event is received by handler or times out
-					select {
-					case <-eventReceivedChannel:
-					case <-evCtx.Done():
-						framework.FailfWithOffset(2, "timed out while waiting for event")
+				By("verify the events received", func() {
+					if receivedEvents == nil {
+						framework.FailfWithOffset(2, "no events received")
 					}
-				})
+					Expect(len(receivedEvents)).To(BeNumerically(">", 0))
+					Expect(receivedEvents[0].Body).To(Equal(event.Data()))
 
-				By("verifying the sent event", func() {
-					Expect(payload).To(Equal(event.Data()))
 				})
 			})
 		})

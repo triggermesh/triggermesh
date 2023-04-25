@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 )
 
 func TestProcessEventGridMessage(t *testing.T) {
@@ -41,9 +41,11 @@ func TestProcessEventGridMessage(t *testing.T) {
 
 // fakeEventGridCloudEvent returns a eventhub.Event which payload represents an
 // event from Event Grid using the CloudEvent schema.
-func fakeEventGridCloudEvent() *eventhub.Event {
-	return &eventhub.Event{
-		Data: sampleEventGridEvent,
+func fakeEventGridCloudEvent() *azeventhubs.ReceivedEventData {
+	return &azeventhubs.ReceivedEventData{
+		EventData: azeventhubs.EventData{
+			Body: sampleEventGridEvent,
+		},
 	}
 }
 
