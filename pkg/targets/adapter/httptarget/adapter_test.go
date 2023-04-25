@@ -19,6 +19,7 @@ package httptarget
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/textproto"
@@ -42,10 +43,11 @@ const (
 	tContentType = "application/json"
 	tCEType      = "io.triggermesh.http.request"
 	tCESource    = "test.source"
+
+	tCETypeArbitrary = "test.some.type"
 )
 
 func TestHTTPRequests(t *testing.T) {
-
 	type tRequest struct {
 		Status int
 	}
@@ -275,6 +277,160 @@ func TestHTTPRequests(t *testing.T) {
 					assert.Equal(t, v, resv, "wrong value for header %q", canonicalK)
 				}
 				for k, v := range tc.reqHeaders {
+					canonicalK := textproto.CanonicalMIMEHeaderKey(k)
+					resv, ok := res.Headers[canonicalK]
+					assert.True(t, ok, "header %q not found", canonicalK)
+					assert.Equal(t, v, resv, "wrong value for header %q", canonicalK)
+				}
+
+			case <-time.After(1 * time.Second):
+				assert.Fail(t, "expected cloud event response was not received")
+			}
+		})
+	}
+}
+
+func TestArbitraryEventTypeHTTPRequest(t *testing.T) {
+	type tResponse struct {
+		Method   string
+		Path     string
+		Headers  map[string]string
+		Username string
+		Password string
+		Body     []byte
+	}
+
+	tServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			assert.FailNow(t, "mock service could not read body from request")
+		}
+
+		user, password, _ := r.BasicAuth()
+		res := &tResponse{
+			Method:   r.Method,
+			Path:     r.URL.Path,
+			Username: user,
+			Password: password,
+			Body:     body,
+		}
+
+		if len(r.Header) != 0 {
+			res.Headers = make(map[string]string, len(r.Header))
+			for k, v := range r.Header {
+				if len(v) == 0 {
+					res.Headers[k] = ""
+					continue
+				}
+				res.Headers[k] = v[0]
+			}
+		}
+
+		if err = json.NewEncoder(w).Encode(res); err != nil {
+			assert.FailNow(t, "mock service could not JSON encode response")
+		}
+	}))
+
+	testCases := map[string]struct {
+		// adapter config
+
+		url               string
+		method            string
+		skipVerify        bool
+		caCertificate     string
+		headers           map[string]string
+		basicAuthUsername string
+		basicAuthPassword string
+
+		// service mock
+		status int
+
+		// request
+		body []byte
+	}{
+		"POST request": {
+			url:    tURL,
+			method: "POST",
+
+			status: 200,
+			body:   []byte("hello world"),
+		},
+
+		"simple POST with headers": {
+			url:    tURL,
+			method: "POST",
+			headers: map[string]string{
+				"key1": "value1",
+				"key2": "value2",
+			},
+			body: []byte(`{"hello":"world"}`),
+
+			status: 200,
+		},
+
+		"basic auth request": {
+			url:               tURL,
+			method:            "GET",
+			basicAuthUsername: "jane",
+			basicAuthPassword: "doe",
+			body:              []byte(`{"hello":"world"}`),
+
+			status: 200,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			client := tServer.Client()
+
+			ceClient, send, responses := cetest.NewMockResponderClient(t, 1)
+
+			u, err := url.Parse(tServer.URL)
+			assert.NoError(t, err, "test URL is not valid")
+
+			adapter := &httpAdapter{
+				eventType:   tEventType,
+				eventSource: tEventSource,
+
+				url:               u,
+				method:            tc.method,
+				headers:           tc.headers,
+				basicAuthUsername: tc.basicAuthUsername,
+				basicAuthPassword: tc.basicAuthPassword,
+				client:            client,
+
+				ceClient: ceClient,
+				logger:   logtesting.TestLogger(t),
+			}
+
+			go func() {
+				if err := adapter.Start(context.Background()); err != nil {
+					assert.FailNow(t, "could not start test adapter")
+				}
+			}()
+
+			event := ceevent.New()
+			if err = event.SetData(tContentType, tc.body); err != nil {
+				assert.Fail(t, "could not write test payload to CloudEvent: %v", string(tc.body))
+			}
+
+			event.SetID(tID)
+			event.SetType(tCETypeArbitrary)
+			event.SetSource(tCESource)
+
+			send <- event
+
+			select {
+			case event := <-responses:
+				res := &tResponse{}
+				assert.NoError(t, event.Event.DataAs(res), "error parsing response from mocked service")
+				assert.Equal(t, tc.method, res.Method, "wrong HTTP method used")
+				assert.Equal(t, tc.basicAuthUsername, res.Username, "wrong username")
+				assert.Equal(t, tc.basicAuthPassword, res.Password, "wrong password")
+				assert.Equal(t, tc.body, res.Body, "unexpected body")
+				for k, v := range tc.headers {
 					canonicalK := textproto.CanonicalMIMEHeaderKey(k)
 					resv, ok := res.Headers[canonicalK]
 					assert.True(t, ok, "header %q not found", canonicalK)
