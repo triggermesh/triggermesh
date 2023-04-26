@@ -156,7 +156,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 			ceType:   ceType,
 		}
 	default:
-		panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
+		logger.Panicw("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
 	consumerGroup := azeventhubs.DefaultConsumerGroup
@@ -188,8 +188,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	go health.Start(ctx)
 
 	defer func() {
-		err := a.ehClient.Close(ctx)
-		if err != nil {
+		if err := a.ehClient.Close(ctx); err != nil {
 			a.logger.Errorw("Unable to close Event Hub client", zap.Error(err))
 		}
 	}()
@@ -222,42 +221,38 @@ func (a *adapter) Start(ctx context.Context) error {
 }
 
 // processPartition processes events from a single partition of the Event Hub.
-func (a *adapter) processPartition(ctx context.Context, partitionID string) {
+func (a *adapter) processPartition(ctx context.Context, partitionID string) error {
 	partitionClient, err := a.ehClient.NewPartitionClient(partitionID, &azeventhubs.PartitionClientOptions{
 		StartPosition: azeventhubs.StartPosition{
 			Latest: to.Ptr(true),
 		},
 	})
 	if err != nil {
-		a.logger.Errorf("creating partition client for partition %s: %v", partitionID, err)
-		return
+		return err
 	}
-	defer partitionClient.Close(ctx)
+	defer func() {
+		if err := partitionClient.Close(ctx); err != nil {
+			a.logger.Errorf("closing partition client for partition %s: %v", partitionID, err)
+		}
+	}()
 
 	for {
-		select {
-		case <-ctx.Done():
-			continue
-		default:
-			receiveCtx, cancel := context.WithTimeout(ctx, connTimeout)
+		receiveCtx, cancel := context.WithTimeout(ctx, connTimeout)
+		events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
+		cancel()
 
-			events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
-			cancel()
-
-			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-				if ctx.Err() != nil {
-					a.logger.Info("[Partition: %s] Application is stopping, stopping receive for partition\n", partitionID)
-					break
-				}
-			} else if err != nil {
-				a.logger.Errorf("receiving events for partition %s: %v", partitionID, err)
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			if ctx.Err() != nil {
+				return err
 			}
+		} else if err != nil {
+			return err
+		}
 
-			for _, event := range events {
-				err = a.handleMessage(ctx, event)
-				if err != nil {
-					a.logger.Errorw("Error handling message", zap.Error(err))
-				}
+		for _, event := range events {
+			err = a.handleMessage(ctx, event)
+			if err != nil {
+				return err
 			}
 		}
 	}

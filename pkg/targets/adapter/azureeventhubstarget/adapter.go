@@ -80,8 +80,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	defer func() {
-		err := producerClient.Close(ctx)
-		if err != nil {
+		if err := producerClient.Close(ctx); err != nil {
 			logger.Errorw("Unable to close Event Hub client", zap.Error(err))
 		}
 	}()
