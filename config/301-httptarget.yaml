@@ -26,7 +26,8 @@ metadata:
         {
           "type": "io.triggermesh.http.request",
           "schema": "https://raw.githubusercontent.com/triggermesh/triggermesh/main/schemas/io.triggermesh.http.request.json"
-        }
+        },
+        { "type": "*" }
       ]
     registry.knative.dev/eventTypes: |
       [

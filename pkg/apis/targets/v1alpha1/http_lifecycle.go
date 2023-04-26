@@ -72,6 +72,7 @@ func (t *HTTPTarget) Validate(ctx context.Context) *apis.FieldError {
 func (*HTTPTarget) AcceptedEventTypes() []string {
 	return []string{
 		EventTypeHTTPTargetRequest,
+		EventTypeWildcard,
 	}
 }
 
