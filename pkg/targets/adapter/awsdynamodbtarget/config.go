@@ -30,6 +30,9 @@ type envAccessor struct {
 
 	AwsTargetArn string `envconfig:"ARN" required:"true"`
 
+	// Assume this IAM Role when access keys provided.
+	AssumeIamRole string `envconfig:"AWS_ASSUME_ROLE_ARN"`
+
 	DiscardCEContext bool `envconfig:"AWS_DISCARD_CE_CONTEXT"`
 
 	// The environment variables below aren't read from the envConfig struct
