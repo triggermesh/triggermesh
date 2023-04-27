@@ -212,7 +212,10 @@ func (a *adapter) Start(ctx context.Context) error {
 		wg.Add(1)
 		go func(partitionID string) {
 			defer wg.Done()
-			a.processPartition(ctx, partitionID)
+			err = a.processPartition(ctx, partitionID)
+			if err != nil {
+				a.logger.Errorw("Error processing partition %s: %v", partitionID, err)
+			}
 		}(partition)
 	}
 	health.MarkReady()
