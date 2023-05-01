@@ -58,7 +58,7 @@ require (
 	github.com/logzio/logzio-go v1.1.1-alpha
 	github.com/nukosuke/go-zendesk v0.14.2
 	github.com/onsi/ginkgo/v2 v2.9.2
-	github.com/onsi/gomega v1.27.4
+	github.com/onsi/gomega v1.27.6
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
 	github.com/sendgrid/sendgrid-go v3.12.0+incompatible
 	github.com/sethvargo/go-limiter v0.7.2
