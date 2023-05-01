@@ -90,6 +90,7 @@ rules:
   - googlecloudstoragesources
   - httppollersources
   - ibmmqsources
+  - mongodbsources
   - kafkasources
   - ocimetricssources
   - salesforcesources
@@ -134,6 +135,7 @@ rules:
   - googlecloudstoragesources/status
   - httppollersources/status
   - ibmmqsources/status
+  - mongodbsources/status
   - kafkasources/status
   - ocimetricssources/status
   - salesforcesources/status
@@ -317,6 +319,7 @@ rules:
   - googlecloudstoragesources/finalizers
   - httppollersources/finalizers
   - ibmmqsources/finalizers
+  - mongodbsources/finalizers
   - kafkasources/finalizers
   - ocimetricssources/finalizers
   - salesforcesources/finalizers
@@ -764,6 +767,7 @@ rules:
   - googlecloudstoragesources
   - httppollersources
   - ibmmqsources
+  - mongodbsources
   - kafkasources
   - ocimetricssources
   - salesforcesources

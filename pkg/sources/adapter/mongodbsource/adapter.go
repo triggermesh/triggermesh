@@ -18,6 +18,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
+	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
@@ -89,13 +90,9 @@ func (a *adapter) Start(ctx context.Context) error {
 	go health.Start(ctx)
 
 	health.MarkReady()
-
 	a.logger.Info("Starting collection of MongoDB change events")
-
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
-
 	coll := a.mongoClient.Database(a.database).Collection(a.collection)
-
 	cs, err := coll.Watch(ctx, mongo.Pipeline{})
 	if err != nil {
 		return fmt.Errorf("watching MongoDB collection: %w", err)
@@ -148,8 +145,8 @@ func (a *adapter) processChanges(ctx context.Context, cs *mongo.ChangeStream) er
 func (a *adapter) processChangeEvent(ctx context.Context, changeEvent bson.M) error {
 	fmt.Println("procesing change")
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
-	event.SetType("v1alpha1.EventTypeMongoDBChange")
-	event.SetSource("v1alpha1.EventSource(a.mt.Namespace, a.mt.Name))")
+	event.SetType(v1alpha1.MongoDBSourceEventType)
+	event.SetSource(a.mt.Namespace + "/" + a.mt.Name)
 	event.SetTime(time.Now())
 
 	if err := event.SetData(cloudevents.ApplicationJSON, changeEvent); err != nil {

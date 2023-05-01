@@ -5011,6 +5011,137 @@ func (w *wrapSourcesV1alpha1KafkaSourceImpl) Watch(ctx context.Context, opts v1.
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapSourcesV1alpha1) MongoDBSources(namespace string) typedsourcesv1alpha1.MongoDBSourceInterface {
+	return &wrapSourcesV1alpha1MongoDBSourceImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "sources.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "mongodbsources",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapSourcesV1alpha1MongoDBSourceImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedsourcesv1alpha1.MongoDBSourceInterface = (*wrapSourcesV1alpha1MongoDBSourceImpl)(nil)
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) Create(ctx context.Context, in *sourcesv1alpha1.MongoDBSource, opts v1.CreateOptions) (*sourcesv1alpha1.MongoDBSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "MongoDBSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.MongoDBSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*sourcesv1alpha1.MongoDBSource, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.MongoDBSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) List(ctx context.Context, opts v1.ListOptions) (*sourcesv1alpha1.MongoDBSourceList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.MongoDBSourceList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *sourcesv1alpha1.MongoDBSource, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.MongoDBSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) Update(ctx context.Context, in *sourcesv1alpha1.MongoDBSource, opts v1.UpdateOptions) (*sourcesv1alpha1.MongoDBSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "MongoDBSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.MongoDBSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) UpdateStatus(ctx context.Context, in *sourcesv1alpha1.MongoDBSource, opts v1.UpdateOptions) (*sourcesv1alpha1.MongoDBSource, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "sources.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "MongoDBSource",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &sourcesv1alpha1.MongoDBSource{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapSourcesV1alpha1MongoDBSourceImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapSourcesV1alpha1) OCIMetricsSources(namespace string) typedsourcesv1alpha1.OCIMetricsSourceInterface {
 	return &wrapSourcesV1alpha1OCIMetricsSourceImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{

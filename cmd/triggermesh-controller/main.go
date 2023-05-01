@@ -56,6 +56,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/httppollersource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ibmmqsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/kafkasource"
+	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/mongodbsource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/ocimetricssource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/salesforcesource"
 	"github.com/triggermesh/triggermesh/pkg/sources/reconciler/slacksource"
@@ -129,6 +130,7 @@ func main() {
 		googlecloudstoragesource.NewController,
 		httppollersource.NewController,
 		ibmmqsource.NewController,
+		mongodbsource.NewController,
 		kafkasource.NewController,
 		ocimetricssource.NewController,
 		salesforcesource.NewController,

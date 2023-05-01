@@ -76,6 +76,8 @@ type IBMMQSourceExpansion interface{}
 
 type KafkaSourceExpansion interface{}
 
+type MongoDBSourceExpansion interface{}
+
 type OCIMetricsSourceExpansion interface{}
 
 type SalesforceSourceExpansion interface{}

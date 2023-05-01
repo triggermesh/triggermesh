@@ -137,6 +137,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().IBMMQSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("kafkasources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().KafkaSources().Informer()}, nil
+	case sourcesv1alpha1.SchemeGroupVersion.WithResource("mongodbsources"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().MongoDBSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("ocimetricssources"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Sources().V1alpha1().OCIMetricsSources().Informer()}, nil
 	case sourcesv1alpha1.SchemeGroupVersion.WithResource("salesforcesources"):

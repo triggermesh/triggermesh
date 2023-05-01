@@ -144,6 +144,10 @@ func (c *FakeSourcesV1alpha1) KafkaSources(namespace string) v1alpha1.KafkaSourc
 	return &FakeKafkaSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) MongoDBSources(namespace string) v1alpha1.MongoDBSourceInterface {
+	return &FakeMongoDBSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) OCIMetricsSources(namespace string) v1alpha1.OCIMetricsSourceInterface {
 	return &FakeOCIMetricsSources{c, namespace}
 }
