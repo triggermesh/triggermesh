@@ -52,7 +52,7 @@ type AzureEventHubsTargetSpec struct {
 	//
 	// Expected format:
 	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
-	EventHubID EventHubResourceID `json:"eventHubID"`
+	EventHubID AzureResourceID `json:"eventHubID"`
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`

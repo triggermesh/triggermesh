@@ -38,6 +38,7 @@ type TargetsV1alpha1Interface interface {
 	AWSSQSTargetsGetter
 	AzureEventHubsTargetsGetter
 	AzureSentinelTargetsGetter
+	AzureServiceBusTargetsGetter
 	CloudEventsTargetsGetter
 	DatadogTargetsGetter
 	ElasticsearchTargetsGetter
@@ -106,6 +107,10 @@ func (c *TargetsV1alpha1Client) AzureEventHubsTargets(namespace string) AzureEve
 
 func (c *TargetsV1alpha1Client) AzureSentinelTargets(namespace string) AzureSentinelTargetInterface {
 	return newAzureSentinelTargets(c, namespace)
+}
+
+func (c *TargetsV1alpha1Client) AzureServiceBusTargets(namespace string) AzureServiceBusTargetInterface {
+	return newAzureServiceBusTargets(c, namespace)
 }
 
 func (c *TargetsV1alpha1Client) CloudEventsTargets(namespace string) CloudEventsTargetInterface {

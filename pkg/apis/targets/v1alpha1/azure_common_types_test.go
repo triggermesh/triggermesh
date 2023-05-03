@@ -23,32 +23,125 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStringerEventHubResourceID(t *testing.T) {
+func TestStringerAzureResourceID(t *testing.T) {
 	testCases := []struct {
 		name         string
-		input        EventHubResourceID
+		input        AzureResourceID
 		expectOutput string
 	}{{
-		name: "Valid Event Hubs instance resource ID",
-		input: EventHubResourceID{
+		name: "Valid resource ID (subscription)",
+		input: AzureResourceID{
+			SubscriptionID: "s",
+		},
+		expectOutput: "/subscriptions/s",
+	}, {
+		name: "Valid resource ID (resource group)",
+		input: AzureResourceID{
 			SubscriptionID: "s",
 			ResourceGroup:  "rg",
-			Namespace:      "ns",
-			EventHub:       "eh",
 		},
-		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/eventHubs/eh",
+		expectOutput: "/subscriptions/s/resourceGroups/rg",
 	}, {
-		name: "Valid Event Hubs namespace resource ID",
-		input: EventHubResourceID{
-			SubscriptionID: "s",
-			ResourceGroup:  "rg",
-			Namespace:      "ns",
+		name: "Valid resource ID (resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
 		},
-		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns",
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn",
 	}, {
-		name: "Invalid resource ID",
-		input: EventHubResourceID{
+		name: "Valid resource ID (subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn",
+	}, {
+		name: "Valid resource ID (namespace)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "namespaces",
+			ResourceName:     "ns",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns",
+	}, {
+		name: "Valid resource ID (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn",
+	}, {
+		name: "Valid resource ID (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: "/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn",
+	}, {
+		name: "Invalid resource ID (subscription)",
+		input: AzureResourceID{
 			SubscriptionID: "",
+		},
+		expectOutput: "",
+	}, {
+		name: "Invalid resource ID (resource group)",
+		input: AzureResourceID{
+			SubscriptionID: "",
+			ResourceGroup:  "rg",
+		},
+		expectOutput: "",
+	}, {
+		name: "Invalid resource ID (resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "",
+			ResourceName:     "rn",
+		},
+		expectOutput: "",
+	}, {
+		name: "Invalid resource ID (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "",
+			ResourceName:     "rn",
+		},
+		expectOutput: "",
+	}, {
+		name: "Invalid resource ID (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "",
+			SubResourceName:  "srn",
 		},
 		expectOutput: "",
 	}}
@@ -62,38 +155,125 @@ func TestStringerEventHubResourceID(t *testing.T) {
 	}
 }
 
-func TestMarshalEventHubResourceID(t *testing.T) {
+func TestMarshalAzureResourceID(t *testing.T) {
 	testCases := []struct {
 		name              string
-		input             EventHubResourceID
+		input             AzureResourceID
 		expectOutput      string
 		expectErrContains string
 	}{{
-		name: "All fields are filled in",
-		input: EventHubResourceID{
+		name: "All fields are filled in (subscription)",
+		input: AzureResourceID{
+			SubscriptionID: "s",
+		},
+		expectOutput: `"/subscriptions/s"`,
+	}, {
+		name: "All fields are filled in (resource group)",
+		input: AzureResourceID{
 			SubscriptionID: "s",
 			ResourceGroup:  "rg",
-			Namespace:      "ns",
-			EventHub:       "eh",
 		},
-		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/eventHubs/eh"`,
+		expectOutput: `"/subscriptions/s/resourceGroups/rg"`,
 	}, {
-		name: "Only EventHub field is empty",
-		input: EventHubResourceID{
+		name: "All fields are filled in (resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn"`,
+	}, {
+		name: "All fields are filled in (subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn"`,
+	}, {
+		name: "All fields are filled in (namespace)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "namespaces",
+			ResourceName:     "ns",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns"`,
+	}, {
+		name: "All fields are filled in (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn"`,
+	}, {
+		name: "All fields are filled in (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn"`,
+	}, {
+		name: "Resource fields are empty",
+		input: AzureResourceID{
 			SubscriptionID: "s",
 			ResourceGroup:  "rg",
-			Namespace:      "ns",
 		},
-		expectOutput: `"/subscriptions/s/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns"`,
+		expectOutput: `"/subscriptions/s/resourceGroups/rg"`,
 	}, {
-		name: "Some required fields are empty",
-		input: EventHubResourceID{
-			SubscriptionID: "s",
+		name: "Some required fields are empty (resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "",
+			ResourceName:     "rn",
+		},
+		expectErrContains: "resource ID contains empty attributes",
+	}, {
+		name: "Some required fields are empty (namespaced resource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "",
+			ResourceName:     "rn",
+		},
+		expectErrContains: "resource ID contains empty attributes",
+	}, {
+		name: "Some required fields are empty (namespaced subresource)",
+		input: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "",
+			SubResourceName:  "srn",
 		},
 		expectErrContains: "resource ID contains empty attributes",
 	}, {
 		name:              "All fields are empty",
-		input:             EventHubResourceID{},
+		input:             AzureResourceID{},
 		expectErrContains: "resource ID contains empty attributes",
 	}}
 
@@ -113,37 +293,78 @@ func TestMarshalEventHubResourceID(t *testing.T) {
 	}
 }
 
-func TestUnmarshalEventHubResourceID(t *testing.T) {
+func TestUnmarshalAzureResourceID(t *testing.T) {
 	testCases := []struct {
 		name              string
 		input             string
-		expectOutput      EventHubResourceID
+		expectOutput      AzureResourceID
 		expectErrContains string
 	}{{
-		name:  "Valid Event Hubs instance resource ID format",
-		input: `"/subscriptions/s/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns/eventHubs/eh"`,
-		expectOutput: EventHubResourceID{
+		name:  "Valid resource ID format (subscription)",
+		input: `"/subscriptions/s"`,
+		expectOutput: AzureResourceID{
 			SubscriptionID: "s",
-			ResourceGroup:  "rg",
-			Namespace:      "ns",
-			EventHub:       "eh",
 		},
 	}, {
-		name:  "Valid Event Hubs namespace resource ID format",
-		input: `"/subscriptions/s/resourceGroups/rg/providers/Microsoft.EventHub/namespaces/ns"`,
-		expectOutput: EventHubResourceID{
+		name:  "Valid resource ID format (resource group)",
+		input: `"/subscriptions/s/resourceGroups/rg"`,
+		expectOutput: AzureResourceID{
 			SubscriptionID: "s",
 			ResourceGroup:  "rg",
-			Namespace:      "ns",
-			EventHub:       "",
+		},
+	}, {
+		name:  "Valid resource ID format (resource)",
+		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+	}, {
+		name:  "Valid resource ID format (subresource)",
+		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
+		},
+	}, {
+		name:  "Valid resource ID format (namespaced resource)",
+		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+		},
+	}, {
+		name:  "Valid resource ID format (namespaced subresource)",
+		input: `"/subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn"`,
+		expectOutput: AzureResourceID{
+			SubscriptionID:   "s",
+			ResourceGroup:    "rg",
+			ResourceProvider: "rp",
+			Namespace:        "ns",
+			ResourceType:     "rt",
+			ResourceName:     "rn",
+			SubResourceType:  "srt",
+			SubResourceName:  "srn",
 		},
 	}, {
 		name:              "Some required fields are empty",
-		input:             `"/subscriptions/s/resourceGroups//providers/Microsoft.EventHub/namespaces//eventHubs/"`,
+		input:             `"/subscriptions/s/resourceGroups/rg/providers/rp//rn"`,
 		expectErrContains: "resource ID contains empty attributes",
 	}, {
 		name:              "Invalid format",
-		input:             `"/subscriptions/s"`,
+		input:             `"/subscriptions/s/resourceGroups/rg/"`,
 		expectErrContains: "does not match expected format",
 	}, {
 		name:              "Invalid input",
@@ -154,7 +375,7 @@ func TestUnmarshalEventHubResourceID(t *testing.T) {
 	for _, tc := range testCases {
 		//nolint:scopelint
 		t.Run(tc.name, func(t *testing.T) {
-			resID := &EventHubResourceID{}
+			resID := &AzureResourceID{}
 			err := json.Unmarshal([]byte(tc.input), resID)
 
 			assert.Equal(t, tc.expectOutput, *resID)
