@@ -73,7 +73,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, listenC
 
 		if err := fw.Add(env.BasicAuthPasswordPath, ceClientUpdater); err != nil {
 			logger.Panicw(
-				fmt.Sprintf("Authentication secret at %q could not be watched", env.BasicAuthPasswordPath),
+				"Authentication secret could not be watched at the specific path",
 				zap.Error(err))
 		}
 		ceAdapter.fileWatcher = fw
@@ -113,7 +113,7 @@ func (a *ceAdapter) senderClientUpdater(url, path, username string) fs.WatchCall
 		if username != "" {
 			password, err := os.ReadFile(path)
 			if err != nil {
-				a.logger.Errorw("Could not read the mounted password.", zap.Error(err), zap.String("path", path))
+				a.logger.Errorw("Could not read the mounted password at the specific path", zap.Error(err))
 				return
 			}
 
