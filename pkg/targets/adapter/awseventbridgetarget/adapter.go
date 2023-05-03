@@ -30,6 +30,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/eventbridge"
 
@@ -53,15 +54,20 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	eventBridgeSession := session.Must(session.NewSession(aws.NewConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(a.Region).
 		WithMaxRetries(5)))
+
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
 
 	return &adapter{
 		awsArnString:      env.AwsTargetArn,
 		awsArn:            a,
 		discardCEContext:  env.DiscardCEContext,
-		eventBridgeClient: eventbridge.New(eventBridgeSession),
+		eventBridgeClient: eventbridge.New(sess, config),
 
 		ceClient: ceClient,
 		logger:   logger,
