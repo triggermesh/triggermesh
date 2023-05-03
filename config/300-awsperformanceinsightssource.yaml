@@ -57,7 +57,8 @@ spec:
             properties:
               arn:
                 description: ARN of the Amazon RDS database instance to receive metrics for. The expected format is documented
-                  at https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonrds.html#amazonrds-resources-for-iam-policies.
+                  at 
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonrds.html#amazonrds-resources-for-iam-policies.
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:rds:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               pollingInterval:

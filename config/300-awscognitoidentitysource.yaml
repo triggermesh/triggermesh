@@ -58,7 +58,8 @@ spec:
             properties:
               arn:
                 description: ARN of the Amazon Cognito Identity Pool to receive notifications from. The expected format is
-                  documented at https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncognitoidentity.html#amazoncognitoidentity-resources-for-iam-policies.
+                  documented at 
+                  https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazoncognitoidentity.html#amazoncognitoidentity-resources-for-iam-policies.
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:cognito-identity:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:identitypool\/.+$
               auth:

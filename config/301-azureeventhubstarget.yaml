@@ -64,7 +64,8 @@ spec:
                   The expected format is
                     /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
                 type: string
-                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}\/event[Hh]ubs\/[a-zA-Z0-9][\w.-]{0,49}$
+                pattern: 
+                  ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.EventHub\/namespaces\/[A-Za-z0-9-]{6,50}\/event[Hh]ubs\/[a-zA-Z0-9][\w.-]{0,49}$
               discardCloudEventContext:
                 description: Whether to omit CloudEvent context attributes in objects created in Azure Event Hub. When this
                   property is false (default), the entire CloudEvent payload is included. When this property is true, only
