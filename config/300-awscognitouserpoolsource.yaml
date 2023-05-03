@@ -58,7 +58,8 @@ spec:
             properties:
               arn:
                 description: ARN of the Amazon Cognito User Pool to receive notifications from. The expected format is documented
-                  at https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncognitouserpools.html#amazoncognitouserpools-resources-for-iam-policies
+                  at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncognitouserpools.html#amazoncognitouserpools-resources-for-iam-policies
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:cognito-idp:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:userpool\/.+$
               auth:

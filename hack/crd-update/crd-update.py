@@ -70,7 +70,7 @@ try:
             tolerations:
               description: Pod tolerations, as documented at
                 https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-                Tolerations require additional configuration for Knative-based deployments - https://knative.dev/docs/serving/configuration/feature-flags/ 
+                Tolerations require additional configuration for Knative-based deployments - https://knative.dev/docs/serving/configuration/feature-flags/
               type: array
               items:
                 type: object
@@ -96,14 +96,14 @@ try:
             nodeSelector:
               description: NodeSelector only allow the object pods to be created at nodes where all selector labels are present, as documented at
                 https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector.
-                NodeSelector require additional configuration for Knative-based deployments - https://knative.dev/docs/serving/configuration/feature-flags/ 
+                NodeSelector require additional configuration for Knative-based deployments - https://knative.dev/docs/serving/configuration/feature-flags/
               type: object
               additionalProperties:
                 type: string
             affinity:
               description: Scheduling constraints of the pod. More info at
                 https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity.
-                Affinity require additional configuration for Knative-based deployments - https://knative.dev/docs/serving/configuration/feature-flags/ 
+                Affinity require additional configuration for Knative-based deployments - https://knative.dev/docs/serving/configuration/feature-flags/
               type: object
               x-kubernetes-preserve-unknown-fields: true
         """
@@ -191,5 +191,11 @@ for i in range(len(crd_versions)):
                 + " If left empty, the events will be sent back to the sender."
             )
 
+# Remove trailing space that happen after formatting descriptions that contain multiple lines.
+def remove_descriptions_trailing_space(stream):
+    if " \n" in stream:
+      return stream.replace(" \n", "\n")
+    return stream
 
-yaml.dump(crd, sys.stdout)
+yaml.dump(crd, sys.stdout, transform=remove_descriptions_trailing_space)
+
