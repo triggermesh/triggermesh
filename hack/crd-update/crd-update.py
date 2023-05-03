@@ -192,4 +192,10 @@ for i in range(len(crd_versions)):
             )
 
 
-yaml.dump(crd, sys.stdout)
+# Remove trailing space that happen after formatting descriptions that contain multiple lines.
+def remove_descriptions_trailing_space(stream):
+    if " \n" in stream:
+      return stream.replace(" \n", "\n")
+    return stream
+
+yaml.dump(crd, sys.stdout, transform=remove_descriptions_trailing_space)
