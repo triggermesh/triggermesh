@@ -63,8 +63,7 @@ spec:
                   - a top-level resource from a resource provider (including Event Grid topic)
                     /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
                 type: string
-                pattern: 
-                  ^\/subscriptions\/[a-z0-9-]+(?:\/resourceGroups\/[\w.()-]+(?:\/providers\/[A-Za-z.]+\/[a-zA-Z0-9][\w.-]+\/[a-zA-Z0-9][\w.-]+)?)?$
+                pattern: ^\/subscriptions\/[a-z0-9-]+(?:\/resourceGroups\/[\w.()-]+(?:\/providers\/[A-Za-z.]+\/[a-zA-Z0-9][\w.-]+\/[a-zA-Z0-9][\w.-]+)?)?$
               eventTypes:
                 description: |-
                   Types of events to subscribe to.

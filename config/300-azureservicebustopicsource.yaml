@@ -63,8 +63,7 @@ spec:
                   The expected format is
                     /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}
                 type: string
-                pattern: 
-                  ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.ServiceBus\/namespaces\/[A-Za-z0-9-]{6,50}\/topics\/[A-Za-z0-9][\w.~/-]{0,258}[A-Za-z0-9]$
+                pattern: ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.ServiceBus\/namespaces\/[A-Za-z0-9-]{6,50}\/topics\/[A-Za-z0-9][\w.~/-]{0,258}[A-Za-z0-9]$
               auth:
                 description: Authentication method to interact with the Azure Service Bus API. This event source only supports
                   the Service Principal authentication. If it not present, it will try to use Azure AKS Managed Identity

@@ -57,8 +57,7 @@ spec:
             type: object
             properties:
               arn:
-                description: ARN of the Log Group to source data from. The expected format is documented at 
-                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatchlogs.html#amazoncloudwatchlogs-resources-for-iam-policies
+                description: ARN of the Log Group to source data from. The expected format is documented at https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatchlogs.html#amazoncloudwatchlogs-resources-for-iam-policies
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:logs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               pollingInterval:
