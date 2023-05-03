@@ -32,6 +32,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 
@@ -61,14 +62,19 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error getting bucket region: %v", err)
 	}
 
-	s3Session := session.Must(session.NewSession(aws.NewConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(region).
 		WithMaxRetries(5)))
+
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
 
 	return &adapter{
 		awsArnString: env.AwsTargetArn,
 		awsArn:       a,
-		s3Client:     s3.New(s3Session),
+		s3Client:     s3.New(sess, config),
 
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,

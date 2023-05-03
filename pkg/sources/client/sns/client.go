@@ -17,13 +17,13 @@ limitations under the License.
 package sns
 
 import (
-	"errors"
 	"fmt"
 
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	awscore "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"
@@ -61,19 +61,31 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSSNSSource) (Client, error) {
-	if src.Spec.Auth.Credentials == nil {
-		return nil, errors.New("AWS security credentials were not specified")
+	var sess *session.Session
+	config := &awscore.Config{}
+
+	switch {
+	case src.Spec.Auth.Credentials != nil:
+		creds, err := aws.Credentials(g.sg(src.Namespace), src.Spec.Auth.Credentials)
+		if err != nil {
+			return nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
+		}
+		sess = session.Must(session.NewSession(awscore.NewConfig().
+			WithRegion(src.Spec.ARN.Region).
+			WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
+		))
+		if assumeRole := src.Spec.Auth.Credentials.AssumeIAMRole; assumeRole != nil {
+			config.Credentials = stscreds.NewCredentials(sess, assumeRole.String())
+		}
+	case src.Spec.Auth.EksIAMRole != nil:
+		sess = session.Must(session.NewSession(awscore.NewConfig().
+			WithRegion(src.Spec.ARN.Region),
+		))
+	default:
+		return nil, fmt.Errorf("neither AWS security credentials nor IAM Role were specified")
 	}
 
-	creds, err := aws.Credentials(g.sg(src.Namespace), src.Spec.Auth.Credentials)
-	if err != nil {
-		return nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
-	}
-
-	return sns.New(session.Must(session.NewSession(awscore.NewConfig().
-		WithRegion(src.Spec.ARN.Region).
-		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
-	))), nil
+	return sns.New(sess, config), nil
 }
 
 // ClientGetterFunc allows the use of ordinary functions as ClientGetter.
