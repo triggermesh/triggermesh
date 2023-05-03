@@ -73,7 +73,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, listenC
 
 		if err := fw.Add(env.BasicAuthPasswordPath, ceClientUpdater); err != nil {
 			logger.Panicw(
-				fmt.Sprintf("Authentication secret could not be watched at the specific path"),
+				"Authentication secret could not be watched at the specific path",
 				zap.Error(err))
 		}
 		ceAdapter.fileWatcher = fw
