@@ -79,6 +79,11 @@ func (in *AWSSecurityCredentials) DeepCopyInto(out *AWSSecurityCredentials) {
 	*out = *in
 	in.AccessKeyID.DeepCopyInto(&out.AccessKeyID)
 	in.SecretAccessKey.DeepCopyInto(&out.SecretAccessKey)
+	if in.AssumeIAMRole != nil {
+		in, out := &in.AssumeIAMRole, &out.AssumeIAMRole
+		*out = new(apis.ARN)
+		**out = **in
+	}
 	return
 }
 

@@ -191,11 +191,11 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/splitter-adapter
         # Function Runtimes
         - name: RUNTIME_KLR_PYTHON
-          value: gcr.io/triggermesh/knative-lambda-python310:latest
+          value: gcr.io/triggermesh/knative-lambda-python310:v1.24.3
         - name: RUNTIME_KLR_NODE
-          value: gcr.io/triggermesh/knative-lambda-node18:latest
+          value: gcr.io/triggermesh/knative-lambda-node18:v1.24.3
         - name: RUNTIME_KLR_RUBY
-          value: gcr.io/triggermesh/knative-lambda-ruby32:latest
+          value: gcr.io/triggermesh/knative-lambda-ruby32:v1.24.3
         # Custom build adapters
         - name: IBMMQSOURCE_IMAGE
           value: gcr.io/triggermesh/ibmmqsource-adapter:latest

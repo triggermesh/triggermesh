@@ -141,12 +141,10 @@ func (a *httpAdapter) Start(ctx context.Context) error {
 }
 
 func (a *httpAdapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
-	if event.Type() != v1alpha1.EventTypeHTTPTargetRequest {
-		return nil, a.errorHTTPResult(http.StatusBadRequest, "Incoming event type error: expected %q, got %q", v1alpha1.EventTypeHTTPTargetRequest, event.Type())
-	}
-
 	rd := &RequestData{}
-	if err := event.DataAs(rd); err != nil {
+	if event.Type() != v1alpha1.EventTypeHTTPTargetRequest {
+		rd.Body = event.Data()
+	} else if err := event.DataAs(rd); err != nil {
 		return nil, a.errorHTTPResult(http.StatusBadRequest, "Error processing incoming event data: %w", err)
 	}
 

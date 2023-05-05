@@ -29,6 +29,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kinesis"
 	"github.com/aws/aws-sdk-go/service/kinesis/kinesisiface"
@@ -48,6 +49,9 @@ type envConfig struct {
 	pkgadapter.EnvConfig
 
 	ARN string `envconfig:"ARN" required:"true"`
+
+	// Assume this IAM Role when access keys provided.
+	AssumeIamRole string `envconfig:"AWS_ASSUME_ROLE_ARN"`
 
 	// The environment variables below aren't read from the envConfig struct
 	// by the AWS SDK, but rather directly using os.Getenv().
@@ -87,16 +91,21 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	arn := common.MustParseARN(env.ARN)
 
-	cfg := session.Must(session.NewSession(aws.NewConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(arn.Region).
 		WithMaxRetries(5),
 	))
+
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
 
 	return &adapter{
 		logger: logger,
 		mt:     mt,
 
-		knsClient: kinesis.New(cfg),
+		knsClient: kinesis.New(sess, config),
 		ceClient:  ceClient,
 
 		arn:    arn,
