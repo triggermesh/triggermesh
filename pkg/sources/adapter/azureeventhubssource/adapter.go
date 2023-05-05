@@ -43,15 +43,13 @@ import (
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureeventhubssource/trace"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 const (
 	resourceProviderEventHub = "Microsoft.EventHub"
-	envKeyName               = "EVENTHUB_KEY_NAME"
-	envKeyValue              = "EVENTHUB_KEY_VALUE"
-	envConnStr               = "EVENTHUB_CONNECTION_STRING"
 
 	connTimeout  = 20 * time.Second
 	drainTimeout = 1 * time.Minute
@@ -156,7 +154,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 			ceType:   ceType,
 		}
 	default:
-		logger.Panicw("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
+		logger.Panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
 	consumerGroup := azeventhubs.DefaultConsumerGroup
@@ -214,7 +212,7 @@ func (a *adapter) Start(ctx context.Context) error {
 			defer wg.Done()
 			err = a.processPartition(ctx, partitionID)
 			if err != nil {
-				a.logger.Errorw("Error processing partition %s: %v", partitionID, err)
+				a.logger.Errorf("Error processing partition %s: %v", partitionID, err)
 			}
 		}(partition)
 	}
@@ -240,22 +238,26 @@ func (a *adapter) processPartition(ctx context.Context, partitionID string) erro
 	}()
 
 	for {
-		receiveCtx, cancel := context.WithTimeout(ctx, connTimeout)
-		events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
-		cancel()
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			receiveCtx, cancel := context.WithTimeout(ctx, connTimeout)
+			events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
+			cancel()
 
-		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-			if ctx.Err() != nil {
+			if err != nil {
+				if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+					continue
+				}
 				return err
 			}
-		} else if err != nil {
-			return err
-		}
 
-		for _, event := range events {
-			err = a.handleMessage(ctx, event)
-			if err != nil {
-				return err
+			for _, event := range events {
+				err = a.handleMessage(ctx, event)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -367,11 +369,11 @@ func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azeventhubs.Con
 // connectionStringFromEnvironment returns a EventHub connection string
 // based on values read from the environment.
 func connectionStringFromEnvironment(namespace, entityPath string) string {
-	connStr := os.Getenv(envConnStr)
+	connStr := os.Getenv(common.EnvHubConnStr)
 
 	// if a key is set explicitly, it takes precedence and is used to
 	// compose a new connection string
-	if keyName, keyValue := os.Getenv(envKeyName), os.Getenv(envKeyValue); keyName != "" || keyValue != "" {
+	if keyName, keyValue := os.Getenv(common.EnvHubKeyName), os.Getenv(common.EnvHubKeyValue); keyName != "" && keyValue != "" {
 		azureEnv := &azure.PublicCloud
 		connStr = fmt.Sprintf("Endpoint=sb://%s.%s;SharedAccessKeyName=%s;SharedAccessKey=%s;EntityPath=%s",
 			namespace, azureEnv.ServiceBusEndpointSuffix, keyName, keyValue, entityPath)

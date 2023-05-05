@@ -79,12 +79,6 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicw("Unable to create Event Hub client", zap.Error(err))
 	}
 
-	defer func() {
-		if err := producerClient.Close(ctx); err != nil {
-			logger.Errorw("Unable to close Event Hub client", zap.Error(err))
-		}
-	}()
-
 	return &adapter{
 		ehClient: producerClient,
 
@@ -195,7 +189,7 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 
 	// if a key is set explicitly, it takes precedence and is used to
 	// compose a new connection string
-	if keyName, keyValue := os.Getenv(envKeyName), os.Getenv(envKeyValue); keyName != "" || keyValue != "" {
+	if keyName, keyValue := os.Getenv(envKeyName), os.Getenv(envKeyValue); keyName != "" && keyValue != "" {
 		azureEnv := &azure.PublicCloud
 		connStr = fmt.Sprintf("Endpoint=sb://%s.%s;SharedAccessKeyName=%s;SharedAccessKey=%s;EntityPath=%s",
 			namespace, azureEnv.ServiceBusEndpointSuffix, keyName, keyValue, entityPath)

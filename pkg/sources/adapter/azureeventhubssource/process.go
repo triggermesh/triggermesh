@@ -27,7 +27,6 @@ import (
 
 // MessageProcessor converts an Event Hubs message to a CloudEvent.
 type MessageProcessor interface {
-	// Process(*eventhub.Event) ([]*cloudevents.Event, error)
 	Process(*azeventhubs.ReceivedEventData) ([]*cloudevents.Event, error)
 }
 
@@ -56,7 +55,7 @@ func (p *defaultMessageProcessor) Process(msg *azeventhubs.ReceivedEventData) ([
 func makeEventHubsEvent(msg *azeventhubs.ReceivedEventData, srcAttr, typeAttr string) (*cloudevents.Event, error) {
 	ceData := toCloudEventData(&msg.EventData)
 
-	event := cloudevents.NewEvent()
+	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetSource(srcAttr)
 	event.SetType(typeAttr)
 	if err := event.SetData(cloudevents.ApplicationJSON, ceData); err != nil {
