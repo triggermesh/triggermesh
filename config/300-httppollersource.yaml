@@ -48,14 +48,13 @@ spec:
             type: object
             properties:
               eventType:
-                description: "Value of the CloudEvents 'type' attribute to set on ingested events. Describes the type of event\
-                  \ related to the originating occurrence. Please refer to the CloudEvents specification for more details:\
-                  \ https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#type"
+                description: "Value of the CloudEvents 'type' attribute to set on ingested events. Describes the type of event
+                  related to the originating occurrence. Please refer to the CloudEvents specification for more details: https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#type"
                 type: string
               eventSource:
-                description: "Value of the CloudEvents 'source' attribute to set on ingested events. Identifies the context\
-                  \ in which an event happened. Must be expressed as a URI-reference. Please refer to the CloudEvents specification\
-                  \ for more details: https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#source-1"
+                description: "Value of the CloudEvents 'source' attribute to set on ingested events. Identifies the context
+                  in which an event happened. Must be expressed as a URI-reference. Please refer to the CloudEvents specification
+                  for more details: https://github.com/cloudevents/spec/blob/v1.0.1/spec.md#source-1"
                 type: string
               endpoint:
                 description: HTTP/S URL of the endpoint to poll data from.

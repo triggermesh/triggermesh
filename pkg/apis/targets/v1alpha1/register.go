@@ -46,6 +46,7 @@ var AllTypes = []v1alpha1.GroupObject{
 	{Single: &AWSSQSTarget{}, List: &AWSSQSTargetList{}},
 	{Single: &AzureEventHubsTarget{}, List: &AzureEventHubsTargetList{}},
 	{Single: &AzureSentinelTarget{}, List: &AzureSentinelTargetList{}},
+	{Single: &AzureServiceBusTarget{}, List: &AzureServiceBusTargetList{}},
 	{Single: &CloudEventsTarget{}, List: &CloudEventsTargetList{}},
 	{Single: &DatadogTarget{}, List: &DatadogTargetList{}},
 	{Single: &ElasticsearchTarget{}, List: &ElasticsearchTargetList{}},

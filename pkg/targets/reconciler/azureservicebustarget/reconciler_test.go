@@ -1,5 +1,5 @@
 /*
-Copyright 2022 TriggerMesh Inc.
+Copyright 2023 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package azureeventhubstarget
+package azureservicebustarget
 
 import (
 	"context"
@@ -29,7 +29,7 @@ import (
 	commonv1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	fakeinjectionclient "github.com/triggermesh/triggermesh/pkg/client/generated/injection/client/fake"
-	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/azureeventhubstarget"
+	reconcilerv1alpha1 "github.com/triggermesh/triggermesh/pkg/client/generated/injection/reconciler/targets/v1alpha1/azureservicebustarget"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	. "github.com/triggermesh/triggermesh/pkg/reconciler/testing"
 )
@@ -47,34 +47,34 @@ func TestReconcile(t *testing.T) {
 	TestReconcileAdapter(t, ctor, trg, ab)
 }
 
-// reconcilerCtor returns a Ctor for a AzureEventHubsTarget Reconciler.
+// reconcilerCtor returns a Ctor for a AzureServiceBusTarget Reconciler.
 func reconcilerCtor(cfg *adapterConfig) Ctor {
 	return func(t *testing.T, ctx context.Context, _ *rt.TableRow, ls *Listers) controller.Reconciler {
 		r := &Reconciler{
 			adapterCfg: cfg,
 		}
 
-		r.base = NewTestServiceReconciler[*v1alpha1.AzureEventHubsTarget](ctx, ls,
-			ls.GetAzureEventHubsTargetLister().AzureEventHubsTargets,
+		r.base = NewTestServiceReconciler[*v1alpha1.AzureServiceBusTarget](ctx, ls,
+			ls.GetAzureServiceBusTargetLister().AzureServiceBusTargets,
 		)
 
 		return reconcilerv1alpha1.NewReconciler(ctx, logging.FromContext(ctx),
-			fakeinjectionclient.Get(ctx), ls.GetAzureEventHubsTargetLister(),
+			fakeinjectionclient.Get(ctx), ls.GetAzureServiceBusTargetLister(),
 			controller.GetEventRecorder(ctx), r)
 	}
 }
 
 // newTarget returns a populated target object.
-func newTarget() *v1alpha1.AzureEventHubsTarget {
-	trg := &v1alpha1.AzureEventHubsTarget{
-		Spec: v1alpha1.AzureEventHubsTargetSpec{
-			EventHubID: v1alpha1.AzureResourceID{
+func newTarget() *v1alpha1.AzureServiceBusTarget {
+	trg := &v1alpha1.AzureServiceBusTarget{
+		Spec: v1alpha1.AzureServiceBusTargetSpec{
+			TopicID: &v1alpha1.AzureResourceID{
 				SubscriptionID:   "00000000-0000-0000-0000-000000000000",
 				ResourceGroup:    "MyGroup",
-				ResourceProvider: "Microsoft.EventHub",
+				ResourceProvider: "Microsoft.ServiceBus",
 				Namespace:        "MyNamespace",
-				ResourceType:     "eventhubs",
-				ResourceName:     "MyEventHub",
+				ResourceType:     "servicebus",
+				ResourceName:     "MyTopic",
 			},
 			Auth: v1alpha1.AzureAuth{
 				SASToken: &v1alpha1.AzureSASToken{

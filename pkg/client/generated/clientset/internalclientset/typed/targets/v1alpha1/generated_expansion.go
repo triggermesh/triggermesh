@@ -38,6 +38,8 @@ type AzureEventHubsTargetExpansion interface{}
 
 type AzureSentinelTargetExpansion interface{}
 
+type AzureServiceBusTargetExpansion interface{}
+
 type CloudEventsTargetExpansion interface{}
 
 type DatadogTargetExpansion interface{}

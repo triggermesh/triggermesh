@@ -1,5 +1,5 @@
 /*
-Copyright 2022 TriggerMesh Inc.
+Copyright 2023 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package azureeventhubstarget
+package azureservicebustarget
 
 import (
 	"strconv"
@@ -42,7 +42,7 @@ type adapterConfig struct {
 	// Configuration accessor for logging/metrics/tracing
 	obsConfig source.ConfigAccessor
 	// Container image
-	Image string `default:"gcr.io/triggermesh/azureeventhubstarget-adapter"`
+	Image string `default:"gcr.io/triggermesh/azureeservicebustarget-adapter"`
 }
 
 // Verify that Reconciler implements common.AdapterBuilder.
@@ -50,7 +50,7 @@ var _ common.AdapterBuilder[*servingv1.Service] = (*Reconciler)(nil)
 
 // BuildAdapter implements common.AdapterBuilder.
 func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) (*servingv1.Service, error) {
-	typedTrg := trg.(*v1alpha1.AzureEventHubsTarget)
+	typedTrg := trg.(*v1alpha1.AzureServiceBusTarget)
 
 	return common.NewAdapterKnService(trg, nil,
 		resource.Image(r.adapterCfg.Image),
@@ -62,28 +62,30 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 
 // MakeAppEnv extracts environment variables from the object.
 // Exported to be used in external tools for local test environments.
-func MakeAppEnv(o *v1alpha1.AzureEventHubsTarget) []corev1.EnvVar {
+func MakeAppEnv(o *v1alpha1.AzureServiceBusTarget) []corev1.EnvVar {
 	envs := []corev1.EnvVar{
 		{
-			Name:  common.EnvHubResourceID,
-			Value: o.Spec.EventHubID.String(),
-		},
-		{
-			Name:  common.EnvHubNamespace,
-			Value: o.Spec.EventHubID.Namespace,
-		}, {
-			Name:  common.EnvHubName,
-			Value: o.Spec.EventHubID.ResourceName,
-		}, {
 			Name:  envDiscardCECtx,
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
 		},
 	}
 
+	var resourceID string
+	if o.Spec.TopicID != nil {
+		resourceID = o.Spec.TopicID.String()
+	} else if o.Spec.QueueID != nil {
+		resourceID = o.Spec.QueueID.String()
+	}
+
+	var webSocketsEnable bool
+	if wss := o.Spec.WebSocketsEnable; wss != nil {
+		webSocketsEnable = *wss
+	}
+
 	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
-		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyName, sasAuth.KeyName)
-		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyValue, sasAuth.KeyValue)
-		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubConnStr, sasAuth.ConnectionString)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvServiceBusKeyName, sasAuth.KeyName)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvServiceBusKeyValue, sasAuth.KeyValue)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvServiceBusConnStr, sasAuth.ConnectionString)
 	}
 
 	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
@@ -98,5 +100,12 @@ func MakeAppEnv(o *v1alpha1.AzureEventHubsTarget) []corev1.EnvVar {
 			Value: string(*o.Spec.EventOptions.PayloadPolicy),
 		})
 	}
-	return envs
+
+	return append(envs, corev1.EnvVar{
+		Name:  common.EnvServiceBusEntityResourceID,
+		Value: resourceID,
+	}, corev1.EnvVar{
+		Name:  common.EnvServiceBusWebSocketsEnable,
+		Value: strconv.FormatBool(webSocketsEnable),
+	})
 }
