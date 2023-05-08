@@ -7253,6 +7253,137 @@ func (w *wrapTargetsV1alpha1AzureSentinelTargetImpl) Watch(ctx context.Context, 
 	return nil, errors.New("NYI: Watch")
 }
 
+func (w *wrapTargetsV1alpha1) AzureServiceBusTargets(namespace string) typedtargetsv1alpha1.AzureServiceBusTargetInterface {
+	return &wrapTargetsV1alpha1AzureServiceBusTargetImpl{
+		dyn: w.dyn.Resource(schema.GroupVersionResource{
+			Group:    "targets.triggermesh.io",
+			Version:  "v1alpha1",
+			Resource: "azureservicebustargets",
+		}),
+
+		namespace: namespace,
+	}
+}
+
+type wrapTargetsV1alpha1AzureServiceBusTargetImpl struct {
+	dyn dynamic.NamespaceableResourceInterface
+
+	namespace string
+}
+
+var _ typedtargetsv1alpha1.AzureServiceBusTargetInterface = (*wrapTargetsV1alpha1AzureServiceBusTargetImpl)(nil)
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) Create(ctx context.Context, in *targetsv1alpha1.AzureServiceBusTarget, opts v1.CreateOptions) (*targetsv1alpha1.AzureServiceBusTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AzureServiceBusTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Create(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AzureServiceBusTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+	return w.dyn.Namespace(w.namespace).Delete(ctx, name, opts)
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	return w.dyn.Namespace(w.namespace).DeleteCollection(ctx, opts, listOpts)
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) Get(ctx context.Context, name string, opts v1.GetOptions) (*targetsv1alpha1.AzureServiceBusTarget, error) {
+	uo, err := w.dyn.Namespace(w.namespace).Get(ctx, name, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AzureServiceBusTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) List(ctx context.Context, opts v1.ListOptions) (*targetsv1alpha1.AzureServiceBusTargetList, error) {
+	uo, err := w.dyn.Namespace(w.namespace).List(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AzureServiceBusTargetList{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *targetsv1alpha1.AzureServiceBusTarget, err error) {
+	uo, err := w.dyn.Namespace(w.namespace).Patch(ctx, name, pt, data, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AzureServiceBusTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) Update(ctx context.Context, in *targetsv1alpha1.AzureServiceBusTarget, opts v1.UpdateOptions) (*targetsv1alpha1.AzureServiceBusTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AzureServiceBusTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).Update(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AzureServiceBusTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) UpdateStatus(ctx context.Context, in *targetsv1alpha1.AzureServiceBusTarget, opts v1.UpdateOptions) (*targetsv1alpha1.AzureServiceBusTarget, error) {
+	in.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "targets.triggermesh.io",
+		Version: "v1alpha1",
+		Kind:    "AzureServiceBusTarget",
+	})
+	uo := &unstructured.Unstructured{}
+	if err := convert(in, uo); err != nil {
+		return nil, err
+	}
+	uo, err := w.dyn.Namespace(w.namespace).UpdateStatus(ctx, uo, opts)
+	if err != nil {
+		return nil, err
+	}
+	out := &targetsv1alpha1.AzureServiceBusTarget{}
+	if err := convert(uo, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (w *wrapTargetsV1alpha1AzureServiceBusTargetImpl) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+	return nil, errors.New("NYI: Watch")
+}
+
 func (w *wrapTargetsV1alpha1) CloudEventsTargets(namespace string) typedtargetsv1alpha1.CloudEventsTargetInterface {
 	return &wrapTargetsV1alpha1CloudEventsTargetImpl{
 		dyn: w.dyn.Resource(schema.GroupVersionResource{

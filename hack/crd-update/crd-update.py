@@ -198,4 +198,3 @@ def remove_descriptions_trailing_space(stream):
     return stream
 
 yaml.dump(crd, sys.stdout, transform=remove_descriptions_trailing_space)
-
