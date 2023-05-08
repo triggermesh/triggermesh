@@ -148,10 +148,7 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		}
 		msg = jsonEvent
 	}
-	err := a.sender.SendMessage(ctx, &azservicebus.Message{
-		Body: msg,
-	}, nil)
-	if err != nil {
+	if err := a.sender.SendMessage(ctx, &azservicebus.Message{Body: msg}, nil);  err != nil {
 		a.logger.Errorw("Error sending message to Service Bus", zap.Error(err))
 		a.sr.ReportProcessingError(true, ceTypeTag, ceSrcTag)
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
