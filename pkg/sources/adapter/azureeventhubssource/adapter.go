@@ -240,7 +240,8 @@ func (a *adapter) processPartition(ctx context.Context, partitionID string) erro
 	for {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			a.logger.Debug("Shutting down Azure Event Hubs adapter")
+			return nil
 		default:
 			receiveCtx, cancel := context.WithTimeout(ctx, connTimeout)
 			events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
