@@ -86,14 +86,14 @@ spec:
                     instrument:
                       type: string
                       enum: [Histogram, Counter, UpDownCounter]
-                      description: "Instrument Kind as defined by OpenTelemetry. Supported values are\n- Histogram, for absolute\
-                        \ values that can be aggregated. - Counter, for delta values that increase monotonically. - UpDownCounter,\
-                        \ for delta values that can increase and decrease."
+                      description: "Instrument Kind as defined by OpenTelemetry. Supported values are\n- Histogram, for absolute
+                        values that can be aggregated. - Counter, for delta values that increase monotonically. - UpDownCounter,
+                        for delta values that can increase and decrease."
                     number:
                       type: string
                       enum: [Int64, Float64]
-                      description: "Number Kind as defined by OpenTelemetry. Defines the measure data type accepted by the\
-                        \ Instrument. Supported values are\n- Int64 - Float64"
+                      description: "Number Kind as defined by OpenTelemetry. Defines the measure data type accepted by the
+                        Instrument. Supported values are\n- Int64 - Float64"
                   required:
                   - name
                   - instrument
@@ -103,9 +103,9 @@ spec:
                 description: Event replies options.
                 properties:
                   payloadPolicy:
-                    description: "Whether this target should generate response events. Possible values are\n- always, if a\
-                      \ response is available it will be sent. - error, only responses categorized as errors will be sent.\
-                      \ - never, no responses will be sent."
+                    description: "Whether this target should generate response events. Possible values are\n- always, if a
+                      response is available it will be sent. - error, only responses categorized as errors will be sent. -
+                      never, no responses will be sent."
 
                     type: string
                     enum: [always, error, never]
