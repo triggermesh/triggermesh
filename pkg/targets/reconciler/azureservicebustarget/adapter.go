@@ -1,5 +1,5 @@
 /*
-Copyright 2022 TriggerMesh Inc.
+Copyright 2023 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -83,9 +83,9 @@ func MakeAppEnv(o *v1alpha1.AzureServiceBusTarget) []corev1.EnvVar {
 	}
 
 	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
-		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyName, sasAuth.KeyName)
-		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubKeyValue, sasAuth.KeyValue)
-		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvHubConnStr, sasAuth.ConnectionString)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvServiceBusKeyName, sasAuth.KeyName)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvServiceBusKeyValue, sasAuth.KeyValue)
+		envs = common.MaybeAppendValueFromEnvVar(envs, common.EnvServiceBusConnStr, sasAuth.ConnectionString)
 	}
 
 	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {

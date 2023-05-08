@@ -1,4 +1,4 @@
-# Copyright 2022 TriggerMesh Inc.
+# Copyright 2023 TriggerMesh Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,6 +74,13 @@ spec:
                 type: string
                 pattern:
                   ^\/subscriptions\/[a-z0-9-]+\/resourceGroups\/[\w.()-]+\/providers\/Microsoft.ServiceBus\/namespaces\/[A-Za-z0-9-]{6,50}\/queues\/[A-Za-z0-9][\w.~/-]{0,258}[A-Za-z0-9]$
+              eventOptions:
+                type: object
+                description: 'When should this target generate a response event for processing: always, on error, or never.'
+                properties:
+                  payloadPolicy:
+                    type: string
+                    enum: [always, error, never]
               discardCloudEventContext:
                 description: Whether to omit CloudEvent context attributes in objects created in Azure Service Bus. When this
                   property is false (default), the entire CloudEvent payload is included. When this property is true, only
@@ -238,6 +245,9 @@ spec:
                 oneOf:
                 - required: [sasToken]
                 - required: [servicePrincipal]
+              webSocketsEnable:
+                description: Boolean to indicate to use WebSockets.
+                type: boolean
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object
