@@ -157,11 +157,11 @@ func (a *adapter) createEvent(ctx context.Context, event []byte) (*azeventhubs.E
 
 // clientFromEnvironment returns a azeventhubs.ProducerClient that is suitable for the
 // authentication method selected via environment variables.
-func clientFromEnvironment(entityID *v1alpha1.EventHubResourceID) (*azeventhubs.ProducerClient, error) {
+func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azeventhubs.ProducerClient, error) {
 	// SAS authentication (token, connection string)
-	connStr := connectionStringFromEnvironment(entityID.Namespace, entityID.EventHub)
+	connStr := connectionStringFromEnvironment(entityID.Namespace, entityID.ResourceName)
 	if connStr != "" {
-		client, err := azeventhubs.NewProducerClientFromConnectionString(connStr, entityID.EventHub, nil)
+		client, err := azeventhubs.NewProducerClientFromConnectionString(connStr, entityID.ResourceName, nil)
 		if err != nil {
 			return nil, fmt.Errorf("creating client from connection string: %w", err)
 		}
@@ -175,7 +175,7 @@ func clientFromEnvironment(entityID *v1alpha1.EventHubResourceID) (*azeventhubs.
 	}
 
 	fqNamespace := entityID.Namespace + ".servicebus.windows.net"
-	client, err := azeventhubs.NewProducerClient(fqNamespace, entityID.EventHub, cred, nil)
+	client, err := azeventhubs.NewProducerClient(fqNamespace, entityID.ResourceName, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("creating client from service principal: %w", err)
 	}
@@ -201,8 +201,8 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 // parseEventHubResourceID parses the given resource ID string to a
 // structured resource ID, and validates that this resource ID refers to a
 // EventHub entity.
-func parseEventHubResourceID(resIDStr string) (*v1alpha1.EventHubResourceID, error) {
-	resID := &v1alpha1.EventHubResourceID{}
+func parseEventHubResourceID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
+	resID := &v1alpha1.AzureResourceID{}
 
 	err := json.Unmarshal([]byte(strconv.Quote(resIDStr)), resID)
 	if err != nil {
