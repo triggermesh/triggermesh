@@ -34,7 +34,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
-	v1alpha1 "github.com/triggermesh/triggermesh/pkg/apis/sources"
+	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
