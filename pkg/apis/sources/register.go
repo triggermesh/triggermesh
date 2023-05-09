@@ -212,6 +212,12 @@ var (
 		Resource: "ocimetricssources",
 	}
 
+	// MongoDbSourceResource represents an event source for MongoDB.
+	MongoDbSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "mongodbsources",
+	}
+
 	// SalesforceSourceResource represents an event source for Salesforce.
 	SalesforceSourceResource = schema.GroupResource{
 		Group:    GroupName,
