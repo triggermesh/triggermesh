@@ -81,6 +81,8 @@ type adapter struct {
 
 	arn arn.ARN
 
+	wg sync.WaitGroup
+
 	lastStreamARN    *string
 	lastStreamStatus *string
 }
