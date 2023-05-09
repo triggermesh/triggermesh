@@ -68,11 +68,13 @@ func reconcilerCtor(cfg *adapterConfig) Ctor {
 func newTarget() *v1alpha1.AzureEventHubsTarget {
 	trg := &v1alpha1.AzureEventHubsTarget{
 		Spec: v1alpha1.AzureEventHubsTargetSpec{
-			EventHubID: v1alpha1.EventHubResourceID{
-				SubscriptionID: "00000000-0000-0000-0000-000000000000",
-				ResourceGroup:  "MyGroup",
-				Namespace:      "MyNamespace",
-				EventHub:       "MyEventHub",
+			EventHubID: v1alpha1.AzureResourceID{
+				SubscriptionID:   "00000000-0000-0000-0000-000000000000",
+				ResourceGroup:    "MyGroup",
+				ResourceProvider: "Microsoft.EventHub",
+				Namespace:        "MyNamespace",
+				ResourceType:     "eventhubs",
+				ResourceName:     "MyEventHub",
 			},
 			Auth: v1alpha1.AzureAuth{
 				SASToken: &v1alpha1.AzureSASToken{

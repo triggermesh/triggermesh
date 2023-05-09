@@ -18,6 +18,7 @@ package awss3target
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
@@ -32,7 +33,12 @@ func getBucketRegion(bucketName string, env *envAccessor) (string, error) {
 	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(defaultS3Region)))
 
-	resp, err := s3.New(sess).GetBucketLocation(&s3.GetBucketLocationInput{
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
+
+	resp, err := s3.New(sess, config).GetBucketLocation(&s3.GetBucketLocationInput{
 		Bucket: &bucketName,
 	})
 	if err != nil {

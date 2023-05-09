@@ -50,6 +50,11 @@ type AWSAuth struct {
 type AWSSecurityCredentials struct {
 	AccessKeyID     ValueFromField `json:"accessKeyID"`
 	SecretAccessKey ValueFromField `json:"secretAccessKey"`
+
+	// The ARN of an IAM role for cross-account or remote impersonation on EKS.
+	// Require the access key credentials to create a client session.
+	// +optional
+	AssumeIAMRole *apis.ARN `json:"assumeIamRole,omitempty"`
 }
 
 // AWSEndpoint contains parameters which are used to override the destination

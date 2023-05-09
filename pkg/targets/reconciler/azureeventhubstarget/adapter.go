@@ -69,7 +69,7 @@ func MakeAppEnv(o *v1alpha1.AzureEventHubsTarget) []corev1.EnvVar {
 			Value: o.Spec.EventHubID.Namespace,
 		}, {
 			Name:  common.EnvHubName,
-			Value: o.Spec.EventHubID.EventHub,
+			Value: o.Spec.EventHubID.ResourceName,
 		}, {
 			Name:  envDiscardCECtx,
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),

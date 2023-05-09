@@ -68,6 +68,10 @@ func (c *FakeTargetsV1alpha1) AzureSentinelTargets(namespace string) v1alpha1.Az
 	return &FakeAzureSentinelTargets{c, namespace}
 }
 
+func (c *FakeTargetsV1alpha1) AzureServiceBusTargets(namespace string) v1alpha1.AzureServiceBusTargetInterface {
+	return &FakeAzureServiceBusTargets{c, namespace}
+}
+
 func (c *FakeTargetsV1alpha1) CloudEventsTargets(namespace string) v1alpha1.CloudEventsTargetInterface {
 	return &FakeCloudEventsTargets{c, namespace}
 }

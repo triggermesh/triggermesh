@@ -30,6 +30,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
@@ -53,6 +54,9 @@ type envConfig struct {
 	pkgadapter.EnvConfig
 
 	ARN string `envconfig:"ARN" required:"true"`
+
+	// Assume this IAM Role when access keys provided.
+	AssumeIamRole string `envconfig:"AWS_ASSUME_ROLE_ARN"`
 
 	// Name of a message processor which takes care of converting SQS
 	// messages to CloudEvents.
@@ -148,10 +152,15 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		}
 	}
 
-	cfg := session.Must(session.NewSession(aws.NewConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(arn.Region).
 		WithEndpointResolver(common.EndpointResolver(arn.Partition)),
 	))
+
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
 
 	// allocate generous buffer sizes to limit blocking on surges of new
 	// messages coming from receivers
@@ -169,7 +178,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		mt: mt,
 		sr: sr,
 
-		sqsClient: sqs.New(cfg),
+		sqsClient: sqs.New(sess, config),
 		ceClient:  ceClient,
 
 		arn: arn,

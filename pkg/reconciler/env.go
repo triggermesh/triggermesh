@@ -35,6 +35,7 @@ const (
 	EnvAccessKeyID     = "AWS_ACCESS_KEY_ID"
 	EnvSecretAccessKey = "AWS_SECRET_ACCESS_KEY" //nolint:gosec
 	EnvEndpointURL     = "AWS_ENDPOINT_URL"
+	EnvAssumeIamRole   = "AWS_ASSUME_ROLE_ARN"
 
 	// Common Azure attributes
 	EnvAADTenantID     = "AZURE_TENANT_ID"

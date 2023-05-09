@@ -57,7 +57,8 @@ spec:
             type: object
             properties:
               arn:
-                description: ARN of the Log Group to source data from. The expected format is documented at https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatchlogs.html#amazoncloudwatchlogs-resources-for-iam-policies
+                description: ARN of the Log Group to source data from. The expected format is documented at
+                  https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazoncloudwatchlogs.html#amazoncloudwatchlogs-resources-for-iam-policies
                 type: string
                 pattern: ^arn:aws(-cn|-us-gov)?:logs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
               pollingInterval:
@@ -116,6 +117,15 @@ spec:
                         oneOf:
                         - required: [value]
                         - required: [valueFromSecret]
+                      assumeIamRole:
+                        description: |-
+                          The ARN of an IAM role for cross-account or remote EKS cluster authorization.
+                          For more information please refer to the AWS General Reference at https://docs.aws.amazon.com/IAM/latest/UserGuide/tutorial_cross-account-with-roles.html
+                        type: string
+                        pattern: ^arn:aws(-cn|-us-gov)?:iam::\d{12}:role\/.+$
+                    required:
+                    - accessKeyID
+                    - secretAccessKey
                   iamRole:
                     description: (Amazon EKS only) The ARN of an IAM role which can be impersonated to obtain AWS permissions.
                       For more information about IAM roles for service accounts, please refer to the Amazon EKS User Guide

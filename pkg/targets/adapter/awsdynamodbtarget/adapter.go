@@ -30,6 +30,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -55,9 +56,14 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	a := MustParseARN(env.AwsTargetArn)
 
-	session := session.Must(session.NewSession(aws.NewConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(a.Region).
 		WithMaxRetries(5)))
+
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
 
 	var dynamodbTable string
 	if a.Service == dynamodb.ServiceName {
@@ -68,7 +74,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		awsArnString:         env.AwsTargetArn,
 		awsArn:               a,
 		awsDynamoDBTableName: dynamodbTable,
-		dynamoDBClient:       dynamodb.New(session),
+		dynamoDBClient:       dynamodb.New(sess, config),
 
 		discardCEContext: env.DiscardCEContext,
 		ceClient:         ceClient,

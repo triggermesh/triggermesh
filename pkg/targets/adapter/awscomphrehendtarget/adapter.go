@@ -27,6 +27,7 @@ import (
 	"knative.dev/pkg/logging"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/comprehend"
 	"github.com/aws/aws-sdk-go/service/comprehend/comprehendiface"
@@ -52,10 +53,15 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
-	cfg := session.Must(session.NewSession(aws.NewConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(env.Region).
 		WithMaxRetries(5),
 	))
+
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
 
 	replier, err := targetce.New(env.Component, logger.Named("replier"),
 		targetce.ReplierWithStatefulHeaders(env.BridgeIdentifier),
@@ -66,7 +72,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	return &comprehendAdapter{
-		comprehend: comprehend.New(cfg),
+		comprehend: comprehend.New(sess, config),
 
 		language: env.Language,
 		ceClient: ceClient,

@@ -31,6 +31,13 @@ func MakeAWSAuthEnvVars(auth v1alpha1.AWSAuth) []corev1.EnvVar {
 	if creds := auth.Credentials; creds != nil {
 		authEnvVars = reconciler.MaybeAppendValueFromEnvVar(authEnvVars, reconciler.EnvAccessKeyID, creds.AccessKeyID)
 		authEnvVars = reconciler.MaybeAppendValueFromEnvVar(authEnvVars, reconciler.EnvSecretAccessKey, creds.SecretAccessKey)
+
+		if creds.AssumeIAMRole != nil {
+			authEnvVars = append(authEnvVars, corev1.EnvVar{
+				Name:  reconciler.EnvAssumeIamRole,
+				Value: creds.AssumeIAMRole.String(),
+			})
+		}
 	}
 
 	return authEnvVars

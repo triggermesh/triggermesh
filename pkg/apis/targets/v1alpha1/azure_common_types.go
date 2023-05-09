@@ -54,77 +54,156 @@ type AzureSASToken struct {
 	ConnectionString v1alpha1.ValueFromField `json:"connectionString"`
 }
 
-// EventHubResourceID represents a resource ID for an Event Hubs instance or namespace.
-type EventHubResourceID struct {
-	SubscriptionID string
-	ResourceGroup  string
-	Namespace      string
-	EventHub       string
+// AzureResourceID represents a resource ID for an Azure resource.
+type AzureResourceID struct {
+	SubscriptionID   string
+	ResourceGroup    string
+	ResourceProvider string
+	Namespace        string
+	ResourceType     string
+	ResourceName     string
+	SubResourceType  string
+	SubResourceName  string
 }
 
 var (
-	_ fmt.Stringer     = (*EventHubResourceID)(nil)
-	_ json.Marshaler   = (*EventHubResourceID)(nil)
-	_ json.Unmarshaler = (*EventHubResourceID)(nil)
+	_ fmt.Stringer     = (*AzureResourceID)(nil)
+	_ json.Marshaler   = (*AzureResourceID)(nil)
+	_ json.Unmarshaler = (*AzureResourceID)(nil)
 )
 
 const (
-	eventHubResourceIDFormat = "/subscriptions/{subscriptionId}" +
-		"/resourceGroups/{resourceGroupName}" +
-		"/providers/Microsoft.EventHub" +
-		"/namespaces/{namespaceName}" +
-		"[/eventHubs/{eventHubName}]"
+	azureResourceIDFormat = "/subscriptions/{subscriptionId}" +
+		"[/resourceGroups/{resourceGroupName}" +
+		"[/providers/{resourceProviderNamespace}" +
+		"[/namespaces/{namespaceName}]" +
+		"/{resourceType}/{resourceName}" +
+		"[/{subresourceType}/{subresourceName}]]]"
 
-	eventHubResourceIDSplitElements    = 11
-	eventHubsNsResourceIDSplitElements = 9
+	// Subscription
+	//   /subscriptions/s
+	azureSubscriptionResourceIDSplitElements = 3
+	// Resource group
+	//   /subscriptions/s/resourceGroups/rg
+	azureResourceGroupResourceIDSplitElements = 5
+	// Resource (including namespaces)
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/rt/rn
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns
+	azureResourceResourceIDSplitElements = 9
+	// Resource with subresource (including namespaced resource)
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/rt/rn/srt/srn
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn
+	azureSubResourceResourceIDSplitElements = 11
+	// Namespaced resource with subresource
+	//   /subscriptions/s/resourceGroups/rg/providers/rp/namespaces/ns/rt/rn/srt/srn
+	azureNamespacedSubResourceResourceIDSplitElements = 13
 )
 
 // UnmarshalJSON implements json.Unmarshaler
-func (rID *EventHubResourceID) UnmarshalJSON(data []byte) error {
+func (rID *AzureResourceID) UnmarshalJSON(data []byte) error {
 	var dataStr string
 	if err := json.Unmarshal(data, &dataStr); err != nil {
 		return err
 	}
 
 	sections := strings.Split(dataStr, "/")
-	if n := len(sections); n != eventHubResourceIDSplitElements && n != eventHubsNsResourceIDSplitElements {
-		return newParseEventHubResourceIDError(dataStr)
+	if n := len(sections); n != azureSubscriptionResourceIDSplitElements &&
+		n != azureResourceGroupResourceIDSplitElements &&
+		n != azureResourceResourceIDSplitElements &&
+		n != azureSubResourceResourceIDSplitElements &&
+		n != azureNamespacedSubResourceResourceIDSplitElements {
+
+		return newParseAzureResourceIDError(dataStr)
 	}
 
 	const (
-		subscriptionIDIdx = 2
-		resourceGroupIdx  = 4
-		namespaceIdx      = 8
-		eventHubIdx       = 10
+		subscriptionIDIdx   = 2
+		resourceGroupIdx    = 4
+		resourceProviderIdx = 6
+		resourceTypeIdx     = 7
+		resourceNameIdx     = 8
+		subresourceTypeIdx  = 9
+		subresourceNameIdx  = 10
+		// with namespace
+		namespaceIdx         = 8
+		resourceTypeNsIdx    = 9
+		resourceNameNsIdx    = 10
+		subresourceTypeNsIdx = 11
+		subresourceNameNsIdx = 12
 	)
 
+	// An Azure resource ID always includes a subscription ID. Whether
+	// other elements should be defined in the resource ID depends on the
+	// type of resource that the ID represents (resource group, resource).
 	subscriptionID := sections[subscriptionIDIdx]
-	resourceGroup := sections[resourceGroupIdx]
-	namespace := sections[namespaceIdx]
-
-	// the eventHub element can be empty, in which case the resource ID
-	// represents an Event Hubs namespace
-	var eventHub string
-	if len(sections) == eventHubResourceIDSplitElements {
-		eventHub = sections[eventHubIdx]
+	if subscriptionID == "" {
+		return errAzureResourceIDEmptyAttrs
 	}
 
-	if subscriptionID == "" || resourceGroup == "" || namespace == "" {
-		return errEventHubResourceIDEmptyAttrs
+	var resourceGroup string
+	if len(sections) >= azureResourceGroupResourceIDSplitElements {
+		resourceGroup = sections[resourceGroupIdx]
+		if resourceGroup == "" {
+			return errAzureResourceIDEmptyAttrs
+		}
+	}
+
+	var resourceProvider string
+	var resourceType string
+	var resourceName string
+	if len(sections) >= azureResourceResourceIDSplitElements {
+		resourceProvider = sections[resourceProviderIdx]
+		resourceType = sections[resourceTypeIdx]
+		resourceName = sections[resourceNameIdx]
+		if resourceProvider == "" || resourceType == "" || resourceName == "" {
+			return errAzureResourceIDEmptyAttrs
+		}
+	}
+
+	var namespace string
+	var subresourceType string
+	var subresourceName string
+	if len(sections) >= azureSubResourceResourceIDSplitElements {
+		if strings.ToLower(resourceType) == "namespaces" {
+			namespace = sections[namespaceIdx]
+			resourceType = sections[resourceTypeNsIdx]
+			resourceName = sections[resourceNameNsIdx]
+			if namespace == "" || resourceType == "" || resourceName == "" {
+				return errAzureResourceIDEmptyAttrs
+			}
+		} else {
+			subresourceType = sections[subresourceTypeIdx]
+			subresourceName = sections[subresourceNameIdx]
+			if subresourceType == "" || subresourceName == "" {
+				return errAzureResourceIDEmptyAttrs
+			}
+		}
+	}
+
+	if len(sections) == azureNamespacedSubResourceResourceIDSplitElements {
+		subresourceType = sections[subresourceTypeNsIdx]
+		subresourceName = sections[subresourceNameNsIdx]
+		if subresourceType == "" || subresourceName == "" {
+			return errAzureResourceIDEmptyAttrs
+		}
 	}
 
 	rID.SubscriptionID = subscriptionID
 	rID.ResourceGroup = resourceGroup
+	rID.ResourceProvider = resourceProvider
 	rID.Namespace = namespace
-	rID.EventHub = eventHub
+	rID.ResourceType = resourceType
+	rID.ResourceName = resourceName
+	rID.SubResourceType = subresourceType
+	rID.SubResourceName = subresourceName
 
 	return nil
 }
 
 // MarshalJSON implements json.Marshaler
-func (rID EventHubResourceID) MarshalJSON() ([]byte, error) {
-	if rID.SubscriptionID == "" || rID.ResourceGroup == "" || rID.Namespace == "" {
-		return nil, errEventHubResourceIDEmptyAttrs
+func (rID AzureResourceID) MarshalJSON() ([]byte, error) {
+	if rID.SubscriptionID == "" {
+		return nil, errAzureResourceIDEmptyAttrs
 	}
 
 	var b bytes.Buffer
@@ -132,14 +211,46 @@ func (rID EventHubResourceID) MarshalJSON() ([]byte, error) {
 	b.WriteByte('"')
 	b.WriteString("/subscriptions/")
 	b.WriteString(rID.SubscriptionID)
-	b.WriteString("/resourceGroups/")
-	b.WriteString(rID.ResourceGroup)
-	b.WriteString("/providers/Microsoft.EventHub/namespaces/")
-	b.WriteString(rID.Namespace)
 
-	if rID.EventHub != "" {
-		b.WriteString("/eventHubs/")
-		b.WriteString(rID.EventHub)
+	if rID.ResourceGroup != "" {
+		b.WriteString("/resourceGroups/")
+		b.WriteString(rID.ResourceGroup)
+	}
+
+	if rID.ResourceProvider != "" || rID.ResourceType != "" || rID.ResourceName != "" {
+		// entering this condition means _all_ fields should be set
+		if rID.ResourceGroup == "" ||
+			rID.ResourceProvider == "" ||
+			rID.ResourceType == "" ||
+			rID.ResourceName == "" {
+
+			return nil, errAzureResourceIDEmptyAttrs
+		}
+
+		b.WriteString("/providers/")
+		b.WriteString(rID.ResourceProvider)
+		if rID.Namespace != "" {
+			b.WriteString("/namespaces/")
+			b.WriteString(rID.Namespace)
+		}
+		b.WriteByte('/')
+		b.WriteString(rID.ResourceType)
+		b.WriteByte('/')
+		b.WriteString(rID.ResourceName)
+	}
+
+	if rID.SubResourceType != "" || rID.SubResourceName != "" {
+		// entering this condition means _all_ fields should be set
+		if rID.SubResourceType == "" ||
+			rID.SubResourceName == "" {
+
+			return nil, errAzureResourceIDEmptyAttrs
+		}
+
+		b.WriteByte('/')
+		b.WriteString(rID.SubResourceType)
+		b.WriteByte('/')
+		b.WriteString(rID.SubResourceName)
 	}
 
 	b.WriteByte('"')
@@ -148,7 +259,7 @@ func (rID EventHubResourceID) MarshalJSON() ([]byte, error) {
 }
 
 // String implements the fmt.Stringer interface.
-func (rID *EventHubResourceID) String() string {
+func (rID *AzureResourceID) String() string {
 	b, err := rID.MarshalJSON()
 	if err != nil {
 		return ""
@@ -159,24 +270,28 @@ func (rID *EventHubResourceID) String() string {
 	return string(b[1 : len(b)-1])
 }
 
-// errEventHubResourceIDEmptyAttrs indicates that a resource ID
+// errAzureResourceIDEmptyAttrs indicates that a resource ID
 // string or object contains empty attributes.
-var errEventHubResourceIDEmptyAttrs = errors.New("resource ID contains empty attributes")
+var errAzureResourceIDEmptyAttrs = errors.New("resource ID contains empty attributes")
 
-// errParseEventHubResourceID indicates that a resource ID string
+// // errEventHubResourceIDEmptyAttrs indicates that a resource ID
+// // string or object contains empty attributes.
+// var errEventHubResourceIDEmptyAttrs = errors.New("resource ID contains empty attributes")
+
+// errParseAzureResourceID indicates that a resource ID string
 // does not match the expected format.
-type errParseEventHubResourceID struct {
+type errParseAzureResourceID struct {
 	gotInput string
 }
 
-func newParseEventHubResourceIDError(got string) error {
-	return &errParseEventHubResourceID{
+func newParseAzureResourceIDError(got string) error {
+	return &errParseAzureResourceID{
 		gotInput: got,
 	}
 }
 
 // Error implements the error interface.
-func (e *errParseEventHubResourceID) Error() string {
-	return fmt.Sprintf("Event Hub resource ID %q does not match expected format %q",
-		e.gotInput, eventHubResourceIDFormat)
+func (e *errParseAzureResourceID) Error() string {
+	return fmt.Sprintf("resource ID %q does not match expected format %q",
+		e.gotInput, azureResourceIDFormat)
 }

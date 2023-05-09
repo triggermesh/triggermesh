@@ -27,6 +27,7 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/cloudwatch/cloudwatchiface"
@@ -48,6 +49,9 @@ type envConfig struct {
 
 	Query           string `envconfig:"QUERIES" required:"true"`          // JSON based array of name/query pairs
 	PollingInterval string `envconfig:"POLLING_INTERVAL" required:"true"` // free tier is 5m
+
+	// Assume this IAM Role when access keys provided.
+	AssumeIamRole string `envconfig:"AWS_ASSUME_ROLE_ARN"`
 
 	// The environment variables below aren't read from the envConfig struct
 	// by the AWS SDK, but rather directly using os.Getenv().
@@ -89,9 +93,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envConfig)
 
-	cfg := session.Must(session.NewSession(aws.NewConfig().
+	sess := session.Must(session.NewSession(aws.NewConfig().
 		WithRegion(env.Region),
 	))
+
+	config := &aws.Config{}
+	if env.AssumeIamRole != "" {
+		config.Credentials = stscreds.NewCredentials(sess, env.AssumeIamRole)
+	}
 
 	interval, err := time.ParseDuration(env.PollingInterval)
 	if err != nil {
@@ -108,7 +117,7 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		mt:          mt,
 		eventsource: eventsource,
 
-		cwClient: cloudwatch.New(cfg),
+		cwClient: cloudwatch.New(sess, config),
 		ceClient: ceClient,
 
 		pollingInterval: interval,

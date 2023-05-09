@@ -44,6 +44,8 @@ type Interface interface {
 	AzureEventHubsTargets() AzureEventHubsTargetInformer
 	// AzureSentinelTargets returns a AzureSentinelTargetInformer.
 	AzureSentinelTargets() AzureSentinelTargetInformer
+	// AzureServiceBusTargets returns a AzureServiceBusTargetInformer.
+	AzureServiceBusTargets() AzureServiceBusTargetInformer
 	// CloudEventsTargets returns a CloudEventsTargetInformer.
 	CloudEventsTargets() CloudEventsTargetInformer
 	// DatadogTargets returns a DatadogTargetInformer.
@@ -151,6 +153,11 @@ func (v *version) AzureEventHubsTargets() AzureEventHubsTargetInformer {
 // AzureSentinelTargets returns a AzureSentinelTargetInformer.
 func (v *version) AzureSentinelTargets() AzureSentinelTargetInformer {
 	return &azureSentinelTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureServiceBusTargets returns a AzureServiceBusTargetInformer.
+func (v *version) AzureServiceBusTargets() AzureServiceBusTargetInformer {
+	return &azureServiceBusTargetInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // CloudEventsTargets returns a CloudEventsTargetInformer.

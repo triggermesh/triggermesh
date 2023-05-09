@@ -17,7 +17,6 @@ limitations under the License.
 package s3
 
 import (
-	"errors"
 	"fmt"
 
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -73,26 +72,30 @@ var _ ClientGetter = (*ClientGetterWithSecretGetter)(nil)
 
 // Get implements ClientGetter.
 func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, SQSClient, error) {
-	if src.Spec.Auth.Credentials == nil && src.Spec.Auth.EksIAMRole == nil {
-		return nil, nil, errors.New("AWS security credentials were not specified")
-	}
-
-	sess := session.Must(session.NewSession(awscore.NewConfig()))
+	var sess *session.Session
+	config := &awscore.Config{}
 
 	var creds *credentials.Value
 	var err error
-	if src.Spec.Auth.Credentials != nil {
-		creds, err = aws.Credentials(g.sg(src.Namespace), src.Spec.Auth.Credentials)
-		if err != nil {
+
+	switch {
+	case src.Spec.Auth.Credentials != nil:
+		if creds, err = aws.Credentials(g.sg(src.Namespace), src.Spec.Auth.Credentials); err != nil {
 			return nil, nil, fmt.Errorf("retrieving AWS security credentials: %w", err)
 		}
-	} else {
-		iamCreds := stscreds.NewCredentials(sess, src.Spec.Auth.EksIAMRole.String())
-		cred, err := iamCreds.Get()
-		if err != nil {
-			return nil, nil, fmt.Errorf("retrieving AWS IAM Role: %w", err)
+		sess = session.Must(session.NewSession(awscore.NewConfig().
+			WithRegion(defaultS3Region).
+			WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
+		))
+		if assumeRole := src.Spec.Auth.Credentials.AssumeIAMRole; assumeRole != nil {
+			config.Credentials = stscreds.NewCredentials(sess, assumeRole.String())
 		}
-		creds = &cred
+	case src.Spec.Auth.EksIAMRole != nil:
+		sess = session.Must(session.NewSession(awscore.NewConfig().
+			WithRegion(defaultS3Region),
+		))
+	default:
+		return nil, nil, fmt.Errorf("neither AWS security credentials nor IAM Role were specified")
 	}
 
 	// The ARN of a S3 bucket differs from other ARNs because it doesn't
@@ -105,7 +108,7 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 	// places, we bake the very specific logic of retrieving both the
 	// account ID and region into the ClientGetter for the time being.
 
-	region, err := determineS3Region(src, creds)
+	region, err := determineS3Region(src, sess, config)
 	if err != nil {
 		return nil, nil, fmt.Errorf("determining suitable S3 region: %w", err)
 	}
@@ -113,7 +116,23 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 		src.Spec.ARN.Region = region
 	}
 
-	accID, err := determineBucketOwnerAccount(src, creds)
+	if defaultS3Region != region {
+		if creds != nil {
+			sess = session.Must(session.NewSession(awscore.NewConfig().
+				WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)).
+				WithRegion(region),
+			))
+			if assumeRole := src.Spec.Auth.Credentials.AssumeIAMRole; assumeRole != nil {
+				config.Credentials = stscreds.NewCredentials(sess, assumeRole.String())
+			}
+		} else if src.Spec.Auth.EksIAMRole != nil {
+			sess = session.Must(session.NewSession(awscore.NewConfig().
+				WithRegion(region),
+			))
+		}
+	}
+
+	accID, err := determineBucketOwnerAccount(src, sess, config)
 	if err != nil {
 		return nil, nil, fmt.Errorf("determining bucket's owner: %w", err)
 	}
@@ -121,11 +140,7 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 		src.Spec.ARN.AccountID = accID
 	}
 
-	sess.Config.
-		WithRegion(src.Spec.ARN.Region).
-		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds))
-
-	return s3.New(sess), sqs.New(sess), nil
+	return s3.New(sess, config), sqs.New(sess, config), nil
 }
 
 // determineS3Region determines the most suitable region for interacting with
@@ -134,7 +149,7 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 // - Value provided in the ARN of the S3 bucket
 // - Value provided in the ARN of the SQS queue
 // - Value retrieved from the S3 API
-func determineS3Region(src *v1alpha1.AWSS3Source, creds *credentials.Value) (string, error) {
+func determineS3Region(src *v1alpha1.AWSS3Source, sess *session.Session, config *awscore.Config) (string, error) {
 	if src.Spec.ARN.Region != "" {
 		return src.Spec.ARN.Region, nil
 	}
@@ -145,7 +160,7 @@ func determineS3Region(src *v1alpha1.AWSS3Source, creds *credentials.Value) (str
 		}
 	}
 
-	region, err := getBucketRegion(src.Spec.ARN.Resource, creds)
+	region, err := getBucketRegion(src.Spec.ARN.Resource, sess, config)
 	if err != nil {
 		return "", fmt.Errorf("getting location of bucket %q: %w", src.Spec.ARN.Resource, err)
 	}
@@ -154,13 +169,8 @@ func determineS3Region(src *v1alpha1.AWSS3Source, creds *credentials.Value) (str
 }
 
 // getBucketRegion retrieves the region the provided bucket resides in.
-func getBucketRegion(bucketName string, creds *credentials.Value) (string, error) {
-	sess := session.Must(session.NewSession(awscore.NewConfig().
-		WithRegion(defaultS3Region).
-		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
-	))
-
-	resp, err := s3.New(sess).GetBucketLocation(&s3.GetBucketLocationInput{
+func getBucketRegion(bucketName string, sess *session.Session, config *awscore.Config) (string, error) {
+	resp, err := s3.New(sess, config).GetBucketLocation(&s3.GetBucketLocationInput{
 		Bucket: &bucketName,
 	})
 	if err != nil {
@@ -179,7 +189,7 @@ func getBucketRegion(bucketName string, creds *credentials.Value) (string, error
 // - Value provided in the ARN of the S3 bucket
 // - Value provided in the ARN of the SQS queue
 // - Value retrieved from the STS API
-func determineBucketOwnerAccount(src *v1alpha1.AWSS3Source, creds *credentials.Value) (string, error) {
+func determineBucketOwnerAccount(src *v1alpha1.AWSS3Source, sess *session.Session, config *awscore.Config) (string, error) {
 	if src.Spec.ARN.AccountID != "" {
 		return src.Spec.ARN.AccountID, nil
 	}
@@ -190,7 +200,7 @@ func determineBucketOwnerAccount(src *v1alpha1.AWSS3Source, creds *credentials.V
 		}
 	}
 
-	accID, err := getCallerAccountID(creds)
+	accID, err := getCallerAccountID(sess, config)
 	if err != nil {
 		return "", fmt.Errorf("getting ID of caller: %w", err)
 	}
@@ -199,12 +209,8 @@ func determineBucketOwnerAccount(src *v1alpha1.AWSS3Source, creds *credentials.V
 }
 
 // getCallerAccountID retrieves the account ID of the caller.
-func getCallerAccountID(creds *credentials.Value) (string, error) {
-	sess := session.Must(session.NewSession(awscore.NewConfig().
-		WithCredentials(credentials.NewStaticCredentialsFromCreds(*creds)),
-	))
-
-	resp, err := sts.New(sess).GetCallerIdentity(&sts.GetCallerIdentityInput{})
+func getCallerAccountID(sess *session.Session, config *awscore.Config) (string, error) {
+	resp, err := sts.New(sess, config).GetCallerIdentity(&sts.GetCallerIdentityInput{})
 	if err != nil {
 		return "", err
 	}
