@@ -86,9 +86,9 @@ type adapter struct {
 	arn arn.ARN
 
 	// tracker for running records processors
-	//lint:ignore
+	// lint:ignore
 	processors sync.Map
-	//lint:ignore
+	// lint:ignore
 	wg sync.WaitGroup
 
 	lastStreamARN    *string
