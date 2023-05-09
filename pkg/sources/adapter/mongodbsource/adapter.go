@@ -19,7 +19,6 @@ package mongodbsource
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -59,9 +58,6 @@ type adapter struct {
 
 	database   string
 	collection string
-
-	processors sync.Map
-	wg         sync.WaitGroup
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
