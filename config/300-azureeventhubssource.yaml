@@ -256,6 +256,14 @@ spec:
                 anyOf:
                 - required: [ref]
                 - required: [uri]
+              messageCountSize:
+                description: The number of messages to receive from the Event Hub at a time.
+                type: integer
+                format: string
+              messageTimeout:
+                description: The timeout in seconds to wait for the number of messages to be available in the Event Hub before.
+                type: integer
+                format: string
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object

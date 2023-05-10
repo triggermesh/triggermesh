@@ -50,9 +50,6 @@ import (
 
 const (
 	resourceProviderEventHub = "Microsoft.EventHub"
-
-	connTimeout  = 20 * time.Second
-	drainTimeout = 1 * time.Minute
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -72,6 +69,12 @@ type envConfig struct {
 	//
 	// Supported values: [ default eventgrid ]
 	MessageProcessor string `envconfig:"EVENTHUB_MESSAGE_PROCESSOR" default:"default"`
+
+	// MessageTimeout is the maximum amount of time to wait for receiving the messages in seconds
+	MessageTimeout string `envconfig:"EVENTHUB_MESSAGE_TIMEOUT" default:"20"`
+
+	// MessageCountSize is the maximum number of messages to receive at once
+	MessageCountSize string `envconfig:"EVENTHUB_MESSAGE_COUNT_SIZE" default:"100"`
 
 	// Allows overriding common CloudEvents attributes.
 	CEOverrideSource string `envconfig:"CE_SOURCE"`
@@ -99,8 +102,10 @@ type adapter struct {
 	ehClient    *azeventhubs.ConsumerClient
 	ceClient    cloudevents.Client
 
-	ehConsumerGroup string
-	msgPrcsr        MessageProcessor
+	ehConsumerGroup  string
+	msgPrcsr         MessageProcessor
+	messageTimeout   int
+	messageCountSize int
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -162,6 +167,15 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		consumerGroup = env.ConsumerGroup
 	}
 
+	msgTimeout, err := strconv.Atoi(env.MessageTimeout)
+	if err != nil {
+		logger.Panicw("Unable to parse message timeout "+strconv.Quote(env.MessageTimeout), zap.Error(err))
+	}
+	msgCountSize, err := strconv.Atoi(env.MessageCountSize)
+	if err != nil {
+		logger.Panicw("Unable to parse message count size "+strconv.Quote(env.MessageCountSize), zap.Error(err))
+	}
+
 	// The Event Hubs client uses the default "NoOpTracer" tab.Tracer
 	// implementation, which does not produce any log message. We register
 	// a custom implementation so that event handling errors are logged via
@@ -177,7 +191,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 		ehConsumerGroup: consumerGroup,
 
-		msgPrcsr: msgPrcsr,
+		msgPrcsr:         msgPrcsr,
+		messageTimeout:   msgTimeout,
+		messageCountSize: msgCountSize,
 	}
 }
 
@@ -243,8 +259,8 @@ func (a *adapter) processPartition(ctx context.Context, partitionID string) erro
 			a.logger.Debug("Shutting down Azure Event Hubs adapter")
 			return nil
 		default:
-			receiveCtx, cancel := context.WithTimeout(ctx, connTimeout)
-			events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
+			receiveCtx, cancel := context.WithTimeout(ctx, time.Duration(a.messageTimeout)*time.Second)
+			events, err := partitionClient.ReceiveEvents(receiveCtx, a.messageCountSize, nil)
 			cancel()
 
 			if err != nil {

@@ -61,6 +61,14 @@ type AzureEventHubsSourceSpec struct {
 	// If it not present, it will try to use Azure AKS Managed Identity
 	Auth AzureAuth `json:"auth"`
 
+	// MessageTimeout of the Event Hubs client in seconds.
+	// +optional
+	MessageTimeout *string `json:"messagesTimeout,omitempty"`
+
+	// MessageCountSize of the Event Hubs client.
+	// +optional
+	MessageCountSize *string `json:"messagesCountSize,omitempty"`
+
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
