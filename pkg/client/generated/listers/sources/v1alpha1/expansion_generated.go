@@ -170,6 +170,14 @@ type AzureServiceBusQueueSourceListerExpansion interface{}
 // AzureServiceBusQueueSourceNamespaceLister.
 type AzureServiceBusQueueSourceNamespaceListerExpansion interface{}
 
+// AzureServiceBusSourceListerExpansion allows custom methods to be added to
+// AzureServiceBusSourceLister.
+type AzureServiceBusSourceListerExpansion interface{}
+
+// AzureServiceBusSourceNamespaceListerExpansion allows custom methods to be added to
+// AzureServiceBusSourceNamespaceLister.
+type AzureServiceBusSourceNamespaceListerExpansion interface{}
+
 // AzureServiceBusTopicSourceListerExpansion allows custom methods to be added to
 // AzureServiceBusTopicSourceLister.
 type AzureServiceBusTopicSourceListerExpansion interface{}

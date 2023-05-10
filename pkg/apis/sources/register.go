@@ -140,6 +140,13 @@ var (
 		Resource: "azureservicebusqueuesources",
 	}
 
+	// AzureServiceBusSourceResource respresents an event source for
+	// Azure Service Bus.
+	AzureServiceBusSourceResource = schema.GroupResource{
+		Group:    GroupName,
+		Resource: "azureservicebussources",
+	}
+
 	// AzureServiceBusTopicSourceResource respresents an event source for
 	// Azure Service Bus Topics.
 	AzureServiceBusTopicSourceResource = schema.GroupResource{

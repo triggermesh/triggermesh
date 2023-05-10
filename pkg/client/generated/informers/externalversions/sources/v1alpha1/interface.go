@@ -62,6 +62,8 @@ type Interface interface {
 	AzureQueueStorageSources() AzureQueueStorageSourceInformer
 	// AzureServiceBusQueueSources returns a AzureServiceBusQueueSourceInformer.
 	AzureServiceBusQueueSources() AzureServiceBusQueueSourceInformer
+	// AzureServiceBusSources returns a AzureServiceBusSourceInformer.
+	AzureServiceBusSources() AzureServiceBusSourceInformer
 	// AzureServiceBusTopicSources returns a AzureServiceBusTopicSourceInformer.
 	AzureServiceBusTopicSources() AzureServiceBusTopicSourceInformer
 	// CloudEventsSources returns a CloudEventsSourceInformer.
@@ -202,6 +204,11 @@ func (v *version) AzureQueueStorageSources() AzureQueueStorageSourceInformer {
 // AzureServiceBusQueueSources returns a AzureServiceBusQueueSourceInformer.
 func (v *version) AzureServiceBusQueueSources() AzureServiceBusQueueSourceInformer {
 	return &azureServiceBusQueueSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// AzureServiceBusSources returns a AzureServiceBusSourceInformer.
+func (v *version) AzureServiceBusSources() AzureServiceBusSourceInformer {
+	return &azureServiceBusSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // AzureServiceBusTopicSources returns a AzureServiceBusTopicSourceInformer.
