@@ -155,7 +155,6 @@ func (a *adapter) processChanges(ctx context.Context, cs *mongo.ChangeStream) er
 }
 
 func (a *adapter) processChangeEvent(ctx context.Context, changeEvent bson.M) error {
-	fmt.Println("procesing change")
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetType(v1alpha1.MongoDBSourceEventType)
 	event.SetSource(a.mt.Namespace + "/" + a.mt.Name)
