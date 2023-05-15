@@ -20,7 +20,7 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	cloud.google.com/go/logging v1.7.0
 	cloud.google.com/go/pubsub v1.28.0
-	cloud.google.com/go/storage v1.28.1
+	cloud.google.com/go/storage v1.30.1
 	cloud.google.com/go/workflows v1.10.0
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.3
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
@@ -74,8 +74,8 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.27.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/oauth2 v0.6.0
-	google.golang.org/api v0.112.0
-	google.golang.org/genproto v0.0.0-20230303212802-e74f57abe488
+	google.golang.org/api v0.114.0
+	google.golang.org/genproto v0.0.0-20230320184635-7606e756e683
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.30.0
 	k8s.io/api v0.23.9
@@ -151,7 +151,7 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/pprof v0.0.0-20210827144239-02619b876842 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
-	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.7.1 // indirect
 	github.com/googleapis/gnostic v0.5.5 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
