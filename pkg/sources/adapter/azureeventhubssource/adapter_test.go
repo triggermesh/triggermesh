@@ -24,8 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 
 	adaptertest "knative.dev/eventing/pkg/adapter/v2/test"
 	loggingtesting "knative.dev/pkg/logging/testing"
@@ -56,18 +55,15 @@ func TestHandleMessage(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ceClient := adaptertest.NewTestClient()
 
-			event := eventhub.Event{
-				Data: tc.eventData,
-				SystemProperties: &eventhub.SystemProperties{
-					SequenceNumber: to.Ptr[int64](1),
+			event := &azeventhubs.ReceivedEventData{
+				EventData: azeventhubs.EventData{
+					Body: tc.eventData,
 				},
-				ID:           "someMessageID",
-				PartitionKey: to.Ptr("partition1"),
 			}
 
 			a := &adapter{
-				runtimeInfo: &eventhub.HubRuntimeInformation{
-					Path: "testHub",
+				runtimeInfo: &azeventhubs.EventHubProperties{
+					Name: "testHub",
 				},
 				logger:   loggingtesting.TestLogger(t),
 				ceClient: ceClient,
@@ -77,7 +73,7 @@ func TestHandleMessage(t *testing.T) {
 				},
 			}
 
-			err := a.handleMessage(context.Background(), &event)
+			err := a.handleMessage(context.Background(), event)
 			assert.NoError(t, err)
 
 			events := ceClient.Sent()
@@ -98,7 +94,7 @@ func extractDataFromEvent(t *testing.T, b []byte) string {
 	err := json.Unmarshal(b, &unstructuredEvent)
 	require.NoError(t, err)
 
-	dataBytes, err := json.Marshal(unstructuredEvent["Data"])
+	dataBytes, err := json.Marshal(unstructuredEvent["Body"])
 	require.NoError(t, err)
 
 	var data json.RawMessage

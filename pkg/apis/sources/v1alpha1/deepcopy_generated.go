@@ -1900,6 +1900,16 @@ func (in *AzureEventHubsSourceSpec) DeepCopyInto(out *AzureEventHubsSourceSpec) 
 		**out = **in
 	}
 	in.Auth.DeepCopyInto(&out.Auth)
+	if in.MessageTimeout != nil {
+		in, out := &in.MessageTimeout, &out.MessageTimeout
+		*out = new(string)
+		**out = **in
+	}
+	if in.MessageCountSize != nil {
+		in, out := &in.MessageCountSize, &out.MessageCountSize
+		*out = new(string)
+		**out = **in
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)

@@ -28,6 +28,9 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 
+	// Resource ID of the Event Hubs instance.
+	HubResourceID string `envconfig:"EVENTHUB_RESOURCE_ID" required:"true"`
+
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`
 

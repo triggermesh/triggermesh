@@ -23,7 +23,8 @@ import (
 	"os"
 	"time"
 
-	eventhubs "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	. "github.com/onsi/ginkgo/v2" //nolint:stylecheck
 	. "github.com/onsi/gomega"    //nolint:stylecheck
@@ -95,7 +96,6 @@ var _ = Describe("Azure EventHubs", func() {
 	var sink *duckv1.Destination
 
 	var rg armresources.ResourceGroup
-	var hub *eventhubs.Hub
 
 	BeforeEach(func() {
 		ns = f.UniqueName
@@ -113,7 +113,7 @@ var _ = Describe("Azure EventHubs", func() {
 					_ = azure.DeleteResourceGroup(ctx, subscriptionID, *rg.Name)
 				})
 
-				hub = azure.CreateEventHubComponents(ctx, subscriptionID, ns, region, *rg.Name)
+				azure.CreateEventHubComponents(ctx, subscriptionID, ns, region, *rg.Name)
 
 				sink = bridges.CreateEventDisplaySink(f.KubeClient, ns)
 			})
@@ -132,9 +132,31 @@ var _ = Describe("Azure EventHubs", func() {
 				ducktypes.WaitUntilReady(f.DynamicClient, src)
 				time.Sleep(5 * time.Second)
 
-				ev := eventhubs.NewEvent([]byte("hello world"))
-				err = hub.Send(ctx, ev, eventhubs.SendWithMessageID("12345"))
+				defaultAzureCred, err := azidentity.NewDefaultAzureCredential(nil)
 				Expect(err).ToNot(HaveOccurred())
+
+				nsfqdn := fmt.Sprintf("%s.servicebus.windows.net", ns)
+				producerClient, err := azeventhubs.NewProducerClient(nsfqdn, ns, defaultAzureCred, nil)
+				Expect(err).ToNot(HaveOccurred())
+
+				DeferCleanup(func() {
+					err = producerClient.Close(ctx)
+					Expect(err).ToNot(HaveOccurred())
+				})
+
+				events := createEventsForSample()
+				batch, err := producerClient.NewEventDataBatch(ctx, &azeventhubs.EventDataBatchOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				for i := range events {
+					err = batch.AddEventData(events[i], nil)
+					Expect(err).ToNot(HaveOccurred())
+				}
+
+				if batch.NumEvents() > 0 {
+					err = producerClient.SendEventDataBatch(ctx, batch, nil)
+					Expect(err).ToNot(HaveOccurred())
+				}
 
 				const receiveTimeout = 150 * time.Second // it takes events a little longer to flow in from azure
 				const pollInterval = 500 * time.Millisecond
@@ -153,8 +175,9 @@ var _ = Describe("Azure EventHubs", func() {
 
 				data := make(map[string]interface{})
 				err = json.Unmarshal(e.Data(), &data)
-				testID := fmt.Sprintf("%v", data["ID"])
-				Expect(data["ID"]).To(Equal(testID))
+				Expect(err).ToNot(HaveOccurred())
+				testID := fmt.Sprintf("%v", data["MessageID"])
+				Expect(data["MessageID"]).To(Equal(testID))
 			})
 		})
 	})
@@ -273,4 +296,12 @@ func readReceivedEvents(c clientset.Interface, namespace, eventDisplayName strin
 // createEventhubID will create the EventHub path used by the k8s azureeventhubssource
 func createEventhubID(subscriptionID, testName string) string {
 	return "/subscriptions/" + subscriptionID + "/resourceGroups/" + testName + "/providers/Microsoft.EventHub/namespaces/" + testName + "/eventHubs/" + testName
+}
+
+func createEventsForSample() []*azeventhubs.EventData {
+	return []*azeventhubs.EventData{
+		{
+			Body: []byte("hello world"),
+		},
+	}
 }

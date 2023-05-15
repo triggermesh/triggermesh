@@ -79,6 +79,18 @@ func MakeAppEnv(o *v1alpha1.AzureEventHubsSource) []corev1.EnvVar {
 			Value: *o.Spec.ConsumerGroup,
 		})
 	}
+	if o.Spec.MessageCountSize != nil {
+		hubEnvs = append(hubEnvs, corev1.EnvVar{
+			Name:  common.EnvHubMessageCountSize,
+			Value: *o.Spec.MessageCountSize,
+		})
+	}
+	if o.Spec.MessageTimeout != nil {
+		hubEnvs = append(hubEnvs, corev1.EnvVar{
+			Name:  common.EnvHubMessageTimeout,
+			Value: *o.Spec.MessageTimeout,
+		})
+	}
 
 	return append(hubEnvs,
 		[]corev1.EnvVar{
