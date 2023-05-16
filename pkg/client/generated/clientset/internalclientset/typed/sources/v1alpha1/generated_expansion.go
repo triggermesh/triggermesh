@@ -56,6 +56,8 @@ type AzureQueueStorageSourceExpansion interface{}
 
 type AzureServiceBusQueueSourceExpansion interface{}
 
+type AzureServiceBusSourceExpansion interface{}
+
 type AzureServiceBusTopicSourceExpansion interface{}
 
 type CloudEventsSourceExpansion interface{}

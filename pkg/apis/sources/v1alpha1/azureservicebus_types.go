@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
 )
@@ -26,61 +27,70 @@ import (
 // +genreconciler
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AzureServiceBusTarget is the Schema for an Azure Service Bus Target.
-type AzureServiceBusTarget struct {
+// AzureServiceBusSource is the Schema for the event source.
+type AzureServiceBusSource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AzureServiceBusTargetSpec `json:"spec"`
-	Status v1alpha1.Status           `json:"status,omitempty"`
+	Spec   AzureServiceBusSourceSpec   `json:"spec,omitempty"`
+	Status AzureServiceBusSourceStatus `json:"status,omitempty"`
 }
 
-// Check the interfaces the event target should be implementing.
+// Check the interfaces the event source should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*AzureServiceBusTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*AzureServiceBusTarget)(nil)
-	_ v1alpha1.EventReceiver       = (*AzureServiceBusTarget)(nil)
-	_ v1alpha1.EventSource         = (*AzureServiceBusTarget)(nil)
+	_ v1alpha1.Reconcilable        = (*AzureServiceBusSource)(nil)
+	_ v1alpha1.AdapterConfigurable = (*AzureServiceBusSource)(nil)
+	_ v1alpha1.EventSource         = (*AzureServiceBusSource)(nil)
+	_ v1alpha1.EventSender         = (*AzureServiceBusSource)(nil)
 )
 
-// AzureServiceBusTargetSpec defines the desired state of the event target.
-type AzureServiceBusTargetSpec struct {
-	// The resource ID the Service Bus Topic.
+// AzureServiceBusSourceSpec defines the desired state of the event source.
+type AzureServiceBusSourceSpec struct {
+	duckv1.SourceSpec `json:",inline"`
+
+	// The resource ID the Service Bus Topic to subscribe to.
 	//
 	// Expected format:
 	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}
 	// +optional
 	TopicID *AzureResourceID `json:"topicID,omitempty"`
 
-	// The resource ID the Service Bus Queue.
+	// The resource ID the Service Bus Queue to subscribe to.
 	//
 	// Expected format:
 	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}
 	// +optional
 	QueueID *AzureResourceID `json:"queueID,omitempty"`
 
-	// Authentication method to interact with the Azure Service Bus API.
+	// Authentication method to interact with the Azure REST API.
+	// This event source only supports the ServicePrincipal authentication.
+	// If it not present, it will try to use Azure AKS Managed Identity
 	Auth AzureAuth `json:"auth"`
 
 	// WebSocketsEnable
 	// +optional
 	WebSocketsEnable *bool `json:"webSocketsEnable,omitempty"`
 
-	// EventOptions for targets
-	EventOptions *EventOptions `json:"eventOptions,omitempty"`
-
-	DiscardCEContext bool `json:"discardCloudEventContext"`
-
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`
 }
 
+// AzureServiceBusSourceStatus defines the observed state of the event source.
+type AzureServiceBusSourceStatus struct {
+	v1alpha1.Status `json:",inline"`
+
+	// Resource ID of the Service Bus Subscription that is currently used
+	// by the event source for consuming events from the configured Service
+	// Bus.
+	SubscriptionID *AzureResourceID `json:"subscriptionID,omitempty"`
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// AzureServiceBusTargetList is a list of event target instances.
-type AzureServiceBusTargetList struct {
+// AzureServiceBusSourceList contains a list of event sources.
+type AzureServiceBusSourceList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata"`
-	Items           []AzureServiceBusTarget `json:"items"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []AzureServiceBusSource `json:"items"`
 }

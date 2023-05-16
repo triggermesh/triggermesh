@@ -104,6 +104,10 @@ func (c *FakeSourcesV1alpha1) AzureServiceBusQueueSources(namespace string) v1al
 	return &FakeAzureServiceBusQueueSources{c, namespace}
 }
 
+func (c *FakeSourcesV1alpha1) AzureServiceBusSources(namespace string) v1alpha1.AzureServiceBusSourceInterface {
+	return &FakeAzureServiceBusSources{c, namespace}
+}
+
 func (c *FakeSourcesV1alpha1) AzureServiceBusTopicSources(namespace string) v1alpha1.AzureServiceBusTopicSourceInterface {
 	return &FakeAzureServiceBusTopicSources{c, namespace}
 }
