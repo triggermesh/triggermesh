@@ -250,6 +250,14 @@ type KafkaSourceListerExpansion interface{}
 // KafkaSourceNamespaceLister.
 type KafkaSourceNamespaceListerExpansion interface{}
 
+// MongoDBSourceListerExpansion allows custom methods to be added to
+// MongoDBSourceLister.
+type MongoDBSourceListerExpansion interface{}
+
+// MongoDBSourceNamespaceListerExpansion allows custom methods to be added to
+// MongoDBSourceNamespaceLister.
+type MongoDBSourceNamespaceListerExpansion interface{}
+
 // OCIMetricsSourceListerExpansion allows custom methods to be added to
 // OCIMetricsSourceLister.
 type OCIMetricsSourceListerExpansion interface{}

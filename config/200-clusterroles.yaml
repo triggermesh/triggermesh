@@ -91,6 +91,7 @@ rules:
   - httppollersources
   - ibmmqsources
   - kafkasources
+  - mongodbsources
   - ocimetricssources
   - salesforcesources
   - slacksources
@@ -135,6 +136,7 @@ rules:
   - httppollersources/status
   - ibmmqsources/status
   - kafkasources/status
+  - mongodbsources/status
   - ocimetricssources/status
   - salesforcesources/status
   - slacksources/status
@@ -320,6 +322,7 @@ rules:
   - httppollersources/finalizers
   - ibmmqsources/finalizers
   - kafkasources/finalizers
+  - mongodbsources/finalizers
   - ocimetricssources/finalizers
   - salesforcesources/finalizers
   - slacksources/finalizers
@@ -768,6 +771,7 @@ rules:
   - httppollersources
   - ibmmqsources
   - kafkasources
+  - mongodbsources
   - ocimetricssources
   - salesforcesources
   - slacksources

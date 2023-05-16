@@ -82,6 +82,8 @@ type Interface interface {
 	IBMMQSources() IBMMQSourceInformer
 	// KafkaSources returns a KafkaSourceInformer.
 	KafkaSources() KafkaSourceInformer
+	// MongoDBSources returns a MongoDBSourceInformer.
+	MongoDBSources() MongoDBSourceInformer
 	// OCIMetricsSources returns a OCIMetricsSourceInformer.
 	OCIMetricsSources() OCIMetricsSourceInformer
 	// SalesforceSources returns a SalesforceSourceInformer.
@@ -252,6 +254,11 @@ func (v *version) IBMMQSources() IBMMQSourceInformer {
 // KafkaSources returns a KafkaSourceInformer.
 func (v *version) KafkaSources() KafkaSourceInformer {
 	return &kafkaSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// MongoDBSources returns a MongoDBSourceInformer.
+func (v *version) MongoDBSources() MongoDBSourceInformer {
+	return &mongoDBSourceInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // OCIMetricsSources returns a OCIMetricsSourceInformer.

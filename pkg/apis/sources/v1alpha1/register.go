@@ -57,6 +57,7 @@ var AllTypes = []v1alpha1.GroupObject{
 	{Single: &AzureServiceBusQueueSource{}, List: &AzureServiceBusQueueSourceList{}},
 	{Single: &AzureServiceBusTopicSource{}, List: &AzureServiceBusTopicSourceList{}},
 	{Single: &CloudEventsSource{}, List: &CloudEventsSourceList{}},
+	{Single: &MongoDBSource{}, List: &MongoDBSourceList{}},
 	{Single: &KafkaSource{}, List: &KafkaSourceList{}},
 	{Single: &GoogleCloudAuditLogsSource{}, List: &GoogleCloudAuditLogsSourceList{}},
 	{Single: &GoogleCloudBillingSource{}, List: &GoogleCloudBillingSourceList{}},
