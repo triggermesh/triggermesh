@@ -48,6 +48,7 @@ resources:
 - config/300-httppollersource.yaml
 - config/300-ibmmqsource.yaml
 - config/300-kafkasource.yaml
+- config/300-mongodbsource.yaml
 - config/300-ocimetricssource.yaml
 - config/300-salesforcesource.yaml
 - config/300-slacksource.yaml
