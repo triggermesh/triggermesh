@@ -79,6 +79,10 @@ func (r *Reconciler) ReconcileKind(ctx context.Context, o *v1alpha1.AzureService
 			return fmt.Errorf("failed to reconcile Service Bus Subscription: %w", err)
 		}
 	}
+	if o.Spec.QueueID != nil {
+		o.Status.SubscriptionID = nil
+		o.Status.MarkSubscribedWithReason("SUBSCRIPTIONNOTNEEDED", "QueueID is present, no subscription needed")
+	}
 	return r.base.ReconcileAdapter(ctx, r)
 }
 

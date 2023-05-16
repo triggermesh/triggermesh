@@ -95,6 +95,11 @@ func (s *AzureServiceBusSourceStatus) MarkSubscribed() {
 	azureServiceBusSourceConditionSet.Manage(s).MarkTrue(AzureServiceBusConditionSubscribed)
 }
 
+// MarkSubscribedWithReason sets the Subscribed condition to True with reason.
+func (s *AzureServiceBusSourceStatus) MarkSubscribedWithReason(reason, msg string) {
+	azureServiceBusSourceConditionSet.Manage(s).MarkTrueWithReason(AzureServiceBusConditionSubscribed, reason, msg)
+}
+
 // MarkNotSubscribed sets the Subscribed condition to False with the given
 // reason and message.
 func (s *AzureServiceBusSourceStatus) MarkNotSubscribed(reason, msg string) {
