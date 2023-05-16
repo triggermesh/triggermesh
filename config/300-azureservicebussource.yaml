@@ -156,8 +156,84 @@ spec:
                     - tenantID
                     - clientID
                     - clientSecret
-                required:
-                - servicePrincipal
+                  sasToken:
+                    description: An Azure shared access signature (SAS) token. For more information about SAS tokens, please
+                      refer to the Azure Service Bus Queue documentation at https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas.
+                    type: object
+                    properties:
+                      keyName:
+                        description: Name of the key used by the SAS token. Mutually exclusive with 'connectionString'.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal name of the key.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the key's name.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      keyValue:
+                        description: Value of the key used by the SAS token. Mutually exclusive with 'connectionString'.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the key.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the key's value.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                      connectionString:
+                        description: Connection string containing both the resource URI of the Service Bus Queue, and the
+                          SAS token. Mutually exclusive with 'keyName' and 'keyValue'.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the connection string.
+                            type: string
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the connection string.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
+                    oneOf:
+                    - required:
+                      - keyName
+                      - keyValue
+                    - required:
+                      - connectionString
+                oneOf:
+                - required: [sasToken]
+                - required: [servicePrincipal]
               webSocketsEnable:
                 description: Boolean to indicate to use WebSockets.
                 type: boolean
