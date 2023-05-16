@@ -165,7 +165,7 @@ func (a *adapter) processChangeEvent(ctx context.Context, changeEvent bson.M) er
 	}
 
 	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-		a.logger.Infow("Failed to send event", zap.String("target", a.mt.Namespace+"/"+a.mt.Name), zap.Error(result))
+		a.logger.Errorw("Failed to send event", zap.String("target", a.mt.Namespace+"/"+a.mt.Name), zap.Error(result))
 		return fmt.Errorf("sending event: %w", result)
 	}
 
