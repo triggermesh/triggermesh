@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.google.cloud.storage.notification" }
+        { "type": "com.google.cloud.storage.notification" },
+        { "type": "com.google.cloud.storage.objectfinalize" },
+        { "type": "com.google.cloud.storage.objectmetadataupdate" },
+        { "type": "com.google.cloud.storage.objectdelete" },
+        { "type": "com.google.cloud.storage.objectarchive" }
       ]
 spec:
   group: sources.triggermesh.io

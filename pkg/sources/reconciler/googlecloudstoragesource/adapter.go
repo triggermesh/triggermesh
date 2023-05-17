@@ -77,14 +77,14 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudStorageSource) []corev1.EnvVar {
 
 	return append(envVar, []corev1.EnvVar{
 		{
+			Name:  "GCLOUD_PUBSUB_MESSAGE_PROCESSOR",
+			Value: "gcs",
+		}, {
 			Name:  common.EnvGCloudPubSubSubscription,
 			Value: subsName,
 		}, {
 			Name:  common.EnvCESource,
 			Value: o.AsEventSource(),
-		}, {
-			Name:  common.EnvCEType,
-			Value: v1alpha1.GoogleCloudStorageGenericEventType,
 		}, {
 			Name:  adapter.EnvConfigCEOverrides,
 			Value: cloudevents.OverridesJSON(o.Spec.CloudEventOverrides),
