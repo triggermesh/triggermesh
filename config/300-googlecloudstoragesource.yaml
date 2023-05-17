@@ -89,6 +89,9 @@ spec:
                   - OBJECT_METADATA_UPDATE
                   - OBJECT_DELETE
                   - OBJECT_ARCHIVE
+              objectNamePrefix:
+                description: If present, will only receive notifications for objects whose names that begin with this prefix.
+                type: string
               serviceAccountKey:
                 description: Deprecated - please use spec.auth.serviceAccountKey. Service account key used to authenticate
                   the event source and allow it to interact with Google Cloud APIs. Only the JSON format is supported.
