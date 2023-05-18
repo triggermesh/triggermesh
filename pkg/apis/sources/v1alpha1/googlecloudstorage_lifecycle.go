@@ -119,7 +119,7 @@ func PubSubAttributeToCEType(eventType string) string {
 	case "OBJECT_FINALIZE":
 		return GoogleCloudStorageFinalizeEventType
 	case "OBJECT_METADATA_UPDATE":
-		return GoogleCloudStorageFinalizeEventType
+		return GoogleCloudStorageUpdateEventType
 	case "OBJECT_DELETE":
 		return GoogleCloudStorageDeleteEventType
 	case "OBJECT_ARCHIVE":
