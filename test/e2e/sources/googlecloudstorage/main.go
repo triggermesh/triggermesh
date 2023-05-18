@@ -31,7 +31,6 @@ import (
 
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
-	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
 
@@ -150,7 +149,9 @@ var _ = Describe("Google Cloud Storage source", func() {
 				Expect(e.Type()).To(Equal("com.google.cloud.storage.objectfinalize"))
 				Expect(e.Source()).To(Equal("gs://" + bucketID))
 
-				var msg pubsub.Message
+				var msg = struct {
+					Attributes map[string]string
+				}{}
 				Expect(e.DataAs(&msg)).ToNot(HaveOccurred())
 
 				Expect(msg.Attributes["bucketId"]).To(Equal(bucketID))
