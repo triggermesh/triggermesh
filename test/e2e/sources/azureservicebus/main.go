@@ -1,5 +1,5 @@
 /*
-Copyright 2022 TriggerMesh Inc.
+Copyright 2023 TriggerMesh Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ import (
   - AZURE_CLIENT_SECRET - The Azure ServicePrincipal Client Secret
 
   These will be done by the e2e test:
-  - Create an Azure Resource Group, ServiceBus Namespace, and a Topic
+  - Create an Azure Resource Group, ServiceBus Namespace, and a Topic and Queue
   - Send an event from the Azure ServiceBus into the TriggerMesh source
 
 */
