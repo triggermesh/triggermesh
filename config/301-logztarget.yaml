@@ -77,10 +77,6 @@ spec:
               logsListenerURL:
                 type: string
                 description: Logz listener host to stream events to.
-                properties:
-                  payloadPolicy:
-                    type: string
-                    enum: [always, error, never]
               adapterOverrides:
                 description: Kubernetes object parameters to apply on top of default adapter values.
                 type: object

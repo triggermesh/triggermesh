@@ -24,7 +24,11 @@ metadata:
   annotations:
     registry.knative.dev/eventTypes: |
       [
-        { "type": "com.google.cloud.storage.notification" }
+        { "type": "com.google.cloud.storage.notification" },
+        { "type": "com.google.cloud.storage.objectfinalize" },
+        { "type": "com.google.cloud.storage.objectmetadataupdate" },
+        { "type": "com.google.cloud.storage.objectdelete" },
+        { "type": "com.google.cloud.storage.objectarchive" }
       ]
 spec:
   group: sources.triggermesh.io
@@ -89,6 +93,9 @@ spec:
                   - OBJECT_METADATA_UPDATE
                   - OBJECT_DELETE
                   - OBJECT_ARCHIVE
+              objectNamePrefix:
+                description: If present, will only receive notifications for objects whose names that begin with this prefix.
+                type: string
               serviceAccountKey:
                 description: Deprecated - please use spec.auth.serviceAccountKey. Service account key used to authenticate
                   the event source and allow it to interact with Google Cloud APIs. Only the JSON format is supported.

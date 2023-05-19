@@ -37,6 +37,7 @@ resources:
 - config/300-azureiothubsource.yaml
 - config/300-azurequeuestoragesource.yaml
 - config/300-azureservicebusqueuesource.yaml
+- config/300-azureservicebussource.yaml
 - config/300-azureservicebustopicsource.yaml
 - config/300-cloudeventssource.yaml
 - config/300-googlecloudauditlogssource.yaml
@@ -47,6 +48,7 @@ resources:
 - config/300-httppollersource.yaml
 - config/300-ibmmqsource.yaml
 - config/300-kafkasource.yaml
+- config/300-mongodbsource.yaml
 - config/300-ocimetricssource.yaml
 - config/300-salesforcesource.yaml
 - config/300-slacksource.yaml

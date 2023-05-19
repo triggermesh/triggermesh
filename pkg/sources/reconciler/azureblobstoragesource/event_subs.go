@@ -20,7 +20,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"hash/crc32"
 	"net/http"
+	"strconv"
 	"time"
 
 	"go.uber.org/zap"
@@ -271,8 +273,11 @@ func isDenied(err error) bool {
 
 // subscriptionName returns a predictable name for an Event Grid event
 // subscription associated with the given source instance.
-func subscriptionName(o *v1alpha1.AzureBlobStorageSource) string {
-	return "io.triggermesh.azureblobstoragesource." + o.Namespace + "." + o.Name
+// The Event Subscription name must be 3-64 characters in length and can only
+// contain a-z, A-Z, 0-9, and "-".
+func subscriptionName(src *v1alpha1.AzureBlobStorageSource) string {
+	nsNameChecksum := crc32.ChecksumIEEE([]byte(src.Namespace + "/" + src.Name))
+	return "io-triggermesh-azureblobstoragesource-" + strconv.FormatUint(uint64(nsNameChecksum), 10)
 }
 
 // cmpFunc can compare the equality of two interfaces. The function signature

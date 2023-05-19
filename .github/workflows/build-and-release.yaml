@@ -96,7 +96,7 @@ jobs:
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       env:
         KO_DOCKER_REPO: docker.io/triggermesh
-        KOFLAGS: --jobs=8 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}
+        KOFLAGS: --jobs=2 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}
         DIST_DIR: /tmp/dist
       run: |
         IMAGE_TAG=${{ steps.image-tag.outputs.IMAGE_TAG }} make release
@@ -111,9 +111,9 @@ jobs:
         popd
 
         if [[ ${GITHUB_REF_TYPE} == "tag" ]]; then
-          export KOFLAGS='--jobs=8 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}'
+          export KOFLAGS='--jobs=2 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}'
         else
-          export KOFLAGS='--jobs=8 --platform=linux/amd64 --push=${{ github.event_name != 'pull_request' }}'
+          export KOFLAGS='--jobs=2 --platform=linux/amd64 --push=${{ github.event_name != 'pull_request' }}'
         fi
 
         IMAGE_TAG=${{ steps.image-tag.outputs.IMAGE_TAG }} make release

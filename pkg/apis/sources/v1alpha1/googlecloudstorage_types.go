@@ -65,6 +65,15 @@ type GoogleCloudStorageSourceSpec struct {
 	// +optional
 	EventTypes []string `json:"eventTypes,omitempty"`
 
+	// Object name prefix filter
+	//
+	// If present, will only receive notifications for objects whose names that begin with this prefix.
+	//
+	// If not set, notifications are received for all objects.
+	//
+	// +optional
+	ObjectNamePrefix string `json:"objectNamePrefix,omitempty"`
+
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
 	// Deprecated, use Auth object instead.

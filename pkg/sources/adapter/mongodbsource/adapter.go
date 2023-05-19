@@ -155,7 +155,6 @@ func (a *adapter) processChanges(ctx context.Context, cs *mongo.ChangeStream) er
 }
 
 func (a *adapter) processChangeEvent(ctx context.Context, changeEvent bson.M) error {
-	fmt.Println("procesing change")
 	event := cloudevents.NewEvent(cloudevents.VersionV1)
 	event.SetType(v1alpha1.MongoDBSourceEventType)
 	event.SetSource(a.mt.Namespace + "/" + a.mt.Name)
@@ -166,7 +165,7 @@ func (a *adapter) processChangeEvent(ctx context.Context, changeEvent bson.M) er
 	}
 
 	if result := a.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
-		a.logger.Infow("Failed to send event", zap.String("target", a.mt.Namespace+"/"+a.mt.Name), zap.Error(result))
+		a.logger.Errorw("Failed to send event", zap.String("target", a.mt.Namespace+"/"+a.mt.Name), zap.Error(result))
 		return fmt.Errorf("sending event: %w", result)
 	}
 

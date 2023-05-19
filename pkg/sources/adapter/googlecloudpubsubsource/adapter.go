@@ -118,6 +118,10 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 			ceSource: ceSource,
 			ceType:   ceType,
 		}
+	case "gcs":
+		msgPrcsr = &gcsMessageProcessor{
+			ceSource: ceSource,
+		}
 	default:
 		logger.Panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}

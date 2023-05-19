@@ -65,6 +65,10 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 func MakeAppEnv(o *v1alpha1.AzureEventHubsTarget) []corev1.EnvVar {
 	envs := []corev1.EnvVar{
 		{
+			Name:  common.EnvHubResourceID,
+			Value: o.Spec.EventHubID.String(),
+		},
+		{
 			Name:  common.EnvHubNamespace,
 			Value: o.Spec.EventHubID.Namespace,
 		}, {

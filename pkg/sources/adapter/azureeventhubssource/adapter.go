@@ -18,8 +18,12 @@ package azureeventhubssource
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/devigned/tab"
@@ -29,20 +33,23 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/cloudevents/sdk-go/v2/protocol"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
+	"github.com/Azure/go-autorest/autorest/azure"
 
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/sources"
 	"github.com/triggermesh/triggermesh/pkg/apis/sources/v1alpha1"
+	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/azureeventhubssource/trace"
 	"github.com/triggermesh/triggermesh/pkg/sources/adapter/common/health"
 )
 
 const (
-	connTimeout  = 20 * time.Second
-	drainTimeout = 1 * time.Minute
+	resourceProviderEventHub = "Microsoft.EventHub"
 )
 
 // envConfig is a set parameters sourced from the environment for the source's
@@ -62,6 +69,12 @@ type envConfig struct {
 	//
 	// Supported values: [ default eventgrid ]
 	MessageProcessor string `envconfig:"EVENTHUB_MESSAGE_PROCESSOR" default:"default"`
+
+	// MessageTimeout is the maximum amount of time to wait for receiving the messages in seconds
+	MessageTimeout string `envconfig:"EVENTHUB_MESSAGE_TIMEOUT" default:"20"`
+
+	// MessageCountSize is the maximum number of messages to receive at once
+	MessageCountSize string `envconfig:"EVENTHUB_MESSAGE_COUNT_SIZE" default:"100"`
 
 	// Allows overriding common CloudEvents attributes.
 	CEOverrideSource string `envconfig:"CE_SOURCE"`
@@ -85,13 +98,14 @@ type adapter struct {
 	logger *zap.SugaredLogger
 	mt     *pkgadapter.MetricTag
 
-	runtimeInfo *eventhub.HubRuntimeInformation
+	runtimeInfo *azeventhubs.EventHubProperties
+	ehClient    *azeventhubs.ConsumerClient
+	ceClient    cloudevents.Client
 
-	ehClient *eventhub.Hub
-	ceClient cloudevents.Client
-
-	ehConsumerGroup string
-	msgPrcsr        MessageProcessor
+	ehConsumerGroup  string
+	msgPrcsr         MessageProcessor
+	messageTimeout   int
+	messageCountSize int
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -112,7 +126,12 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 	env := envAcc.(*envConfig)
 
-	hub, err := eventhub.NewHubFromEnvironment()
+	entityID, err := parseEventHubResourceID(env.HubResourceID)
+	if err != nil {
+		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.HubResourceID), zap.Error(err))
+	}
+
+	consumerClient, err := clientFromEnvironment(entityID)
 	if err != nil {
 		logger.Panicw("Unable to create Event Hub client", zap.Error(err))
 	}
@@ -140,12 +159,21 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 			ceType:   ceType,
 		}
 	default:
-		panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
+		logger.Panic("Unsupported message processor " + strconv.Quote(env.MessageProcessor))
 	}
 
-	consumerGroup := eventhub.DefaultConsumerGroup
+	consumerGroup := azeventhubs.DefaultConsumerGroup
 	if env.ConsumerGroup != "" {
 		consumerGroup = env.ConsumerGroup
+	}
+
+	msgTimeout, err := strconv.Atoi(env.MessageTimeout)
+	if err != nil {
+		logger.Panicw("Unable to parse message timeout "+strconv.Quote(env.MessageTimeout), zap.Error(err))
+	}
+	msgCountSize, err := strconv.Atoi(env.MessageCountSize)
+	if err != nil {
+		logger.Panicw("Unable to parse message count size "+strconv.Quote(env.MessageCountSize), zap.Error(err))
 	}
 
 	// The Event Hubs client uses the default "NoOpTracer" tab.Tracer
@@ -159,11 +187,13 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 		mt:     mt,
 
 		ceClient: ceClient,
-		ehClient: hub,
+		ehClient: consumerClient,
 
 		ehConsumerGroup: consumerGroup,
 
-		msgPrcsr: msgPrcsr,
+		msgPrcsr:         msgPrcsr,
+		messageTimeout:   msgTimeout,
+		messageCountSize: msgCountSize,
 	}
 }
 
@@ -171,15 +201,17 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 func (a *adapter) Start(ctx context.Context) error {
 	go health.Start(ctx)
 
-	connCtx, cancel := context.WithTimeout(ctx, connTimeout)
-	runtimeInfo, err := a.ehClient.GetRuntimeInformation(connCtx)
-	cancel()
+	defer func() {
+		if err := a.ehClient.Close(ctx); err != nil {
+			a.logger.Errorw("Unable to close Event Hub client", zap.Error(err))
+		}
+	}()
+
+	runtimeInfo, err := a.ehClient.GetEventHubProperties(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("getting Event Hub runtime information: %w", err)
 	}
-	a.runtimeInfo = runtimeInfo
-
-	a.logger.Info("Starting Event Hub message receivers for partitions ", runtimeInfo.PartitionIDs)
+	a.runtimeInfo = &runtimeInfo
 
 	// TODO(antoineco): Find a way to inject Prometheus metric tags into
 	// the context.Context that is passed to handleMessage().
@@ -188,49 +220,75 @@ func (a *adapter) Start(ctx context.Context) error {
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
 	// listen to each partition of the Event Hub
-	for _, partitionID := range runtimeInfo.PartitionIDs {
-		connCtx, cancel := context.WithTimeout(ctx, connTimeout)
-		_, err := a.ehClient.Receive(connCtx, partitionID, a.handleMessage,
-			eventhub.ReceiveWithLatestOffset(), eventhub.ReceiveWithConsumerGroup(a.ehConsumerGroup))
-		cancel()
-		if err != nil {
-			a.logger.Errorw("An error occurred while starting message receivers. "+
-				"Terminating all active receivers", zap.Error(err))
-
-			closeCtx, cancel := context.WithTimeout(ctx, drainTimeout)
-			defer cancel()
-			if err := a.ehClient.Close(closeCtx); err != nil {
-				a.logger.Errorw("An additional error occurred while terminating active "+
-					"Event Hub message receivers", zap.Error(err))
+	wg := sync.WaitGroup{}
+	a.logger.Info("Starting Event Hub message receivers for partitions ", runtimeInfo.PartitionIDs)
+	for _, partition := range a.runtimeInfo.PartitionIDs {
+		wg.Add(1)
+		go func(partitionID string) {
+			defer wg.Done()
+			err = a.processPartition(ctx, partitionID)
+			if err != nil {
+				a.logger.Errorf("Error processing partition %s: %v", partitionID, err)
 			}
-
-			return fmt.Errorf("starting message receiver for partition %s: %w", partitionID, err)
-		}
+		}(partition)
 	}
-
 	health.MarkReady()
-
-	<-ctx.Done()
-	a.logger.Debug("Terminating all active Event Hub message receivers")
-
-	closeCtx, cancel := context.WithTimeout(context.Background(), drainTimeout)
-	defer cancel()
-	if err := a.ehClient.Close(closeCtx); err != nil {
-		return fmt.Errorf("terminating active Event Hub message receivers: %w", err)
-	}
-
+	wg.Wait()
 	return nil
 }
 
+// processPartition processes events from a single partition of the Event Hub.
+func (a *adapter) processPartition(ctx context.Context, partitionID string) error {
+	partitionClient, err := a.ehClient.NewPartitionClient(partitionID, &azeventhubs.PartitionClientOptions{
+		StartPosition: azeventhubs.StartPosition{
+			Latest: to.Ptr(true),
+		},
+	})
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := partitionClient.Close(ctx); err != nil {
+			a.logger.Errorf("closing partition client for partition %s: %v", partitionID, err)
+		}
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			a.logger.Debug("Shutting down Azure Event Hubs adapter")
+			return nil
+		default:
+			receiveCtx, cancel := context.WithTimeout(ctx, time.Duration(a.messageTimeout)*time.Second)
+			events, err := partitionClient.ReceiveEvents(receiveCtx, a.messageCountSize, nil)
+			cancel()
+
+			if err != nil {
+				if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+					continue
+				}
+				return err
+			}
+
+			for _, event := range events {
+				err = a.handleMessage(ctx, event)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+}
+
 // handleMessage satisfies eventhub.Handler.
-func (a *adapter) handleMessage(ctx context.Context, msg *eventhub.Event) error {
+func (a *adapter) handleMessage(ctx context.Context, msg *azeventhubs.ReceivedEventData) error {
 	if msg == nil {
 		return nil
 	}
 
 	events, err := a.msgPrcsr.Process(msg)
 	if err != nil {
-		return fmt.Errorf("processing Event Hubs message with ID %s: %w", msg.ID, err)
+		return fmt.Errorf("processing Event Hubs message with ID %s: %w", *msg.MessageID, err)
 	}
 
 	var sendErrs errList
@@ -296,4 +354,67 @@ func sanitizeEvent(validErrs event.ValidationError, origEvent *cloudevents.Event
 	}
 
 	return origEvent
+}
+
+// clientFromEnvironment returns a azeventhubs.ConsumerClient that is suitable for the
+// authentication method selected via environment variables.
+func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azeventhubs.ConsumerClient, error) {
+	// SAS authentication (token, connection string)
+	connStr := connectionStringFromEnvironment(entityID.Namespace, entityID.ResourceName)
+	if connStr != "" {
+		client, err := azeventhubs.NewConsumerClientFromConnectionString(connStr, entityID.ResourceName, azeventhubs.DefaultConsumerGroup, nil)
+		if err != nil {
+			return nil, fmt.Errorf("creating client from connection string: %w", err)
+		}
+		return client, nil
+	}
+
+	// AAD authentication (service principal)
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create Azure credentials: %w", err)
+	}
+
+	fqNamespace := entityID.Namespace + ".servicebus.windows.net"
+	client, err := azeventhubs.NewConsumerClient(fqNamespace, entityID.ResourceName, azeventhubs.DefaultConsumerGroup, cred, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating client from service principal: %w", err)
+	}
+	return client, nil
+}
+
+// connectionStringFromEnvironment returns a EventHub connection string
+// based on values read from the environment.
+func connectionStringFromEnvironment(namespace, entityPath string) string {
+	connStr := os.Getenv(common.EnvHubConnStr)
+
+	// if a key is set explicitly, it takes precedence and is used to
+	// compose a new connection string
+	if keyName, keyValue := os.Getenv(common.EnvHubKeyName), os.Getenv(common.EnvHubKeyValue); keyName != "" && keyValue != "" {
+		azureEnv := &azure.PublicCloud
+		connStr = fmt.Sprintf("Endpoint=sb://%s.%s;SharedAccessKeyName=%s;SharedAccessKey=%s;EntityPath=%s",
+			namespace, azureEnv.ServiceBusEndpointSuffix, keyName, keyValue, entityPath)
+	}
+
+	return connStr
+}
+
+// parseEventHubResourceID parses the given resource ID string to a
+// structured resource ID, and validates that this resource ID refers to a
+// EventHub entity.
+func parseEventHubResourceID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
+	resID := &v1alpha1.AzureResourceID{}
+
+	err := json.Unmarshal([]byte(strconv.Quote(resIDStr)), resID)
+	if err != nil {
+		return nil, fmt.Errorf("deserializing resource ID string: %w", err)
+	}
+
+	// Must match the following pattern:
+	//  - /.../providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventhub}
+	if resID.ResourceProvider != resourceProviderEventHub || resID.Namespace == "" {
+		return nil, errors.New("resource ID does not refer to a Event Hub entity")
+	}
+
+	return resID, nil
 }

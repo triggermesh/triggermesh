@@ -266,7 +266,7 @@ const (
 	tName = "test"
 	tKey  = tNs + "/" + tName
 
-	tEventSubs = "io.triggermesh.azureblobstoragesource." + tNs + "." + tName
+	tEventSubs = "io-triggermesh-azureblobstoragesource-" + "521367233" // CRC-32 checksum of "<tNs>/<tName>"
 )
 
 var (

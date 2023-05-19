@@ -49,13 +49,15 @@ type AzureServiceBusTargetSpec struct {
 	//
 	// Expected format:
 	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}
-	TopicID *AzureResourceID `json:"topicID"`
+	// +optional
+	TopicID *AzureResourceID `json:"topicID,omitempty"`
 
 	// The resource ID the Service Bus Queue.
 	//
 	// Expected format:
 	// - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}
-	QueueID *AzureResourceID `json:"queueID"`
+	// +optional
+	QueueID *AzureResourceID `json:"queueID,omitempty"`
 
 	// Authentication method to interact with the Azure Service Bus API.
 	Auth AzureAuth `json:"auth"`

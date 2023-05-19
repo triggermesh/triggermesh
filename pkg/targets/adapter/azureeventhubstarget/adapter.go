@@ -19,6 +19,9 @@ package azureeventhubstarget
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"os"
+	"strconv"
 
 	"go.uber.org/zap"
 
@@ -27,12 +30,21 @@ import (
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
 	"knative.dev/pkg/logging"
 
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
+	"github.com/Azure/go-autorest/autorest/azure"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/targets"
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	"github.com/triggermesh/triggermesh/pkg/metrics"
 	targetce "github.com/triggermesh/triggermesh/pkg/targets/adapter/cloudevents"
+)
+
+const (
+	resourceProviderEventHub = "Microsoft.EventHub"
+	envKeyName               = "EVENTHUB_KEY_NAME"
+	envKeyValue              = "EVENTHUB_KEY_VALUE"
+	envConnStr               = "EVENTHUB_CONNECTION_STRING"
 )
 
 // NewTarget adapter implementation
@@ -57,13 +69,18 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		logger.Panicf("Error creating CloudEvents replier: %v", err)
 	}
 
-	hub, err := eventhub.NewHubFromEnvironment()
+	entityID, err := parseEventHubResourceID(env.HubResourceID)
 	if err != nil {
-		logger.Panicf("Error creating EventHub connection: %v", err)
+		logger.Panicw("Unable to parse entity ID "+strconv.Quote(env.HubResourceID), zap.Error(err))
+	}
+
+	producerClient, err := clientFromEnvironment(entityID)
+	if err != nil {
+		logger.Panicw("Unable to create Event Hub client", zap.Error(err))
 	}
 
 	return &adapter{
-		hub: hub,
+		ehClient: producerClient,
 
 		discardCEContext: env.DiscardCEContext,
 		replier:          replier,
@@ -77,7 +94,7 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*adapter)(nil)
 
 type adapter struct {
-	hub *eventhub.Hub
+	ehClient *azeventhubs.ProducerClient
 
 	discardCEContext bool
 	replier          *targetce.Replier
@@ -95,7 +112,11 @@ func (a *adapter) Start(ctx context.Context) error {
 
 func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloudevents.Event, cloudevents.Result) {
 	if a.discardCEContext {
-		err := a.hub.Send(ctx, eventhub.NewEvent(event.Data()))
+		batch, err := a.createEvent(ctx, event.Data())
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+		err = a.ehClient.SendEventDataBatch(ctx, batch, nil)
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
@@ -105,11 +126,88 @@ func (a *adapter) dispatch(ctx context.Context, event cloudevents.Event) (*cloud
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
-		err = a.hub.Send(ctx, eventhub.NewEvent(bs))
+		batch, err := a.createEvent(ctx, bs)
+		if err != nil {
+			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
+		}
+		err = a.ehClient.SendEventDataBatch(ctx, batch, nil)
 		if err != nil {
 			return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 		}
 	}
 
 	return a.replier.Ok(&event, "ok")
+}
+
+func (a *adapter) createEvent(ctx context.Context, event []byte) (*azeventhubs.EventDataBatch, error) {
+	batch, err := a.ehClient.NewEventDataBatch(ctx, &azeventhubs.EventDataBatchOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	err = batch.AddEventData(&azeventhubs.EventData{
+		Body: event,
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return batch, nil
+}
+
+// clientFromEnvironment returns a azeventhubs.ProducerClient that is suitable for the
+// authentication method selected via environment variables.
+func clientFromEnvironment(entityID *v1alpha1.AzureResourceID) (*azeventhubs.ProducerClient, error) {
+	// SAS authentication (token, connection string)
+	connStr := connectionStringFromEnvironment(entityID.Namespace, entityID.ResourceName)
+	if connStr != "" {
+		client, err := azeventhubs.NewProducerClientFromConnectionString(connStr, entityID.ResourceName, nil)
+		if err != nil {
+			return nil, fmt.Errorf("creating client from connection string: %w", err)
+		}
+		return client, nil
+	}
+
+	// AAD authentication (service principal)
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create Azure credentials: %w", err)
+	}
+
+	fqNamespace := entityID.Namespace + ".servicebus.windows.net"
+	client, err := azeventhubs.NewProducerClient(fqNamespace, entityID.ResourceName, cred, nil)
+	if err != nil {
+		return nil, fmt.Errorf("creating client from service principal: %w", err)
+	}
+	return client, nil
+}
+
+// connectionStringFromEnvironment returns a EventHub connection string
+// based on values read from the environment.
+func connectionStringFromEnvironment(namespace, entityPath string) string {
+	connStr := os.Getenv(envConnStr)
+
+	// if a key is set explicitly, it takes precedence and is used to
+	// compose a new connection string
+	if keyName, keyValue := os.Getenv(envKeyName), os.Getenv(envKeyValue); keyName != "" && keyValue != "" {
+		azureEnv := &azure.PublicCloud
+		connStr = fmt.Sprintf("Endpoint=sb://%s.%s;SharedAccessKeyName=%s;SharedAccessKey=%s;EntityPath=%s",
+			namespace, azureEnv.ServiceBusEndpointSuffix, keyName, keyValue, entityPath)
+	}
+
+	return connStr
+}
+
+// parseEventHubResourceID parses the given resource ID string to a
+// structured resource ID, and validates that this resource ID refers to a
+// EventHub entity.
+func parseEventHubResourceID(resIDStr string) (*v1alpha1.AzureResourceID, error) {
+	resID := &v1alpha1.AzureResourceID{}
+
+	err := json.Unmarshal([]byte(strconv.Quote(resIDStr)), resID)
+	if err != nil {
+		return nil, fmt.Errorf("deserializing resource ID string: %w", err)
+	}
+
+	return resID, nil
 }

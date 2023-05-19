@@ -234,6 +234,11 @@ func (l *Listers) GetAzureServiceBusQueueSourceLister() sourceslistersv1alpha1.A
 	return sourceslistersv1alpha1.NewAzureServiceBusQueueSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureServiceBusQueueSource{}))
 }
 
+// GetAzureServiceBusSourceLister returns a Lister for AzureServiceBusSource objects.
+func (l *Listers) GetAzureServiceBusSourceLister() sourceslistersv1alpha1.AzureServiceBusSourceLister {
+	return sourceslistersv1alpha1.NewAzureServiceBusSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureServiceBusSource{}))
+}
+
 // GetAzureServiceBusTopicSourceLister returns a Lister for AzureServiceBusTopicSource objects.
 func (l *Listers) GetAzureServiceBusTopicSourceLister() sourceslistersv1alpha1.AzureServiceBusTopicSourceLister {
 	return sourceslistersv1alpha1.NewAzureServiceBusTopicSourceLister(l.IndexerFor(&sourcesv1alpha1.AzureServiceBusTopicSource{}))

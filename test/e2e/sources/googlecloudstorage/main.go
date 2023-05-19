@@ -146,12 +146,17 @@ var _ = Describe("Google Cloud Storage source", func() {
 
 				e := receivedEvents[0]
 
-				Expect(e.Type()).To(Equal("com.google.cloud.storage.notification"))
+				Expect(e.Type()).To(Equal("com.google.cloud.storage.objectfinalize"))
 				Expect(e.Source()).To(Equal("gs://" + bucketID))
 
-				Expect(e.Extensions()["pubsubmsgbucketid"]).To(Equal(bucketID))
-				Expect(e.Extensions()["pubsubmsgeventtype"]).To(Equal("OBJECT_FINALIZE"))
-				Expect(e.Extensions()["pubsubmsgobjectid"]).To(Equal(objectName))
+				var msg = struct {
+					Attributes map[string]string
+				}{}
+				Expect(e.DataAs(&msg)).ToNot(HaveOccurred())
+
+				Expect(msg.Attributes["bucketId"]).To(Equal(bucketID))
+				Expect(msg.Attributes["eventType"]).To(Equal("OBJECT_FINALIZE"))
+				Expect(msg.Attributes["objectId"]).To(Equal(objectName))
 			})
 		})
 	})

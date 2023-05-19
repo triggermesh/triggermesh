@@ -52,10 +52,11 @@ func EnsureNotificationConfig(ctx context.Context, cli *storage.Client,
 	status := &src.Status
 
 	desiredNotif := &storage.Notification{
-		EventTypes:     src.Spec.EventTypes,
-		PayloadFormat:  storage.JSONPayload,
-		TopicProjectID: topicResName.Project,
-		TopicID:        topicResName.Resource,
+		EventTypes:       src.Spec.EventTypes,
+		ObjectNamePrefix: src.Spec.ObjectNamePrefix,
+		PayloadFormat:    storage.JSONPayload,
+		TopicProjectID:   topicResName.Project,
+		TopicID:          topicResName.Resource,
 	}
 
 	bh := cli.Bucket(src.Spec.Bucket)

@@ -44,13 +44,15 @@ const (
 
 	// Azure Event Hub attributes
 	// https://pkg.go.dev/github.com/Azure/azure-event-hubs-go/v3#readme-environment-variables
-	EnvHubNamespace     = "EVENTHUB_NAMESPACE"
-	EnvHubName          = "EVENTHUB_NAME"
-	EnvHubKeyName       = "EVENTHUB_KEY_NAME"
-	EnvHubKeyValue      = "EVENTHUB_KEY_VALUE"
-	EnvHubConnStr       = "EVENTHUB_CONNECTION_STRING"
-	EnvHubResourceID    = "EVENTHUB_RESOURCE_ID"
-	EnvHubConsumerGroup = "EVENTHUB_CONSUMER_GROUP"
+	EnvHubNamespace        = "EVENTHUB_NAMESPACE"
+	EnvHubName             = "EVENTHUB_NAME"
+	EnvHubKeyName          = "EVENTHUB_KEY_NAME"
+	EnvHubKeyValue         = "EVENTHUB_KEY_VALUE"
+	EnvHubConnStr          = "EVENTHUB_CONNECTION_STRING"
+	EnvHubResourceID       = "EVENTHUB_RESOURCE_ID"
+	EnvHubConsumerGroup    = "EVENTHUB_CONSUMER_GROUP"
+	EnvHubMessageTimeout   = "EVENTHUB_MESSAGE_TIMEOUT"
+	EnvHubMessageCountSize = "EVENTHUB_MESSAGE_COUNT_SIZE"
 
 	// Azure Service Bus attributes
 	EnvServiceBusKeyName          = "SERVICEBUS_KEY_NAME"
