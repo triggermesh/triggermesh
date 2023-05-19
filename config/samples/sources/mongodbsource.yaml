@@ -27,14 +27,3 @@ spec:
       kind: Service
       namespace: default
       name: my-knative-service
-  adapterOverrides:
-    env:
-      - name: CUSTOM_ENV_VARIABLE
-        value: custom_value
-    resources:
-      limits:
-        cpu: 100m
-        memory: 128Mi
-      requests:
-        cpu: 50m
-        memory: 64Mi
