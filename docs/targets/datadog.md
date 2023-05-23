@@ -58,6 +58,22 @@ spec:
 
 A valid `apiKey` is ***REQUIRED*** to deploy
 
+If you're using a Datadog instance in the EU or another region, this can also be configured:
+
+```yaml
+apiVersion: targets.triggermesh.io/v1alpha1
+kind: DatadogTarget
+metadata:
+  name: datadogtarget
+spec:
+  site: datadoghq.eu
+  apiKey:
+    secretKeyRef:
+      name: ddapitoken
+      key: apiKey
+```
+
+Refer to the list of [sites](https://docs.datadoghq.com/getting_started/site/) for possible values of the site parameter.
 
 ## Event Types
 

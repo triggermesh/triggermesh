@@ -1301,6 +1301,11 @@ func (in *DatadogTargetList) DeepCopyObject() runtime.Object {
 func (in *DatadogTargetSpec) DeepCopyInto(out *DatadogTargetSpec) {
 	*out = *in
 	in.DatadogAPIKey.DeepCopyInto(&out.DatadogAPIKey)
+	if in.DatadogSite != nil {
+		in, out := &in.DatadogSite, &out.DatadogSite
+		*out = new(string)
+		**out = **in
+	}
 	if in.MetricPrefix != nil {
 		in, out := &in.MetricPrefix, &out.MetricPrefix
 		*out = new(string)

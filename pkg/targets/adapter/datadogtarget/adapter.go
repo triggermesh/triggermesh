@@ -37,9 +37,9 @@ import (
 )
 
 const (
-	apiBaseURL     = "https://api.datadoghq.com"
-	logsAPIBaseURL = "https://http-intake.logs.datadoghq.com"
-	apiKeyHeader   = "DD-API-KEY"
+	apiBaseDomain     = "https://api"
+	logsAPIBaseDomain = "https://http-intake.logs"
+	apiKeyHeader      = "DD-API-KEY"
 )
 
 const (
@@ -70,7 +70,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 	}
 
 	return &datadogAdapter{
-		apiKey: env.APIKey,
+		apiKey:     env.APIKey,
+		apiURL:     fmt.Sprintf("%s.%s", apiBaseDomain, env.Site),
+		apiLogsURL: fmt.Sprintf("%s.%s", logsAPIBaseDomain, env.Site),
 
 		replier:    replier,
 		httpClient: http.DefaultClient,
@@ -84,7 +86,9 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 var _ pkgadapter.Adapter = (*datadogAdapter)(nil)
 
 type datadogAdapter struct {
-	apiKey string
+	apiKey     string
+	apiURL     string
+	apiLogsURL string
 
 	replier    *targetce.Replier
 	httpClient *http.Client
@@ -118,7 +122,7 @@ func (a *datadogAdapter) postLog(event cloudevents.Event) (*cloudevents.Event, c
 		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
-	request, err := newLogsAPIRequest("/v1/input", a.apiKey, event.Data())
+	request, err := newLogsAPIRequest(a.apiLogsURL, "/v1/input", a.apiKey, event.Data())
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 
@@ -149,7 +153,7 @@ func (a *datadogAdapter) postEvent(event cloudevents.Event) (*cloudevents.Event,
 		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
-	request, err := newAPIRequest("/api/v1/events", a.apiKey, event.Data())
+	request, err := newAPIRequest(a.apiURL, "/api/v1/events", a.apiKey, event.Data())
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 
@@ -180,7 +184,7 @@ func (a *datadogAdapter) postMetric(event cloudevents.Event) (*cloudevents.Event
 		return a.replier.Error(&event, targetce.ErrorCodeRequestParsing, err, nil)
 	}
 
-	request, err := newAPIRequest("/api/v1/series", a.apiKey, event.Data())
+	request, err := newAPIRequest(a.apiURL, "/api/v1/series", a.apiKey, event.Data())
 	if err != nil {
 		return a.replier.Error(&event, targetce.ErrorCodeAdapterProcess, err, nil)
 	}
@@ -206,13 +210,13 @@ func (a *datadogAdapter) postMetric(event cloudevents.Event) (*cloudevents.Event
 }
 
 // newAPIRequest returns a POST http.Request that is ready to send to the Datadog general-purpose API.
-func newAPIRequest(path, apiKey string, body []byte) (*http.Request, error) {
-	return newAPIRequestWithHost(apiBaseURL, path, apiKey, body)
+func newAPIRequest(host, path, apiKey string, body []byte) (*http.Request, error) {
+	return newAPIRequestWithHost(host, path, apiKey, body)
 }
 
 // newLogsAPIRequest returns a POST http.Request that is ready to send to the Datadog logs API.
-func newLogsAPIRequest(path, apiKey string, body []byte) (*http.Request, error) {
-	return newAPIRequestWithHost(logsAPIBaseURL, path, apiKey, body)
+func newLogsAPIRequest(host, path, apiKey string, body []byte) (*http.Request, error) {
+	return newAPIRequestWithHost(host, path, apiKey, body)
 }
 
 // newAPIRequestWithHost returns a POST http.Request that is ready to send to the Datadog API.
