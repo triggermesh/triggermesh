@@ -31,6 +31,7 @@ import (
 
 const (
 	envDatadogAPIKey       = "DD_CLIENT_API_KEY"
+	envDatadogSite         = "DD_CLIENT_SITE"
 	envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
 )
 
@@ -67,6 +68,13 @@ func MakeAppEnv(o *v1alpha1.DatadogTarget) []corev1.EnvVar {
 				SecretKeyRef: o.Spec.DatadogAPIKey.SecretKeyRef,
 			},
 		},
+	}
+
+	if o.Spec.DatadogSite != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  envDatadogSite,
+			Value: *o.Spec.DatadogSite,
+		})
 	}
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {

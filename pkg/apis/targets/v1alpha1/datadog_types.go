@@ -48,6 +48,10 @@ type DatadogTargetSpec struct {
 	// DatadogApiKey represents how Datadog credentials should be provided in the secret
 	DatadogAPIKey SecretValueFromSource `json:"apiKey"`
 
+	// DatadogSite controls the site of the Datadog intake API, defaults to `datadoghq.com`
+	// +optional
+	DatadogSite *string `json:"site,omitempty"`
+
 	// MetricPrefix is prepended to the name of the associated metrics.
 	// +optional
 	MetricPrefix *string `json:"metricPrefix"`

@@ -75,6 +75,9 @@ spec:
                         type: string
                       name:
                         type: string
+              site:
+                type: string
+                description: Controls the site of the Datadog intake API
               eventOptions:
                 description: 'When should this target generate a response event for processing: always, on error, or never.'
                 type: object
