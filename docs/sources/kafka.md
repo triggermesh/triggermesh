@@ -105,7 +105,7 @@ In order to configure the adapter correctly the following fields are mandatory:
 
 - `boostrapservers`
 - `topic`
-- `salsEnable`
+- `saslEnable`
 
 ### Status
 
