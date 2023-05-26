@@ -64,7 +64,7 @@ kind: KafkaTarget
 metadata:
   name: sample
 spec:
-  salsEnable: true
+  saslEnable: true
   tlsEnable: true
   bootstrapServers:
   - kafka.example.com:9093
@@ -94,7 +94,7 @@ spec:
 
 - boostrapservers
 - topic
-- salsEnable
+- saslEnable
 
 ## Status
 
