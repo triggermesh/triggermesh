@@ -62,6 +62,10 @@ spec:
                 format: url
                 pattern: ^https?:\/\/.+$
 
+              path:
+                description: Path at the remote endpoint under which requests are accepted.
+                type: string
+
               credentials:
                 description: Optional credentials specification for remote CloudEvents endpoint.
                 type: object
