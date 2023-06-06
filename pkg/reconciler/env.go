@@ -34,6 +34,7 @@ const (
 	EnvARN             = "ARN"
 	EnvAccessKeyID     = "AWS_ACCESS_KEY_ID"
 	EnvSecretAccessKey = "AWS_SECRET_ACCESS_KEY" //nolint:gosec
+	EnvSessionToken    = "AWS_SESSION_TOKEN"
 	EnvEndpointURL     = "AWS_ENDPOINT_URL"
 	EnvAssumeIamRole   = "AWS_ASSUME_ROLE_ARN"
 

@@ -51,6 +51,11 @@ type AWSSecurityCredentials struct {
 	AccessKeyID     ValueFromField `json:"accessKeyID"`
 	SecretAccessKey ValueFromField `json:"secretAccessKey"`
 
+	// The AWS session token for temporary credentials.
+	// See https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#api_getsessiontoken
+	// +optional
+	SessionToken ValueFromField `json:"sessionToken,omitempty"`
+
 	// The ARN of an IAM role for cross-account or remote impersonation on EKS.
 	// Require the access key credentials to create a client session.
 	// +optional
