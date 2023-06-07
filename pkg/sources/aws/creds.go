@@ -34,6 +34,7 @@ import (
 func Credentials(cli coreclientv1.SecretInterface, creds *v1alpha1.AWSSecurityCredentials) (*credentials.Value, error) {
 	accessKeyID := creds.AccessKeyID.Value
 	secretAccessKey := creds.SecretAccessKey.Value
+	sessionToken := creds.SessionToken.Value
 
 	// cache a Secret object by name to avoid GET-ing the same Secret
 	// object multiple times
@@ -70,8 +71,25 @@ func Credentials(cli coreclientv1.SecretInterface, creds *v1alpha1.AWSSecurityCr
 		secretAccessKey = string(secr.Data[vfs.Key])
 	}
 
+	if vfs := creds.SessionToken.ValueFromSecret; vfs != nil {
+		var secr *corev1.Secret
+		var err error
+
+		if secretCache != nil && secretCache[vfs.Name] != nil {
+			secr = secretCache[vfs.Name]
+		} else {
+			secr, err = cli.Get(context.Background(), vfs.Name, metav1.GetOptions{})
+			if err != nil {
+				return nil, fmt.Errorf("getting Secret from cluster: %w", err)
+			}
+		}
+
+		sessionToken = string(secr.Data[vfs.Key])
+	}
+
 	return &credentials.Value{
 		AccessKeyID:     accessKeyID,
 		SecretAccessKey: secretAccessKey,
+		SessionToken:    sessionToken,
 	}, nil
 }
