@@ -111,6 +111,28 @@ spec:
                         oneOf:
                         - required: [value]
                         - required: [valueFromSecret]
+                      sessionToken:
+                        description: The AWS session token for temporary credentials.
+                        type: object
+                        properties:
+                          value:
+                            description: Literal value of the session token.
+                            type: string
+                            format: password
+                          valueFromSecret:
+                            description: A reference to a Kubernetes Secret object containing the session token.
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                            required:
+                            - name
+                            - key
+                        oneOf:
+                        - required: [value]
+                        - required: [valueFromSecret]
                       assumeIamRole:
                         description: |-
                           The ARN of an IAM role for cross-account or remote EKS cluster authorization.
