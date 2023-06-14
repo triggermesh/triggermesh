@@ -89,7 +89,8 @@ type envConfig struct {
 
 // adapter implements the source's adapter.
 type adapter struct {
-	mt *pkgadapter.MetricTag
+	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	msgRcvr  *azservicebus.Receiver
 	ceClient cloudevents.Client
@@ -154,7 +155,8 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	tab.Register(trace.NewNoOpTracerWithLogger(logger))
 
 	return &adapter{
-		mt: mt,
+		logger: logger,
+		mt:     mt,
 
 		ceClient: ceClient,
 
@@ -261,38 +263,94 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 //	- Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
 	const maxMessages = 100
+	const maxConcurrentGoroutines = 10
 	logging.FromContext(ctx).Info("Listening for messages")
 
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
-loop:
+	errChan := make(chan error)
+	errLogChan := make(chan error)
+	msgChan := make(chan *Message, maxMessages)
+	origMsgChan := make(chan *azservicebus.ReceivedMessage, maxMessages)
+	doneChan := make(chan bool)
+
+	concurrencyLimiter := make(chan bool, maxConcurrentGoroutines)
+
+	go a.receiveMessages(ctx, maxMessages, errChan, errLogChan, msgChan, origMsgChan, doneChan)
+	go a.processMessages(ctx, errChan, errLogChan, msgChan, origMsgChan, concurrencyLimiter)
+	return a.monitorErrorsAndShutdown(ctx, errChan, errLogChan, doneChan, concurrencyLimiter)
+}
+
+// receiveMessages continuously receives messages and places them onto the provided channels.
+func (a *adapter) receiveMessages(ctx context.Context, maxMessages int, errChan chan error, errLogChan chan error, msgChan chan *Message, origMsgChan chan *azservicebus.ReceivedMessage, doneChan chan bool) {
 	for {
 		select {
 		case <-ctx.Done():
-			break loop
+			close(doneChan)
+			return
 		default:
 			messages, err := a.msgRcvr.ReceiveMessages(ctx, maxMessages, nil)
 			if err != nil {
-				return fmt.Errorf("error receiving messages: %w", err)
+				errChan <- fmt.Errorf("error receiving messages: %w", err)
+				return
 			}
 			for _, m := range messages {
 				msg, err := toMessage(m)
 				if err != nil {
-					return fmt.Errorf("error transforming message: %w", err)
+					errChan <- fmt.Errorf("error transforming message: %w", err)
+					return
 				}
-
-				if err := a.handleMessage(ctx, msg); err != nil {
-					return fmt.Errorf("error processing message: %w", err)
-				}
-
-				if err := a.msgRcvr.CompleteMessage(ctx, m, nil); err != nil {
-					return fmt.Errorf("error completing message: %w", err)
-				}
+				msgChan <- msg
+				origMsgChan <- m
 			}
 		}
 	}
+}
 
-	return nil
+// processMessages continuously processes messages from the provided channel.
+func (a *adapter) processMessages(ctx context.Context, errChan chan error, errLogChan chan error, msgChan chan *Message, origMsgChan chan *azservicebus.ReceivedMessage, concurrencyLimiter chan bool) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case msg := <-msgChan:
+			m := <-origMsgChan
+			concurrencyLimiter <- true
+			go func(msg *Message, m *azservicebus.ReceivedMessage) {
+				defer func() { <-concurrencyLimiter }()
+				if err := a.handleMessage(ctx, msg); err != nil {
+					errLogChan <- fmt.Errorf("error processing message: %w", err)
+					return
+				}
+
+				if err := a.msgRcvr.CompleteMessage(ctx, m, nil); err != nil {
+					errChan <- fmt.Errorf("error completing message: %w", err)
+				}
+			}(msg, m)
+		}
+	}
+}
+
+// monitorErrorsAndShutdown monitors for errors and controls graceful shutdown of the adapter.
+func (a *adapter) monitorErrorsAndShutdown(ctx context.Context, errChan chan error, errLogChan chan error, doneChan chan bool, concurrencyLimiter chan bool) error {
+	for {
+		select {
+		case <-doneChan:
+			// ensure all goroutines have finished
+			for i := 0; i < cap(concurrencyLimiter); i++ {
+				concurrencyLimiter <- true
+			}
+			return nil
+		case err := <-errChan:
+			// ensure all goroutines have finished
+			for i := 0; i < cap(concurrencyLimiter); i++ {
+				concurrencyLimiter <- true
+			}
+			return err
+		case err := <-errLogChan:
+			a.logger.Errorw("error processing message", zap.Error(err))
+		}
+	}
 }
 
 // handleMessage handles a single Service Bus message.
