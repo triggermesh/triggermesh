@@ -237,6 +237,9 @@ spec:
               webSocketsEnable:
                 description: Boolean to indicate to use WebSockets.
                 type: boolean
+              maxConcurrent:
+                description: 	maximum number of goroutines that will be used to process messages. default:"10"`
+                type: integer
               sink:
                 description: The destination of events sourced from the Azure Service Bus.
                 type: object

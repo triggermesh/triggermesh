@@ -64,17 +64,24 @@ func MakeAppEnv(o *v1alpha1.AzureServiceBusSource) []corev1.EnvVar {
 		webSocketsEnable = *wss
 	}
 
-	var authEnvs []corev1.EnvVar
+	var appEnvs []corev1.EnvVar
 	//TODO should this be here?
 	if sasAuth := o.Spec.Auth.SASToken; sasAuth != nil {
-		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusKeyName, sasAuth.KeyName)
-		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusKeyValue, sasAuth.KeyValue)
-		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvServiceBusConnStr, sasAuth.ConnectionString)
+		appEnvs = common.MaybeAppendValueFromEnvVar(appEnvs, common.EnvServiceBusKeyName, sasAuth.KeyName)
+		appEnvs = common.MaybeAppendValueFromEnvVar(appEnvs, common.EnvServiceBusKeyValue, sasAuth.KeyValue)
+		appEnvs = common.MaybeAppendValueFromEnvVar(appEnvs, common.EnvServiceBusConnStr, sasAuth.ConnectionString)
 	}
 	if spAuth := o.Spec.Auth.ServicePrincipal; spAuth != nil {
-		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADTenantID, spAuth.TenantID)
-		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientID, spAuth.ClientID)
-		authEnvs = common.MaybeAppendValueFromEnvVar(authEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
+		appEnvs = common.MaybeAppendValueFromEnvVar(appEnvs, common.EnvAADTenantID, spAuth.TenantID)
+		appEnvs = common.MaybeAppendValueFromEnvVar(appEnvs, common.EnvAADClientID, spAuth.ClientID)
+		appEnvs = common.MaybeAppendValueFromEnvVar(appEnvs, common.EnvAADClientSecret, spAuth.ClientSecret)
+	}
+
+	if o.Spec.MaxConcurrent != nil {
+		appEnvs = append(appEnvs, corev1.EnvVar{
+			Name:  common.EnvServiceBusMaxConcurrent,
+			Value: strconv.Itoa(*o.Spec.MaxConcurrent),
+		})
 	}
 
 	var resourceID string
@@ -85,7 +92,7 @@ func MakeAppEnv(o *v1alpha1.AzureServiceBusSource) []corev1.EnvVar {
 	} else if o.Spec.QueueID != nil {
 		resourceID = o.Spec.QueueID.String()
 	}
-	return append(authEnvs, []corev1.EnvVar{{
+	return append(appEnvs, []corev1.EnvVar{{
 		Name:  common.EnvServiceBusEntityResourceID,
 		Value: resourceID,
 	}, {

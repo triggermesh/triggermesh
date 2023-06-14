@@ -76,6 +76,10 @@ type envConfig struct {
 	// WebSocketsEnable.
 	WebSocketsEnable bool `envconfig:"SERVICEBUS_WEBSOCKETS_ENABLE" default:"false"`
 
+	// MaxConcurrent is the maximum number of goroutines that
+	// will be used to process messages.
+	MaxConcurrent int `envconfig:"SERVICEBUS_MAX_CONCURRENT" default:"10"`
+
 	// The environment variables below aren't read from the envConfig struct
 	// by the Service Bus SDK, but rather directly using os.Getenv().
 	// They are nevertheless listed here for documentation purposes.
@@ -95,7 +99,8 @@ type adapter struct {
 	msgRcvr  *azservicebus.Receiver
 	ceClient cloudevents.Client
 
-	msgPrcsr MessageProcessor
+	msgPrcsr      MessageProcessor
+	maxConcurrent int
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -160,8 +165,9 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 
 		ceClient: ceClient,
 
-		msgRcvr:  rcvr,
-		msgPrcsr: msgPrcsr,
+		msgRcvr:       rcvr,
+		msgPrcsr:      msgPrcsr,
+		maxConcurrent: env.MaxConcurrent,
 	}
 }
 
@@ -263,7 +269,6 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 //	- Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
 	const maxMessages = 100
-	const maxConcurrentGoroutines = 10
 	logging.FromContext(ctx).Info("Listening for messages")
 
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
@@ -274,7 +279,7 @@ func (a *adapter) Start(ctx context.Context) error {
 	origMsgChan := make(chan *azservicebus.ReceivedMessage, maxMessages)
 	doneChan := make(chan bool)
 
-	concurrencyLimiter := make(chan bool, maxConcurrentGoroutines)
+	concurrencyLimiter := make(chan bool, a.maxConcurrent)
 
 	go a.receiveMessages(ctx, maxMessages, errChan, errLogChan, msgChan, origMsgChan, doneChan)
 	go a.processMessages(ctx, errChan, errLogChan, msgChan, origMsgChan, concurrencyLimiter)
