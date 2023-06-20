@@ -33,6 +33,26 @@ Deploy the platform:
 kubectl apply -f https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh.yaml
 ```
 
+## Namespaced installation
+
+TriggerMesh controller can be configured to work with a single namespace set at the `WORKING_NAMESPACE` environment variable, which can be added editing the deployment manifest.
+
+```yaml
+        - name: WORKING_NAMESPACE
+          value: my-namespace
+```
+
+When working with a single namespace, all `ClusterRoleBindings` should also be modified adding the namespace to limit the scope of the granted permissions.
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-controller
+  namespace: working
+...
+```
+
 ## Contributing
 
 Please refer to our [guidelines for contributors](CONTRIBUTING.md).

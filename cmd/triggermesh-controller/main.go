@@ -17,7 +17,11 @@ limitations under the License.
 package main
 
 import (
+	"os"
+
+	"knative.dev/pkg/injection"
 	"knative.dev/pkg/injection/sharedmain"
+	"knative.dev/pkg/signals"
 
 	"github.com/triggermesh/triggermesh/pkg/extensions/reconciler/function"
 	"github.com/triggermesh/triggermesh/pkg/flow/reconciler/jqtransformation"
@@ -102,7 +106,14 @@ import (
 )
 
 func main() {
-	sharedmain.Main("triggermesh-controller",
+	ctx := signals.NewContext()
+
+	ns := os.Getenv("WORKING_NAMESPACE")
+	if len(ns) != 0 {
+		ctx = injection.WithNamespaceScope(ctx, ns)
+	}
+
+	sharedmain.MainWithContext(ctx, "triggermesh-controller",
 		// sources
 		awscloudwatchlogssource.NewController,
 		awscloudwatchsource.NewController,
