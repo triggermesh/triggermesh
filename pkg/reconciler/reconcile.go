@@ -372,6 +372,12 @@ func (r *GenericRBACReconciler[T, L]) syncAdapterServiceAccount(ctx context.Cont
 		return currentSA, nil
 	}
 
+	// If the service account is not managed by the triggermesh controller,
+	// then it can be externally created and we should not reconcile it.
+	if manager, set := currentSA.GetLabels()[appManagedByLabel]; !set || manager != managedBy {
+		return currentSA, nil
+	}
+
 	// resourceVersion must be returned to the API server unmodified for
 	// optimistic concurrency, as per Kubernetes API conventions
 	desiredSA.ResourceVersion = currentSA.ResourceVersion
@@ -392,6 +398,17 @@ func (r *GenericRBACReconciler[T, L]) syncAdapterServiceAccount(ctx context.Cont
 	// Keep image pull secrets that users might have configured.
 	desiredSA.ImagePullSecrets = currentSA.ImagePullSecrets
 
+	// If we share a service account between multiple objects, each object must
+	// be listed as the owner, otherwise, SA can be removed while in use.
+	desiredSA.OwnerReferences = mergeOwners(currentSA.OwnerReferences, desiredSA.OwnerReferences)
+
+	// If there is more than one owner, preserve annotations and labels
+	// to avoid reconcilitaion conflicts.
+	if len(desiredSA.OwnerReferences) > 1 {
+		desiredSA.Annotations = currentSA.Annotations
+		desiredSA.Labels = currentSA.Labels
+	}
+
 	sa, err := r.SAClient(desiredSA.Namespace).Update(ctx, desiredSA, metav1.UpdateOptions{})
 	if err != nil {
 		return nil, reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedRBACUpdate,
@@ -405,16 +422,23 @@ func (r *GenericRBACReconciler[T, L]) syncAdapterServiceAccount(ctx context.Cont
 	return sa, nil
 }
 
+// mergeOwners merges owner references without duplicates.
+func mergeOwners(current, desired []metav1.OwnerReference) []metav1.OwnerReference {
+	owners := make(map[string]metav1.OwnerReference, len(current)+len(desired))
+	for _, owner := range append(current, desired...) {
+		owners[owner.Kind+"/"+owner.Name] = owner
+	}
+	result := make([]metav1.OwnerReference, 0)
+	for _, owner := range owners {
+		result = append(result, owner)
+	}
+	return result
+}
+
 // serviceAccountMutations returns functional options for mutating the
 // ServiceAccount associated with the given component instance.
 func serviceAccountMutations(rcl v1alpha1.Reconcilable) []resource.ServiceAccountOption {
-	if !v1alpha1.WantsOwnServiceAccount(rcl) {
-		return nil
-	}
-
-	var saMutations []resource.ServiceAccountOption
-
-	return append(saMutations, v1alpha1.ServiceAccountOptions(rcl)...)
+	return v1alpha1.ServiceAccountOptions(rcl)
 }
 
 // getOrCreateAdapterRoleBinding returns the existing adapter RoleBinding, or

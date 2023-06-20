@@ -67,3 +67,14 @@ injection:
 		--versioned-clientset-package $(PKG)/pkg/client/generated/clientset/internalclientset \
 		--listers-package $(PKG)/pkg/client/generated/listers \
 		--external-versions-informers-package $(PKG)/pkg/client/generated/informers/externalversions
+
+# In environments where the project is located outside the GOPATH,
+# codegen creates a nested $(PKG) directory right in the project's root.
+# Until the codegen configuration gets fixed,
+# this target can be used to move generated files where they belong.
+codegen-cleanup:
+	@if [ -d "./$(PKG)" ]; then \
+		cp -a ./$(PKG)/pkg/client/generated/ pkg/client/generated/ ;\
+		cp -a ./$(PKG)/pkg/apis/* pkg/apis/ ;\
+		rm -rf "./$(PKG)" ;\
+	fi

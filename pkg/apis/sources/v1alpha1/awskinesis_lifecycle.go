@@ -80,18 +80,12 @@ func (s *AWSKinesisSource) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *AWSKinesisSource) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.EksIAMRole != nil
+	return s.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (s *AWSKinesisSource) ServiceAccountOptions() []resource.ServiceAccountOption {
-	var saOpts []resource.ServiceAccountOption
-
-	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
-	}
-
-	return saOpts
+	return s.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable
@@ -100,5 +94,5 @@ func (s *AWSKinesisSource) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (s *AWSKinesisSource) Validate(ctx context.Context) *apis.FieldError {
-	return nil
+	return s.Spec.Auth.Validate(ctx)
 }

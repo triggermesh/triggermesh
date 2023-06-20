@@ -17,6 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -25,6 +27,9 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
+
+// AnnotationEksIAMRole is the SA annotation used on EKS for IAM authentication.
+const AnnotationEksIAMRole = "eks.amazonaws.com/role-arn"
 
 // AWSAuth contains multiple authentication methods for AWS services.
 //
@@ -37,11 +42,28 @@ type AWSAuth struct {
 	// +optional
 	Credentials *AWSSecurityCredentials `json:"credentials,omitempty"`
 
-	// (Amazon EKS only) The ARN of an IAM role which can be impersonated
+	// Deprecation warning: please use IAM object instead.
+	// +optional
+	EksIAMRole *apis.ARN `json:"iamRole,omitempty"`
+
+	// The IAM role authentication parameters. For Amazon EKS only.
+	// +optional
+	IAM *EksIAM `json:"iam,omitempty"`
+}
+
+// EksIAM contains parameters used for IAM authentication on EKS.
+//
+// +k8s:deepcopy-gen=true
+type EksIAM struct {
+	// The ARN of an IAM role which can be impersonated
 	// to obtain AWS permissions.
 	// See https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
 	// +optional
-	EksIAMRole *apis.ARN `json:"iamRole,omitempty"`
+	Role *apis.ARN `json:"roleArn,omitempty"`
+
+	// The name of the service account to be assigned on the receiver adapter.
+	// +optional
+	ServiceAccount string `json:"serviceAccount,omitempty"`
 }
 
 // AWSSecurityCredentials represents a set of AWS security credentials.
@@ -73,12 +95,50 @@ type AWSEndpoint struct {
 	URL *pkgapis.URL `json:"url,omitempty"`
 }
 
-const annotationEksIAMRole = "eks.amazonaws.com/role-arn"
+// WantsOwnServiceAccount indicates wether the object requires its own SA.
+func (a *AWSAuth) WantsOwnServiceAccount() bool {
+	return a.EksIAMRole != nil || a.IAM != nil
+}
 
-// AwsIamRoleAnnotation returns a functional option that sets the EKS role-arn
-// annotation on a ServiceAccount.
-func AwsIamRoleAnnotation(iamRole apis.ARN) resource.ServiceAccountOption {
-	return func(sa *corev1.ServiceAccount) {
-		metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationEksIAMRole, iamRole.String())
+// ServiceAccountOptions returns the set of SA mutations based on the object spec.
+func (a *AWSAuth) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
+
+	if a.EksIAMRole != nil {
+		saOpts = append(saOpts, awsIamRoleAnnotation(*a.EksIAMRole))
 	}
+	if a.IAM == nil {
+		return saOpts
+	}
+	if a.IAM.Role != nil {
+		saOpts = append(saOpts, awsIamRoleAnnotation(*a.IAM.Role))
+	}
+	if a.IAM.ServiceAccount != "" {
+		saOpts = append(saOpts, saName(a.IAM.ServiceAccount))
+	}
+	return saOpts
+}
+
+// awsIamRoleAnnotation returns a functional option that sets the EKS role-arn
+// annotation on a ServiceAccount.
+func awsIamRoleAnnotation(iamRole apis.ARN) resource.ServiceAccountOption {
+	return func(sa *corev1.ServiceAccount) {
+		metav1.SetMetaDataAnnotation(&sa.ObjectMeta, AnnotationEksIAMRole, iamRole.String())
+	}
+}
+
+// saName returns a functional option that overwrites the
+// Kubernetes Service Account name.
+func saName(name string) resource.ServiceAccountOption {
+	return func(sa *corev1.ServiceAccount) {
+		sa.SetName(name)
+	}
+}
+
+// Validate method is used to validate AWS objects' Auth spec.
+func (a *AWSAuth) Validate(ctx context.Context) *pkgapis.FieldError {
+	if a.EksIAMRole != nil {
+		return pkgapis.ErrDisallowedUpdateDeprecatedFields("auth.iamRole")
+	}
+	return nil
 }

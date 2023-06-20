@@ -80,18 +80,12 @@ func (s *AWSCloudWatchLogsSource) GetAdapterOverrides() *v1alpha1.AdapterOverrid
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *AWSCloudWatchLogsSource) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.EksIAMRole != nil
+	return s.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (s *AWSCloudWatchLogsSource) ServiceAccountOptions() []resource.ServiceAccountOption {
-	var saOpts []resource.ServiceAccountOption
-
-	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
-	}
-
-	return saOpts
+	return s.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable
@@ -100,5 +94,5 @@ func (s *AWSCloudWatchLogsSource) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (s *AWSCloudWatchLogsSource) Validate(ctx context.Context) *apis.FieldError {
-	return nil
+	return s.Spec.Auth.Validate(ctx)
 }

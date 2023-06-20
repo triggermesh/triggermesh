@@ -75,18 +75,12 @@ func (s *AWSSQSSource) AsEventSource() string {
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *AWSSQSSource) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.EksIAMRole != nil
+	return s.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (s *AWSSQSSource) ServiceAccountOptions() []resource.ServiceAccountOption {
-	var saOpts []resource.ServiceAccountOption
-
-	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
-	}
-
-	return saOpts
+	return s.Spec.Auth.ServiceAccountOptions()
 }
 
 // GetAdapterOverrides implements AdapterConfigurable.
@@ -100,5 +94,5 @@ func (s *AWSSQSSource) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (s *AWSSQSSource) Validate(ctx context.Context) *apis.FieldError {
-	return nil
+	return s.Spec.Auth.Validate(ctx)
 }

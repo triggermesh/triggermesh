@@ -17,9 +17,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 const annotationGcpSA = "iam.gke.io/gcp-service-account"
