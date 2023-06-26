@@ -197,8 +197,11 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 		if result := h.ceClient.Send(ctx, event); !cloudevents.IsACK(result) {
 			h.handleError(fmt.Errorf("could not send Cloud Event: %w", result), http.StatusInternalServerError, w)
 		}
-
-		w.WriteHeader(http.StatusOK)
+		if event.Data() != nil {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
