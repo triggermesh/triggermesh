@@ -294,6 +294,7 @@ func (a *adapter) Start(ctx context.Context) error {
 					defer func() { <-concurrencyLimiter }()
 					if err := a.handleMessage(ctx, msg); err != nil {
 						errChan <- fmt.Errorf("error handling message: %w", err)
+						return
 					}
 					if err := a.msgRcvr.CompleteMessage(ctx, m, nil); err != nil {
 						errChan <- fmt.Errorf("error completing message: %w", err)
