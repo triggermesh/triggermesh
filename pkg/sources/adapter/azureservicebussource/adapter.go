@@ -24,6 +24,8 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
+	"sync"
 
 	"github.com/devigned/tab"
 	"go.uber.org/zap"
@@ -76,6 +78,10 @@ type envConfig struct {
 	// WebSocketsEnable.
 	WebSocketsEnable bool `envconfig:"SERVICEBUS_WEBSOCKETS_ENABLE" default:"false"`
 
+	// MaxConcurrent is the maximum number of goroutines that
+	// will be used to process messages.
+	MaxConcurrent int `envconfig:"SERVICEBUS_MAX_CONCURRENT" default:"10"`
+
 	// The environment variables below aren't read from the envConfig struct
 	// by the Service Bus SDK, but rather directly using os.Getenv().
 	// They are nevertheless listed here for documentation purposes.
@@ -89,12 +95,14 @@ type envConfig struct {
 
 // adapter implements the source's adapter.
 type adapter struct {
-	mt *pkgadapter.MetricTag
+	logger *zap.SugaredLogger
+	mt     *pkgadapter.MetricTag
 
 	msgRcvr  *azservicebus.Receiver
 	ceClient cloudevents.Client
 
-	msgPrcsr MessageProcessor
+	msgPrcsr      MessageProcessor
+	maxConcurrent int
 }
 
 // NewEnvConfig satisfies pkgadapter.EnvConfigConstructor.
@@ -154,12 +162,14 @@ func NewAdapter(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClie
 	tab.Register(trace.NewNoOpTracerWithLogger(logger))
 
 	return &adapter{
-		mt: mt,
+		logger: logger,
+		mt:     mt,
 
 		ceClient: ceClient,
 
-		msgRcvr:  rcvr,
-		msgPrcsr: msgPrcsr,
+		msgRcvr:       rcvr,
+		msgPrcsr:      msgPrcsr,
+		maxConcurrent: env.MaxConcurrent,
 	}
 }
 
@@ -260,39 +270,127 @@ func connectionStringFromEnvironment(namespace, entityPath string) string {
 //	Both (DataAction):
 //	- Microsoft.ServiceBus/namespaces/messages/receive/action
 func (a *adapter) Start(ctx context.Context) error {
-	const maxMessages = 100
 	logging.FromContext(ctx).Info("Listening for messages")
-
 	ctx = pkgadapter.ContextWithMetricTag(ctx, a.mt)
 
-loop:
-	for {
-		select {
-		case <-ctx.Done():
-			break loop
-		default:
-			messages, err := a.msgRcvr.ReceiveMessages(ctx, maxMessages, nil)
-			if err != nil {
-				return fmt.Errorf("error receiving messages: %w", err)
-			}
-			for _, m := range messages {
-				msg, err := toMessage(m)
-				if err != nil {
-					return fmt.Errorf("error transforming message: %w", err)
-				}
+	// We might need to cancel the context to make routines
+	// exit if an error occurs at any of them.
+	cctx, cancel := context.WithCancel(ctx)
 
-				if err := a.handleMessage(ctx, msg); err != nil {
-					return fmt.Errorf("error processing message: %w", err)
-				}
+	// Waitgroup makes sure all routines have finished before
+	// returning from start.
+	wg := &sync.WaitGroup{}
 
-				if err := a.msgRcvr.CompleteMessage(ctx, m, nil); err != nil {
-					return fmt.Errorf("error completing message: %w", err)
-				}
-			}
-		}
+	// We are communicating with routines via channels.
+	// Create errChan with capacity to deal with the worst case,
+	// which would be one error returned from every routine.
+	errChan := make(chan error, a.maxConcurrent)
+	msgChan := make(chan *fullMessage)
+
+	// Launch maxConcurrent consumers
+	for i := 0; i < a.maxConcurrent; i++ {
+		wg.Add(1)
+		go func() {
+			a.consume(cctx, msgChan, errChan)
+			wg.Done()
+		}()
+	}
+
+	// Launch one producer.
+	wg.Add(1)
+	go func() {
+		a.produce(cctx, msgChan, errChan)
+		wg.Done()
+	}()
+
+	// This variable store all errors returned from routines.
+	errs := []string{}
+
+	// Wait for either context done or an error from any routine.
+	select {
+	case <-cctx.Done():
+	case err := <-errChan:
+		// If an error occurs, write it at the errors store, we
+		// will
+		// errs = append(errs, err)
+		errs = append(errs, err.Error())
+
+	}
+
+	// cancel the context to bring all routines to an end.
+	cancel()
+
+	// Wait for all routines to exit. If routines fail while exiting
+	// they will write to the errChan, which has capacity to store
+	// an error per routine without blocking.
+	wg.Wait()
+
+	// Gather and sumarize errors from routines
+	for err := range errChan {
+		// errs = append(errs, err)
+		errs = append(errs, err.Error())
+
+	}
+
+	// If there are errors, return them as a single error.
+	if len(errs) > 0 {
+		return errors.New(strings.Join(errs, ". "))
 	}
 
 	return nil
+}
+
+// convenience structure for message processing.
+type fullMessage struct {
+	received     *azservicebus.ReceivedMessage
+	serializable *Message
+}
+
+func (a *adapter) produce(ctx context.Context, msgChan chan *fullMessage, errChan chan error) {
+	const maxMessages = 100
+
+	for {
+		messages, err := a.msgRcvr.ReceiveMessages(ctx, maxMessages, nil)
+
+		switch {
+		case err == nil:
+			for _, m := range messages {
+				msg, err := toMessage(m)
+				if err != nil {
+					errChan <- fmt.Errorf("error transforming message: %w", err)
+					return
+				}
+
+				msgChan <- &fullMessage{
+					received:     m,
+					serializable: msg,
+				}
+			}
+		case errors.Is(err, context.Canceled):
+			return
+		default:
+			errChan <- fmt.Errorf("error receiving messages: %w", err)
+			return
+		}
+	}
+}
+
+func (a *adapter) consume(ctx context.Context, msgChan chan *fullMessage, errChan chan error) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case fm := <-msgChan:
+			if err := a.handleMessage(ctx, fm.serializable); err != nil {
+				errChan <- fmt.Errorf("error handling message: %w", err)
+				return
+			}
+			if err := a.msgRcvr.CompleteMessage(ctx, fm.received, nil); err != nil {
+				errChan <- fmt.Errorf("error completing message: %w", err)
+				return
+			}
+		}
+	}
 }
 
 // handleMessage handles a single Service Bus message.

@@ -67,6 +67,7 @@ type AzureServiceBusTargetSpec struct {
 	WebSocketsEnable *bool `json:"webSocketsEnable,omitempty"`
 
 	// EventOptions for targets
+	// +optional
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`
 
 	DiscardCEContext bool `json:"discardCloudEventContext"`

@@ -71,6 +71,10 @@ type AzureServiceBusSourceSpec struct {
 	// +optional
 	WebSocketsEnable *bool `json:"webSocketsEnable,omitempty"`
 
+	// MaxConcurrent
+	// +optional
+	MaxConcurrent *int `json:"maxConcurrent,omitempty"`
+
 	// Adapter spec overrides parameters.
 	// +optional
 	AdapterOverrides *v1alpha1.AdapterOverrides `json:"adapterOverrides,omitempty"`

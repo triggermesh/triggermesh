@@ -2302,6 +2302,11 @@ func (in *AzureServiceBusSourceSpec) DeepCopyInto(out *AzureServiceBusSourceSpec
 		*out = new(bool)
 		**out = **in
 	}
+	if in.MaxConcurrent != nil {
+		in, out := &in.MaxConcurrent, &out.MaxConcurrent
+		*out = new(int)
+		**out = **in
+	}
 	if in.AdapterOverrides != nil {
 		in, out := &in.AdapterOverrides, &out.AdapterOverrides
 		*out = new(commonv1alpha1.AdapterOverrides)
