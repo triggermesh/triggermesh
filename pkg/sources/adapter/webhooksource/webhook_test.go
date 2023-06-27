@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
 
 	zapt "go.uber.org/zap/zaptest"
@@ -162,10 +164,10 @@ func TestWebhookEvent(t *testing.T) {
 
 	for name, c := range tc {
 		t.Run(name, func(t *testing.T) {
-			ceClient, chEvent := cloudeventst.NewMockSenderClient(t, 1,
-				cloudevents.WithTimeNow(), cloudevents.WithUUIDs(),
-			)
-
+			replierFn := func(inMessage event.Event) (*event.Event, protocol.Result) {
+				return &inMessage, nil
+			}
+			ceClient, chEvent := cloudeventst.NewMockRequesterClient(t, 1, replierFn, cloudevents.WithTimeNow(), cloudevents.WithUUIDs())
 			handler := &webhookHandler{
 				eventType:   tEventType,
 				eventSource: tEventSource,
@@ -199,7 +201,6 @@ func TestWebhookEvent(t *testing.T) {
 
 			assert.Equal(t, c.expectedCode, rr.Code, "unexpected response code")
 			assert.Contains(t, rr.Body.String(), c.expectedResponseContains, "could not find expected response")
-
 			if c.expectedEventData != "" {
 				select {
 				case event := <-chEvent:
