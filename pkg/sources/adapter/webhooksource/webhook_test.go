@@ -167,8 +167,7 @@ func TestWebhookEvent(t *testing.T) {
 		},
 
 		"empty response": {
-			body: read("arbitrary message"),
-
+			body:          read("arbitrary message"),
 			responseEvent: newEvent(""),
 
 			expectedCode:       http.StatusNoContent,
