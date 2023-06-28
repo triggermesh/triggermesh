@@ -108,9 +108,8 @@ import (
 func main() {
 	ctx := signals.NewContext()
 
-	ns := os.Getenv("WORKING_NAMESPACE")
-	if len(ns) != 0 {
-		ctx = injection.WithNamespaceScope(ctx, ns)
+	if namespace, set := os.LookupEnv("WORKING_NAMESPACE"); set {
+		ctx = injection.WithNamespaceScope(ctx, namespace)
 	}
 
 	sharedmain.MainWithContext(ctx, "triggermesh-controller",
