@@ -37,9 +37,11 @@ import (
 )
 
 const (
-	tEventType   = "testType"
-	tEventSource = "testSource"
-	tHost        = "test-host"
+	tEventType           = "testType"
+	tEventSource         = "testSource"
+	tHost                = "test-host"
+	tResponseEventType   = "testRespType"
+	tResponseEventSource = "testRespSource"
 )
 
 var (
@@ -66,6 +68,8 @@ func TestWebhookEvent(t *testing.T) {
 		expectedResponseContains string
 		expectedEventData        string
 		expectedExtensions       map[string]interface{}
+		responseResult           protocol.Result
+		responseEvent            *event.Event
 	}{
 		"nil body": {
 			body: nil,
@@ -149,6 +153,7 @@ func TestWebhookEvent(t *testing.T) {
 				"hk2": "v2",
 			}),
 		},
+
 		"extra queries": {
 			body:  read("arbitrary message"),
 			query: "?k1=v1&k2=v2",
@@ -160,12 +165,33 @@ func TestWebhookEvent(t *testing.T) {
 				"qk2": "v2",
 			}),
 		},
+
+		"empty response": {
+			body: read("arbitrary message"),
+
+			responseEvent: newEvent(""),
+
+			expectedCode:       http.StatusNoContent,
+			expectedEventData:  "arbitrary message",
+			expectedExtensions: expectedExtensionsBase,
+		},
 	}
 
 	for name, c := range tc {
 		t.Run(name, func(t *testing.T) {
 			replierFn := func(inMessage event.Event) (*event.Event, protocol.Result) {
-				return &inMessage, nil
+				// If the test case does not define a response event use a default one
+				e := c.responseEvent
+				if e == nil {
+					e = newEvent(`{"test":"default"}`)
+				}
+
+				// If the test case does not define a result return ACK
+				r := c.responseResult
+				if r == nil {
+					r = protocol.ResultACK
+				}
+				return e, r
 			}
 			ceClient, chEvent := cloudeventst.NewMockRequesterClient(t, 1, replierFn, cloudevents.WithTimeNow(), cloudevents.WithUUIDs())
 			handler := &webhookHandler{
@@ -277,4 +303,16 @@ func expectedExtensions(extensions map[string]string) map[string]interface{} {
 		ee[k] = v
 	}
 	return ee
+}
+
+func newEvent(body string) *event.Event {
+	e := event.New(event.CloudEventsVersionV1)
+	e.SetType(tResponseEventType)
+	e.SetSource(tResponseEventSource)
+
+	if body != "" {
+		e.SetData("text/json", body)
+	}
+
+	return &e
 }
