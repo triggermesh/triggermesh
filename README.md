@@ -33,6 +33,22 @@ Deploy the platform:
 kubectl apply -f https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh.yaml
 ```
 
+### Namespaced installation
+
+By default, TriggerMesh works with resources across all namespaces in the Kubernetes cluster. This requires permissions provided by ClusterRoles and ClusterRoleBindings. If cluster-wide permissions are not desired, TriggerMesh can be configured to run in a single namespace. To get the namespace-scoped installation, first, deploy the CRDs:
+
+```shell
+kubectl apply -f https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh-crds.yaml
+```
+
+And then, using kubectl's "kustomization" feature, install customized manifests:
+
+ ```shell
+ kubectl apply -k config/kustomization/namespaced/
+ ```
+
+Controllers created with this command won't reconcile resources outside the `triggermesh` namespace, ClusterRoleBindings will have the namespace scope.
+
 ## Contributing
 
 Please refer to our [guidelines for contributors](CONTRIBUTING.md).
