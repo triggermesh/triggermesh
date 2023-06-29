@@ -25,6 +25,10 @@ patches:
     labelSelector: "app.kubernetes.io/part-of=triggermesh"
   patch: |-
 
+    - op: replace
+      path: /kind
+      value: RoleBinding
+
     - op: add
       path: /metadata/namespace
       value: triggermesh
