@@ -310,7 +310,9 @@ func newEvent(body string) *event.Event {
 	e.SetSource(tResponseEventSource)
 
 	if body != "" {
-		e.SetData("text/json", body)
+		if err := e.SetData("text/json", body); err != nil {
+			panic(err)
+		}
 	}
 
 	return &e
