@@ -199,7 +199,7 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 			h.handleError(fmt.Errorf("could not send Cloud Event: %w", result), http.StatusInternalServerError, w)
 			return
 		}
-		if rEvent.Data() == nil {
+		if rEvent == nil || rEvent.Data() == nil {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
