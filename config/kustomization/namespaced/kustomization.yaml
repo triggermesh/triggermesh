@@ -16,13 +16,14 @@
 # directory, so we use the Github project as a remote base.
 resources:
 - https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh.yaml
+- webhook-rbac.yaml
 
 namespace: triggermesh
 
 patches:
 - target:
     kind: ClusterRoleBinding
-    labelSelector: "app.kubernetes.io/part-of=triggermesh"
+    labelSelector: "app.kubernetes.io/part-of=triggermesh, app.kubernetes.io/scope!=cluster"
   patch: |-
 
     - op: replace
@@ -32,6 +33,14 @@ patches:
     - op: add
       path: /metadata/namespace
       value: triggermesh
+
+- target:
+    kind: ClusterRole
+    name: triggermesh-webhook
+  patch: |-
+
+    - op: remove
+      path: /rules/7
 
 - target:
     kind: Deployment
