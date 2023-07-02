@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/cloudevents/sdk-go/v2/protocol"
 	"github.com/stretchr/testify/assert"
 
 	zapt "go.uber.org/zap/zaptest"
@@ -35,9 +37,11 @@ import (
 )
 
 const (
-	tEventType   = "testType"
-	tEventSource = "testSource"
-	tHost        = "test-host"
+	tEventType           = "testType"
+	tEventSource         = "testSource"
+	tHost                = "test-host"
+	tResponseEventType   = "testRespType"
+	tResponseEventSource = "testRespSource"
 )
 
 var (
@@ -64,6 +68,8 @@ func TestWebhookEvent(t *testing.T) {
 		expectedResponseContains string
 		expectedEventData        string
 		expectedExtensions       map[string]interface{}
+		responseResult           protocol.Result
+		responseEvent            *event.Event
 	}{
 		"nil body": {
 			body: nil,
@@ -147,6 +153,7 @@ func TestWebhookEvent(t *testing.T) {
 				"hk2": "v2",
 			}),
 		},
+
 		"extra queries": {
 			body:  read("arbitrary message"),
 			query: "?k1=v1&k2=v2",
@@ -158,14 +165,34 @@ func TestWebhookEvent(t *testing.T) {
 				"qk2": "v2",
 			}),
 		},
+
+		"empty response": {
+			body:          read("arbitrary message"),
+			responseEvent: newEvent(""),
+
+			expectedCode:       http.StatusNoContent,
+			expectedEventData:  "arbitrary message",
+			expectedExtensions: expectedExtensionsBase,
+		},
 	}
 
 	for name, c := range tc {
 		t.Run(name, func(t *testing.T) {
-			ceClient, chEvent := cloudeventst.NewMockSenderClient(t, 1,
-				cloudevents.WithTimeNow(), cloudevents.WithUUIDs(),
-			)
+			replierFn := func(inMessage event.Event) (*event.Event, protocol.Result) {
+				// If the test case does not define a response event use a default one
+				e := c.responseEvent
+				if e == nil {
+					e = newEvent(`{"test":"default"}`)
+				}
 
+				// If the test case does not define a result return ACK
+				r := c.responseResult
+				if r == nil {
+					r = protocol.ResultACK
+				}
+				return e, r
+			}
+			ceClient, chEvent := cloudeventst.NewMockRequesterClient(t, 1, replierFn, cloudevents.WithTimeNow(), cloudevents.WithUUIDs())
 			handler := &webhookHandler{
 				eventType:   tEventType,
 				eventSource: tEventSource,
@@ -199,7 +226,6 @@ func TestWebhookEvent(t *testing.T) {
 
 			assert.Equal(t, c.expectedCode, rr.Code, "unexpected response code")
 			assert.Contains(t, rr.Body.String(), c.expectedResponseContains, "could not find expected response")
-
 			if c.expectedEventData != "" {
 				select {
 				case event := <-chEvent:
@@ -276,4 +302,18 @@ func expectedExtensions(extensions map[string]string) map[string]interface{} {
 		ee[k] = v
 	}
 	return ee
+}
+
+func newEvent(body string) *event.Event {
+	e := event.New(event.CloudEventsVersionV1)
+	e.SetType(tResponseEventType)
+	e.SetSource(tResponseEventSource)
+
+	if body != "" {
+		if err := e.SetData("text/json", body); err != nil {
+			panic(err)
+		}
+	}
+
+	return &e
 }
