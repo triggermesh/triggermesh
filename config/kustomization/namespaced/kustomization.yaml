@@ -16,6 +16,7 @@
 # directory, so we use the Github project as a remote base.
 resources:
 - https://github.com/triggermesh/triggermesh/releases/latest/download/triggermesh.yaml
+- controller-rbac.yaml
 - webhook-rbac.yaml
 
 namespace: triggermesh
