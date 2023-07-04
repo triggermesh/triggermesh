@@ -120,6 +120,7 @@ jobs:
 
         declare -a release_files=(
           triggermesh-crds.yaml
+          triggermesh-namespaced.yaml
           triggermesh.yaml
         )
 

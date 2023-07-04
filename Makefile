@@ -125,16 +125,24 @@ undeploy: ## Remove TriggerMesh stack from default Kubernetes cluster
 release: ## Publish container images and generate release manifests
 	@mkdir -p $(DIST_DIR)
 	$(KO) resolve -f config/ -l 'triggermesh.io/crd-install' > $(DIST_DIR)/triggermesh-crds.yaml
-	@cp config/namespace/100-namespace.yaml $(DIST_DIR)/triggermesh.yaml
+
 ifeq ($(shell echo ${IMAGE_TAG} | egrep "${TAG_REGEX}"),${IMAGE_TAG})
 	$(KO) resolve $(KOFLAGS) -B -t latest -f config/ -l '!triggermesh.io/crd-install' > /dev/null
 endif
+
+	# clusterscope manifests
+	@cp config/namespace/100-namespace.yaml $(DIST_DIR)/triggermesh.yaml
 	$(KO) resolve $(KOFLAGS) -B -t $(IMAGE_TAG) --tag-only -f config/ -l '!triggermesh.io/crd-install' >> $(DIST_DIR)/triggermesh.yaml
+
+	# namespaced manifests
+	@cp config/namespace/100-namespace.yaml $(DIST_DIR)/triggermesh-namespaced.yaml
+	$(KO) resolve $(KOFLAGS) -B -t $(IMAGE_TAG) --tag-only -f config/kustomization/namespaced/ -l '!triggermesh.io/crd-install' >> $(DIST_DIR)/triggermesh-namespaced.yaml
 
 	@for component in $(CUSTOM_BUILD_IMAGES); do \
 		$(MAKE) -C ./cmd/$$component build CONTEXT=$(BASE_DIR) IMAGE_TAG=$(KO_DOCKER_REPO)/$$component:$(IMAGE_TAG) && \
 		$(MAKE) -C ./cmd/$$component push IMAGE_TAG=$(KO_DOCKER_REPO)/$$component && \
 		$(SED) 's/'$$component':.*/'$$component':$(IMAGE_TAG)/g' $(DIST_DIR)/triggermesh.yaml || exit 1; \
+		$(SED) 's/'$$component':.*/'$$component':$(IMAGE_TAG)/g' $(DIST_DIR)/triggermesh-namespaced.yaml || exit 1; \
 	done
 
 ifeq ($(shell echo ${IMAGE_TAG} | egrep "${TAG_REGEX}"),${IMAGE_TAG})
@@ -146,7 +154,6 @@ endif
 
 gen-apidocs: ## Generate API docs
 	GOPATH="" OUTPUT_DIR=$(DOCS_OUTPUT_DIR) ./hack/gen-api-reference-docs.sh
-
 
 GOPKGS_LIST ?= $(filter-out $(GOPKGS_SKIP_TESTS), $(shell go list $(GOPKGS)))
 ifdef WITH_DEPENDENCIES
@@ -189,7 +196,7 @@ clean: ## Clean build artifacts
 	@for bin in $(COMMANDS) ; do \
 		$(RM) -v $(BIN_OUTPUT_DIR)/$$bin; \
 	done
-	@$(RM) -v $(DIST_DIR)/triggermesh-crds.yaml $(DIST_DIR)/triggermesh.yaml
+	@$(RM) -v $(DIST_DIR)/triggermesh-crds.yaml $(DIST_DIR)/triggermesh-namespaced.yaml $(DIST_DIR)/triggermesh.yaml
 	@$(RM) -v $(TEST_OUTPUT_DIR)/$(KREPO)-c.out $(TEST_OUTPUT_DIR)/$(KREPO)-unit-tests.xml
 	@$(RM) -v $(COVER_OUTPUT_DIR)/$(KREPO)-coverage.html
 
