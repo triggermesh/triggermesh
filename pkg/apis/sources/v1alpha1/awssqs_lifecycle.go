@@ -94,5 +94,9 @@ func (s *AWSSQSSource) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (s *AWSSQSSource) Validate(ctx context.Context) *apis.FieldError {
+	// Do not validate authentication object in case of resource deletion
+	if s.DeletionTimestamp != nil {
+		return nil
+	}
 	return s.Spec.Auth.Validate(ctx)
 }

@@ -133,5 +133,9 @@ func (s *AWSEventBridgeSource) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (s *AWSEventBridgeSource) Validate(ctx context.Context) *apis.FieldError {
+	// Do not validate authentication object in case of resource deletion
+	if s.DeletionTimestamp != nil {
+		return nil
+	}
 	return s.Spec.Auth.Validate(ctx)
 }

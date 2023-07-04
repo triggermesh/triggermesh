@@ -171,6 +171,7 @@ spec:
                         type: string
                 oneOf:
                 - required: [credentials]
+                - required: [iamRole]
                 - required: [iam]
               region:
                 description: Code of the AWS region to use for the Comprehend API. Available region codes are documented in

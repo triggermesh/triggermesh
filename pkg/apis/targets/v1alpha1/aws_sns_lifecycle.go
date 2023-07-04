@@ -72,5 +72,9 @@ func (t *AWSSNSTarget) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (t *AWSSNSTarget) Validate(ctx context.Context) *apis.FieldError {
+	// Do not validate authentication object in case of resource deletion
+	if t.DeletionTimestamp != nil {
+		return nil
+	}
 	return t.Spec.Auth.Validate(ctx)
 }

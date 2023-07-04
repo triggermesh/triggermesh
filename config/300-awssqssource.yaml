@@ -188,6 +188,7 @@ spec:
                         type: string
                 oneOf:
                 - required: [credentials]
+                - required: [iamRole]
                 - required: [iam]
               endpoint:
                 description: Customizations of the AWS REST API endpoint.

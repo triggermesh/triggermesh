@@ -235,6 +235,7 @@ spec:
                         type: string
                 oneOf:
                 - required: [credentials]
+                - required: [iamRole]
                 - required: [iam]
               sink:
                 description: The destination of events generated from Amazon CloudWatch metrics.

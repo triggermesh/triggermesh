@@ -171,6 +171,7 @@ spec:
                         type: string
                 oneOf:
                 - required: [credentials]
+                - required: [iamRole]
                 - required: [iam]
               arn:
                 type: string
