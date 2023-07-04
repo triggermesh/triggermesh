@@ -76,18 +76,12 @@ func (t *AWSDynamoDBTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (t *AWSDynamoDBTarget) WantsOwnServiceAccount() bool {
-	return t.Spec.Auth.EksIAMRole != nil
+	return t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (t *AWSDynamoDBTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
-	var saOpts []resource.ServiceAccountOption
-
-	if iamRole := t.Spec.Auth.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
-	}
-
-	return saOpts
+	return t.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable
@@ -96,5 +90,9 @@ func (t *AWSDynamoDBTarget) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (t *AWSDynamoDBTarget) Validate(ctx context.Context) *apis.FieldError {
-	return nil
+	// Do not validate authentication object in case of resource deletion
+	if t.DeletionTimestamp != nil {
+		return nil
+	}
+	return t.Spec.Auth.Validate(ctx)
 }

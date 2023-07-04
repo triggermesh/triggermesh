@@ -203,7 +203,9 @@ type sourceOption func(*v1alpha1.AWSSQSSource)
 
 // iamRole enables IAM role authentication.
 func iamRole(src *v1alpha1.AWSSQSSource) {
-	src.Spec.Auth.EksIAMRole = &tIAMRoleARN
+	src.Spec.Auth.IAM = &commonv1alpha1.EksIAM{
+		Role: &tIAMRoleARN,
+	}
 }
 
 // newReconciledAdapter returns a test receive adapter object that is identical

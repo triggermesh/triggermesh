@@ -90,7 +90,7 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 		if assumeRole := src.Spec.Auth.Credentials.AssumeIAMRole; assumeRole != nil {
 			config.Credentials = stscreds.NewCredentials(sess, assumeRole.String())
 		}
-	case src.Spec.Auth.EksIAMRole != nil:
+	case src.Spec.Auth.EksIAMRole != nil || src.Spec.Auth.IAM != nil:
 		sess = session.Must(session.NewSession(awscore.NewConfig().
 			WithRegion(defaultS3Region),
 		))
@@ -125,7 +125,7 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSS3Source) (Client, S
 			if assumeRole := src.Spec.Auth.Credentials.AssumeIAMRole; assumeRole != nil {
 				config.Credentials = stscreds.NewCredentials(sess, assumeRole.String())
 			}
-		} else if src.Spec.Auth.EksIAMRole != nil {
+		} else if src.Spec.Auth.EksIAMRole != nil || src.Spec.Auth.IAM != nil {
 			sess = session.Must(session.NewSession(awscore.NewConfig().
 				WithRegion(region),
 			))

@@ -65,7 +65,11 @@ func (s *AWSS3Source) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (s *AWSS3Source) Validate(ctx context.Context) *apis.FieldError {
-	return nil
+	// Do not validate authentication object in case of resource deletion
+	if s.DeletionTimestamp != nil {
+		return nil
+	}
+	return s.Spec.Auth.Validate(ctx)
 }
 
 // Supported event types (see AWSS3SourceSpec)
@@ -123,18 +127,12 @@ func (s *AWSS3Source) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *AWSS3Source) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.EksIAMRole != nil
+	return s.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (s *AWSS3Source) ServiceAccountOptions() []resource.ServiceAccountOption {
-	var saOpts []resource.ServiceAccountOption
-
-	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
-	}
-
-	return saOpts
+	return s.Spec.Auth.ServiceAccountOptions()
 }
 
 // Status conditions

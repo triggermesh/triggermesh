@@ -82,7 +82,7 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.AWSEventBridgeSource) (
 		if assumeRole := src.Spec.Auth.Credentials.AssumeIAMRole; assumeRole != nil {
 			config.Credentials = stscreds.NewCredentials(sess, assumeRole.String())
 		}
-	case src.Spec.Auth.EksIAMRole != nil:
+	case src.Spec.Auth.EksIAMRole != nil || src.Spec.Auth.IAM != nil:
 		sess = session.Must(session.NewSession(awscore.NewConfig().
 			WithRegion(src.Spec.ARN.Region),
 		))

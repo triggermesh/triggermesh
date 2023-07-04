@@ -80,18 +80,12 @@ func (s *AWSCognitoIdentitySource) GetAdapterOverrides() *v1alpha1.AdapterOverri
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *AWSCognitoIdentitySource) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.EksIAMRole != nil
+	return s.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (s *AWSCognitoIdentitySource) ServiceAccountOptions() []resource.ServiceAccountOption {
-	var saOpts []resource.ServiceAccountOption
-
-	if iamRole := s.Spec.Auth.EksIAMRole; iamRole != nil {
-		saOpts = append(saOpts, v1alpha1.AwsIamRoleAnnotation(*iamRole))
-	}
-
-	return saOpts
+	return s.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable
@@ -100,5 +94,9 @@ func (s *AWSCognitoIdentitySource) SetDefaults(ctx context.Context) {
 
 // Validate implements apis.Validatable
 func (s *AWSCognitoIdentitySource) Validate(ctx context.Context) *apis.FieldError {
-	return nil
+	// Do not validate authentication object in case of resource deletion
+	if s.DeletionTimestamp != nil {
+		return nil
+	}
+	return s.Spec.Auth.Validate(ctx)
 }
