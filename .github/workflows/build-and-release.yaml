@@ -71,13 +71,6 @@ jobs:
     - name: Installing ko
       run: go install github.com/google/ko@v0.11.2
 
-    - name: Login to Docker Hub
-      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-
     - name: Login to GCR
       uses: docker/login-action@v2
       with:
@@ -91,15 +84,6 @@ jobs:
         IMAGE_TAG=${GITHUB_SHA}
         [[ ${GITHUB_REF_TYPE} == "tag" ]] && IMAGE_TAG=${GITHUB_REF_NAME}
         echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_OUTPUT
-
-    - name: Publish container images to DockerHub
-      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-      env:
-        KO_DOCKER_REPO: docker.io/triggermesh
-        KOFLAGS: --jobs=2 --platform=linux/amd64,linux/arm64,linux/ppc64le --push=${{ github.event_name != 'pull_request' }}
-        DIST_DIR: /tmp/dist
-      run: |
-        IMAGE_TAG=${{ steps.image-tag.outputs.IMAGE_TAG }} make release
 
     - name: Publish container images to GCR
       env:
