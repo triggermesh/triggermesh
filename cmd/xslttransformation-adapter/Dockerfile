@@ -14,7 +14,7 @@
 
 # (!) Debian 11 'bullseye' must be used in both the builder and final image to
 # ensure the compatibility of the GNU libc.
-FROM golang:1.19-bullseye as builder
+FROM golang:1.20-bullseye as builder
 
 RUN set -eux; \
     apt-get update; \
