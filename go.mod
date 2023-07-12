@@ -1,6 +1,6 @@
 module github.com/triggermesh/triggermesh
 
-go 1.18
+go 1.20
 
 // Knative and CloudEvents are the common denominator to all TriggerMesh components.
 require (
