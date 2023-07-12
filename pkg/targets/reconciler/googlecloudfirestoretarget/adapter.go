@@ -29,6 +29,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const (
@@ -77,13 +78,10 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudFirestoreTarget) []corev1.EnvVar {
 		}, {
 			Name:  envDiscardCEContext,
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
-		}, {
-			Name: common.EnvGCloudSAKey,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.Credentials.SecretKeyRef,
-			},
 		},
 	}
+
+	env = append(env, reconciler.MakeGCPAuthEnvVars(o.Spec.Credentials, o.Spec.Auth)...)
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{

@@ -37,16 +37,21 @@ type GoogleCloudWorkflowsTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudWorkflowsTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudWorkflowsTarget)(nil)
-	_ v1alpha1.EventReceiver       = (*GoogleCloudWorkflowsTarget)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventReceiver          = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudWorkflowsTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudWorkflowsTarget)(nil)
 )
 
 // GoogleCloudWorkflowsTargetSpec defines the desired state of the event target.
 type GoogleCloudWorkflowsTargetSpec struct {
 	// GoogleCloudWorkflowsApiKey represents how GoogleCloudWorkflows credentials should be provided in the secret
-	Credentials SecretValueFromSource `json:"credentialsJson"`
+	// Deprecated, please use "auth" object.
+	Credentials *SecretValueFromSource `json:"credentialsJson,omitempty"`
+
+	// Authentication methods common for all GCP targets.
+	Auth *v1alpha1.GoogleCloudAuth `json:"auth,omitempty"`
 
 	// EventOptions for targets
 	EventOptions *EventOptions `json:"eventOptions,omitempty"`

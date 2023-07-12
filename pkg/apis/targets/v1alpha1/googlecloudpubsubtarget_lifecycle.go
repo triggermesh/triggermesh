@@ -25,6 +25,7 @@ import (
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 
 	"github.com/triggermesh/triggermesh/pkg/apis/common/v1alpha1"
+	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
 )
 
 // Managed event types
@@ -77,6 +78,16 @@ func (t *GoogleCloudPubSubTarget) AsEventSource() string {
 // GetAdapterOverrides implements AdapterConfigurable.
 func (t *GoogleCloudPubSubTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 	return t.Spec.AdapterOverrides
+}
+
+// WantsOwnServiceAccount implements ServiceAccountProvider.
+func (s *GoogleCloudPubSubTarget) WantsOwnServiceAccount() bool {
+	return s.Spec.Auth.WantsOwnServiceAccount()
+}
+
+// ServiceAccountOptions implements ServiceAccountProvider.
+func (s *GoogleCloudPubSubTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	return s.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable

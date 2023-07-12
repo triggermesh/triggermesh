@@ -29,6 +29,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const envEventsPayloadPolicy = "EVENTS_PAYLOAD_POLICY"
@@ -64,15 +65,12 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudStorageTarget) []corev1.EnvVar {
 			Name:  "GOOGLE_STORAGE_BUCKET_NAME",
 			Value: o.Spec.BucketName,
 		}, {
-			Name: common.EnvGCloudSAKey,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.Credentials.SecretKeyRef,
-			},
-		}, {
 			Name:  "GOOGLE_STORAGE_DISCARD_CE_CONTEXT",
 			Value: strconv.FormatBool(o.Spec.DiscardCEContext),
 		},
 	}
+
+	env = append(env, reconciler.MakeGCPAuthEnvVars(o.Spec.Credentials, o.Spec.Auth)...)
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{

@@ -67,12 +67,8 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudBillingSource) []corev1.EnvVar {
 
 	var envVar []corev1.EnvVar
 
-	saKeyRef := o.Spec.ServiceAccountKey
-	if o.Spec.Auth != nil && o.Spec.Auth.ServiceAccountKey != nil {
-		saKeyRef = o.Spec.Auth.ServiceAccountKey
-	}
-	if saKeyRef != nil {
-		envVar = common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *saKeyRef)
+	if o.Spec.Auth.ServiceAccountKey != nil {
+		envVar = common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *o.Spec.Auth.ServiceAccountKey)
 	}
 
 	return append(envVar, []corev1.EnvVar{

@@ -37,16 +37,21 @@ type GoogleCloudStorageTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudStorageTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudStorageTarget)(nil)
-	_ v1alpha1.EventReceiver       = (*GoogleCloudStorageTarget)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventReceiver          = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudStorageTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudStorageTarget)(nil)
 )
 
 // GoogleCloudStorageTargetSpec defines the desired state of the event target.
 type GoogleCloudStorageTargetSpec struct {
 	// Credentials represents how Google Storage credentials should be provided in the secret
-	Credentials SecretValueFromSource `json:"credentialsJson"`
+	// Deprecated, please use "auth" object.
+	Credentials *SecretValueFromSource `json:"credentialsJson,omitempty"`
+
+	// Authentication methods common for all GCP targets.
+	Auth *v1alpha1.GoogleCloudAuth `json:"auth,omitempty"`
 
 	// BucketName specifies the Google Storage Bucket
 	BucketName string `json:"bucketName"`

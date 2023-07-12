@@ -18,7 +18,8 @@ metadata:
   name: googlecloudstorage
 spec:
   bucketName: tmdemo
-  credentialsJson:
-    secretKeyRef:
-      name: googlecloudstorage
-      key: creds
+  auth:
+    serviceAccountKey:
+      valueFromSecret:
+        name: googlecloudstorage
+        key: creds

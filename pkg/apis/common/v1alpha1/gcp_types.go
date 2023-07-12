@@ -25,6 +25,22 @@ import (
 
 const annotationGcpSA = "iam.gke.io/gcp-service-account"
 
+// GoogleCloudAuth contains authentication related attributes.
+//
+// +k8s:deepcopy-gen=true
+type GoogleCloudAuth struct {
+	// Service account key in JSON format.
+	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
+	ServiceAccountKey *ValueFromField `json:"serviceAccountKey,omitempty"`
+
+	// GCP Service account for Workload Identity.
+	// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+	GCPServiceAccount *string `json:"gcpServiceAccount,omitempty"`
+
+	// Name of the kubernetes service account bound to the gcpServiceAccount to act as an IAM service account.
+	KubernetesServiceAccount *string `json:"kubernetesServiceAccount,omitempty"`
+}
+
 // GcpServiceAccountAnnotation returns a functional option that sets the GCP
 // Service Account annotation on Kubernetes ServiceAccount.
 func GcpServiceAccountAnnotation(gcpSA string) resource.ServiceAccountOption {
@@ -39,4 +55,21 @@ func K8sServiceAccountName(name string) resource.ServiceAccountOption {
 	return func(sa *corev1.ServiceAccount) {
 		sa.SetName(name)
 	}
+}
+
+// WantsOwnServiceAccount indicates wether the object requires its own SA.
+func (a *GoogleCloudAuth) WantsOwnServiceAccount() bool {
+	return a.GCPServiceAccount != nil
+}
+
+// ServiceAccountOptions is the set of mutations applied on the service account.
+func (a *GoogleCloudAuth) ServiceAccountOptions() []resource.ServiceAccountOption {
+	var saOpts []resource.ServiceAccountOption
+	if a.GCPServiceAccount != nil {
+		saOpts = append(saOpts, GcpServiceAccountAnnotation(*a.GCPServiceAccount))
+	}
+	if a.KubernetesServiceAccount != nil {
+		saOpts = append(saOpts, K8sServiceAccountName(*a.KubernetesServiceAccount))
+	}
+	return saOpts
 }

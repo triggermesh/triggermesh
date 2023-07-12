@@ -79,28 +79,6 @@ spec:
                 oneOf:
                 - required: [project]
                 - required: [topic]
-              serviceAccountKey:
-                description: Deprecated - please use spec.auth.serviceAccountKey. Service account key used to authenticate
-                  the event source and allow it to interact with Google Cloud APIs. Only the JSON format is supported.
-                type: object
-                properties:
-                  value:
-                    description: Literal value of the service account key.
-                    type: string
-                  valueFromSecret:
-                    description: A reference to a Kubernetes Secret object containing the service account key.
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      key:
-                        type: string
-                    required:
-                    - name
-                    - key
-                oneOf:
-                - required: [value]
-                - required: [valueFromSecret]
               auth:
                 description:
                 type: object
@@ -257,6 +235,7 @@ spec:
             - budgetId
             - pubsub
             - sink
+            - auth
           status:
             description: Reported status of the event source.
             type: object

@@ -18,7 +18,8 @@ metadata:
   name: googlecloudpubsub
 spec:
   topic: ''
-  credentialsJson:
-    secretKeyRef:
-      name: googlecloudpubsub
-      key: creds
+  auth:
+    serviceAccountKey:
+      valueFromSecret:
+        name: googlecloudpubsub
+        key: creds

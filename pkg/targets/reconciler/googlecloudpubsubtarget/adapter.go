@@ -29,6 +29,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const (
@@ -64,18 +65,13 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudPubSubTarget) []corev1.EnvVar {
 		{
 			Name:  "GCLOUD_PUBSUB_TOPIC",
 			Value: o.Spec.Topic.String(),
-		},
-		{
-			Name: common.EnvGCloudSAKey,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.ServiceAccountKey.SecretKeyRef,
-			},
-		},
-		{
+		}, {
 			Name:  envDiscardCEContext,
 			Value: strconv.FormatBool(o.Spec.DiscardCloudEventContext),
 		},
 	}
+
+	env = append(env, reconciler.MakeGCPAuthEnvVars(o.Spec.ServiceAccountKey, o.Spec.Auth)...)
 
 	if o.Spec.EventOptions != nil && o.Spec.EventOptions.PayloadPolicy != nil {
 		env = append(env, corev1.EnvVar{

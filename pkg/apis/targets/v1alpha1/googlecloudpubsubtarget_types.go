@@ -40,21 +40,25 @@ type GoogleCloudPubSubTarget struct {
 
 // Check the interfaces GoogleCloudPubSubTarget should be implementing.
 var (
-	_ runtime.Object     = (*GoogleCloudPubSubTarget)(nil)
-	_ kmeta.OwnerRefable = (*GoogleCloudPubSubTarget)(nil)
-	_ duckv1.KRShaped    = (*GoogleCloudPubSubTarget)(nil)
+	_ runtime.Object                  = (*GoogleCloudPubSubTarget)(nil)
+	_ kmeta.OwnerRefable              = (*GoogleCloudPubSubTarget)(nil)
+	_ duckv1.KRShaped                 = (*GoogleCloudPubSubTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudPubSubTarget)(nil)
 )
 
 // GoogleCloudPubSubTargetSpec holds the desired state of the event target.
 type GoogleCloudPubSubTargetSpec struct {
-
 	// Full resource name of the Pub/Sub topic to subscribe to, in the
 	// format "projects/{project_name}/topics/{topic_name}".
 	Topic GCloudResourceName `json:"topic"`
 
 	// Service account key in JSON format.
 	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-	ServiceAccountKey SecretValueFromSource `json:"credentialsJson"`
+	// Deprecated, please use "auth" object.
+	ServiceAccountKey *SecretValueFromSource `json:"credentialsJson,omitempty"`
+
+	// Authentication methods common for all GCP targets.
+	Auth *v1alpha1.GoogleCloudAuth `json:"auth,omitempty"`
 
 	// Adapter spec overrides parameters.
 	// +optional

@@ -27,6 +27,7 @@ import (
 	"github.com/triggermesh/triggermesh/pkg/apis/targets/v1alpha1"
 	common "github.com/triggermesh/triggermesh/pkg/reconciler"
 	"github.com/triggermesh/triggermesh/pkg/reconciler/resource"
+	"github.com/triggermesh/triggermesh/pkg/targets/reconciler"
 )
 
 const (
@@ -60,18 +61,15 @@ func (r *Reconciler) BuildAdapter(trg commonv1alpha1.Reconcilable, _ *apis.URL) 
 // MakeAppEnv extracts environment variables from the object.
 // Exported to be used in external tools for local test environments.
 func MakeAppEnv(o *v1alpha1.GoogleSheetTarget) []corev1.EnvVar {
-	return []corev1.EnvVar{
+	env := append([]corev1.EnvVar{
 		{
-			Name: common.EnvGCloudSAKey,
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: o.Spec.GoogleServiceAccount.SecretKeyRef,
-			},
-		}, {
 			Name:  envSheetID,
 			Value: o.Spec.ID,
 		}, {
 			Name:  envDefaultPrefix,
 			Value: o.Spec.DefaultPrefix,
 		},
-	}
+	}, reconciler.MakeGCPAuthEnvVars(o.Spec.GoogleServiceAccount, o.Spec.Auth)...)
+
+	return env
 }

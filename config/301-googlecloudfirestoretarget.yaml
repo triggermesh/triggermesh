@@ -82,8 +82,7 @@ spec:
                 type: boolean
               credentialsJson:
                 type: object
-                description: GCP credentials used to programmatically interact with Google Cloud Storage. For additional information,
-                  refer to https://cloud.google.com/docs/authentication/production.
+                description: Deprecated, please use spec.auth.serviceAccountKey object.
                 properties:
                   secretKeyRef:
                     type: object
@@ -92,6 +91,8 @@ spec:
                         type: string
                       name:
                         type: string
+                required:
+                - secretKeyRef
               eventOptions:
                 type: object
                 description: 'When should this target generate a response event for processing: always, on error, or never.'
@@ -187,10 +188,49 @@ spec:
                       Affinity require additional configuration for Knative-based deployments - https://knative.dev/docs/serving/configuration/feature-flags/
                     type: object
                     x-kubernetes-preserve-unknown-fields: true
+              auth:
+                description: Authentication options for Google Cloud Platform API.
+                type: object
+                properties:
+                  serviceAccountKey:
+                    description: Service account key used to authenticate the event source and allow it to interact with Google
+                      Cloud APIs. Only the JSON format is supported.
+                    type: object
+                    properties:
+                      value:
+                        description: Literal value of the service account key.
+                        type: string
+                      valueFromSecret:
+                        description: A reference to a Kubernetes Secret object containing the service account key.
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          key:
+                            type: string
+                        required:
+                        - name
+                        - key
+                    oneOf:
+                    - required: [value]
+                    - required: [valueFromSecret]
+                  gcpServiceAccount:
+                    description: GCP Service account name to impersonate Identity and Access Management (IAM) service accounts
+                      to access Google Cloud services.
+                    pattern: ^[a-z0-9-]{6,30}@[a-z0-9-]{1,30}(?:\.[a-z0-9-]{1,30})?\.gserviceaccount\.com$
+                    type: string
+                  kubernetesServiceAccount:
+                    description: The name of the Kubernetes Service account that will be created and bound to the gcpServiceAccount
+                      to act as an IAM service account. Optional, by default the Kubernetes service account name will be generated
+                      by the controller.
+                    type: string
+                oneOf:
+                - required: [serviceAccountKey]
+                - required: [gcpServiceAccount]
             required:
-            - credentialsJson
             - projectID
             - defaultCollection
+            - auth
           status:
             type: object
             properties:

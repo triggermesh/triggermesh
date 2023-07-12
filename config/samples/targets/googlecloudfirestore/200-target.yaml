@@ -20,7 +20,8 @@ spec:
   defaultCollection: ''
   projectID: ''
   discardCloudEventContext: true
-  credentialsJson:
-    secretKeyRef:
-      name: googlecloudfirestore
-      key: creds
+  auth:
+    serviceAccountKey:
+      valueFromSecret:
+        name: googlecloudfirestore
+        key: creds
