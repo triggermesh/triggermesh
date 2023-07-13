@@ -54,9 +54,12 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 		Name:          envAcc.GetName(),
 	}
 
-	psCli, err := pubsub.NewClient(ctx, env.TopicName.Project,
-		option.WithCredentialsJSON(env.ServiceAccountKey),
-	)
+	opts := make([]option.ClientOption, 0)
+	if env.ServiceAccountKey != nil {
+		opts = append(opts, option.WithCredentialsJSON(env.ServiceAccountKey))
+	}
+
+	psCli, err := pubsub.NewClient(ctx, env.TopicName.Project, opts...)
 	if err != nil {
 		logger.Panicw("Failed to create Google Cloud Pub/Sub API client", zap.Error(err))
 	}

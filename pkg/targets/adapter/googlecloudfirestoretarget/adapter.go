@@ -54,8 +54,13 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
+	opts := make([]option.ClientOption, 0)
+	if env.ServiceAccountKey != nil {
+		opts = append(opts, option.WithCredentialsJSON(env.ServiceAccountKey))
+	}
+
 	// Creates a client.
-	client, err := firestore.NewClient(ctx, env.ProjectID, option.WithCredentialsJSON([]byte(env.Credentials)))
+	client, err := firestore.NewClient(ctx, env.ProjectID, opts...)
 	if err != nil {
 		logger.Panicf("Failed to create client: %v", err)
 	}

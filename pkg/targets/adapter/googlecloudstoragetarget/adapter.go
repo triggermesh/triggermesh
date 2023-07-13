@@ -50,8 +50,13 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
+	opts := make([]option.ClientOption, 0)
+	if env.ServiceAccountKey != nil {
+		opts = append(opts, option.WithCredentialsJSON(env.ServiceAccountKey))
+	}
+
 	// Creates a client.
-	client, err := storage.NewClient(ctx, option.WithCredentialsJSON([]byte(env.Credentials)))
+	client, err := storage.NewClient(ctx, opts...)
 	if err != nil {
 		logger.Panicf("Failed to create client: %v", err)
 	}

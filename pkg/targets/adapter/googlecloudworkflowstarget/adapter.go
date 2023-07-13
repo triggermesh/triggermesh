@@ -52,12 +52,17 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
-	client, err := workflows.NewClient(ctx, option.WithCredentialsJSON([]byte(env.Credentials)))
+	opts := make([]option.ClientOption, 0)
+	if env.ServiceAccountKey != nil {
+		opts = append(opts, option.WithCredentialsJSON(env.ServiceAccountKey))
+	}
+
+	client, err := workflows.NewClient(ctx, opts...)
 	if err != nil {
 		logger.Panicf("Failed to create client: %v", err)
 	}
 
-	eClient, err := executions.NewClient(ctx, option.WithCredentialsJSON([]byte(env.Credentials)))
+	eClient, err := executions.NewClient(ctx, opts...)
 	if err != nil {
 		logger.Panicf("Failed to create client: %v", err)
 	}

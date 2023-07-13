@@ -65,13 +65,7 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudSourceRepositoriesSource) []corev1.EnvVar
 		subsName = sn.String()
 	}
 
-	var envVar []corev1.EnvVar
-
-	if o.Spec.Auth.ServiceAccountKey != nil {
-		envVar = common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *o.Spec.Auth.ServiceAccountKey)
-	}
-
-	return append(envVar, []corev1.EnvVar{
+	envVar := []corev1.EnvVar{
 		{
 			Name:  common.EnvGCloudPubSubSubscription,
 			Value: subsName,
@@ -85,6 +79,11 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudSourceRepositoriesSource) []corev1.EnvVar
 			Name:  adapter.EnvConfigCEOverrides,
 			Value: cloudevents.OverridesJSON(o.Spec.CloudEventOverrides),
 		},
-	}...,
-	)
+	}
+
+	if o.Spec.Auth.ServiceAccountKey != nil {
+		envVar = append(envVar, common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *o.Spec.Auth.ServiceAccountKey)...)
+	}
+
+	return envVar
 }

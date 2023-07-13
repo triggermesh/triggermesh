@@ -28,7 +28,7 @@ func EnvAccessorCtor() pkgadapter.EnvConfigAccessor {
 type envAccessor struct {
 	pkgadapter.EnvConfig
 	DefaultCollection string `envconfig:"GOOGLE_FIRESTORE_DEFAULT_COLLECTION" required:"true"`
-	Credentials       string `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
+	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"false"`
 	ProjectID         string `envconfig:"GOOGLE_FIRESTORE_PROJECT_ID" required:"true"`
 	DiscardCEContext  bool   `envconfig:"DISCARD_CE_CONTEXT"`
 	// CloudEvents responses parametrization
