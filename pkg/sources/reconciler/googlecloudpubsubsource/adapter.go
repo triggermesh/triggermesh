@@ -64,7 +64,7 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudPubSubSource) []corev1.EnvVar {
 		subsName = sn.String()
 	}
 
-	envVar := []corev1.EnvVar{corev1.EnvVar{
+	envVar := []corev1.EnvVar{{
 		Name:  common.EnvGCloudPubSubSubscription,
 		Value: subsName,
 	}}

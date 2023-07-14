@@ -97,13 +97,13 @@ func (t *GoogleCloudFirestoreTarget) GetAdapterOverrides() *v1alpha1.AdapterOver
 }
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
-func (s *GoogleCloudFirestoreTarget) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.WantsOwnServiceAccount()
+func (t *GoogleCloudFirestoreTarget) WantsOwnServiceAccount() bool {
+	return t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
-func (s *GoogleCloudFirestoreTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
-	return s.Spec.Auth.ServiceAccountOptions()
+func (t *GoogleCloudFirestoreTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	return t.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable

@@ -197,9 +197,6 @@ spec:
                       to act as an IAM service account. Optional, by default the Kubernetes service account name will be generated
                       by the controller.
                     type: string
-                oneOf:
-                - required: [serviceAccountKey]
-                - required: [gcpServiceAccount]
             required:
             - topic
             - auth

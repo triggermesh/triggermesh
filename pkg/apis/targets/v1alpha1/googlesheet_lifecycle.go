@@ -84,13 +84,13 @@ func (t *GoogleSheetTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrides {
 }
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
-func (s *GoogleSheetTarget) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.WantsOwnServiceAccount()
+func (t *GoogleSheetTarget) WantsOwnServiceAccount() bool {
+	return t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
-func (s *GoogleSheetTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
-	return s.Spec.Auth.ServiceAccountOptions()
+func (t *GoogleSheetTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	return t.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable

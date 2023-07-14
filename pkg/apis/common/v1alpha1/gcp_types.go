@@ -41,35 +41,27 @@ type GoogleCloudAuth struct {
 	KubernetesServiceAccount *string `json:"kubernetesServiceAccount,omitempty"`
 }
 
-// GcpServiceAccountAnnotation returns a functional option that sets the GCP
+// gcpSaAnnotation returns a functional option that sets the GCP
 // Service Account annotation on Kubernetes ServiceAccount.
-func GcpServiceAccountAnnotation(gcpSA string) resource.ServiceAccountOption {
+func gcpSaAnnotation(gcpSA string) resource.ServiceAccountOption {
 	return func(sa *corev1.ServiceAccount) {
 		metav1.SetMetaDataAnnotation(&sa.ObjectMeta, annotationGcpSA, gcpSA)
 	}
 }
 
-// K8sServiceAccountName returns a functional option that overwrites the
-// Kubernetes Service Account name.
-func K8sServiceAccountName(name string) resource.ServiceAccountOption {
-	return func(sa *corev1.ServiceAccount) {
-		sa.SetName(name)
-	}
-}
-
 // WantsOwnServiceAccount indicates wether the object requires its own SA.
 func (a *GoogleCloudAuth) WantsOwnServiceAccount() bool {
-	return a.GCPServiceAccount != nil
+	return a.GCPServiceAccount != nil || a.KubernetesServiceAccount != nil
 }
 
 // ServiceAccountOptions is the set of mutations applied on the service account.
 func (a *GoogleCloudAuth) ServiceAccountOptions() []resource.ServiceAccountOption {
 	var saOpts []resource.ServiceAccountOption
 	if a.GCPServiceAccount != nil {
-		saOpts = append(saOpts, GcpServiceAccountAnnotation(*a.GCPServiceAccount))
+		saOpts = append(saOpts, gcpSaAnnotation(*a.GCPServiceAccount))
 	}
 	if a.KubernetesServiceAccount != nil {
-		saOpts = append(saOpts, K8sServiceAccountName(*a.KubernetesServiceAccount))
+		saOpts = append(saOpts, saName(*a.KubernetesServiceAccount))
 	}
 	return saOpts
 }

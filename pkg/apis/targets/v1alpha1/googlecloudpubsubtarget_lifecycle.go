@@ -81,13 +81,13 @@ func (t *GoogleCloudPubSubTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrid
 }
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
-func (s *GoogleCloudPubSubTarget) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.WantsOwnServiceAccount()
+func (t *GoogleCloudPubSubTarget) WantsOwnServiceAccount() bool {
+	return t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
-func (s *GoogleCloudPubSubTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
-	return s.Spec.Auth.ServiceAccountOptions()
+func (t *GoogleCloudPubSubTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	return t.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable

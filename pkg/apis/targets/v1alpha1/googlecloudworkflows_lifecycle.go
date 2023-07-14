@@ -85,13 +85,13 @@ func (t *GoogleCloudWorkflowsTarget) GetAdapterOverrides() *v1alpha1.AdapterOver
 }
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
-func (s *GoogleCloudWorkflowsTarget) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth.WantsOwnServiceAccount()
+func (t *GoogleCloudWorkflowsTarget) WantsOwnServiceAccount() bool {
+	return t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
-func (s *GoogleCloudWorkflowsTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
-	return s.Spec.Auth.ServiceAccountOptions()
+func (t *GoogleCloudWorkflowsTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	return t.Spec.Auth.ServiceAccountOptions()
 }
 
 // SetDefaults implements apis.Defaultable
