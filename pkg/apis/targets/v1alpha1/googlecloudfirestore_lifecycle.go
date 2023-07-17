@@ -98,11 +98,14 @@ func (t *GoogleCloudFirestoreTarget) GetAdapterOverrides() *v1alpha1.AdapterOver
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (t *GoogleCloudFirestoreTarget) WantsOwnServiceAccount() bool {
-	return t.Spec.Auth.WantsOwnServiceAccount()
+	return t.Spec.Auth != nil && t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (t *GoogleCloudFirestoreTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	if t.Spec.Auth == nil {
+		return []resource.ServiceAccountOption{}
+	}
 	return t.Spec.Auth.ServiceAccountOptions()
 }
 

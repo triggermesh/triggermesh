@@ -82,11 +82,14 @@ func (t *GoogleCloudPubSubTarget) GetAdapterOverrides() *v1alpha1.AdapterOverrid
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (t *GoogleCloudPubSubTarget) WantsOwnServiceAccount() bool {
-	return t.Spec.Auth.WantsOwnServiceAccount()
+	return t.Spec.Auth != nil && t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (t *GoogleCloudPubSubTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	if t.Spec.Auth == nil {
+		return []resource.ServiceAccountOption{}
+	}
 	return t.Spec.Auth.ServiceAccountOptions()
 }
 

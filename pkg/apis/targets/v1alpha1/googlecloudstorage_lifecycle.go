@@ -87,11 +87,14 @@ func (t *GoogleCloudStorageTarget) GetAdapterOverrides() *v1alpha1.AdapterOverri
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (t *GoogleCloudStorageTarget) WantsOwnServiceAccount() bool {
-	return t.Spec.Auth.WantsOwnServiceAccount()
+	return t.Spec.Auth != nil && t.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (t *GoogleCloudStorageTarget) ServiceAccountOptions() []resource.ServiceAccountOption {
+	if t.Spec.Auth == nil {
+		return []resource.ServiceAccountOption{}
+	}
 	return t.Spec.Auth.ServiceAccountOptions()
 }
 
