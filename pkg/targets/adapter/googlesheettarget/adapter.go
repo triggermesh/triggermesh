@@ -54,7 +54,12 @@ func NewTarget(ctx context.Context, envAcc pkgadapter.EnvConfigAccessor, ceClien
 
 	env := envAcc.(*envAccessor)
 
-	sheetsService, err := sheets.NewService(ctx, option.WithCredentialsJSON([]byte(env.CredentialJSON)))
+	opts := make([]option.ClientOption, 0)
+	if env.ServiceAccountKey != nil {
+		opts = append(opts, option.WithCredentialsJSON(env.ServiceAccountKey))
+	}
+
+	sheetsService, err := sheets.NewService(ctx, opts...)
 	if err != nil {
 		logger.Fatalw("Error creating sheets client", zap.Error(err))
 	}

@@ -37,16 +37,21 @@ type GoogleSheetTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleSheetTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleSheetTarget)(nil)
-	_ v1alpha1.EventReceiver       = (*GoogleSheetTarget)(nil)
-	_ v1alpha1.EventSource         = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventReceiver          = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.EventSource            = (*GoogleSheetTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleSheetTarget)(nil)
 )
 
 // GoogleSheetTargetSpec defines the desired state of the event target.
 type GoogleSheetTargetSpec struct {
 	// GoogleSheet credential JSON for auth
-	GoogleServiceAccount SecretValueFromSource `json:"googleServiceAccount"`
+	// Deprecated, please use "auth" object.
+	GoogleServiceAccount *SecretValueFromSource `json:"googleServiceAccount"`
+
+	// Authentication methods common for all GCP targets.
+	Auth *v1alpha1.GoogleCloudAuth `json:"auth,omitempty"`
 
 	// ID of Google a spreadsheet
 	ID string `json:"id"`

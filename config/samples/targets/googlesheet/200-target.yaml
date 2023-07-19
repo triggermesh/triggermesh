@@ -22,7 +22,8 @@ spec:
   # Static prefix assignment for reciving CloudEvents without prior transformation.
   defaultPrefix: <Default Prefix>
   # These values should not change.
-  googleServiceAccount:
-    secretKeyRef:
-      name: googlesheet
-      key: credentials
+  auth:
+    serviceAccountKey:
+      valueFromSecret:
+        name: googlesheet
+        key: credentials

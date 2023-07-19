@@ -37,16 +37,21 @@ type GoogleCloudFirestoreTarget struct {
 
 // Check the interfaces the event target should be implementing.
 var (
-	_ v1alpha1.Reconcilable        = (*GoogleCloudFirestoreTarget)(nil)
-	_ v1alpha1.AdapterConfigurable = (*GoogleCloudFirestoreTarget)(nil)
-	_ v1alpha1.EventReceiver       = (*GoogleCloudFirestoreTarget)(nil)
-	_ v1alpha1.EventSource         = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.Reconcilable           = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.AdapterConfigurable    = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.EventReceiver          = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.EventSource            = (*GoogleCloudFirestoreTarget)(nil)
+	_ v1alpha1.ServiceAccountProvider = (*GoogleCloudFirestoreTarget)(nil)
 )
 
 // GoogleCloudFirestoreTargetSpec defines the desired state of the event target.
 type GoogleCloudFirestoreTargetSpec struct {
 	// Credentials represents how Google Firestore credentials should be provided in the secret
-	Credentials SecretValueFromSource `json:"credentialsJson"`
+	// Deprecated, please use "auth" object.
+	Credentials *SecretValueFromSource `json:"credentialsJson,omitempty"`
+
+	// Authentication methods common for all GCP targets.
+	Auth *v1alpha1.GoogleCloudAuth `json:"auth,omitempty"`
 
 	// DefaultCollection sets a default Firestore collection to select from
 	DefaultCollection string `json:"defaultCollection"`

@@ -31,7 +31,7 @@ type envAccessor struct {
 
 	TopicName googlecloudpubsubsource.GCloudResourceName `envconfig:"GCLOUD_PUBSUB_TOPIC" required:"true"`
 
-	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"true"`
+	ServiceAccountKey []byte `envconfig:"GCLOUD_SERVICEACCOUNT_KEY" required:"false"`
 
 	// BridgeIdentifier is the name of the bridge workflow this target is part of
 	BridgeIdentifier string `envconfig:"EVENTS_BRIDGE_IDENTIFIER"`

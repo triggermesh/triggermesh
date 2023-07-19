@@ -74,13 +74,8 @@ type GoogleCloudStorageSourceSpec struct {
 	// +optional
 	ObjectNamePrefix string `json:"objectNamePrefix,omitempty"`
 
-	// Service account key in JSON format.
-	// https://cloud.google.com/iam/docs/creating-managing-service-account-keys
-	// Deprecated, use Auth object instead.
-	ServiceAccountKey *v1alpha1.ValueFromField `json:"serviceAccountKey,omitempty"`
-
 	// Different authentication methods available in sources on GCP.
-	Auth *GoogleCloudSourceAuth `json:"auth,omitempty"`
+	Auth v1alpha1.GoogleCloudAuth `json:"auth"`
 
 	// Adapter spec overrides parameters.
 	// +optional

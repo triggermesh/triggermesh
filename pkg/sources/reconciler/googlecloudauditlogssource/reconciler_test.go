@@ -81,8 +81,10 @@ func newEventSource() *v1alpha1.GoogleCloudAuditLogsSource {
 			PubSub: v1alpha1.GoogleCloudSourcePubSubSpec{
 				Project: ptr.String("my-project"),
 			},
-			ServiceAccountKey: &commonv1alpha1.ValueFromField{
-				Value: "{}",
+			Auth: commonv1alpha1.GoogleCloudAuth{
+				ServiceAccountKey: &commonv1alpha1.ValueFromField{
+					Value: "{}",
+				},
 			},
 		},
 	}

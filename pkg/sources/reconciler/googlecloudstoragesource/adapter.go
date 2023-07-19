@@ -65,17 +65,7 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudStorageSource) []corev1.EnvVar {
 		subsName = sn.String()
 	}
 
-	var envVar []corev1.EnvVar
-
-	saKeyRef := o.Spec.ServiceAccountKey
-	if o.Spec.Auth != nil && o.Spec.Auth.ServiceAccountKey != nil {
-		saKeyRef = o.Spec.Auth.ServiceAccountKey
-	}
-	if saKeyRef != nil {
-		envVar = common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *saKeyRef)
-	}
-
-	return append(envVar, []corev1.EnvVar{
+	envVar := []corev1.EnvVar{
 		{
 			Name:  "GCLOUD_PUBSUB_MESSAGE_PROCESSOR",
 			Value: "gcs",
@@ -89,6 +79,11 @@ func MakeAppEnv(o *v1alpha1.GoogleCloudStorageSource) []corev1.EnvVar {
 			Name:  adapter.EnvConfigCEOverrides,
 			Value: cloudevents.OverridesJSON(o.Spec.CloudEventOverrides),
 		},
-	}...,
-	)
+	}
+
+	if o.Spec.Auth.ServiceAccountKey != nil {
+		envVar = append(envVar, common.MaybeAppendValueFromEnvVar([]corev1.EnvVar{}, common.EnvGCloudSAKey, *o.Spec.Auth.ServiceAccountKey)...)
+	}
+
+	return envVar
 }

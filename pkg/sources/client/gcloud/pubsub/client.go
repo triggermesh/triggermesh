@@ -58,12 +58,8 @@ func (g *ClientGetterWithSecretGetter) Get(src *v1alpha1.GoogleCloudPubSubSource
 	project := src.Spec.Topic.Project
 
 	creds := make([]option.ClientOption, 0)
-	saKeyRef := src.Spec.ServiceAccountKey
-	if src.Spec.Auth != nil && src.Spec.Auth.ServiceAccountKey != nil {
-		saKeyRef = src.Spec.Auth.ServiceAccountKey
-	}
-	if saKeyRef != nil {
-		requestedSecrets, err := secret.NewGetter(g.sg(src.Namespace)).Get(*saKeyRef)
+	if src.Spec.Auth.ServiceAccountKey != nil {
+		requestedSecrets, err := secret.NewGetter(g.sg(src.Namespace)).Get(*src.Spec.Auth.ServiceAccountKey)
 		if err != nil {
 			return nil, fmt.Errorf("retrieving Google Cloud service account key: %w", err)
 		}

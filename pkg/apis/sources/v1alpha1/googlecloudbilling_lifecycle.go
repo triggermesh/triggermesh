@@ -68,22 +68,12 @@ func (s *GoogleCloudBillingSource) GetAdapterOverrides() *v1alpha1.AdapterOverri
 
 // WantsOwnServiceAccount implements ServiceAccountProvider.
 func (s *GoogleCloudBillingSource) WantsOwnServiceAccount() bool {
-	return s.Spec.Auth != nil && s.Spec.Auth.GCPServiceAccount != nil
+	return s.Spec.Auth.WantsOwnServiceAccount()
 }
 
 // ServiceAccountOptions implements ServiceAccountProvider.
 func (s *GoogleCloudBillingSource) ServiceAccountOptions() []resource.ServiceAccountOption {
-	saOpts := []resource.ServiceAccountOption{}
-	if s.Spec.Auth == nil {
-		return saOpts
-	}
-	if gcpSA := s.Spec.Auth.GCPServiceAccount; gcpSA != nil {
-		saOpts = append(saOpts, v1alpha1.GcpServiceAccountAnnotation(*gcpSA))
-	}
-	if k8sSA := s.Spec.Auth.KubernetesServiceAccount; k8sSA != nil {
-		saOpts = append(saOpts, v1alpha1.K8sServiceAccountName(*k8sSA))
-	}
-	return saOpts
+	return s.Spec.Auth.ServiceAccountOptions()
 }
 
 // Supported event types
