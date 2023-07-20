@@ -61,7 +61,7 @@ const (
 	targetResource = "googlecloudstoragetargets"
 )
 
-const gcpCredentialsJosnSecretKey = "credentialsJson"
+const gcpServiceAccountKey = "serviceAccountKey"
 
 var _ = Describe("Google Cloud Storage target", func() {
 	// NOTE: bucket names aren't allowed to contain "goog"
@@ -293,7 +293,7 @@ var _ = Describe("Google Cloud Storage target", func() {
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(
-					"spec.credentialsJson: Required value"))
+					"spec.auth: Required value"))
 			})
 		})
 	})
@@ -335,15 +335,15 @@ func withDiscardCEContext() targetOption {
 
 func withCredentials(secretName string) targetOption {
 	credentials := map[string]interface{}{
-		"secretKeyRef": map[string]interface{}{
+		"valueFromSecret": map[string]interface{}{
 			"name": secretName,
-			"key":  gcpCredentialsJosnSecretKey,
+			"key":  gcpServiceAccountKey,
 		},
 	}
 
 	return func(trgt *unstructured.Unstructured) {
-		if err := unstructured.SetNestedMap(trgt.Object, credentials, "spec", gcpCredentialsJosnSecretKey); err != nil {
-			framework.FailfWithOffset(2, "Failed to set spec.credentialsJson field: %s", err)
+		if err := unstructured.SetNestedMap(trgt.Object, credentials, "spec", "auth", gcpServiceAccountKey); err != nil {
+			framework.FailfWithOffset(2, "Failed to set spec.auth.serviceAccountKey field: %s", err)
 		}
 	}
 }
@@ -356,7 +356,7 @@ func createGCPCredsSecret(c clientset.Interface, namespace string, creds string)
 			GenerateName: "gcp-creds-",
 		},
 		StringData: map[string]string{
-			gcpCredentialsJosnSecretKey: creds,
+			gcpServiceAccountKey: creds,
 		},
 	}
 
