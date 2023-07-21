@@ -211,7 +211,7 @@ var _ = Describe("Google Cloud Source Repositories source", func() {
 				)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring(
-					`"spec.serviceAccountKey" must validate one and only one schema (oneOf).`))
+					`"spec.auth.serviceAccountKey" must validate one and only one schema (oneOf).`))
 			})
 		})
 	})
@@ -263,8 +263,8 @@ func withServiceAccountKey(key string) sourceOption {
 	}
 
 	return func(src *unstructured.Unstructured) {
-		if err := unstructured.SetNestedMap(src.Object, svcAccKeyMap, "spec", "serviceAccountKey"); err != nil {
-			framework.FailfWithOffset(3, "Failed to set spec.serviceAccountKey field: %s", err)
+		if err := unstructured.SetNestedMap(src.Object, svcAccKeyMap, "spec", "auth", "serviceAccountKey"); err != nil {
+			framework.FailfWithOffset(3, "Failed to set spec.auth.serviceAccountKey field: %s", err)
 		}
 	}
 }
