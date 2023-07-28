@@ -56,7 +56,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
 	github.com/logzio/logzio-go v1.1.1-alpha
-	github.com/nukosuke/go-zendesk v0.14.2
+	github.com/nukosuke/go-zendesk v0.15.0
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.10
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
