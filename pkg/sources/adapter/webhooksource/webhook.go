@@ -176,6 +176,12 @@ func (h *webhookHandler) handleAll(ctx context.Context) http.HandlerFunc {
 						}
 						continue
 					}
+					if k == "Ce-Subject" {
+						if len(v) != 0 {
+							event.SetSubject(v[0])
+						}
+						continue
+					}
 
 					if len(v) == 1 {
 						event.SetExtension(sanitizeCloudEventAttributeName(headerPrefix+k), v[0])
