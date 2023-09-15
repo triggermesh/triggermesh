@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936
 	github.com/google/go-cmp v0.5.8
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.0
 	knative.dev/pkg v0.0.0-20220505013700-a8b7d99374a3
 )
 
