@@ -139,7 +139,8 @@ spec:
                 type: object
                 properties:
                   rules:
-                    description: The object key name prefix or suffix identifying one or more objects to which the filtering rule applies
+                    description: The object key name prefix or suffix identifying one or more objects to which the filtering
+                      rule applies
                     type: array
                     items:
                       type: object
