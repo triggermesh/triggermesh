@@ -45,7 +45,7 @@ type envAccessor struct {
 
 func (e *envAccessor) validate() error {
 	if !e.AllowXSLTOverride && e.XSLT == "" {
-		return errors.New("if XSLT cannot be overriden by CloudEvent payloads, configured XSLT cannot be empty")
+		return errors.New("if XSLT cannot be overridden by CloudEvent payloads, configured XSLT cannot be empty")
 	}
 	return nil
 }
