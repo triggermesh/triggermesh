@@ -139,7 +139,7 @@ func TestNewTarget(t *testing.T) {
 
 		"wrong configuration not providing XSLT": {
 			xslt:        "",
-			expectPanic: "if XSLT cannot be overriden by CloudEvent payloads, configured XSLT cannot be empty",
+			expectPanic: "if XSLT cannot be overridden by CloudEvent payloads, configured XSLT cannot be empty",
 		},
 	}
 
