@@ -51,7 +51,7 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/google/uuid v1.3.0
 	github.com/ibm-messaging/mq-golang/v5 v5.5.0
-	github.com/itchyny/gojq v0.12.11
+	github.com/itchyny/gojq v0.12.13
 	github.com/jarcoal/httpmock v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kevinburke/twilio-go v0.0.0-20200203063821-378e630e02da
@@ -178,7 +178,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
