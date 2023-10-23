@@ -67,6 +67,13 @@ type AWSS3SourceSpec struct {
 	// https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-how-to-event-types-and-destinations.html
 	EventTypes []string `json:"eventTypes"`
 
+	// The object key name prefix or suffix identifying one or more objects to which
+	// the filtering rule applies. The maximum length is 1,024 characters. Overlapping
+	// prefixes and suffixes are not supported. For more information, see Configuring
+	// Event Notifications (https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html)
+	// in the Amazon S3 User Guide.
+	Filter *AWSS3SourceFilter `json:"filter,omitempty"`
+
 	// The intermediate destination of notifications originating from the
 	// Amazon S3 bucket, before they are retrieved by this event source.
 	// If omitted, an Amazon SQS queue is automatically created and
@@ -111,4 +118,15 @@ type AWSS3SourceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AWSS3Source `json:"items"`
+}
+
+// AWSS3SourceFilterRule defines a notification filter rule for the event source.
+type AWSS3SourceFilterRule struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// AWSS3SourceFilter defines a notification filter for the event source.
+type AWSS3SourceFilter struct {
+	Rules []AWSS3SourceFilterRule `json:"rules,omitempty"`
 }

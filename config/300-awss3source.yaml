@@ -134,6 +134,23 @@ spec:
                         pattern: ^arn:aws(-cn|-us-gov)?:sqs:[a-z]{2}(-gov)?-[a-z]+-\d:\d{12}:.+$
                     required:
                     - queueARN
+              filter:
+                description: Object key name filtering for event notifications
+                type: object
+                properties:
+                  rules:
+                    description: The object key name prefix or suffix identifying one or more objects to which the filtering
+                      rule applies
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          description: name
+                          type: string
+                        value:
+                          description: value
+                          type: string
               auth:
                 description: Authentication method to interact with the Amazon S3 and SQS APIs.
                 type: object
