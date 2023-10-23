@@ -16,7 +16,7 @@ require (
 replace k8s.io/client-go => k8s.io/client-go v0.23.5
 
 require (
-	cloud.google.com/go/billing v1.17.0
+	cloud.google.com/go/billing v1.17.2
 	cloud.google.com/go/firestore v1.13.0
 	cloud.google.com/go/logging v1.8.1
 	cloud.google.com/go/pubsub v1.33.0
