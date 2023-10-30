@@ -16,7 +16,7 @@ require (
 replace k8s.io/client-go => k8s.io/client-go v0.23.5
 
 require (
-	cloud.google.com/go/billing v1.17.0
+	cloud.google.com/go/billing v1.17.3
 	cloud.google.com/go/firestore v1.13.0
 	cloud.google.com/go/logging v1.8.1
 	cloud.google.com/go/pubsub v1.33.0
@@ -76,7 +76,7 @@ require (
 	golang.org/x/oauth2 v0.13.0
 	google.golang.org/api v0.147.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20231002182017-d307bd883b97
-	google.golang.org/grpc v1.58.2
+	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 	k8s.io/api v0.23.9
 	k8s.io/apimachinery v0.23.9
