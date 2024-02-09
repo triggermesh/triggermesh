@@ -1,0 +1,118 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/event.json",
+    "title": "MongoDB Event",
+    "type": "object",
+    "properties": {
+      "specversion": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "source": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      },
+      "datacontenttype": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "object",
+            "properties": {
+              "_data": {
+                "type": "string"
+              }
+            },
+            "required": ["_data"]
+          },
+          "clusterTime": {
+            "type": "object",
+            "properties": {
+              "T": {
+                "type": "integer"
+              },
+              "I": {
+                "type": "integer"
+              }
+            },
+            "required": ["T", "I"]
+          },
+          "documentKey": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              }
+            },
+            "required": ["_id"]
+          },
+          "fullDocument": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "hello": {
+                "type": "string"
+              }
+            },
+            "required": ["_id"]
+          },
+          "ns": {
+            "type": "object",
+            "properties": {
+              "coll": {
+                "type": "string"
+              },
+              "db": {
+                "type": "string"
+              }
+            },
+            "required": ["coll", "db"]
+          },
+          "operationType": {
+            "type": "string"
+          },
+          "wallTime": {
+            "type": "string"
+          },
+          "updateDescription": {
+            "type": "object",
+            "properties": {
+              "removedFields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "truncatedArrays": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "updatedFields": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["removedFields", "truncatedArrays", "updatedFields"]
+          }
+        },
+        "required": ["_id", "clusterTime", "documentKey", "operationType", "wallTime"]
+      }
+    },
+    "required": ["specversion", "type", "source", "id", "time", "datacontenttype", "data"]
+  }
+  
