@@ -18,6 +18,7 @@ package kafkasource
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 
 	"github.com/Shopify/sarama"
@@ -39,6 +40,12 @@ func (a *kafkasourceAdapter) emitEvent(ctx context.Context, msg sarama.ConsumerM
 	event.SetSubject("kafka/event")
 	event.SetSource(msg.Topic)
 	event.SetID(string(msg.Key))
+
+	if len(msg.Value) > 5 && msg.Value[0] == 0 {
+		schemaId := binary.BigEndian.Uint32(msg.Value[1:5])
+		event.SetExtension("schemaId", schemaId)
+		msg.Value = msg.Value[5:]
+	}
 
 	if err := event.SetData(cloudevents.ApplicationJSON, msg.Value); err != nil {
 		return fmt.Errorf("failed to set event data: %w", err)
