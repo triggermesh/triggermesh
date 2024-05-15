@@ -87,3 +87,46 @@ func MakeAppEnv(o *v1alpha1.AWSSQSSource) []corev1.EnvVar {
 		Value: o.Spec.ARN.String(),
 	})
 }
+
+func customizeDeployment(d *appsv1.Deployment, typedSrc *v1alpha1.AWSSQSSource) *appsv1.Deployment {
+	d.Spec.Replicas = typedSrc.Spec.Replicas
+
+	nodeSelectorMap := map[string]string{}
+	for k, v := range typedSrc.Spec.NodeSelector {
+		nodeSelectorMap[k] = v
+	}
+
+	envVars := d.Spec.Template.Spec.Containers[0].Env
+
+	annotations := map[string]string{"sidecar.istio.io/inject": "true"}
+	for k, v := range typedSrc.Spec.Annotations {
+		annotations[k] = v
+	}
+
+	d.Spec.Template.Spec.NodeSelector = nodeSelectorMap
+	d.Spec.Template.Spec.Affinity = &typedSrc.Spec.Affinity
+	d.Spec.Template.Annotations = annotations
+
+	maxBatchSizeProvided := typedSrc.Spec.MaxBatchSize
+	if len(maxBatchSizeProvided) != 0 {
+		envVars = append(envVars, corev1.EnvVar{Name: "AWS_SQS_MAX_BATCH_SIZE", Value: maxBatchSizeProvided})
+	}
+
+	sendBatchedResponse := typedSrc.Spec.SendBatchedResponse
+	if len(sendBatchedResponse) != 0 {
+		envVars = append(envVars, corev1.EnvVar{Name: "AWS_SQS_SEND_BATCH_RESPONSE", Value: sendBatchedResponse})
+	}
+
+	onFailedPollWaitSecs := typedSrc.Spec.OnFailedPollWaitSecs
+	if len(onFailedPollWaitSecs) != 0 {
+		envVars = append(envVars, corev1.EnvVar{Name: "AWS_SQS_POLL_FAILED_WAIT_TIME", Value: onFailedPollWaitSecs})
+	}
+
+	waitTimeSeconds := typedSrc.Spec.WaitTimeSeconds
+	if len(waitTimeSeconds) != 0 {
+		envVars = append(envVars, corev1.EnvVar{Name: "AWS_SQS_WAIT_TIME_SECONDS", Value: waitTimeSeconds})
+	}
+	d.Spec.Template.Spec.Containers[0].Env = envVars
+
+	return d
+}
