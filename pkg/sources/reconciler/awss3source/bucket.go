@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -116,11 +117,22 @@ func EnsureNotificationsDisabled(ctx context.Context, cli s3iface.S3API) error {
 			"Error reading current event notifications configuration: %s", toErrMsg(err))
 	}
 
-	notifCfg = removeQueueConfiguration(notifCfg, sourceID(src))
+	// Check if the queue configuration exists in the bucket notification configuration.
+	notifCfgExists := false
+	for _, cfg := range notifCfg.QueueConfigurations {
+		if *cfg.Id == sourceID(src) {
+			notifCfgExists = true
+			break
+		}
+	}
 
-	if err := configureNotifications(ctx, cli, bucketARN.Resource, notifCfg); err != nil {
-		return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
-			"Error configuring event notifications: %s", toErrMsg(err)))
+	// If the queue configuration exists, remove it from the bucket notification configuration.
+	if notifCfgExists {
+		notifCfg = removeQueueConfiguration(notifCfg, sourceID(src))
+		if err := configureNotifications(ctx, cli, bucketARN.Resource, notifCfg); err != nil {
+			return fmt.Errorf("%w", reconciler.NewEvent(corev1.EventTypeWarning, ReasonFailedUnsubscribe,
+				"Error configuring event notifications: %s", toErrMsg(err)))
+		}
 	}
 
 	return reconciler.NewEvent(corev1.EventTypeNormal, ReasonUnsubscribed,
@@ -155,11 +167,28 @@ func configureNotifications(ctx context.Context, cli s3iface.S3API, bucket strin
 
 // makeQueueConfiguration returns a QueueConfiguration for the given source.
 func makeQueueConfiguration(src *v1alpha1.AWSS3Source, queueARN string) *s3.QueueConfiguration {
-	return &s3.QueueConfiguration{
+	queueConfiguration := &s3.QueueConfiguration{
 		Id:       aws.String(sourceID(src)),
 		Events:   aws.StringSlice(src.Spec.EventTypes),
 		QueueArn: &queueARN,
+		Filter:   nil,
 	}
+	// If a filter is specified, add it to the queue configuration.
+	if src.Spec.Filter != nil && len(src.Spec.Filter.Rules) > 0 {
+		filterRules := []*s3.FilterRule{}
+		for _, rule := range src.Spec.Filter.Rules {
+			filterRules = append(filterRules, &s3.FilterRule{
+				Name:  aws.String(rule.Name),
+				Value: aws.String(rule.Value),
+			})
+		}
+		queueConfiguration.Filter = &s3.NotificationConfigurationFilter{
+			Key: &s3.KeyFilter{
+				FilterRules: filterRules,
+			},
+		}
+	}
+	return queueConfiguration
 }
 
 // setQueueConfiguration sets/updates a QueueConfiguration in the given
@@ -174,7 +203,7 @@ func setQueueConfiguration(nCfg *s3.NotificationConfiguration, qCfg *s3.QueueCon
 		if *cfg.Id == *qCfg.Id {
 			isSet = true
 			nCfg.QueueConfigurations[i] = qCfg
-			hasUpdates = !equalEventTypes(qCfg.Events, cfg.Events)
+			hasUpdates = !equalEventTypes(qCfg.Events, cfg.Events) || !equalFilterRules(qCfg.Filter, cfg.Filter)
 			break
 		}
 	}
@@ -201,6 +230,34 @@ func equalEventTypes(a, b []*string) bool {
 
 	for i := range sortedA {
 		if sortedA[i] != *b[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+// equalFilterRules returns whether two lists of filter rules are semantically equal.
+// "b" must be the "current" state, which is expected to always be returned
+// while "a" is user-provided
+func equalFilterRules(a, b *s3.NotificationConfigurationFilter) bool {
+	if a == nil || b == nil {
+		return false
+	}
+
+	if len(a.Key.FilterRules) != len(b.Key.FilterRules) {
+		return false
+	}
+
+	for qCfgRule := range a.Key.FilterRules {
+		isEqual := false
+		for cfgRule := range b.Key.FilterRules {
+			if strings.EqualFold(*a.Key.FilterRules[qCfgRule].Name, *b.Key.FilterRules[cfgRule].Name) && *a.Key.FilterRules[qCfgRule].Value == *b.Key.FilterRules[cfgRule].Value {
+				isEqual = true
+				break
+			}
+		}
+		if !isEqual {
 			return false
 		}
 	}
