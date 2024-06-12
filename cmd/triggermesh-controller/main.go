@@ -143,6 +143,7 @@ func main() {
 		googlecloudstoragesource.NewController,
 		httppollersource.NewController,
 		ibmmqsource.NewController,
+		mongodbsource.NewController,
 		kafkasource.NewController,
 		mongodbsource.NewController,
 		ocimetricssource.NewController,

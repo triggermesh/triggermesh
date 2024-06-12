@@ -96,6 +96,8 @@ spec:
           value: ko://github.com/triggermesh/triggermesh/cmd/httppollersource-adapter
         - name: OCIMETRICSSOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/ocimetricssource-adapter
+        - name: MONGODBSOURCE_IMAGE
+          value: ko://github.com/triggermesh/triggermesh/cmd/mongodbsource-adapter
         - name: KAFKASOURCE_IMAGE
           value: ko://github.com/triggermesh/triggermesh/cmd/kafkasource-adapter
         - name: MONGODBSOURCE_IMAGE
